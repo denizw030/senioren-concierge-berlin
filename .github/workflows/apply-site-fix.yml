@@ -1,0 +1,39 @@
+name: Apply targeted site fix
+on:
+  push:
+    paths:
+      - '.github/workflows/apply-site-fix.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch only hero image and footer logo shape
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('index.html')
+          s=p.read_text()
+          s,n=re.subn(r'(<div class="heroR"><img src=")[^"]+(" alt="Senioren Concierge Berlin")', r'\1assets/hero-senioren.jpg\2', s, count=1)
+          if n != 1:
+              s,n2=re.subn(r'(<div class="hero-right"><img src=")[^"]+(" alt="Persönliche Unterstützung für Senioren")', r'\1assets/hero-senioren.jpg\2', s, count=1)
+              n += n2
+          if '.footbrand .emblem{width:82px;height:82px}' in s:
+              s=s.replace('.footbrand .emblem{width:82px;height:82px}', '.footbrand .emblem{width:82px;height:82px;border-radius:50%;object-fit:cover;overflow:hidden}', 1)
+          elif '.footbrand img:first-child{width:82px;height:82px;object-fit:contain}' in s:
+              s=s.replace('.footbrand img:first-child{width:82px;height:82px;object-fit:contain}', '.footbrand img:first-child{width:82px;height:82px;object-fit:cover;border-radius:50%;overflow:hidden}', 1)
+          if n != 1:
+              raise SystemExit('Hero image target not found exactly once')
+          p.write_text(s)
+          PY
+      - name: Commit targeted changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet && exit 0
+          git commit -m 'Hero-Bild einsetzen und Footer-Logo kreisförmig abgrenzen'
+          git push
