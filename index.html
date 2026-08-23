@@ -3,19 +3,494 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Senioren Concierge Berlin</title>
+  <meta name="description" content="Senioren Concierge Berlin – persönliche Unterstützung im Alltag, bei Technik, Organisation und digitalen Anliegen in Berlin.">
+  <meta name="theme-color" content="#0f0f10">
+  <title>Senioren Concierge Berlin | Persönliche Unterstützung im Alltag</title>
+  <style>
+    :root {
+      --black: #0f0f10;
+      --red: #c91f2b;
+      --red-dark: #9f1721;
+      --white: #ffffff;
+      --offwhite: #f7f6f3;
+      --gray: #646469;
+      --line: #e4e2dd;
+      --shadow: 0 18px 50px rgba(15, 15, 16, .09);
+      --radius: 24px;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--black);
+      background: var(--white);
+      line-height: 1.65;
+      font-size: 18px;
+    }
+    a { color: inherit; }
+    img { max-width: 100%; }
+    .wrap { width: min(var(--max), calc(100% - 40px)); margin: 0 auto; }
+
+    .topbar {
+      background: var(--black);
+      color: var(--white);
+      font-size: 15px;
+      text-align: center;
+      padding: 9px 20px;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255,255,255,.94);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(228,226,221,.9);
+    }
+    .nav {
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      text-decoration: none;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      line-height: 1.15;
+    }
+    .mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      background: var(--red);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      font-size: 20px;
+    }
+    nav { display: flex; gap: 26px; align-items: center; }
+    nav a { text-decoration: none; font-size: 16px; font-weight: 650; }
+    nav a:hover { color: var(--red); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 54px;
+      padding: 0 24px;
+      border-radius: 999px;
+      background: var(--red);
+      color: white;
+      text-decoration: none;
+      font-weight: 800;
+      border: 2px solid var(--red);
+      transition: .2s ease;
+    }
+    .btn:hover { background: var(--red-dark); border-color: var(--red-dark); transform: translateY(-1px); }
+    .btn.secondary { background: transparent; color: var(--black); border-color: var(--black); }
+    .btn.secondary:hover { background: var(--black); color: white; }
+
+    .hero {
+      padding: 92px 0 76px;
+      background:
+        radial-gradient(circle at 88% 16%, rgba(201,31,43,.13), transparent 28%),
+        linear-gradient(180deg, #fff 0%, #faf9f6 100%);
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.16fr .84fr;
+      align-items: center;
+      gap: 64px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      color: var(--red);
+      text-transform: uppercase;
+      letter-spacing: .11em;
+      font-size: 14px;
+      font-weight: 900;
+    }
+    .eyebrow::before { content: ""; width: 28px; height: 3px; background: var(--red); border-radius: 9px; }
+    h1 {
+      margin: 18px 0 22px;
+      font-size: clamp(46px, 6.6vw, 82px);
+      line-height: .99;
+      letter-spacing: -.055em;
+      max-width: 850px;
+    }
+    .hero .lead { font-size: clamp(20px, 2vw, 25px); color: #424246; max-width: 760px; margin: 0 0 32px; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; }
+    .trustline { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 18px 28px; font-size: 15px; font-weight: 700; color: #4d4d51; }
+    .trustline span::before { content: "✓"; color: var(--red); margin-right: 7px; font-weight: 900; }
+
+    .hero-card {
+      background: var(--black);
+      color: white;
+      padding: 34px;
+      border-radius: 34px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      width: 180px; height: 180px;
+      background: var(--red);
+      border-radius: 50%;
+      right: -80px; top: -80px;
+      opacity: .9;
+    }
+    .hero-card .number { font-size: 72px; font-weight: 900; line-height: 1; color: var(--red); letter-spacing: -.06em; }
+    .hero-card h2 { font-size: 28px; line-height: 1.15; margin: 12px 0 14px; max-width: 320px; }
+    .hero-card p { color: #cfcfd2; margin: 0; }
+
+    section { padding: 88px 0; }
+    .section-head { max-width: 760px; margin-bottom: 42px; }
+    .section-head h2 { font-size: clamp(36px, 5vw, 58px); line-height: 1.04; letter-spacing: -.045em; margin: 12px 0 16px; }
+    .section-head p { color: var(--gray); margin: 0; font-size: 20px; }
+
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 30px;
+      background: white;
+      min-height: 265px;
+      box-shadow: 0 10px 34px rgba(15,15,16,.04);
+    }
+    .icon {
+      width: 48px; height: 48px; border-radius: 15px;
+      display: grid; place-items: center;
+      background: rgba(201,31,43,.1);
+      color: var(--red);
+      font-weight: 900;
+      font-size: 21px;
+      margin-bottom: 22px;
+    }
+    .card h3 { margin: 0 0 10px; font-size: 23px; letter-spacing: -.025em; }
+    .card p { margin: 0; color: var(--gray); }
+
+    .dark { background: var(--black); color: white; }
+    .dark .section-head p { color: #b8b8bd; }
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+    .step { border-top: 1px solid #3b3b3f; padding-top: 26px; }
+    .step-no { color: var(--red); font-weight: 900; font-size: 15px; letter-spacing: .1em; }
+    .step h3 { font-size: 27px; margin: 10px 0 9px; }
+    .step p { color: #b8b8bd; margin: 0; }
+
+    .promise { background: var(--offwhite); }
+    .promise-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+    .quote {
+      background: white;
+      border-left: 5px solid var(--red);
+      padding: 34px;
+      border-radius: 0 var(--radius) var(--radius) 0;
+      box-shadow: var(--shadow);
+      font-size: 25px;
+      font-weight: 750;
+      letter-spacing: -.02em;
+    }
+    .checks { display: grid; gap: 18px; }
+    .check { display: grid; grid-template-columns: 34px 1fr; gap: 13px; align-items: start; }
+    .check b:first-child { color: var(--red); font-size: 21px; }
+    .check strong { display: block; margin-bottom: 3px; }
+    .check span { color: var(--gray); }
+
+    .plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: stretch; }
+    .plan { border: 1px solid var(--line); border-radius: var(--radius); padding: 30px; display: flex; flex-direction: column; }
+    .plan.featured { background: var(--black); color: white; border-color: var(--black); transform: translateY(-8px); box-shadow: var(--shadow); }
+    .tag { align-self: flex-start; background: rgba(201,31,43,.12); color: var(--red); padding: 6px 11px; border-radius: 999px; font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; }
+    .featured .tag { background: var(--red); color: white; }
+    .plan h3 { font-size: 28px; margin: 18px 0 6px; }
+    .plan p { color: var(--gray); margin-top: 0; }
+    .featured p { color: #b8b8bd; }
+    .plan ul { list-style: none; padding: 0; margin: 18px 0 28px; display: grid; gap: 10px; }
+    .plan li::before { content: "✓"; color: var(--red); font-weight: 900; margin-right: 9px; }
+    .plan .note { margin-top: auto; font-size: 14px; }
+
+    .faq { max-width: 900px; }
+    details { border-bottom: 1px solid var(--line); padding: 22px 0; }
+    summary { cursor: pointer; list-style: none; font-size: 21px; font-weight: 800; display: flex; justify-content: space-between; gap: 20px; }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; color: var(--red); font-size: 28px; line-height: 1; }
+    details[open] summary::after { content: "–"; }
+    details p { color: var(--gray); max-width: 760px; }
+
+    .contact-box {
+      background: var(--red);
+      color: white;
+      border-radius: 34px;
+      padding: 54px;
+      display: grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap: 38px;
+      align-items: center;
+    }
+    .contact-box h2 { margin: 0 0 12px; font-size: clamp(36px, 5vw, 58px); line-height: 1.02; letter-spacing: -.045em; }
+    .contact-box p { margin: 0; color: rgba(255,255,255,.85); font-size: 20px; }
+    .contact-box .btn { background: white; color: var(--black); border-color: white; justify-self: end; }
+    .contact-box .btn:hover { background: var(--black); color: white; border-color: var(--black); }
+
+    footer { padding: 42px 0; border-top: 1px solid var(--line); }
+    .footer-grid { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; align-items: center; }
+    footer p { margin: 0; color: var(--gray); font-size: 15px; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 18px; font-size: 15px; }
+
+    @media (max-width: 900px) {
+      nav a:not(.btn) { display: none; }
+      .hero { padding-top: 66px; }
+      .hero-grid, .promise-grid, .contact-box { grid-template-columns: 1fr; }
+      .cards, .steps, .plans { grid-template-columns: 1fr; }
+      .hero-card { max-width: 620px; }
+      .contact-box .btn { justify-self: start; }
+      .plan.featured { transform: none; }
+    }
+    @media (max-width: 560px) {
+      body { font-size: 17px; }
+      .wrap { width: min(var(--max), calc(100% - 28px)); }
+      .brand span:last-child { max-width: 170px; }
+      nav .btn { display: none; }
+      h1 { font-size: 48px; }
+      section { padding: 66px 0; }
+      .hero-card, .contact-box { padding: 28px; border-radius: 25px; }
+    }
+  </style>
 </head>
 <body>
-  <h1>Senioren Concierge Berlin</h1>
+  <div class="topbar">Persönliche Unterstützung für Senioren und Angehörige in Berlin</div>
 
-  <p>Persönlicher Service für Senioren und Angehörige in Berlin.</p>
+  <header>
+    <div class="wrap nav">
+      <a class="brand" href="#top" aria-label="Senioren Concierge Berlin Startseite">
+        <span class="mark">SC</span>
+        <span>Senioren Concierge Berlin</span>
+      </a>
+      <nav aria-label="Hauptnavigation">
+        <a href="#leistungen">Leistungen</a>
+        <a href="#ablauf">So funktioniert's</a>
+        <a href="#pakete">Pakete</a>
+        <a href="#faq">FAQ</a>
+        <a class="btn" href="#kontakt">Kontakt</a>
+      </nav>
+    </div>
+  </header>
 
-  <p>
-    <a href="datenschutz.html">Datenschutzerklärung</a>
-  </p>
+  <main id="top">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="eyebrow">Menschlichkeit zuerst</div>
+          <h1>Ein Ansprechpartner. Für alles, was im Alltag leichter werden darf.</h1>
+          <p class="lead">Persönliche Hilfe bei Organisation, Technik und alltäglichen Anliegen – verständlich, zuverlässig und ohne komplizierte Umwege.</p>
+          <div class="hero-actions">
+            <a class="btn" href="#kontakt">Unverbindlich kennenlernen</a>
+            <a class="btn secondary" href="#leistungen">Leistungen ansehen</a>
+          </div>
+          <div class="trustline">
+            <span>Persönlicher Ansprechpartner</span>
+            <span>Einfach erklärt</span>
+            <span>Berlin</span>
+          </div>
+        </div>
 
-  <p>
-    <a href="datenloeschung.html">Anleitung zur Datenlöschung</a>
-  </p>
+        <aside class="hero-card" aria-label="Unser Versprechen">
+          <div class="number">1</div>
+          <h2>Eine zentrale Anlaufstelle statt vieler einzelner Ansprechpartner.</h2>
+          <p>Wir helfen dabei, Anliegen zu sortieren, Lösungen zu finden und die nächsten Schritte verständlich umzusetzen.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section id="leistungen">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow">Leistungen</div>
+          <h2>Unterstützung dort, wo sie wirklich gebraucht wird.</h2>
+          <p>Vom Smartphone bis zum Behördenbrief: Wir verbinden persönliche Betreuung mit moderner digitaler Hilfe.</p>
+        </div>
+
+        <div class="cards">
+          <article class="card">
+            <div class="icon">01</div>
+            <h3>Technik & Digitales</h3>
+            <p>Hilfe bei Smartphone, Tablet, Fernseher, Apps, E-Mail, WhatsApp und alltäglichen digitalen Fragen.</p>
+          </article>
+          <article class="card">
+            <div class="icon">02</div>
+            <h3>Briefe & Formulare</h3>
+            <p>Unterlagen gemeinsam verständlich durchgehen, einordnen und die nächsten praktischen Schritte vorbereiten.</p>
+          </article>
+          <article class="card">
+            <div class="icon">03</div>
+            <h3>Termine & Organisation</h3>
+            <p>Unterstützung beim Planen, Erinnern, Recherchieren und Koordinieren von Terminen und Erledigungen.</p>
+          </article>
+          <article class="card">
+            <div class="icon">04</div>
+            <h3>Alltag & Besorgungen</h3>
+            <p>Praktische Unterstützung bei alltäglichen Aufgaben und bei der Organisation passender Angebote oder Dienste.</p>
+          </article>
+          <article class="card">
+            <div class="icon">05</div>
+            <h3>Begleitung</h3>
+            <p>Persönliche Unterstützung bei ausgewählten Terminen und Situationen, in denen eine helfende Hand Sicherheit gibt.</p>
+          </article>
+          <article class="card">
+            <div class="icon">06</div>
+            <h3>Für Angehörige</h3>
+            <p>Eine verlässliche Anlaufstelle vor Ort, wenn Angehörige nicht jede Frage oder Aufgabe selbst übernehmen können.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="dark" id="ablauf">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow">So funktioniert's</div>
+          <h2>Einfach anfangen. Den Rest klären wir gemeinsam.</h2>
+          <p>Keine komplizierte Plattform, keine langen Wege und kein Technikstress.</p>
+        </div>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-no">SCHRITT 01</div>
+            <h3>Anliegen schildern</h3>
+            <p>Per Nachricht, Telefon oder im persönlichen Gespräch erklären, wobei Unterstützung gebraucht wird.</p>
+          </div>
+          <div class="step">
+            <div class="step-no">SCHRITT 02</div>
+            <h3>Lösung finden</h3>
+            <p>Wir ordnen das Anliegen ein und erklären verständlich, was jetzt sinnvoll ist.</p>
+          </div>
+          <div class="step">
+            <div class="step-no">SCHRITT 03</div>
+            <h3>Umsetzen</h3>
+            <p>Je nach Anliegen helfen wir direkt, begleiten die nächsten Schritte oder koordinieren passende Unterstützung.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="promise">
+      <div class="wrap promise-grid">
+        <div class="quote">„Nicht für jedes Problem einen neuen Ansprechpartner suchen müssen – sondern wissen, wen man zuerst fragen kann.“</div>
+        <div class="checks">
+          <div class="check"><b>✓</b><div><strong>Persönlich statt anonym</strong><span>Ein fester Ansprechpartner schafft Vertrauen und spart Erklärungen.</span></div></div>
+          <div class="check"><b>✓</b><div><strong>Verständlich statt technisch</strong><span>Wir erklären Lösungen ohne unnötige Fachsprache.</span></div></div>
+          <div class="check"><b>✓</b><div><strong>Digital, wenn es hilft</strong><span>Moderne Technik soll Wege verkürzen – nicht neue Hürden schaffen.</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="pakete">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow">Pakete</div>
+          <h2>Die passende Unterstützung für unterschiedliche Bedürfnisse.</h2>
+          <p>Die endgültigen Leistungen und Preise werden derzeit zusammengestellt. Die drei geplanten Betreuungsstufen zeigen bereits die Richtung.</p>
+        </div>
+
+        <div class="plans">
+          <article class="plan">
+            <span class="tag">Basis</span>
+            <h3>Concierge Start</h3>
+            <p>Für gelegentliche Fragen und Unterstützung im Alltag.</p>
+            <ul>
+              <li>Persönlicher Ansprechpartner</li>
+              <li>Digitale Alltagshilfe</li>
+              <li>Unterstützung bei Organisation</li>
+            </ul>
+            <p class="note"><strong>Preis:</strong> wird vor dem Start transparent veröffentlicht.</p>
+          </article>
+
+          <article class="plan featured">
+            <span class="tag">Kernangebot</span>
+            <h3>Concierge Plus</h3>
+            <p>Für regelmäßige Unterstützung und einen verlässlichen Ansprechpartner.</p>
+            <ul>
+              <li>Alles aus Concierge Start</li>
+              <li>Erweiterte persönliche Betreuung</li>
+              <li>Unterstützung bei komplexeren Anliegen</li>
+              <li>Koordination weiterer Schritte</li>
+            </ul>
+            <p class="note"><strong>Preis:</strong> wird vor dem Start transparent veröffentlicht.</p>
+          </article>
+
+          <article class="plan">
+            <span class="tag">Intensiv</span>
+            <h3>Concierge Premium</h3>
+            <p>Für höheren Unterstützungsbedarf und besonders enge Begleitung.</p>
+            <ul>
+              <li>Alles aus Concierge Plus</li>
+              <li>Mehr persönliche Betreuung</li>
+              <li>Priorisierte Unterstützung</li>
+            </ul>
+            <p class="note"><strong>Preis:</strong> wird vor dem Start transparent veröffentlicht.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" class="promise">
+      <div class="wrap faq">
+        <div class="section-head">
+          <div class="eyebrow">FAQ</div>
+          <h2>Häufige Fragen.</h2>
+        </div>
+
+        <details>
+          <summary>Für wen ist Senioren Concierge Berlin gedacht?</summary>
+          <p>Für ältere Menschen, die sich bei alltäglichen, organisatorischen oder digitalen Aufgaben Unterstützung wünschen, sowie für Angehörige, die eine verlässliche Anlaufstelle suchen.</p>
+        </details>
+        <details>
+          <summary>Muss ich mich mit Technik auskennen?</summary>
+          <p>Nein. Gerade dafür ist der Service gedacht. Alles wird so erklärt, dass die nächsten Schritte nachvollziehbar bleiben.</p>
+        </details>
+        <details>
+          <summary>Kann ich auch nur mit einer einzelnen Frage kommen?</summary>
+          <p>Das Angebot wird sowohl für einzelne Anliegen als auch für regelmäßige Betreuung ausgelegt.</p>
+        </details>
+        <details>
+          <summary>Ersetzt der Service Pflege, Medizin oder Rechtsberatung?</summary>
+          <p>Nein. Senioren Concierge Berlin ist ein Unterstützungs- und Organisationsservice. Medizinische, pflegerische, steuerliche oder rechtliche Fachberatung wird nicht ersetzt.</p>
+        </details>
+      </div>
+    </section>
+
+    <section id="kontakt">
+      <div class="wrap">
+        <div class="contact-box">
+          <div>
+            <h2>Ein Anliegen? Der erste Schritt soll einfach sein.</h2>
+            <p>Die direkte Kontaktmöglichkeit wird aktuell für den Start vorbereitet und hier ergänzt.</p>
+          </div>
+          <a class="btn" href="#top">Mehr über den Service</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap footer-grid">
+      <p>© 2026 Senioren Concierge Berlin</p>
+      <div class="footer-links">
+        <a href="datenschutz.html">Datenschutz</a>
+        <a href="datenloeschung.html">Datenlöschung</a>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>
