@@ -29,6 +29,7 @@ Dieses Regelwerk ist verbindlich für die visuelle Umsetzung der Website. Die ma
 - Hinter der Figur liegt ein großer goldener Kreis/Ring.
 - Figur groß; sie ist ein zentrales Gestaltungselement, keine kleine Icon-Figur.
 - Keine Waffen, keine Actionpose, keine aggressiven Elemente.
+- Für dieses Hauptmotiv dürfen keine improvisierten SVG-Personen oder KI-generierten Ersatzbilder verwendet werden. Bis ein endgültiges freigegebenes Markenfoto vorliegt, ist ausschließlich ein reales, rechtlich nutzbares Foto mit passender Licht- und Anzugwirkung zulässig.
 
 ## 4. Prime Hero-Typografie
 - Eyebrow: NAHWERK CONCIERGE in Gold, Versalien, weit gespationiert.
@@ -117,6 +118,8 @@ Senioren: #FFFDF8 / #FBF2DF / #FFFFFF / #192235 / #514A40 / #DDAA37 / #E9DDC8.
 
 ## 16. Verbotene Abweichungen
 - Keine Cartoon-Hauptfigur im Prime-Bereich.
+- Keine improvisierte SVG-Person als Ersatz für das Prime-Hauptfoto.
+- Keine automatisch generierten Homepage-Mockups oder generierten Ersatzbilder ohne ausdrückliche Freigabe.
 - Kein helles Prime-Design.
 - Kein schwarzes Senioren-Hauptdesign.
 - Keine neuen Farben außerhalb der festgelegten Palette.
@@ -126,4 +129,4 @@ Senioren: #FFFDF8 / #FBF2DF / #FFFFFF / #192235 / #514A40 / #DDAA37 / #E9DDC8.
 - Keine kreative Neuinterpretation der Referenz ohne ausdrückliche Nutzerfreigabe.
 
 ## 17. Umsetzungsregel
-Bei jeder visuellen Änderung gilt in dieser Reihenfolge: Referenzbild > dieses Regelwerk > bestehende Website. Funktionierende Backend-, Login-, Session-, WhatsApp-, n8n- und Kundenbereichslogik darf nicht beschädigt werden.
+Bei jeder visuellen Änderung gilt in dieser Reihenfolge: Referenzbild > dieses Regelwerk > bestehende Website. Funktionierende Backend-, Login-, Session-, WhatsApp-, n8n- und Kundenbereichslogik darf nicht beschädigt werden. Änderungen an der Startseite werden zuerst dort stabilisiert und erst danach auf weitere Seiten übertragen.
