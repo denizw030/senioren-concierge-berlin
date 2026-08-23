@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://denizw030.github.io/senioren-concierge-berlin/sitemap.xml
