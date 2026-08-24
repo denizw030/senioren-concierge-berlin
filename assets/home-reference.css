@@ -155,12 +155,13 @@ body.home-reference {
   margin-bottom: 13px;
 }
 .home-title {
-  font:
-    700 48px/0.98 Georgia,
-    serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+  font-size: 48px;
+  font-weight: 700;
+  line-height: .98;
   margin: 0 0 15px;
   color: #fff;
-  letter-spacing: -0.6px;
+  letter-spacing: -0.045em;
 }
 .home-title .gold-word {
   color: #e8b13b;
@@ -241,9 +242,9 @@ body.home-reference {
   stroke-linejoin: round;
 }
 .feature-tile h3 {
-  font:
-    700 18px Georgia,
-    serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
   margin: 0 0 8px;
   color: #fff;
 }
@@ -294,9 +295,9 @@ body.home-reference {
   margin-left: auto;
 }
 .whatsapp-copy h2 {
-  font:
-    700 26px Georgia,
-    serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+  font-size: 26px;
+  font-weight: 700;
   margin: 0 0 7px;
   color: #fff;
 }
@@ -373,9 +374,10 @@ body.home-reference {
   margin-bottom: 14px;
 }
 .senior-title {
-  font:
-    700 39px/1.02 Georgia,
-    serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+  font-size: 39px;
+  font-weight: 700;
+  line-height: 1.02;
   color: #192235;
   margin: 0 0 13px;
   letter-spacing: -0.3px;
@@ -463,9 +465,10 @@ body.home-reference {
   height: 232px;
 }
 .senior-bottom h2 {
-  font:
-    700 25px/1.06 Georgia,
-    serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 1.06;
   color: #192235;
   margin: 0 0 8px;
 }
@@ -662,7 +665,11 @@ body.home-reference {
   margin-bottom: 34px;
 }
 .overview-head h2 {
-  font: 700 clamp(34px, 4vw, 52px)/1.05 Georgia, serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+  font-size: clamp(34px, 4vw, 52px);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.045em;
   margin: 8px 0 16px;
 }
 .overview-head p {
@@ -689,7 +696,7 @@ body.home-reference {
   border-color: #b28d3e;
   background: linear-gradient(145deg, #17140e, #0b0a08);
 }
-.choice-panel h3 { font: 700 29px/1.1 Georgia, serif; margin: 8px 0 13px; }
+.choice-panel h3 { font: 700 29px/1.08 -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif; letter-spacing: -.03em; margin: 8px 0 13px; }
 .choice-panel p { color: #c8c3ba; line-height: 1.6; }
 .choice-panel ul { list-style: none; padding: 0; margin: 22px 0; }
 .choice-panel li { position: relative; padding: 8px 0 8px 28px; color: #e3ded3; }

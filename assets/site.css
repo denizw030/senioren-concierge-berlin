@@ -344,9 +344,11 @@ textarea:focus-visible {
   letter-spacing: 1.5px;
 }
 .hero h1 {
-  font:
-    700 52px/1.08 Georgia,
-    serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+  font-size: clamp(38px, 5.2vw, 58px);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.045em;
   margin: 11px 0 18px;
 }
 .hero p {
@@ -370,16 +372,28 @@ textarea:focus-visible {
   border-bottom: 1px solid #222;
 }
 h2 {
-  font:
-    700 36px/1.15 Georgia,
-    serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+  font-size: clamp(30px, 3.4vw, 40px);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
   margin: 0 0 14px;
   color: #fff;
 }
 h3 {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
   font-size: 20px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
   margin: 0 0 10px;
   color: #fff;
+}
+.formcard h1 {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif !important;
+  font-weight: 700 !important;
+  line-height: 1.04 !important;
+  letter-spacing: -0.04em !important;
 }
 .lead {
   font-size: 17px;
