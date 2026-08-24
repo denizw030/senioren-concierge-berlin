@@ -905,6 +905,20 @@ h3 {
   border-top-color: #332d22;
 }
 
+.whatsapp-label {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .22em;
+  white-space: nowrap;
+}
+.whatsapp-mark {
+  width: 1em;
+  height: 1em;
+  flex: 0 0 1em;
+  align-self: center;
+  vertical-align: -.12em;
+}
+
 /* Must remain last so legacy page-specific responsive rules cannot reopen the menu. */
 html, body { max-width: 100%; overflow-x: clip; }
 img, svg, video { max-width: 100%; }

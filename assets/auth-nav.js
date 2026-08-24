@@ -118,7 +118,7 @@
       }
     });
     ensureOdysxBar();
-    document.querySelectorAll(".footbottom span:first-child").forEach((element) => { element.textContent = "© 2026 Nahwerk Concierge"; });
+    document.querySelectorAll(".footbottom > span:first-child").forEach((element) => { element.textContent = "© 2026 Nahwerk Concierge"; });
     document.querySelectorAll('.footer a[href="anmelden.html"],.footer a[href="registrieren.html"]').forEach((link) => { if (isLoggedIn()) link.remove(); });
   }
   function updateNav() {
@@ -149,7 +149,42 @@
     clearLocalAuth();
     return false;
   }
+  function decorateWhatsApp(root = document.body) {
+    if (!root) return;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        if (!node.nodeValue.includes("WhatsApp")) return NodeFilter.FILTER_REJECT;
+        const parent = node.parentElement;
+        if (!parent || parent.closest("script,style,noscript,textarea,.whatsapp-label")) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach((node) => {
+      const parts = node.nodeValue.split("WhatsApp");
+      if (parts.length < 2) return;
+      const fragment = document.createDocumentFragment();
+      parts.forEach((part, index) => {
+        if (index) {
+          const label = document.createElement("span");
+          label.className = "whatsapp-label";
+          label.innerHTML = '<img class="whatsapp-mark" src="assets/whatsapp-mark.svg?v=1" alt="" aria-hidden="true">WhatsApp';
+          fragment.appendChild(label);
+        }
+        if (part) fragment.appendChild(document.createTextNode(part));
+      });
+      node.replaceWith(fragment);
+    });
+  }
   document.addEventListener("DOMContentLoaded", async () => {
+    decorateWhatsApp();
+    new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => mutation.addedNodes.forEach((node) => {
+        if (node.nodeType === Node.TEXT_NODE) decorateWhatsApp(node.parentElement);
+        else if (node.nodeType === Node.ELEMENT_NODE && !node.matches(".whatsapp-label")) decorateWhatsApp(node);
+      }));
+    }).observe(document.body, { childList: true, subtree: true });
     normalizeShell();
     const current = page();
     const valid = await validateSession();
