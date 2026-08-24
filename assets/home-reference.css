@@ -1,1 +1,626 @@
-body.home-reference{margin:0;background:#050505;color:#f7f5ef}.home-reference .top{position:sticky;top:0;z-index:60;background:#020303!important;border-bottom:1px solid #2b2b2b!important;backdrop-filter:none}.home-reference .wrap{max-width:1536px;padding:0 28px}.home-reference .nav{min-height:76px;height:76px;display:flex;align-items:center;justify-content:space-between;gap:24px}.home-reference .brand{min-width:338px;gap:14px}.home-reference .mark,.home-reference .mark.nahwerk-mark{width:68px;height:68px;flex-basis:68px;background:#050505 center/96% no-repeat url("logo-nahwerk-concierge-gold.svg?v=11")!important;border:2px solid #c08d27!important;box-shadow:0 0 0 1px rgba(255,213,110,.18)!important}.home-reference .brandtext strong:before{font:700 30px/1 Georgia,serif;letter-spacing:2.4px;color:#e7b23e}.home-reference .brandtext span:before{font:700 10px/1 Arial,sans-serif;letter-spacing:6px;color:#e7b23e}.home-reference .links{gap:29px;font-size:14px;font-weight:600}.home-reference .links a{padding:28px 0 20px}.home-reference .links a.active{border-bottom-width:2px}.home-reference .links .auth-link{padding:12px 25px;border-radius:8px}.split-home{position:relative;display:grid;grid-template-columns:1fr 1fr;max-width:1536px;margin:0 auto;min-height:948px;background:#050505}.prime-side,.senior-side{position:relative;overflow:hidden;min-height:948px}.prime-side{padding:60px 58px 36px;background:radial-gradient(660px 510px at 10% 29%,rgba(229,175,54,.23),transparent 53%),radial-gradient(560px 430px at 88% 83%,rgba(203,143,23,.19),transparent 58%),linear-gradient(148deg,#030303 0%,#070808 58%,#020303 100%);border-right:1px solid #d2a03a}.prime-side:before{content:"";position:absolute;left:-118px;top:92px;width:550px;height:550px;border-radius:50%;border:6px solid rgba(226,171,50,.78);box-shadow:0 0 42px rgba(216,155,36,.18),inset 0 0 36px rgba(216,155,36,.09)}.prime-side:after{content:"";position:absolute;right:-130px;bottom:-190px;width:500px;height:500px;border-radius:50%;border:2px solid rgba(224,171,48,.28)}.prime-visual{position:absolute;left:-8px;top:10px;width:46%;height:690px;z-index:2;background-image:url("Primconcierge-NAHWERK-ODYSX.png?v=12");background-size:cover;background-position:52% 32%;background-repeat:no-repeat;-webkit-mask-image:linear-gradient(to right,#000 0%,#000 72%,transparent 100%);mask-image:linear-gradient(to right,#000 0%,#000 72%,transparent 100%)}.prime-copy{position:relative;z-index:4;margin-left:42%;max-width:455px;padding-top:8px}.eyebrow-home{color:#e2ad32;font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:13px}.home-title{font:700 48px/.98 Georgia,serif;margin:0 0 15px;color:#fff;letter-spacing:-.6px}.home-title .gold-word{color:#e8b13b}.home-sub{font-size:20px;line-height:1.4;color:#fff;margin:0 0 17px}.home-text{font-size:16px;line-height:1.48;color:#ddd8cf;max-width:450px;margin:0}.home-actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:22px}.ref-btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 24px;border-radius:8px;font-weight:800;font-size:13px;border:1px solid #b98824;white-space:nowrap}.ref-btn.primary{background:linear-gradient(135deg,#f5ca60,#dda027);color:#171109;box-shadow:0 9px 25px rgba(206,152,41,.18)}.ref-btn.secondary{background:#080909;color:#e9b640}.prime-features{position:relative;z-index:4;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:42px}.feature-tile{border:1px solid #9c731f;border-radius:12px;padding:19px 16px 17px;text-align:center;background:linear-gradient(180deg,rgba(15,16,16,.97),rgba(6,7,7,.98));min-height:144px}.feature-icon{width:34px;height:34px;margin:0 auto 12px;color:#e6ad31}.feature-icon svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.feature-tile h3{font:700 18px Georgia,serif;margin:0 0 8px;color:#fff}.feature-tile p{font-size:13px;line-height:1.42;color:#ddd5c8;margin:0}.whatsapp-strip{display:grid;grid-template-columns:244px 1fr;gap:24px;align-items:center;margin-top:22px;position:relative;z-index:4}.phone-mock{height:268px;border:3px solid #777;border-radius:34px;background:linear-gradient(180deg,#172124,#0c1416);box-shadow:0 18px 32px rgba(0,0,0,.42);padding:24px 14px;color:#fff;overflow:hidden}.phone-top{font-weight:700;font-size:12px;margin-bottom:16px}.bubble{max-width:90%;padding:10px 11px;border-radius:9px;font-size:11px;line-height:1.38;margin-bottom:11px}.bubble.in{background:#303638}.bubble.out{background:#e5b23f;color:#15100a;margin-left:auto}.whatsapp-copy h2{font:700 26px Georgia,serif;margin:0 0 7px;color:#fff}.whatsapp-copy p{color:#ddd5c8;margin:0 0 16px;font-size:14px}.mini-icons{display:flex;gap:21px;flex-wrap:wrap;color:#e5b13b;font-size:12px}.senior-side{padding:38px 52px 35px;background:linear-gradient(155deg,#fffdf8,#fbf2df 63%,#fff8eb);color:#25211b}.senior-side:after{content:"";position:absolute;right:-150px;bottom:-180px;width:430px;height:430px;border-radius:50%;background:radial-gradient(circle,rgba(228,176,57,.18),transparent 68%)}.senior-hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:12px;align-items:center;position:relative;z-index:2}.senior-brandlock{display:flex;align-items:center;gap:12px;margin-bottom:12px}.senior-brandlock img{width:82px;height:82px;border-radius:50%;object-fit:cover;border:2px solid #d8a436}.senior-brandlock strong{display:block;font:700 31px/1 Georgia,serif;color:#b97f15;letter-spacing:1px}.senior-brandlock span{display:block;color:#a97816;font-size:12px;letter-spacing:5px;margin-top:5px}.senior-kicker{font-size:15px;color:#514a40;margin-bottom:14px}.senior-title{font:700 39px/1.02 Georgia,serif;color:#192235;margin:0 0 13px;letter-spacing:-.3px}.senior-title:after{content:"";display:block;width:52px;height:2px;background:#dca538;margin-top:10px}.senior-text{font-size:14px;line-height:1.48;color:#55504a;margin:0}.senior-photo{height:365px;background:center/cover no-repeat url("hero-senioren.jpg?v=2");filter:saturate(.9) contrast(.98);-webkit-mask-image:linear-gradient(90deg,transparent 0%,black 16%,black 100%);mask-image:linear-gradient(90deg,transparent 0%,black 16%,black 100%)}.senior-actions{display:flex;gap:13px;margin-top:17px;flex-wrap:wrap}.senior-side .ref-btn.secondary{background:#fff;color:#2e2922;border-color:#d6ac55}.senior-features{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:17px;position:relative;z-index:3}.senior-card{background:#fff;border:1px solid #eadfc9;border-radius:13px;padding:17px 15px;text-align:center;box-shadow:0 8px 22px rgba(94,71,26,.08)}.senior-card .feature-icon{color:#dfaa33;width:31px;height:31px;margin-bottom:10px}.senior-card h3{font-size:15px;color:#25211b;margin:0 0 6px}.senior-card p{font-size:12px;color:#5f584e;line-height:1.4;margin:0}.senior-bottom{display:grid;grid-template-columns:230px 1fr 136px;gap:20px;align-items:center;margin-top:17px;position:relative;z-index:3}.senior-bottom .phone-mock{height:232px}.senior-bottom h2{font:700 25px/1.06 Georgia,serif;color:#192235;margin:0 0 8px}.senior-bottom p{color:#554f46;margin:0;font-size:13px}.martin-avatar{width:122px;height:122px;border-radius:50%;border:3px solid #d9a43a;background:#fff center/cover no-repeat url("hero-senioren.jpg?v=2");box-shadow:0 8px 18px rgba(111,78,18,.12)}.split-tag{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:20;background:#070707;border:1px solid #a7771c;color:#f1b83c;border-radius:13px;padding:13px 25px;font-size:11px;letter-spacing:.35px;box-shadow:0 12px 30px rgba(0,0,0,.35)}@media(max-width:1180px){.split-home{grid-template-columns:1fr;min-height:0}.prime-side,.senior-side{min-height:auto}.prime-side{border-right:0;border-bottom:1px solid #a77c22}.prime-visual{width:42%}.home-reference .nav{height:auto;min-height:76px;align-items:flex-start}.home-reference .brand{min-width:0}.split-tag{display:none}}@media(max-width:760px){.prime-side,.senior-side{padding:38px 20px}.prime-visual{position:relative;left:auto;top:auto;width:100%;height:340px;background-position:center 28%;margin-bottom:8px;-webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 82%,transparent 100%);mask-image:linear-gradient(to bottom,#000 0%,#000 82%,transparent 100%)}.prime-side:before{left:50%;transform:translateX(-50%);top:52px;width:320px;height:320px}.prime-copy{margin-left:0;padding-top:0}.home-title{font-size:39px}.prime-features,.senior-features{grid-template-columns:1fr}.whatsapp-strip,.senior-bottom,.senior-hero-grid{grid-template-columns:1fr}.senior-photo{height:300px;-webkit-mask-image:none;mask-image:none;border-radius:18px}.phone-mock{height:235px}.senior-brandlock strong{font-size:27px}.senior-title{font-size:35px}.home-reference .wrap{padding:0 18px}}
+body.home-reference {
+  margin: 0;
+  background: #050505;
+  color: #f7f5ef;
+}
+.home-reference .top {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: #020303 !important;
+  border-bottom: 1px solid #2b2b2b !important;
+  backdrop-filter: none;
+}
+.home-reference .wrap {
+  max-width: 1536px;
+  padding: 0 28px;
+}
+.home-reference .nav {
+  min-height: 76px;
+  height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.home-reference .brand {
+  min-width: 338px;
+  gap: 14px;
+}
+.home-reference .mark,
+.home-reference .mark.nahwerk-mark {
+  width: 68px;
+  height: 68px;
+  flex-basis: 68px;
+  background: #050505 center/96% no-repeat
+    url("logo-nahwerk-concierge-gold.svg?v=11") !important;
+  border: 2px solid #c08d27 !important;
+  box-shadow: 0 0 0 1px rgba(255, 213, 110, 0.18) !important;
+}
+.home-reference .brandtext strong:before {
+  font:
+    700 30px/1 Georgia,
+    serif;
+  letter-spacing: 2.4px;
+  color: #e7b23e;
+}
+.home-reference .brandtext span:before {
+  font:
+    700 10px/1 Arial,
+    sans-serif;
+  letter-spacing: 6px;
+  color: #e7b23e;
+}
+.home-reference .links {
+  gap: 29px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.home-reference .links a {
+  padding: 28px 0 20px;
+}
+.home-reference .links a.active {
+  border-bottom-width: 2px;
+}
+.home-reference .links .auth-link {
+  padding: 12px 25px;
+  border-radius: 8px;
+}
+.split-home {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  max-width: 1536px;
+  margin: 0 auto;
+  min-height: 948px;
+  background: #050505;
+}
+.prime-side,
+.senior-side {
+  position: relative;
+  overflow: hidden;
+  min-height: 948px;
+}
+.prime-side {
+  padding: 60px 58px 36px;
+  background:
+    radial-gradient(
+      660px 510px at 10% 29%,
+      rgba(229, 175, 54, 0.23),
+      transparent 53%
+    ),
+    radial-gradient(
+      560px 430px at 88% 83%,
+      rgba(203, 143, 23, 0.19),
+      transparent 58%
+    ),
+    linear-gradient(148deg, #030303 0%, #070808 58%, #020303 100%);
+  border-right: 1px solid #d2a03a;
+}
+.prime-side:before {
+  content: "";
+  position: absolute;
+  left: -118px;
+  top: 92px;
+  width: 550px;
+  height: 550px;
+  border-radius: 50%;
+  border: 6px solid rgba(226, 171, 50, 0.78);
+  box-shadow:
+    0 0 42px rgba(216, 155, 36, 0.18),
+    inset 0 0 36px rgba(216, 155, 36, 0.09);
+}
+.prime-side:after {
+  content: "";
+  position: absolute;
+  right: -130px;
+  bottom: -190px;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  border: 2px solid rgba(224, 171, 48, 0.28);
+}
+.prime-visual {
+  position: absolute;
+  left: -8px;
+  top: 10px;
+  width: 46%;
+  height: 690px;
+  z-index: 2;
+  background-image: url("Primconcierge-NAHWERK-ODYSX.png?v=12");
+  background-size: cover;
+  background-position: 52% 32%;
+  background-repeat: no-repeat;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    #000 0%,
+    #000 72%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(to right, #000 0%, #000 72%, transparent 100%);
+}
+.prime-copy {
+  position: relative;
+  z-index: 4;
+  margin-left: 42%;
+  max-width: 455px;
+  padding-top: 8px;
+}
+.eyebrow-home {
+  color: #e2ad32;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 13px;
+}
+.home-title {
+  font:
+    700 48px/0.98 Georgia,
+    serif;
+  margin: 0 0 15px;
+  color: #fff;
+  letter-spacing: -0.6px;
+}
+.home-title .gold-word {
+  color: #e8b13b;
+}
+.home-sub {
+  font-size: 20px;
+  line-height: 1.4;
+  color: #fff;
+  margin: 0 0 17px;
+}
+.home-text {
+  font-size: 16px;
+  line-height: 1.48;
+  color: #ddd8cf;
+  max-width: 450px;
+  margin: 0;
+}
+.home-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+}
+.ref-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 24px;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 13px;
+  border: 1px solid #b98824;
+  white-space: nowrap;
+}
+.ref-btn.primary {
+  background: linear-gradient(135deg, #f5ca60, #dda027);
+  color: #171109;
+  box-shadow: 0 9px 25px rgba(206, 152, 41, 0.18);
+}
+.ref-btn.secondary {
+  background: #080909;
+  color: #e9b640;
+}
+.prime-features {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 42px;
+}
+.feature-tile {
+  border: 1px solid #9c731f;
+  border-radius: 12px;
+  padding: 19px 16px 17px;
+  text-align: center;
+  background: linear-gradient(
+    180deg,
+    rgba(15, 16, 16, 0.97),
+    rgba(6, 7, 7, 0.98)
+  );
+  min-height: 144px;
+}
+.feature-icon {
+  width: 34px;
+  height: 34px;
+  margin: 0 auto 12px;
+  color: #e6ad31;
+}
+.feature-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.feature-tile h3 {
+  font:
+    700 18px Georgia,
+    serif;
+  margin: 0 0 8px;
+  color: #fff;
+}
+.feature-tile p {
+  font-size: 13px;
+  line-height: 1.42;
+  color: #ddd5c8;
+  margin: 0;
+}
+.whatsapp-strip {
+  display: grid;
+  grid-template-columns: 244px 1fr;
+  gap: 24px;
+  align-items: center;
+  margin-top: 22px;
+  position: relative;
+  z-index: 4;
+}
+.phone-mock {
+  height: 268px;
+  border: 3px solid #777;
+  border-radius: 34px;
+  background: linear-gradient(180deg, #172124, #0c1416);
+  box-shadow: 0 18px 32px rgba(0, 0, 0, 0.42);
+  padding: 24px 14px;
+  color: #fff;
+  overflow: hidden;
+}
+.phone-top {
+  font-weight: 700;
+  font-size: 12px;
+  margin-bottom: 16px;
+}
+.bubble {
+  max-width: 90%;
+  padding: 10px 11px;
+  border-radius: 9px;
+  font-size: 11px;
+  line-height: 1.38;
+  margin-bottom: 11px;
+}
+.bubble.in {
+  background: #303638;
+}
+.bubble.out {
+  background: #e5b23f;
+  color: #15100a;
+  margin-left: auto;
+}
+.whatsapp-copy h2 {
+  font:
+    700 26px Georgia,
+    serif;
+  margin: 0 0 7px;
+  color: #fff;
+}
+.whatsapp-copy p {
+  color: #ddd5c8;
+  margin: 0 0 16px;
+  font-size: 14px;
+}
+.mini-icons {
+  display: flex;
+  gap: 21px;
+  flex-wrap: wrap;
+  color: #e5b13b;
+  font-size: 12px;
+}
+.senior-side {
+  padding: 38px 52px 35px;
+  background: linear-gradient(155deg, #fffdf8, #fbf2df 63%, #fff8eb);
+  color: #25211b;
+}
+.senior-side:after {
+  content: "";
+  position: absolute;
+  right: -150px;
+  bottom: -180px;
+  width: 430px;
+  height: 430px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(228, 176, 57, 0.18),
+    transparent 68%
+  );
+}
+.senior-hero-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 12px;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+.senior-brandlock {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.senior-brandlock img {
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #d8a436;
+}
+.senior-brandlock strong {
+  display: block;
+  font:
+    700 31px/1 Georgia,
+    serif;
+  color: #b97f15;
+  letter-spacing: 1px;
+}
+.senior-brandlock span {
+  display: block;
+  color: #a97816;
+  font-size: 12px;
+  letter-spacing: 5px;
+  margin-top: 5px;
+}
+.senior-kicker {
+  font-size: 15px;
+  color: #514a40;
+  margin-bottom: 14px;
+}
+.senior-title {
+  font:
+    700 39px/1.02 Georgia,
+    serif;
+  color: #192235;
+  margin: 0 0 13px;
+  letter-spacing: -0.3px;
+}
+.senior-title:after {
+  content: "";
+  display: block;
+  width: 52px;
+  height: 2px;
+  background: #dca538;
+  margin-top: 10px;
+}
+.senior-text {
+  font-size: 14px;
+  line-height: 1.48;
+  color: #55504a;
+  margin: 0;
+}
+.senior-photo {
+  height: 365px;
+  background: center/cover no-repeat url("hero-senioren.jpg?v=2");
+  filter: saturate(0.9) contrast(0.98);
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    black 16%,
+    black 100%
+  );
+  mask-image: linear-gradient(90deg, transparent 0%, black 16%, black 100%);
+}
+.senior-actions {
+  display: flex;
+  gap: 13px;
+  margin-top: 17px;
+  flex-wrap: wrap;
+}
+.senior-side .ref-btn.secondary {
+  background: #fff;
+  color: #2e2922;
+  border-color: #d6ac55;
+}
+.senior-features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 13px;
+  margin-top: 17px;
+  position: relative;
+  z-index: 3;
+}
+.senior-card {
+  background: #fff;
+  border: 1px solid #eadfc9;
+  border-radius: 13px;
+  padding: 17px 15px;
+  text-align: center;
+  box-shadow: 0 8px 22px rgba(94, 71, 26, 0.08);
+}
+.senior-card .feature-icon {
+  color: #dfaa33;
+  width: 31px;
+  height: 31px;
+  margin-bottom: 10px;
+}
+.senior-card h3 {
+  font-size: 15px;
+  color: #25211b;
+  margin: 0 0 6px;
+}
+.senior-card p {
+  font-size: 12px;
+  color: #5f584e;
+  line-height: 1.4;
+  margin: 0;
+}
+.senior-bottom {
+  display: grid;
+  grid-template-columns: 230px 1fr 136px;
+  gap: 20px;
+  align-items: center;
+  margin-top: 17px;
+  position: relative;
+  z-index: 3;
+}
+.senior-bottom .phone-mock {
+  height: 232px;
+}
+.senior-bottom h2 {
+  font:
+    700 25px/1.06 Georgia,
+    serif;
+  color: #192235;
+  margin: 0 0 8px;
+}
+.senior-bottom p {
+  color: #554f46;
+  margin: 0;
+  font-size: 13px;
+}
+.martin-avatar {
+  width: 122px;
+  height: 122px;
+  border-radius: 50%;
+  border: 3px solid #d9a43a;
+  background: #fff center/cover no-repeat url("hero-senioren.jpg?v=2");
+  box-shadow: 0 8px 18px rgba(111, 78, 18, 0.12);
+}
+.split-tag {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  z-index: 20;
+  background: #070707;
+  border: 1px solid #a7771c;
+  color: #f1b83c;
+  border-radius: 13px;
+  padding: 13px 25px;
+  font-size: 11px;
+  letter-spacing: 0.35px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+@media (max-width: 1180px) {
+  .split-home {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+  .prime-side,
+  .senior-side {
+    min-height: auto;
+  }
+  .prime-side {
+    border-right: 0;
+    border-bottom: 1px solid #a77c22;
+  }
+  .prime-visual {
+    width: 42%;
+  }
+  .home-reference .nav {
+    height: auto;
+    min-height: 76px;
+    align-items: flex-start;
+  }
+  .home-reference .brand {
+    min-width: 0;
+  }
+  .split-tag {
+    display: none;
+  }
+}
+@media (max-width: 760px) {
+  .prime-side,
+  .senior-side {
+    padding: 38px 20px;
+  }
+  .prime-visual {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: 100%;
+    height: 340px;
+    background-position: center 28%;
+    margin-bottom: 8px;
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      #000 0%,
+      #000 82%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(to bottom, #000 0%, #000 82%, transparent 100%);
+  }
+  .prime-side:before {
+    left: 50%;
+    transform: translateX(-50%);
+    top: 52px;
+    width: 320px;
+    height: 320px;
+  }
+  .prime-copy {
+    margin-left: 0;
+    padding-top: 0;
+  }
+  .home-title {
+    font-size: 39px;
+  }
+  .prime-features,
+  .senior-features {
+    grid-template-columns: 1fr;
+  }
+  .whatsapp-strip,
+  .senior-bottom,
+  .senior-hero-grid {
+    grid-template-columns: 1fr;
+  }
+  .senior-photo {
+    height: 300px;
+    -webkit-mask-image: none;
+    mask-image: none;
+    border-radius: 18px;
+  }
+  .phone-mock {
+    height: 235px;
+  }
+  .senior-brandlock strong {
+    font-size: 27px;
+  }
+  .senior-title {
+    font-size: 35px;
+  }
+  .home-reference .wrap {
+    padding: 0 18px;
+  }
+}
+
+/* Navigation bleibt bei schmaleren Fenstern vollständig unter dem Logo. */
+@media (max-width: 1280px) {
+  .home-reference .nav {
+    height: auto;
+    min-height: 76px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+  }
+  .home-reference .brand {
+    min-width: 0;
+  }
+  .home-reference .links {
+    width: 100%;
+    justify-content: center;
+    gap: clamp(13px, 2vw, 26px);
+    flex-wrap: wrap;
+    white-space: normal;
+  }
+  .home-reference .links a,
+  .home-reference .links .auth-link {
+    padding: 8px 0 10px;
+  }
+}
+
+@media (max-width: 700px) {
+  .home-reference .links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px 16px;
+    text-align: center;
+  }
+}
