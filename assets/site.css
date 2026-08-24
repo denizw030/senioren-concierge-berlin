@@ -645,6 +645,14 @@ h3 {
 .senior-product .hero:has(.senior-hero-photo):after {
   display: none;
 }
+.senior-product .senior-image-hero:after {
+  display: none !important;
+}
+.senior-product .senior-image-hero .senior-hero-photo {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
 .senior-hero-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(360px, 0.82fr);
