@@ -624,3 +624,18 @@ body.home-reference {
     text-align: center;
   }
 }
+
+/* Übersicht: eine durchgehende Nahwerk-Concierge-Hauptseite. */
+.home-reference .split-home {
+  display: block;
+  max-width: 1536px;
+}
+.home-reference .prime-side {
+  width: 100%;
+  border-right: 0;
+}
+.home-reference + .footer,
+.home-reference .footer {
+  position: relative;
+  z-index: 5;
+}
