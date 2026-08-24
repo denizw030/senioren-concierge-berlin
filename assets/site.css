@@ -1,3 +1,10 @@
+perl: warning: Setting locale failed.
+perl: warning: Please check that your locale settings:
+	LC_ALL = "C.UTF-8",
+	LC_CTYPE = "C.UTF-8",
+	LANG = "C.UTF-8"
+    are supported and installed on your system.
+perl: warning: Falling back to the standard locale ("C").
 :root {
   --gold: #d7a934;
   --gold2: #f3cf73;
@@ -666,11 +673,47 @@ h3 {
 .senior-product .product,
 .senior-product .mini-plan,
 .senior-product .step,
-.senior-product .contactitem {
+.senior-product .contactitem,
+.senior-product .formcard,
+.senior-product .preview {
   color: #211f1a !important;
   background: #fff !important;
   border-color: #e8dfcf !important;
   box-shadow: 0 12px 34px rgba(96, 72, 24, 0.08) !important;
+}
+.senior-product .formcard h1,
+.senior-product .formcard label,
+.senior-product .preview .msg,
+.senior-product .trustline {
+  color: #211f1a !important;
+}
+.senior-product .formcard .tiny,
+.senior-product .preview-note {
+  color: #6e685f !important;
+}
+.senior-product .field input,
+.senior-product .field select,
+.senior-product .field textarea,
+.senior-product .choice label,
+.senior-product .msg,
+.senior-product .selfhint,
+.senior-product .status {
+  color: #211f1a !important;
+  background: #fffdf9 !important;
+  border-color: #ded2bc !important;
+}
+.senior-product .choice label.selected {
+  background: #fff5dc !important;
+  border-color: #c99b2d !important;
+}
+.senior-product .planbox {
+  color: #211f1a !important;
+  background: linear-gradient(145deg, #fff8e7, #fffdf9) !important;
+  border-color: #d7a934 !important;
+}
+.senior-product .planbox .plan-sub,
+.senior-product .planbox li {
+  color: #625d55 !important;
 }
 .senior-product .card.redline {
   border-color: #dfc27d !important;

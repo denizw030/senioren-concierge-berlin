@@ -1,3 +1,10 @@
+perl: warning: Setting locale failed.
+perl: warning: Please check that your locale settings:
+	LC_ALL = "C.UTF-8",
+	LC_CTYPE = "C.UTF-8",
+	LANG = "C.UTF-8"
+    are supported and installed on your system.
+perl: warning: Falling back to the standard locale ("C").
 <!doctype html>
 <html lang="de">
   <head>
@@ -8,7 +15,7 @@
       name="description"
       content="Dauerhaft kostenlosen Nahwerk-Concierge-Zugang registrieren."
     />
-    <link rel="stylesheet" href="assets/site.css?v=16" />
+    <link rel="stylesheet" href="assets/site.css?v=17" />
     <style>
       .signup {
         display: grid;
@@ -187,7 +194,7 @@
       <section class="section">
         <div class="wrap signup">
           <form class="formcard" id="signupForm">
-            <h1
+            <h1 id="registrationTitle"
               style="
                 font:
                   700 38px/1.1 Georgia,
@@ -199,6 +206,7 @@
             </h1>
             <div class="planbox">
               <strong>KOSTENLOS · 0 € DAUERHAFT</strong>
+              <span class="plan-sub" id="productLabel">Prime Concierge</span>
               <ul class="benefits">
                 <li>20 Dialoge im 1. Monat</li>
                 <li>15 Dialoge im 2. Monat</li>
@@ -458,8 +466,8 @@
             <div class="eyebrow">Persönlicher Zugang</div>
             <h3>Web-Konto + WhatsApp.</h3>
             <div class="msg" id="messagePreview">
-              <strong>Hallo 👋</strong><br /><br />Willkommen bei Nahwerk
-              Concierge.<br /><br />Ich bin Martin (KI), dein digitaler,
+              <strong>Hallo 👋</strong><br /><br />Willkommen bei Prime
+              Concierge.<br /><br />Ich bin Prime Martin (KI), dein digitaler,
               KI-gestützter Concierge.<br /><br />Ich helfe dir bei
               Organisation, Informationen, Technik und vielem mehr – schnell,
               persönlich und zuverlässig.<br /><br />Einfach schreiben, ich bin
@@ -495,8 +503,8 @@
         </div>
       </div>
     </footer>
-    <script src="assets/auth-nav.js?v=13"></script>
-    <script src="assets/onboarding.js?v=6"></script>
+    <script src="assets/auth-nav.js?v=14"></script>
+    <script src="assets/onboarding.js?v=7"></script>
     <script>
       const eye =
         '<svg class="eye-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.7"></circle></svg>';
