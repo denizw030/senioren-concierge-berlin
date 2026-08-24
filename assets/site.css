@@ -556,16 +556,66 @@ h3 {
   transform: translateY(-50%);
   width: min(330px, 27vw);
   aspect-ratio: 1;
-  background: center/contain no-repeat
+  background: center/100% 100% no-repeat
     url("NASHWERK-Concierge-Smartphone-mittig-ODYSX.png?v=1");
+  -webkit-clip-path: circle(42% at 50% 45%);
+  clip-path: circle(42% at 50% 45%);
   filter: drop-shadow(0 0 26px rgba(255, 255, 255, 0.13));
-  opacity: 0.16;
+  opacity: 0.34;
   pointer-events: none;
 }
 .senior-product .hero:after {
   background: center/cover no-repeat url("logo-senioren-concierge.webp");
+  -webkit-clip-path: none;
+  clip-path: none;
   border-radius: 50%;
   opacity: 0.12;
+}
+
+@media (max-width: 1280px) {
+  .nav {
+    height: auto;
+    min-height: 0;
+    padding-top: 10px;
+    padding-bottom: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .brand {
+    min-width: 0;
+  }
+  .links {
+    width: 100%;
+    justify-content: center;
+    gap: clamp(13px, 2vw, 26px);
+    flex-wrap: wrap;
+    white-space: normal;
+  }
+  .links a,
+  .links .auth-link {
+    padding: 8px 0 10px;
+  }
+}
+
+@media (max-width: 700px) {
+  .wrap {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+  .links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px 16px;
+    text-align: center;
+  }
+  .links .auth-link {
+    border-radius: 7px;
+  }
+  .hero:after {
+    right: 10px;
+    width: min(240px, 46vw);
+    opacity: 0.14;
+  }
 }
 
 /* Senioren Concierge: ruhige, helle Produktwelt bei dunkler Hauptnavigation. */
