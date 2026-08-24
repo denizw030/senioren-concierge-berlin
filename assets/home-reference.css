@@ -717,6 +717,14 @@ body.home-reference {
 .overview-plan .amount small { font: 500 13px Arial, sans-serif; color: #aaa49a; }
 .overview-plan p { color: #bbb5ab; line-height: 1.55; min-height: 72px; }
 .overview-plan strong { display: block; color: #eee8dc; margin-top: 14px; }
+.overview-plan-action {
+  display: block;
+  margin-top: 20px;
+  color: #f0ba3d;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .01em;
+}
 .overview-steps { grid-template-columns: repeat(3, 1fr); counter-reset: overview-step; }
 .overview-step { padding: 27px; border: 1px solid #3d3629; border-radius: 16px; background: #0d0d0d; }
 .overview-step:before { counter-increment: overview-step; content: counter(overview-step); display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: #e5af38; color: #171109; font-weight: 900; margin-bottom: 18px; }

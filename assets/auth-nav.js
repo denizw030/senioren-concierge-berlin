@@ -20,8 +20,14 @@
       sessionStorage.setItem(PRODUCT_KEY, requested);
       return requested;
     }
-    if (current === "senioren-concierge.html" || current === "angehoerige.html") return "senioren";
-    if (current === "prime-concierge.html") return "prime";
+    if (current === "senioren-concierge.html" || current === "angehoerige.html") {
+      sessionStorage.setItem(PRODUCT_KEY, "senioren");
+      return "senioren";
+    }
+    if (current === "prime-concierge.html") {
+      sessionStorage.setItem(PRODUCT_KEY, "prime");
+      return "prime";
+    }
     if (CONTEXT_PAGES.has(current)) return sessionStorage.getItem(PRODUCT_KEY) === "senioren" ? "senioren" : "prime";
     return "prime";
   }
@@ -134,6 +140,23 @@
       }
     });
   }
+  function activatePlanCards() {
+    document.querySelectorAll("[data-plan-url]").forEach((card) => {
+      if (card.dataset.planReady) return;
+      card.dataset.planReady = "1";
+      const open = () => { location.href = card.dataset.planUrl; };
+      card.addEventListener("click", (event) => {
+        if (event.target.closest("a,button,input,select,textarea,label")) return;
+        open();
+      });
+      card.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          open();
+        }
+      });
+    });
+  }
   async function validateSession() {
     const session = getSession();
     if (!session?.session_token) return false;
@@ -179,6 +202,7 @@
   }
   document.addEventListener("DOMContentLoaded", async () => {
     decorateWhatsApp();
+    activatePlanCards();
     new MutationObserver((mutations) => {
       mutations.forEach((mutation) => mutation.addedNodes.forEach((node) => {
         if (node.nodeType === Node.TEXT_NODE) decorateWhatsApp(node.parentElement);

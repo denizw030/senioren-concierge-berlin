@@ -8,7 +8,7 @@
       name="description"
       content="Die fünf transparenten Tarife für Senioren Concierge und Prime Concierge – mit Nilo oder Mira direkt über WhatsApp."
     />
-    <link rel="stylesheet" href="assets/site.css?v=22" />
+    <link rel="stylesheet" href="assets/site.css?v=23" />
     <style>
       .plans {
         display: grid;
@@ -146,7 +146,7 @@
             Widerrufs- und Kündigungsprozess aktiviert ist.
           </div>
           <div class="plans">
-            <article class="card plan redline">
+            <article class="card plan" data-plan-url="registrieren.html?paket=free" role="link" tabindex="0" aria-label="Tarif FREE auswählen">
               <h3>FREE</h3>
               <p>
                 Dauerhaft nutzen – ohne Zahlungsdaten und ohne automatische
@@ -184,12 +184,12 @@
                 <li>Keine Zahlungsdaten erforderlich</li>
               </ul>
               <div class="actions">
-                <a class="btn red" href="registrieren.html?paket=kostenlos"
-                  >Kostenlos starten</a
+                <a class="btn red" href="registrieren.html?paket=free"
+                  >FREE auswählen</a
                 >
               </div>
             </article>
-            <article class="card plan">
+            <article class="card plan" data-plan-url="registrieren.html?paket=standard" role="link" tabindex="0" aria-label="Tarif STANDARD auswählen">
               <h3>STANDARD</h3>
               <p>Für regelmäßige Unterstützung im Alltag.</p>
               <div class="price">9,99 € <small>/ Monat</small></div>
@@ -217,8 +217,9 @@
               <span class="planned"
                 >Geplant · noch nicht verbindlich buchbar</span
               >
+              <div class="actions"><a class="btn light" href="registrieren.html?paket=standard">STANDARD auswählen</a></div>
             </article>
-            <article class="card plan popular">
+            <article class="card plan popular" data-plan-url="registrieren.html?paket=komfort" role="link" tabindex="0" aria-label="Tarif KOMFORT auswählen">
               <span class="badge">Beliebt</span>
               <h3>KOMFORT</h3>
               <p>Für Nutzer, die ihren Concierge mehrmals täglich einsetzen möchten.</p>
@@ -246,8 +247,9 @@
               <span class="planned"
                 >Geplant · noch nicht verbindlich buchbar</span
               >
+              <div class="actions"><a class="btn light" href="registrieren.html?paket=komfort">KOMFORT auswählen</a></div>
             </article>
-            <article class="card plan">
+            <article class="card plan" data-plan-url="registrieren.html?paket=premium" role="link" tabindex="0" aria-label="Tarif PREMIUM auswählen">
               <h3>PREMIUM</h3>
               <p>Für intensive tägliche Nutzung.</p>
               <div class="price">29,99 € <small>/ Monat</small></div>
@@ -274,8 +276,9 @@
               <span class="planned"
                 >Geplant · noch nicht verbindlich buchbar</span
               >
+              <div class="actions"><a class="btn light" href="registrieren.html?paket=premium">PREMIUM auswählen</a></div>
             </article>
-            <article class="card plan">
+            <article class="card plan" data-plan-url="registrieren.html?paket=premium-plus" role="link" tabindex="0" aria-label="Tarif PREMIUM PLUS auswählen">
               <h3>PREMIUM PLUS</h3>
               <p>Für umfangreiche persönliche Concierge-Unterstützung im Alltag.</p>
               <div class="price">44,99 € <small>/ Monat</small></div>
@@ -285,6 +288,7 @@
               <div class="metric"><span>Erinnerungen</span><strong>150 / Monat</strong></div>
               <ul><li>Nilo oder Mira als umfangreicher persönlicher KI-Concierge</li><li>Optionaler menschlicher Concierge: 0,80 € / Minute</li></ul>
               <span class="planned">Geplant · noch nicht verbindlich buchbar</span>
+              <div class="actions"><a class="btn light" href="registrieren.html?paket=premium-plus">PREMIUM PLUS auswählen</a></div>
             </article>
           </div>
           <p class="fine">
@@ -411,6 +415,6 @@
         </div>
       </div>
     </footer>
-    <script src="assets/auth-nav.js?v=17"></script>
+    <script src="assets/auth-nav.js?v=18"></script>
   </body>
 </html>

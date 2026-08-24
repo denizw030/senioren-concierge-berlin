@@ -5,11 +5,31 @@
   const form = document.getElementById("signupForm");
   if (!form) return;
   const $ = (id) => document.getElementById(id);
-  const product = new URLSearchParams(location.search).get("produkt") === "senioren" ? "senioren" : "prime";
+  const params = new URLSearchParams(location.search);
+  const requestedProduct = params.get("produkt");
+  const product = requestedProduct === "senioren" || (!requestedProduct && sessionStorage.getItem("nahwerk_product") === "senioren") ? "senioren" : "prime";
   const productLabel = product === "senioren" ? "Senioren Concierge" : "Prime Concierge";
+  const planKey = ({ kostenlos: "free" }[params.get("paket")] || params.get("paket") || "free").toLowerCase();
+  const plans = {
+    free: { code: "FREE", title: "FREE · 0 € / MONAT", benefits: ["30 Dialoge/Monat in den ersten 2 Monaten", "Danach dauerhaft 15 Dialoge pro Monat", "1 Bildgenerierung pro Monat", "1 Foto-/Dokument-Digitalisierung pro Monat", "5 Erinnerungen pro Monat, z. B. Wecker oder Termine", "Direkt in WhatsApp", "Text- und Sprachnachrichten"] },
+    standard: { code: "STANDARD", title: "STANDARD · 9,99 € / MONAT", benefits: ["100 Dialoge pro Monat", "5 Bildgenerierungen", "10 Foto-/Dokument-Digitalisierungen", "25 Erinnerungen"] },
+    komfort: { code: "KOMFORT", title: "KOMFORT · 19,99 € / MONAT", benefits: ["200 Dialoge pro Monat", "10 Bildgenerierungen", "20 Foto-/Dokument-Digitalisierungen", "50 Erinnerungen"] },
+    premium: { code: "PREMIUM", title: "PREMIUM · 29,99 € / MONAT", benefits: ["350 Dialoge pro Monat", "25 Bildgenerierungen", "25 Foto-/Dokument-Digitalisierungen", "100 Erinnerungen"] },
+    "premium-plus": { code: "PREMIUM PLUS", title: "PREMIUM PLUS · 44,99 € / MONAT", benefits: ["600 Dialoge pro Monat", "40 Bildgenerierungen", "50 Foto-/Dokument-Digitalisierungen", "150 Erinnerungen"] }
+  };
+  const selectedPlan = plans[planKey] || plans.free;
+  const planBookable = selectedPlan.code === "FREE";
   sessionStorage.setItem("nahwerk_product", product);
   $("registrationTitle").textContent = `${productLabel} Zugang registrieren`;
   $("productLabel").textContent = productLabel;
+  $("selectedPlanName").textContent = selectedPlan.title;
+  $("selectedPlanBenefits").innerHTML = selectedPlan.benefits.map((benefit) => `<li>${benefit}</li>`).join("");
+  if (!planBookable) {
+    $("selectedPlanBox").classList.add("selected-paid-plan");
+    $("planSelectionNote").innerHTML = `<strong>${selectedPlan.code} ist ausgewählt.</strong><br>Dieser Tarif ist noch nicht verbindlich buchbar, weil der sichere Zahlungs-, Widerrufs- und Kündigungsprozess noch nicht aktiviert ist. <a href="registrieren.html?produkt=${product}&paket=free">Stattdessen FREE starten</a>.`;
+    $("registrationSubmit").textContent = `${selectedPlan.code} ausgewählt · noch nicht buchbar`;
+    $("registrationSubmit").setAttribute("aria-disabled", "true");
+  }
   document.title = `${productLabel} registrieren | NAHWERK`;
   const recipientIds = ["recipientSalutation", "recipientFirstName", "recipientLastName", "relationship", "recipientPhone"];
   const fullName = (first, last) => [first.trim(), last.trim()].filter(Boolean).join(" ");
@@ -53,13 +73,14 @@
   form.addEventListener("change", (event) => { if (event.target.name === "setupFor") syncSelf(); if (event.target.id === "safetyEnabled") syncSafety(); render(); });
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (!planBookable) return show(`<strong>${selectedPlan.code} ist ausgewählt, aber noch nicht buchbar.</strong><br>Für eine verbindliche Buchung fehlt derzeit noch der Zahlungs- und Vertragsprozess. Sie können aktuell <a href="registrieren.html?produkt=${product}&paket=free">FREE registrieren</a>.`, true);
     const password = $("webPassword").value;
     if (password.length < 10 || password.length > 128) return show("<strong>Das Passwort muss zwischen 10 und 128 Zeichen lang sein.</strong>", true);
     if (password !== $("webPasswordConfirm").value) return show("<strong>Die beiden Passwörter stimmen nicht überein.</strong>", true);
     if (!form.reportValidity()) return;
     const self = isSelf(), p = person(), safety = $("safetyEnabled").checked;
     const request = {
-      product, concierge_profile: product === "senioren" ? "SENIOR_MARTIN" : "PRIME_MARTIN", concierge_choice: concierge().toUpperCase(), package: "FREE",
+      product, concierge_profile: product === "senioren" ? "SENIOR_MARTIN" : "PRIME_MARTIN", concierge_choice: concierge().toUpperCase(), package: selectedPlan.code,
       registration_type: self ? "self" : "other", account_holder_name: fullName($("ownerFirstName").value, $("ownerLastName").value), account_holder_salutation: $("ownerSalutation").value,
       account_holder_first_name: $("ownerFirstName").value.trim(), account_holder_last_name: $("ownerLastName").value.trim(), email: $("ownerEmail").value.trim(), phone: self ? $("ownerPhone").value.trim() : "",
       supported_person_name: fullName(p.first, p.last), supported_person_salutation: p.sal, supported_person_first_name: p.first, supported_person_last_name: p.last,

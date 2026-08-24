@@ -8,7 +8,7 @@
       name="description"
       content="Dauerhaft kostenlosen Nahwerk-Concierge-Zugang registrieren."
     />
-    <link rel="stylesheet" href="assets/site.css?v=22" />
+    <link rel="stylesheet" href="assets/site.css?v=23" />
     <style>
       .signup {
         display: grid;
@@ -197,10 +197,10 @@
             >
               Zugang registrieren
             </h1>
-            <div class="planbox">
-              <strong>FREE · 0 € / MONAT</strong>
+            <div class="planbox" id="selectedPlanBox">
+              <strong id="selectedPlanName">FREE · 0 € / MONAT</strong>
               <span class="plan-sub" id="productLabel">Prime Concierge</span>
-              <ul class="benefits">
+              <ul class="benefits" id="selectedPlanBenefits">
                 <li><strong>30 Dialoge/Monat in den ersten 2 Monaten</strong></li>
                 <li>Danach dauerhaft 15 Dialoge pro Monat</li>
                 <li>1 Bildgenerierung pro Monat</li>
@@ -216,6 +216,7 @@
                   kostenpflichtige Umwandlung
                 </li>
               </ul>
+              <div class="plan-selection-note" id="planSelectionNote"></div>
             </div>
             <div class="field">
               <label>Wer soll Ihr persönlicher Concierge sein?</label>
@@ -458,7 +459,7 @@
                 >
                 zur Kenntnis genommen.</span
               ></label
-            ><button class="btn red" type="submit">
+            ><button class="btn red" type="submit" id="registrationSubmit">
               Kostenlosen Zugang registrieren
             </button>
             <div class="status" id="status"></div>
@@ -516,8 +517,8 @@
         </div>
       </div>
     </footer>
-    <script src="assets/auth-nav.js?v=17"></script>
-    <script src="assets/onboarding.js?v=8"></script>
+    <script src="assets/auth-nav.js?v=18"></script>
+    <script src="assets/onboarding.js?v=9"></script>
     <script>
       const eye =
         '<svg class="eye-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.7"></circle></svg>';
