@@ -3,8 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Kundenbereich | Senioren Concierge Berlin</title>
-    <link rel="stylesheet" href="assets/site.css?v=17" />
+    <title>Kundenbereich | NAHWERK Concierge</title>
+    <meta name="description" content="Persönlicher NAHWERK-Kundenbereich für Tarif, Nutzung, Concierge- und Sicherheitseinstellungen." />
+    <link rel="stylesheet" href="assets/site.css?v=20" />
     <style>
       .dash {
         display: grid;
@@ -115,7 +116,7 @@
         }
       }
     </style>
-  </head>
+  <link rel="canonical" href="https://nahwerkconcierge.com/konto.html"><link rel="icon" type="image/png" href="assets/NAHWERKConcierge-Logo.png?v=3"></head>
   <body>
     <header class="top">
       <div class="wrap nav">
@@ -128,7 +129,7 @@
         <nav class="links">
           <a href="index.html">Startseite</a
           ><a class="active" href="konto.html">Kundenbereich</a
-          ><a href="martin-anpassen.html">Martin (KI) anpassen</a>
+          ><a href="concierge-anpassen.html">Mein Concierge</a>
         </nav>
       </div>
     </header>
@@ -136,9 +137,9 @@
       <section class="hero">
         <div class="wrap">
           <div class="eyebrow">Mein Bereich</div>
-          <h1>Nutzung sehen und Martin (KI) persönlich einstellen.</h1>
+          <h1>Nutzung sehen und Nilo oder Mira persönlich einstellen.</h1>
           <p>
-            Hier wird die monatliche Nutzung sichtbar. Martin (KI) kann außerdem
+            Hier wird die monatliche Nutzung sichtbar. Nilo und Mira können außerdem
             an die unterstützte Person angepasst werden: Ansprache, Sprechtempo,
             Erklärstil und individuelle Wünsche.
           </p>
@@ -155,10 +156,10 @@
           <div class="dash">
             <article class="card">
               <div class="eyebrow">Paket</div>
-              <div class="value" id="planName">KOSTENLOS · 0 € DAUERHAFT</div>
+              <div class="value" id="planName">FREE · 0 € / MONAT</div>
               <p class="muted" id="planMeta">
-                20 Dialoge im 1. Monat · 15 im 2. Monat · danach 10 pro Monat ·
-                1 Bildgenerierung · 1 Foto-/Dokument-Digitalisierung · 10
+                30 Dialoge pro Monat in den ersten zwei Monaten · danach 15 ·
+                1 Bildgenerierung · 1 Foto-/Dokument-Digitalisierung · 5
                 Erinnerungen pro Kalendermonat.
               </p>
             </article>
@@ -166,7 +167,7 @@
               <div class="eyebrow">Status</div>
               <div class="value">
                 <span class="statusdot"></span
-                ><span id="contactStatus">KOSTENLOS aktiv</span>
+                ><span id="contactStatus">FREE aktiv</span>
               </div>
               <p class="muted">
                 Keine zeitliche Befristung. Keine Zahlungsdaten und keine
@@ -184,12 +185,12 @@
               <p class="muted" id="ownerMeta">–</p>
             </article>
             <article class="card wide personalize">
-              <div class="eyebrow">Martin (KI) anpassen</div>
+              <div class="eyebrow">Mein Concierge</div>
               <div class="value">
-                Martin (KI) passt sich dem Menschen an – nicht umgekehrt.
+                Nilo und Mira passen sich dem Menschen an – nicht umgekehrt.
               </div>
               <p class="muted">
-                Stellen Sie Martin (KI) passend zur unterstützten Person ein.
+                Stellen Sie Nilo oder Mira passend zur unterstützten Person ein.
                 Neben festen Optionen können individuelle Wünsche frei
                 beschrieben werden.
               </p>
@@ -200,62 +201,63 @@
                 ><span class="prefchip">Individuelle Hinweise</span>
               </div>
               <div class="actions">
-                <a class="btn red" href="martin-anpassen.html"
-                  >Martin (KI) individuell anpassen</a
+                <a class="btn red" href="concierge-anpassen.html"
+                  >Concierge und Einstellungen verwalten</a
                 >
               </div>
             </article>
             <article class="card wide">
               <div class="eyebrow">Nutzung diesen Kalendermonat</div>
-              <h3>KOSTENLOS-Kontingente</h3>
-              <div class="usagegrid">
+              <h3>Aktueller Verbrauch</h3>
+              <div class="empty" id="usageState">Live-Verbrauchsdaten sind für dieses Konto noch nicht angebunden. Es werden keine erfundenen Werte angezeigt.</div>
+              <div class="usagegrid" id="usageGrid" hidden>
                 <div class="usagebox">
                   <span class="muted">Dialoge</span>
                   <div class="big">
-                    <span id="dialoguesUsed">0</span> /
-                    <span id="dialoguesLimit">20</span>
+                    <span id="dialoguesUsed">–</span> /
+                    <span id="dialoguesLimit">–</span>
                   </div>
                   <div class="bar"><span id="dialoguesBar"></span></div>
                   <span class="muted" id="dialoguesRemaining"
-                    >20 Dialoge übrig</span
+                    >–</span
                   >
                 </div>
                 <div class="usagebox">
                   <span class="muted">Bildgenerierungen</span>
                   <div class="big">
-                    <span id="imagesUsed">0</span> /
-                    <span id="imagesLimit">1</span>
+                    <span id="imagesUsed">–</span> /
+                    <span id="imagesLimit">–</span>
                   </div>
                   <div class="bar"><span id="imagesBar"></span></div>
                   <span class="muted" id="imagesRemaining"
-                    >1 Bildgenerierung übrig</span
+                    >–</span
                   >
                 </div>
                 <div class="usagebox">
                   <span class="muted">Foto-/Dokument-Digitalisierungen</span>
                   <div class="big">
-                    <span id="docsUsed">0</span> / <span id="docsLimit">1</span>
+                    <span id="docsUsed">–</span> / <span id="docsLimit">–</span>
                   </div>
                   <div class="bar"><span id="docsBar"></span></div>
                   <span class="muted" id="docsRemaining"
-                    >1 Digitalisierung übrig</span
+                    >–</span
                   >
                 </div>
                 <div class="usagebox">
                   <span class="muted">Erinnerungen (Wecker oder Termine)</span>
                   <div class="big">
-                    <span id="remindersUsed">0</span> /
-                    <span id="remindersLimit">10</span>
+                    <span id="remindersUsed">–</span> /
+                    <span id="remindersLimit">–</span>
                   </div>
                   <div class="bar"><span id="remindersBar"></span></div>
                   <span class="muted" id="remindersRemaining"
-                    >10 Erinnerungen übrig</span
+                    >–</span
                   >
                 </div>
               </div>
               <div class="recommend" id="recommendation">
                 <strong>Monatlicher Neustart</strong><br /><span class="muted"
-                  >Die KOSTENLOS-Kontingente werden zu Beginn jedes Kalendermonats
+                  >Die FREE-Kontingente werden zu Beginn jedes Kalendermonats
                   automatisch zurückgesetzt. Allgemeine Kundenservice- und
                   Accountfragen belasten das Senioren-Dialogkontingent
                   nicht.</span
@@ -266,6 +268,11 @@
                 sehen können – nicht automatisch den privaten Inhalt jedes
                 WhatsApp-Gesprächs.
               </p>
+            </article>
+            <article class="card wide">
+              <div class="eyebrow">Sicherheit</div>
+              <div class="value" id="safetyStatus">Deaktiviert</div>
+              <p class="muted" id="safetyMeta">Optionale Check-ins sind standardmäßig ausgeschaltet. Die Funktion ersetzt keinen medizinischen Notruf oder Hausnotruf; in akuten Notfällen gilt 112.</p>
             </article>
             <article class="card wide">
               <h3>Gespeicherte Informationen</h3>
@@ -279,9 +286,9 @@
             </article>
           </div>
           <div class="actions">
-            <a class="btn red" href="martin-anpassen.html"
-              >Martin (KI) anpassen</a
-            ><a class="btn light" href="pakete.html">Pakete vergleichen</a
+            <a class="btn red" href="concierge-anpassen.html"
+              >Nilo oder Mira anpassen</a
+            ><a class="btn light" href="pakete.html">Tarife vergleichen</a
             ><a class="btn light" href="kontakt.html">Kontakt aufnehmen</a>
           </div>
         </div>
@@ -298,21 +305,23 @@
         </div>
       </div>
     </footer>
-    <script src="assets/auth-nav.js?v=14"></script>
+    <script src="assets/auth-nav.js?v=16"></script>
     <script>
       (() => {
         function pct(a, b) {
           return b ? Math.min(100, Math.round((a / b) * 100)) : 0;
         }
         function setUsage(u) {
+          document.getElementById("usageState").hidden = true;
+          document.getElementById("usageGrid").hidden = false;
           const du = Number(u.dialogues_used || 0),
-            dl = Number(u.dialogue_limit || 20),
+            dl = Number(u.dialogue_limit || 0),
             iu = Number(u.image_generations_used || 0),
-            il = Number(u.image_generation_limit || 1),
+            il = Number(u.image_generation_limit || 0),
             xu = Number(u.document_digitizations_used || 0),
-            xl = Number(u.document_digitization_limit || 1),
+            xl = Number(u.document_digitization_limit || 0),
             ru = Number(u.reminders_used || 0),
-            rl = Number(u.reminder_limit || 10);
+            rl = Number(u.reminder_limit || 0);
           document.getElementById("dialoguesUsed").textContent = du;
           document.getElementById("dialoguesLimit").textContent = dl;
           document.getElementById("dialoguesRemaining").textContent =
@@ -363,6 +372,12 @@
             localStorage.getItem("scb_onboarding") || "null",
           );
           if (d) {
+            const selected = d.concierge_choice || d.conciergeChoice;
+            if (selected) document.querySelector(".personalize .value").textContent = `${String(selected).toUpperCase() === "MIRA" ? "Mira" : "Nilo"} ist Ihr persönlicher KI-Concierge.`;
+            if (d.safety_enabled) {
+              document.getElementById("safetyStatus").textContent = "Aktiviert";
+              document.getElementById("safetyMeta").textContent = [d.checkin_times, d.trusted_contact_name, d.trusted_contact_phone].filter(Boolean).join(" · ") || "Aktiviert; Details werden nach Backend-Anbindung angezeigt.";
+            }
             document.getElementById("recipientName").textContent =
               d.recipient?.name || "–";
             document.getElementById("recipientMeta").textContent = [
@@ -390,7 +405,7 @@
           if (u) setUsage(u);
           prefSummary(
             JSON.parse(
-              localStorage.getItem("scb_martin_preferences") || "null",
+              localStorage.getItem("nahwerk_concierge_preferences") || "null",
             ),
           );
         } catch (e) {}

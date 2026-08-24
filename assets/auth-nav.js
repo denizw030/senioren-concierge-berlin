@@ -3,12 +3,15 @@
   logoCss.rel = "stylesheet";
   logoCss.href = "assets/nahwerk-logo-v2.css?v=4";
   document.head.appendChild(logoCss);
+  const mobileCss = document.createElement("style");
+  mobileCss.textContent = `@media(max-width:1180px){.top .nav{position:relative!important;flex-wrap:nowrap!important;justify-content:space-between!important}.top .links{display:none!important;position:absolute!important;top:calc(100% - 1px)!important;left:20px!important;right:20px!important;width:auto!important;grid-template-columns:1fr!important;flex-direction:column!important;align-items:stretch!important;text-align:left!important;background:#090909!important}.top .links.is-open{display:flex!important}}@media(max-width:620px){.top .links{left:10px!important;right:10px!important}}`;
+  document.head.appendChild(mobileCss);
   const SESSION_KEY = "scb_web_session";
   const PRODUCT_KEY = "nahwerk_product";
   const CHECK_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/session/check";
   const LOGOUT_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/logout";
-  const PROTECTED = new Set(["konto.html", "martin-anpassen.html"]);
-  const CONTEXT_PAGES = new Set(["registrieren.html", "anmelden.html", "konto.html", "martin-anpassen.html"]);
+  const PROTECTED = new Set(["konto.html", "concierge-anpassen.html"]);
+  const CONTEXT_PAGES = new Set(["registrieren.html", "anmelden.html", "konto.html", "concierge-anpassen.html"]);
   const NAV = [["index.html", "Übersicht"], ["prime-concierge.html", "Prime Concierge"], ["senioren-concierge.html", "Senioren Concierge"], ["angehoerige.html", "Für Angehörige"], ["kontakt.html", "Kontakt"]];
   const page = () => location.pathname.split("/").pop() || "index.html";
   function productContext(current = page()) {
@@ -86,6 +89,32 @@
         const suffix = `?produkt=${product}`;
         nav.appendChild(makeLink(`anmelden.html${suffix}`, "Anmelden", current === "anmelden.html" ? "active auth-link login-link" : ""));
         nav.appendChild(makeLink(`registrieren.html${suffix}`, "Registrieren", current === "registrieren.html" ? "active auth-link register-link" : "auth-link register-link"));
+      }
+      nav.id ||= "main-navigation";
+      if (!nav.previousElementSibling?.classList.contains("nav-toggle")) {
+        const toggle = document.createElement("button");
+        toggle.className = "nav-toggle";
+        toggle.type = "button";
+        toggle.setAttribute("aria-label", "Menü öffnen");
+        toggle.setAttribute("aria-controls", nav.id);
+        toggle.setAttribute("aria-expanded", "false");
+        toggle.innerHTML = '<span></span><span></span><span></span>';
+        const close = () => {
+          nav.classList.remove("is-open");
+          toggle.setAttribute("aria-expanded", "false");
+          toggle.setAttribute("aria-label", "Menü öffnen");
+        };
+        toggle.addEventListener("click", (event) => {
+          event.stopPropagation();
+          const open = !nav.classList.contains("is-open");
+          nav.classList.toggle("is-open", open);
+          toggle.setAttribute("aria-expanded", String(open));
+          toggle.setAttribute("aria-label", open ? "Menü schließen" : "Menü öffnen");
+        });
+        nav.addEventListener("click", (event) => { if (event.target.closest("a")) close(); });
+        document.addEventListener("click", (event) => { if (!event.target.closest(".nav")) close(); });
+        document.addEventListener("keydown", (event) => { if (event.key === "Escape") { close(); toggle.focus(); } });
+        nav.before(toggle);
       }
     });
     ensureOdysxBar();

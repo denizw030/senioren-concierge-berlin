@@ -8,7 +8,7 @@
       name="description"
       content="Dauerhaft kostenlosen Nahwerk-Concierge-Zugang registrieren."
     />
-    <link rel="stylesheet" href="assets/site.css?v=17" />
+    <link rel="stylesheet" href="assets/site.css?v=20" />
     <style>
       .signup {
         display: grid;
@@ -161,7 +161,7 @@
         }
       }
     </style>
-  </head>
+  <link rel="canonical" href="https://nahwerkconcierge.com/registrieren.html"><link rel="icon" type="image/png" href="assets/NAHWERKConcierge-Logo.png?v=3"></head>
   <body>
     <header class="top">
       <div class="wrap nav">
@@ -198,15 +198,14 @@
               Zugang registrieren
             </h1>
             <div class="planbox">
-              <strong>KOSTENLOS · 0 € DAUERHAFT</strong>
+              <strong>FREE · 0 € / MONAT</strong>
               <span class="plan-sub" id="productLabel">Prime Concierge</span>
               <ul class="benefits">
-                <li>20 Dialoge im 1. Monat</li>
-                <li>15 Dialoge im 2. Monat</li>
-                <li>Ab dem 3. Monat 10 Dialoge pro Monat</li>
+                <li><strong>30 Dialoge/Monat in den ersten 2 Monaten</strong></li>
+                <li>Danach dauerhaft 15 Dialoge pro Monat</li>
                 <li>1 Bildgenerierung pro Monat</li>
                 <li>1 Foto-/Dokument-Digitalisierung pro Monat</li>
-                <li>10 Erinnerungen pro Monat, z. B. Wecker oder Termine</li>
+                <li>5 Erinnerungen pro Monat, z. B. Wecker oder Termine</li>
                 <li>Direkt in WhatsApp</li>
                 <li>Text- und Sprachnachrichten</li>
                 <li>
@@ -217,6 +216,14 @@
                   kostenpflichtige Umwandlung
                 </li>
               </ul>
+            </div>
+            <div class="field">
+              <label>Wer soll Ihr persönlicher Concierge sein?</label>
+              <div class="concierge-choice">
+                <label><input type="radio" name="conciergeChoice" value="nilo" checked /><strong>Nilo</strong><span>Ihr persönlicher KI-Concierge mit männlicher Stimme.</span></label>
+                <label><input type="radio" name="conciergeChoice" value="mira" /><strong>Mira</strong><span>Ihre persönliche KI-Concierge mit weiblicher Stimme.</span></label>
+              </div>
+              <span class="tiny">Sie können später jederzeit zwischen Nilo und Mira wechseln – einfach per Nachricht oder Sprache.</span>
             </div>
             <div class="field">
               <label>Für wen richten Sie den Zugang ein?</label>
@@ -335,7 +342,7 @@
                 autocomplete="tel"
                 placeholder="z. B. +49 170 ..."
               /><span class="tiny"
-                >Nur nötig, wenn Sie Martin (KI) selbst über WhatsApp
+                >Nur nötig, wenn Sie Nilo oder Mira selbst über WhatsApp
                 nutzen.</span
               >
             </div>
@@ -345,7 +352,7 @@
             </div>
             <div id="recipientBlock" hidden>
               <h2 style="font-size: 25px">
-                Person, die Martin (KI) unterstützen soll
+                Person, die Nilo oder Mira unterstützen soll
               </h2>
               <div class="row name">
                 <div class="field">
@@ -390,7 +397,7 @@
               </div>
               <div class="field">
                 <label for="note"
-                  >Was sollte Martin (KI) am Anfang wissen?
+                  >Was sollte Nilo oder Mira am Anfang wissen?
                   <span class="tiny">(optional)</span></label
                 ><textarea
                   id="note"
@@ -400,11 +407,24 @@
             </div>
             <div class="field">
               <label for="addressing"
-                >Wie soll Martin (KI) die unterstützte Person ansprechen?</label
+                >Wie soll Nilo oder Mira die unterstützte Person ansprechen?</label
               ><select id="addressing">
                 <option value="du">Du – mit Vornamen</option>
                 <option value="sie">Sie – mit Anrede und Nachnamen</option>
               </select>
+            </div>
+            <label class="check" id="safetyToggleRow"
+              ><input type="checkbox" id="safetyEnabled" /><span
+                ><strong>Optionale Sicherheitsfunktion einrichten</strong><br />Standardmäßig deaktiviert. Nilo oder Mira können zu vereinbarten Zeiten nachfragen, ob alles in Ordnung ist.</span
+              ></label>
+            <div class="progressive-panel" id="safetyFields" hidden>
+              <div class="row">
+                <div class="field"><label for="checkinTimes">Gewünschte Check-in-Zeit(en)</label><input id="checkinTimes" placeholder="z. B. täglich um 9:00 Uhr" /></div>
+                <div class="field"><label for="trustedContactPhone">Telefonnummer der Vertrauensperson</label><input id="trustedContactPhone" type="tel" placeholder="+49 ..." /></div>
+              </div>
+              <div class="field"><label for="trustedContactName">Name der Vertrauensperson <span class="tiny">(freiwillig)</span></label><input id="trustedContactName" /></div>
+              <p class="tiny">Diese Nummer wird ausschließlich für die von Ihnen aktivierten Sicherheitsfunktionen verwendet, damit im vorgesehenen Fall eine von Ihnen bestimmte Vertrauensperson informiert werden kann. Die Vertrauensperson erhält nicht allein durch die Registrierung automatisch eine WhatsApp-Nachricht.</p>
+              <p class="tiny"><strong>Kein Notruf:</strong> Die Sicherheitsfunktionen ersetzen keinen medizinischen Notruf oder Hausnotruf. In akuten Notfällen gilt weiterhin 112.</p>
             </div>
             <label class="check" id="consentRow" hidden
               ><input type="checkbox" id="consent" /><span
@@ -460,7 +480,7 @@
             <h3>Web-Konto + WhatsApp.</h3>
             <div class="msg" id="messagePreview">
               <strong>Hallo 👋</strong><br /><br />Willkommen bei Prime
-              Concierge.<br /><br />Ich bin Prime Martin (KI), dein digitaler,
+              Concierge.<br /><br />Ich bin Nilo oder Mira, dein digitaler,
               KI-gestützter Concierge.<br /><br />Ich helfe dir bei
               Organisation, Informationen, Technik und vielem mehr – schnell,
               persönlich und zuverlässig.<br /><br />Einfach schreiben, ich bin
@@ -496,7 +516,7 @@
         </div>
       </div>
     </footer>
-    <script src="assets/auth-nav.js?v=14"></script>
+    <script src="assets/auth-nav.js?v=16"></script>
     <script src="assets/onboarding.js?v=8"></script>
     <script>
       const eye =
