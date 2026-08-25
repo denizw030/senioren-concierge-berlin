@@ -38,5 +38,13 @@ The website currently calls n8n endpoints for password login and password-reset 
 6. Add unit, Compose UI and accessibility tests.
 7. Add development/staging/production environment injection without committing secrets.
 
-## Build
-A local/CI Android SDK build has not yet been executed by this connector. Do not describe the project as build-verified until `./gradlew test assembleDebug` succeeds in an Android-capable environment.
+## Build / QA
+The repository currently does not contain a Gradle Wrapper (`gradlew` plus `gradle/wrapper/*`). Until a wrapper is added, local builds require a compatible Gradle installation.
+
+The isolated GitHub Actions workflow `.github/workflows/android-qa.yml` uses Java 17 and Gradle 8.9 and executes:
+
+```text
+gradle --no-daemon clean testDebugUnitTest lintDebug assembleDebug
+```
+
+Do not describe the project as build-verified unless that command actually completes successfully in an Android-capable environment. Instrumented/emulator tests are not part of this QA workflow yet.
