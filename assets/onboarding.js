@@ -8,7 +8,7 @@
   const params = new URLSearchParams(location.search);
   const requestedProduct = params.get("produkt");
   const product = requestedProduct === "senioren" || (!requestedProduct && sessionStorage.getItem("nahwerk_product") === "senioren") ? "senioren" : "prime";
-  const productLabel = product === "senioren" ? "Senioren Concierge" : "Prime Concierge";
+  const productLabel = product === "senioren" ? "Senioren Concierge" : "Persönlicher Concierge";
   const planKey = ({ kostenlos: "free" }[params.get("paket")] || params.get("paket") || "free").toLowerCase();
   const plans = {
     free: { code: "FREE", title: "FREE · 0 € / MONAT", benefits: ["30 Dialoge/Monat in den ersten 2 Monaten", "Danach dauerhaft 15 Dialoge pro Monat", "1 Bildgenerierung pro Monat", "1 Foto-/Dokument-Digitalisierung pro Monat", "5 Erinnerungen pro Monat, z. B. Wecker oder Termine", "Direkt in WhatsApp", "Text- und Sprachnachrichten"] },

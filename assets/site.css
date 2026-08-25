@@ -729,7 +729,7 @@ h3 {
   width: min(330px, 27vw);
   aspect-ratio: 1;
   background: center/100% 100% no-repeat
-    url("NASHWERK-Concierge-Smartphone-mittig-ODYSX.png?v=1");
+    url("persoenlicher-concierge.png?v=1");
   -webkit-clip-path: circle(42% at 50% 45%);
   clip-path: circle(42% at 50% 45%);
   filter: drop-shadow(0 0 26px rgba(255, 255, 255, 0.13));

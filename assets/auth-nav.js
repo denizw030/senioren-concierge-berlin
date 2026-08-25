@@ -12,7 +12,7 @@
   const LOGOUT_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/logout";
   const PROTECTED = new Set(["konto.html", "concierge-anpassen.html"]);
   const CONTEXT_PAGES = new Set(["registrieren.html", "anmelden.html", "konto.html", "concierge-anpassen.html"]);
-  const NAV = [["index.html", "Übersicht"], ["prime-concierge.html", "Prime Concierge"], ["senioren-concierge.html", "Senioren Concierge"], ["angehoerige.html", "Für Angehörige"], ["kontakt.html", "Kontakt"]];
+  const NAV = [["index.html", "Übersicht"], ["prime-concierge.html", "Persönlicher Concierge"], ["senioren-concierge.html", "Senioren Concierge"], ["angehoerige.html", "Für Angehörige"], ["kontakt.html", "Kontakt"]];
   const page = () => location.pathname.split("/").pop() || "index.html";
   function productContext(current = page()) {
     const requested = new URLSearchParams(location.search).get("produkt");
