@@ -1,0 +1,150 @@
+openapi: 3.1.0
+info:
+  title: NAHWERK Provider Switch API
+  version: 0.1.0-design
+  description: Design-only contracts. Authentication/authorization are delegated to the existing NAHWERK security layer.
+servers: []
+paths:
+  /contracts/analyze:
+    post:
+      operationId: analyzeContract
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [product_type, input]
+              properties:
+                product_type: {type: string, enum: [electricity, gas, internet, mobile]}
+                input: {type: object, description: Reference to text/transcript/document; never raw secrets.}
+      responses:
+        '200':
+          description: Field-level extraction result
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [contract_id, fields, overall_status]
+                properties:
+                  contract_id: {type: string, format: uuid}
+                  fields: {type: object}
+                  overall_status: {type: string, enum: [verified, probable, uncertain, missing]}
+                  missing_required_fields: {type: array, items: {type: string}}
+  /contracts/compare:
+    post:
+      operationId: compareContract
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [contract_id, need_profile]
+              properties:
+                contract_id: {type: string, format: uuid}
+                need_profile: {type: object}
+      responses:
+        '200':
+          description: Normalized comparison
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [comparison_id, status, ranked_offers]
+                properties:
+                  comparison_id: {type: string, format: uuid}
+                  status: {type: string}
+                  current_effective_cost: {type: object}
+                  ranked_offers: {type: array, items: {type: object}}
+                  assumptions: {type: array, items: {type: string}}
+                  missing_data: {type: array, items: {type: string}}
+  /contracts/{id}/comparison:
+    get:
+      operationId: getComparison
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: {type: string, format: uuid}
+      responses:
+        '200': {description: Latest authorized comparison snapshot}
+  /switch/prepare:
+    post:
+      operationId: prepareSwitch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [comparison_id, selected_offer_id]
+              properties:
+                comparison_id: {type: string, format: uuid}
+                selected_offer_id: {type: string, format: uuid}
+      responses:
+        '200':
+          description: Immutable approval candidate
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [switch_id, version, preparation_hash, summary, expires_at]
+                properties:
+                  switch_id: {type: string, format: uuid}
+                  version: {type: integer}
+                  preparation_hash: {type: string}
+                  summary: {type: object}
+                  expires_at: {type: string, format: date-time}
+  /switch/{id}/summary:
+    get:
+      operationId: getSwitchSummary
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: {type: string, format: uuid}
+      responses:
+        '200': {description: Human-readable approval summary plus machine snapshot hash}
+  /switch/{id}/approve:
+    post:
+      operationId: approveSwitch
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: {type: string, format: uuid}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [preparation_hash, explicit_confirmation]
+              properties:
+                preparation_hash: {type: string}
+                explicit_confirmation: {type: boolean, const: true}
+      responses:
+        '200': {description: Approval recorded for the exact current preparation}
+        '409': {description: Offer/preparation changed or expired; re-approval required}
+  /switch/{id}/cancel:
+    post:
+      operationId: cancelSwitch
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: {type: string, format: uuid}
+      responses:
+        '200': {description: Preparation/approval cancelled where execution has not irreversibly started}
+  /switch/{id}/execute:
+    post:
+      operationId: executeSwitchConceptOnly
+      description: CONCEPT ONLY. Must remain disabled until Security, legal review and provider-specific integration approval are complete.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: {type: string, format: uuid}
+      responses:
+        '501': {description: Disabled in current phase}
