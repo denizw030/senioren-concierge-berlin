@@ -5,3 +5,4 @@ from .providers import *
 from .validation import validate_contract, validate_offer
 from .safety import safety_gate, execution_allowed
 from .recommendations import select_concierge_recommendations
+from .transport import raise_for_provider_status
