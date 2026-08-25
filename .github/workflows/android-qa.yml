@@ -13,9 +13,10 @@ on:
     paths:
       - 'android-app/**'
       - '.github/workflows/android-qa.yml'
+  workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-test-lint:
@@ -25,6 +26,8 @@ jobs:
         working-directory: android-app
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -32,8 +35,25 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+          cache-read-only: false
+      - name: Bootstrap Gradle wrapper 8.9 when missing
+        shell: bash
+        run: |
+          if [ ! -f gradlew ] || [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
+            gradle wrapper --gradle-version 8.9 --distribution-type bin
+            chmod +x gradlew
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add gradlew gradlew.bat gradle/wrapper/gradle-wrapper.properties gradle/wrapper/gradle-wrapper.jar
+            if ! git diff --cached --quiet; then
+              git commit -m "Add Gradle 8.9 wrapper"
+              git push origin HEAD:codex/nahwerk-android-foundation
+            fi
+          fi
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
       - name: Compile, test, lint and build debug APK
-        run: gradle --no-daemon clean testDebugUnitTest lintDebug assembleDebug
+        run: ./gradlew --no-daemon clean testDebugUnitTest lintDebug assembleDebug
       - name: Upload debug APK
         if: success()
         uses: actions/upload-artifact@v4
@@ -41,3 +61,10 @@ jobs:
           name: nahwerk-debug-apk
           path: android-app/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+      - name: Upload lint report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nahwerk-lint-report
+          path: android-app/app/build/reports/lint-results-debug.html
+          if-no-files-found: warn
