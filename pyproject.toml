@@ -1,0 +1,8 @@
+[project]
+name = "nahwerk-provider-switch-core"
+version = "0.1.0"
+description = "Isolated, non-production NAHWERK provider switch core engine"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests/provider_switch_core"]
