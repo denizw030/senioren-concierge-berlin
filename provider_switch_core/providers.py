@@ -41,7 +41,7 @@ class FixtureProviderAdapter(ProviderAdapter):
         return LocationValidationResult(bool(request.postal_code), bool(request.postal_code), None if request.postal_code else 'postal_code_required')
     def normalize_offer(self, raw): return NormalizedOffer(**raw)
     def get_provider_capabilities(self):
-        return ProviderCapabilities('fixture', ('electricity','gas','internet','mobile'), True, True, True, False, False, False, False, False, True, ('TEST_ONLY',))
+        return ProviderCapabilities('fixture', ('electricity','gas','internet','mobile'), True, True, True, False, False, False, False, False, True, ('TEST_ONLY',), ('electricity','gas','internet','mobile'), ())
 
 @dataclass
 class VerivoxAdapter(ProviderAdapter):
@@ -71,7 +71,7 @@ class VerivoxAdapter(ProviderAdapter):
             raise ValueError('Only explicit NAHWERK Verivox test fixtures may be normalized without partner API documentation')
         return NormalizedOffer(offer_id=raw['offer_id'],provider_name=raw['provider_name'],tariff_name=raw['tariff_name'],product_type=raw['product_type'],monthly_base_price=raw.get('monthly_base_price'),variable_unit_price=raw.get('variable_unit_price'),annual_usage_units=raw.get('annual_usage_units'),one_time_costs=raw.get('one_time_costs',0),hardware_costs=raw.get('hardware_costs',0),connection_costs=raw.get('connection_costs',0),shipping_costs=raw.get('shipping_costs',0),eligible_bonus_first_year=raw.get('eligible_bonus_first_year',0),monthly_price_after_promo=raw.get('monthly_price_after_promo'),promo_months=raw.get('promo_months',0),minimum_term_months=raw.get('minimum_term_months'),cancellation_notice_days=raw.get('cancellation_notice_days'),price_guarantee_months=raw.get('price_guarantee_months'),performance=raw.get('performance'),available=raw.get('available'),source='VERIVOX_TEST_FIXTURE',fetched_at=raw.get('fetched_at','TEST_ONLY'),valid_until=raw.get('valid_until'),risk_score=raw.get('risk_score',0),preference_match=raw.get('preference_match',0.5),commercial=CommercialMetadata(affiliate_program='Verivox Partnerprogramm TEST FIXTURE',commission_type=raw.get('commission_type'),commission_value=raw.get('commission_value'),confirmed=False))
     def get_provider_capabilities(self):
-        return ProviderCapabilities('verivox',('electricity','gas','internet','mobile'),True,True,True,True,True,True,True,True,False,('Structured Webservice publicly confirmed for electricity/gas; separate contract required.','Public partner page lists DSL/mobile marketing via iFrame/link-out and asks partners to contact Verivox for APIs/deep integration.','Authentication, endpoint schema, sandbox and rate limits are not publicly documented in sufficient detail.'))
+        return ProviderCapabilities('verivox',('electricity','gas','internet','mobile'),True,True,True,True,True,True,True,True,False,('Structured Webservice publicly confirmed for electricity/gas; separate contract required.','Public partner page lists DSL/mobile marketing via iFrame/link-out and asks partners to contact Verivox for APIs/deep integration.','Authentication, endpoint schema, sandbox and rate limits are not publicly documented in sufficient detail.'),('electricity','gas'),('electricity','gas'))
 
 @dataclass
 class Check24Adapter(ProviderAdapter):
@@ -98,11 +98,11 @@ class Check24Adapter(ProviderAdapter):
         if parsed.scheme!='https' or not parsed.netloc: raise ValueError('partner_deep_link must be an HTTPS URL supplied by CHECK24 partner account')
         return self.partner_deep_link
     def get_provider_capabilities(self):
-        return ProviderCapabilities('check24',('electricity','gas','internet','mobile'),False,False,True,True,True,True,True,True,False,('Public materials confirm whitelabel comparison calculators and personal direct/deep links including WhatsApp usage.','No public structured tariff-search API schema/auth/rate-limit contract was confirmed.','Energy terms state applicant must submit the application themselves.'))
+        return ProviderCapabilities('check24',('electricity','gas','internet','mobile'),False,False,True,True,True,True,True,True,False,('Public materials confirm whitelabel comparison calculators and personal direct/deep links including WhatsApp usage.','No public structured tariff-search API schema/auth/rate-limit contract was confirmed.','Energy terms state applicant must submit the application themselves.'),(),())
 
 class DirectProviderAdapter(ProviderAdapter):
     def search_offers(self,request,region=None,need=None): raise MissingPartnerConfiguration('Direct provider integration requires an explicit provider contract/API')
     def get_offer_details(self,provider_offer_id): raise MissingPartnerConfiguration('Direct provider integration requires an explicit provider contract/API')
     def validate_location(self,request): return LocationValidationResult(False,False,'direct_provider_contract_required')
     def normalize_offer(self,raw): raise MissingPartnerConfiguration('Direct provider schema required')
-    def get_provider_capabilities(self): return ProviderCapabilities('direct',(),False,False,False,False,False,False,False,True,False,('Provider-specific contract required.',))
+    def get_provider_capabilities(self): return ProviderCapabilities('direct',(),False,False,False,False,False,False,False,True,False,('Provider-specific contract required.',),(),())
