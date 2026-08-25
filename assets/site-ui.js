@@ -1,34 +1,42 @@
 (() => {
   const updateProductCopy = () => {
     const page = location.pathname.split('/').pop() || 'index.html';
-    if (page !== 'registrieren.html') return;
 
-    const planName = document.getElementById('selectedPlanName');
-    const benefits = document.getElementById('selectedPlanBenefits');
-    if (planName && /FREE/i.test(planName.textContent || '')) planName.textContent = 'FREE · 0 € / MONAT';
-    if (benefits && /30 Dialoge|15 Dialoge|FREE/i.test(benefits.textContent || '')) {
-      benefits.innerHTML = [
-        '<li><strong>10 Dialoge pro Monat</strong></li>',
-        '<li>1 Bildgenerierung pro Monat</li>',
-        '<li>1 Foto-/Dokument-Digitalisierung pro Monat</li>',
-        '<li>Direkt über WhatsApp</li>',
-        '<li>Text- und Sprachnachrichten</li>',
-        '<li>Persönliche Ansprache und hilfreiche Präferenzen</li>',
-        '<li>Dauerhaft kostenlos und keine automatische kostenpflichtige Umwandlung</li>'
-      ].join('');
+    if (page === 'registrieren.html') {
+      const planName = document.getElementById('selectedPlanName');
+      const benefits = document.getElementById('selectedPlanBenefits');
+      if (planName && /FREE/i.test(planName.textContent || '')) planName.textContent = 'FREE · 0 € / MONAT';
+      if (benefits && /30 Dialoge|15 Dialoge|FREE/i.test(benefits.textContent || '')) {
+        benefits.innerHTML = [
+          '<li><strong>10 Dialoge pro Monat</strong></li>',
+          '<li>1 Bildgenerierung pro Monat</li>',
+          '<li>1 Foto-/Dokument-Digitalisierung pro Monat</li>',
+          '<li>Direkt über WhatsApp</li>',
+          '<li>Text- und Sprachnachrichten</li>',
+          '<li>Persönliche Ansprache und hilfreiche Präferenzen</li>',
+          '<li>Dauerhaft kostenlos und keine automatische kostenpflichtige Umwandlung</li>'
+        ].join('');
+      }
+
+      const preview = document.getElementById('messagePreview');
+      if (preview) {
+        preview.innerHTML = '<strong>Hallo 👋</strong><br><br>Willkommen bei NAHWERK Concierge.<br><br>Ich bin dein digitaler KI-Concierge und unterstütze dich direkt über WhatsApp bei Alltag, Organisation, Technik, Fotos, Dokumenten und Erinnerungen.<br><br>Du kannst schreiben oder eine Sprachnachricht senden. Die tatsächliche Ansprache richtet sich nach deiner Einstellung.';
+      }
+
+      const trust = document.querySelector('.trustline span');
+      if (trust) trust.textContent = 'Wie Daten verarbeitet und geschützt werden, erklären wir transparent in der Datenschutzerklärung.';
+
+      const safetyRow = document.getElementById('safetyToggleRow');
+      const safetyLabel = safetyRow?.querySelector('span');
+      if (safetyLabel) safetyLabel.innerHTML = '<strong>Freiwillige Check-ins einrichten</strong><br>Standardmäßig deaktiviert. Nur aktivieren, wenn die unterstützte Person diese zusätzliche Funktion ausdrücklich wünscht.';
     }
 
-    const preview = document.getElementById('messagePreview');
-    if (preview) {
-      preview.innerHTML = '<strong>Hallo 👋</strong><br><br>Willkommen bei NAHWERK Concierge.<br><br>Ich bin dein digitaler KI-Concierge und unterstütze dich direkt über WhatsApp bei Alltag, Organisation, Technik, Fotos, Dokumenten und Erinnerungen.<br><br>Du kannst schreiben oder eine Sprachnachricht senden. Die tatsächliche Ansprache richtet sich nach deiner Einstellung.';
+    if (page === 'konto.html') {
+      const planName = document.getElementById('planName');
+      const planMeta = document.getElementById('planMeta');
+      if (planName) planName.textContent = 'FREE · 0 € / MONAT';
+      if (planMeta) planMeta.textContent = '10 Dialoge pro Monat · 1 Bildgenerierung pro Monat · 1 Foto-/Dokument-Digitalisierung pro Monat.';
     }
-
-    const trust = document.querySelector('.trustline span');
-    if (trust) trust.textContent = 'Wie Daten verarbeitet und geschützt werden, erklären wir transparent in der Datenschutzerklärung.';
-
-    const safetyRow = document.getElementById('safetyToggleRow');
-    const safetyLabel = safetyRow?.querySelector('span');
-    if (safetyLabel) safetyLabel.innerHTML = '<strong>Freiwillige Check-ins einrichten</strong><br>Standardmäßig deaktiviert. Nur aktivieren, wenn die unterstützte Person diese zusätzliche Funktion ausdrücklich wünscht.';
   };
 
   const ready = () => {
