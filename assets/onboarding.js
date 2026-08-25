@@ -9,16 +9,25 @@
   const requestedProduct = params.get("produkt");
   const product = requestedProduct === "senioren" || (!requestedProduct && sessionStorage.getItem("nahwerk_product") === "senioren") ? "senioren" : "prime";
   const productLabel = product === "senioren" ? "Senioren Concierge" : "Persönlicher Concierge";
-  const planKey = ({ kostenlos: "free" }[params.get("paket")] || params.get("paket") || "free").toLowerCase();
-  const plans = {
-    free: { code: "FREE", title: "FREE · 0 € / MONAT", benefits: ["30 Dialoge/Monat in den ersten 2 Monaten", "Danach dauerhaft 15 Dialoge pro Monat", "1 Bildgenerierung pro Monat", "1 Foto-/Dokument-Digitalisierung pro Monat", "5 Erinnerungen pro Monat, z. B. Wecker oder Termine", "Direkt in WhatsApp", "Text- und Sprachnachrichten"] },
-    standard: { code: "STANDARD", title: "STANDARD · 9,99 € / MONAT", benefits: ["100 Dialoge pro Monat", "5 Bildgenerierungen", "10 Foto-/Dokument-Digitalisierungen", "25 Erinnerungen"] },
-    komfort: { code: "KOMFORT", title: "KOMFORT · 19,99 € / MONAT", benefits: ["200 Dialoge pro Monat", "10 Bildgenerierungen", "20 Foto-/Dokument-Digitalisierungen", "50 Erinnerungen"] },
-    premium: { code: "PREMIUM", title: "PREMIUM · 29,99 € / MONAT", benefits: ["350 Dialoge pro Monat", "25 Bildgenerierungen", "25 Foto-/Dokument-Digitalisierungen", "100 Erinnerungen"] },
-    "premium-plus": { code: "PREMIUM PLUS", title: "PREMIUM PLUS · 44,99 € / MONAT", benefits: ["600 Dialoge pro Monat", "40 Bildgenerierungen", "50 Foto-/Dokument-Digitalisierungen", "150 Erinnerungen"] }
+  const requestedPlanKey = ({ kostenlos: "free" }[params.get("paket")] || params.get("paket") || "free").toLowerCase();
+  const freePlan = {
+    code: "FREE",
+    title: "FREE · 0 € / MONAT",
+    benefits: [
+      "10 Dialoge pro Monat",
+      "1 Bildgenerierung pro Monat",
+      "1 Foto-/Dokument-Digitalisierung pro Monat",
+      "Direkt in WhatsApp",
+      "Text- und Sprachnachrichten",
+      "Dauerhaft kostenlos und keine automatische kostenpflichtige Umwandlung"
+    ]
   };
-  const selectedPlan = plans[planKey] || plans.free;
-  const planBookable = selectedPlan.code === "FREE";
+  const planBookable = requestedPlanKey === "free";
+  const selectedPlan = planBookable ? freePlan : {
+    code: "NICHT VERFÜGBAR",
+    title: "Weitere Tarife · noch nicht verfügbar",
+    benefits: ["Aktuell ist ausschließlich FREE verbindlich verfügbar."]
+  };
   sessionStorage.setItem("nahwerk_product", product);
   $("registrationTitle").textContent = `${productLabel} Zugang registrieren`;
   $("productLabel").textContent = productLabel;
@@ -26,8 +35,8 @@
   $("selectedPlanBenefits").innerHTML = selectedPlan.benefits.map((benefit) => `<li>${benefit}</li>`).join("");
   if (!planBookable) {
     $("selectedPlanBox").classList.add("selected-paid-plan");
-    $("planSelectionNote").innerHTML = `<strong>${selectedPlan.code} ist ausgewählt.</strong><br>Dieser Tarif ist noch nicht verbindlich buchbar, weil der sichere Zahlungs-, Widerrufs- und Kündigungsprozess noch nicht aktiviert ist. <a href="registrieren.html?produkt=${product}&paket=free">Stattdessen FREE starten</a>.`;
-    $("registrationSubmit").textContent = `${selectedPlan.code} ausgewählt · noch nicht buchbar`;
+    $("planSelectionNote").innerHTML = `<strong>Dieser Tarif ist aktuell nicht verfügbar.</strong><br>Weitere kostenpflichtige Tarife werden erst mit finalen Preisen, Leistungen und Vertragsprozessen veröffentlicht. <a href="registrieren.html?produkt=${product}&paket=free">Stattdessen FREE starten</a>.`;
+    $("registrationSubmit").textContent = "Tarif noch nicht verfügbar";
     $("registrationSubmit").setAttribute("aria-disabled", "true");
   }
   document.title = `${productLabel} registrieren | NAHWERK`;
@@ -60,6 +69,8 @@
     $("safetyFields").hidden = !enabled; $("checkinTimes").required = enabled; $("trustedContactPhone").required = enabled;
   }
   function show(message, error = false) {
+    $("status").setAttribute("role", error ? "alert" : "status");
+    $("status").setAttribute("aria-live", error ? "assertive" : "polite");
     $("status").style.display = "block"; $("status").style.borderLeftColor = error ? "#a84b4b" : "var(--gold)"; $("status").innerHTML = message;
   }
   async function login(email, password) {
@@ -73,7 +84,7 @@
   form.addEventListener("change", (event) => { if (event.target.name === "setupFor") syncSelf(); if (event.target.id === "safetyEnabled") syncSafety(); render(); });
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
-    if (!planBookable) return show(`<strong>${selectedPlan.code} ist ausgewählt, aber noch nicht buchbar.</strong><br>Für eine verbindliche Buchung fehlt derzeit noch der Zahlungs- und Vertragsprozess. Sie können aktuell <a href="registrieren.html?produkt=${product}&paket=free">FREE registrieren</a>.`, true);
+    if (!planBookable) return show(`<strong>Dieser Tarif ist aktuell nicht verfügbar.</strong><br>Sie können derzeit <a href="registrieren.html?produkt=${product}&paket=free">FREE registrieren</a>.`, true);
     const password = $("webPassword").value;
     if (password.length < 10 || password.length > 128) return show("<strong>Das Passwort muss zwischen 10 und 128 Zeichen lang sein.</strong>", true);
     if (password !== $("webPasswordConfirm").value) return show("<strong>Die beiden Passwörter stimmen nicht überein.</strong>", true);
