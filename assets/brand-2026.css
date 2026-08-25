@@ -91,6 +91,30 @@ body[data-product="senioren"] .section.alt,body.senior-product .section.alt { ba
 body[data-product="senioren"] .card,body[data-product="senioren"] .product,body[data-product="senioren"] .step,body.senior-product .card,body.senior-product .product,body.senior-product .step { background:rgba(255,255,255,.58)!important; border-color:var(--nw-line-light)!important; color:var(--nw-ink)!important; box-shadow:var(--nw-shadow-soft)!important; }
 body[data-product="senioren"] .card p,body[data-product="senioren"] .card li,body.senior-product .card p,body.senior-product .card li { color:var(--nw-muted-light)!important; }
 body[data-product="senioren"] .btn.light,body.senior-product .btn.light { color:var(--nw-ink)!important; border-color:rgba(42,35,23,.3)!important; }
+body[data-product="senioren"] :is(.notice,.status,.selfhint,.warning,.planbox,.progressive-panel,.legalbox,.faq details,.formcard,.preview,.logincard,.resetcard,.usagebox,.billing,.transferbox),
+body.senior-product :is(.notice,.status,.selfhint,.warning,.planbox,.progressive-panel,.legalbox,.faq details,.formcard,.preview,.logincard,.resetcard,.usagebox,.billing,.transferbox) {
+  background:rgba(255,255,255,.72)!important;
+  color:var(--nw-ink)!important;
+  border:1px solid rgba(112,87,39,.18)!important;
+  border-left:3px solid var(--nw-gold)!important;
+  box-shadow:0 14px 40px rgba(57,45,22,.07)!important;
+}
+body[data-product="senioren"] :is(.notice,.status,.selfhint,.warning,.planbox,.progressive-panel,.legalbox,.faq details,.formcard,.preview,.logincard,.resetcard,.usagebox,.billing,.transferbox) :is(p,li,strong,h2,h3,label,span),
+body.senior-product :is(.notice,.status,.selfhint,.warning,.planbox,.progressive-panel,.legalbox,.faq details,.formcard,.preview,.logincard,.resetcard,.usagebox,.billing,.transferbox) :is(p,li,strong,h2,h3,label,span) {
+  color:var(--nw-ink)!important;
+}
+body[data-product="senioren"] :is(.concierge-choice label,.choice label),
+body.senior-product :is(.concierge-choice label,.choice label) {
+  background:#fbfaf7!important;
+  color:var(--nw-ink)!important;
+  border-color:rgba(42,35,23,.18)!important;
+}
+body[data-product="senioren"] :is(.field input,.field select,.field textarea),
+body.senior-product :is(.field input,.field select,.field textarea) {
+  background:#fff!important;
+  color:var(--nw-ink)!important;
+  border-color:rgba(42,35,23,.24)!important;
+}
 .reveal { opacity:0; transform:translateY(18px); transition:opacity .7s var(--nw-ease),transform .7s var(--nw-ease); }
 .reveal.is-visible { opacity:1; transform:none; }
 body.menu-open { overflow:hidden; }
