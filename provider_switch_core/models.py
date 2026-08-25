@@ -78,6 +78,8 @@ class ProviderCapabilities:
     requires_partner_contract: bool
     production_ready: bool = False
     notes: tuple[str, ...] = ()
+    structured_search_categories: tuple[str, ...] = ()
+    completion_flow_categories: tuple[str, ...] = ()
 
 @dataclass(frozen=True)
 class NormalizedOffer:
