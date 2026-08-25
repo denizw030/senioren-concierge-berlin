@@ -1,0 +1,20 @@
+-- NW-FAMILY-CORE-02 — DESIGN ONLY. DO NOT APPLY TO PRODUCTION.
+-- Existing production primitives discovered and intended for reuse:
+-- public.authorize_family_access(account, actor, target, permission, scope)
+-- public.register_family_permission_invite_secure(...)
+-- public.set_family_permission_invite_consent_secure(...)
+-- public.accept_family_permission_invite_secure(...)
+-- public.revoke_family_permission_secure(...)
+--
+-- Canonical scope mapping proposed for future compatibility:
+-- reminder.read | reminder.create | reminder.update | reminder.delete
+-- profile.basic.read | support.request | memory.read | memory.write
+-- mobility.information | mobility.prepare | mobility.approve | mobility.execute
+-- restaurant.information | restaurant.prepare | restaurant.approve | restaurant.execute
+-- provider_switch.information | provider_switch.prepare | provider_switch.approve | provider_switch.execute
+-- documents.read
+--
+-- family_authorize_action should be an adapter around authorize_family_access,
+-- adding sensitivity/context checks. It must fail closed and must not trust
+-- client-provided AuthorizationContext. No DDL or CREATE FUNCTION is included
+-- here intentionally because productive schema/security changes are forbidden.
