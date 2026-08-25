@@ -116,18 +116,18 @@
         }
       }
     </style>
-  <link rel="canonical" href="https://nahwerkconcierge.com/konto.html"><link rel="icon" type="image/png" href="assets/NAHWERKConcierge-Logo.png?v=3"><link rel="stylesheet" href="assets/brand-2026.css?v=4"><meta property="og:type" content="website"><meta property="og:locale" content="de_DE"><meta property="og:title" content="NAHWERK Concierge"><meta property="og:description" content="Persönliche, verständliche Concierge-Unterstützung direkt über WhatsApp."></head>
+  <link rel="canonical" href="https://nahwerkconcierge.com/konto.html"><link rel="icon" type="image/png" href="assets/NAHWERKConcierge-Logo.png?v=3"><link rel="stylesheet" href="assets/brand-2026.css?v=3"><meta property="og:type" content="website"><meta property="og:locale" content="de_DE"><meta property="og:title" content="NAHWERK Concierge"><meta property="og:description" content="Persönliche, verständliche Concierge-Unterstützung direkt über WhatsApp."></head>
   <body>
     <header class="top">
       <div class="wrap nav">
         <a class="brand" href="index.html"
-          ><span class="mark">SC</span
+          ><span class="mark nahwerk-mark" aria-hidden="true"></span
           ><span class="brandtext"
-            ><strong>Senioren Concierge</strong><span>Berlin</span></span
+            ><strong>NAHWERK</strong><span>CONCIERGE</span></span
           ></a
         >
         <nav class="links">
-          <a href="index.html">Startseite</a
+          <a href="index.html">Übersicht</a
           ><a class="active" href="konto.html">Kundenbereich</a
           ><a href="concierge-anpassen.html">Mein Concierge</a>
         </nav>
@@ -158,9 +158,8 @@
               <div class="eyebrow">Paket</div>
               <div class="value" id="planName">FREE · 0 € / MONAT</div>
               <p class="muted" id="planMeta">
-                30 Dialoge pro Monat in den ersten zwei Monaten · danach 15 ·
-                1 Bildgenerierung · 1 Foto-/Dokument-Digitalisierung · 5
-                Erinnerungen pro Kalendermonat.
+                10 Dialoge pro Monat · 1 Bildgenerierung ·
+                1 Foto-/Dokument-Digitalisierung pro Kalendermonat.
               </p>
             </article>
             <article class="card">
@@ -170,7 +169,7 @@
                 ><span id="contactStatus">FREE aktiv</span>
               </div>
               <p class="muted">
-                Keine zeitliche Befristung. Keine Zahlungsdaten und keine
+                Dauerhaft kostenlos. Keine Zahlungsdaten und keine
                 automatische kostenpflichtige Umwandlung.
               </p>
             </article>
@@ -218,9 +217,7 @@
                     <span id="dialoguesLimit">–</span>
                   </div>
                   <div class="bar"><span id="dialoguesBar"></span></div>
-                  <span class="muted" id="dialoguesRemaining"
-                    >–</span
-                  >
+                  <span class="muted" id="dialoguesRemaining">–</span>
                 </div>
                 <div class="usagebox">
                   <span class="muted">Bildgenerierungen</span>
@@ -229,9 +226,7 @@
                     <span id="imagesLimit">–</span>
                   </div>
                   <div class="bar"><span id="imagesBar"></span></div>
-                  <span class="muted" id="imagesRemaining"
-                    >–</span
-                  >
+                  <span class="muted" id="imagesRemaining">–</span>
                 </div>
                 <div class="usagebox">
                   <span class="muted">Foto-/Dokument-Digitalisierungen</span>
@@ -239,27 +234,14 @@
                     <span id="docsUsed">–</span> / <span id="docsLimit">–</span>
                   </div>
                   <div class="bar"><span id="docsBar"></span></div>
-                  <span class="muted" id="docsRemaining"
-                    >–</span
-                  >
-                </div>
-                <div class="usagebox">
-                  <span class="muted">Erinnerungen (Wecker oder Termine)</span>
-                  <div class="big">
-                    <span id="remindersUsed">–</span> /
-                    <span id="remindersLimit">–</span>
-                  </div>
-                  <div class="bar"><span id="remindersBar"></span></div>
-                  <span class="muted" id="remindersRemaining"
-                    >–</span
-                  >
+                  <span class="muted" id="docsRemaining">–</span>
                 </div>
               </div>
               <div class="recommend" id="recommendation">
                 <strong>Monatlicher Neustart</strong><br /><span class="muted"
                   >Die FREE-Kontingente werden zu Beginn jedes Kalendermonats
                   automatisch zurückgesetzt. Allgemeine Kundenservice- und
-                  Accountfragen belasten das Senioren-Dialogkontingent
+                  Accountfragen belasten das Concierge-Dialogkontingent
                   nicht.</span
                 >
               </div>
@@ -286,9 +268,8 @@
             </article>
           </div>
           <div class="actions">
-            <a class="btn red" href="concierge-anpassen.html"
-              >Nilo oder Mira anpassen</a
-            ><a class="btn light" href="pakete.html">Tarife vergleichen</a
+            <a class="btn red" href="concierge-anpassen.html">Nilo oder Mira anpassen</a
+            ><a class="btn light" href="pakete.html">Tarife ansehen</a
             ><a class="btn light" href="kontakt.html">Kontakt aufnehmen</a>
           </div>
         </div>
@@ -319,15 +300,12 @@
             iu = Number(u.image_generations_used || 0),
             il = Number(u.image_generation_limit || 0),
             xu = Number(u.document_digitizations_used || 0),
-            xl = Number(u.document_digitization_limit || 0),
-            ru = Number(u.reminders_used || 0),
-            rl = Number(u.reminder_limit || 0);
+            xl = Number(u.document_digitization_limit || 0);
           document.getElementById("dialoguesUsed").textContent = du;
           document.getElementById("dialoguesLimit").textContent = dl;
           document.getElementById("dialoguesRemaining").textContent =
             Math.max(0, dl - du) + " Dialoge übrig";
-          document.getElementById("dialoguesBar").style.width =
-            pct(du, dl) + "%";
+          document.getElementById("dialoguesBar").style.width = pct(du, dl) + "%";
           document.getElementById("imagesUsed").textContent = iu;
           document.getElementById("imagesLimit").textContent = il;
           document.getElementById("imagesRemaining").textContent =
@@ -338,12 +316,6 @@
           document.getElementById("docsRemaining").textContent =
             Math.max(0, xl - xu) + " Digitalisierungen übrig";
           document.getElementById("docsBar").style.width = pct(xu, xl) + "%";
-          document.getElementById("remindersUsed").textContent = ru;
-          document.getElementById("remindersLimit").textContent = rl;
-          document.getElementById("remindersRemaining").textContent =
-            Math.max(0, rl - ru) + " Erinnerungen übrig";
-          document.getElementById("remindersBar").style.width =
-            pct(ru, rl) + "%";
         }
         function prefSummary(p) {
           if (!p) return;
@@ -361,16 +333,13 @@
           chips.push(p.addressing === "sie" ? "Sie-Ansprache" : "Du-Ansprache");
           if (p.speechSpeed) chips.push(names[p.speechSpeed] || p.speechSpeed);
           if (p.detailLevel) chips.push(names[p.detailLevel] || p.detailLevel);
-          if (p.customInstructions)
-            chips.push("Individuelle Vorgaben gespeichert");
+          if (p.customInstructions) chips.push("Individuelle Vorgaben gespeichert");
           document.getElementById("prefSummary").innerHTML = chips
             .map((x) => '<span class="prefchip">' + x + "</span>")
             .join("");
         }
         try {
-          const d = JSON.parse(
-            localStorage.getItem("scb_onboarding") || "null",
-          );
+          const d = JSON.parse(localStorage.getItem("scb_onboarding") || "null");
           if (d) {
             const selected = d.concierge_choice || d.conciergeChoice;
             if (selected) document.querySelector(".personalize .value").textContent = `${String(selected).toUpperCase() === "MIRA" ? "Mira" : "Nilo"} ist Ihr persönlicher KI-Concierge.`;
@@ -378,36 +347,19 @@
               document.getElementById("safetyStatus").textContent = "Aktiviert";
               document.getElementById("safetyMeta").textContent = [d.checkin_times, d.trusted_contact_name, d.trusted_contact_phone].filter(Boolean).join(" · ") || "Aktiviert; Details werden nach Backend-Anbindung angezeigt.";
             }
-            document.getElementById("recipientName").textContent =
-              d.recipient?.name || "–";
+            document.getElementById("recipientName").textContent = d.recipient?.name || "–";
             document.getElementById("recipientMeta").textContent = [
               d.recipient?.relationship,
               d.recipient?.phone,
-              d.recipient?.addressing === "du"
-                ? "Du-Ansprache"
-                : "Sie-Ansprache",
-            ]
-              .filter(Boolean)
-              .join(" · ");
-            document.getElementById("ownerName").textContent =
-              d.owner?.name || "–";
-            document.getElementById("ownerMeta").textContent = [
-              d.owner?.email,
-              d.owner?.phone,
-            ]
-              .filter(Boolean)
-              .join(" · ");
-            if (d.recipient?.note)
-              document.getElementById("profileInfo").textContent =
-                d.recipient.note;
+              d.recipient?.addressing === "du" ? "Du-Ansprache" : "Sie-Ansprache",
+            ].filter(Boolean).join(" · ");
+            document.getElementById("ownerName").textContent = d.owner?.name || "–";
+            document.getElementById("ownerMeta").textContent = [d.owner?.email, d.owner?.phone].filter(Boolean).join(" · ");
+            if (d.recipient?.note) document.getElementById("profileInfo").textContent = d.recipient.note;
           }
           const u = JSON.parse(localStorage.getItem("scb_usage") || "null");
           if (u) setUsage(u);
-          prefSummary(
-            JSON.parse(
-              localStorage.getItem("nahwerk_concierge_preferences") || "null",
-            ),
-          );
+          prefSummary(JSON.parse(localStorage.getItem("nahwerk_concierge_preferences") || "null"));
         } catch (e) {}
       })();
     </script>

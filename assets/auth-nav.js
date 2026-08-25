@@ -97,6 +97,7 @@
         nav.appendChild(makeLink(`registrieren.html${suffix}`, "Registrieren", current === "registrieren.html" ? "active auth-link register-link" : "auth-link register-link"));
       }
       nav.id ||= "main-navigation";
+      nav.setAttribute("aria-label", "Hauptnavigation");
       if (!nav.previousElementSibling?.classList.contains("nav-toggle")) {
         const toggle = document.createElement("button");
         toggle.className = "nav-toggle";
@@ -120,6 +121,10 @@
         nav.addEventListener("click", (event) => { if (event.target.closest("a")) close(); });
         document.addEventListener("click", (event) => { if (!event.target.closest(".nav")) close(); });
         document.addEventListener("keydown", (event) => { if (event.key === "Escape") { close(); toggle.focus(); } });
+        const desktopMq = window.matchMedia("(min-width: 1181px)");
+        const resetForDesktop = (event) => { if (event.matches) close(); };
+        if (desktopMq.addEventListener) desktopMq.addEventListener("change", resetForDesktop);
+        else desktopMq.addListener(resetForDesktop);
         nav.before(toggle);
       }
     });
