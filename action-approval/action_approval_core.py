@@ -156,7 +156,17 @@ class ActionApprovalEngine:
     def _changes(self, approved:Mapping[str,Any], actual:Mapping[str,Any], variance:Mapping[str,Any]|None=None)->set[RiskGate]:
         variance=variance or {}; gates=set()
         for k,new in actual.items():
-            if k not in approved: continue
+            if k not in approved:
+                if k in {'price','monthly_price'}: gates.add(RiskGate.PRICE_CHANGED)
+                elif k in {'fee','fees'}: gates.add(RiskGate.FEE_CHANGED)
+                elif k in {'provider','provider_id'}: gates.add(RiskGate.PROVIDER_UNTRUSTED)
+                elif k in {'party_size','persons'}: gates.add(RiskGate.PARTY_SIZE_CHANGED)
+                elif k in {'time','datetime','reservation_time'}: gates.add(RiskGate.TIME_CHANGED)
+                elif k in {'prepayment_required'} and new: gates.add(RiskGate.PAYMENT_REQUIRED)
+                elif k in {'credit_card_required'} and new: gates.add(RiskGate.CREDIT_CARD_REQUIRED)
+                elif k in {'sensitive_data_required'} and new: gates.add(RiskGate.SENSITIVE_DATA_REQUIRED)
+                else: gates.add(RiskGate.CONTRACT_CHANGED)
+                continue
             old=approved[k]
             if old==new: continue
             if k in {'price','monthly_price'}: gates.add(RiskGate.PRICE_CHANGED)
