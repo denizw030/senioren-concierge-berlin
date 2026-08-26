@@ -1,16 +1,18 @@
-name: Local Intelligence Provider Restaurant Tests
+name: Local Intelligence + Outbound Call Tests
 on:
   push:
     branches:
       - design/nahwerk-local-provider-restaurant-02
+      - design/nahwerk-outbound-call-core-01
   pull_request:
     branches:
       - design/nahwerk-local-intelligence-core-01
+      - design/nahwerk-local-provider-restaurant-02
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
-  test:
+  local-intelligence:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -22,3 +24,13 @@ jobs:
           python-version: '3.12'
       - name: Run Local Intelligence tests
         run: python -m unittest discover -s tests -v
+  outbound-call-core:
+    if: github.ref == 'refs/heads/design/nahwerk-outbound-call-core-01' || github.base_ref == 'design/nahwerk-local-provider-restaurant-02'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run Outbound Call Core tests
+        run: python -m unittest -v outbound-call/test_outbound_call_core.py
