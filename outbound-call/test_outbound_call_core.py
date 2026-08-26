@@ -1,5 +1,5 @@
-import importlib.util, pathlib, unittest
-p=pathlib.Path(__file__).with_name('outbound_call_core.py'); s=importlib.util.spec_from_file_location('core',p); c=importlib.util.module_from_spec(s); s.loader.exec_module(c)
+import importlib.util, pathlib, sys, unittest
+p=pathlib.Path(__file__).with_name('outbound_call_core.py'); s=importlib.util.spec_from_file_location('core',p); c=importlib.util.module_from_spec(s); sys.modules['core']=c; s.loader.exec_module(c)
 
 
 def req(**kw):
