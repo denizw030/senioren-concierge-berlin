@@ -57,7 +57,8 @@ Official sources:
 - Official site advertises a flexible API, 100+ integrations and restaurant booking/channel-management integrations.
 - Google, TheFork, Facebook and Instagram are named booking channels.
 - Public technical diner-facing API specification suitable for an unaffiliated concierge was not confirmed in reviewed public material.
-- NAHWERK status: partner/deep-link boundary only until SevenRooms grants and documents the relevant API scope.
+- A generic independent-concierge deep-link contract was also not sufficiently documented publicly, so `supports_deeplink` remains false.
+- NAHWERK status: partner/integration boundary only until SevenRooms grants and documents the relevant API scope.
 
 Official source:
 - https://sevenrooms.com/platform/integrations-apis/
