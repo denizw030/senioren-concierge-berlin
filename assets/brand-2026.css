@@ -128,6 +128,17 @@ body.senior-product :is(.field input,.field select,.field textarea) {
   color:var(--nw-ink)!important;
   border-color:rgba(42,35,23,.24)!important;
 }
+body[data-product="senioren"] :is(.plan,.why,.familybox),
+body.senior-product :is(.plan,.why,.familybox) {
+  background:rgba(255,255,255,.62)!important;
+  border-color:var(--nw-line-light)!important;
+  color:var(--nw-ink)!important;
+  box-shadow:var(--nw-shadow-soft)!important;
+}
+body[data-product="senioren"] .familybox :is(h2,p),
+body.senior-product .familybox :is(h2,p) { color:var(--nw-ink)!important; }
+body[data-product="senioren"] .metric,
+body.senior-product .metric { border-color:var(--nw-line-light)!important; }
 .reveal { opacity:0; transform:translateY(18px); transition:opacity .7s var(--nw-ease),transform .7s var(--nw-ease); }
 .reveal.is-visible { opacity:1; transform:none; }
 body.menu-open { overflow:hidden; }
