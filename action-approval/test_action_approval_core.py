@@ -31,8 +31,8 @@ class T(unittest.TestCase):
     with self.assertRaises(ActionBlocked) as x: e.execute(ExecutionRequest('e',r.request.action_id,'x',{'price':11},NOW),good_executor)
     self.assertIn(RiskGate.PRICE_CHANGED,x.exception.gates)
  def test_10_fee_added(self):
-    e,r=self.approved(params={'fee':0},limits={'fee':0});
-    with self.assertRaises(ActionBlocked) as x: e.execute(ExecutionRequest('e',r.request.action_id,'x',{'fee':2},NOW),good_executor)
+    e,r=self.approved(params={'restaurant':'R'},limits={'restaurant':'R'});
+    with self.assertRaises(ActionBlocked) as x: e.execute(ExecutionRequest('e',r.request.action_id,'x',{'restaurant':'R','fee':2},NOW),good_executor)
     self.assertIn(RiskGate.FEE_CHANGED,x.exception.gates)
  def test_11_time_within_tolerance(self): e,r=self.approved(params={'time':18},limits={'time':18}); self.assertTrue(e.execute(ExecutionRequest('e',r.request.action_id,'x',{'time':18.25},NOW),good_executor,{'time':.5}).success)
  def test_12_time_outside_tolerance(self): e,r=self.approved(params={'time':18},limits={'time':18}); self.assertRaises(ActionBlocked,e.execute,ExecutionRequest('e',r.request.action_id,'x',{'time':19},NOW),good_executor,{'time':.5})
