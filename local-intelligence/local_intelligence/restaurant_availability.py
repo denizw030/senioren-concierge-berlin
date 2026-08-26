@@ -68,7 +68,6 @@ THEFORK_CAPABILITIES = RestaurantProviderCapabilities(
     requires_partner_contract=True,
 )
 SEVENROOMS_CAPABILITIES = RestaurantProviderCapabilities(
-    supports_deeplink=True,
     requires_partner_contract=True,
 )
 RESMIO_CAPABILITIES = RestaurantProviderCapabilities(
