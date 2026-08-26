@@ -68,8 +68,8 @@ body.senior-product .nav-toggle {
   color:#4d463d!important;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.75)!important;
 }
-.prime-image-page .hero .wrap { padding-right:min(39vw,500px); }
-.prime-image-page .hero:after {
+:is(.prime-image-page,.login-image-page) .hero .wrap { padding-right:min(39vw,500px); }
+:is(.prime-image-page,.login-image-page) .hero:after {
   width:min(360px,30vw);
   aspect-ratio:4/5;
   background:#080706 center top/cover no-repeat url("Primconcierge-NAHWERK-ODYSX.png?v=14")!important;
@@ -81,9 +81,9 @@ body.senior-product .nav-toggle {
   box-shadow:0 30px 80px rgba(0,0,0,.42);
 }
 @media(max-width:900px){
-  .prime-image-page .hero .wrap { padding-right:0; }
-  .prime-image-page .hero { padding-bottom:calc(var(--nw-space) + 400px); }
-  .prime-image-page .hero:after { top:auto; bottom:var(--nw-space); right:50%; transform:translateX(50%); width:min(320px,80vw); }
+  :is(.prime-image-page,.login-image-page) .hero .wrap { padding-right:0; }
+  :is(.prime-image-page,.login-image-page) .hero { padding-bottom:calc(var(--nw-space) + 400px); }
+  :is(.prime-image-page,.login-image-page) .hero:after { top:auto; bottom:var(--nw-space); right:50%; transform:translateX(50%); width:min(320px,80vw); }
 }
 h1,h2,h3,.home-title,.formcard h1 { font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif!important; }
 h1 { font-size:clamp(2.65rem,6.2vw,5.8rem)!important; line-height:.98!important; letter-spacing:-.055em!important; font-weight:620!important; text-wrap:balance; }
