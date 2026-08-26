@@ -45,8 +45,9 @@ jobs:
           git clone NAHWERK-senioren-concierge-berlin.bundle test-worktree
           cd test-worktree
           git checkout design/nahwerk-concierge-case-handoff-core-01
+          cd concierge-case-handoff
           test -f test_concierge_case_handoff_core.py
-          python -m unittest -v test_concierge_case_handoff_core.py |& tee ../representative-test.txt
+          python -m unittest -v test_concierge_case_handoff_core.py |& tee ../../representative-test.txt
 
       - name: Upload Git-native backup evidence
         uses: actions/upload-artifact@v4
@@ -62,4 +63,4 @@ jobs:
             restore-summary.txt
             representative-test.txt
 
-# phase-3 isolated evidence trigger
+# phase-3 isolated evidence trigger v2
