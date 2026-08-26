@@ -60,7 +60,8 @@ class SecurityTests(unittest.TestCase):
  def test_50_expired_blocks(self): self.assertRaises(PermissionError,assert_environment,ref(status=CredentialStatus.EXPIRED),Environment.STAGING)
  def test_51_missing_credential(self): self.assertRaises(ValueError,ref,secret_reference='')
  def test_52_provider_unavailable(self): self.assertEqual(safe_error('x','c',Environment.TEST,'provider_unavailable')['error_category'],'provider_unavailable')
- def test_53_idempotent_disconnect(self): self.assertEqual(disconnect(disconnect(conn())),disconnect(conn()))
+ def test_53_idempotent_disconnect(self):
+  once=disconnect(conn()); self.assertIs(disconnect(once),once)
  def test_54_rotation_grace(self): self.assertEqual(RotationPolicy(True,None,None,timedelta(minutes=5)).grace_period,timedelta(minutes=5))
  def test_55_old_revoked(self): self.assertEqual(transition_credential(CredentialStatus.ROTATING,CredentialStatus.REVOKED),CredentialStatus.REVOKED)
  def test_56_audit_ids_only(self): self.assertEqual(set(audit_event('credential_failed',credential_id='c',provider='p',environment='STAGING',status='ERROR',error_category='x')),{'event','credential_id','provider','environment','status','error_category'})
