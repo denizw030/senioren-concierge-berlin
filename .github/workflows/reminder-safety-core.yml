@@ -1,0 +1,18 @@
+name: Reminder Safety Core
+on:
+  push:
+    branches: [design/nahwerk-reminder-safety-core-02]
+  pull_request:
+    paths: ['reminder-safety-core/**']
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: reminder-safety-core
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm test
