@@ -1,0 +1,63 @@
+name: NAHWERK Backup Evidence Phase 3
+
+on:
+  push:
+    branches:
+      - evidence-backup-phase-3
+    paths:
+      - '.github/workflows/backup-evidence-phase-3.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  mirror-restore-evidence:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create full Git mirror and bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --mirror "https://github.com/${GITHUB_REPOSITORY}.git" source-mirror.git
+          git -C source-mirror.git bundle create ../NAHWERK-senioren-concierge-berlin.bundle --all
+          sha256sum NAHWERK-senioren-concierge-berlin.bundle | tee NAHWERK-senioren-concierge-berlin.bundle.sha256
+          git -C source-mirror.git for-each-ref --format='%(refname) %(objectname)' refs/heads refs/tags | sort > source-refs.txt
+          git -C source-mirror.git fsck --full
+
+      - name: Restore bundle into isolated bare repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --mirror NAHWERK-senioren-concierge-berlin.bundle restored-mirror.git
+          git -C restored-mirror.git for-each-ref --format='%(refname) %(objectname)' refs/heads refs/tags | sort > restored-refs.txt
+          diff -u source-refs.txt restored-refs.txt
+          git -C restored-mirror.git fsck --full
+          echo "SOURCE_HEADS=$(grep -c '^refs/heads/' source-refs.txt || true)" | tee restore-summary.txt
+          echo "SOURCE_TAGS=$(grep -c '^refs/tags/' source-refs.txt || true)" | tee -a restore-summary.txt
+          echo "RESTORED_HEADS=$(grep -c '^refs/heads/' restored-refs.txt || true)" | tee -a restore-summary.txt
+          echo "RESTORED_TAGS=$(grep -c '^refs/tags/' restored-refs.txt || true)" | tee -a restore-summary.txt
+          echo "REF_DIFF=0" | tee -a restore-summary.txt
+
+      - name: Run representative restored-branch test
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone NAHWERK-senioren-concierge-berlin.bundle test-worktree
+          cd test-worktree
+          git checkout design/nahwerk-concierge-case-handoff-core-01
+          test -f test_concierge_case_handoff_core.py
+          python -m unittest -v test_concierge_case_handoff_core.py |& tee ../representative-test.txt
+
+      - name: Upload Git-native backup evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: nahwerk-github-mirror-evidence-phase-3
+          retention-days: 30
+          compression-level: 0
+          path: |
+            NAHWERK-senioren-concierge-berlin.bundle
+            NAHWERK-senioren-concierge-berlin.bundle.sha256
+            source-refs.txt
+            restored-refs.txt
+            restore-summary.txt
+            representative-test.txt
