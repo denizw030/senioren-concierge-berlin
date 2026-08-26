@@ -1,0 +1,15 @@
+name: Daily Brief Delivery Tests
+on:
+  push:
+    branches: [design/nahwerk-daily-brief-delivery-planning-01]
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest -v test_daily_brief_delivery.py
+      - run: python -m unittest -v test_daily_brief_core.py
