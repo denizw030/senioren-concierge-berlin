@@ -1,7 +1,9 @@
 name: Document Intelligence Core
 on:
   push:
-    branches: [design/nahwerk-document-intelligence-core-01]
+    branches:
+      - design/nahwerk-document-intelligence-core-01
+      - design/nahwerk-document-ocr-vision-providers-01
     paths:
       - 'document-intelligence-core/**'
       - '.github/workflows/document-intelligence-core.yml'
