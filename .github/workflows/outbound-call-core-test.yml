@@ -1,0 +1,16 @@
+name: Outbound Call Core Tests
+on:
+  push:
+    branches: [design/nahwerk-outbound-call-core-01]
+  pull_request:
+    paths: ['outbound-call/**', '.github/workflows/outbound-call-core-test.yml']
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run outbound call tests
+        run: python -m unittest -v outbound-call/test_outbound_call_core.py
