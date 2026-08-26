@@ -1,0 +1,20 @@
+name: Document Intelligence Core
+on:
+  push:
+    branches: [design/nahwerk-document-intelligence-core-01]
+    paths:
+      - 'document-intelligence-core/**'
+      - '.github/workflows/document-intelligence-core.yml'
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: document-intelligence-core
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm test
