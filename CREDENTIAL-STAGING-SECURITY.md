@@ -40,3 +40,6 @@ Server-side only. A customer can manage only their own ProviderConnection. Famil
 
 ## Secret inventory
 The code contains a value-free inventory for OpenTable, TheFork, Verivox, CHECK24, Twilio, OpenAI, Microsoft, Gmail, GMX, WEB.DE, T-Online, TIMIFY, Calendly, Google Document AI, Azure, AWS and DB/VBB. Each entry records credential shape, platform/user ownership, staging-separation recommendation and store class. Production remains gated by the common cutover contract.
+
+## Verification
+The isolated regression suite contains 70 tests and runs with `python -m unittest -v test_credential_security_core.py`. It uses synthetic metadata only and performs no network or provider calls.
