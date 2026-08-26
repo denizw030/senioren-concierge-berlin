@@ -1,0 +1,15 @@
+name: Service Appointment Core Tests
+on:
+  push:
+    branches: [design/nahwerk-service-appointment-core-01]
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest
+      - run: python -m pytest -q service-appointment/tests
