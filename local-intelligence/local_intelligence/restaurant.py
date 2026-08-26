@@ -5,7 +5,7 @@ from datetime import date, time
 from enum import Enum
 from math import log10
 from typing import Any
-from .core import Place, OpeningStatus, Confidence, deduplicate
+from .core import Place, OpeningStatus, Confidence, duplicate
 
 class RankingMode(str, Enum):
     BEST_MATCH="BEST_MATCH"; BEST_RATED="BEST_RATED"; NEAREST_GOOD="NEAREST_GOOD"; PRICE_CONSCIOUS="PRICE_CONSCIOUS"; MEMORY_PERSONALIZED="MEMORY_PERSONALIZED"
@@ -111,7 +111,6 @@ def objective_quality(place: Place) -> float:
     rating = place.rating or 0.0
     reviews = max(0, place.review_count or 0)
     confidence = {Confidence.HIGH:1.0, Confidence.MEDIUM:0.65, Confidence.LOW:0.25, Confidence.REJECT:0.0}[place.confidence]
-    # Bayesian-like reliability: a 5.0 based on 3 reviews cannot dominate a 4.8 based on 1500.
     review_strength = min(1.0, log10(reviews + 1) / 3.0)
     reputation = rating * (0.55 + 0.45 * review_strength)
     return reputation * 12.0 + confidence * 10.0
@@ -151,12 +150,14 @@ def rank_restaurants(candidates:list[RestaurantCandidate], req:RestaurantRequest
         if req.ranking_mode==RankingMode.PRICE_CONSCIOUS: return q*.8 + distance*.7 + opening + price*2
         if req.ranking_mode==RankingMode.MEMORY_PERSONALIZED: return q + distance*.6 + opening + min(memory_score,12)
         return q + distance*.8 + travel*.4 + opening + min(memory_score,8) + price
-    # commercial_partner intentionally absent from score
     return sorted([c for c in candidates if eligible(c,req)], key=score, reverse=True)
 
 def deduplicate_candidates(candidates:list[RestaurantCandidate])->list[RestaurantCandidate]:
-    unique_places=deduplicate([c.place for c in candidates]); keys={(p.external_provider,p.external_id) for p in unique_places}
-    return [c for c in candidates if (c.place.external_provider,c.place.external_id) in keys]
+    out=[]
+    for candidate in candidates:
+        if not any(duplicate(candidate.place, existing.place) for existing in out):
+            out.append(candidate)
+    return out
 
 def visible_candidates(candidates:list[RestaurantCandidate])->list[RestaurantCandidate]: return candidates[:3]
 

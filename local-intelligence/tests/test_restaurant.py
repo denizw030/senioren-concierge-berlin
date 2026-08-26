@@ -63,7 +63,7 @@ class RestaurantTests(unittest.TestCase):
         with self.assertRaises(MissingProviderCredential): GooglePlacesAdapter().search_places(ProviderSearchRequest(query_text="restaurant"))
     def test_36_missing_tomtom_key_no_fake_call(self):
         with self.assertRaises(MissingProviderCredential): TomTomPlacesAdapter().search_places(ProviderSearchRequest(query_text="restaurant"))
-    def test_37_call_disclosure(self): self.assertIn("digitaler Concierge",CALL_DISCLOSURE_TEMPLATE)
+    def test_37_call_disclosure(self): self.assertIn("digitale Concierge",CALL_DISCLOSURE_TEMPLATE)
     def test_38_state_machine_contains_required(self):
         for x in ["REQUESTED","SEARCHING","CANDIDATES_FOUND","CHECKING_AVAILABILITY","AVAILABLE","PREPARED","APPROVED","RESERVING","CONFIRMED","FAILED","NEEDS_USER_INPUT","CANCELLED"]: self.assertIn(x,ReservationState.__members__)
 
