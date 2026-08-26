@@ -1,0 +1,3 @@
+export function localParts(date,timeZone='Europe/Berlin'){const p=new Intl.DateTimeFormat('en-CA',{timeZone,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(date));return Object.fromEntries(p.filter(x=>x.type!=='literal').map(x=>[x.type,x.value]));}
+export function sameLocalClock(a,b,timeZone='Europe/Berlin'){const x=localParts(a,timeZone),y=localParts(b,timeZone);return x.hour===y.hour&&x.minute===y.minute;}
+export function timezoneSupported(tz){try{new Intl.DateTimeFormat('de-DE',{timeZone:tz}).format();return true}catch{return false}}
