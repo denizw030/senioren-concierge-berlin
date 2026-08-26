@@ -11,7 +11,7 @@
   const CHECK_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/session/check";
   const LOGOUT_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/logout";
   const PROTECTED = new Set(["konto.html", "concierge-anpassen.html"]);
-  const CONTEXT_PAGES = new Set(["pakete.html", "registrieren.html", "anmelden.html", "konto.html", "concierge-anpassen.html"]);
+  const CONTEXT_PAGES = new Set(["registrieren.html", "anmelden.html", "konto.html", "concierge-anpassen.html"]);
   const NAV = [["index.html", "Übersicht"], ["prime-concierge.html", "Persönlicher Concierge"], ["senioren-concierge.html", "Senioren Concierge"], ["angehoerige.html", "Für Angehörige"], ["kontakt.html", "Kontakt"]];
   const page = () => location.pathname.split("/").pop() || "index.html";
   function productContext(current = page()) {
@@ -78,14 +78,6 @@
     const product = productContext(current);
     document.body.dataset.product = product;
     document.body.classList.toggle("senior-product", product === "senioren");
-    if (current === "pakete.html" && product === "senioren") {
-      document.title = "Senioren-Concierge Tarife | NAHWERK";
-      document.querySelectorAll('[href^="registrieren.html"]').forEach((link) => {
-        const url = new URL(link.getAttribute("href"), location.href);
-        url.searchParams.set("produkt", "senioren");
-        link.setAttribute("href", `${url.pathname.split("/").pop()}?${url.searchParams.toString()}`);
-      });
-    }
     document.querySelectorAll("header.top .brand").forEach((brand) => {
       brand.href = "index.html";
       brand.innerHTML = '<span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span>';
