@@ -69,7 +69,7 @@
     const bar = document.createElement("div");
     bar.className = "odysx-info-bar";
     bar.setAttribute("role", "note");
-    bar.innerHTML = '<img src="assets/Krone.png?v=1" alt="ODYSX" style="width:24px;height:24px;object-fit:contain;display:block;flex:0 0 auto"><span>Eine Marke von <strong>ODYSX</strong></span>';
+    bar.innerHTML = '<img src="assets/Krone.png?v=1" alt="" aria-hidden="true" style="width:24px;height:24px;object-fit:contain;display:block;flex:0 0 auto"><span>Eine Marke von <strong>ODYSX</strong></span><img class="odysx-crown-logo" src="assets/Krone-white.png?v=1" alt="ODYSX Krone">';
     Object.assign(bar.style, { boxSizing: "border-box", width: "100%", minHeight: "32px", padding: "4px 20px", background: "#242424", borderTop: "1px solid #343434", borderBottom: "1px solid #3a3a3a", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", gap: "9px", textAlign: "center", font: "500 13px/18px Arial,sans-serif", letterSpacing: ".25px", position: "relative", zIndex: "49" });
     header.insertAdjacentElement("afterend", bar);
   }
