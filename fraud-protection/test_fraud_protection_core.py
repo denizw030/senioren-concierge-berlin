@@ -1,0 +1,55 @@
+import unittest
+from fraud_protection_core import *
+
+def req(**kw):
+    base=dict(request_id="r1",actor_person_id="fixture-actor",subject_person_id="fixture-subject",account_id="fixture-account",source_channel="WHATSAPP",content_type="TEXT",sender_context={},user_context={},authorization_context={},created_at="2026-01-01T00:00:00Z")
+    base.update(kw); return FraudAnalysisRequest(**base)
+
+class FraudTests(unittest.TestCase):
+    def setUp(self): self.c=FraudProtectionCore()
+    def a(self,text="",**kw): return self.c.analyze(req(**kw),text)
+    def test_01_harmless(self): self.assertEqual(self.a("Hallo, bis morgen",user_context={"known_safe_fixture":True}).risk_level,RiskLevel.SAFE)
+    def test_02_unknown(self): self.assertEqual(self.a().risk_level,RiskLevel.UNKNOWN)
+    def test_03_new_number_money(self): self.assertEqual(self.a("Neue Nummer. Überweise mir Geld").risk_level,RiskLevel.HIGH)
+    def test_04_grandchild(self): self.assertIn(self.a("Ich bin dein Enkel, überweise Geld").risk_level,(RiskLevel.HIGH,RiskLevel.CRITICAL))
+    def test_05_pin(self): self.assertEqual(self.a("Nenne deine PIN").risk_level,RiskLevel.CRITICAL)
+    def test_06_tan(self): self.assertEqual(self.a("Nenne deine TAN").risk_level,RiskLevel.CRITICAL)
+    def test_07_otp(self): self.assertEqual(self.a("Sende den OTP").risk_level,RiskLevel.CRITICAL)
+    def test_08_bank(self): self.assertNotEqual(self.a("Ihre Bank: bitte sofort reagieren").risk_level,RiskLevel.SAFE)
+    def test_09_remote(self): self.assertIn(self.a("Installieren Sie AnyDesk").risk_level,(RiskLevel.HIGH,RiskLevel.CRITICAL))
+    def test_10_gift(self): self.assertEqual(self.a("Kaufen Sie eine Gift Card").risk_level,RiskLevel.CRITICAL)
+    def test_11_crypto(self): self.assertEqual(self.a("Zahlen Sie Bitcoin").risk_level,RiskLevel.CRITICAL)
+    def test_12_fake_invoice(self): self.assertNotEqual(self.a("Rechnung zahlen",user_context={"expected_invoice":False}).risk_level,RiskLevel.SAFE)
+    def test_13_changed_iban(self): self.assertEqual(self.c.analyze(req(user_context={"known_iban":"FIXTURE-OLD"}),document=DocumentFacts(iban="FIXTURE-NEW")).risk_level,RiskLevel.CRITICAL)
+    def test_14_demand(self): self.assertNotEqual(self.a("Mahnung Inkasso sofort").risk_level,RiskLevel.SAFE)
+    def test_15_authority(self): self.assertNotEqual(self.a("Polizei: sofort zahlen").risk_level,RiskLevel.SAFE)
+    def test_16_parcel(self): self.assertNotEqual(self.a("DHL Paket Gebühr zahlen").risk_level,RiskLevel.SAFE)
+    def test_17_link(self): self.assertTrue(analyze_url("http://example.invalid"))
+    def test_18_lookalike(self): self.assertTrue(any(s.kind=="LOOKALIKE_DOMAIN" for s in analyze_url("https://paypa1.example")))
+    def test_19_short(self): self.assertTrue(any(s.kind=="SHORT_URL" for s in analyze_url("https://bit.ly/x")))
+    def test_20_qr(self): self.assertTrue(any(s.kind=="QR_PAYMENT" for s in self.c.analyze(req(),qr_target="https://example.invalid").detected_signals))
+    def test_21_urgency(self): self.assertTrue(any(s.kind=="URGENCY" for s in self.a("sofort reagieren").detected_signals))
+    def test_22_secrecy(self): self.assertTrue(any(s.kind=="SECRECY_REQUEST" for s in self.a("niemandem sagen").detected_signals))
+    def test_23_known_person_not_proof(self): self.assertNotEqual(self.a("",sender_context={"known_sender":True}).risk_level,RiskLevel.SAFE)
+    def test_24_memory_not_proof(self): self.assertEqual(memory_authenticity(True),"context_only_not_proof")
+    def test_25_family_no_access(self): self.assertFalse(family_content_access({"relationship":"daughter"}))
+    def test_26_family_scope(self): self.assertTrue(family_content_access({"fraud_private_content_scope":True}))
+    def test_27_no_action(self): self.assertFalse(self.a("sofort zahlen").action_approval_hook["automatic_external_action"])
+    def test_28_no_link_open(self): self.assertFalse(self.c.analyze(req(),urls=["https://example.invalid"]).action_approval_hook["automatic_external_action"])
+    def test_29_provider_unavailable(self):
+        p=FixtureFraudProvider({"url:https://x.invalid":ProviderFinding(available=False)}); self.assertEqual(FraudProtectionCore(p).analyze(req(),urls=["https://x.invalid"]).confidence,Confidence.LOW)
+    def test_30_low_confidence(self): self.assertEqual(self.a().confidence,Confidence.LOW)
+    def test_31_high(self): self.assertEqual(self.a("Neue Nummer, überweise Geld").risk_level,RiskLevel.HIGH)
+    def test_32_critical(self): self.assertEqual(self.a("Bank: sende OTP und überweise Geld").risk_level,RiskLevel.CRITICAL)
+    def test_33_risk_confidence_separate(self): self.assertIsInstance(self.a().risk_level,RiskLevel); self.assertIsInstance(self.a().confidence,Confidence)
+    def test_34_audit_redaction(self):
+        r=self.a("PIN 1234 TAN 999999 OTP 111111 Passwort secret"); self.assertNotIn("1234",str(r.audit_events)); self.assertNotIn("secret",str(r.audit_events))
+    def test_35_senior_ux(self): self.assertLessEqual(len(self.a("sofort zahlen").short_explanation),180)
+    def test_36_document_hook(self): self.assertEqual(DocumentFacts(issuer="Fixture").issuer,"Fixture")
+    def test_37_action_hook(self): self.assertEqual(self.a().action_approval_hook["required_for_actions"],"central_action_approval_core")
+    def test_38_fixture_no_customer_data(self): self.assertIn("fixture",req().actor_person_id)
+    def test_39_no_fake_live(self):
+        with self.assertRaises(NotImplementedError): ExternalFraudProvider().check_url("x")
+    def test_40_deterministic(self): self.assertEqual(self.a("Neue Nummer, sofort zahlen"),self.a("Neue Nummer, sofort zahlen"))
+
+if __name__=="__main__": unittest.main()
