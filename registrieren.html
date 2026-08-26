@@ -28,6 +28,22 @@
       .row.name {
         grid-template-columns: 0.72fr 1fr 1fr;
       }
+      .password-single-row {
+        grid-template-columns: 1fr;
+      }
+      .recipient-contact-row .field {
+        display: flex;
+        flex-direction: column;
+      }
+      .recipient-contact-row .field > label {
+        display: flex;
+        min-height: 46px;
+        align-items: flex-end;
+      }
+      .recipient-contact-row :is(select, input) {
+        box-sizing: border-box;
+        height: 54px;
+      }
       .field {
         margin: 0 0 17px;
       }
@@ -41,6 +57,16 @@
         min-height: 96px;
         resize: vertical;
       }
+      #ownerSalutation,
+      #recipientSalutation {
+        appearance: none;
+        -webkit-appearance: none;
+        padding-right: 46px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23c7a24d' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: right 16px center !important;
+        background-size: 16px !important;
+      }
       .choice {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -52,6 +78,114 @@
         padding: 16px;
         cursor: pointer;
         transition: 0.18s ease;
+      }
+      .setup-choice label {
+        display: grid;
+        min-height: 62px;
+        place-items: center;
+        padding: 16px 20px;
+        text-align: center;
+        font-weight: 700;
+      }
+      .setup-choice input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+      }
+      .setup-choice label:has(input:focus-visible) {
+        outline: 3px solid rgba(191, 143, 40, 0.38);
+        outline-offset: 3px;
+      }
+      .concierge-intro {
+        margin: 8px 0 18px;
+        color: #66635d;
+        line-height: 1.6;
+      }
+      .concierge-choice {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        margin: 14px 0 15px;
+      }
+      .concierge-choice .concierge-card {
+        position: relative;
+        display: block;
+        min-width: 0;
+        overflow: hidden;
+        border: 1px solid rgba(26, 25, 22, 0.12);
+        border-radius: 24px;
+        background: #090909;
+        box-shadow: 0 12px 34px rgba(37, 31, 19, 0.08);
+        cursor: pointer;
+        transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+      }
+      .concierge-choice .concierge-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(192, 145, 49, 0.48);
+        box-shadow: 0 18px 42px rgba(37, 31, 19, 0.12);
+      }
+      .concierge-choice .concierge-card:has(input:focus-visible) {
+        outline: 3px solid rgba(191, 143, 40, 0.38);
+        outline-offset: 3px;
+      }
+      .concierge-choice .concierge-card.selected,
+      .concierge-choice .concierge-card:has(input:checked) {
+        border-color: #bd8f2f;
+        background: #090909;
+        box-shadow: 0 0 0 2px rgba(189, 143, 47, 0.16), 0 18px 44px rgba(86, 62, 14, 0.14);
+      }
+      .concierge-card input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .concierge-image {
+        display: block;
+        width: 100%;
+        aspect-ratio: 4 / 4.25;
+        object-fit: cover;
+        object-position: center 18%;
+        background: #eeeae2;
+      }
+      .concierge-card-body {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 28px;
+        gap: 10px;
+        align-items: start;
+        padding: 16px 16px 18px;
+      }
+      .concierge-choice .concierge-copy strong {
+        display: block;
+        margin-bottom: 5px;
+        color: #fff;
+        font-size: 19px;
+      }
+      .concierge-choice .concierge-copy span {
+        display: block;
+        color: #c9c9c5;
+        font-size: 13px;
+        line-height: 1.45;
+      }
+      .concierge-check {
+        display: grid;
+        place-items: center;
+        width: 28px;
+        height: 28px;
+        border: 1px solid rgba(222, 222, 218, 0.58);
+        border-radius: 50%;
+        color: transparent;
+        background: transparent;
+        font-weight: 800;
+        transition: 180ms ease;
+      }
+      .concierge-card.selected .concierge-check,
+      .concierge-card:has(input:checked) .concierge-check {
+        border-color: #bd8f2f;
+        color: #fff;
+        background: #bd8f2f;
       }
       .check {
         display: flex;
@@ -65,12 +199,18 @@
         font-size: 23px;
         margin: 8px 0 16px;
       }
-      .msg {
+      .preview .msg {
         border-radius: 13px;
         padding: 22px;
         line-height: 1.6;
         font-size: 15px;
+        color: #fff !important;
+        background: #090909 !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
         box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+      }
+      .preview .msg strong {
+        color: #fff;
       }
       .status {
         display: none;
@@ -159,6 +299,16 @@
         .preview {
           padding: 22px;
         }
+        .concierge-choice {
+          grid-template-columns: 1fr;
+        }
+        .concierge-image {
+          aspect-ratio: 4 / 3.35;
+          object-position: center 20%;
+        }
+        .recipient-contact-row .field > label {
+          min-height: 0;
+        }
       }
     </style>
   <link rel="canonical" href="https://nahwerkconcierge.com/registrieren.html"><link rel="icon" type="image/png" href="assets/NAHWERKConcierge-Logo.png?v=3"><link rel="stylesheet" href="assets/brand-2026.css?v=8"><meta property="og:type" content="website"><meta property="og:locale" content="de_DE"><meta property="og:title" content="NAHWERK Concierge"><meta property="og:description" content="Persönliche, verständliche Concierge-Unterstützung direkt über WhatsApp."></head>
@@ -175,7 +325,7 @@
           <a href="index.html">Übersicht</a
           ><a href="prime-concierge.html">Persönlicher Concierge</a
           ><a href="senioren-concierge.html">Senioren Concierge</a
-          ><a href="angehoerige.html">Für Angehörige</a
+          ><a href="senioren-concierge.html#angehoerige">Für Angehörige</a
           ><a href="kontakt.html">Kontakt</a><a href="anmelden.html">Anmelden</a
           ><a class="active auth-link register-link" href="registrieren.html"
             >Registrieren</a
@@ -218,17 +368,20 @@
               </ul>
               <div class="plan-selection-note" id="planSelectionNote"></div>
             </div>
-            <div class="field">
-              <label>Wer soll Ihr persönlicher Concierge sein?</label>
+            <fieldset class="field" style="border:0;padding:0;margin-inline:0">
+              <legend style="font:700 25px/1.2 Georgia,serif">Wer darf Sie begleiten?</legend>
+              <p class="concierge-intro">Wählen Sie den Concierge, dessen Auftreten und Kommunikationsstil am besten zu Ihnen passt. Die grundlegenden Möglichkeiten bleiben bei allen Profilen gleich.</p>
               <div class="concierge-choice">
-                <label><input type="radio" name="conciergeChoice" value="nilo" checked /><strong>Nilo</strong><span>Ihr persönlicher KI-Concierge mit männlicher Stimme.</span></label>
-                <label><input type="radio" name="conciergeChoice" value="mira" /><strong>Mira</strong><span>Ihre persönliche KI-Concierge mit weiblicher Stimme.</span></label>
+                <label class="concierge-card selected"><input type="radio" name="conciergeChoice" value="nilo" checked /><img class="concierge-image" src="assets/NAHWERK-Concierge-Nilo.png" alt="KI-Concierge Nilo" /><span class="concierge-card-body"><span class="concierge-copy"><strong>Nilo</strong><span>Klar, ruhig und strukturiert.</span></span><span class="concierge-check" aria-hidden="true">✓</span></span></label>
+                <label class="concierge-card"><input type="radio" name="conciergeChoice" value="mira" /><img class="concierge-image" src="assets/NAHWERK-Concierge-Mira.png" alt="KI-Concierge Mira" /><span class="concierge-card-body"><span class="concierge-copy"><strong>Mira</strong><span>Warm, verständlich und aufmerksam.</span></span><span class="concierge-check" aria-hidden="true">✓</span></span></label>
+                <label class="concierge-card"><input type="radio" name="conciergeChoice" value="lena" /><img class="concierge-image" src="assets/NAHWERK-Concierge-Lena.png" alt="KI-Concierge Lena" /><span class="concierge-card-body"><span class="concierge-copy"><strong>Lena</strong><span>Modern, empathisch und lösungsorientiert.</span></span><span class="concierge-check" aria-hidden="true">✓</span></span></label>
+                <label class="concierge-card"><input type="radio" name="conciergeChoice" value="lukas" /><img class="concierge-image" src="assets/NAHWERK-Concierge-Lukas.png" alt="KI-Concierge Lukas" /><span class="concierge-card-body"><span class="concierge-copy"><strong>Lukas</strong><span>Souverän, direkt und zuverlässig.</span></span><span class="concierge-check" aria-hidden="true">✓</span></span></label>
               </div>
-              <span class="tiny">Sie können später jederzeit zwischen Nilo und Mira wechseln – einfach per Nachricht oder Sprache.</span>
-            </div>
+              <span class="tiny">Alle vier Profile gehören zum selben NAHWERK-Concierge-System. Die Auswahl bestimmt vor allem Ansprache, Stimme und Kommunikationsstil und kann später geändert werden.</span>
+            </fieldset>
             <div class="field">
               <label>Für wen richten Sie den Zugang ein?</label>
-              <div class="choice">
+              <div class="choice setup-choice">
                 <label
                   ><input type="radio" name="setupFor" value="self" checked />
                   Für mich selbst</label
@@ -243,7 +396,7 @@
               <div class="field">
                 <label for="ownerSalutation">Anrede</label
                 ><select id="ownerSalutation">
-                  <option value="">Keine Angabe</option>
+                  <option value="" aria-label="Keine Angabe"></option>
                   <option value="Herr">Herr</option>
                   <option value="Frau">Frau</option>
                 </select>
@@ -274,7 +427,7 @@
                 required
               />
             </div>
-            <div class="row">
+            <div class="row password-single-row">
               <div class="field">
                 <label for="webPassword">Passwort</label>
                 <div class="password-wrap">
@@ -305,35 +458,6 @@
                 </div>
                 <div class="tiny passwordhint">Mindestens 10 Zeichen.</div>
               </div>
-              <div class="field">
-                <label for="webPasswordConfirm">Passwort wiederholen</label>
-                <div class="password-wrap">
-                  <input
-                    id="webPasswordConfirm"
-                    type="password"
-                    autocomplete="new-password"
-                    minlength="10"
-                    required
-                  /><button
-                    class="password-toggle"
-                    type="button"
-                    data-password-toggle="webPasswordConfirm"
-                    aria-label="Passwort anzeigen"
-                    title="Passwort anzeigen"
-                  >
-                    <svg
-                      class="eye-icon"
-                      viewBox="0 0 24 24"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"
-                      ></path>
-                      <circle cx="12" cy="12" r="2.7"></circle>
-                    </svg>
-                  </button>
-                </div>
-              </div>
             </div>
             <div class="field" id="ownerPhoneField">
               <label for="ownerPhone">Ihre WhatsApp-Telefonnummer</label
@@ -343,7 +467,7 @@
                 autocomplete="tel"
                 placeholder="z. B. +49 170 ..."
               /><span class="tiny"
-                >Nur nötig, wenn Sie Nilo oder Mira selbst über WhatsApp
+                id="ownerPhoneHint">Nur nötig, wenn Sie Nilo selbst über WhatsApp
                 nutzen.</span
               >
             </div>
@@ -352,14 +476,14 @@
               WhatsApp-Zugang verwendet.
             </div>
             <div id="recipientBlock" hidden>
-              <h2 style="font-size: 25px">
-                Person, die Nilo oder Mira unterstützen soll
+              <h2 id="recipientHeading" style="font-size: 25px">
+                Wen darf Nilo unterstützen?
               </h2>
               <div class="row name">
                 <div class="field">
                   <label for="recipientSalutation">Anrede</label
                   ><select id="recipientSalutation">
-                    <option value="">Keine Angabe</option>
+                    <option value="" aria-label="Keine Angabe"></option>
                     <option value="Herr">Herr</option>
                     <option value="Frau">Frau</option>
                   </select>
@@ -373,7 +497,7 @@
                   ><input id="recipientLastName" autocomplete="family-name" />
                 </div>
               </div>
-              <div class="row">
+              <div class="row recipient-contact-row">
                 <div class="field">
                   <label for="relationship">Beziehung</label
                   ><select id="relationship">
@@ -398,7 +522,7 @@
               </div>
               <div class="field">
                 <label for="note"
-                  >Was sollte Nilo oder Mira am Anfang wissen?
+                  ><span id="notePrompt">Was sollte Nilo am Anfang wissen?</span>
                   <span class="tiny">(optional)</span></label
                 ><textarea
                   id="note"
@@ -407,8 +531,8 @@
               </div>
             </div>
             <div class="field">
-              <label for="addressing"
-                >Wie soll Nilo oder Mira die unterstützte Person ansprechen?</label
+              <label id="addressingLabel" for="addressing"
+                >Wie soll Nilo die unterstützte Person ansprechen?</label
               ><select id="addressing">
                 <option value="du">Du – mit Vornamen</option>
                 <option value="sie">Sie – mit Anrede und Nachnamen</option>
@@ -416,7 +540,7 @@
             </div>
             <label class="check" id="safetyToggleRow"
               ><input type="checkbox" id="safetyEnabled" /><span
-                ><strong>Optionale Sicherheitsfunktion einrichten</strong><br />Standardmäßig deaktiviert. Nilo oder Mira können zu vereinbarten Zeiten nachfragen, ob alles in Ordnung ist.</span
+                ><strong>Optionale Sicherheitsfunktion einrichten</strong><br />Standardmäßig deaktiviert. <span id="safetyConciergeName">Nilo</span> kann zu vereinbarten Zeiten nachfragen, ob alles in Ordnung ist.</span
               ></label>
             <div class="progressive-panel" id="safetyFields" hidden>
               <div class="row">
@@ -517,8 +641,8 @@
         </div>
       </div>
     </footer>
-    <script src="assets/auth-nav.js?v=23"></script>
-    <script src="assets/onboarding.js?v=9"></script>
+    <script src="assets/auth-nav.js?v=25"></script>
+    <script src="assets/onboarding.js?v=10"></script>
     <script>
       const eye =
         '<svg class="eye-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.7"></circle></svg>';
@@ -538,5 +662,5 @@
         });
       });
     </script>
-  <script src="assets/site-ui.js?v=1"></script></body>
+  <script src="assets/site-ui.js?v=3"></script></body>
 </html>

@@ -305,7 +305,7 @@
         </div>
       </div>
     </footer>
-    <script src="assets/auth-nav.js?v=23"></script>
+    <script src="assets/auth-nav.js?v=25"></script>
     <script>
       (() => {
         function pct(a, b) {
@@ -373,7 +373,11 @@
           );
           if (d) {
             const selected = d.concierge_choice || d.conciergeChoice;
-            if (selected) document.querySelector(".personalize .value").textContent = `${String(selected).toUpperCase() === "MIRA" ? "Mira" : "Nilo"} ist Ihr persönlicher KI-Concierge.`;
+            if (selected) {
+              const conciergeNames = { nilo: "Nilo", mira: "Mira", lena: "Lena", lukas: "Lukas" };
+              const conciergeName = conciergeNames[String(selected).toLowerCase()] || "Nilo";
+              document.querySelector(".personalize .value").textContent = `${conciergeName} ist Ihr persönlicher KI-Concierge.`;
+            }
             if (d.safety_enabled) {
               document.getElementById("safetyStatus").textContent = "Aktiviert";
               document.getElementById("safetyMeta").textContent = [d.checkin_times, d.trusted_contact_name, d.trusted_contact_phone].filter(Boolean).join(" · ") || "Aktiviert; Details werden nach Backend-Anbindung angezeigt.";
@@ -411,5 +415,5 @@
         } catch (e) {}
       })();
     </script>
-  <script src="assets/site-ui.js?v=1"></script></body>
+  <script src="assets/site-ui.js?v=3"></script></body>
 </html>
