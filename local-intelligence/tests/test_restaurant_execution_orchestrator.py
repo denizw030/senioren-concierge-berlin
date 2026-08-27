@@ -7,8 +7,12 @@ from local_intelligence.restaurant import AvailabilityStatus,RestaurantCandidate
 from local_intelligence.restaurant_execution import *
 
 
-def raw(name="Roma",eid="r1",rating=4.6,distance=1.2,url="https://example.test/book",phone="030000",address="Teststr. 1"):
-    return RestaurantCandidate(Place("fixture",eid,name,Category.RESTAURANT,address,52.4,13.3,phone=phone,opening_status=OpeningStatus.OPEN_NOW,rating=rating,review_count=100,confidence=Confidence.HIGH,distance=distance),cuisines=["italian"],reservation_url=url)
+def raw(name="Roma",eid="r1",rating=4.6,distance=1.2,url="https://example.test/book",phone=None,address=None):
+    phone=phone or f"030{eid}"
+    address=address or f"Teststr. {eid}"
+    lat=52.40+(sum(map(ord,eid))%20)/10000
+    lon=13.30+(sum(map(ord,eid))%20)/10000
+    return RestaurantCandidate(Place("fixture",eid,name,Category.RESTAURANT,address,lat,lon,phone=phone,opening_status=OpeningStatus.OPEN_NOW,rating=rating,review_count=100,confidence=Confidence.HIGH,distance=distance),cuisines=["italian"],reservation_url=url)
 
 def req(min_rating=4.0):
     return RestaurantRequest("u","u","12207",date=date(2026,8,29),time=time(19,0),party_size=4,cuisine_preferences=["italian"],min_rating=min_rating,reservation_intent=True,explicit_auto_reserve=True)
@@ -79,7 +83,7 @@ class EOTests(unittest.TestCase):
     def test_EO26_provider_reconciliation(self):
         j=loaded(raw()); transition_job(j,JobState.CHECKING_ONLINE); a=begin_attempt(j,AttemptChannel.ONLINE); mark_confirmation_pending(j,a); self.assertEqual(reconcile_provider(j,confirmed=True,provider_booking_id="P2"),"CONFIRMED")
     def test_EO27_success_stops_further_attempts(self):
-        j=loaded(raw()); transition_job(j,JobState.CHECKING_ONLINE); transition_job(j,JobState.BOOKING_ONLINE); confirm(j,provider_reference="P");
+        j=loaded(raw()); transition_job(j,JobState.CHECKING_ONLINE); transition_job(j,JobState.BOOKING_ONLINE); confirm(j,provider_reference="P")
         with self.assertRaises(RuntimeError): begin_attempt(j,AttemptChannel.ONLINE)
     def test_EO28_deposit_guard(self):
         d=needs_approval(binding=True,deposit=True); self.assertTrue(d.required and d.elevated)
@@ -96,7 +100,7 @@ class EOTests(unittest.TestCase):
     def test_EO34_failure_result(self):
         j=loaded(raw()); transition_job(j,JobState.CHECKING_ONLINE); try_next(j,reason="unavailable"); self.assertEqual(customer_result(j)["status"],"not_confirmed")
     def test_EO35_tenant_isolation(self):
-        j=job(); tenant_guard(j,tenant_id="t",account_id="a");
+        j=job(); tenant_guard(j,tenant_id="t",account_id="a")
         with self.assertRaises(PermissionError): tenant_guard(j,tenant_id="wrong",account_id="a")
     def test_EO36_cost_attempt_limits(self):
         j=loaded(raw(url=None),limits=ExecutionLimits(max_calls=1)); transition_job(j,JobState.CALLING); a=begin_attempt(j,AttemptChannel.VOICE); j.attempts[j.attempts.index(a)]=replace(a,state=AttemptState.FAILED)
