@@ -8,10 +8,11 @@ from local_intelligence.restaurant_execution import *
 
 
 def raw(name="Roma",eid="r1",rating=4.6,distance=1.2,url="https://example.test/book",phone=None,address=None):
-    phone=phone or f"030{eid}"
+    suffix=sum(map(ord,eid))
+    phone=phone or f"030{suffix}"
     address=address or f"Teststr. {eid}"
-    lat=52.40+(sum(map(ord,eid))%20)/10000
-    lon=13.30+(sum(map(ord,eid))%20)/10000
+    lat=52.40+(suffix%20)/10000
+    lon=13.30+(suffix%20)/10000
     return RestaurantCandidate(Place("fixture",eid,name,Category.RESTAURANT,address,lat,lon,phone=phone,opening_status=OpeningStatus.OPEN_NOW,rating=rating,review_count=100,confidence=Confidence.HIGH,distance=distance),cuisines=["italian"],reservation_url=url)
 
 def req(min_rating=4.0):
