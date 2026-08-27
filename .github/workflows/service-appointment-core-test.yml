@@ -1,15 +1,25 @@
 name: Service Appointment Core Tests
 on:
   push:
-    branches: [design/nahwerk-service-appointment-core-01]
+    branches:
+      - design/nahwerk-service-appointment-core-01
+      - staging/service-appointment-integration-01
   workflow_dispatch:
 jobs:
   test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: service-appointment
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - run: python -m pip install pytest
-      - run: python -m pytest -q service-appointment/tests
+      - name: Existing core regression
+        run: python -m pytest -q tests/test_core.py
+      - name: Appointment integration regression
+        run: python -m pytest -q tests/test_integration.py
+      - name: Full appointment regression
+        run: python -m pytest -q tests
