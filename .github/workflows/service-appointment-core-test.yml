@@ -1,7 +1,9 @@
 name: Service Appointment Core Tests
 on:
   push:
-    branches: [design/nahwerk-service-appointment-core-01]
+    branches:
+      - design/nahwerk-service-appointment-core-01
+      - staging/service-appointment-integration-01
   workflow_dispatch:
 jobs:
   test:
