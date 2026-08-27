@@ -17,4 +17,9 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install pytest
-      - run: python -m pytest -q tests
+      - name: Existing core regression
+        run: python -m pytest -q tests/test_core.py
+      - name: Appointment integration regression
+        run: python -m pytest -q tests/test_integration.py
+      - name: Full appointment regression
+        run: python -m pytest -q tests
