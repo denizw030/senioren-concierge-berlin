@@ -38,13 +38,13 @@ body {
 .nav { min-height:78px; }
 .brand { min-width:245px; gap:12px; }
 .mark,.mark.nahwerk-mark { width:50px; height:50px; flex-basis:50px; box-shadow:none!important; }
-.brandtext strong:before { font-family:Georgia,serif; font-size:23px; font-weight:500; letter-spacing:.13em; color:var(--nw-gold-light); }
+.brandtext strong:before { font-family:Georgia,serif; font-size:23px; font-weight:500; letter-spacing:.13em; color:#D4AF37!important; }
 .brandtext span:before { font-size:9px; font-weight:600; letter-spacing:.42em; color:var(--nw-gold); }
 .top .brandtext span:before { color:#fff!important; }
 body[data-product="senioren"] .top .brandtext span:before,
 body.senior-product .top .brandtext span:before { color:#17130d!important; }
 body[data-product="senioren"] .top .brandtext strong:before,
-body.senior-product .top .brandtext strong:before { color:#a77c29!important; }
+body.senior-product .top .brandtext strong:before { color:#D4AF37!important; }
 .links { gap:24px; font-size:14px; font-weight:560; }
 .links a { min-height:44px; padding:27px 0 20px; border-bottom-width:1px; }
 .links a:hover,.links a.active { color:var(--nw-gold-light); }
