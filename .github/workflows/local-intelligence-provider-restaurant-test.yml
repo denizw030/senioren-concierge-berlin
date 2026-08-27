@@ -5,6 +5,7 @@ on:
       - design/nahwerk-local-provider-restaurant-02
       - design/nahwerk-restaurant-availability-providers-01
       - staging/restaurant-concierge-integration-01
+      - staging/restaurant-execution-orchestrator-01
   pull_request:
     branches:
       - design/nahwerk-local-intelligence-core-01
