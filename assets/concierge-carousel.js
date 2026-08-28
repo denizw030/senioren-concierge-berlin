@@ -24,8 +24,9 @@
 
     function goToRegistration(index=active){
       if(!registerUrl)return;
-      const separator=registerUrl.includes("?")?"&":"?";
-      location.href=`${registerUrl}${separator}concierge=${encodeURIComponent(profiles[index].key)}`;
+      const target=new URL(registerUrl,location.href);
+      target.searchParams.set("concierge",profiles[index].key);
+      location.href=`${target.pathname.split("/").pop()}${target.search}${target.hash}`;
     }
     const cards=profiles.map((profile,index)=>{
       const card=document.createElement("button");
@@ -49,7 +50,10 @@
         const relative=circularDelta(active,index),x=relative*gap+dragX,distance=Math.abs(x/gap),scale=Math.max(.56,1-distance*.2),opacity=distance>3.6?0:Math.max(.28,1-distance*.2);
         card.style.transform=`translate3d(calc(-50% + ${x}px),-50%,0) scale(${scale})`;
         card.style.opacity=String(opacity); card.style.zIndex=String(30-Math.round(distance*3)); card.style.filter=distance>2.3?"saturate(.72)":"none"; card.style.pointerEvents=distance>3.6?"none":"auto";
-        card.classList.toggle("is-active",index===active); card.setAttribute("aria-pressed",index===active?"true":"false"); card.tabIndex=distance<=3.6?0:-1;
+        const isActive=index===active;
+        card.classList.toggle("is-active",isActive); card.setAttribute("aria-pressed",isActive?"true":"false"); card.tabIndex=distance<=3.6?0:-1;
+        card.setAttribute("aria-label",isActive&&registerUrl?`${profiles[index].name} auswählen und registrieren`:`${profiles[index].name} anzeigen`);
+        card.title=isActive&&registerUrl?`${profiles[index].name} auswählen und registrieren`:`${profiles[index].name} anzeigen`;
         if(distance<=2){const image=card.querySelector("img");image.loading="eager";image.decode?.().catch(()=>{});}
       });
     }
