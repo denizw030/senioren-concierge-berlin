@@ -1,7 +1,39 @@
 (() => {
   const profiles = [
-    ["nilo","Nilo","NAHWERK-Concierge-Nilo.png","Klar, ruhig und strukturiert."],["mira","Mira","MIRA-Spanisch-NAHWERK-Concierge.png","Warm, verständlich und aufmerksam."],["lena","Lena","NAHWERK-Concierge-Lena.png","Modern, empathisch und lösungsorientiert."],["lukas","Lukas","NAHWERK-Concierge-Lukas.png","Souverän, direkt und zuverlässig."],["hartmut","Hartmut","HARTMUT-Deutsch-NAHWERK-Concierge.png","Ruhig, erfahren und geduldig."],["frida","Frida","FRIDA-Deutsch-NAHWERK-Concierge.png","Herzlich, klar und zugewandt."],["asha","Asha","ASHA-HINDI-NAHWERK-Concierge.png","Empathisch, aufmerksam und besonnen."],["sari","Sari","SARI-Indonesisch-NAHWERK-Concierge.png","Freundlich, ruhig und lösungsorientiert."],["leyla","Leyla","LEYLA-Tuerkisch-NAHWERK-Concierge.png","Warm, direkt und verlässlich."],["noor","Noor","NOOR-Levantisch-Arabisch-NAHWERK-Concierge.png","Aufmerksam, feinfühlig und strukturiert."],["sofia","Sofia","SOFIA-Spanisch-Mediterran-NAHWERK-Concierge.png","Lebendig, herzlich und klar."],["camille","Camille","CAMILLE-Franzoesisch-NAHWERK-Concierge.png","Elegant, ruhig und präzise."],["anna","Anna","ANNA-Polnisch-NAHWERK-Concierge.png","Pragmatisch, freundlich und zuverlässig."],["olena","Olena","OLENA_Ukrainisch-NAHWERK-Concierge.png","Einfühlsam, klar und ausdauernd."],["mei","Mei","MEI-Chinesisch-NAHWERK-Concierge.png","Bedacht, modern und aufmerksam."],["amara","Amara","AMARA-Ghanisch-NAHWERK-Concierge.png","Souverän, herzlich und lösungsstark."],["kwame","Kwame","KWAME-Ghanisch-NAHWERK-Concierge.png","Gelassen, verbindlich und strukturiert."],["zuri","Zuri","ZURI-Kenianisch-NAHWERK-Concierge.png","Positiv, aufmerksam und klar."],["jabari","Jabari","JABARI-Kenianisch-NAHWERK-Concierge.png","Ruhig, selbstbewusst und zuverlässig."],["arjun","Arjun","ARJUN-Indisch-NAHWERK-Concierge.png","Analytisch, freundlich und lösungsorientiert."],["wei","Wei","WEI-Chinesisch-NAHWERK-Concierge.png","Präzise, besonnen und effizient."],["yuki","Yuki","JUKI-Japanisch-NAHWERK-Concierge.png","Ruhig, modern und detailbewusst."],["ren","Ren","REN-Japanisch-NAHWERK-Concierge.png","Klar, ausgeglichen und zuverlässig."]
-  ].map(([key,name,file,description]) => ({key,name,image:`assets/${file}`,description}));
+    ["nilo","Nilo","NAHWERK-Concierge-Nilo.png","Klar, ruhig und strukturiert.","europe","ES","male","cedar"],
+    ["mira","Mira","MIRA-Spanisch-NAHWERK-Concierge.png","Warm, verständlich und aufmerksam.","europe","ES","female","marin"],
+    ["lena","Lena","NAHWERK-Concierge-Lena.png","Modern, empathisch und lösungsorientiert.",null,null,"female","coral"],
+    ["lukas","Lukas","NAHWERK-Concierge-Lukas.png","Souverän, direkt und zuverlässig.",null,null,"male","alloy"],
+    ["hartmut","Hartmut","HARTMUT-Deutsch-NAHWERK-Concierge.png","Ruhig, erfahren und geduldig.",null,null,"male","ballad"],
+    ["frida","Frida","FRIDA-Deutsch-NAHWERK-Concierge.png","Herzlich, klar und zugewandt.",null,null,"female","sage"],
+    ["asha","Asha","ASHA-HINDI-NAHWERK-Concierge.png","Empathisch, aufmerksam und besonnen.",null,null,null,null],
+    ["sari","Sari","SARI-Indonesisch-NAHWERK-Concierge.png","Freundlich, ruhig und lösungsorientiert.",null,null,null,null],
+    ["leyla","Leyla","LEYLA-Tuerkisch-NAHWERK-Concierge.png","Warm, direkt und verlässlich.",null,null,null,null],
+    ["noor","Noor","NOOR-Levantisch-Arabisch-NAHWERK-Concierge.png","Aufmerksam, feinfühlig und strukturiert.",null,null,null,null],
+    ["sofia","Sofia","SOFIA-Spanisch-Mediterran-NAHWERK-Concierge.png","Lebendig, herzlich und klar.",null,null,null,null],
+    ["camille","Camille","CAMILLE-Franzoesisch-NAHWERK-Concierge.png","Elegant, ruhig und präzise.",null,null,null,null],
+    ["anna","Anna","ANNA-Polnisch-NAHWERK-Concierge.png","Pragmatisch, freundlich und zuverlässig.",null,null,null,null],
+    ["olena","Olena","OLENA_Ukrainisch-NAHWERK-Concierge.png","Einfühlsam, klar und ausdauernd.",null,null,null,null],
+    ["mei","Mei","MEI-Chinesisch-NAHWERK-Concierge.png","Bedacht, modern und aufmerksam.",null,null,null,null],
+    ["amara","Amara","AMARA-Ghanisch-NAHWERK-Concierge.png","Souverän, herzlich und lösungsstark.",null,null,null,null],
+    ["kwame","Kwame","KWAME-Ghanisch-NAHWERK-Concierge.png","Gelassen, verbindlich und strukturiert.",null,null,null,null],
+    ["zuri","Zuri","ZURI-Kenianisch-NAHWERK-Concierge.png","Positiv, aufmerksam und klar.",null,null,null,null],
+    ["jabari","Jabari","JABARI-Kenianisch-NAHWERK-Concierge.png","Ruhig, selbstbewusst und zuverlässig.",null,null,null,null],
+    ["arjun","Arjun","ARJUN-Indisch-NAHWERK-Concierge.png","Analytisch, freundlich und lösungsorientiert.",null,null,null,null],
+    ["wei","Wei","WEI-Chinesisch-NAHWERK-Concierge.png","Präzise, besonnen und effizient.",null,null,null,null],
+    ["yuki","Yuki","JUKI-Japanisch-NAHWERK-Concierge.png","Ruhig, modern und detailbewusst.",null,null,null,null],
+    ["ren","Ren","REN-Japanisch-NAHWERK-Concierge.png","Klar, ausgeglichen und zuverlässig.",null,null,null,null]
+  ].map(([key,name,file,description,continent,country,gender,defaultVoice]) => ({
+    key,
+    name,
+    image:`assets/${file}`,
+    description,
+    visual_identity:{continent,country,gender},
+    voice:{default_voice:defaultVoice,compatible_voices:null},
+    languages:{default:null,supported:null,policy:"global_supported_languages"},
+    active:true,
+    selectable:true
+  }));
   const byKey = Object.fromEntries(profiles.map(profile => [profile.key,profile]));
   const mod = value => (value % profiles.length + profiles.length) % profiles.length;
   const circularDelta = (from,to) => { let delta=mod(to-from); if(delta>Math.floor(profiles.length/2)) delta-=profiles.length; return delta; };
