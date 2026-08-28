@@ -13,6 +13,20 @@
       .senior-benefit-chips{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 2px;max-width:760px}
       .senior-benefit-chip{display:inline-flex;align-items:center;gap:8px;padding:9px 13px;border:1px solid rgba(185,135,36,.28);border-radius:999px;background:rgba(255,255,255,.82);box-shadow:0 6px 18px rgba(92,64,16,.06);font-size:13px;font-weight:750;color:#3d321f;white-space:nowrap}
       .senior-benefit-chip:before{content:"✓";display:grid;place-items:center;width:19px;height:19px;flex:0 0 19px;border-radius:50%;background:linear-gradient(135deg,#efd073,#c9962d);color:#fff;font-size:11px;font-weight:900;box-shadow:0 3px 9px rgba(167,119,25,.18)}
+      .senior-image-hero{min-height:calc(100svh - 112px);display:grid;align-items:center;padding:clamp(70px,9vw,124px) 0!important;overflow:hidden}
+      .senior-image-hero .senior-hero-layout{grid-template-columns:minmax(0,1.04fr) minmax(390px,.96fr);gap:clamp(48px,7vw,104px);align-items:center}
+      .senior-image-hero .senior-hero-copy{max-width:690px}
+      .senior-image-hero .eyebrow{margin-bottom:20px;letter-spacing:.19em}
+      .senior-image-hero h1{max-width:10.5ch;margin:0;font-size:clamp(58px,6.2vw,92px)!important;line-height:.93!important;letter-spacing:-.065em!important;text-wrap:balance}
+      .senior-image-hero .senior-hero-lead{max-width:610px;margin:30px 0 0!important;font-size:clamp(18px,1.55vw,22px)!important;line-height:1.55!important;color:#625b50!important}
+      .senior-image-hero .senior-benefit-chips{margin-top:26px;gap:8px}
+      .senior-image-hero .senior-benefit-chip{padding:8px 12px;background:rgba(255,255,255,.58);box-shadow:none;font-size:12px}
+      .senior-image-hero .actions{margin-top:30px;gap:12px}
+      .senior-image-hero .actions .btn{min-height:56px;padding:15px 24px;border-radius:999px;font-size:15px}
+      .senior-image-hero .actions .btn.red{background:#171511!important;color:#fff!important;border-color:#171511!important;box-shadow:0 14px 32px rgba(32,25,14,.18)}
+      .senior-image-hero .actions .btn.red:hover{transform:translateY(-2px);box-shadow:0 18px 38px rgba(32,25,14,.24)}
+      .senior-image-hero .senior-hero-photo{aspect-ratio:4/5;border-radius:34px;box-shadow:0 34px 80px rgba(73,52,18,.16)}
+      .senior-image-hero .senior-hero-photo img{object-position:center}
       .senior-tariffs{margin-top:42px}
       .senior-family-section{scroll-margin-top:120px;margin-top:42px;padding:34px;border:1px solid #dec98f;border-radius:24px;background:#fffdf9;box-shadow:0 16px 42px rgba(104,78,28,.08)}
       .senior-family-section>p{max-width:850px;color:#5f594f;line-height:1.7}
@@ -44,8 +58,9 @@
       a.senior-plan-cta:focus-visible{outline:3px solid rgba(177,128,31,.38);outline-offset:3px}
       .senior-plan-cta[aria-disabled="true"]{border-color:#d8d0c1;background:#eee9df;color:#746d61!important;cursor:not-allowed}
       .senior-tariff-note{margin-top:20px;padding:15px 17px;border-left:3px solid #c99b38;border-radius:10px;background:#fffaf0;color:#5d564b;font-size:13px;line-height:1.55}
-      @media(max-width:1100px){.senior-plan-grid,.senior-family-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.senior-plan p{min-height:0}}
-      @media(max-width:650px){.senior-benefit-chips{gap:8px;margin-top:18px}.senior-benefit-chip{width:100%;white-space:normal;padding:10px 13px}}
+      @media(max-width:1100px){.senior-plan-grid,.senior-family-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.senior-plan p{min-height:0}.senior-image-hero .senior-hero-layout{grid-template-columns:minmax(0,1fr) minmax(340px,.82fr);gap:42px}.senior-image-hero h1{font-size:clamp(52px,6.6vw,72px)!important}}
+      @media(max-width:900px){.senior-image-hero{min-height:0;padding:68px 0 76px!important}.senior-image-hero .senior-hero-layout{grid-template-columns:1fr}.senior-image-hero .senior-hero-copy{max-width:760px}.senior-image-hero h1{max-width:11ch}.senior-image-hero .senior-hero-photo{width:100%;max-width:760px;aspect-ratio:16/10}}
+      @media(max-width:650px){.senior-benefit-chips{gap:8px;margin-top:18px}.senior-benefit-chip{width:100%;white-space:normal;padding:10px 13px}.senior-image-hero{padding:52px 0 62px!important}.senior-image-hero h1{font-size:clamp(46px,14vw,64px)!important}.senior-image-hero .senior-hero-lead{margin-top:24px!important;font-size:18px!important}.senior-image-hero .actions{display:grid}.senior-image-hero .actions .btn{width:100%}.senior-image-hero .senior-hero-photo{aspect-ratio:4/3;border-radius:24px}}
       @media(max-width:700px){.senior-plan-grid,.senior-family-grid{grid-template-columns:1fr}.senior-tariffs{margin-top:34px}.senior-family-section{margin-top:34px;padding:24px 20px}}
     </style>
     <link rel="canonical" href="https://nahwerkconcierge.com/senioren-concierge.html">
@@ -75,26 +90,22 @@
       <section class="hero senior-image-hero">
         <div class="wrap senior-hero-layout">
           <div class="senior-hero-copy">
-          <div class="eyebrow">Nahwerk Concierge · Seniorenbereich</div>
-          <h1>Digitale Unterstützung, die sich dem Menschen anpasst.</h1>
-          <p>
-            Senioren Concierge ist der speziell auf ältere Menschen und ihre
-            Angehörigen ausgerichtete Bereich innerhalb von Nahwerk Concierge.
-            Die helle Weiß-Gold-Welt sorgt für Ruhe, Klarheit und sehr gute
-            Lesbarkeit; das eigene Senioren-Logo kennzeichnet diesen
-            spezialisierten Bereich.
+          <div class="eyebrow">Senioren Concierge · persönlich voreingestellt</div>
+          <h1>Einfach fragen. In Ruhe verstehen.</h1>
+          <p class="senior-hero-lead">
+            Persönliche Unterstützung direkt über WhatsApp – verständlich,
+            geduldig und auf Wunsch bereits von Angehörigen passend eingerichtet.
           </p>
           <div class="senior-benefit-chips" aria-label="Vorteile">
             <span class="senior-benefit-chip">Keine komplizierte App</span>
             <span class="senior-benefit-chip">Einfach über WhatsApp</span>
-            <span class="senior-benefit-chip">Fragen per Sprache oder Text</span>
-            <span class="senior-benefit-chip">Ruhig &amp; verständlich erklärt</span>
-            <span class="senior-benefit-chip">Persönlich auf Sie eingestellt</span>
+            <span class="senior-benefit-chip">Sprache oder Text</span>
+            <span class="senior-benefit-chip">Ruhig erklärt</span>
           </div>
           <div class="actions">
             <a class="btn red" href="registrieren.html?produkt=senioren"
-              >Kostenlos starten</a
-            ><a class="btn light" href="senioren-concierge.html#angehoerige">Für Angehörige</a>
+              >Kostenlos ausprobieren</a
+            ><a class="btn light" href="senioren-concierge.html#angehoerige">Für jemanden einrichten</a>
           </div>
           </div>
           <figure class="senior-hero-photo">
