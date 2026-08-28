@@ -1,0 +1,66 @@
+name: Temporary concierge image optimization
+
+on:
+  push:
+    branches:
+      - staging/website-full-product-ux-premium-preview-01
+    paths:
+      - .github/workflows/concierge-image-opt-temp.yml
+
+permissions:
+  contents: write
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: staging/website-full-product-ux-premium-preview-01
+          fetch-depth: 0
+      - name: Install WebP tools
+        run: sudo apt-get update && sudo apt-get install -y webp
+      - name: Generate responsive WebP concierge assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets/concierges/card assets/concierges/large
+          while IFS='|' read -r key src; do
+            [ -f "assets/$src" ] || { echo "Missing source: assets/$src"; exit 1; }
+            cwebp -quiet -q 84 -resize 480 0 "assets/$src" -o "assets/concierges/card/$key.webp"
+            cwebp -quiet -q 88 -resize 900 0 "assets/$src" -o "assets/concierges/large/$key.webp"
+          done <<'EOF'
+          nilo|NILO-Spanisch-NAHWERK-Concierge.png
+          mira|MIRA-Spanisch-NAHWERK-Concierge.png
+          lena|LENA-Deutsch-NAHWERK-Concierge.png
+          lukas|LUKAS-Deutsch-NAHWERK-Concierge.png
+          hartmut|HARTMUT-Deutsch-NAHWERK-Concierge.png
+          frida|FRIDA-Deutsch-NAHWERK-Concierge.png
+          asha|ASHA-HINDI-NAHWERK-Concierge.png
+          sari|SARI-Indonesisch-NAHWERK-Concierge.png
+          leyla|LEYLA-Tuerkisch-NAHWERK-Concierge.png
+          noor|NOOR-Levantisch-Arabisch-NAHWERK-Concierge.png
+          sofia|SOFIA-Spanisch-Mediterran-NAHWERK-Concierge.png
+          camille|CAMILLE-Franzoesisch-NAHWERK-Concierge.png
+          anna|ANNA-Polnisch-NAHWERK-Concierge.png
+          olena|OLENA_Ukrainisch-NAHWERK-Concierge.png
+          mei|MEI-Chinesisch-NAHWERK-Concierge.png
+          amara|AMARA-Ghanisch-NAHWERK-Concierge.png
+          kwame|KWAME-Ghanisch-NAHWERK-Concierge.png
+          zuri|ZURI-Kenianisch-NAHWERK-Concierge.png
+          jabari|JABARI-Kenianisch-NAHWERK-Concierge.png
+          arjun|ARJUN-Indisch-NAHWERK-Concierge.png
+          wei|WEI-Chinesisch-NAHWERK-Concierge.png
+          yuki|JUKI-Japanisch-NAHWERK-Concierge.png
+          ren|REN-Japanisch-NAHWERK-Concierge.png
+          EOF
+      - name: Commit generated assets and remove temporary workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/concierge-image-opt-temp.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/concierges .github/workflows/concierge-image-opt-temp.yml
+          git commit -m "Optimize concierge portraits for responsive web delivery"
+          git push origin HEAD:staging/website-full-product-ux-premium-preview-01
