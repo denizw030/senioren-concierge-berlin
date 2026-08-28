@@ -15,6 +15,7 @@
     const requested=options.selected||root.dataset.selected||"nilo";
     let active=Math.max(0,profiles.findIndex(profile=>profile.key===requested));
     let dragX=0,pointerStart=0,dragging=false,moved=false,wheelLock=false;
+    const loaded = new Set();
     root.dataset.variant=variant;
     root.classList.add("nw-carousel");
     root.setAttribute("role","region");
@@ -28,11 +29,16 @@
       target.searchParams.set("concierge",profiles[index].key);
       location.href=`${target.pathname.split("/").pop()}${target.search}${target.hash}`;
     }
+
     const cards=profiles.map((profile,index)=>{
       const card=document.createElement("button");
       card.type="button"; card.className="nw-carousel-card"; card.dataset.index=String(index);
       card.setAttribute("aria-label",`${profile.name} anzeigen`);
-      card.innerHTML=`<img src="${profile.image}" alt="Portrait von ${profile.name}, NAHWERK Concierge" width="900" height="1200" loading="lazy" decoding="async"><span>${profile.name}</span>`;
+      card.innerHTML=`<img alt="Portrait von ${profile.name}, NAHWERK Concierge" width="900" height="1200" decoding="async"><span>${profile.name}</span>`;
+      const image=card.querySelector("img");
+      image.dataset.src=profile.image;
+      image.addEventListener("load",()=>card.classList.add("is-image-ready"),{once:true});
+      image.addEventListener("error",()=>{card.classList.add("is-image-error");card.classList.remove("is-image-loading");},{once:true});
       card.addEventListener("click",()=>{
         if(moved)return;
         if(index===active&&registerUrl){goToRegistration(index);return;}
@@ -42,21 +48,46 @@
       return card;
     });
 
+    function ensureImage(index,priority="auto"){
+      const safe=mod(index),card=cards[safe],image=card?.querySelector("img");
+      if(!image || loaded.has(safe) || image.src) return;
+      loaded.add(safe);
+      card.classList.add("is-image-loading");
+      image.loading=priority==="high"?"eager":"lazy";
+      if("fetchPriority" in image) image.fetchPriority=priority;
+      image.src=image.dataset.src;
+      if(priority==="high") image.decode?.().catch(()=>{});
+    }
+
+    function warmWindow(center=active){
+      ensureImage(center,"high");
+      ensureImage(center-1,"high");
+      ensureImage(center+1,"high");
+      ensureImage(center-2,"auto");
+      ensureImage(center+2,"auto");
+    }
+
     function measureSpacing(){const raw=getComputedStyle(root).getPropertyValue("--nw-carousel-space").trim(),probe=document.createElement("div");probe.style.cssText=`position:absolute;visibility:hidden;width:${raw}`;root.appendChild(probe);const value=probe.getBoundingClientRect().width;probe.remove();return value||220;}
     let cardSpacing=measureSpacing();
+
     function positionCards(){
       const gap=cardSpacing;
       cards.forEach((card,index)=>{
         const relative=circularDelta(active,index),x=relative*gap+dragX,distance=Math.abs(x/gap),scale=Math.max(.56,1-distance*.2),opacity=distance>3.6?0:Math.max(.28,1-distance*.2);
-        card.style.transform=`translate3d(calc(-50% + ${x}px),-50%,0) scale(${scale})`;
-        card.style.opacity=String(opacity); card.style.zIndex=String(30-Math.round(distance*3)); card.style.filter=distance>2.3?"saturate(.72)":"none"; card.style.pointerEvents=distance>3.6?"none":"auto";
+        card.style.setProperty("--nw-card-x",`${x}px`);
+        card.style.setProperty("--nw-card-scale",String(scale));
+        card.style.opacity=String(opacity);
+        card.style.zIndex=String(30-Math.round(distance*3));
+        card.style.pointerEvents=distance>3.6?"none":"auto";
+        card.classList.toggle("is-near",distance<=2.2);
         const isActive=index===active;
         card.classList.toggle("is-active",isActive); card.setAttribute("aria-pressed",isActive?"true":"false"); card.tabIndex=distance<=3.6?0:-1;
         card.setAttribute("aria-label",isActive&&registerUrl?`${profiles[index].name} auswählen und registrieren`:`${profiles[index].name} anzeigen`);
         card.title=isActive&&registerUrl?`${profiles[index].name} auswählen und registrieren`:`${profiles[index].name} anzeigen`;
-        if(distance<=2){const image=card.querySelector("img");image.loading="eager";image.decode?.().catch(()=>{});}
+        if(distance<=2.2) ensureImage(index,isActive||distance<=1.05?"high":"auto");
       });
     }
+
     function updateInfo(emit=false){
       const profile=profiles[active]; name.textContent=profile.name; description.textContent=profile.description;
       status.hidden=variant!=="selection"&&!registerUrl;
@@ -65,19 +96,37 @@
       if(input&&input.value!==profile.key){input.value=profile.key;if(emit){input.dispatchEvent(new Event("input",{bubbles:true}));input.dispatchEvent(new Event("change",{bubbles:true}));}}
       if(emit) root.dispatchEvent(new CustomEvent("conciergechange",{bubbles:true,detail:profile}));
     }
-    function select(target,emit=false){const numeric=typeof target==="number",index=numeric?target:profiles.indexOf(byKey[target]);if(!numeric&&index<0)return;const next=mod(index);if(next===active&&dragX===0)return;active=next;dragX=0;positionCards();updateInfo(emit);}
+
+    function select(target,emit=false){
+      const numeric=typeof target==="number",index=numeric?target:profiles.indexOf(byKey[target]);
+      if(!numeric&&index<0)return;
+      const next=mod(index);
+      if(next===active&&dragX===0)return;
+      active=next; dragX=0; warmWindow(active); positionCards(); updateInfo(emit);
+    }
+
     const move=(direction,emit=false)=>select(active+direction,emit);
-    root.querySelector(".prev").addEventListener("click",()=>move(-1,true)); root.querySelector(".next").addEventListener("click",()=>move(1,true)); status.addEventListener("click",()=>goToRegistration());
+    root.querySelector(".prev").addEventListener("click",()=>move(-1,true));
+    root.querySelector(".next").addEventListener("click",()=>move(1,true));
+    status.addEventListener("click",()=>goToRegistration());
     stage.addEventListener("keydown",event=>{if(event.key==="ArrowLeft"){event.preventDefault();move(-1,true);}if(event.key==="ArrowRight"){event.preventDefault();move(1,true);}if(event.key==="Home"){event.preventDefault();select(0,true);}if(event.key==="End"){event.preventDefault();select(profiles.length-1,true);}});
     stage.addEventListener("pointerdown",event=>{dragging=true;moved=false;pointerStart=event.clientX;dragX=0;stage.classList.add("is-dragging");stage.setPointerCapture?.(event.pointerId);});
     stage.addEventListener("pointermove",event=>{if(!dragging)return;dragX=event.clientX-pointerStart;moved||=Math.abs(dragX)>6;positionCards();});
     const finishDrag=()=>{if(!dragging)return;dragging=false;stage.classList.remove("is-dragging");const steps=Math.round(-dragX/Math.max(1,cardSpacing));if(steps)select(active+steps,true);else{dragX=0;positionCards();}setTimeout(()=>{moved=false;},0);};
     stage.addEventListener("pointerup",finishDrag); stage.addEventListener("pointercancel",finishDrag);
     stage.addEventListener("wheel",event=>{if(Math.abs(event.deltaX)<=Math.abs(event.deltaY)||wheelLock)return;event.preventDefault();wheelLock=true;move(event.deltaX>0?1:-1,true);setTimeout(()=>{wheelLock=false;},280);},{passive:false});
-    addEventListener("resize",()=>{cardSpacing=measureSpacing();positionCards();},{passive:true});
+
+    let resizeFrame=0;
+    addEventListener("resize",()=>{cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(()=>{cardSpacing=measureSpacing();positionCards();});},{passive:true});
+
     const api={select:key=>{if(byKey[key])select(key,true);},get selected(){return profiles[active];}};
-    root._nahwerkCarousel=api; positionCards(); updateInfo(); return api;
+    root._nahwerkCarousel=api;
+    warmWindow(active);
+    positionCards();
+    updateInfo();
+    return api;
   }
+
   function autoMount(scope=document){scope.querySelectorAll("[data-concierge-carousel]").forEach(root=>mount(root));}
   window.NAHWERK_CONCIERGES=profiles; window.NAHWERKCarousel={profiles,byKey,mount,autoMount,circularDelta};
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>autoMount());else autoMount();
