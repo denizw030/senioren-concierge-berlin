@@ -20,17 +20,12 @@
   };
   const selectedPlan = plans[planKey] || plans.free;
   const planBookable = selectedPlan.code === "FREE";
-  const conciergeProfiles = {
-    nilo: { name: "Nilo", description: "Klar, ruhig und strukturiert.", image: "assets/NAHWERK-Concierge-Nilo.png" },
-    mira: { name: "Mira", description: "Warm, verständlich und aufmerksam.", image: "assets/NAHWERK-Concierge-Mira.png" },
-    lena: { name: "Lena", description: "Modern, empathisch und lösungsorientiert.", image: "assets/NAHWERK-Concierge-Lena.png" },
-    lukas: { name: "Lukas", description: "Souverän, direkt und zuverlässig.", image: "assets/NAHWERK-Concierge-Lukas.png" }
-  };
+  const conciergeProfiles = window.NAHWERKCarousel?.byKey || {};
   const recipientIds = ["recipientSalutation", "recipientFirstName", "recipientLastName", "relationship", "recipientPhone"];
   const fullName = (first, last) => [first.trim(), last.trim()].filter(Boolean).join(" ");
   const isSelf = () => form.querySelector('input[name="setupFor"]:checked')?.value === "self";
   const conciergeValue = () => {
-    const value = form.querySelector('input[name="conciergeChoice"]:checked')?.value;
+    const value = form.querySelector('[name="conciergeChoice"]')?.value;
     return conciergeProfiles[value] ? value : "nilo";
   };
   const concierge = () => conciergeProfiles[conciergeValue()].name;
@@ -63,28 +58,22 @@
   function setupConciergeSelection() {
     const choice = form.querySelector(".concierge-choice");
     if (!choice) return;
-    injectConciergeStyles();
+    const requestedConcierge = params.get("concierge");
+    if (conciergeProfiles[requestedConcierge]) choice.dataset.selected = requestedConcierge;
     const field = choice.closest(".field");
-    const heading = field?.querySelector(":scope > label");
+    const heading = field?.querySelector(":scope > legend, :scope > label");
     if (heading) {
       heading.classList.add("concierge-selection-title");
       heading.textContent = "Wer darf Sie begleiten?";
     }
-    let intro = field?.querySelector(".concierge-selection-intro");
+    let intro = field?.querySelector(".concierge-intro, .concierge-selection-intro");
     if (!intro && field) {
       intro = document.createElement("p");
-      intro.className = "concierge-selection-intro";
+      intro.className = "concierge-intro concierge-selection-intro";
       choice.before(intro);
     }
     if (intro) intro.textContent = "Wählen Sie den Concierge, dessen Auftreten und Kommunikationsstil am besten zu Ihnen passt. Die grundlegenden Möglichkeiten bleiben bei allen Profilen gleich.";
-    choice.innerHTML = Object.entries(conciergeProfiles).map(([value, profile], index) => `
-      <label class="concierge-option">
-        <input type="radio" name="conciergeChoice" value="${value}"${index === 0 ? " checked" : ""} aria-label="${profile.name} auswählen" />
-        <span class="concierge-card-content">
-          <img src="${profile.image}" alt="Portrait von ${profile.name}, NAHWERK Concierge" loading="lazy" />
-          <span class="concierge-card-copy"><strong>${profile.name}</strong><span>${profile.description}</span><span class="concierge-check" aria-hidden="true">✓</span></span>
-        </span>
-      </label>`).join("");
+    window.NAHWERKCarousel?.mount(choice, { variant: "selection", inputName: "conciergeChoice", selected: choice.dataset.selected || "nilo" });
     const oldHint = field?.querySelector(".tiny");
     if (oldHint) oldHint.textContent = "Die Auswahl gilt für diesen Zugang und kann später in den Concierge-Einstellungen geändert werden.";
   }
@@ -100,7 +89,7 @@
     const ownerPhoneHint = $("ownerPhoneField")?.querySelector(".tiny");
     if (ownerPhoneHint) ownerPhoneHint.textContent = `Nur nötig, wenn Sie ${name} selbst über WhatsApp nutzen.`;
     const recipientHeading = $("recipientBlock")?.querySelector("h2");
-    if (recipientHeading) recipientHeading.textContent = `Person, die ${name} unterstützen soll`;
+    if (recipientHeading) recipientHeading.textContent = `Wen darf ${name} unterstützen?`;
     const noteLabel = document.querySelector('label[for="note"]');
     if (noteLabel) noteLabel.innerHTML = `Was sollte ${name} am Anfang wissen? <span class="tiny">(optional)</span>`;
     const addressingLabel = document.querySelector('label[for="addressing"]');
@@ -116,7 +105,10 @@
     const owner = fullName($("ownerFirstName").value, $("ownerLastName").value);
     const introduction = !isSelf() && owner ? `<br>${owner} hat diesen Zugang für ${informal ? "dich" : "Sie"} eingerichtet.` : "";
     updateContextTexts();
-    $("messagePreview").innerHTML = `<strong>${greeting} 👋</strong><br><br>Willkommen bei ${productLabel}.${introduction}<br><br>Ich bin ${concierge()}, ${informal ? "dein" : "Ihr"} persönlicher KI-Concierge.<br><br>Ich erkläre die Bedienung verständlich und helfe ${informal ? "dir" : "Ihnen"} bei Organisation, Informationen, Dokumenten und vielem mehr.`;
+    const welcomeMessage = product === "senioren"
+      ? `<strong>${greeting} 👋</strong><br><br>Willkommen bei NAHWERK Concierge.${introduction}<br><br>Ich bin ${concierge()}, ${informal ? "dein" : "Ihr"} persönlicher KI-Concierge.<br><br>Ich helfe ${informal ? "dir" : "Ihnen"} dabei, Fragen verständlich zu klären, Technik Schritt für Schritt zu bedienen und wichtige Erinnerungen im Blick zu behalten.<br><br>Auf Wunsch erstelle ich Bilder, ordne Fotos ein, vergleiche Möglichkeiten und fasse Informationen übersichtlich zusammen.`
+      : `<strong>${greeting} 👋</strong><br><br>Willkommen bei ${productLabel}.${introduction}<br><br>Ich bin ${concierge()}, ${informal ? "dein" : "Ihr"} persönlicher KI-Concierge.<br><br>Ich erkläre die Bedienung verständlich und helfe ${informal ? "dir" : "Ihnen"} bei Organisation, Informationen, Dokumenten und vielem mehr.`;
+    $("messagePreview").innerHTML = welcomeMessage;
   }
 
   function syncSelf() {
@@ -171,56 +163,9 @@
     $("registrationSubmit").setAttribute("aria-disabled", "true");
   }
   document.title = `${productLabel} registrieren | NAHWERK`;
-  const recipientIds = ["recipientSalutation", "recipientFirstName", "recipientLastName", "relationship", "recipientPhone"];
-  const fullName = (first, last) => [first.trim(), last.trim()].filter(Boolean).join(" ");
-  const isSelf = () => form.querySelector('input[name="setupFor"]:checked')?.value === "self";
-  const conciergeProfiles = { nilo: "Nilo", mira: "Mira", lena: "Lena", lukas: "Lukas" };
-  const conciergeValue = () => form.querySelector('input[name="conciergeChoice"]:checked')?.value || "nilo";
-  const concierge = () => conciergeProfiles[conciergeValue()] || "Nilo";
-  function person() {
-    return isSelf() ? { sal: $("ownerSalutation").value, first: $("ownerFirstName").value.trim(), last: $("ownerLastName").value.trim(), phone: $("ownerPhone").value.trim() } : { sal: $("recipientSalutation").value, first: $("recipientFirstName").value.trim(), last: $("recipientLastName").value.trim(), phone: $("recipientPhone").value.trim() };
-  }
-  function render() {
-    const p = person(), informal = $("addressing").value === "du";
-    const conciergeName = concierge();
-    const greeting = informal && p.first ? `Hallo ${p.first}` : p.sal && p.last ? `Hallo ${p.sal} ${p.last}` : p.last ? `Hallo ${p.last}` : p.first ? `Hallo ${p.first}` : "Hallo";
-    const owner = fullName($("ownerFirstName").value, $("ownerLastName").value);
-    const introduction = !isSelf() && owner ? `<br>${owner} hat diesen Zugang für ${informal ? "dich" : "Sie"} eingerichtet.` : "";
-    $("recipientHeading").textContent = `Wen darf ${conciergeName} unterstützen?`;
-    $("ownerPhoneHint").textContent = `Nur nötig, wenn Sie ${conciergeName} selbst über WhatsApp nutzen.`;
-    $("notePrompt").textContent = `Was sollte ${conciergeName} am Anfang wissen?`;
-    $("addressingLabel").textContent = `Wie soll ${conciergeName} die unterstützte Person ansprechen?`;
-    $("safetyConciergeName").textContent = conciergeName;
-    $("messagePreview").innerHTML = `<strong>${greeting} 👋</strong><br><br>Willkommen bei ${productLabel}.${introduction}<br><br>Ich bin ${conciergeName}, ${informal ? "dein" : "Ihr"} persönlicher KI-Concierge.<br><br>Ich erkläre die Bedienung verständlich und helfe ${informal ? "dir" : "Ihnen"} bei Organisation, Informationen, Dokumenten und vielem mehr.`;
-  }
-  function syncSelf() {
-    const self = isSelf();
-    form.querySelectorAll('.choice label').forEach((label) => label.classList.toggle("selected", label.querySelector("input")?.checked));
-    $("recipientBlock").hidden = self; $("selfHint").hidden = !self; $("consentRow").hidden = self; $("ownerPhoneField").hidden = !self;
-    $("ownerPhone").required = self; $("ownerPhone").disabled = !self; $("consent").required = !self;
-    recipientIds.forEach((id) => { $(id).disabled = self; });
-    $("recipientFirstName").required = !self; $("recipientLastName").required = !self; $("recipientPhone").required = !self;
-    if (self) $("consent").checked = true;
-    render();
-  }
-  function syncSafety() {
-    const enabled = $("safetyEnabled").checked;
-    $("safetyFields").hidden = !enabled; $("checkinTimes").required = enabled; $("trustedContactPhone").required = enabled;
-  }
-  function show(message, error = false) {
-    $("status").style.display = "block"; $("status").style.borderLeftColor = error ? "#a84b4b" : "var(--gold)"; $("status").innerHTML = message;
-  }
-  async function login(email, password) {
-    const response = await fetch(LOGIN_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }) });
-    const body = await response.json().catch(() => ({}));
-    if (!(response.ok && body.ok && body.status === "logged_in" && body.session_token)) return false;
-    localStorage.setItem(SESSION_KEY, JSON.stringify({ session_token: body.session_token, customer_account_id: body.customer_account_id, person_id: body.person_id, role: body.role, expires_at: body.expires_at }));
-    return true;
-  }
   form.addEventListener("input", render);
   form.addEventListener("change", (event) => {
     if (event.target.name === "setupFor") syncSelf();
-    if (event.target.name === "conciergeChoice") form.querySelectorAll(".concierge-card").forEach((card) => card.classList.toggle("selected", card.querySelector("input")?.checked));
     if (event.target.id === "safetyEnabled") syncSafety();
     render();
   });
