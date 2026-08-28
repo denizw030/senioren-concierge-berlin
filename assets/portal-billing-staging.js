@@ -8,7 +8,7 @@
   const money=cents=>cents==null?'—':new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(Number(cents)/100);
   const number=v=>v==null?'—':new Intl.NumberFormat('de-DE').format(Number(v));
   const bool=v=>v===true?'Aktiv':'Deaktiviert';
-  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]));
 
   function session(){try{return JSON.parse(sessionStorage.getItem(SESSION)||'null')}catch{return null}}
   async function api(path){
@@ -31,11 +31,12 @@
   function renderState(state){
     const sub=state.subscription||null;
     const pref=state.preferences||{};
-    const plan=sub?.plans||sub?.plan||null;
-    const charges=Array.isArray(state.daily_charges)?state.daily_charges:[];
-    const today=charges[0]||null;
+    const plan=sub?.plan||null;
+    const charges=Array.isArray(state.daily_usage_charges)?state.daily_usage_charges:[];
+    const todayIso=new Date().toISOString().slice(0,10);
+    const today=charges.find(x=>x?.usage_date===todayIso)||charges[0]||null;
     const checkout=Array.isArray(state.checkout_intents)?state.checkout_intents[0]:null;
-    const planName=plan?.code||sub?.plan_code||'FREE / kein Bezahlabo';
+    const planName=plan?.code||'FREE / kein Bezahlabo';
     const price=plan?.monthly_price_cents;
     const limits={
       Nachrichten:plan?.message_limit,
