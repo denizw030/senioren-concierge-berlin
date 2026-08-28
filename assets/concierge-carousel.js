@@ -35,6 +35,24 @@
     selectable:true
   }));
   const byKey = Object.fromEntries(profiles.map(profile => [profile.key,profile]));
+
+  const filterProfiles = ({continent=null,country=null,gender=null,active=true,selectable=true}={}) => profiles.filter(profile => {
+    if(active !== null && profile.active !== active) return false;
+    if(selectable !== null && profile.selectable !== selectable) return false;
+    if(continent !== null && profile.visual_identity.continent !== continent) return false;
+    if(country !== null && profile.visual_identity.country !== country) return false;
+    if(gender !== null && profile.visual_identity.gender !== gender) return false;
+    return true;
+  });
+  const distinctKnown = (items,selector) => [...new Set(items.map(selector).filter(value => value !== null && value !== undefined && value !== ""))];
+  const catalog = {
+    filter: filters => filterProfiles(filters),
+    continents: (filters={}) => distinctKnown(filterProfiles(filters),profile => profile.visual_identity.continent),
+    countries: (filters={}) => distinctKnown(filterProfiles(filters),profile => profile.visual_identity.country),
+    genders: (filters={}) => distinctKnown(filterProfiles(filters),profile => profile.visual_identity.gender),
+    personas: (filters={}) => filterProfiles(filters)
+  };
+
   const mod = value => (value % profiles.length + profiles.length) % profiles.length;
   const circularDelta = (from,to) => { let delta=mod(to-from); if(delta>Math.floor(profiles.length/2)) delta-=profiles.length; return delta; };
 
@@ -160,6 +178,6 @@
   }
 
   function autoMount(scope=document){scope.querySelectorAll("[data-concierge-carousel]").forEach(root=>mount(root));}
-  window.NAHWERK_CONCIERGES=profiles; window.NAHWERKCarousel={profiles,byKey,mount,autoMount,circularDelta};
+  window.NAHWERK_CONCIERGES=profiles; window.NAHWERKCarousel={profiles,byKey,catalog,filterProfiles,mount,autoMount,circularDelta};
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>autoMount());else autoMount();
 })();
