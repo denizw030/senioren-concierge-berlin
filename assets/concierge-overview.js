@@ -30,7 +30,7 @@
     opener = button;
     image.width = 900;
     image.height = 1200;
-    image.src = profile.image;
+    image.src = profile.largeImage || profile.image;
     image.alt = `Portrait von ${profile.name}, NAHWERK Concierge`;
     name.textContent = profile.name;
     description.textContent = profile.description;
@@ -45,7 +45,7 @@
     button.setAttribute("aria-label", `Informationen zu ${profile.name} öffnen`);
     button.innerHTML = `<span class="concierge-overview-card-media"><img alt="Portrait von ${profile.name}, NAHWERK Concierge" width="900" height="1200" decoding="async"></span><span class="concierge-overview-card-copy"><strong>${profile.name}</strong><small>${profile.description}</small></span>`;
     const cardImage = button.querySelector("img");
-    cardImage.dataset.src = profile.image;
+    cardImage.dataset.src = profile.cardImage || profile.image;
     if (index < 4) loadImage(cardImage, index < 2 ? "high" : "auto");
     else if (observer) observer.observe(cardImage);
     else loadImage(cardImage, "auto");
