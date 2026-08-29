@@ -195,6 +195,9 @@
         line-height: 1.5;
         margin: 14px 0;
       }
+      #signupForm [hidden] {
+        display: none !important;
+      }
       .preview h3 {
         font-size: 23px;
         margin: 8px 0 16px;
@@ -234,6 +237,21 @@
         font-size: 12px;
         line-height: 1.5;
       }
+      .planbox-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+      }
+      .planbox-kicker {
+        display: block;
+        margin-bottom: 6px;
+        color: #aaa69d;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
       .planbox strong {
         display: block;
         font-size: 18px;
@@ -244,6 +262,146 @@
         margin-top: 3px;
         color: #f5f0df;
         font-weight: 700;
+      }
+      .plan-change-button {
+        min-height: 42px;
+        flex: 0 0 auto;
+        padding: 0 17px;
+        border: 1px solid rgba(230, 180, 58, 0.48);
+        border-radius: 999px;
+        color: #f4d98f;
+        background: rgba(255, 255, 255, 0.04);
+        font: 750 13px/1 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+        cursor: pointer;
+        transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+      }
+      .plan-change-button:hover {
+        transform: translateY(-1px);
+        border-color: #e6b43a;
+        background: rgba(230, 180, 58, 0.1);
+      }
+      .plan-picker {
+        margin-top: 18px;
+        padding-top: 18px;
+        border: 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+      }
+      .plan-picker legend {
+        margin-bottom: 6px;
+        color: #fff;
+        font-size: 18px;
+        font-weight: 760;
+      }
+      .plan-picker-intro {
+        margin: 0 0 14px;
+        color: #aaa69d;
+        font-size: 13px;
+        line-height: 1.55;
+      }
+      .plan-options {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+      .plan-option {
+        position: relative;
+        display: block;
+        min-width: 0;
+        cursor: pointer;
+      }
+      .plan-option input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .plan-option-card {
+        display: grid;
+        min-height: 108px;
+        align-content: start;
+        gap: 6px;
+        padding: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.025);
+        transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+      }
+      .plan-option:hover .plan-option-card {
+        transform: translateY(-2px);
+        border-color: rgba(230, 180, 58, 0.52);
+      }
+      .plan-option input:checked + .plan-option-card {
+        border-color: #e6b43a;
+        background: rgba(230, 180, 58, 0.1);
+        box-shadow: 0 0 0 2px rgba(230, 180, 58, 0.12);
+      }
+      .plan-option input:focus-visible + .plan-option-card {
+        outline: 3px solid rgba(230, 180, 58, 0.38);
+        outline-offset: 3px;
+      }
+      .plan-option-name {
+        color: #fff;
+        font-size: 15px;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+      }
+      .plan-option-price {
+        color: #e6b43a;
+        font-size: 14px;
+        font-weight: 760;
+      }
+      .plan-option-usage {
+        color: #aaa69d;
+        font-size: 12px;
+        line-height: 1.4;
+      }
+      .plan-option-state {
+        justify-self: start;
+        margin-top: 2px;
+        padding: 4px 7px;
+        border-radius: 999px;
+        color: #d7d3ca;
+        background: rgba(255, 255, 255, 0.08);
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .plan-selection-note a {
+        color: #f4d98f;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+      body[data-product="senioren"] .plan-picker,
+      body.senior-product .plan-picker {
+        border-top-color: rgba(112, 87, 39, 0.2);
+      }
+      body[data-product="senioren"] .plan-picker :is(legend, .plan-option-name),
+      body.senior-product .plan-picker :is(legend, .plan-option-name) {
+        color: #211f1a;
+      }
+      body[data-product="senioren"] .plan-picker-intro,
+      body[data-product="senioren"] .plan-option-usage,
+      body.senior-product .plan-picker-intro,
+      body.senior-product .plan-option-usage {
+        color: #6e685f;
+      }
+      body[data-product="senioren"] .plan-option-card,
+      body.senior-product .plan-option-card {
+        border-color: #ded2bc;
+        background: rgba(255, 255, 255, 0.76);
+      }
+      body[data-product="senioren"] .plan-option input:checked + .plan-option-card,
+      body.senior-product .plan-option input:checked + .plan-option-card {
+        border-color: #c99b2d;
+        background: #fff5dc;
+      }
+      body[data-product="senioren"] .plan-change-button,
+      body.senior-product .plan-change-button {
+        color: #5d481e;
+        border-color: #d8bd7d;
+        background: #fff;
       }
       .benefits {
         margin: 12px 0 0;
@@ -320,6 +478,16 @@
         .recipient-contact-row .field > label {
           min-height: 0;
         }
+        .planbox-head {
+          align-items: stretch;
+          flex-direction: column;
+        }
+        .plan-change-button {
+          width: 100%;
+        }
+        .plan-options {
+          grid-template-columns: 1fr;
+        }
       }
     </style>
   <link rel="canonical" href="https://nahwerkconcierge.com/registrieren.html"><link rel="icon" type="image/png" href="assets/NAHWERKConcierge-Logo.png?v=3"><link rel="stylesheet" href="assets/brand-2026.css?v=15"><link rel="stylesheet" href="assets/nahwerk-logo-v2.css?v=7"><link rel="stylesheet" href="assets/concierge-carousel.css?v=3"><meta property="og:type" content="website"><meta property="og:locale" content="de_DE"><meta property="og:title" content="NAHWERK Concierge"><meta property="og:description" content="Persönliche, verständliche Concierge-Unterstützung direkt über WhatsApp."></head>
@@ -358,27 +526,34 @@
             >
               Zugang registrieren
             </h1>
-            <div class="planbox" id="selectedPlanBox">
-              <strong id="selectedPlanName">FREE · 0 € / MONAT</strong>
-              <span class="plan-sub" id="productLabel">Persönlicher Concierge</span>
+            <section class="planbox" id="selectedPlanBox" aria-labelledby="selectedPlanName">
+              <div class="planbox-head">
+                <div>
+                  <span class="planbox-kicker">Ihr gewählter Tarif</span>
+                  <strong id="selectedPlanName">FREE · 0 € / MONAT</strong>
+                  <span class="plan-sub" id="productLabel">Persönlicher Concierge</span>
+                </div>
+                <button
+                  class="plan-change-button"
+                  type="button"
+                  id="planChangeButton"
+                  aria-controls="registrationPlanPicker"
+                  aria-expanded="false"
+                >Tarif ändern</button>
+              </div>
+              <fieldset class="plan-picker" id="registrationPlanPicker" hidden>
+                <legend>Tarif auswählen</legend>
+                <p class="plan-picker-intro">Tarif und Concierge werden unabhängig gewählt. Ihre übrigen Angaben bleiben beim Wechsel erhalten.</p>
+                <div class="plan-options" id="registrationPlanOptions"></div>
+              </fieldset>
               <ul class="benefits" id="selectedPlanBenefits">
-                <li><strong>30 Dialoge/Monat in den ersten 2 Monaten</strong></li>
-                <li>Danach dauerhaft 15 Dialoge pro Monat</li>
-                <li>1 Bildgenerierung pro Monat</li>
-                <li>1 Foto-/Dokument-Digitalisierung pro Monat</li>
-                <li>5 Erinnerungen pro Monat, z. B. Wecker oder Termine</li>
+                <li>Dauerhaft kostenlos</li>
                 <li>Direkt in WhatsApp</li>
                 <li>Text- und Sprachnachrichten</li>
-                <li>
-                  Persönliche Präferenzen und hilfreicher gespeicherter Kontext
-                </li>
-                <li>
-                  Keine zeitliche Befristung und keine automatische
-                  kostenpflichtige Umwandlung
-                </li>
+                <li>Keine Zahlungsdaten und keine automatische kostenpflichtige Umwandlung</li>
               </ul>
-              <div class="plan-selection-note" id="planSelectionNote"></div>
-            </div>
+              <div class="plan-selection-note" id="planSelectionNote" role="status" aria-live="polite"></div>
+            </section>
             <fieldset class="field" style="border:0;padding:0;margin-inline:0">
               <legend style="font:700 25px/1.2 Georgia,serif">Wer darf Sie begleiten?</legend>
               <p class="concierge-intro">Wählen Sie den Concierge, dessen Auftreten und Kommunikationsstil am besten zu Ihnen passt. Die grundlegenden Möglichkeiten bleiben bei allen Profilen gleich.</p>
@@ -649,7 +824,7 @@
     </footer>
     <script src="assets/concierge-carousel.js?v=7"></script>
     <script src="assets/auth-nav.js?v=27"></script>
-    <script src="assets/onboarding.js?v=13"></script>
+    <script src="assets/onboarding.js?v=14"></script>
     <script>
       const eye =
         '<svg class="eye-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.7"></circle></svg>';
