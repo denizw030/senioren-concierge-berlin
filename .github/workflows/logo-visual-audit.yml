@@ -1,0 +1,53 @@
+name: Temporary logo visual audit
+on:
+  push:
+    branches: [staging/website-concierge-voice-preview-01]
+    paths: [.github/workflows/logo-visual-audit.yml]
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install pillow cairosvg
+      - name: Build sheet
+        shell: python
+        run: |
+          from PIL import Image,ImageOps,ImageDraw
+          from pathlib import Path
+          import cairosvg
+          items=[
+            "assets/NAHWERKConcierge-Logo.png",
+            "assets/logo-senioren-concierge.webp",
+            "assets/logo-nahwerk-concierge-agent-gold.svg",
+            "assets/logo-nahwerk-concierge-gold.svg",
+            "assets/logo-nahwerk-concierge.svg",
+            "assets/NAHWERK_Concierge_Wandlogo_fertigungsfaehig.svg",
+          ]
+          tiles=[]
+          for i,name in enumerate(items):
+            p=Path(name)
+            if p.suffix.lower()==".svg":
+              tmp=Path(f"/tmp/logo-{i}.png")
+              cairosvg.svg2png(url=str(p),write_to=str(tmp),output_width=600)
+              im=Image.open(tmp).convert("RGB")
+            else:
+              im=Image.open(p).convert("RGB")
+            orig=im.size
+            thumb=ImageOps.contain(im,(520,360))
+            canvas=Image.new("RGB",(600,450),"white")
+            canvas.paste(thumb,((600-thumb.width)//2,20))
+            d=ImageDraw.Draw(canvas)
+            d.text((20,395),f"{p.name}\n{orig[0]}×{orig[1]}",fill="black")
+            tiles.append(canvas)
+          out=Image.new("RGB",(1200,1350),(230,230,230))
+          for i,t in enumerate(tiles): out.paste(t,((i%2)*600,(i//2)*450))
+          Path("audit").mkdir(exist_ok=True)
+          out.save("audit/logos.jpg",quality=92)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: logo-visual-audit
+          path: audit/logos.jpg
