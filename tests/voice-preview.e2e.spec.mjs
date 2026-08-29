@@ -150,3 +150,106 @@ test("all 24 audition MP3s return successfully",async({page})=>{
     expect(check.bytes,check.key).toBeGreaterThan(50000);
   }
 });
+
+test("senior page starts on Frida with Hartmut visible beside her",async({page})=>{
+  await page.setViewportSize({width:1024,height:900});
+  await page.goto("http://127.0.0.1:4173/senioren-concierge.html",{waitUntil:"networkidle"});
+  const root=page.locator("[data-concierge-carousel]");
+  await expect(root).toHaveAttribute("data-variant","senior");
+  expect(await root.evaluate(el=>el._nahwerkCarousel.selected.key)).toBe("frida");
+  const active=page.locator(".nw-carousel-card.is-active");
+  await expect(active).toContainText("Frida");
+  const hartmut=page.locator(".nw-carousel-card").filter({hasText:"Hartmut"});
+  await expect(hartmut).toBeVisible();
+  const rework=page.locator('[data-concierge-key="frida"] .nw-voice-preview-button');
+  await expect(rework).toBeDisabled();
+  await expect(rework.locator(".nw-voice-preview-copy")).toHaveText("Stimme wird überarbeitet");
+  await page.screenshot({path:"test-results/screenshots/tablet-senior-initial-frida-hartmut.png",fullPage:true});
+});
+
+for(const surface of ["/index.html","/prime-concierge.html","/senioren-concierge.html","/concierges.html","/registrieren.html"]){
+  test(`tablet menu keeps scroll position on ${surface}`,async({page})=>{
+    await page.setViewportSize({width:1024,height:900});
+    await page.goto(`http://127.0.0.1:4173${surface}`,{waitUntil:"networkidle"});
+    await page.evaluate(()=>window.scrollTo(0,Math.min(700,document.documentElement.scrollHeight-window.innerHeight-50)));
+    const before=await page.evaluate(()=>window.scrollY);
+    const toggle=page.locator(".nav-toggle");
+    await expect(toggle).toBeVisible();
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-expanded","true");
+    await expect(page.locator(".links")).toHaveClass(/is-open/);
+    const opened=await page.evaluate(()=>window.scrollY);
+    expect(Math.abs(opened-before)).toBeLessThanOrEqual(2);
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-expanded","false");
+    const closed=await page.evaluate(()=>window.scrollY);
+    expect(Math.abs(closed-before)).toBeLessThanOrEqual(2);
+  });
+}
+
+test("carousel shell clips images uniformly and registration is optically centered",async({page})=>{
+  await page.setViewportSize({width:1024,height:900});
+  await page.goto("http://127.0.0.1:4173/senioren-concierge.html",{waitUntil:"networkidle"});
+  const style=await page.locator(".nw-carousel-card.is-active").evaluate(card=>{
+    const image=card.querySelector("img");
+    const button=document.querySelector(".nw-carousel-status");
+    const cs=getComputedStyle(card),is=getComputedStyle(image),bs=getComputedStyle(button);
+    return {
+      radius:cs.borderRadius,
+      overflow:cs.overflow,
+      imageRadius:is.borderRadius,
+      imageFit:is.objectFit,
+      display:bs.display,
+      align:bs.alignItems,
+      justify:bs.justifyContent,
+      height:button.getBoundingClientRect().height
+    };
+  });
+  expect(style.radius).toBe("28px");
+  expect(style.overflow).toBe("hidden");
+  expect(style.imageRadius).toBe("0px");
+  expect(style.imageFit).toBe("cover");
+  expect(style.display).toBe("flex");
+  expect(style.align).toBe("center");
+  expect(style.justify).toBe("center");
+  expect(style.height).toBeGreaterThanOrEqual(44);
+});
+
+test("NAHWERK wordmark renders NAH gold and WERK silver",async({page})=>{
+  await page.goto("http://127.0.0.1:4173/index.html",{waitUntil:"networkidle"});
+  const brand=await page.locator(".top .brandtext strong").evaluate(el=>({
+    beforeContent:getComputedStyle(el,"::before").content,
+    beforeColor:getComputedStyle(el,"::before").color,
+    afterContent:getComputedStyle(el,"::after").content,
+    afterColor:getComputedStyle(el,"::after").color
+  }));
+  expect(brand.beforeContent).toContain("NAH");
+  expect(brand.afterContent).toContain("WERK");
+  expect(brand.beforeColor).not.toBe(brand.afterColor);
+});
+
+test("services and senior lifestyle imagery is visible and responsive",async({page})=>{
+  await page.setViewportSize({width:1024,height:900});
+  await page.goto("http://127.0.0.1:4173/leistungen.html",{waitUntil:"networkidle"});
+  const servicePhoto=page.locator(".services-hero-photo img");
+  await expect(servicePhoto).toBeVisible();
+  await expect(servicePhoto).toHaveAttribute("src",/junge-Frau-Ku/);
+  const serviceBox=await servicePhoto.boundingBox();
+  expect(serviceBox.width).toBeGreaterThan(300);
+  const wrapBox=await page.locator(".services-hero .wrap").boundingBox();
+  expect(wrapBox.x).toBeGreaterThanOrEqual(30);
+  expect(1024-(wrapBox.x+wrapBox.width)).toBeGreaterThanOrEqual(30);
+  await page.screenshot({path:"test-results/screenshots/tablet-services-lifestyle-hero.png",fullPage:true});
+
+  await page.goto("http://127.0.0.1:4173/senioren-concierge.html",{waitUntil:"networkidle"});
+  await expect(page.locator(".senior-hero-photo img")).toHaveAttribute("src",/Älterer-Mann-am-Handy/);
+  await page.goto("http://127.0.0.1:4173/index.html",{waitUntil:"networkidle"});
+  await expect(page.locator(".product-band.senior .product-band-image")).toHaveAttribute("src",/Frau-Wohnzimmer/);
+});
+
+test("dark overview hero contains multi-colour ambient background",async({page})=>{
+  await page.goto("http://127.0.0.1:4173/index.html",{waitUntil:"networkidle"});
+  const background=await page.locator(".home-hero").evaluate(el=>getComputedStyle(el).backgroundImage);
+  expect(background).toContain("radial-gradient");
+  expect(background.split("radial-gradient").length-1).toBeGreaterThanOrEqual(3);
+});
