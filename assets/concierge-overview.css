@@ -13,11 +13,11 @@
 .concierge-overview-card{grid-template-rows:auto auto auto}
 .concierge-overview-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px 12px;border-top:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.018)}
 .concierge-overview-actions .nw-voice-preview-control{min-width:0}
-.concierge-overview-actions .nw-voice-preview-button{min-height:38px;padding:0 10px;font-size:11px;gap:7px}
+.concierge-overview-actions .nw-voice-preview-button{min-height:44px;padding:0 10px;font-size:11px;gap:7px}
 .concierge-overview-actions .nw-voice-preview-icon{width:17px;height:17px;flex-basis:17px}
 .concierge-overview-actions .nw-voice-preview-icon svg{width:17px;height:17px}
 .concierge-overview-actions .nw-voice-preview-badge{display:none}
-.concierge-overview-select{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 11px;border-radius:999px;background:#f0eee7;color:#171714;text-decoration:none;font:650 11px/1 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;white-space:nowrap;transition:transform .18s ease,background .18s ease}
+.concierge-overview-select{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 11px;border-radius:999px;background:#f0eee7;color:#171714;text-decoration:none;font:650 11px/1 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;white-space:nowrap;transition:transform .18s ease,background .18s ease}
 .concierge-overview-select:hover{background:#fff;transform:translateY(-1px)}
 .concierge-overview-select:focus-visible{outline:2px solid #d9b95f;outline-offset:3px}
-@media(max-width:720px){.concierge-overview-actions{align-items:stretch;flex-direction:column}.concierge-overview-actions .nw-voice-preview-control,.concierge-overview-actions .nw-voice-preview-button,.concierge-overview-select{width:100%;box-sizing:border-box}.concierge-overview-actions .nw-voice-preview-button{min-height:42px}.concierge-overview-select{min-height:42px}}
+@media(max-width:720px){.concierge-overview-actions{align-items:stretch;flex-direction:column}.concierge-overview-actions .nw-voice-preview-control,.concierge-overview-actions .nw-voice-preview-button,.concierge-overview-select{width:100%;box-sizing:border-box}.concierge-overview-actions .nw-voice-preview-button{min-height:44px}.concierge-overview-select{min-height:44px}}
