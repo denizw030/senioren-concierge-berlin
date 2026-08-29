@@ -6,8 +6,8 @@
   const PRODUCT_KEY = "nahwerk_product";
   const CHECK_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/session/check";
   const LOGOUT_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/logout";
-  const PROTECTED = new Set(["konto.html", "concierge-anpassen.html"]);
-  const CONTEXT_PAGES = new Set(["pakete.html", "registrieren.html", "anmelden.html", "konto.html", "concierge-anpassen.html"]);
+  const PROTECTED = new Set(["konto.html", "concierge-anpassen.html", "email-concierge.html"]);
+  const CONTEXT_PAGES = new Set(["pakete.html", "registrieren.html", "anmelden.html", "konto.html", "concierge-anpassen.html", "email-concierge.html"]);
   const NAV = [["index.html", "Übersicht"], ["prime-concierge.html", "Persönlicher Concierge"], ["concierges.html", "Alle Concierges"], ["senioren-concierge.html", "Senioren Concierge"], ["senioren-concierge.html#angehoerige", "Für Angehörige"], ["kontakt.html", "Kontakt"]];
   const page = () => location.pathname.split("/").pop() || "index.html";
   function productContext(current = page()) {
@@ -91,6 +91,7 @@
       NAV.forEach(([href, label]) => nav.appendChild(makeLink(href, label, current === href ? "active" : "")));
       if (isLoggedIn()) {
         nav.appendChild(makeLink("konto.html", "Kundenbereich", current === "konto.html" ? "active" : ""));
+        nav.appendChild(makeLink("email-concierge.html", "E-Mail Concierge", current === "email-concierge.html" ? "active" : ""));
         const out = makeLink("#", "Abmelden");
         out.dataset.logout = "1";
         out.addEventListener("click", (event) => { event.preventDefault(); logout(); });
@@ -137,6 +138,7 @@
     document.querySelectorAll(".footergrid>div").forEach((box) => {
       if (box.querySelector("h4")?.textContent.trim() === "Informationen" && !box.querySelector('a[href="konto.html"]')) {
         box.appendChild(makeLink("konto.html", "Kundenbereich"));
+        box.appendChild(makeLink("email-concierge.html", "E-Mail Concierge"));
         const out = makeLink("#", "Abmelden");
         out.dataset.logout = "1";
         out.addEventListener("click", (event) => { event.preventDefault(); logout(); });
