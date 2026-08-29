@@ -15,6 +15,10 @@ for(const viewport of viewports){
       page.on("pageerror",error=>errors.push(String(error)));
       page.on("console",message=>{if(message.type()==="error")errors.push(message.text())});
       await page.goto(`http://127.0.0.1:4173${surface}`,{waitUntil:"networkidle"});
+      if(surface==="/concierges.html"){
+        await expect(page.locator("#conciergeOverviewGrid")).toBeHidden();
+        await page.locator("#showAllConcierges").click();
+      }
       const voiceButtons=page.locator(".nw-voice-preview-button");
       if(await voiceButtons.count()===0){const diag=await page.evaluate(()=>({root:!!document.querySelector("[data-concierge-carousel]"),carousel:!!window.NAHWERKCarousel,voice:!!window.NAHWERKVoicePreview}));console.log("VOICE_DIAG",surface,diag,errors);}
       await expect(voiceButtons.first()).toBeVisible();
@@ -344,6 +348,7 @@ test("carousel portrait click opens registration for that concierge",async({page
 
 test("overview portrait click opens registration directly",async({page})=>{
   await page.goto("http://127.0.0.1:4173/concierges.html",{waitUntil:"networkidle"});
+  await page.locator("#showAllConcierges").click();
   const card=page.locator(".concierge-overview-card").first();
   const key=await card.locator(".concierge-overview-voice").getAttribute("data-concierge-key");
   await Promise.all([
@@ -352,7 +357,7 @@ test("overview portrait click opens registration directly",async({page})=>{
   ]);
 });
 
-test("senior header uses realistic gold-man emblem and black WERK/CONCIERGE",async({page})=>{
+test("senior header uses gold emblem with darker grey WERK and CONCIERGE",async({page})=>{
   await page.goto("http://127.0.0.1:4173/senioren-concierge.html",{waitUntil:"networkidle"});
   const result=await page.locator(".top .brand").evaluate(el=>{
     const strong=el.querySelector(".brandtext strong");
@@ -366,9 +371,9 @@ test("senior header uses realistic gold-man emblem and black WERK/CONCIERGE",asy
     };
   });
   expect(result.nah).not.toBe(result.werk);
-  expect(result.werk).toBe("rgb(23, 19, 13)");
-  expect(result.concierge).toBe("rgb(23, 19, 13)");
-  expect(result.mark).toContain("NAHWERKConcierge-Logo.png");
+  expect(result.werk).toBe("rgb(139, 143, 150)");
+  expect(result.concierge).toBe("rgb(133, 137, 144)");
+  expect(result.mark).toContain("logo-nahwerk-concierge-gold.svg");
 });
 
 test("senior registration first paint stays light",async({page})=>{
@@ -388,4 +393,39 @@ test("app-free copy explicitly mentions no extra app and future free NAHWERK app
   await page.goto("http://127.0.0.1:4173/senioren-concierge.html",{waitUntil:"networkidle"});
   await expect(page.locator("body")).toContainText("Keine zusätzliche App notwendig");
   await expect(page.locator(".senior-app-note")).toContainText("kostenlos");
+});
+
+test("concierge discovery drills from continent to country and only shows full grid on request",async({page})=>{
+  await page.goto("http://127.0.0.1:4173/concierges.html",{waitUntil:"networkidle"});
+  const grid=page.locator("#conciergeOverviewGrid");
+  await expect(grid).toBeHidden();
+  await expect(page.locator(".concierge-overview-card")).toHaveCount(0);
+  await expect(page.locator(".concierge-continent-card")).toHaveCount(3);
+
+  await page.locator('.concierge-continent-card[data-continent="Europa"]').click();
+  await expect(page.locator("#countryStep")).toBeVisible();
+  const germany=page.locator(".concierge-country-chip").filter({hasText:"Deutschland"});
+  await expect(germany).toBeVisible();
+  await germany.click();
+  await expect(grid).toBeVisible();
+  await expect(page.locator(".concierge-overview-card")).toHaveCount(4);
+  await expect(page.locator(".concierge-overview-card")).toContainText(["Lena","Lukas","Hartmut","Frida"]);
+
+  await page.locator("#conciergeResultsReset").click();
+  await expect(grid).toBeHidden();
+  await page.locator("#showAllConcierges").click();
+  await expect(grid).toBeVisible();
+  await expect(page.locator(".concierge-overview-card")).toHaveCount(23);
+});
+
+test("family setup exposes optional personal message and previews it",async({page})=>{
+  await page.goto("http://127.0.0.1:4173/registrieren.html?produkt=senioren&fuer=andere",{waitUntil:"networkidle"});
+  const other=page.locator('input[name="setupFor"][value="other"]');
+  await expect(other).toBeChecked();
+  await expect(page.locator("#recipientBlock")).toBeVisible();
+  const message=page.locator("#familyMessage");
+  await expect(message).toBeVisible();
+  await message.fill("Liebe Oma, ich habe dir NAHWERK eingerichtet, damit du jederzeit Unterstützung hast.");
+  await expect(page.locator("#messagePreview")).toContainText("Liebe Oma");
+  await expect(page.locator("#messagePreview")).toContainText("Persönliche Nachricht");
 });
