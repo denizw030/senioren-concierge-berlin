@@ -9,3 +9,45 @@
 body[data-product="senioren"] .nw-carousel-status,body.senior-product .nw-carousel-status,.nw-carousel[data-variant="senior"] .nw-carousel-status{background:rgba(255,255,255,.72);color:#282219;border-color:rgba(83,67,35,.16)}
 body[data-product="senioren"] .nw-carousel-status:not(:disabled):hover,body.senior-product .nw-carousel-status:not(:disabled):hover,.nw-carousel[data-variant="senior"] .nw-carousel-status:not(:disabled):hover{background:#fff;border-color:rgba(83,67,35,.25)}
 @media(max-width:760px){.nw-carousel-info{min-height:136px}.nw-carousel-actions{gap:8px;margin-top:7px}.nw-carousel-status{min-height:44px}}
+
+/* Continuation 03: one clean radius owner and optically centered actions. */
+.nw-carousel-card{
+  border-radius:28px;
+  overflow:hidden;
+  isolation:isolate;
+}
+.nw-carousel-select{
+  display:grid;
+  grid-template-rows:auto auto;
+  width:100%;
+  border-radius:inherit;
+  overflow:hidden;
+}
+.nw-carousel-card img{
+  width:100%;
+  aspect-ratio:480/722;
+  object-fit:cover;
+  object-position:center top;
+  border-radius:0!important;
+}
+.nw-carousel-select>span{
+  position:relative;
+  z-index:1;
+  background:inherit;
+}
+.nw-carousel-status{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  height:44px;
+  min-height:44px;
+  padding:0 16px;
+  line-height:1;
+  vertical-align:middle;
+  appearance:none;
+  -webkit-appearance:none;
+}
+@media(max-width:760px){
+  .nw-carousel-card{border-radius:24px}
+  .nw-carousel-status{height:44px}
+}
