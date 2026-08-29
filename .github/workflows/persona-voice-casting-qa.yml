@@ -31,14 +31,14 @@ jobs:
             best_variant=""
             best_voice=""
             for variant in 0 1; do
-              wav="/tmp/persona-qa/${key}-${variant}.wav"
+              sample="/tmp/persona-qa/${key}-${variant}.mp3"
               json="/tmp/persona-qa/${key}-${variant}.json"
 
               echo "Generating ${key} candidate ${variant}"
-              curl --fail --silent --show-error --location --retry 1                 "$base/generate/${key}/${variant}" -o "$wav"
-              test -s "$wav"
+              curl --fail --silent --show-error --location --retry 1                 "$base/generate/${key}/${variant}" -o "$sample"
+              test -s "$sample"
 
-              curl --fail --silent --show-error --location --retry 1                 -X POST -H "content-type: audio/wav" --data-binary "@$wav"                 "$base/evaluate/${key}/${variant}" -o "$json"
+              curl --fail --silent --show-error --location --retry 1                 -X POST -H "content-type: audio/mpeg" --data-binary "@$sample"                 "$base/evaluate/${key}/${variant}" -o "$json"
 
               age=$(jq -r '.age_fit // 0' "$json")
               accent=$(jq -r '.accent_fit // 0' "$json")
@@ -94,3 +94,5 @@ jobs:
           name: persona-voice-qa-report
           path: /tmp/persona-qa-report.txt
           if-no-files-found: warn
+
+# mp3-direct-v2
