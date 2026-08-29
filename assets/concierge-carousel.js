@@ -34,13 +34,22 @@
       const card=document.createElement("button");
       card.type="button"; card.className="nw-carousel-card"; card.dataset.index=String(index);
       card.setAttribute("aria-label",`${profile.name} anzeigen`);
-      card.innerHTML=`<img alt="Portrait von ${profile.name}, NAHWERK Concierge" width="900" height="1200" decoding="async"><span>${profile.name}</span>`;
+      card.innerHTML=`<img alt="Portrait von ${profile.name}, NAHWERK Concierge" width="480" height="722" decoding="async"><span>${profile.name}</span>`;
       const image=card.querySelector("img");
       image.dataset.src=profile.cardImage;
       image.dataset.srcset=`${profile.cardImage} 480w, ${profile.largeImage} 900w`;
       image.dataset.sizes="(max-width: 700px) 52vw, 420px";
-      image.addEventListener("load",()=>card.classList.add("is-image-ready"),{once:true});
-      image.addEventListener("error",()=>{card.classList.add("is-image-error");card.classList.remove("is-image-loading");},{once:true});
+      image.addEventListener("load",()=>{card.classList.add("is-image-ready");card.classList.remove("is-image-loading","is-image-error");});
+      image.addEventListener("error",()=>{
+        if(image.dataset.fallbackUsed!=="1"){
+          image.dataset.fallbackUsed="1";
+          image.removeAttribute("srcset");
+          image.removeAttribute("sizes");
+          image.src=profile.largeImage;
+          return;
+        }
+        card.classList.add("is-image-error");card.classList.remove("is-image-loading");
+      });
       card.addEventListener("click",()=>{
         if(moved)return;
         if(index===active&&registerUrl){goToRegistration(index);return;}

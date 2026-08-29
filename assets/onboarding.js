@@ -22,11 +22,12 @@
       code: "FREE",
       title: "FREE · 0 € / MONAT",
       price: "0 € / Monat",
-      usage: "Aktuell direkt verfügbar",
+      usage: "50 Dialoge pro Monat",
       state: "Verfügbar",
       bookable: true,
       benefits: [
         "Dauerhaft kostenlos",
+        "50 Dialoge pro Monat",
         "Direkt in WhatsApp",
         "Text- und Sprachnachrichten",
         "Keine Zahlungsdaten und keine automatische kostenpflichtige Umwandlung"
@@ -34,39 +35,42 @@
     },
     plus: {
       code: "PLUS",
-      title: "PLUS · IN VORBEREITUNG",
-      price: "Preis folgt",
-      usage: "Für häufigere Nutzung",
-      state: "In Vorbereitung",
+      title: "PLUS · 19,99 € / MONAT",
+      price: "19,99 € / Monat",
+      usage: "200 Dialoge pro Monat",
+      state: "Checkout folgt",
       bookable: false,
       benefits: [
-        "Für häufigere Concierge-Nutzung vorgesehen",
-        "Finale Leistungen und Preise werden vor dem Checkout klar angezeigt",
+        "200 Dialoge pro Monat",
+        "Für regelmäßige Concierge-Nutzung",
+        "Preis, Laufzeit und Zahlung werden vor dem Checkout klar angezeigt",
         "Keine Bestellung ohne ausdrückliche Bestätigung"
       ]
     },
     komfort: {
       code: "KOMFORT",
-      title: "KOMFORT · IN VORBEREITUNG",
-      price: "Preis folgt",
-      usage: "Für intensive Nutzung",
-      state: "In Vorbereitung",
+      title: "KOMFORT · 34,99 € / MONAT",
+      price: "34,99 € / Monat",
+      usage: "350 Dialoge pro Monat",
+      state: "Checkout folgt",
       bookable: false,
       benefits: [
-        "Für intensive Concierge-Nutzung vorgesehen",
-        "Finale Leistungen und Preise werden vor dem Checkout klar angezeigt",
+        "350 Dialoge pro Monat",
+        "Für intensive Concierge-Nutzung",
+        "Preis, Laufzeit und Zahlung werden vor dem Checkout klar angezeigt",
         "Keine Bestellung ohne ausdrückliche Bestätigung"
       ]
     },
     familie: {
       code: "FAMILIE",
-      title: "FAMILIE · IN VORBEREITUNG",
-      price: "Preis folgt",
-      usage: "Für gemeinsam verwaltete Zugänge",
-      state: "In Vorbereitung",
+      title: "FAMILIE · 59,99 € / MONAT",
+      price: "59,99 € / Monat",
+      usage: "600 Dialoge gemeinsam",
+      state: "Checkout folgt",
       bookable: false,
       benefits: [
-        "Für Familien und gemeinsam verwaltete Zugänge vorgesehen",
+        "600 gemeinsam nutzbare Dialoge pro Monat",
+        "Für Familien und unterstützte Angehörige",
         "Berechtigungen und Privatsphäre bleiben getrennt",
         "Keine Bestellung ohne ausdrückliche Bestätigung"
       ]

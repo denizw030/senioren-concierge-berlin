@@ -221,3 +221,47 @@ body[data-product="senioren"] .top .links.is-open a{
     border-color:rgba(112,87,39,.18)!important;
   }
 }
+
+/* Shared NAHWERK colour atmosphere for every dark product and service page. */
+body:not(.senior-product):not([data-product="senioren"]) main{
+  background:
+    radial-gradient(900px 560px at 104% 18%,rgba(212,175,55,.105),transparent 64%),
+    radial-gradient(760px 520px at -10% 62%,rgba(151,92,27,.085),transparent 66%),
+    linear-gradient(180deg,#080807 0%,#0b0a08 48%,#060605 100%);
+}
+body:not(.senior-product):not([data-product="senioren"]) main>.section:not(.alt),
+body:not(.senior-product):not([data-product="senioren"]) main>.home-section{
+  background:
+    radial-gradient(620px 380px at 90% 8%,rgba(212,175,55,.065),transparent 68%),
+    radial-gradient(520px 340px at 4% 92%,rgba(164,91,25,.05),transparent 70%)!important;
+}
+body:not(.senior-product):not([data-product="senioren"]) main>.section.alt{
+  background:
+    radial-gradient(680px 420px at 8% 12%,rgba(212,175,55,.075),transparent 68%),
+    linear-gradient(145deg,rgba(19,18,14,.98),rgba(8,8,7,.98))!important;
+  border-color:rgba(212,175,55,.11)!important;
+}
+body:not(.senior-product):not([data-product="senioren"]) :is(.formcard,.preview,.logincard,.resetcard,.usagebox,.legalbox,.faq details,.price-card,.package-card){
+  border-color:rgba(212,175,55,.18)!important;
+  background:
+    radial-gradient(circle at 92% 0,rgba(212,175,55,.08),transparent 30%),
+    linear-gradient(145deg,rgba(24,23,18,.96),rgba(10,10,8,.98))!important;
+  box-shadow:0 26px 80px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.025)!important;
+}
+body:not(.senior-product):not([data-product="senioren"]) :is(.planbox,.notice,.status,.selfhint,.progressive-panel,.pricing-note,.prime-usage){
+  background:linear-gradient(110deg,rgba(212,175,55,.09),rgba(212,175,55,.025))!important;
+  border-color:rgba(212,175,55,.24)!important;
+}
+body:not(.senior-product):not([data-product="senioren"]) .footer{
+  background:radial-gradient(620px 260px at 15% 0,rgba(212,175,55,.07),transparent 70%),#050504!important;
+}
+.request-intro{max-width:760px;margin:0 0 34px;color:var(--nw-muted-dark);font-size:clamp(1.05rem,1.45vw,1.2rem);line-height:1.65}.request-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.request-card{position:relative;display:flex;min-height:230px;flex-direction:column;padding:26px;overflow:hidden;border:1px solid rgba(212,175,55,.18);border-radius:22px;background:radial-gradient(circle at 100% 0,rgba(212,175,55,.12),transparent 38%),linear-gradient(145deg,#181712,#0d0d0a);box-shadow:0 18px 52px rgba(0,0,0,.18)}.request-card.featured{grid-column:span 2;background:radial-gradient(circle at 90% 8%,rgba(212,175,55,.22),transparent 36%),linear-gradient(135deg,#211d12,#0d0d0a)}.request-card-kicker{display:inline-flex;align-self:flex-start;margin-bottom:auto;padding:6px 9px;border:1px solid rgba(212,175,55,.28);border-radius:999px;color:#d9bd75;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.request-card blockquote{margin:28px 0 12px;color:#fff;font-size:clamp(1.35rem,2vw,2rem);font-weight:620;line-height:1.13;letter-spacing:-.035em}.request-card p{margin:0;color:#aaa69d;font-size:14px;line-height:1.55}.request-safety{margin-top:22px;color:#918c82;font-size:13px;line-height:1.6}.request-safety strong{color:#d6bd82}.senior-product .request-intro{color:#625b50}.senior-product .request-card{border-color:#dfc98f;background:radial-gradient(circle at 100% 0,rgba(202,155,57,.14),transparent 38%),linear-gradient(145deg,#fffdf9,#f5ecdc);box-shadow:0 18px 46px rgba(104,78,28,.08)}.senior-product .request-card.featured{background:radial-gradient(circle at 92% 8%,rgba(202,155,57,.2),transparent 38%),linear-gradient(145deg,#fffaf0,#f2e5cc)}.senior-product .request-card-kicker{border-color:#d9bd78;color:#6d5120;background:rgba(255,255,255,.58)}.senior-product .request-card blockquote{color:#201d17}.senior-product .request-card p{color:#655e52}.senior-product .request-safety{color:#665f54}.senior-product .request-safety strong{color:#5d481e}
+@media(max-width:1050px){.request-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.request-card.featured{grid-column:span 2}}
+@media(max-width:720px){
+  body:not(.senior-product):not([data-product="senioren"]) main{
+    background:
+      radial-gradient(520px 360px at 115% 12%,rgba(212,175,55,.1),transparent 68%),
+      linear-gradient(180deg,#080807,#060605);
+  }
+  .request-grid{grid-template-columns:1fr}.request-card.featured{grid-column:auto}.request-card{min-height:210px}
+}

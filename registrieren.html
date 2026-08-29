@@ -118,7 +118,11 @@
         background: #090909;
         box-shadow: 0 12px 34px rgba(37, 31, 19, 0.08);
         cursor: pointer;
-        transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+        transition:
+          transform 180ms ease,
+          border-color 180ms ease,
+          box-shadow 180ms ease,
+          background 180ms ease;
       }
       .concierge-choice .concierge-card:hover {
         transform: translateY(-3px);
@@ -133,7 +137,9 @@
       .concierge-choice .concierge-card:has(input:checked) {
         border-color: #bd8f2f;
         background: #090909;
-        box-shadow: 0 0 0 2px rgba(189, 143, 47, 0.16), 0 18px 44px rgba(86, 62, 14, 0.14);
+        box-shadow:
+          0 0 0 2px rgba(189, 143, 47, 0.16),
+          0 18px 44px rgba(86, 62, 14, 0.14);
       }
       .concierge-card input {
         position: absolute;
@@ -271,9 +277,18 @@
         border-radius: 999px;
         color: #f4d98f;
         background: rgba(255, 255, 255, 0.04);
-        font: 750 13px/1 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+        font:
+          750 13px/1 -apple-system,
+          BlinkMacSystemFont,
+          "SF Pro Text",
+          "Helvetica Neue",
+          Arial,
+          sans-serif;
         cursor: pointer;
-        transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+        transition:
+          transform 180ms ease,
+          border-color 180ms ease,
+          background 180ms ease;
       }
       .plan-change-button:hover {
         transform: translateY(-1px);
@@ -325,7 +340,11 @@
         border: 1px solid rgba(255, 255, 255, 0.14);
         border-radius: 16px;
         background: rgba(255, 255, 255, 0.025);
-        transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+        transition:
+          transform 180ms ease,
+          border-color 180ms ease,
+          background 180ms ease,
+          box-shadow 180ms ease;
       }
       .plan-option:hover .plan-option-card {
         transform: translateY(-2px);
@@ -392,7 +411,10 @@
         border-color: #ded2bc;
         background: rgba(255, 255, 255, 0.76);
       }
-      body[data-product="senioren"] .plan-option input:checked + .plan-option-card,
+      body[data-product="senioren"]
+        .plan-option
+        input:checked
+        + .plan-option-card,
       body.senior-product .plan-option input:checked + .plan-option-card {
         border-color: #c99b2d;
         background: #fff5dc;
@@ -490,8 +512,27 @@
         }
       }
     </style>
-  <link rel="canonical" href="https://nahwerkconcierge.com/registrieren.html"><link rel="icon" type="image/png" href="assets/NAHWERKConcierge-Logo.png?v=3"><link rel="stylesheet" href="assets/brand-2026.css?v=15"><link rel="stylesheet" href="assets/nahwerk-logo-v2.css?v=7"><link rel="stylesheet" href="assets/concierge-carousel.css?v=3"><meta property="og:type" content="website"><meta property="og:locale" content="de_DE"><meta property="og:title" content="NAHWERK Concierge"><meta property="og:description" content="Persönliche, verständliche Concierge-Unterstützung direkt über WhatsApp."></head>
-  <body>
+    <link
+      rel="canonical"
+      href="https://nahwerkconcierge.com/registrieren.html"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="assets/NAHWERKConcierge-Logo.png?v=3"
+    />
+    <link rel="stylesheet" href="assets/brand-2026.css?v=15" />
+    <link rel="stylesheet" href="assets/nahwerk-logo-v2.css?v=7" />
+    <link rel="stylesheet" href="assets/concierge-carousel.css?v=3" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="de_DE" />
+    <meta property="og:title" content="NAHWERK Concierge" />
+    <meta
+      property="og:description"
+      content="Persönliche, verständliche Concierge-Unterstützung direkt über WhatsApp."
+    />
+  </head>
+  <body class="registration-page">
     <header class="top">
       <div class="wrap nav">
         <a class="brand" href="index.html"
@@ -516,7 +557,8 @@
       <section class="section">
         <div class="wrap signup">
           <form class="formcard" id="signupForm">
-            <h1 id="registrationTitle"
+            <h1
+              id="registrationTitle"
               style="
                 font:
                   700 38px/1.1 Georgia,
@@ -526,12 +568,18 @@
             >
               Zugang registrieren
             </h1>
-            <section class="planbox" id="selectedPlanBox" aria-labelledby="selectedPlanName">
+            <section
+              class="planbox"
+              id="selectedPlanBox"
+              aria-labelledby="selectedPlanName"
+            >
               <div class="planbox-head">
                 <div>
                   <span class="planbox-kicker">Ihr gewählter Tarif</span>
                   <strong id="selectedPlanName">FREE · 0 € / MONAT</strong>
-                  <span class="plan-sub" id="productLabel">Persönlicher Concierge</span>
+                  <span class="plan-sub" id="productLabel"
+                    >Persönlicher Concierge</span
+                  >
                 </div>
                 <button
                   class="plan-change-button"
@@ -539,26 +587,66 @@
                   id="planChangeButton"
                   aria-controls="registrationPlanPicker"
                   aria-expanded="false"
-                >Tarif ändern</button>
+                >
+                  Tarif ändern
+                </button>
               </div>
               <fieldset class="plan-picker" id="registrationPlanPicker" hidden>
                 <legend>Tarif auswählen</legend>
-                <p class="plan-picker-intro">Tarif und Concierge werden unabhängig gewählt. Ihre übrigen Angaben bleiben beim Wechsel erhalten.</p>
+                <p class="plan-picker-intro">
+                  Tarif und Concierge werden unabhängig gewählt. Ihre übrigen
+                  Angaben bleiben beim Wechsel erhalten.
+                </p>
                 <div class="plan-options" id="registrationPlanOptions"></div>
               </fieldset>
               <ul class="benefits" id="selectedPlanBenefits">
                 <li>Dauerhaft kostenlos</li>
+                <li>50 Dialoge pro Monat</li>
                 <li>Direkt in WhatsApp</li>
                 <li>Text- und Sprachnachrichten</li>
-                <li>Keine Zahlungsdaten und keine automatische kostenpflichtige Umwandlung</li>
+                <li>
+                  Keine Zahlungsdaten und keine automatische kostenpflichtige
+                  Umwandlung
+                </li>
               </ul>
-              <div class="plan-selection-note" id="planSelectionNote" role="status" aria-live="polite"></div>
+              <div
+                class="plan-selection-note"
+                id="planSelectionNote"
+                role="status"
+                aria-live="polite"
+              ></div>
             </section>
-            <fieldset class="field" style="border:0;padding:0;margin-inline:0">
-              <legend style="font:700 25px/1.2 Georgia,serif">Wer darf Sie begleiten?</legend>
-              <p class="concierge-intro">Wählen Sie den Concierge, dessen Auftreten und Kommunikationsstil am besten zu Ihnen passt. Die grundlegenden Möglichkeiten bleiben bei allen Profilen gleich.</p>
-              <div class="concierge-choice" data-concierge-carousel data-variant="selection" data-input-name="conciergeChoice" data-selected="nilo" data-label="Persönlichen KI-Concierge auswählen"></div>
-              <span class="tiny">Alle 23 Profile gehören zum selben NAHWERK-Concierge-System. Die Auswahl bestimmt vor allem Ansprache, Stimme und Kommunikationsstil und kann später geändert werden.</span>
+            <fieldset
+              class="field"
+              style="border: 0; padding: 0; margin-inline: 0"
+            >
+              <legend
+                style="
+                  font:
+                    700 25px/1.2 Georgia,
+                    serif;
+                "
+              >
+                Wer darf Sie begleiten?
+              </legend>
+              <p class="concierge-intro">
+                Wählen Sie den Concierge, dessen Auftreten und
+                Kommunikationsstil am besten zu Ihnen passt. Die grundlegenden
+                Möglichkeiten bleiben bei allen Profilen gleich.
+              </p>
+              <div
+                class="concierge-choice"
+                data-concierge-carousel
+                data-variant="selection"
+                data-input-name="conciergeChoice"
+                data-selected="nilo"
+                data-label="Persönlichen KI-Concierge auswählen"
+              ></div>
+              <span class="tiny"
+                >Alle 23 Profile gehören zum selben NAHWERK-Concierge-System.
+                Die Auswahl bestimmt vor allem Ansprache, Stimme und
+                Kommunikationsstil und kann später geändert werden.</span
+              >
             </fieldset>
             <div class="field">
               <label>Für wen richten Sie den Zugang ein?</label>
@@ -647,9 +735,8 @@
                 type="tel"
                 autocomplete="tel"
                 placeholder="z. B. +49 170 ..."
-              /><span class="tiny"
-                id="ownerPhoneHint">Nur nötig, wenn Sie Nilo selbst über WhatsApp
-                nutzen.</span
+              /><span class="tiny" id="ownerPhoneHint"
+                >Nur nötig, wenn Sie Nilo selbst über WhatsApp nutzen.</span
               >
             </div>
             <div class="selfhint" id="selfHint">
@@ -703,7 +790,9 @@
               </div>
               <div class="field">
                 <label for="note"
-                  ><span id="notePrompt">Was sollte Nilo am Anfang wissen?</span>
+                  ><span id="notePrompt"
+                    >Was sollte Nilo am Anfang wissen?</span
+                  >
                   <span class="tiny">(optional)</span></label
                 ><textarea
                   id="note"
@@ -721,16 +810,49 @@
             </div>
             <label class="check" id="safetyToggleRow"
               ><input type="checkbox" id="safetyEnabled" /><span
-                ><strong>Optionale Sicherheitsfunktion einrichten</strong><br />Standardmäßig deaktiviert. <span id="safetyConciergeName">Nilo</span> kann zu vereinbarten Zeiten nachfragen, ob alles in Ordnung ist.</span
-              ></label>
+                ><strong>Optionale Sicherheitsfunktion einrichten</strong
+                ><br />Standardmäßig deaktiviert.
+                <span id="safetyConciergeName">Nilo</span> kann zu vereinbarten
+                Zeiten nachfragen, ob alles in Ordnung ist.</span
+              ></label
+            >
             <div class="progressive-panel" id="safetyFields" hidden>
               <div class="row">
-                <div class="field"><label for="checkinTimes">Gewünschte Check-in-Zeit(en)</label><input id="checkinTimes" placeholder="z. B. täglich um 9:00 Uhr" /></div>
-                <div class="field"><label for="trustedContactPhone">Telefonnummer der Vertrauensperson</label><input id="trustedContactPhone" type="tel" placeholder="+49 ..." /></div>
+                <div class="field">
+                  <label for="checkinTimes">Gewünschte Check-in-Zeit(en)</label
+                  ><input
+                    id="checkinTimes"
+                    placeholder="z. B. täglich um 9:00 Uhr"
+                  />
+                </div>
+                <div class="field">
+                  <label for="trustedContactPhone"
+                    >Telefonnummer der Vertrauensperson</label
+                  ><input
+                    id="trustedContactPhone"
+                    type="tel"
+                    placeholder="+49 ..."
+                  />
+                </div>
               </div>
-              <div class="field"><label for="trustedContactName">Name der Vertrauensperson <span class="tiny">(freiwillig)</span></label><input id="trustedContactName" /></div>
-              <p class="tiny">Diese Nummer wird ausschließlich für die von Ihnen aktivierten Sicherheitsfunktionen verwendet, damit im vorgesehenen Fall eine von Ihnen bestimmte Vertrauensperson informiert werden kann. Die Vertrauensperson erhält nicht allein durch die Registrierung automatisch eine WhatsApp-Nachricht.</p>
-              <p class="tiny"><strong>Kein Notruf:</strong> Die Sicherheitsfunktionen ersetzen keinen medizinischen Notruf oder Hausnotruf. In akuten Notfällen gilt weiterhin 112.</p>
+              <div class="field">
+                <label for="trustedContactName"
+                  >Name der Vertrauensperson
+                  <span class="tiny">(freiwillig)</span></label
+                ><input id="trustedContactName" />
+              </div>
+              <p class="tiny">
+                Diese Nummer wird ausschließlich für die von Ihnen aktivierten
+                Sicherheitsfunktionen verwendet, damit im vorgesehenen Fall eine
+                von Ihnen bestimmte Vertrauensperson informiert werden kann. Die
+                Vertrauensperson erhält nicht allein durch die Registrierung
+                automatisch eine WhatsApp-Nachricht.
+              </p>
+              <p class="tiny">
+                <strong>Kein Notruf:</strong> Die Sicherheitsfunktionen ersetzen
+                keinen medizinischen Notruf oder Hausnotruf. In akuten Notfällen
+                gilt weiterhin 112.
+              </p>
             </div>
             <label class="check" id="consentRow" hidden
               ><input type="checkbox" id="consent" /><span
@@ -844,5 +966,6 @@
         });
       });
     </script>
-  <script src="assets/site-ui.js?v=3"></script></body>
+    <script src="assets/site-ui.js?v=3"></script>
+  </body>
 </html>
