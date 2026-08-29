@@ -407,3 +407,34 @@ body[data-product="senioren"] .mark.nahwerk-mark{
   border:1px solid rgba(181,138,45,.34)!important;
   box-shadow:0 8px 24px rgba(107,79,24,.08)!important;
 }
+
+/* Continuation 04 — senior logo correction and white-surface wordmark. */
+body.senior-product .mark,
+body[data-product="senioren"] .mark,
+body.senior-product .mark.nahwerk-mark,
+body[data-product="senioren"] .mark.nahwerk-mark{
+  background:#090807 center/cover no-repeat url("NAHWERKConcierge-Logo.png?v=1")!important;
+  border:1px solid rgba(181,138,45,.34)!important;
+  box-shadow:0 8px 24px rgba(107,79,24,.10)!important;
+}
+body.senior-product .brandtext strong:before,
+body[data-product="senioren"] .brandtext strong:before{
+  color:#d4af37!important;
+}
+body.senior-product .brandtext strong:after,
+body[data-product="senioren"] .brandtext strong:after{
+  color:#17130d!important;
+}
+body.senior-product .brandtext span:before,
+body[data-product="senioren"] .brandtext span:before,
+body.senior-product .top .brandtext span:before,
+body[data-product="senioren"] .top .brandtext span:before{
+  color:#17130d!important;
+}
+.senior-app-note{
+  max-width:64ch;
+  margin:16px 0 0;
+  color:#6b6256!important;
+  font-size:13px;
+  line-height:1.6;
+}
