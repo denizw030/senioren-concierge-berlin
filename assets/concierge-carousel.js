@@ -75,9 +75,16 @@
     const cards=profiles.map((profile,index)=>{
       const card=document.createElement("div");
       card.className="nw-carousel-card"; card.dataset.index=String(index);
-      const selectButton=document.createElement("button");
-      selectButton.type="button"; selectButton.className="nw-carousel-select";
-      selectButton.setAttribute("aria-label",`${profile.name} anzeigen`);
+      const selectButton=document.createElement(registerUrl?"a":"button");
+      if(registerUrl){
+        const target=new URL(registerUrl,location.href);
+        target.searchParams.set("concierge",profile.key);
+        selectButton.href=`${target.pathname.split("/").pop()}${target.search}${target.hash}`;
+      }else{
+        selectButton.type="button";
+      }
+      selectButton.className="nw-carousel-select";
+      selectButton.setAttribute("aria-label",registerUrl?`${profile.name} auswählen und registrieren`:`${profile.name} anzeigen`);
       selectButton.innerHTML=`<img alt="Portrait von ${profile.name}, NAHWERK Concierge" width="480" height="722" decoding="async"><span>${profile.name}</span>`;
       card.appendChild(selectButton);
       const image=selectButton.querySelector("img");
@@ -95,9 +102,9 @@
         }
         card.classList.add("is-image-error");card.classList.remove("is-image-loading");
       });
-      selectButton.addEventListener("click",()=>{
-        if(moved)return;
-        if(registerUrl){goToRegistration(index);return;}
+      selectButton.addEventListener("click",event=>{
+        if(moved){event.preventDefault();return;}
+        if(registerUrl)return;
         select(index,true);
       });
       track.appendChild(card);
@@ -142,8 +149,8 @@
         card.classList.toggle("is-active",isActive);
         selectButton.setAttribute("aria-pressed",isActive?"true":"false");
         selectButton.tabIndex=distance<=3.6?0:-1;
-        selectButton.setAttribute("aria-label",isActive&&registerUrl?`${profiles[index].name} auswählen und registrieren`:`${profiles[index].name} anzeigen`);
-        selectButton.title=isActive&&registerUrl?`${profiles[index].name} auswählen und registrieren`:`${profiles[index].name} anzeigen`;
+        selectButton.setAttribute("aria-label",registerUrl?`${profiles[index].name} auswählen und registrieren`:`${profiles[index].name} anzeigen`);
+        selectButton.title=registerUrl?`${profiles[index].name} auswählen und registrieren`:`${profiles[index].name} anzeigen`;
         if(distance<=2.2) ensureImage(index,isActive||distance<=1.05?"high":"auto");
       });
     }
