@@ -1,70 +1,15 @@
-(() => {
-  const ready = () => {
-    if (!document.querySelector('link[data-nw-premium-preview]')) {
-      const premium = document.createElement('link');
-      premium.rel = 'stylesheet';
-      premium.href = 'assets/premium-preview.css?v=2';
-      premium.dataset.nwPremiumPreview = 'true';
-      document.head.append(premium);
-      const master=document.createElement('link'); master.rel='stylesheet'; master.href='assets/master-reference-2026.css?v=1'; master.dataset.nwMaster='true'; document.head.append(master); const components=document.createElement('link'); components.rel='stylesheet'; components.href='assets/master-components-2026.css?v=1'; document.head.append(components); const senior=document.createElement('link'); senior.rel='stylesheet'; senior.href='assets/master-senior-2026.css?v=1'; document.head.append(senior);
-    }
-
-    if (!document.querySelector('.skip-link')) {
-      const skip = document.createElement('a');
-      skip.className = 'skip-link';
-      skip.href = '#main-content';
-      skip.textContent = 'Direkt zum Inhalt';
-      document.body.prepend(skip);
-    }
-
-    document.querySelectorAll('.brand .mark').forEach((mark)=>mark.classList.add('nahwerk-mark'));
-    const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT); const bad=[]; while(walker.nextNode()){if(walker.currentNode.nodeValue?.includes('\\n')) bad.push(walker.currentNode)} bad.forEach((n)=>{n.nodeValue=n.nodeValue.replace(/\\n/g,' ')});
-    const main = document.querySelector('main');
-    if (main) main.id ||= 'main-content';
-
-    const sofa=document.querySelector('img[src*="senior-woman-sofa"]'); if(sofa){sofa.src='assets/NAHWERK-Concierge-Ältere-Frau-Wohnzimmer.png?v=1'; sofa.removeAttribute('srcset'); sofa.style.objectPosition='center 38%';}
-    const heroStage=document.querySelector('.home-hero .concierge-stage'); if(heroStage && heroStage.querySelector('.portrait')){heroStage.innerHTML='<div data-concierge-carousel data-variant="compact" data-register-url="registrieren.html?produkt=prime" data-label="Persönliche NAHWERK Concierges"></div>'; window.NAHWERKCarousel?.autoMount?.(heroStage);}
-    if(document.body.classList.contains('concierge-overview-page')){const rc=document.createElement('link');rc.rel='stylesheet';rc.href='assets/region-reference-2026.css?v=1';document.head.append(rc);const rs=document.createElement('script');rs.src='assets/region-reference-2026.js?v=1';document.body.append(rs);}
-
-    document.querySelectorAll('img').forEach((img) => {
-      if (!img.hasAttribute('loading') && !img.closest('.hero,.home-hero')) img.loading = 'lazy';
-      if (!img.hasAttribute('decoding')) img.decoding = 'async';
-    });
-
-    document.querySelectorAll('main > section, .footer').forEach((el) => el.classList.add('reveal'));
-    if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      const observer = new IntersectionObserver((entries) => entries.forEach((entry) => {
-        if (entry.isIntersecting) { entry.target.classList.add('is-visible'); observer.unobserve(entry.target); }
-      }), { rootMargin: '0px 0px -8% 0px', threshold: .08 });
-      document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-    } else document.querySelectorAll('.reveal').forEach((el) => el.classList.add('is-visible'));
-
-    const nav = document.querySelector('.links');
-    const toggle = document.querySelector('.nav-toggle');
-    if (!nav || !toggle) return;
-
-    toggle.setAttribute('aria-controls', nav.id || 'site-navigation');
-    nav.id ||= 'site-navigation';
-    const sync = () => {
-      const open = nav.classList.contains('is-open');
-      toggle.setAttribute('aria-expanded', String(open));
-      document.body.classList.remove('menu-open');
-    };
-    sync();
-    new MutationObserver(sync).observe(nav, { attributes:true, attributeFilter:['class'] });
-
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && nav.classList.contains('is-open')) {
-        nav.classList.remove('is-open');
-        toggle.focus();
-        return;
-      }
-      if (event.key !== 'Tab' || !nav.classList.contains('is-open')) return;
-      const items = [toggle, ...nav.querySelectorAll('a,button:not([disabled])')];
-      const first = items[0], last = items[items.length - 1];
-      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
-      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
-    });
-  };
-  document.addEventListener('DOMContentLoaded', () => setTimeout(ready, 0));
-})();
+(()=>{function css(h){if(document.querySelector('link[href^="'+h+'"]'))return;const l=document.createElement("link");l.rel="stylesheet";l.href=h;document.head.append(l)}function js(h){if(document.querySelector('script[src^="'+h+'"]'))return;const s=document.createElement("script");s.src=h;document.body.append(s)}
+function ready(){
+css("assets/premium-preview.css?v=2");css("assets/master-reference-2026.css?v=1");css("assets/master-components-2026.css?v=1");css("assets/master-senior-2026.css?v=1");
+document.querySelectorAll(".brand .mark").forEach(m=>m.classList.add("nahwerk-mark"));
+if(!document.querySelector(".skip-link")){const a=document.createElement("a");a.className="skip-link";a.href="#main-content";a.textContent="Direkt zum Inhalt";document.body.prepend(a)}
+const main=document.querySelector("main");if(main)main.id||="main-content";
+const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT),bad=[];while(w.nextNode())if(w.currentNode.nodeValue?.includes("\\n"))bad.push(w.currentNode);bad.forEach(n=>n.nodeValue=n.nodeValue.replace(/\\n/g," "));
+const sofa=document.querySelector('img[src*="senior-woman-sofa"]');if(sofa){sofa.src="assets/NAHWERK-Concierge-Ältere-Frau-Wohnzimmer.png?v=1";sofa.removeAttribute("srcset");sofa.style.objectPosition="center 38%"}
+const stage=document.querySelector(".home-hero .concierge-stage");if(stage?.querySelector(".portrait")){stage.innerHTML='<div data-concierge-carousel data-variant="compact" data-register-url="registrieren.html?produkt=prime" data-label="Persönliche NAHWERK Concierges"></div>';window.NAHWERKCarousel?.autoMount?.(stage)}
+document.querySelectorAll("img").forEach(i=>{if(!i.hasAttribute("loading")&&!i.closest(".hero,.home-hero"))i.loading="lazy";if(!i.hasAttribute("decoding"))i.decoding="async"});
+document.querySelectorAll("main > section,.footer").forEach(e=>e.classList.add("reveal"));
+if("IntersectionObserver"in window&&!matchMedia("(prefers-reduced-motion: reduce)").matches){const o=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("is-visible");o.unobserve(e.target)}}),{rootMargin:"0px 0px -8% 0px",threshold:.08});document.querySelectorAll(".reveal").forEach(e=>o.observe(e))}else document.querySelectorAll(".reveal").forEach(e=>e.classList.add("is-visible"));
+if(document.body.classList.contains("concierge-overview-page")){css("assets/region-reference-2026.css?v=1");css("assets/region-hero-2026.css?v=1");js("assets/region-reference-2026.js?v=1");js("assets/region-hero-2026.js?v=1")}
+const nav=document.querySelector(".links"),toggle=document.querySelector(".nav-toggle");if(!nav||!toggle)return;nav.id||="site-navigation";toggle.setAttribute("aria-controls",nav.id);const sync=()=>toggle.setAttribute("aria-expanded",String(nav.classList.contains("is-open")));sync();new MutationObserver(sync).observe(nav,{attributes:true,attributeFilter:["class"]});document.addEventListener("keydown",e=>{if(e.key==="Escape"&&nav.classList.contains("is-open")){nav.classList.remove("is-open");toggle.focus()}})}
+document.readyState==="loading"?document.addEventListener("DOMContentLoaded",()=>setTimeout(ready,0)):setTimeout(ready,0)})();
