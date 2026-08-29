@@ -89,3 +89,60 @@ test("rejected senior voices are marked for rework",()=>{
   assert.match(ui,/Stimme wird überarbeitet/);
   assert.match(ui,/button\.disabled = true/);
 });
+
+test("senior surface opens on Frida with Hartmut adjacent",()=>{
+  const html=read("senioren-concierge.html");
+  assert.match(html,/data-variant="senior"/);
+  assert.match(html,/data-selected="frida"/);
+  const src=read("assets/concierge-carousel.js");
+  const hartmut=src.indexOf('["hartmut","Hartmut"');
+  const frida=src.indexOf('["frida","Frida"');
+  assert.ok(hartmut>=0 && frida>hartmut);
+});
+
+test("shared shell preserves scroll and uses split NAH WERK brand",()=>{
+  const auth=read("assets/auth-nav.js");
+  const ui=read("assets/site-ui.js");
+  const brand=read("assets/brand-2026.css");
+  assert.match(auth,/preserveViewport/);
+  assert.match(auth,/event\.preventDefault\(\)/);
+  assert.doesNotMatch(ui,/classList\.toggle\('menu-open'/);
+  assert.match(brand,/body\.menu-open \{ overflow:visible; \}/);
+  assert.match(brand,/content:"NAH"!important/);
+  assert.match(brand,/content:"WERK"/);
+  assert.match(brand,/color:#d4af37!important/);
+  assert.match(brand,/color:#c6c9cf/);
+});
+
+test("carousel and overview use one clipped radius owner",()=>{
+  const carousel=read("assets/concierge-carousel.css");
+  const overview=read("assets/concierge-overview.css");
+  assert.match(carousel,/\.nw-carousel-card\{[\s\S]*border-radius:28px;[\s\S]*overflow:hidden;[\s\S]*isolation:isolate;/);
+  assert.match(carousel,/aspect-ratio:480\/722;/);
+  assert.match(carousel,/object-fit:cover;/);
+  assert.match(overview,/\.concierge-overview-card\{[\s\S]*border-radius:22px;[\s\S]*overflow:hidden;/);
+});
+
+test("real lifestyle assets are assigned by audience",()=>{
+  const senior=read("senioren-concierge.html");
+  const home=read("index.html");
+  const services=read("leistungen.html");
+  assert.match(senior,/NAHWERK-Concierge-Älterer-Mann-am-Handy-Zuhause-auf-Stuhl\.png/);
+  assert.match(home,/NAHWERK-Concierge-Frau-Wohnzimmer\.png/);
+  assert.match(services,/NAHWERK-Concierge-junge-Frau-Küche\.png/);
+  assert.match(services,/services-hero-layout/);
+});
+
+test("dark pages restore multi-colour ambient depth and responsive gutter",()=>{
+  const brand=read("assets/brand-2026.css");
+  assert.match(brand,/rgba\(58,111,224,\.115\)/);
+  assert.match(brand,/rgba\(131,67,174,\.09\)/);
+  assert.match(brand,/rgba\(34,153,157,\.075\)/);
+  assert.match(brand,/--nw-gutter:clamp\(20px,3\.5vw,48px\)/);
+  assert.match(brand,/calc\(100% - var\(--nw-gutter\) - var\(--nw-gutter\)\)/);
+});
+
+test("registration action is a centered 44px flex control",()=>{
+  const css=read("assets/concierge-carousel.css");
+  assert.match(css,/\.nw-carousel-status\{[\s\S]*align-items:center;[\s\S]*justify-content:center;[\s\S]*height:44px;/);
+});
