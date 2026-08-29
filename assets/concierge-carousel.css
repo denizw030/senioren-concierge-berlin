@@ -51,3 +51,12 @@ body[data-product="senioren"] .nw-carousel-status:not(:disabled):hover,body.seni
   .nw-carousel-card{border-radius:24px}
   .nw-carousel-status{height:44px}
 }
+
+/* Multilingual voice control alignment. */
+.nw-carousel-actions{align-items:flex-start}
+.nw-carousel-voice-host{display:flex;align-items:flex-start}
+.nw-carousel-status{margin-top:0}
+@media(max-width:620px){
+  .nw-carousel-actions{align-items:stretch}
+  .nw-carousel-voice-host{justify-content:center}
+}
