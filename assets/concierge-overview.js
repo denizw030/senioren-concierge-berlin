@@ -38,8 +38,17 @@
     button.innerHTML = `<span class="concierge-overview-card-media"><span class="concierge-overview-placeholder" aria-hidden="true"><span>NAHWERK</span><small>${profile.name}</small></span><img alt="Portrait von ${profile.name}, NAHWERK Concierge" width="480" height="722" decoding="async"></span><span class="concierge-overview-card-copy"><strong>${profile.name}</strong><small>${profile.description}</small></span>`;
     card.appendChild(button);
 
+    const actions = document.createElement("div");
+    actions.className = "concierge-overview-actions";
     const voiceControl = window.NAHWERKVoicePreview?.createControl(profile,{className:"concierge-overview-voice"});
-    if (voiceControl) card.appendChild(voiceControl);
+    if (voiceControl) actions.appendChild(voiceControl);
+    const selectLink = document.createElement("a");
+    selectLink.className = "concierge-overview-select";
+    selectLink.href = `registrieren.html?produkt=prime&concierge=${encodeURIComponent(profile.key)}`;
+    selectLink.textContent = "Auswählen";
+    selectLink.setAttribute("aria-label", `${profile.name} auswählen und registrieren`);
+    actions.appendChild(selectLink);
+    card.appendChild(actions);
 
     const cardImage = button.querySelector("img");
     cardImage.loading = index < 4 ? "eager" : "lazy";
