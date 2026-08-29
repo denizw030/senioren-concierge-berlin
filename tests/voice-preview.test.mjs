@@ -47,13 +47,17 @@ test("voice preview is lazy, user initiated and single-player",()=>{
   assert.match(src,/aria-pressed/);
 });
 
-test("selection and voice buttons are siblings, never nested",()=>{
+test("voice controls live in dedicated action rows, never on concierge images",()=>{
   const carousel=read("assets/concierge-carousel.js");
   const overview=read("assets/concierge-overview.js");
-  assert.match(carousel,/card\.appendChild\(selectButton\);[\s\S]*card\.appendChild\(voiceControl\)/);
-  assert.match(overview,/card\.appendChild\(button\);[\s\S]*card\.appendChild\(voiceControl\)/);
-  assert.doesNotMatch(carousel,/selectButton\.appendChild\(voiceControl\)/);
-  assert.doesNotMatch(overview,/button\.appendChild\(voiceControl\)/);
+  const css=read("assets/concierge-voice-preview.css");
+  assert.match(carousel,/nw-carousel-actions/);
+  assert.match(carousel,/nw-carousel-voice-host/);
+  assert.doesNotMatch(carousel,/card\.appendChild\(voiceControl\)/);
+  assert.match(overview,/concierge-overview-actions/);
+  assert.match(overview,/actions\.appendChild\(voiceControl\)/);
+  assert.doesNotMatch(overview,/card\.appendChild\(voiceControl\)/);
+  assert.doesNotMatch(css,/position:absolute/);
 });
 
 test("every real concierge surface loads preview assets before carousel",()=>{
