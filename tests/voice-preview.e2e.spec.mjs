@@ -137,7 +137,7 @@ test("all 24 audition MP3s return successfully",async({page})=>{
       const button=card.querySelector(".nw-voice-preview-button");
       const control=button?.closest(".nw-voice-preview-control");
       const profileKey=control?.dataset.conciergeKey;
-      const url="assets/concierges/voice-samples/"+key+".mp3?v=persona-20260829-1";
+      const url="assets/concierges/voice-samples/"+key+".mp3?v=persona-20260829-2";
       const response=await fetch(url,{cache:"no-store"});
       checks.push({key,profileKey,status:response.status,bytes:(await response.arrayBuffer()).byteLength});
     }
@@ -171,7 +171,11 @@ for(const surface of ["/index.html","/prime-concierge.html","/senioren-concierge
   test(`tablet menu keeps scroll position on ${surface}`,async({page})=>{
     await page.setViewportSize({width:1024,height:900});
     await page.goto(`http://127.0.0.1:4173${surface}`,{waitUntil:"networkidle"});
-    await page.evaluate(()=>window.scrollTo(0,Math.min(700,document.documentElement.scrollHeight-window.innerHeight-50)));
+    await page.evaluate(()=>{
+      document.documentElement.style.scrollBehavior="auto";
+      window.scrollTo(0,Math.min(700,document.documentElement.scrollHeight-window.innerHeight-50));
+    });
+    await page.waitForTimeout(50);
     const before=await page.evaluate(()=>window.scrollY);
     const toggle=page.locator(".nav-toggle");
     await expect(toggle).toBeVisible();
