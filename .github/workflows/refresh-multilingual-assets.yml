@@ -1,0 +1,40 @@
+name: Refresh multilingual preview assets
+on:
+  push:
+    branches: [staging/website-concierge-voice-preview-01]
+    paths: [.github/workflows/refresh-multilingual-assets.yml]
+permissions:
+  contents: write
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: staging/website-concierge-voice-preview-01
+      - name: Bump shared asset versions
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          replacements={
+            "brand-2026.css?v=17":"brand-2026.css?v=18",
+            "concierge-voice-preview.css?v=4":"concierge-voice-preview.css?v=5",
+            "concierge-voice-preview.js?v=4":"concierge-voice-preview.js?v=5",
+            "concierge-carousel.css?v=6":"concierge-carousel.css?v=7",
+            "concierge-carousel.js?v=11":"concierge-carousel.js?v=12",
+            "concierge-overview.css?v=7":"concierge-overview.css?v=8",
+            "concierge-overview.js?v=4":"concierge-overview.js?v=5",
+          }
+          for p in Path(".").glob("*.html"):
+              s=p.read_text()
+              n=s
+              for a,b in replacements.items(): n=n.replace(a,b)
+              if n!=s: p.write_text(n)
+          PY
+          git config user.name "NAHWERK UX"
+          git config user.email "actions@users.noreply.github.com"
+          git add '*.html'
+          git commit -m "Refresh multilingual voice and brand assets"
+          git pull --rebase origin staging/website-concierge-voice-preview-01
+          git push origin HEAD:staging/website-concierge-voice-preview-01
