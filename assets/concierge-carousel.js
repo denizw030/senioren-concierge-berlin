@@ -49,8 +49,8 @@
     root.classList.add("nw-carousel");
     root.setAttribute("role","region");
     root.setAttribute("aria-label",root.dataset.label||"KI-Concierge auswählen");
-    root.innerHTML=`<button class="nw-carousel-arrow prev" type="button" aria-label="Vorherigen Concierge anzeigen">‹</button><div class="nw-carousel-stage" tabindex="0" aria-roledescription="Karussell"><div class="nw-carousel-track"></div></div><button class="nw-carousel-arrow next" type="button" aria-label="Nächsten Concierge anzeigen">›</button><div class="nw-carousel-info" aria-live="polite"><h3 class="nw-carousel-name"></h3><p class="nw-carousel-description"></p><p class="nw-carousel-language-note">Concierge und gewünschte Sprache können unabhängig voneinander gewählt werden.</p><p class="nw-carousel-voice-note" hidden></p><button class="nw-carousel-status" type="button" hidden>Ausgewählt</button></div>${inputName?`<input type="hidden" name="${inputName}" value="${profiles[active].key}">`:""}`;
-    const stage=root.querySelector(".nw-carousel-stage"),track=root.querySelector(".nw-carousel-track"),name=root.querySelector(".nw-carousel-name"),description=root.querySelector(".nw-carousel-description"),voiceNote=root.querySelector(".nw-carousel-voice-note"),status=root.querySelector(".nw-carousel-status"),input=inputName?root.querySelector(`[name="${inputName}"]`):null;
+    root.innerHTML=`<button class="nw-carousel-arrow prev" type="button" aria-label="Vorherigen Concierge anzeigen">‹</button><div class="nw-carousel-stage" tabindex="0" aria-roledescription="Karussell"><div class="nw-carousel-track"></div></div><button class="nw-carousel-arrow next" type="button" aria-label="Nächsten Concierge anzeigen">›</button><div class="nw-carousel-info" aria-live="polite"><h3 class="nw-carousel-name"></h3><p class="nw-carousel-description"></p><p class="nw-carousel-language-note">Concierge und gewünschte Sprache können unabhängig voneinander gewählt werden.</p><p class="nw-carousel-voice-note" hidden></p><div class="nw-carousel-actions"><span class="nw-carousel-voice-host"></span><button class="nw-carousel-status" type="button" hidden>Ausgewählt</button></div></div>${inputName?`<input type="hidden" name="${inputName}" value="${profiles[active].key}">`:""}`;
+    const stage=root.querySelector(".nw-carousel-stage"),track=root.querySelector(".nw-carousel-track"),name=root.querySelector(".nw-carousel-name"),description=root.querySelector(".nw-carousel-description"),voiceNote=root.querySelector(".nw-carousel-voice-note"),voiceHost=root.querySelector(".nw-carousel-voice-host"),status=root.querySelector(".nw-carousel-status"),input=inputName?root.querySelector(`[name="${inputName}"]`):null;
 
     function goToRegistration(index=active){
       if(!registerUrl)return;
@@ -67,8 +67,6 @@
       selectButton.setAttribute("aria-label",`${profile.name} anzeigen`);
       selectButton.innerHTML=`<img alt="Portrait von ${profile.name}, NAHWERK Concierge" width="480" height="722" decoding="async"><span>${profile.name}</span>`;
       card.appendChild(selectButton);
-      const voiceControl=window.NAHWERKVoicePreview?.createControl(profile,{className:"nw-carousel-voice"});
-      if(voiceControl) card.appendChild(voiceControl);
       const image=selectButton.querySelector("img");
       image.dataset.src=profile.cardImage;
       image.dataset.srcset=`${profile.cardImage} 480w, ${profile.largeImage} 900w`;
@@ -137,14 +135,22 @@
       });
     }
 
+    function renderVoice(profile){
+      window.NAHWERKVoicePreview?.stopAll();
+      voiceHost.replaceChildren();
+      const control=window.NAHWERKVoicePreview?.createControl(profile,{className:"nw-carousel-voice"});
+      if(control) voiceHost.appendChild(control);
+    }
+
     function updateInfo(emit=false){
       const profile=profiles[active]; name.textContent=profile.name; description.textContent=profile.description;
       const provisional=profile.voiceStatus!=="approved";
       voiceNote.hidden=!provisional;
-      voiceNote.textContent=provisional?"Diese Hörprobe verwendet die aktuell zugeordnete Teststimme; die Qualitätsfreigabe ist noch offen.":"";
+      voiceNote.textContent=provisional?"Die Hörprobe ist noch nicht final freigegeben.":"";
       status.hidden=variant!=="selection"&&!registerUrl;
       status.textContent=registerUrl?"Registrieren":"Ausgewählt";
       status.disabled=!registerUrl;
+      renderVoice(profile);
       if(input&&input.value!==profile.key){input.value=profile.key;if(emit){input.dispatchEvent(new Event("input",{bubbles:true}));input.dispatchEvent(new Event("change",{bubbles:true}));}}
       if(emit) root.dispatchEvent(new CustomEvent("conciergechange",{bubbles:true,detail:profile}));
     }
