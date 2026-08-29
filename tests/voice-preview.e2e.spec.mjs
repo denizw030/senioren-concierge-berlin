@@ -15,7 +15,7 @@ for(const viewport of viewports){
       page.on("pageerror",error=>errors.push(String(error)));
       page.on("console",message=>{if(message.type()==="error")errors.push(message.text())});
       await page.goto(`http://127.0.0.1:4173${surface}`,{waitUntil:"networkidle"});
-      await expect(page.locator(".nw-voice-preview-button").first()).toBeVisible();
+      const voiceButtons=page.locator(".nw-voice-preview-button");\n      if(await voiceButtons.count()===0){const diag=await page.evaluate(()=>({root:!!document.querySelector("[data-concierge-carousel]"),carousel:!!window.NAHWERKCarousel,voice:!!window.NAHWERKVoicePreview}));console.log("VOICE_DIAG",surface,diag,errors);}\n      await expect(voiceButtons.first()).toBeVisible();
       expect(await page.locator("button button").count()).toBe(0);
       const box=await page.locator(".nw-voice-preview-button").first().boundingBox();
       expect(box.width).toBeGreaterThanOrEqual(44);
