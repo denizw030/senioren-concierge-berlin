@@ -10,7 +10,8 @@
     />
     <meta name="theme-color" content="#fffdf9" />
     <meta name="color-scheme" content="light" />
-    <style id="registration-first-paint">html,body{margin:0;background:#fffdf9!important;color-scheme:light}</style>
+    <style id="registration-first-paint">html,body{margin:0;background:#fffdf9!important;color-scheme:light}.family-message-field textarea{min-height:112px;resize:vertical}.family-message-field .tiny{display:block;margin-top:7px}
+</style>
     <link rel="stylesheet" href="assets/site.css?v=24" />
     <style>
       .signup {
@@ -802,6 +803,18 @@
                   id="note"
                   placeholder="Zum Beispiel: Bitte langsam sprechen und Technik in kleinen Schritten erklären."
                 ></textarea>
+              <div class="field family-message-field">
+                <label for="familyMessage">
+                  Persönliche Nachricht für die unterstützte Person
+                  <span class="tiny">(optional)</span>
+                </label>
+                <textarea
+                  id="familyMessage"
+                  maxlength="600"
+                  placeholder="Zum Beispiel: Mama, ich habe dir NAHWERK eingerichtet, damit du jederzeit jemanden hast, der dir in Ruhe weiterhilft. Liebe Grüße, Deniz."
+                ></textarea>
+                <span class="tiny">Ihre Nachricht kann beim ersten Kontakt zusätzlich zur NAHWERK-Begrüßung übermittelt werden.</span>
+              </div>
               </div>
             </div>
             <div class="field">
