@@ -1,0 +1,55 @@
+name: Temporary asset visual audit
+
+on:
+  push:
+    branches:
+      - staging/website-concierge-voice-preview-01
+    paths:
+      - .github/workflows/asset-visual-audit.yml
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pillow
+      - name: Build contact sheet
+        shell: python
+        run: |
+          from PIL import Image,ImageOps,ImageDraw,ImageFont
+          from pathlib import Path
+          names=[
+            "assets/NAHWERK-Concierge-Älterer-Mann-am-Handy-Zuhause-auf-Stuhl.png",
+            "assets/NAHWERK-Concierge-junge-Frau-Küche.png",
+            "assets/NAHWERK-Concierge-Frau-Wohnzimmer.png",
+            "assets/hero-senioren.jpg",
+            "assets/Primconcierge-NAHWERK-ODYSX.png",
+            "assets/NAHWERK-Persönlicher-Concierge.png",
+          ]
+          tiles=[]
+          for name in names:
+            p=Path(name)
+            im=Image.open(p).convert("RGB")
+            orig=im.size
+            thumb=ImageOps.fit(im,(560,420),method=Image.Resampling.LANCZOS)
+            canvas=Image.new("RGB",(600,500),"white")
+            canvas.paste(thumb,(20,20))
+            d=ImageDraw.Draw(canvas)
+            label=f"{p.name}\n{orig[0]}×{orig[1]}"
+            d.multiline_text((20,450),label,fill="black",spacing=4)
+            tiles.append(canvas)
+          out=Image.new("RGB",(1200,1500),(235,235,235))
+          for i,t in enumerate(tiles):
+            out.paste(t,((i%2)*600,(i//2)*500))
+          Path("audit").mkdir(exist_ok=True)
+          out.save("audit/contact-sheet.jpg",quality=92)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: asset-visual-audit
+          path: audit/contact-sheet.jpg
