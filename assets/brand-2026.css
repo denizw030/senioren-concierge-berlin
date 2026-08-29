@@ -397,3 +397,13 @@ body:not(.senior-product):not([data-product="senioren"]) :is(.home-hero,.concier
   .services-hero-photo{border-radius:24px}
   .home-hero .concierge-stage:before{filter:blur(36px);opacity:.6}
 }
+
+/* Continuation 03b — unified NAHWERK emblem on every product surface. */
+body.senior-product .mark,
+body[data-product="senioren"] .mark,
+body.senior-product .mark.nahwerk-mark,
+body[data-product="senioren"] .mark.nahwerk-mark{
+  background:#f7f3ea center/92% no-repeat url("logo-nahwerk-concierge-gold.svg")!important;
+  border:1px solid rgba(181,138,45,.34)!important;
+  box-shadow:0 8px 24px rgba(107,79,24,.08)!important;
+}
