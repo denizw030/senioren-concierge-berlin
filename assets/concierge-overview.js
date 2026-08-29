@@ -67,7 +67,13 @@
     });
     cardImage.src = profile.cardImage || profile.image;
     if (index < 2) cardImage.decode?.().catch(() => {});
-    button.addEventListener("click", () => openProfile(profile, button));
+    button.addEventListener("click", event => {
+      if (event.target.closest(".concierge-overview-card-media")) {
+        location.href = `registrieren.html?produkt=prime&concierge=${encodeURIComponent(profile.key)}`;
+        return;
+      }
+      openProfile(profile, button);
+    });
     grid.appendChild(card);
   });
 
