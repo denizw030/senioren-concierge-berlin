@@ -9,18 +9,18 @@ const viewports=[
 
 for(const viewport of viewports){
   for(const surface of surfaces){
-    test(\`${viewport.name} ${surface} renders voice controls without browser errors\`,async({page})=>{
+    test(`${viewport.name} ${surface} renders voice controls without browser errors`,async({page})=>{
       await page.setViewportSize({width:viewport.width,height:viewport.height});
       const errors=[];
       page.on("pageerror",error=>errors.push(String(error)));
       page.on("console",message=>{if(message.type()==="error")errors.push(message.text())});
-      await page.goto(\`http://127.0.0.1:4173${surface}\`,{waitUntil:"networkidle"});
+      await page.goto(`http://127.0.0.1:4173${surface}`,{waitUntil:"networkidle"});
       await expect(page.locator(".nw-voice-preview-button").first()).toBeVisible();
       expect(await page.locator("button button").count()).toBe(0);
       const box=await page.locator(".nw-voice-preview-button").first().boundingBox();
       expect(box.width).toBeGreaterThanOrEqual(44);
       expect(box.height).toBeGreaterThanOrEqual(44);
-      await page.screenshot({path:\`test-results/screenshots/${viewport.name}-${surface.replaceAll("/","_")}.png\`,fullPage:true});
+      await page.screenshot({path:`test-results/screenshots/${viewport.name}-${surface.replaceAll("/","_")}.png`,fullPage:true});
       expect(errors).toEqual([]);
     });
   }
@@ -41,8 +41,8 @@ test("all 23 image and audio assets return successfully",async({page})=>{
   });
   expect(result.count).toBe(23);
   for(const check of result.checks){
-    expect(check.status,\`${check.key} ${check.kind}\`).toBe(200);
-    expect(check.bytes,\`${check.key} ${check.kind}\`).toBeGreaterThan(1000);
+    expect(check.status,`${check.key} ${check.kind}`).toBe(200);
+    expect(check.bytes,`${check.key} ${check.kind}`).toBeGreaterThan(1000);
   }
 });
 
@@ -50,7 +50,7 @@ test("Nilo, Mira, Jabari and Arjun can start and stop their mapped samples",asyn
   await page.goto("http://127.0.0.1:4173/index.html",{waitUntil:"networkidle"});
   for(const key of ["nilo","mira","jabari","arjun"]){
     await page.locator("[data-concierge-carousel]").evaluate((root,key)=>root._nahwerkCarousel.select(key),key);
-    const button=page.locator(\`.nw-voice-preview-control[data-concierge-key="${key}"] .nw-voice-preview-button\`);
+    const button=page.locator(`.nw-voice-preview-control[data-concierge-key="${key}"] .nw-voice-preview-button`);
     await button.click();
     await expect(button).toHaveAttribute("data-state","playing",{timeout:5000});
     await button.click();
@@ -85,7 +85,7 @@ test("voice click never changes registration selection, normal selection still w
 test("provisional voices are explicitly labelled as test voices",async({page})=>{
   await page.goto("http://127.0.0.1:4173/index.html",{waitUntil:"networkidle"});
   for(const key of ["jabari","arjun"]){
-    const control=page.locator(\`.nw-voice-preview-control[data-concierge-key="${key}"]\`);
+    const control=page.locator(`.nw-voice-preview-control[data-concierge-key="${key}"]`);
     await expect(control).toHaveAttribute("data-provisional","true");
     await expect(control.locator(".nw-voice-preview-tag")).toHaveText("Teststimme");
   }
