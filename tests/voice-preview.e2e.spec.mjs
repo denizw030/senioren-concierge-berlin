@@ -193,12 +193,14 @@ for(const surface of ["/index.html","/prime-concierge.html","/senioren-concierge
     const headerBox=await header.boundingBox();
     expect(headerBox.y).toBeGreaterThanOrEqual(-2);
     expect(headerBox.y).toBeLessThanOrEqual(2);
-    await toggle.click();
+    const toggleBox=await toggle.boundingBox();
+    await page.mouse.click(toggleBox.x+toggleBox.width/2,toggleBox.y+toggleBox.height/2);
     await expect(toggle).toHaveAttribute("aria-expanded","true");
     await expect(page.locator(".links")).toHaveClass(/is-open/);
     const opened=await page.evaluate(()=>window.scrollY);
     expect(Math.abs(opened-before)).toBeLessThanOrEqual(2);
-    await toggle.click();
+    const toggleBoxOpen=await toggle.boundingBox();
+    await page.mouse.click(toggleBoxOpen.x+toggleBoxOpen.width/2,toggleBoxOpen.y+toggleBoxOpen.height/2);
     await expect(toggle).toHaveAttribute("aria-expanded","false");
     const closed=await page.evaluate(()=>window.scrollY);
     expect(Math.abs(closed-before)).toBeLessThanOrEqual(2);
@@ -283,7 +285,8 @@ test("mobile menu panel is viewport anchored beneath the sticky header",async({p
   const headerBox=await header.boundingBox();
   expect(headerBox.y).toBeGreaterThanOrEqual(-2);
   expect(headerBox.y).toBeLessThanOrEqual(2);
-  await toggle.click();
+  const toggleBox=await toggle.boundingBox();
+  await page.mouse.click(toggleBox.x+toggleBox.width/2,toggleBox.y+toggleBox.height/2);
   const menu=page.locator(".top .links.is-open");
   await expect(menu).toBeVisible();
   const position=await menu.evaluate(el=>getComputedStyle(el).position);
