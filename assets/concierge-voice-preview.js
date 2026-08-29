@@ -4,29 +4,25 @@
 
   const isProvisional = profile => profile.voiceStatus && profile.voiceStatus !== "approved";
 
-  function visibleLabel(entry, state) {
-    const test = isProvisional(entry.profile);
+  function visibleCopy(entry, state) {
     if (state === "loading") return "Wird geladen";
-    if (state === "playing") return "Wiedergabe stoppen";
-    if (state === "error") return "Audio nicht verfügbar";
-    if (state === "stopped") return test ? "Teststimme anhören" : "Stimme anhören";
-    return test ? "Teststimme anhören" : "Stimme anhören";
+    if (state === "playing") return "Stoppen";
+    if (state === "error") return "Nicht verfügbar";
+    return "Stimme anhören";
   }
 
   function setState(entry, state) {
     if (!entry) return;
     entry.state = state;
-    const { button, profile, label } = entry;
+    const { button, profile, copy, control } = entry;
     button.dataset.state = state;
+    control.dataset.state = state;
     button.setAttribute("aria-pressed", state === "playing" ? "true" : "false");
     const action = state === "playing" ? "stoppen" : "anhören";
     const prefix = isProvisional(profile) ? "Teststimme" : "Stimme";
     button.setAttribute("aria-label", `${prefix} von ${profile.name} ${action}`);
     button.title = `${prefix} von ${profile.name} ${action}`;
-    if (label) label.textContent = visibleLabel(entry, state);
-    const srState = button.querySelector(".nw-voice-preview-state");
-    if (srState) srState.textContent = state;
-    entry.control.dataset.state = state;
+    copy.textContent = visibleCopy(entry, state);
   }
 
   function resetAudio(entry) {
@@ -77,31 +73,31 @@
 
   function createControl(profile, options = {}) {
     if (!profile?.sampleAudio) return null;
-
     const control = document.createElement("span");
     control.className = `nw-voice-preview-control ${options.className || ""}`.trim();
     control.dataset.conciergeKey = profile.key;
-    if (isProvisional(profile)) control.dataset.provisional = "true";
-
-    const label = document.createElement("span");
-    label.className = "nw-voice-preview-label";
-    label.setAttribute("aria-hidden", "true");
-    control.appendChild(label);
+    const provisional = isProvisional(profile);
+    if (provisional) control.dataset.provisional = "true";
 
     const button = document.createElement("button");
     button.type = "button";
     button.className = "nw-voice-preview-button";
     button.innerHTML = `
       <span class="nw-voice-preview-icon" aria-hidden="true">
-        <svg class="icon-speaker" viewBox="0 0 24 24" focusable="false"><path d="M4 9v6h4l5 4V5L8 9H4zm12.5 3a4.5 4.5 0 0 0-2.1-3.8v7.6A4.5 4.5 0 0 0 16.5 12zm0-7.2v2.1a7 7 0 0 1 0 10.2v2.1a9 9 0 0 0 0-13.4z"/></svg>
-        <svg class="icon-stop" viewBox="0 0 24 24" focusable="false"><rect x="7" y="7" width="10" height="10" rx="1.5"/></svg>
+        <svg class="icon-wave" viewBox="0 0 22 18" focusable="false">
+          <path d="M2 10.5v-3M6.5 14V4M11 16V2M15.5 13V5M20 10.5v-3" />
+        </svg>
         <span class="icon-loading"></span>
+        <svg class="icon-stop" viewBox="0 0 18 18" focusable="false"><rect x="5" y="5" width="8" height="8" rx="2"/></svg>
         <span class="icon-error">!</span>
       </span>
-      <span class="nw-voice-preview-state visually-hidden">idle</span>`;
+      <span class="nw-voice-preview-copy"></span>
+      ${provisional ? '<span class="nw-voice-preview-badge" aria-hidden="true">Test</span>' : ""}
+    `;
+    const copy = button.querySelector(".nw-voice-preview-copy");
     control.appendChild(button);
 
-    const entry = { profile, button, label, control, audio: null, state: "idle" };
+    const entry = { profile, button, copy, control, audio: null, state: "idle" };
     entries.add(entry);
     setState(entry, "idle");
 
@@ -111,7 +107,6 @@
       event.stopPropagation();
       toggle(entry);
     });
-
     return control;
   }
 
