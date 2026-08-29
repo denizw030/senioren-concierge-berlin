@@ -1,0 +1,72 @@
+name: Generate multilingual concierge previews
+on:
+  push:
+    branches: [staging/website-concierge-voice-preview-01]
+    paths: [.github/workflows/generate-multilingual-previews.yml]
+permissions:
+  contents: write
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: staging/website-concierge-voice-preview-01
+      - name: Generate native, German and English samples
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://btqklftjmwtqqqdmwlnk.supabase.co/functions/v1/nw-voice-multilingual-preview-20260829/multiPreview-20260829-v1"
+          mkdir -p assets/concierges/voice-samples
+          pairs="
+          nilo:es,de,en
+          mira:es,de,en
+          lena:de,en
+          lukas:de,en
+          hartmut:de,en
+          frida:de,en
+          asha:hi,de,en
+          sari:id,de,en
+          leyla:tr,de,en
+          noor:ar,de,en
+          sofia:es,de,en
+          camille:fr,de,en
+          anna:pl,de,en
+          olena:uk,de,en
+          mei:zh,de,en
+          amara:tw,de,en
+          kwame:tw,de,en
+          zuri:sw,de,en
+          jabari:sw,de,en
+          arjun:pa,de,en
+          wei:zh,de,en
+          yuki:ja,de,en
+          ren:ja,de,en
+          "
+          count=0
+          while read -r item; do
+            [ -z "$item" ] && continue
+            key="${item%%:*}"
+            langs="${item#*:}"
+            IFS=',' read -ra list <<< "$langs"
+            for lang in "${list[@]}"; do
+              out="assets/concierges/voice-samples/${key}-${lang}.mp3"
+              echo "Generating ${key}/${lang}"
+              curl --fail --silent --show-error --location --retry 1 "$base/${key}/${lang}" -o "$out"
+              size=$(wc -c < "$out")
+              test "$size" -gt 20000
+              echo "${key}-${lang} ${size} bytes"
+              count=$((count+1))
+            done
+          done <<< "$pairs"
+          echo "Generated $count multilingual samples"
+          test "$count" -eq 65
+      - name: Commit multilingual samples
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "NAHWERK Voice Preview"
+          git config user.email "actions@users.noreply.github.com"
+          git add assets/concierges/voice-samples/*-*.mp3
+          git commit -m "Add multilingual native-first concierge previews"
+          git push origin HEAD:staging/website-concierge-voice-preview-01
