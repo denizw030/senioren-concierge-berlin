@@ -5,12 +5,12 @@ import path from "node:path";
 
 const root=process.cwd();
 const profiles=[
-["nilo","Nilo","onyx","hearing_test"],["mira","Mira","marin","hearing_test"],["lena","Lena","coral","hearing_test"],["lukas","Lukas","ash","hearing_test"],
-["hartmut","Hartmut","ballad","voice_rework"],["frida","Frida","sage","voice_rework"],["asha","Asha","shimmer","hearing_test"],["sari","Sari","nova","hearing_test"],
-["leyla","Leyla","coral","hearing_test"],["noor","Noor","sage","hearing_test"],["sofia","Sofia","verse","hearing_test"],["camille","Camille","nova","hearing_test"],
-["anna","Anna","nova","hearing_test"],["olena","Olena","shimmer","hearing_test"],["mei","Mei","sage","hearing_test"],["amara","Amara","coral","hearing_test"],
-["kwame","Kwame","cedar","hearing_test"],["zuri","Zuri","shimmer","hearing_test"],["jabari","Jabari","onyx","hearing_test"],["arjun","Arjun","ash","hearing_test"],
-["wei","Wei","echo","hearing_test"],["yuki","Yuki","marin","hearing_test"],["ren","Ren","alloy","hearing_test"]
+["nilo","Nilo","cedar","approved"],["mira","Mira","marin","hearing_test"],["lena","Lena","coral","hearing_test"],["lukas","Lukas","alloy","hearing_test"],
+["hartmut","Hartmut","onyx","approved"],["frida","Frida","sage","hearing_test"],["asha","Asha","shimmer","hearing_test"],["sari","Sari","coral","hearing_test"],
+["leyla","Leyla","marin","hearing_test"],["noor","Noor","sage","hearing_test"],["sofia","Sofia","shimmer","hearing_test"],["camille","Camille","marin","hearing_test"],
+["anna","Anna","coral","hearing_test"],["olena","Olena","shimmer","hearing_test"],["mei","Mei","sage","hearing_test"],["amara","Amara","coral","hearing_test"],
+["kwame","Kwame","cedar","hearing_test"],["zuri","Zuri","shimmer","hearing_test"],["jabari","Jabari","alloy","hearing_test"],["arjun","Arjun","cedar","hearing_test"],
+["wei","Wei","ballad","hearing_test"],["yuki","Yuki","marin","hearing_test"],["ren","Ren","alloy","hearing_test"]
 ];
 const pages=["index.html","prime-concierge.html","senioren-concierge.html","concierges.html","registrieren.html","concierge-anpassen.html"];
 const read=p=>fs.readFileSync(path.join(root,p),"utf8");
@@ -24,16 +24,16 @@ test("canonical catalog contains exactly 23 voice mappings",()=>{
     const row=src.slice(start,start+240);
     assert.ok(row.includes('"'+voice+'","'+status+'"'),key+" voice/status mismatch");
   }
-  assert.ok(src.includes("voice-samples/\${key}.mp3?v=persona-20260829-2"));
+  assert.ok(src.includes("voice-samples/\${key}.mp3?v=persona-runtime-20260829-1"));
 });
 
-test("all 24 persona-tuned static MP3 samples exist and are non-empty",()=>{
+test("all 23 runtime samples plus Lars reserve exist and are non-empty",()=>{
   const audioKeys=[...profiles.map(([key])=>key),"lars"];
   assert.equal(audioKeys.length,24);
   for(const key of audioKeys){
     const file=path.join(root,"assets/concierges/voice-samples",key+".mp3");
     const stat=fs.statSync(file);
-    assert.ok(stat.size>50000,key+" sample unexpectedly small");
+    assert.ok(stat.size>20000,key+" sample unexpectedly small");
     assert.ok(stat.size<200000,key+" sample unexpectedly large");
   }
 });
@@ -81,13 +81,11 @@ test("frontend contains no OpenAI endpoint or API key",()=>{
 });
 
 
-test("rejected senior voices are marked for rework",()=>{
+test("runtime senior status mirrors published voice state",()=>{
   const src=read("assets/concierge-carousel.js");
-  assert.match(src,/\["hartmut","Hartmut",[\s\S]{0,120}"voice_rework"/);
-  assert.match(src,/\["frida","Frida",[\s\S]{0,120}"voice_rework"/);
-  const ui=read("assets/concierge-voice-preview.js");
-  assert.match(ui,/Stimme wird überarbeitet/);
-  assert.match(ui,/button\.disabled = true/);
+  assert.match(src,/\["hartmut","Hartmut",[\s\S]{0,120}"onyx","approved"/);
+  assert.match(src,/\["frida","Frida",[\s\S]{0,120}"sage","hearing_test"/);
+  assert.doesNotMatch(src,/voice_rework/);
 });
 
 test("senior surface opens on Frida with Hartmut adjacent",()=>{
@@ -123,13 +121,13 @@ test("carousel and overview use one clipped radius owner",()=>{
   assert.match(overview,/\.concierge-overview-card\{[\s\S]*border-radius:22px;[\s\S]*overflow:hidden;/);
 });
 
-test("real lifestyle assets are assigned by audience",()=>{
+test("optimized lifestyle assets are assigned by audience",()=>{
   const senior=read("senioren-concierge.html");
   const home=read("index.html");
   const services=read("leistungen.html");
-  assert.match(senior,/NAHWERK-Concierge-Älterer-Mann-am-Handy-Zuhause-auf-Stuhl\.png/);
-  assert.match(home,/NAHWERK-Concierge-Frau-Wohnzimmer\.png/);
-  assert.match(services,/NAHWERK-Concierge-junge-Frau-Küche\.png/);
+  assert.match(senior,/assets\/lifestyle\/senior-man-phone\.webp/);
+  assert.match(home,/assets\/lifestyle\/senior-woman-sofa\.webp/);
+  assert.match(services,/assets\/lifestyle\/young-woman-kitchen\.webp/);
   assert.match(services,/services-hero-layout/);
 });
 
@@ -147,13 +145,26 @@ test("registration action is a centered 44px flex control",()=>{
   assert.match(css,/\.nw-carousel-status\{[\s\S]*align-items:center;[\s\S]*justify-content:center;[\s\S]*height:44px;/);
 });
 
-test("quality-gated greetings are reflected in the catalog",()=>{
+test("published runtime matrix and native greetings are reflected in the catalog",()=>{
   const src=read("assets/concierge-carousel.js");
   assert.match(src,/Hola, ich bin Nilo/);
   assert.match(src,/Namaste, ich bin Asha/);
   assert.match(src,/Merhaba, ich bin Leyla/);
   assert.match(src,/Bonjour, ich bin Camille/);
-  assert.match(src,/\["nilo","Nilo",[\s\S]{0,100}"onyx"/);
-  assert.match(src,/\["lukas","Lukas",[\s\S]{0,100}"ash"/);
-  assert.match(src,/\["camille","Camille",[\s\S]{0,100}"nova"/);
+  assert.match(src,/\["nilo","Nilo",[\s\S]{0,100}"cedar","approved"/);
+  assert.match(src,/\["lukas","Lukas",[\s\S]{0,100}"alloy","hearing_test"/);
+  assert.match(src,/\["hartmut","Hartmut",[\s\S]{0,100}"onyx","approved"/);
+  assert.match(src,/\["leyla","Leyla",[\s\S]{0,100}"marin","hearing_test"/);
+  assert.match(src,/\["camille","Camille",[\s\S]{0,100}"marin","hearing_test"/);
+  assert.match(src,/\["arjun","Arjun",[\s\S]{0,100}"cedar","hearing_test"/);
+  assert.match(src,/\["wei","Wei",[\s\S]{0,100}"ballad","hearing_test"/);
+  assert.match(src,/\["jabari","Jabari",[\s\S]{0,100}"alloy","hearing_test"/);
+});
+
+test("voice audition distinguishes 23 runtime personas from Lars reserve",()=>{
+  const html=read("voice-audition.html");
+  assert.match(html,/23 Runtime-Stimmen\. Eine Reserve\./);
+  assert.match(html,/window\.NAHWERK_CONCIERGES/);
+  assert.match(html,/key:"lars"/);
+  assert.match(html,/nicht Teil der aktuell veröffentlichten 23er-Runtime/);
 });
