@@ -109,10 +109,16 @@ test("24-persona audition page exposes every tuned voice including Lars",async({
   await page.goto("http://127.0.0.1:4173/voice-audition.html",{waitUntil:"networkidle"});
   const controls=page.locator(".voice-audition-card .nw-voice-preview-control");
   await expect(controls).toHaveCount(24);
-  for(const key of ["nilo","lukas","hartmut","frida","lars"]){
+  for(const key of ["nilo","lukas","lars"]){
     const control=page.locator(`.voice-audition-card[data-key="${key}"] .nw-voice-preview-control`);
     await expect(control).toHaveAttribute("data-provisional","true");
     await expect(control.locator(".nw-voice-preview-badge")).toHaveText("Test");
+  }
+  for(const key of ["hartmut","frida"]){
+    const control=page.locator(`.voice-audition-card[data-key="${key}"] .nw-voice-preview-control`);
+    await expect(control).toHaveAttribute("data-rework","true");
+    await expect(control.locator(".nw-voice-preview-button")).toBeDisabled();
+    await expect(control.locator(".nw-voice-preview-copy")).toHaveText("Stimme wird überarbeitet");
   }
   const lars=page.locator('[data-concierge-key="lars"] .nw-voice-preview-button');
   await lars.click();
