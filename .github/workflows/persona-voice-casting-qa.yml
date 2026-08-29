@@ -63,7 +63,7 @@ jobs:
 
             if [ -n "$best_variant" ]; then
               echo "WINNER ${key}: variant=${best_variant} voice=${best_voice} score=${best_score}" | tee -a /tmp/persona-qa/results.txt
-              ffmpeg -hide_banner -loglevel error -y                 -i "/tmp/persona-qa/${key}-${best_variant}.wav"                 -codec:a libmp3lame -b:a 128k                 "assets/concierges/voice-samples/${key}.mp3"
+              cp "/tmp/persona-qa/${key}-${best_variant}.mp3" "assets/concierges/voice-samples/${key}.mp3"
               accepted="$accepted $key"
             else
               echo "NO_WINNER ${key}: current sample retained" | tee -a /tmp/persona-qa/results.txt
