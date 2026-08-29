@@ -6,7 +6,7 @@ import path from "node:path";
 const root=process.cwd();
 const profiles=[
 ["nilo","Nilo","cedar","hearing_test"],["mira","Mira","marin","hearing_test"],["lena","Lena","coral","hearing_test"],["lukas","Lukas","alloy","hearing_test"],
-["hartmut","Hartmut","ballad","hearing_test"],["frida","Frida","sage","hearing_test"],["asha","Asha","shimmer","hearing_test"],["sari","Sari","nova","hearing_test"],
+["hartmut","Hartmut","ballad","voice_rework"],["frida","Frida","sage","voice_rework"],["asha","Asha","shimmer","hearing_test"],["sari","Sari","nova","hearing_test"],
 ["leyla","Leyla","coral","hearing_test"],["noor","Noor","sage","hearing_test"],["sofia","Sofia","verse","hearing_test"],["camille","Camille","marin","hearing_test"],
 ["anna","Anna","nova","hearing_test"],["olena","Olena","shimmer","hearing_test"],["mei","Mei","sage","hearing_test"],["amara","Amara","coral","hearing_test"],
 ["kwame","Kwame","cedar","hearing_test"],["zuri","Zuri","shimmer","hearing_test"],["jabari","Jabari","onyx","hearing_test"],["arjun","Arjun","ash","hearing_test"],
