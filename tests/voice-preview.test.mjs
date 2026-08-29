@@ -65,7 +65,7 @@ test("every real concierge surface loads preview assets before carousel",()=>{
     const html=read(page);
     const css=html.indexOf("concierge-voice-preview.css?v=4");
     const js=html.indexOf("concierge-voice-preview.js?v=4");
-    const carousel=html.indexOf("concierge-carousel.js?v=10");
+    const carousel=html.indexOf("concierge-carousel.js?v=11");
     assert.ok(css>=0,page+" missing preview CSS");
     assert.ok(js>=0,page+" missing preview JS");
     assert.ok(carousel>js,page+" must load preview JS before carousel");
@@ -167,4 +167,12 @@ test("voice audition distinguishes 23 runtime personas from Lars reserve",()=>{
   assert.match(html,/window\.NAHWERK_CONCIERGES/);
   assert.match(html,/key:"lars"/);
   assert.match(html,/nicht Teil der aktuell veröffentlichten 23er-Runtime/);
+});
+
+test("mobile menu is viewport fixed beneath sticky header",()=>{
+  const auth=read("assets/auth-nav.js");
+  assert.match(auth,/position:fixed!important/);
+  assert.match(auth,/--nw-mobile-menu-top/);
+  assert.match(auth,/syncMenuTop/);
+  assert.match(auth,/position:sticky!important/);
 });
