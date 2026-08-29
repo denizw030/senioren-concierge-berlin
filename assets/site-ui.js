@@ -22,6 +22,10 @@
     const main = document.querySelector('main');
     if (main) main.id ||= 'main-content';
 
+    const sofa=document.querySelector('img[src*="senior-woman-sofa"]'); if(sofa){sofa.src='assets/NAHWERK-Concierge-Ältere-Frau-Wohnzimmer.png?v=1'; sofa.removeAttribute('srcset'); sofa.style.objectPosition='center 38%';}
+    const heroStage=document.querySelector('.home-hero .concierge-stage'); if(heroStage && heroStage.querySelector('.portrait')){heroStage.innerHTML='<div data-concierge-carousel data-variant="compact" data-register-url="registrieren.html?produkt=prime" data-label="Persönliche NAHWERK Concierges"></div>'; window.NAHWERKCarousel?.autoMount?.(heroStage);}
+    if(document.body.classList.contains('concierge-overview-page')){const rc=document.createElement('link');rc.rel='stylesheet';rc.href='assets/region-reference-2026.css?v=1';document.head.append(rc);const rs=document.createElement('script');rs.src='assets/region-reference-2026.js?v=1';document.body.append(rs);}
+
     document.querySelectorAll('img').forEach((img) => {
       if (!img.hasAttribute('loading') && !img.closest('.hero,.home-hero')) img.loading = 'lazy';
       if (!img.hasAttribute('decoding')) img.decoding = 'async';
