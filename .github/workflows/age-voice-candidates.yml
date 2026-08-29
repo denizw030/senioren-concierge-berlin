@@ -1,0 +1,84 @@
+name: Age-cast senior voice candidates
+
+on:
+  push:
+    branches:
+      - staging/website-concierge-voice-preview-01
+    paths:
+      - .github/workflows/age-voice-candidates.yml
+
+permissions:
+  contents: write
+
+jobs:
+  cast:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: staging/website-concierge-voice-preview-01
+
+      - name: Generate, evaluate and select senior voices
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://btqklftjmwtqqqdmwlnk.supabase.co/functions/v1/nw-voice-age-candidate-20260829"
+          mkdir -p /tmp/voice-age-qa assets/concierges/voice-samples
+          : > /tmp/voice-age-qa/results.txt
+
+          for key in hartmut frida; do
+            best_score=-1
+            best_variant=""
+            best_age=0
+            best_fit=0
+            for variant in 0 1 2; do
+              wav="/tmp/voice-age-qa/${key}-${variant}.wav"
+              json="/tmp/voice-age-qa/${key}-${variant}.json"
+              echo "Generating ${key} candidate ${variant}"
+              curl --fail --silent --show-error --location --retry 2                 "$base?token=ageqa_7pK4vN2xQ9mR6sT8&key=${key}&variant=${variant}"                 -o "$wav"
+              test -s "$wav"
+              curl --fail --silent --show-error --location --retry 2                 -X POST -H "content-type: audio/wav"                 --data-binary "@$wav"                 "$base?token=ageqa_7pK4vN2xQ9mR6sT8&key=${key}&variant=${variant}"                 -o "$json"
+
+              cat "$json"
+              echo
+              age=$(jq -r '.perceived_age // 0' "$json")
+              senior=$(jq -r '.senior_fit // 0' "$json")
+              natural=$(jq -r '.naturalness // 0' "$json")
+              persona=$(jq -r '.persona_fit // 0' "$json")
+              voice=$(jq -r '.voice // "unknown"' "$json")
+              score=$(( senior * 4 + natural * 2 + persona * 2 ))
+              echo "${key} variant=${variant} voice=${voice} age=${age} senior=${senior} natural=${natural} persona=${persona} score=${score}" | tee -a /tmp/voice-age-qa/results.txt
+
+              if [ "$age" -ge 60 ] && [ "$senior" -ge 7 ] && [ "$score" -gt "$best_score" ]; then
+                best_score="$score"
+                best_variant="$variant"
+                best_age="$age"
+                best_fit="$senior"
+              fi
+            done
+
+            if [ -z "$best_variant" ]; then
+              echo "QUALITY_GATE_FAILED for ${key}: no candidate sounded convincingly senior." >&2
+              cat /tmp/voice-age-qa/results.txt >&2
+              exit 1
+            fi
+
+            echo "WINNER ${key}: variant=${best_variant} perceived_age=${best_age} senior_fit=${best_fit} score=${best_score}" | tee -a /tmp/voice-age-qa/results.txt
+            ffmpeg -hide_banner -loglevel error -y -i "/tmp/voice-age-qa/${key}-${best_variant}.wav"               -codec:a libmp3lame -b:a 128k "assets/concierges/voice-samples/${key}.mp3"
+          done
+
+          cat /tmp/voice-age-qa/results.txt
+
+      - name: Commit only quality-gated senior samples
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "NAHWERK Voice QA"
+          git config user.email "actions@users.noreply.github.com"
+          git add assets/concierges/voice-samples/hartmut.mp3 assets/concierges/voice-samples/frida.mp3
+          if git diff --cached --quiet; then
+            echo "No audio changes"
+            exit 0
+          fi
+          git commit -m "Replace senior voices with age-cast audio candidates"
+          git push origin HEAD:staging/website-concierge-voice-preview-01
