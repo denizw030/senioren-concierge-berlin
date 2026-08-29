@@ -86,7 +86,9 @@ test("voice click never changes registration selection, normal selection still w
 
 test("provisional voices are explicitly labelled as test voices",async({page})=>{
   await page.goto("http://127.0.0.1:4173/index.html",{waitUntil:"networkidle"});
+  const root=page.locator("[data-concierge-carousel]");
   for(const key of ["jabari","arjun"]){
+    await root.evaluate((el,key)=>el._nahwerkCarousel.select(key),key);
     const control=page.locator(`.nw-voice-preview-control[data-concierge-key="${key}"]`);
     await expect(control).toHaveAttribute("data-provisional","true");
     await expect(control.locator(".nw-voice-preview-badge")).toHaveText("Test");
