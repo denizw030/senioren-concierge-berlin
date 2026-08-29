@@ -1,0 +1,96 @@
+name: Persona voice casting QA
+
+on:
+  push:
+    branches:
+      - staging/website-concierge-voice-preview-01
+    paths:
+      - .github/workflows/persona-voice-casting-qa.yml
+
+permissions:
+  contents: write
+
+jobs:
+  cast:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: staging/website-concierge-voice-preview-01
+      - name: Generate and evaluate persona candidates
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://btqklftjmwtqqqdmwlnk.supabase.co/functions/v1/nw-voice-persona-qa-20260829/personaQa-8Kf2Qm7Ls4"
+          mkdir -p /tmp/persona-qa assets/concierges/voice-samples
+          : > /tmp/persona-qa/results.txt
+          accepted=""
+
+          for key in nilo lukas mira asha leyla camille; do
+            best_score=-1
+            best_variant=""
+            best_voice=""
+            for variant in 0 1; do
+              wav="/tmp/persona-qa/${key}-${variant}.wav"
+              json="/tmp/persona-qa/${key}-${variant}.json"
+
+              echo "Generating ${key} candidate ${variant}"
+              curl --fail --silent --show-error --location --retry 1                 "$base/generate/${key}/${variant}" -o "$wav"
+              test -s "$wav"
+
+              curl --fail --silent --show-error --location --retry 1                 -X POST -H "content-type: audio/wav" --data-binary "@$wav"                 "$base/evaluate/${key}/${variant}" -o "$json"
+
+              age=$(jq -r '.age_fit // 0' "$json")
+              accent=$(jq -r '.accent_fit // 0' "$json")
+              persona=$(jq -r '.persona_fit // 0' "$json")
+              natural=$(jq -r '.naturalness // 0' "$json")
+              intel=$(jq -r '.intelligibility // 0' "$json")
+              premium=$(jq -r '.premium // 0' "$json")
+              perceived=$(jq -r '.perceived_age // 0' "$json")
+              voice=$(jq -r '.voice // "unknown"' "$json")
+              score=$(( age*2 + accent*3 + persona*2 + natural*2 + intel*2 + premium ))
+
+              echo "${key} variant=${variant} voice=${voice} perceived_age=${perceived} age_fit=${age} accent_fit=${accent} persona_fit=${persona} naturalness=${natural} intelligibility=${intel} premium=${premium} score=${score}" | tee -a /tmp/persona-qa/results.txt
+
+              accent_gate=6
+              if [ "$key" = "lukas" ]; then accent_gate=7; fi
+              if [ "$age" -ge 7 ] && [ "$accent" -ge "$accent_gate" ] && [ "$persona" -ge 7 ] && [ "$natural" -ge 7 ] && [ "$intel" -ge 8 ] && [ "$premium" -ge 6 ] && [ "$score" -gt "$best_score" ]; then
+                best_score="$score"
+                best_variant="$variant"
+                best_voice="$voice"
+              fi
+            done
+
+            if [ -n "$best_variant" ]; then
+              echo "WINNER ${key}: variant=${best_variant} voice=${best_voice} score=${best_score}" | tee -a /tmp/persona-qa/results.txt
+              ffmpeg -hide_banner -loglevel error -y                 -i "/tmp/persona-qa/${key}-${best_variant}.wav"                 -codec:a libmp3lame -b:a 128k                 "assets/concierges/voice-samples/${key}.mp3"
+              accepted="$accepted $key"
+            else
+              echo "NO_WINNER ${key}: current sample retained" | tee -a /tmp/persona-qa/results.txt
+            fi
+          done
+
+          echo "ACCEPTED:${accepted}" | tee -a /tmp/persona-qa/results.txt
+          cat /tmp/persona-qa/results.txt
+          cp /tmp/persona-qa/results.txt /tmp/persona-qa-report.txt
+
+      - name: Commit only quality-gated winners
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "NAHWERK Voice QA"
+          git config user.email "actions@users.noreply.github.com"
+          git add assets/concierges/voice-samples/*.mp3
+          if git diff --cached --quiet; then
+            echo "No persona candidate passed the quality gates."
+            exit 0
+          fi
+          git commit -m "Replace quality-gated persona voice samples"
+          git push origin HEAD:staging/website-concierge-voice-preview-01
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: persona-voice-qa-report
+          path: /tmp/persona-qa-report.txt
+          if-no-files-found: warn
