@@ -12,6 +12,7 @@ const profiles=[
 ["kwame","Kwame","cedar","hearing_test"],["zuri","Zuri","shimmer","hearing_test"],["jabari","Jabari","alloy","hearing_test"],["arjun","Arjun","cedar","hearing_test"],
 ["wei","Wei","ballad","hearing_test"],["yuki","Yuki","marin","hearing_test"],["ren","Ren","alloy","hearing_test"]
 ];
+const nativeLanguages={nilo:"es",mira:"es",lena:"de",lukas:"de",hartmut:"de",frida:"de",asha:"hi",sari:"id",leyla:"tr",noor:"ar",sofia:"es",camille:"fr",anna:"pl",olena:"uk",mei:"zh",amara:"tw",kwame:"tw",zuri:"sw",jabari:"sw",arjun:"pa",wei:"zh",yuki:"ja",ren:"ja"};
 const pages=["index.html","prime-concierge.html","senioren-concierge.html","concierges.html","registrieren.html","concierge-anpassen.html"];
 const read=p=>fs.readFileSync(path.join(root,p),"utf8");
 
@@ -24,18 +25,24 @@ test("canonical catalog contains exactly 23 voice mappings",()=>{
     const row=src.slice(start,start+240);
     assert.ok(row.includes('"'+voice+'","'+status+'"'),key+" voice/status mismatch");
   }
-  assert.ok(src.includes("voice-samples/\${key}.mp3?v=persona-runtime-20260829-1"));
+  assert.ok(src.includes("voice-samples/\${key}-\${code}.mp3?v=multilingual-20260829-1"));
 });
 
-test("all 23 runtime samples plus Lars reserve exist and are non-empty",()=>{
-  const audioKeys=[...profiles.map(([key])=>key),"lars"];
-  assert.equal(audioKeys.length,24);
-  for(const key of audioKeys){
-    const file=path.join(root,"assets/concierges/voice-samples",key+".mp3");
-    const stat=fs.statSync(file);
-    assert.ok(stat.size>20000,key+" sample unexpectedly small");
-    assert.ok(stat.size<200000,key+" sample unexpectedly large");
+test("all 65 multilingual runtime previews plus Lars reserve exist and are non-empty",()=>{
+  let count=0;
+  for(const [key] of profiles){
+    const langs=[...new Set([nativeLanguages[key],"de","en"])];
+    for(const lang of langs){
+      const file=path.join(root,"assets/concierges/voice-samples",key+"-"+lang+".mp3");
+      const stat=fs.statSync(file);
+      assert.ok(stat.size>20000,key+"-"+lang+" sample unexpectedly small");
+      assert.ok(stat.size<260000,key+"-"+lang+" sample unexpectedly large");
+      count++;
+    }
   }
+  assert.equal(count,65);
+  const reserve=fs.statSync(path.join(root,"assets/concierges/voice-samples/lars.mp3"));
+  assert.ok(reserve.size>20000);
 });
 
 test("voice preview is lazy, user initiated and single-player",()=>{
@@ -175,4 +182,49 @@ test("mobile menu is viewport fixed beneath sticky header",()=>{
   assert.match(auth,/--nw-mobile-menu-top/);
   assert.match(auth,/syncMenuTop/);
   assert.match(auth,/position:sticky!important/);
+});
+
+test("native-first language controls are complete for all 23 personas",()=>{
+  const catalog=read("assets/concierge-carousel.js");
+  const ui=read("assets/concierge-voice-preview.js");
+  for(const [key] of profiles){
+    const native=nativeLanguages[key];
+    assert.match(catalog,new RegExp('\\["'+key+'","[^"]+"[\\s\\S]{0,260}"'+native+'"\\]'));
+  }
+  assert.match(catalog,/sampleAudioByLanguage/);
+  assert.match(catalog,/previewLanguages/);
+  assert.match(ui,/nw-voice-preview-language-select/);
+  assert.match(ui,/await play\(entry\)/);
+  assert.match(ui,/select\.addEventListener\("change"/);
+});
+
+test("every origin group starts with its own greeting",()=>{
+  const src=read("assets/concierge-carousel.js");
+  for(const greeting of ["Hola, ich bin Nilo","Hola, ich bin Mira","Hallo, ich bin Lena","Guten Tag, ich bin Hartmut","Namaste, ich bin Asha","Halo, ich bin Sari","Merhaba, ich bin Leyla","Marhaba, ich bin Noor","Bonjour, ich bin Camille","Dzień dobry, ich bin Anna","Pryvit, ich bin Olena","Nǐ hǎo, ich bin Mei","Akwaaba, ich bin Amara","Akwaaba, ich bin Kwame","Jambo, ich bin Zuri","Jambo, ich bin Jabari","Sat Sri Akal, ich bin Arjun","Konnichiwa, ich bin Yuki"]){
+    assert.ok(src.includes(greeting),greeting+" missing");
+  }
+});
+
+test("portrait clicks route to registration while voice controls stay separate",()=>{
+  const carousel=read("assets/concierge-carousel.js");
+  const overview=read("assets/concierge-overview.js");
+  assert.match(carousel,/if\(registerUrl\)\{goToRegistration\(index\);return;\}/);
+  assert.match(overview,/concierge-overview-card-media/);
+  assert.match(overview,/registrieren\.html\?produkt=prime&concierge=/);
+});
+
+test("app-free wording, future free app, senior logo and light first paint are present",()=>{
+  const home=read("index.html");
+  const senior=read("senioren-concierge.html");
+  const brand=read("assets/brand-2026.css");
+  const registration=read("registrieren.html");
+  assert.match(home,/Keine zusätzliche App notwendig/);
+  assert.match(home,/NAHWERK App ist in Entwicklung/);
+  assert.match(senior,/Keine zusätzliche App notwendig/);
+  assert.match(senior,/NAHWERK App ist in Entwicklung/);
+  assert.match(brand,/NAHWERKConcierge-Logo\.png/);
+  assert.match(brand,/body\.senior-product \.brandtext strong:after[\s\S]*color:#17130d!important/);
+  assert.match(brand,/body\.senior-product \.brandtext span:before[\s\S]*color:#17130d!important/);
+  assert.match(registration,/name="theme-color" content="#fffdf9"/);
+  assert.match(registration,/registration-first-paint/);
 });
