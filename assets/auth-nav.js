@@ -109,15 +109,24 @@
         toggle.setAttribute("aria-controls", nav.id);
         toggle.setAttribute("aria-expanded", "false");
         toggle.innerHTML = '<span></span><span></span><span></span>';
+        const preserveViewport = (change) => {
+          const x = window.scrollX;
+          const y = window.scrollY;
+          change();
+          requestAnimationFrame(() => {
+            if (window.scrollX !== x || window.scrollY !== y) window.scrollTo({ left:x, top:y, behavior:"auto" });
+          });
+        };
         const close = () => {
-          nav.classList.remove("is-open");
+          preserveViewport(() => nav.classList.remove("is-open"));
           toggle.setAttribute("aria-expanded", "false");
           toggle.setAttribute("aria-label", "Menü öffnen");
         };
         toggle.addEventListener("click", (event) => {
+          event.preventDefault();
           event.stopPropagation();
           const open = !nav.classList.contains("is-open");
-          nav.classList.toggle("is-open", open);
+          preserveViewport(() => nav.classList.toggle("is-open", open));
           toggle.setAttribute("aria-expanded", String(open));
           toggle.setAttribute("aria-label", open ? "Menü schließen" : "Menü öffnen");
         });
