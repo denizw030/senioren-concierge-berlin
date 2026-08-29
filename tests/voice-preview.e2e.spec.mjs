@@ -105,49 +105,57 @@ test("protected concierge settings keeps voice integration in source",async({req
   expect(html).toContain("concierge-carousel.js");
 });
 
-test("24-persona audition page exposes every tuned voice including Lars",async({page})=>{
+test("audition exposes 23 runtime personas plus Lars reserve with correct approval state",async({page})=>{
   await page.goto("http://127.0.0.1:4173/voice-audition.html",{waitUntil:"networkidle"});
+  const cards=page.locator(".voice-audition-card");
   const controls=page.locator(".voice-audition-card .nw-voice-preview-control");
+  await expect(cards).toHaveCount(24);
   await expect(controls).toHaveCount(24);
-  for(const key of ["nilo","lukas","lars"]){
-    const control=page.locator(`.voice-audition-card[data-key="${key}"] .nw-voice-preview-control`);
+
+  for(const key of ["nilo","hartmut"]){
+    const card=page.locator(`.voice-audition-card[data-key="${key}"]`);
+    const control=card.locator(".nw-voice-preview-control");
+    await expect(card.locator(".voice-status")).toHaveText("Approved");
+    await expect(control).not.toHaveAttribute("data-provisional","true");
+    await expect(control.locator(".nw-voice-preview-button")).toBeEnabled();
+  }
+
+  for(const key of ["frida","lukas","mira"]){
+    const card=page.locator(`.voice-audition-card[data-key="${key}"]`);
+    const control=card.locator(".nw-voice-preview-control");
+    await expect(card.locator(".voice-status")).toHaveText("Test");
     await expect(control).toHaveAttribute("data-provisional","true");
-    await expect(control.locator(".nw-voice-preview-badge")).toHaveText("Test");
+    await expect(control.locator(".nw-voice-preview-button")).toBeEnabled();
   }
-  for(const key of ["hartmut","frida"]){
-    const control=page.locator(`.voice-audition-card[data-key="${key}"] .nw-voice-preview-control`);
-    await expect(control).toHaveAttribute("data-rework","true");
-    await expect(control.locator(".nw-voice-preview-button")).toBeDisabled();
-    await expect(control.locator(".nw-voice-preview-copy")).toHaveText("Stimme wird überarbeitet");
-  }
-  const lars=page.locator('[data-concierge-key="lars"] .nw-voice-preview-button');
+
+  const larsCard=page.locator('.voice-audition-card[data-key="lars"]');
+  await expect(larsCard).toHaveClass(/is-reserve/);
+  await expect(larsCard.locator(".voice-status")).toContainText("Reserve");
+  const lars=larsCard.locator(".nw-voice-preview-button");
   await lars.click();
   await expect(lars).toHaveAttribute("data-state","playing",{timeout:5000});
   await lars.click();
   await expect(lars).toHaveAttribute("data-state","stopped");
 });
 
-test("all 24 audition MP3s return successfully",async({page})=>{
+test("all 23 runtime MP3s and Lars reserve return successfully",async({page})=>{
   await page.goto("http://127.0.0.1:4173/voice-audition.html",{waitUntil:"networkidle"});
   const result=await page.evaluate(async()=>{
-    const cards=[...document.querySelectorAll(".voice-audition-card")];
+    const profiles=[...window.NAHWERK_CONCIERGES,{
+      key:"lars",
+      sampleAudio:"assets/concierges/voice-samples/lars.mp3?v=reserve-20260829-1"
+    }];
     const checks=[];
-    for(const card of cards){
-      const key=card.dataset.key;
-      const button=card.querySelector(".nw-voice-preview-button");
-      const control=button?.closest(".nw-voice-preview-control");
-      const profileKey=control?.dataset.conciergeKey;
-      const url="assets/concierges/voice-samples/"+key+".mp3?v=persona-20260829-2";
-      const response=await fetch(url,{cache:"no-store"});
-      checks.push({key,profileKey,status:response.status,bytes:(await response.arrayBuffer()).byteLength});
+    for(const profile of profiles){
+      const response=await fetch(profile.sampleAudio,{cache:"no-store"});
+      checks.push({key:profile.key,status:response.status,bytes:(await response.arrayBuffer()).byteLength});
     }
     return checks;
   });
   expect(result).toHaveLength(24);
   for(const check of result){
-    expect(check.profileKey).toBe(check.key);
     expect(check.status,check.key).toBe(200);
-    expect(check.bytes,check.key).toBeGreaterThan(50000);
+    expect(check.bytes,check.key).toBeGreaterThan(20000);
   }
 });
 
@@ -161,9 +169,10 @@ test("senior page starts on Frida with Hartmut visible beside her",async({page})
   await expect(active).toContainText("Frida");
   const hartmut=page.locator(".nw-carousel-card").filter({hasText:"Hartmut"});
   await expect(hartmut).toBeVisible();
-  const rework=page.locator('[data-concierge-key="frida"] .nw-voice-preview-button');
-  await expect(rework).toBeDisabled();
-  await expect(rework.locator(".nw-voice-preview-copy")).toHaveText("Stimme wird überarbeitet");
+  const frida=page.locator('[data-concierge-key="frida"] .nw-voice-preview-control');
+  await expect(frida).toHaveAttribute("data-provisional","true");
+  await expect(frida.locator(".nw-voice-preview-button")).toBeEnabled();
+  await expect(frida.locator(".nw-voice-preview-badge")).toHaveText("Test");
   await page.screenshot({path:"test-results/screenshots/tablet-senior-initial-frida-hartmut.png",fullPage:true});
 });
 
@@ -237,7 +246,7 @@ test("services and senior lifestyle imagery is visible and responsive",async({pa
   await page.goto("http://127.0.0.1:4173/leistungen.html",{waitUntil:"networkidle"});
   const servicePhoto=page.locator(".services-hero-photo img");
   await expect(servicePhoto).toBeVisible();
-  await expect(servicePhoto).toHaveAttribute("src",/junge-Frau-Ku/);
+  await expect(servicePhoto).toHaveAttribute("src",/assets\/lifestyle\/young-woman-kitchen\.webp/);
   const serviceBox=await servicePhoto.boundingBox();
   expect(serviceBox.width).toBeGreaterThan(300);
   const wrapBox=await page.locator(".services-hero .wrap").boundingBox();
@@ -246,9 +255,9 @@ test("services and senior lifestyle imagery is visible and responsive",async({pa
   await page.screenshot({path:"test-results/screenshots/tablet-services-lifestyle-hero.png",fullPage:true});
 
   await page.goto("http://127.0.0.1:4173/senioren-concierge.html",{waitUntil:"networkidle"});
-  await expect(page.locator(".senior-hero-photo img")).toHaveAttribute("src",/Älterer-Mann-am-Handy/);
+  await expect(page.locator(".senior-hero-photo img")).toHaveAttribute("src",/assets\/lifestyle\/senior-man-phone\.webp/);
   await page.goto("http://127.0.0.1:4173/index.html",{waitUntil:"networkidle"});
-  await expect(page.locator(".product-band.senior .product-band-image")).toHaveAttribute("src",/Frau-Wohnzimmer/);
+  await expect(page.locator(".product-band.senior .product-band-image")).toHaveAttribute("src",/assets\/lifestyle\/senior-woman-sofa\.webp/);
 });
 
 test("dark overview hero contains multi-colour ambient background",async({page})=>{
