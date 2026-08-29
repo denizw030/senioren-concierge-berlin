@@ -72,7 +72,7 @@ test("every real concierge surface loads preview assets before carousel",()=>{
     const html=read(page);
     const css=html.indexOf("concierge-voice-preview.css?v=5");
     const js=html.indexOf("concierge-voice-preview.js?v=5");
-    const carousel=html.indexOf("concierge-carousel.js?v=12");
+    const carousel=html.indexOf("concierge-carousel.js?v=13");
     assert.ok(css>=0,page+" missing preview CSS");
     assert.ok(js>=0,page+" missing preview JS");
     assert.ok(carousel>js,page+" must load preview JS before carousel");
@@ -208,7 +208,8 @@ test("every origin group starts with its own greeting",()=>{
 test("portrait clicks route to registration while voice controls stay separate",()=>{
   const carousel=read("assets/concierge-carousel.js");
   const overview=read("assets/concierge-overview.js");
-  assert.match(carousel,/if\(registerUrl\)\{goToRegistration\(index\);return;\}/);
+  assert.match(carousel,/document\.createElement\(registerUrl\?"a":"button"\)/);
+  assert.match(carousel,/target\.searchParams\.set\("concierge",profile\.key\)/);
   assert.match(overview,/concierge-overview-card-media/);
   assert.match(overview,/registrieren\.html\?produkt=prime&concierge=/);
 });
