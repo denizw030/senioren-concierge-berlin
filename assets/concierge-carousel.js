@@ -189,7 +189,7 @@
     root.querySelector(".next").addEventListener("click",()=>move(1,true));
     status.addEventListener("click",()=>goToRegistration());
     stage.addEventListener("keydown",event=>{if(event.key==="ArrowLeft"){event.preventDefault();move(-1,true);}if(event.key==="ArrowRight"){event.preventDefault();move(1,true);}if(event.key==="Home"){event.preventDefault();select(0,true);}if(event.key==="End"){event.preventDefault();select(profiles.length-1,true);}});
-    stage.addEventListener("pointerdown",event=>{if(event.target.closest(".nw-voice-preview-control"))return;dragging=true;moved=false;pointerStart=event.clientX;dragX=0;stage.classList.add("is-dragging");stage.setPointerCapture?.(event.pointerId);});
+    stage.addEventListener("pointerdown",event=>{if(event.target.closest(".nw-voice-preview-control"))return;dragging=true;moved=false;pointerStart=event.clientX;dragX=0;stage.classList.add("is-dragging");if(!event.target.closest("a.nw-carousel-select"))stage.setPointerCapture?.(event.pointerId);});
     stage.addEventListener("pointermove",event=>{if(!dragging)return;dragX=event.clientX-pointerStart;moved||=Math.abs(dragX)>6;positionCards();});
     const finishDrag=()=>{if(!dragging)return;dragging=false;stage.classList.remove("is-dragging");const steps=Math.round(-dragX/Math.max(1,cardSpacing));if(steps)select(active+steps,true);else{dragX=0;positionCards();}setTimeout(()=>{moved=false;},0);};
     stage.addEventListener("pointerup",finishDrag); stage.addEventListener("pointercancel",finishDrag);
