@@ -4,8 +4,8 @@
     ["mira","Mira","Warm, verständlich und aufmerksam.","marin","hearing_test","Hallo, ich bin Mira. Ich begleite Sie aufmerksam, warm und zuverlässig im Alltag."],
     ["lena","Lena","Modern, empathisch und lösungsorientiert.","coral","hearing_test","Hallo, ich bin Lena. Ich helfe Ihnen freundlich, klar und lösungsorientiert weiter."],
     ["lukas","Lukas","Souverän, direkt und zuverlässig.","alloy","hearing_test","Hallo, ich bin Lukas. Ich unterstütze Sie klar, souverän und zuverlässig."],
-    ["hartmut","Hartmut","Ruhig, erfahren und geduldig.","ballad","hearing_test","Guten Tag, ich bin Hartmut. Ich begleite Sie ruhig, verständlich und mit Geduld."],
-    ["frida","Frida","Herzlich, klar und zugewandt.","sage","hearing_test","Guten Tag, ich bin Frida. Ich bin gern mit Ruhe, Herzlichkeit und Erfahrung für Sie da."],
+    ["hartmut","Hartmut","Ruhig, erfahren und geduldig.","ballad","voice_rework","Guten Tag, ich bin Hartmut. Ich begleite Sie ruhig, verständlich und mit Geduld."],
+    ["frida","Frida","Herzlich, klar und zugewandt.","sage","voice_rework","Guten Tag, ich bin Frida. Ich bin gern mit Ruhe, Herzlichkeit und Erfahrung für Sie da."],
     ["asha","Asha","Empathisch, aufmerksam und besonnen.","shimmer","hearing_test","Hallo, ich bin Asha. Ich unterstütze Sie aufmerksam, besonnen und freundlich."],
     ["sari","Sari","Freundlich, ruhig und lösungsorientiert.","nova","hearing_test","Hallo, ich bin Sari. Ich helfe Ihnen freundlich, ruhig und lösungsorientiert."],
     ["leyla","Leyla","Warm, direkt und verlässlich.","coral","hearing_test","Hallo, ich bin Leyla. Ich unterstütze Sie warm, direkt und verlässlich."],
@@ -146,7 +146,7 @@
       const profile=profiles[active]; name.textContent=profile.name; description.textContent=profile.description;
       const provisional=profile.voiceStatus!=="approved";
       voiceNote.hidden=!provisional;
-      voiceNote.textContent=provisional?"Die Hörprobe ist noch nicht final freigegeben.":"";
+      voiceNote.textContent=profile.voiceStatus==="voice_rework"?"Diese Stimme wird neu ausgewählt und ist vorübergehend nicht abspielbar.":provisional?"Die Hörprobe ist noch nicht final freigegeben.":"";
       status.hidden=variant!=="selection"&&!registerUrl;
       status.textContent=registerUrl?"Registrieren":"Ausgewählt";
       status.disabled=!registerUrl;
