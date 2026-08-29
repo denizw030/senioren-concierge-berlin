@@ -28,17 +28,25 @@
   }
 
   profiles.forEach((profile, index) => {
+    const card = document.createElement("article");
+    card.className = "concierge-overview-card";
+
     const button = document.createElement("button");
     button.type = "button";
-    button.className = "concierge-overview-card";
+    button.className = "concierge-overview-profile";
     button.setAttribute("aria-label", `Informationen zu ${profile.name} öffnen`);
     button.innerHTML = `<span class="concierge-overview-card-media"><span class="concierge-overview-placeholder" aria-hidden="true"><span>NAHWERK</span><small>${profile.name}</small></span><img alt="Portrait von ${profile.name}, NAHWERK Concierge" width="480" height="722" decoding="async"></span><span class="concierge-overview-card-copy"><strong>${profile.name}</strong><small>${profile.description}</small></span>`;
+    card.appendChild(button);
+
+    const voiceControl = window.NAHWERKVoicePreview?.createControl(profile,{className:"concierge-overview-voice"});
+    if (voiceControl) card.appendChild(voiceControl);
+
     const cardImage = button.querySelector("img");
     cardImage.loading = index < 4 ? "eager" : "lazy";
     if ("fetchPriority" in cardImage) cardImage.fetchPriority = index < 2 ? "high" : "auto";
     cardImage.addEventListener("load", () => {
-      button.classList.add("is-image-ready");
-      button.classList.remove("is-image-error");
+      card.classList.add("is-image-ready");
+      card.classList.remove("is-image-error");
     });
     cardImage.addEventListener("error", () => {
       if (cardImage.dataset.fallbackUsed !== "1" && profile.largeImage) {
@@ -46,12 +54,12 @@
         cardImage.src = profile.largeImage;
         return;
       }
-      button.classList.add("is-image-error");
+      card.classList.add("is-image-error");
     });
     cardImage.src = profile.cardImage || profile.image;
     if (index < 2) cardImage.decode?.().catch(() => {});
     button.addEventListener("click", () => openProfile(profile, button));
-    grid.appendChild(button);
+    grid.appendChild(card);
   });
 
   close.addEventListener("click", () => dialog.close());

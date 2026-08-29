@@ -1,7 +1,36 @@
 (() => {
   const profiles = [
-    ["nilo","Nilo","Klar, ruhig und strukturiert."],["mira","Mira","Warm, verständlich und aufmerksam."],["lena","Lena","Modern, empathisch und lösungsorientiert."],["lukas","Lukas","Souverän, direkt und zuverlässig."],["hartmut","Hartmut","Ruhig, erfahren und geduldig."],["frida","Frida","Herzlich, klar und zugewandt."],["asha","Asha","Empathisch, aufmerksam und besonnen."],["sari","Sari","Freundlich, ruhig und lösungsorientiert."],["leyla","Leyla","Warm, direkt und verlässlich."],["noor","Noor","Aufmerksam, feinfühlig und strukturiert."],["sofia","Sofia","Lebendig, herzlich und klar."],["camille","Camille","Elegant, ruhig und präzise."],["anna","Anna","Pragmatisch, freundlich und zuverlässig."],["olena","Olena","Einfühlsam, klar und ausdauernd."],["mei","Mei","Bedacht, modern und aufmerksam."],["amara","Amara","Souverän, herzlich und lösungsstark."],["kwame","Kwame","Gelassen, verbindlich und strukturiert."],["zuri","Zuri","Positiv, aufmerksam und klar."],["jabari","Jabari","Ruhig, selbstbewusst und zuverlässig."],["arjun","Arjun","Analytisch, freundlich und lösungsorientiert."],["wei","Wei","Präzise, besonnen und effizient."],["yuki","Yuki","Ruhig, modern und detailbewusst."],["ren","Ren","Klar, ausgeglichen und zuverlässig."]
-  ].map(([key,name,description]) => ({key,name,image:`assets/concierges/large/${key}.webp`,cardImage:`assets/concierges/card/${key}.webp`,largeImage:`assets/concierges/large/${key}.webp`,description}));
+    ["nilo","Nilo","Klar, ruhig und strukturiert.","cedar","approved","ruhig und klar"],
+    ["mira","Mira","Warm, verständlich und aufmerksam.","marin","approved","warm und aufmerksam"],
+    ["lena","Lena","Modern, empathisch und lösungsorientiert.","coral","approved","empathisch und lösungsorientiert"],
+    ["lukas","Lukas","Souverän, direkt und zuverlässig.","alloy","approved","souverän und zuverlässig"],
+    ["hartmut","Hartmut","Ruhig, erfahren und geduldig.","ballad","hearing_test","ruhig und geduldig"],
+    ["frida","Frida","Herzlich, klar und zugewandt.","sage","approved","herzlich und klar"],
+    ["asha","Asha","Empathisch, aufmerksam und besonnen.","shimmer","hearing_test","aufmerksam und besonnen"],
+    ["sari","Sari","Freundlich, ruhig und lösungsorientiert.","coral","approved","freundlich und lösungsorientiert"],
+    ["leyla","Leyla","Warm, direkt und verlässlich.","marin","approved","warm und verlässlich"],
+    ["noor","Noor","Aufmerksam, feinfühlig und strukturiert.","sage","approved","feinfühlig und strukturiert"],
+    ["sofia","Sofia","Lebendig, herzlich und klar.","shimmer","approved","herzlich und klar"],
+    ["camille","Camille","Elegant, ruhig und präzise.","marin","approved","ruhig und präzise"],
+    ["anna","Anna","Pragmatisch, freundlich und zuverlässig.","coral","hearing_test_optional","pragmatisch und freundlich"],
+    ["olena","Olena","Einfühlsam, klar und ausdauernd.","shimmer","hearing_test","einfühlsam und klar"],
+    ["mei","Mei","Bedacht, modern und aufmerksam.","sage","approved","bedacht und aufmerksam"],
+    ["amara","Amara","Souverän, herzlich und lösungsstark.","coral","hearing_test","souverän und herzlich"],
+    ["kwame","Kwame","Gelassen, verbindlich und strukturiert.","cedar","validation","gelassen und verbindlich"],
+    ["zuri","Zuri","Positiv, aufmerksam und klar.","shimmer","hearing_test","positiv und aufmerksam"],
+    ["jabari","Jabari","Ruhig, selbstbewusst und zuverlässig.","alloy","hearing_test","ruhig und zuverlässig"],
+    ["arjun","Arjun","Analytisch, freundlich und lösungsorientiert.","cedar","validation","analytisch und lösungsorientiert"],
+    ["wei","Wei","Präzise, besonnen und effizient.","ballad","hearing_test","präzise und besonnen"],
+    ["yuki","Yuki","Ruhig, modern und detailbewusst.","marin","validation","ruhig und detailbewusst"],
+    ["ren","Ren","Klar, ausgeglichen und zuverlässig.","alloy","hearing_test_optional","klar und ausgeglichen"]
+  ].map(([key,name,description,voice,voiceStatus,sampleStyle]) => ({
+    key,name,description,voice,voiceStatus,
+    image:`assets/concierges/large/${key}.webp`,
+    cardImage:`assets/concierges/card/${key}.webp`,
+    largeImage:`assets/concierges/large/${key}.webp`,
+    sampleAudio:`assets/concierges/voice-samples/${key}.mp3`,
+    sampleText:`Hallo, ich bin ${name}, Ihr KI-Concierge. Ich begleite Sie ${sampleStyle} im Alltag.`
+  }));
   const byKey = Object.fromEntries(profiles.map(profile => [profile.key,profile]));
   const mod = value => (value % profiles.length + profiles.length) % profiles.length;
   const circularDelta = (from,to) => { let delta=mod(to-from); if(delta>Math.floor(profiles.length/2)) delta-=profiles.length; return delta; };
@@ -20,8 +49,8 @@
     root.classList.add("nw-carousel");
     root.setAttribute("role","region");
     root.setAttribute("aria-label",root.dataset.label||"KI-Concierge auswählen");
-    root.innerHTML=`<button class="nw-carousel-arrow prev" type="button" aria-label="Vorherigen Concierge anzeigen">‹</button><div class="nw-carousel-stage" tabindex="0" aria-roledescription="Karussell"><div class="nw-carousel-track"></div></div><button class="nw-carousel-arrow next" type="button" aria-label="Nächsten Concierge anzeigen">›</button><div class="nw-carousel-info" aria-live="polite"><h3 class="nw-carousel-name"></h3><p class="nw-carousel-description"></p><p class="nw-carousel-language-note">Concierge und gewünschte Sprache können unabhängig voneinander gewählt werden.</p><button class="nw-carousel-status" type="button" hidden>Ausgewählt</button></div>${inputName?`<input type="hidden" name="${inputName}" value="${profiles[active].key}">`:""}`;
-    const stage=root.querySelector(".nw-carousel-stage"),track=root.querySelector(".nw-carousel-track"),name=root.querySelector(".nw-carousel-name"),description=root.querySelector(".nw-carousel-description"),status=root.querySelector(".nw-carousel-status"),input=inputName?root.querySelector(`[name="${inputName}"]`):null;
+    root.innerHTML=`<button class="nw-carousel-arrow prev" type="button" aria-label="Vorherigen Concierge anzeigen">‹</button><div class="nw-carousel-stage" tabindex="0" aria-roledescription="Karussell"><div class="nw-carousel-track"></div></div><button class="nw-carousel-arrow next" type="button" aria-label="Nächsten Concierge anzeigen">›</button><div class="nw-carousel-info" aria-live="polite"><h3 class="nw-carousel-name"></h3><p class="nw-carousel-description"></p><p class="nw-carousel-language-note">Concierge und gewünschte Sprache können unabhängig voneinander gewählt werden.</p><p class="nw-carousel-voice-note" hidden></p><button class="nw-carousel-status" type="button" hidden>Ausgewählt</button></div>${inputName?`<input type="hidden" name="${inputName}" value="${profiles[active].key}">`:""}`;
+    const stage=root.querySelector(".nw-carousel-stage"),track=root.querySelector(".nw-carousel-track"),name=root.querySelector(".nw-carousel-name"),description=root.querySelector(".nw-carousel-description"),voiceNote=root.querySelector(".nw-carousel-voice-note"),status=root.querySelector(".nw-carousel-status"),input=inputName?root.querySelector(`[name="${inputName}"]`):null;
 
     function goToRegistration(index=active){
       if(!registerUrl)return;
@@ -31,11 +60,16 @@
     }
 
     const cards=profiles.map((profile,index)=>{
-      const card=document.createElement("button");
-      card.type="button"; card.className="nw-carousel-card"; card.dataset.index=String(index);
-      card.setAttribute("aria-label",`${profile.name} anzeigen`);
-      card.innerHTML=`<img alt="Portrait von ${profile.name}, NAHWERK Concierge" width="480" height="722" decoding="async"><span>${profile.name}</span>`;
-      const image=card.querySelector("img");
+      const card=document.createElement("div");
+      card.className="nw-carousel-card"; card.dataset.index=String(index);
+      const selectButton=document.createElement("button");
+      selectButton.type="button"; selectButton.className="nw-carousel-select";
+      selectButton.setAttribute("aria-label",`${profile.name} anzeigen`);
+      selectButton.innerHTML=`<img alt="Portrait von ${profile.name}, NAHWERK Concierge" width="480" height="722" decoding="async"><span>${profile.name}</span>`;
+      card.appendChild(selectButton);
+      const voiceControl=window.NAHWERKVoicePreview?.createControl(profile,{className:"nw-carousel-voice"});
+      if(voiceControl) card.appendChild(voiceControl);
+      const image=selectButton.querySelector("img");
       image.dataset.src=profile.cardImage;
       image.dataset.srcset=`${profile.cardImage} 480w, ${profile.largeImage} 900w`;
       image.dataset.sizes="(max-width: 700px) 52vw, 420px";
@@ -50,7 +84,7 @@
         }
         card.classList.add("is-image-error");card.classList.remove("is-image-loading");
       });
-      card.addEventListener("click",()=>{
+      selectButton.addEventListener("click",()=>{
         if(moved)return;
         if(index===active&&registerUrl){goToRegistration(index);return;}
         select(index,true);
@@ -93,16 +127,21 @@
         card.style.zIndex=String(30-Math.round(distance*3));
         card.style.pointerEvents=distance>3.6?"none":"auto";
         card.classList.toggle("is-near",distance<=2.2);
-        const isActive=index===active;
-        card.classList.toggle("is-active",isActive); card.setAttribute("aria-pressed",isActive?"true":"false"); card.tabIndex=distance<=3.6?0:-1;
-        card.setAttribute("aria-label",isActive&&registerUrl?`${profiles[index].name} auswählen und registrieren`:`${profiles[index].name} anzeigen`);
-        card.title=isActive&&registerUrl?`${profiles[index].name} auswählen und registrieren`:`${profiles[index].name} anzeigen`;
+        const isActive=index===active,selectButton=card.querySelector(".nw-carousel-select");
+        card.classList.toggle("is-active",isActive);
+        selectButton.setAttribute("aria-pressed",isActive?"true":"false");
+        selectButton.tabIndex=distance<=3.6?0:-1;
+        selectButton.setAttribute("aria-label",isActive&&registerUrl?`${profiles[index].name} auswählen und registrieren`:`${profiles[index].name} anzeigen`);
+        selectButton.title=isActive&&registerUrl?`${profiles[index].name} auswählen und registrieren`:`${profiles[index].name} anzeigen`;
         if(distance<=2.2) ensureImage(index,isActive||distance<=1.05?"high":"auto");
       });
     }
 
     function updateInfo(emit=false){
       const profile=profiles[active]; name.textContent=profile.name; description.textContent=profile.description;
+      const provisional=profile.voiceStatus!=="approved";
+      voiceNote.hidden=!provisional;
+      voiceNote.textContent=provisional?"Diese Hörprobe verwendet die aktuell zugeordnete Teststimme; die Qualitätsfreigabe ist noch offen.":"";
       status.hidden=variant!=="selection"&&!registerUrl;
       status.textContent=registerUrl?"Registrieren":"Ausgewählt";
       status.disabled=!registerUrl;
@@ -115,6 +154,7 @@
       if(!numeric&&index<0)return;
       const next=mod(index);
       if(next===active&&dragX===0)return;
+      window.NAHWERKVoicePreview?.stopAll();
       active=next; dragX=0; warmWindow(active); positionCards(); updateInfo(emit);
     }
 
@@ -123,7 +163,7 @@
     root.querySelector(".next").addEventListener("click",()=>move(1,true));
     status.addEventListener("click",()=>goToRegistration());
     stage.addEventListener("keydown",event=>{if(event.key==="ArrowLeft"){event.preventDefault();move(-1,true);}if(event.key==="ArrowRight"){event.preventDefault();move(1,true);}if(event.key==="Home"){event.preventDefault();select(0,true);}if(event.key==="End"){event.preventDefault();select(profiles.length-1,true);}});
-    stage.addEventListener("pointerdown",event=>{dragging=true;moved=false;pointerStart=event.clientX;dragX=0;stage.classList.add("is-dragging");stage.setPointerCapture?.(event.pointerId);});
+    stage.addEventListener("pointerdown",event=>{if(event.target.closest(".nw-voice-preview-control"))return;dragging=true;moved=false;pointerStart=event.clientX;dragX=0;stage.classList.add("is-dragging");stage.setPointerCapture?.(event.pointerId);});
     stage.addEventListener("pointermove",event=>{if(!dragging)return;dragX=event.clientX-pointerStart;moved||=Math.abs(dragX)>6;positionCards();});
     const finishDrag=()=>{if(!dragging)return;dragging=false;stage.classList.remove("is-dragging");const steps=Math.round(-dragX/Math.max(1,cardSpacing));if(steps)select(active+steps,true);else{dragX=0;positionCards();}setTimeout(()=>{moved=false;},0);};
     stage.addEventListener("pointerup",finishDrag); stage.addEventListener("pointercancel",finishDrag);
