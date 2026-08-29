@@ -21,3 +21,29 @@
 .concierge-overview-select:hover{background:#fff;transform:translateY(-1px)}
 .concierge-overview-select:focus-visible{outline:2px solid #d9b95f;outline-offset:3px}
 @media(max-width:720px){.concierge-overview-actions{align-items:stretch;flex-direction:column}.concierge-overview-actions .nw-voice-preview-control,.concierge-overview-actions .nw-voice-preview-button,.concierge-overview-select{width:100%;box-sizing:border-box}.concierge-overview-actions .nw-voice-preview-button{min-height:44px}.concierge-overview-select{min-height:44px}}
+
+/* Continuation 03: keep gallery media flush with the card shell. */
+.concierge-overview-card{
+  border-radius:22px;
+  overflow:hidden;
+  isolation:isolate;
+}
+.concierge-overview-profile{
+  border-radius:inherit;
+  overflow:hidden;
+}
+.concierge-overview-card-media{
+  border-radius:0!important;
+  overflow:hidden;
+}
+.concierge-overview-card .concierge-overview-card-media img{
+  inset:0;
+  width:100%;
+  height:100%;
+  border-radius:0!important;
+  object-fit:cover;
+  object-position:center top;
+}
+@media(max-width:720px){
+  .concierge-overview-card{border-radius:18px}
+}
