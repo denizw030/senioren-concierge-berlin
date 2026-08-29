@@ -22,7 +22,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          base="https://btqklftjmwtqqqdmwlnk.supabase.co/functions/v1/nw-voice-age-candidate-20260829"
+          base="https://btqklftjmwtqqqdmwlnk.supabase.co/functions/v1/nw-voice-age-candidate-20260829/castSenior-4mQ8xP2v"
           mkdir -p /tmp/voice-age-qa assets/concierges/voice-samples
           : > /tmp/voice-age-qa/results.txt
 
@@ -31,25 +31,27 @@ jobs:
             best_variant=""
             best_age=0
             best_fit=0
+
             for variant in 0 1 2; do
               wav="/tmp/voice-age-qa/${key}-${variant}.wav"
               json="/tmp/voice-age-qa/${key}-${variant}.json"
-              echo "Generating ${key} candidate ${variant}"
-              curl --fail --silent --show-error --location --retry 2                 "$base?token=ageqa_7pK4vN2xQ9mR6sT8&key=${key}&variant=${variant}"                 -o "$wav"
-              test -s "$wav"
-              curl --fail --silent --show-error --location --retry 2                 -X POST -H "content-type: audio/wav"                 --data-binary "@$wav"                 "$base?token=ageqa_7pK4vN2xQ9mR6sT8&key=${key}&variant=${variant}"                 -o "$json"
 
-              cat "$json"
-              echo
+              echo "Generating ${key} candidate ${variant}"
+              curl --fail --silent --show-error --location --retry 1                 "$base/generate/${key}/${variant}" -o "$wav"
+              test -s "$wav"
+
+              curl --fail --silent --show-error --location --retry 1                 -X POST -H "content-type: audio/wav" --data-binary "@$wav"                 "$base/evaluate/${key}/${variant}" -o "$json"
+
               age=$(jq -r '.perceived_age // 0' "$json")
               senior=$(jq -r '.senior_fit // 0' "$json")
               natural=$(jq -r '.naturalness // 0' "$json")
               persona=$(jq -r '.persona_fit // 0' "$json")
               voice=$(jq -r '.voice // "unknown"' "$json")
               score=$(( senior * 4 + natural * 2 + persona * 2 ))
-              echo "${key} variant=${variant} voice=${voice} age=${age} senior=${senior} natural=${natural} persona=${persona} score=${score}" | tee -a /tmp/voice-age-qa/results.txt
 
-              if [ "$age" -ge 60 ] && [ "$senior" -ge 7 ] && [ "$score" -gt "$best_score" ]; then
+              echo "${key} variant=${variant} voice=${voice} perceived_age=${age} senior_fit=${senior} naturalness=${natural} persona_fit=${persona} score=${score}" | tee -a /tmp/voice-age-qa/results.txt
+
+              if [ "$age" -ge 60 ] && [ "$senior" -ge 7 ] && [ "$natural" -ge 6 ] && [ "$score" -gt "$best_score" ]; then
                 best_score="$score"
                 best_variant="$variant"
                 best_age="$age"
@@ -64,23 +66,17 @@ jobs:
             fi
 
             echo "WINNER ${key}: variant=${best_variant} perceived_age=${best_age} senior_fit=${best_fit} score=${best_score}" | tee -a /tmp/voice-age-qa/results.txt
-            ffmpeg -hide_banner -loglevel error -y -i "/tmp/voice-age-qa/${key}-${best_variant}.wav"               -codec:a libmp3lame -b:a 128k "assets/concierges/voice-samples/${key}.mp3"
+            ffmpeg -hide_banner -loglevel error -y               -i "/tmp/voice-age-qa/${key}-${best_variant}.wav"               -codec:a libmp3lame -b:a 128k               "assets/concierges/voice-samples/${key}.mp3"
           done
 
           cat /tmp/voice-age-qa/results.txt
 
-      - name: Commit only quality-gated senior samples
+      - name: Commit quality-gated senior samples
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "NAHWERK Voice QA"
           git config user.email "actions@users.noreply.github.com"
           git add assets/concierges/voice-samples/hartmut.mp3 assets/concierges/voice-samples/frida.mp3
-          if git diff --cached --quiet; then
-            echo "No audio changes"
-            exit 0
-          fi
           git commit -m "Replace senior voices with age-cast audio candidates"
           git push origin HEAD:staging/website-concierge-voice-preview-01
-
-# diagnostic trigger 2
