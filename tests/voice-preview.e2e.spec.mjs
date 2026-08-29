@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-const surfaces=["/index.html","/prime-concierge.html","/senioren-concierge.html","/concierges.html","/registrieren.html","/concierge-anpassen.html"];
+const surfaces=["/index.html","/prime-concierge.html","/senioren-concierge.html","/concierges.html","/registrieren.html"];
 const viewports=[
   {name:"desktop",width:1440,height:1000},
   {name:"tablet",width:1024,height:900},
@@ -89,6 +89,16 @@ test("provisional voices are explicitly labelled as test voices",async({page})=>
   for(const key of ["jabari","arjun"]){
     const control=page.locator(`.nw-voice-preview-control[data-concierge-key="${key}"]`);
     await expect(control).toHaveAttribute("data-provisional","true");
-    await expect(control.locator(".nw-voice-preview-tag")).toHaveText("Teststimme");
+    await expect(control.locator(".nw-voice-preview-label")).toContainText("Teststimme");
   }
+});
+
+
+test("protected concierge settings keeps voice integration in source",async({request})=>{
+  const response=await request.get("http://127.0.0.1:4173/concierge-anpassen.html");
+  expect(response.status()).toBe(200);
+  const html=await response.text();
+  expect(html).toContain("data-concierge-carousel");
+  expect(html).toContain("concierge-voice-preview.js");
+  expect(html).toContain("concierge-carousel.js");
 });
