@@ -10,16 +10,73 @@
   const requestedProduct = params.get("produkt");
   const product = requestedProduct === "senioren" || (!requestedProduct && sessionStorage.getItem("nahwerk_product") === "senioren") ? "senioren" : "prime";
   const productLabel = product === "senioren" ? "Senioren Concierge" : "Persönlicher Concierge";
-  const planKey = ({ kostenlos: "free" }[params.get("paket")] || params.get("paket") || "free").toLowerCase();
-  const plans = {
-    free: { code: "FREE", title: "FREE · 0 € / MONAT", benefits: ["30 Dialoge/Monat in den ersten 2 Monaten", "Danach dauerhaft 15 Dialoge pro Monat", "1 Bildgenerierung pro Monat", "1 Foto-/Dokument-Digitalisierung pro Monat", "5 Erinnerungen pro Monat, z. B. Wecker oder Termine", "Direkt in WhatsApp", "Text- und Sprachnachrichten"] },
-    standard: { code: "STANDARD", title: "STANDARD · 9,99 € / MONAT", benefits: ["100 Dialoge pro Monat", "5 Bildgenerierungen", "10 Foto-/Dokument-Digitalisierungen", "25 Erinnerungen"] },
-    komfort: { code: "KOMFORT", title: "KOMFORT · 19,99 € / MONAT", benefits: ["200 Dialoge pro Monat", "10 Bildgenerierungen", "20 Foto-/Dokument-Digitalisierungen", "50 Erinnerungen"] },
-    premium: { code: "PREMIUM", title: "PREMIUM · 29,99 € / MONAT", benefits: ["350 Dialoge pro Monat", "25 Bildgenerierungen", "25 Foto-/Dokument-Digitalisierungen", "100 Erinnerungen"] },
-    "premium-plus": { code: "PREMIUM PLUS", title: "PREMIUM PLUS · 44,99 € / MONAT", benefits: ["600 Dialoge pro Monat", "40 Bildgenerierungen", "50 Foto-/Dokument-Digitalisierungen", "150 Erinnerungen"] }
+  const PLAN_ALIASES = {
+    kostenlos: "free",
+    standard: "plus",
+    premium: "familie",
+    "premium-plus": "familie",
+    superior: "familie"
   };
-  const selectedPlan = plans[planKey] || plans.free;
-  const planBookable = selectedPlan.code === "FREE";
+  const PLANS = {
+    free: {
+      code: "FREE",
+      title: "FREE · 0 € / MONAT",
+      price: "0 € / Monat",
+      usage: "Aktuell direkt verfügbar",
+      state: "Verfügbar",
+      bookable: true,
+      benefits: [
+        "Dauerhaft kostenlos",
+        "Direkt in WhatsApp",
+        "Text- und Sprachnachrichten",
+        "Keine Zahlungsdaten und keine automatische kostenpflichtige Umwandlung"
+      ]
+    },
+    plus: {
+      code: "PLUS",
+      title: "PLUS · IN VORBEREITUNG",
+      price: "Preis folgt",
+      usage: "Für häufigere Nutzung",
+      state: "In Vorbereitung",
+      bookable: false,
+      benefits: [
+        "Für häufigere Concierge-Nutzung vorgesehen",
+        "Finale Leistungen und Preise werden vor dem Checkout klar angezeigt",
+        "Keine Bestellung ohne ausdrückliche Bestätigung"
+      ]
+    },
+    komfort: {
+      code: "KOMFORT",
+      title: "KOMFORT · IN VORBEREITUNG",
+      price: "Preis folgt",
+      usage: "Für intensive Nutzung",
+      state: "In Vorbereitung",
+      bookable: false,
+      benefits: [
+        "Für intensive Concierge-Nutzung vorgesehen",
+        "Finale Leistungen und Preise werden vor dem Checkout klar angezeigt",
+        "Keine Bestellung ohne ausdrückliche Bestätigung"
+      ]
+    },
+    familie: {
+      code: "FAMILIE",
+      title: "FAMILIE · IN VORBEREITUNG",
+      price: "Preis folgt",
+      usage: "Für gemeinsam verwaltete Zugänge",
+      state: "In Vorbereitung",
+      bookable: false,
+      benefits: [
+        "Für Familien und gemeinsam verwaltete Zugänge vorgesehen",
+        "Berechtigungen und Privatsphäre bleiben getrennt",
+        "Keine Bestellung ohne ausdrückliche Bestätigung"
+      ]
+    }
+  };
+  const requestedPlan = (params.get("paket") || "free").toLowerCase();
+  let currentPlanKey = PLAN_ALIASES[requestedPlan] || requestedPlan;
+  if (!Object.hasOwn(PLANS, currentPlanKey)) currentPlanKey = "free";
+  const selectedPlan = () => PLANS[currentPlanKey];
+  const planBookable = () => selectedPlan().bookable;
   const conciergeProfiles = window.NAHWERKCarousel?.byKey || {};
   const recipientIds = ["recipientSalutation", "recipientFirstName", "recipientLastName", "relationship", "recipientPhone"];
   const fullName = (first, last) => [first.trim(), last.trim()].filter(Boolean).join(" ");
@@ -29,6 +86,69 @@
     return conciergeProfiles[value] ? value : "nilo";
   };
   const concierge = () => conciergeProfiles[conciergeValue()].name;
+
+  function setPlanPicker(open) {
+    const picker = $("registrationPlanPicker");
+    const button = $("planChangeButton");
+    picker.hidden = !open;
+    button.setAttribute("aria-expanded", String(open));
+    button.textContent = open ? "Auswahl schließen" : "Tarif ändern";
+  }
+
+  function updatePlanUi() {
+    const plan = selectedPlan();
+    const submit = $("registrationSubmit");
+    $("selectedPlanName").textContent = plan.title;
+    $("selectedPlanBenefits").innerHTML = plan.benefits.map((benefit) => `<li>${benefit}</li>`).join("");
+    $("selectedPlanBox").classList.toggle("selected-paid-plan", !plan.bookable);
+
+    form.querySelectorAll('input[name="planChoice"]').forEach((input) => {
+      input.checked = input.value === currentPlanKey;
+    });
+
+    if (plan.bookable) {
+      $("planSelectionNote").innerHTML = "<strong>Direkt registrierbar.</strong><br>Für FREE werden keine Zahlungsdaten benötigt.";
+      submit.disabled = false;
+      submit.removeAttribute("aria-disabled");
+      submit.textContent = "Kostenlosen Zugang registrieren";
+      return;
+    }
+
+    $("planSelectionNote").innerHTML = `<strong>${plan.code} ist ausgewählt.</strong><br>Der verbindliche Checkout wird erst aktiviert, wenn Preise, Leistungen, Zahlung, Widerruf und Kündigung vollständig freigegeben sind. Bis dahin wird nichts kostenpflichtig bestellt.`;
+    submit.disabled = true;
+    submit.setAttribute("aria-disabled", "true");
+    submit.textContent = `${plan.code} ausgewählt · Checkout folgt`;
+  }
+
+  function selectPlan(key) {
+    if (!Object.hasOwn(PLANS, key)) return;
+    currentPlanKey = key;
+    const url = new URL(location.href);
+    url.searchParams.set("paket", key);
+    history.replaceState(null, "", url);
+    updatePlanUi();
+  }
+
+  function setupPlanSelection() {
+    $("registrationPlanOptions").innerHTML = Object.entries(PLANS).map(([key, plan]) => `
+      <label class="plan-option">
+        <input type="radio" name="planChoice" value="${key}"${key === currentPlanKey ? " checked" : ""} />
+        <span class="plan-option-card">
+          <span class="plan-option-name">${plan.code}</span>
+          <span class="plan-option-price">${plan.price}</span>
+          <span class="plan-option-usage">${plan.usage}</span>
+          <span class="plan-option-state">${plan.state}</span>
+        </span>
+      </label>`).join("");
+    $("planChangeButton").addEventListener("click", () => {
+      setPlanPicker($("registrationPlanPicker").hidden);
+    });
+    form.querySelectorAll('input[name="planChoice"]').forEach((input) => {
+      input.addEventListener("change", () => selectPlan(input.value));
+    });
+    updatePlanUi();
+    if (!planBookable()) setPlanPicker(true);
+  }
 
   function injectConciergeStyles() {
     if ($("conciergeSelectionStyles")) return;
@@ -113,19 +233,23 @@
 
   function syncSelf() {
     const self = isSelf();
+    const consentRow = $("consentRow");
+    const consent = $("consent");
     form.querySelectorAll('.choice label').forEach((label) => label.classList.toggle("selected", label.querySelector("input")?.checked));
     $("recipientBlock").hidden = self;
     $("selfHint").hidden = !self;
-    $("consentRow").hidden = self;
+    consentRow.hidden = self;
+    consentRow.setAttribute("aria-hidden", String(self));
     $("ownerPhoneField").hidden = !self;
     $("ownerPhone").required = self;
     $("ownerPhone").disabled = !self;
-    $("consent").required = !self;
+    consent.required = !self;
+    consent.disabled = self;
     recipientIds.forEach((id) => { $(id).disabled = self; });
     $("recipientFirstName").required = !self;
     $("recipientLastName").required = !self;
     $("recipientPhone").required = !self;
-    if (self) $("consent").checked = true;
+    if (self) consent.checked = false;
     render();
   }
 
@@ -151,17 +275,10 @@
   }
 
   setupConciergeSelection();
+  setupPlanSelection();
   sessionStorage.setItem("nahwerk_product", product);
   $("registrationTitle").textContent = `${productLabel} Zugang registrieren`;
   $("productLabel").textContent = productLabel;
-  $("selectedPlanName").textContent = selectedPlan.title;
-  $("selectedPlanBenefits").innerHTML = selectedPlan.benefits.map((benefit) => `<li>${benefit}</li>`).join("");
-  if (!planBookable) {
-    $("selectedPlanBox").classList.add("selected-paid-plan");
-    $("planSelectionNote").innerHTML = `<strong>${selectedPlan.code} ist ausgewählt.</strong><br>Dieser Tarif ist noch nicht verbindlich buchbar, weil der sichere Zahlungs-, Widerrufs- und Kündigungsprozess noch nicht aktiviert ist. <a href="registrieren.html?produkt=${product}&paket=free">Stattdessen FREE starten</a>.`;
-    $("registrationSubmit").textContent = `${selectedPlan.code} ausgewählt · noch nicht buchbar`;
-    $("registrationSubmit").setAttribute("aria-disabled", "true");
-  }
   document.title = `${productLabel} registrieren | NAHWERK`;
   form.addEventListener("input", render);
   form.addEventListener("change", (event) => {
@@ -171,7 +288,7 @@
   });
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
-    if (!planBookable) return show(`<strong>${selectedPlan.code} ist ausgewählt, aber noch nicht buchbar.</strong><br>Für eine verbindliche Buchung fehlt derzeit noch der Zahlungs- und Vertragsprozess. Sie können aktuell <a href="registrieren.html?produkt=${product}&paket=free">FREE registrieren</a>.`, true);
+    if (!planBookable()) return show(`<strong>${selectedPlan().code} ist ausgewählt, aber der sichere Checkout ist noch nicht freigegeben.</strong><br>Bitte wählen Sie FREE oder ändern Sie den Tarif oben. Es wurde nichts kostenpflichtig bestellt.`, true);
     const password = $("webPassword").value;
     if (password.length < 10 || password.length > 128) return show("<strong>Das Passwort muss zwischen 10 und 128 Zeichen lang sein.</strong>", true);
     if (!form.reportValidity()) return;
@@ -179,7 +296,7 @@
     const p = person();
     const safety = $("safetyEnabled").checked;
     const request = {
-      product, concierge_profile: product === "senioren" ? "SENIOR_MARTIN" : "PRIME_MARTIN", concierge_choice: conciergeValue(), package: selectedPlan.code,
+      product, concierge_profile: product === "senioren" ? "SENIOR_MARTIN" : "PRIME_MARTIN", concierge_choice: conciergeValue(), package: selectedPlan().code,
       registration_type: self ? "self" : "other", account_holder_name: fullName($("ownerFirstName").value, $("ownerLastName").value), account_holder_salutation: $("ownerSalutation").value,
       account_holder_first_name: $("ownerFirstName").value.trim(), account_holder_last_name: $("ownerLastName").value.trim(), email: $("ownerEmail").value.trim(), phone: self ? $("ownerPhone").value.trim() : "",
       supported_person_name: fullName(p.first, p.last), supported_person_salutation: p.sal, supported_person_first_name: p.first, supported_person_last_name: p.last,
@@ -213,7 +330,7 @@
       show("<strong>Die Registrierung konnte gerade nicht übertragen werden.</strong><br>Bitte versuchen Sie es in Kürze erneut.", true);
     } finally {
       submit.disabled = false;
-      submit.textContent = "Kostenlosen Zugang registrieren";
+      updatePlanUi();
     }
   });
   if (params.get("fuer") === "andere") {
