@@ -1,17 +1,17 @@
 (() => {
   const profiles = [
-    ["nilo","Nilo","Klar, ruhig und strukturiert.","cedar","hearing_test","Hallo, ich bin Nilo. Ich würde gerne Ihr persönlicher NAHWERK Concierge werden."],
+    ["nilo","Nilo","Klar, ruhig und strukturiert.","onyx","hearing_test","Hola, ich bin Nilo. Ich begleite Sie ruhig, klar und zuverlässig im Alltag."],
     ["mira","Mira","Warm, verständlich und aufmerksam.","marin","hearing_test","Hallo, ich bin Mira. Ich begleite Sie aufmerksam, warm und zuverlässig im Alltag."],
     ["lena","Lena","Modern, empathisch und lösungsorientiert.","coral","hearing_test","Hallo, ich bin Lena. Ich helfe Ihnen freundlich, klar und lösungsorientiert weiter."],
-    ["lukas","Lukas","Souverän, direkt und zuverlässig.","alloy","hearing_test","Hallo, ich bin Lukas. Ich unterstütze Sie klar, souverän und zuverlässig."],
+    ["lukas","Lukas","Souverän, direkt und zuverlässig.","ash","hearing_test","Hallo, ich bin Lukas. Ich unterstütze Sie klar, souverän und zuverlässig."],
     ["hartmut","Hartmut","Ruhig, erfahren und geduldig.","ballad","voice_rework","Guten Tag, ich bin Hartmut. Ich begleite Sie ruhig, verständlich und mit Geduld."],
     ["frida","Frida","Herzlich, klar und zugewandt.","sage","voice_rework","Guten Tag, ich bin Frida. Ich bin gern mit Ruhe, Herzlichkeit und Erfahrung für Sie da."],
-    ["asha","Asha","Empathisch, aufmerksam und besonnen.","shimmer","hearing_test","Hallo, ich bin Asha. Ich unterstütze Sie aufmerksam, besonnen und freundlich."],
+    ["asha","Asha","Empathisch, aufmerksam und besonnen.","shimmer","hearing_test","Namaste, ich bin Asha. Ich unterstütze Sie freundlich, aufmerksam und mit viel Ruhe."],
     ["sari","Sari","Freundlich, ruhig und lösungsorientiert.","nova","hearing_test","Hallo, ich bin Sari. Ich helfe Ihnen freundlich, ruhig und lösungsorientiert."],
-    ["leyla","Leyla","Warm, direkt und verlässlich.","coral","hearing_test","Hallo, ich bin Leyla. Ich unterstütze Sie warm, direkt und verlässlich."],
+    ["leyla","Leyla","Warm, direkt und verlässlich.","coral","hearing_test","Merhaba, ich bin Leyla. Ich begleite Sie warm, direkt und zuverlässig."],
     ["noor","Noor","Aufmerksam, feinfühlig und strukturiert.","sage","hearing_test","Hallo, ich bin Noor. Ich begleite Sie aufmerksam, feinfühlig und strukturiert."],
     ["sofia","Sofia","Lebendig, herzlich und klar.","verse","hearing_test","Hallo, ich bin Sofia. Ich helfe Ihnen herzlich, lebendig und klar."],
-    ["camille","Camille","Elegant, ruhig und präzise.","marin","hearing_test","Bonjour, ich bin Camille. Ich begleite Sie ruhig, elegant und präzise."],
+    ["camille","Camille","Elegant, ruhig und präzise.","nova","hearing_test","Bonjour, ich bin Camille. Ich begleite Sie ruhig, elegant und aufmerksam."],
     ["anna","Anna","Pragmatisch, freundlich und zuverlässig.","nova","hearing_test","Hallo, ich bin Anna. Ich unterstütze Sie pragmatisch, freundlich und zuverlässig."],
     ["olena","Olena","Einfühlsam, klar und ausdauernd.","shimmer","hearing_test","Hallo, ich bin Olena. Ich begleite Sie einfühlsam, klar und ausdauernd."],
     ["mei","Mei","Bedacht, modern und aufmerksam.","sage","hearing_test","Hallo, ich bin Mei. Ich unterstütze Sie bedacht, aufmerksam und präzise."],
@@ -28,7 +28,7 @@
     image:`assets/concierges/large/${key}.webp`,
     cardImage:`assets/concierges/card/${key}.webp`,
     largeImage:`assets/concierges/large/${key}.webp`,
-    sampleAudio:`assets/concierges/voice-samples/${key}.mp3?v=persona-20260829-1`,
+    sampleAudio:`assets/concierges/voice-samples/${key}.mp3?v=persona-20260829-2`,
     sampleText
   }));
   const byKey = Object.fromEntries(profiles.map(profile => [profile.key,profile]));
