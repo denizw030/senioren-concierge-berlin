@@ -47,3 +47,10 @@
 @media(max-width:720px){
   .concierge-overview-card{border-radius:18px}
 }
+
+/* Multilingual voice control alignment. */
+.concierge-overview-actions{align-items:flex-start}
+.concierge-overview-select{min-height:44px}
+@media(max-width:720px){
+  .concierge-overview-actions{align-items:stretch}
+}
