@@ -41,7 +41,7 @@
     const sync = () => {
       const open = nav.classList.contains('is-open');
       toggle.setAttribute('aria-expanded', String(open));
-      document.body.classList.toggle('menu-open', open);
+      document.body.classList.remove('menu-open');
     };
     sync();
     new MutationObserver(sync).observe(nav, { attributes:true, attributeFilter:['class'] });
