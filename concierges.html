@@ -35,13 +35,37 @@
       <div class="wrap">
         <div class="eyebrow">23 Persönlichkeiten · ein System</div>
         <h1>Welcher Concierge passt zu Ihnen?</h1>
-        <p>Entdecken Sie alle NAHWERK KI‑Concierges auf einen Blick. Die grundlegenden Möglichkeiten bleiben identisch – Persönlichkeit, Auftreten und Kommunikationsstil machen den Unterschied.</p>
+        <p>Entdecken Sie die Persönlichkeiten nach Herkunft: zuerst Kontinent, dann Land. So bleibt die Auswahl ruhig und übersichtlich – und Sie sehen nur die Concierges, die gerade relevant sind.</p>
       </div>
     </section>
     <section class="concierge-overview-section" aria-labelledby="overview-title">
       <div class="wrap">
-        <h2 class="visually-hidden" id="overview-title">Alle 23 KI-Concierges</h2>
-        <div class="concierge-overview-grid" id="conciergeOverviewGrid"></div>
+        <div class="concierge-discovery" id="conciergeDiscovery">
+          <div class="concierge-discovery-head">
+            <div>
+              <span class="concierge-discovery-kicker">Nach Herkunft entdecken</span>
+              <h2 id="overview-title">Erst Kontinent. Dann Land.</h2>
+              <p>Wählen Sie einen Kontinent. Danach zeigen wir nur die verfügbaren Länder und anschließend die passenden Concierges.</p>
+            </div>
+            <button class="concierge-show-all" id="showAllConcierges" type="button">Alle 23 im Raster anzeigen</button>
+          </div>
+          <div class="concierge-discovery-step">
+            <span class="concierge-discovery-label">1 · Kontinent</span>
+            <div class="concierge-discovery-options" id="continentOptions" aria-label="Kontinent auswählen"></div>
+          </div>
+          <div class="concierge-discovery-step" id="countryStep" hidden>
+            <span class="concierge-discovery-label">2 · Land</span>
+            <div class="concierge-country-options" id="countryOptions" aria-label="Land auswählen"></div>
+          </div>
+        </div>
+        <div class="concierge-results-head" id="conciergeResultsHead" hidden>
+          <div>
+            <span class="concierge-results-kicker" id="conciergeResultsKicker"></span>
+            <h2 id="conciergeResultsTitle"></h2>
+          </div>
+          <button type="button" class="concierge-results-reset" id="conciergeResultsReset">Auswahl ändern</button>
+        </div>
+        <div class="concierge-overview-grid" id="conciergeOverviewGrid" hidden></div>
         <p class="concierge-overview-note">Concierge und gewünschte Sprache können unabhängig voneinander gewählt werden.</p>
       </div>
     </section>
