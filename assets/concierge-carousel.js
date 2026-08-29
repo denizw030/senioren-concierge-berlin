@@ -62,7 +62,7 @@
     root.classList.add("nw-carousel");
     root.setAttribute("role","region");
     root.setAttribute("aria-label",root.dataset.label||"KI-Concierge auswählen");
-    root.innerHTML=`<button class="nw-carousel-arrow prev" type="button" aria-label="Vorherigen Concierge anzeigen">‹</button><div class="nw-carousel-stage" tabindex="0" aria-roledescription="Karussell"><div class="nw-carousel-track"></div></div><button class="nw-carousel-arrow next" type="button" aria-label="Nächsten Concierge anzeigen">›</button><div class="nw-carousel-info" aria-live="polite"><h3 class="nw-carousel-name"></h3><p class="nw-carousel-description"></p><p class="nw-carousel-language-note">Concierge und gewünschte Sprache können unabhängig voneinander gewählt werden.</p><p class="nw-carousel-voice-note" hidden></p><div class="nw-carousel-actions"><span class="nw-carousel-voice-host"></span><button class="nw-carousel-status" type="button" hidden>Ausgewählt</button></div></div>${inputName?`<input type="hidden" name="${inputName}" value="${profiles[active].key}">`:""}`;
+    root.innerHTML=`<button class="nw-carousel-arrow prev" type="button" aria-label="Vorherigen Concierge anzeigen">‹</button><div class="nw-carousel-stage" tabindex="0" aria-roledescription="Karussell"><div class="nw-carousel-track"></div></div><button class="nw-carousel-arrow next" type="button" aria-label="Nächsten Concierge anzeigen">›</button><div class="nw-carousel-info" aria-live="polite"><h3 class="nw-carousel-name"></h3><p class="nw-carousel-description"></p><p class="nw-carousel-language-note">Die Hörprobe startet in der Herkunftssprache. Die Sprache können Sie direkt darunter wechseln.</p><p class="nw-carousel-voice-note" hidden></p><div class="nw-carousel-actions"><span class="nw-carousel-voice-host"></span><button class="nw-carousel-status" type="button" hidden>Ausgewählt</button></div></div>${inputName?`<input type="hidden" name="${inputName}" value="${profiles[active].key}">`:""}`;
     const stage=root.querySelector(".nw-carousel-stage"),track=root.querySelector(".nw-carousel-track"),name=root.querySelector(".nw-carousel-name"),description=root.querySelector(".nw-carousel-description"),voiceNote=root.querySelector(".nw-carousel-voice-note"),voiceHost=root.querySelector(".nw-carousel-voice-host"),status=root.querySelector(".nw-carousel-status"),input=inputName?root.querySelector(`[name="${inputName}"]`):null;
 
     function goToRegistration(index=active){
@@ -97,7 +97,7 @@
       });
       selectButton.addEventListener("click",()=>{
         if(moved)return;
-        if(index===active&&registerUrl){goToRegistration(index);return;}
+        if(registerUrl){goToRegistration(index);return;}
         select(index,true);
       });
       track.appendChild(card);
