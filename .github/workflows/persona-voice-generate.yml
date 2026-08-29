@@ -1,0 +1,47 @@
+name: Generate persona-specific concierge voices
+
+on:
+  push:
+    branches:
+      - staging/website-concierge-voice-preview-01
+    paths:
+      - .github/workflows/persona-voice-generate.yml
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: staging/website-concierge-voice-preview-01
+      - name: Generate 24 persona samples
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets/concierges/voice-samples
+          base="https://btqklftjmwtqqqdmwlnk.supabase.co/functions/v1/nw-voice-persona-gen-20260829"
+          keys="nilo mira lena lukas hartmut frida asha sari leyla noor sofia camille anna olena mei amara kwame zuri jabari arjun wei yuki ren lars"
+          for key in $keys; do
+            echo "Generating $key"
+            curl --fail --silent --show-error --location --retry 2 "$base?token=EiqZ6zCYFP_lPbmyBRF5wYX2qmfyuNW_&key=$key" -o "assets/concierges/voice-samples/$key.mp3"
+            test -s "assets/concierges/voice-samples/$key.mp3"
+            size=$(wc -c < "assets/concierges/voice-samples/$key.mp3")
+            test "$size" -gt 50000
+            echo "$key $size bytes"
+          done
+      - name: Commit generated samples
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "NAHWERK Voice Preview Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add assets/concierges/voice-samples
+          if git diff --cached --quiet; then
+            echo "No audio changes"
+            exit 0
+          fi
+          git commit -m "Regenerate persona-specific concierge voice samples"
+          git push origin HEAD:staging/website-concierge-voice-preview-01
