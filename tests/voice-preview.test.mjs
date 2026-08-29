@@ -222,9 +222,39 @@ test("app-free wording, future free app, senior logo and light first paint are p
   assert.match(home,/NAHWERK App ist in Entwicklung/);
   assert.match(senior,/Keine zusätzliche App notwendig/);
   assert.match(senior,/NAHWERK App ist in Entwicklung/);
-  assert.match(brand,/NAHWERKConcierge-Logo\.png/);
-  assert.match(brand,/body\.senior-product \.brandtext strong:after[\s\S]*color:#17130d!important/);
-  assert.match(brand,/body\.senior-product \.brandtext span:before[\s\S]*color:#17130d!important/);
+  assert.match(brand,/logo-nahwerk-concierge-gold\.svg/);
+  assert.match(brand,/body\.senior-product \.brandtext strong:after[\s\S]*color:#8b8f96!important/);
+  assert.match(brand,/body\.senior-product \.brandtext span:before[\s\S]*color:#858990!important/);
   assert.match(registration,/name="theme-color" content="#fffdf9"/);
   assert.match(registration,/registration-first-paint/);
+});
+
+test("concierge discovery starts with continents and hides the full grid",()=>{
+  const html=read("concierges.html");
+  const js=read("assets/concierge-overview.js");
+  assert.match(html,/id="continentOptions"/);
+  assert.match(html,/id="countryOptions"/);
+  assert.match(html,/id="showAllConcierges"/);
+  assert.match(html,/id="conciergeOverviewGrid" hidden/);
+  assert.match(js,/Europa/);
+  assert.match(js,/Asien/);
+  assert.match(js,/Afrika/);
+  assert.match(js,/Deutschland/);
+  assert.match(js,/Spanien/);
+  assert.match(js,/Indien/);
+  assert.match(js,/Ghana/);
+  assert.match(js,/Kenia/);
+  assert.match(js,/renderProfiles/);
+  assert.match(js,/Alle 23 Concierges/);
+});
+
+test("family registration message is optional and uses the existing notes contract",()=>{
+  const html=read("registrieren.html");
+  const onboarding=read("assets/onboarding.js");
+  assert.match(html,/id="familyMessage"/);
+  assert.match(html,/Persönliche Nachricht für die unterstützte Person/);
+  assert.match(onboarding,/familyMessageValue/);
+  assert.match(onboarding,/Persönliche Nachricht der einrichtenden Person/);
+  assert.match(onboarding,/initial_notes:/);
+  assert.doesNotMatch(onboarding,/family_message\s*:/);
 });
