@@ -3,26 +3,30 @@
   const entries = new Set();
 
   const isProvisional = profile => profile.voiceStatus && profile.voiceStatus !== "approved";
-  const labels = {
-    idle: "Anhören",
-    loading: "Lädt",
-    playing: "Spielt",
-    stopped: "Gestoppt",
-    error: "Fehler"
-  };
+
+  function visibleLabel(entry, state) {
+    const test = isProvisional(entry.profile);
+    if (state === "loading") return "Wird geladen";
+    if (state === "playing") return "Wiedergabe stoppen";
+    if (state === "error") return "Audio nicht verfügbar";
+    if (state === "stopped") return test ? "Teststimme anhören" : "Stimme anhören";
+    return test ? "Teststimme anhören" : "Stimme anhören";
+  }
 
   function setState(entry, state) {
     if (!entry) return;
     entry.state = state;
-    const { button, profile } = entry;
+    const { button, profile, label } = entry;
     button.dataset.state = state;
     button.setAttribute("aria-pressed", state === "playing" ? "true" : "false");
     const action = state === "playing" ? "stoppen" : "anhören";
     const prefix = isProvisional(profile) ? "Teststimme" : "Stimme";
     button.setAttribute("aria-label", `${prefix} von ${profile.name} ${action}`);
     button.title = `${prefix} von ${profile.name} ${action}`;
-    const stateText = button.querySelector(".nw-voice-preview-state");
-    if (stateText) stateText.textContent = labels[state] || labels.idle;
+    if (label) label.textContent = visibleLabel(entry, state);
+    const srState = button.querySelector(".nw-voice-preview-state");
+    if (srState) srState.textContent = state;
+    entry.control.dataset.state = state;
   }
 
   function resetAudio(entry) {
@@ -73,10 +77,16 @@
 
   function createControl(profile, options = {}) {
     if (!profile?.sampleAudio) return null;
+
     const control = document.createElement("span");
     control.className = `nw-voice-preview-control ${options.className || ""}`.trim();
     control.dataset.conciergeKey = profile.key;
     if (isProvisional(profile)) control.dataset.provisional = "true";
+
+    const label = document.createElement("span");
+    label.className = "nw-voice-preview-label";
+    label.setAttribute("aria-hidden", "true");
+    control.appendChild(label);
 
     const button = document.createElement("button");
     button.type = "button";
@@ -88,17 +98,10 @@
         <span class="icon-loading"></span>
         <span class="icon-error">!</span>
       </span>
-      <span class="nw-voice-preview-state visually-hidden">Anhören</span>`;
+      <span class="nw-voice-preview-state visually-hidden">idle</span>`;
     control.appendChild(button);
 
-    if (isProvisional(profile)) {
-      const tag = document.createElement("span");
-      tag.className = "nw-voice-preview-tag";
-      tag.textContent = "Teststimme";
-      control.appendChild(tag);
-    }
-
-    const entry = { profile, button, control, audio: null, state: "idle" };
+    const entry = { profile, button, label, control, audio: null, state: "idle" };
     entries.add(entry);
     setState(entry, "idle");
 
@@ -108,6 +111,7 @@
       event.stopPropagation();
       toggle(entry);
     });
+
     return control;
   }
 
