@@ -1,0 +1,47 @@
+name: Optimize selected lifestyle assets
+
+on:
+  push:
+    branches:
+      - staging/website-concierge-voice-preview-01
+    paths:
+      - .github/workflows/optimize-lifestyle-assets.yml
+
+permissions:
+  contents: write
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: staging/website-concierge-voice-preview-01
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pillow
+      - name: Convert source PNGs to web-optimized WebP
+        shell: python
+        run: |
+          from PIL import Image
+          from pathlib import Path
+          pairs={
+            "assets/NAHWERK-Concierge-Älterer-Mann-am-Handy-Zuhause-auf-Stuhl.png":"assets/lifestyle/senior-man-phone.webp",
+            "assets/NAHWERK-Concierge-Frau-Wohnzimmer.png":"assets/lifestyle/senior-woman-sofa.webp",
+            "assets/NAHWERK-Concierge-junge-Frau-Küche.png":"assets/lifestyle/young-woman-kitchen.webp",
+          }
+          Path("assets/lifestyle").mkdir(parents=True,exist_ok=True)
+          for src,dst in pairs.items():
+            im=Image.open(src).convert("RGB")
+            im.save(dst,"WEBP",quality=84,method=6)
+            print(f"{dst}: {Path(dst).stat().st_size} bytes, {im.width}x{im.height}")
+      - name: Commit optimized assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "NAHWERK Asset Pipeline"
+          git config user.email "actions@users.noreply.github.com"
+          git add assets/lifestyle
+          git commit -m "Add web-optimized lifestyle imagery"
+          git push origin HEAD:staging/website-concierge-voice-preview-01
