@@ -1,0 +1,39 @@
+name: Voice Preview E2E
+
+on:
+  push:
+    branches:
+      - staging/website-concierge-voice-preview-01
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Static regression tests
+        run: node --test tests/voice-preview.test.mjs
+      - name: Install Playwright
+        run: |
+          npm install --no-save @playwright/test@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start static site
+        run: |
+          python3 -m http.server 4173 >/tmp/nahwerk-http.log 2>&1 &
+          sleep 2
+      - name: Browser E2E and visual screenshots
+        run: npx playwright test tests/voice-preview.e2e.spec.mjs --reporter=line --workers=1
+      - name: Upload visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: voice-preview-screenshots
+          path: test-results/screenshots
+          if-no-files-found: warn

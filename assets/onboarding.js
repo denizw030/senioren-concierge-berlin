@@ -82,7 +82,7 @@
   const selectedPlan = () => PLANS[currentPlanKey];
   const planBookable = () => selectedPlan().bookable;
   const conciergeProfiles = window.NAHWERKCarousel?.byKey || {};
-  const recipientIds = ["recipientSalutation", "recipientFirstName", "recipientLastName", "relationship", "recipientPhone"];
+  const recipientIds = ["recipientSalutation", "recipientFirstName", "recipientLastName", "relationship", "recipientPhone", "familyMessage"];
   const fullName = (first, last) => [first.trim(), last.trim()].filter(Boolean).join(" ");
   const isSelf = () => form.querySelector('input[name="setupFor"]:checked')?.value === "self";
   const conciergeValue = () => {
@@ -90,6 +90,8 @@
     return conciergeProfiles[value] ? value : "nilo";
   };
   const concierge = () => conciergeProfiles[conciergeValue()].name;
+  const escapeHtml = (value) => String(value || "").replace(/[&<>"']/g, (char) => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[char]));
+  const familyMessageValue = () => $("familyMessage")?.value.trim() || "";
 
   function setPlanPicker(open) {
     const picker = $("registrationPlanPicker");
@@ -227,12 +229,14 @@
     const informal = $("addressing").value === "du";
     const greeting = informal && p.first ? `Hallo ${p.first}` : p.sal && p.last ? `Hallo ${p.sal} ${p.last}` : p.last ? `Hallo ${p.last}` : p.first ? `Hallo ${p.first}` : "Hallo";
     const owner = fullName($("ownerFirstName").value, $("ownerLastName").value);
-    const introduction = !isSelf() && owner ? `<br>${owner} hat diesen Zugang für ${informal ? "dich" : "Sie"} eingerichtet.` : "";
+    const introduction = !isSelf() && owner ? `<br>${escapeHtml(owner)} hat diesen Zugang für ${informal ? "dich" : "Sie"} eingerichtet.` : "";
+    const familyMessage = !isSelf() ? familyMessageValue() : "";
+    const familyMessagePreview = familyMessage ? `<br><br><em>Persönliche Nachricht von ${escapeHtml(owner || "Ihrer Familie")}:</em><br>„${escapeHtml(familyMessage).replace(/\n/g,"<br>")}“` : "";
     updateContextTexts();
     const welcomeMessage = product === "senioren"
       ? `<strong>${greeting} 👋</strong><br><br>Willkommen bei NAHWERK Concierge.${introduction}<br><br>Ich bin ${concierge()}, ${informal ? "dein" : "Ihr"} persönlicher KI-Concierge.<br><br>Ich helfe ${informal ? "dir" : "Ihnen"} dabei, Fragen verständlich zu klären, Technik Schritt für Schritt zu bedienen und wichtige Erinnerungen im Blick zu behalten.<br><br>Auf Wunsch erstelle ich Bilder, ordne Fotos ein, vergleiche Möglichkeiten und fasse Informationen übersichtlich zusammen.`
       : `<strong>${greeting} 👋</strong><br><br>Willkommen bei ${productLabel}.${introduction}<br><br>Ich bin ${concierge()}, ${informal ? "dein" : "Ihr"} persönlicher KI-Concierge.<br><br>Ich erkläre die Bedienung verständlich und helfe ${informal ? "dir" : "Ihnen"} bei Organisation, Informationen, Dokumenten und vielem mehr.`;
-    $("messagePreview").innerHTML = welcomeMessage;
+    $("messagePreview").innerHTML = welcomeMessage + familyMessagePreview;
   }
 
   function syncSelf() {
@@ -304,7 +308,14 @@
       registration_type: self ? "self" : "other", account_holder_name: fullName($("ownerFirstName").value, $("ownerLastName").value), account_holder_salutation: $("ownerSalutation").value,
       account_holder_first_name: $("ownerFirstName").value.trim(), account_holder_last_name: $("ownerLastName").value.trim(), email: $("ownerEmail").value.trim(), phone: self ? $("ownerPhone").value.trim() : "",
       supported_person_name: fullName(p.first, p.last), supported_person_salutation: p.sal, supported_person_first_name: p.first, supported_person_last_name: p.last,
-      relationship: self ? "Ich selbst" : $("relationship").selectedOptions[0].textContent.trim(), supported_whatsapp: p.phone, form_of_address: $("addressing").value.toUpperCase(), initial_notes: $("note").value.trim(),
+      relationship: self ? "Ich selbst" : $("relationship").selectedOptions[0].textContent.trim(), supported_whatsapp: p.phone, form_of_address: $("addressing").value.toUpperCase(), initial_notes: (() => {
+        const notes = $("note").value.trim();
+        const personal = self ? "" : familyMessageValue();
+        const parts = [];
+        if (notes) parts.push(notes);
+        if (personal) parts.push(`Persönliche Nachricht der einrichtenden Person, die beim ersten Kontakt zusätzlich zur NAHWERK-Begrüßung übermittelt werden soll: "${personal}"`);
+        return parts.join("\n\n");
+      })(),
       contact_consent: self || $("consent").checked, safety_enabled: safety, checkin_times: safety ? $("checkinTimes").value.trim() : "", trusted_contact_name: safety ? $("trustedContactName").value.trim() : "", trusted_contact_phone: safety ? $("trustedContactPhone").value.trim() : "",
       account_holder_web_only: !self, web_password: password, web_password_repeat: password
     };

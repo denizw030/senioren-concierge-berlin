@@ -1,4 +1,4 @@
-.concierge-overview-page{background:#080807;color:#f7f4ed}.concierge-overview-hero{padding:clamp(82px,10vw,138px) 0 44px;background:radial-gradient(circle at 72% 18%,rgba(212,175,55,.13),transparent 30%),#080807}.concierge-overview-hero .wrap{max-width:1050px}.concierge-overview-hero h1{max-width:900px;margin:14px 0 24px}.concierge-overview-hero p{max-width:760px;margin:0;color:#aaa69d;font-size:clamp(1.05rem,1.45vw,1.2rem);line-height:1.65}.concierge-overview-section{padding:20px 0 clamp(90px,11vw,150px);background:#080807}.concierge-overview-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:clamp(10px,1.4vw,18px)}.concierge-overview-card{position:relative;min-width:0;padding:0;overflow:hidden;border:1px solid rgba(255,255,255,.11);border-radius:22px;background:#12120f;color:#fff;text-align:left;cursor:pointer;box-shadow:0 12px 34px rgba(0,0,0,.18);transition:transform .35s cubic-bezier(.22,.8,.2,1),border-color .3s ease,box-shadow .35s ease}.concierge-overview-card:hover{transform:translateY(-5px);border-color:rgba(212,175,55,.58);box-shadow:0 22px 48px rgba(0,0,0,.3)}.concierge-overview-card:focus-visible{outline:3px solid #d4af37;outline-offset:4px}.concierge-overview-card img{display:block;width:100%;aspect-ratio:3/4;object-fit:contain;object-position:center;background:#0a0a08}.concierge-overview-card-copy{display:block;padding:14px 15px 16px}.concierge-overview-card strong{display:block;font-size:17px;line-height:1.2}.concierge-overview-card small{display:block;margin-top:5px;color:#9e9a91;font-size:11px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.concierge-overview-note{margin:30px 0 0;color:#8f8a81;font-size:13px;text-align:center}.concierge-profile-dialog{width:min(960px,calc(100% - 32px));max-height:min(820px,calc(100vh - 32px));padding:0;overflow:hidden;border:1px solid rgba(212,175,55,.35);border-radius:30px;background:#11110e;color:#f8f5ee;box-shadow:0 45px 140px rgba(0,0,0,.68)}.concierge-profile-dialog::backdrop{background:rgba(0,0,0,.76);backdrop-filter:blur(14px)}.concierge-dialog-layout{display:grid;grid-template-columns:minmax(280px,.9fr) minmax(0,1.1fr);min-height:560px}.concierge-dialog-image-wrap{display:grid;place-items:center;background:#090908}.concierge-dialog-image-wrap img{display:block;width:100%;height:100%;max-height:720px;object-fit:contain}.concierge-dialog-copy{display:flex;flex-direction:column;justify-content:center;padding:clamp(34px,6vw,72px)}.concierge-dialog-copy h2{margin:12px 0 18px;color:#fff!important}.concierge-dialog-copy p{color:#aaa69d;line-height:1.65}.concierge-dialog-description{color:#e5dfd3!important;font-size:clamp(1.18rem,2vw,1.45rem)}.concierge-dialog-fact{display:grid;gap:6px;margin-top:26px;padding-top:22px;border-top:1px solid rgba(212,175,55,.26)}.concierge-dialog-fact strong{color:#d4af37}.concierge-dialog-fact span{color:#969188;font-size:13px;line-height:1.5}.concierge-dialog-close{position:absolute;z-index:2;top:18px;right:18px;display:grid;place-items:center;width:46px;height:46px;padding:0;border:1px solid rgba(255,255,255,.22);border-radius:50%;background:rgba(8,8,7,.72);color:#fff;font:300 30px/1 Arial;cursor:pointer;backdrop-filter:blur(10px)}.concierge-profile-dialog[open]{animation:concierge-dialog-in .28s cubic-bezier(.22,.8,.2,1)}@keyframes concierge-dialog-in{from{opacity:0;transform:scale(.975) translateY(10px)}to{opacity:1;transform:none}}.visually-hidden{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}@media(max-width:1100px){.concierge-overview-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:720px){.concierge-overview-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.concierge-overview-card{border-radius:18px}.concierge-dialog-layout{grid-template-columns:1fr;overflow-y:auto;max-height:calc(100vh - 34px)}.concierge-dialog-image-wrap{min-height:310px}.concierge-dialog-image-wrap img{max-height:440px}.concierge-dialog-copy{padding:30px 24px 38px}.concierge-profile-dialog{overflow:auto;border-radius:22px}}@media(prefers-reduced-motion:reduce){.concierge-overview-card,.concierge-profile-dialog[open]{transition:none;animation:none}}
+.concierge-overview-page{background:#080807;color:#f7f4ed}.concierge-overview-hero{padding:clamp(82px,10vw,138px) 0 44px;background:radial-gradient(circle at 72% 18%,rgba(212,175,55,.13),transparent 30%),#080807}.concierge-overview-hero .wrap{max-width:1050px}.concierge-overview-hero h1{max-width:900px;margin:14px 0 24px}.concierge-overview-hero p{max-width:760px;margin:0;color:#aaa69d;font-size:clamp(1.05rem,1.45vw,1.2rem);line-height:1.65}.concierge-overview-section{padding:20px 0 clamp(90px,11vw,150px);background:#080807}.concierge-overview-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:clamp(10px,1.4vw,18px)}.concierge-overview-card{position:relative;min-width:0;padding:0;overflow:hidden;border:1px solid rgba(255,255,255,.11);border-radius:22px;background:#12120f;color:#fff;text-align:left;cursor:pointer;box-shadow:0 12px 34px rgba(0,0,0,.18);transition:transform .35s cubic-bezier(.22,.8,.2,1),border-color .3s ease,box-shadow .35s ease}.concierge-overview-card:hover{transform:translateY(-5px);border-color:rgba(212,175,55,.58);box-shadow:0 22px 48px rgba(0,0,0,.3)}.concierge-overview-profile:focus-visible{outline:3px solid #d4af37;outline-offset:4px}.concierge-overview-card img{display:block;width:100%;aspect-ratio:3/4;object-fit:contain;object-position:center;background:#0a0a08}.concierge-overview-card-copy{display:block;padding:14px 15px 16px}.concierge-overview-card strong{display:block;font-size:17px;line-height:1.2}.concierge-overview-card small{display:block;margin-top:5px;color:#9e9a91;font-size:11px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.concierge-overview-note{margin:30px 0 0;color:#8f8a81;font-size:13px;text-align:center}.concierge-profile-dialog{width:min(960px,calc(100% - 32px));max-height:min(820px,calc(100vh - 32px));padding:0;overflow:hidden;border:1px solid rgba(212,175,55,.35);border-radius:30px;background:#11110e;color:#f8f5ee;box-shadow:0 45px 140px rgba(0,0,0,.68)}.concierge-profile-dialog::backdrop{background:rgba(0,0,0,.76);backdrop-filter:blur(14px)}.concierge-dialog-layout{display:grid;grid-template-columns:minmax(280px,.9fr) minmax(0,1.1fr);min-height:560px}.concierge-dialog-image-wrap{display:grid;place-items:center;background:#090908}.concierge-dialog-image-wrap img{display:block;width:100%;height:100%;max-height:720px;object-fit:contain}.concierge-dialog-copy{display:flex;flex-direction:column;justify-content:center;padding:clamp(34px,6vw,72px)}.concierge-dialog-copy h2{margin:12px 0 18px;color:#fff!important}.concierge-dialog-copy p{color:#aaa69d;line-height:1.65}.concierge-dialog-description{color:#e5dfd3!important;font-size:clamp(1.18rem,2vw,1.45rem)}.concierge-dialog-fact{display:grid;gap:6px;margin-top:26px;padding-top:22px;border-top:1px solid rgba(212,175,55,.26)}.concierge-dialog-fact strong{color:#d4af37}.concierge-dialog-fact span{color:#969188;font-size:13px;line-height:1.5}.concierge-dialog-close{position:absolute;z-index:2;top:18px;right:18px;display:grid;place-items:center;width:46px;height:46px;padding:0;border:1px solid rgba(255,255,255,.22);border-radius:50%;background:rgba(8,8,7,.72);color:#fff;font:300 30px/1 Arial;cursor:pointer;backdrop-filter:blur(10px)}.concierge-profile-dialog[open]{animation:concierge-dialog-in .28s cubic-bezier(.22,.8,.2,1)}@keyframes concierge-dialog-in{from{opacity:0;transform:scale(.975) translateY(10px)}to{opacity:1;transform:none}}.visually-hidden{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}@media(max-width:1100px){.concierge-overview-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:720px){.concierge-overview-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.concierge-overview-card{border-radius:18px}.concierge-dialog-layout{grid-template-columns:1fr;overflow-y:auto;max-height:calc(100vh - 34px)}.concierge-dialog-image-wrap{min-height:310px}.concierge-dialog-image-wrap img{max-height:440px}.concierge-dialog-copy{padding:30px 24px 38px}.concierge-profile-dialog{overflow:auto;border-radius:22px}}@media(prefers-reduced-motion:reduce){.concierge-overview-card,.concierge-profile-dialog[open]{transition:none;animation:none}}
 /* Compact gallery geometry: cards follow their content instead of stretching to the row. */
 .concierge-overview-grid{grid-auto-rows:max-content;align-items:start}
 .concierge-overview-card{display:grid;grid-template-rows:auto auto;align-self:start;width:100%;height:auto;min-height:0}
@@ -9,3 +9,165 @@
 .concierge-overview-card-copy{height:66px;min-height:66px;overflow:hidden}
 @keyframes concierge-placeholder-shimmer{0%,45%{transform:translateX(-100%)}80%,100%{transform:translateX(100%)}}
 @media(prefers-reduced-motion:reduce){.concierge-overview-placeholder:before{animation:none}.concierge-overview-card .concierge-overview-card-media img,.concierge-overview-placeholder{transition:none}}
+.concierge-overview-card{position:relative}.concierge-overview-profile{display:grid;grid-template-rows:auto auto;width:100%;height:auto;min-height:0;padding:0;border:0;background:transparent;color:inherit;text-align:left;cursor:pointer;font:inherit;border-radius:inherit}.concierge-overview-profile:focus-visible{position:relative;z-index:8}.concierge-overview-profile .concierge-overview-card-copy{width:100%;box-sizing:border-box}
+.concierge-overview-card{grid-template-rows:auto auto auto}
+.concierge-overview-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px 12px;border-top:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.018)}
+.concierge-overview-actions .nw-voice-preview-control{min-width:0}
+.concierge-overview-actions .nw-voice-preview-button{min-height:44px;padding:0 10px;font-size:11px;gap:7px}
+.concierge-overview-actions .nw-voice-preview-icon{width:17px;height:17px;flex-basis:17px}
+.concierge-overview-actions .nw-voice-preview-icon svg{width:17px;height:17px}
+.concierge-overview-actions .nw-voice-preview-badge{display:none}
+.concierge-overview-select{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 11px;border-radius:999px;background:#f0eee7;color:#171714;text-decoration:none;font:650 11px/1 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;white-space:nowrap;transition:transform .18s ease,background .18s ease}
+.concierge-overview-select:hover{background:#fff;transform:translateY(-1px)}
+.concierge-overview-select:focus-visible{outline:2px solid #d9b95f;outline-offset:3px}
+@media(max-width:720px){.concierge-overview-actions{align-items:stretch;flex-direction:column}.concierge-overview-actions .nw-voice-preview-control,.concierge-overview-actions .nw-voice-preview-button,.concierge-overview-select{width:100%;box-sizing:border-box}.concierge-overview-actions .nw-voice-preview-button{min-height:44px}.concierge-overview-select{min-height:44px}}
+
+/* Continuation 03: keep gallery media flush with the card shell. */
+.concierge-overview-card{
+  border-radius:22px;
+  overflow:hidden;
+  isolation:isolate;
+}
+.concierge-overview-profile{
+  border-radius:inherit;
+  overflow:hidden;
+}
+.concierge-overview-card-media{
+  border-radius:0!important;
+  overflow:hidden;
+}
+.concierge-overview-card .concierge-overview-card-media img{
+  inset:0;
+  width:100%;
+  height:100%;
+  border-radius:0!important;
+  object-fit:cover;
+  object-position:center top;
+}
+@media(max-width:720px){
+  .concierge-overview-card{border-radius:18px}
+}
+
+/* Multilingual voice control alignment. */
+.concierge-overview-actions{align-items:flex-start}
+.concierge-overview-select{min-height:44px}
+@media(max-width:720px){
+  .concierge-overview-actions{align-items:stretch}
+}
+
+/* Continent → country discovery. The 23-card grid stays hidden until requested. */
+.concierge-discovery{
+  position:relative;
+  overflow:hidden;
+  padding:clamp(24px,4vw,46px);
+  border:1px solid rgba(212,175,55,.18);
+  border-radius:32px;
+  background:
+    radial-gradient(circle at 88% 12%,rgba(54,109,225,.12),transparent 28%),
+    radial-gradient(circle at 12% 90%,rgba(125,70,171,.08),transparent 30%),
+    linear-gradient(145deg,rgba(22,22,19,.94),rgba(10,10,8,.97));
+  box-shadow:0 28px 90px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.03);
+}
+.concierge-discovery-head{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:28px;
+  align-items:end;
+}
+.concierge-discovery-head h2{margin:8px 0 10px;color:#fff}
+.concierge-discovery-head p{max-width:690px;margin:0;color:#aaa69d;line-height:1.65}
+.concierge-discovery-kicker,.concierge-discovery-label,.concierge-results-kicker{
+  color:#d4af37;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+}
+.concierge-show-all,.concierge-results-reset{
+  min-height:46px;
+  padding:0 18px;
+  border:1px solid rgba(255,255,255,.17);
+  border-radius:999px;
+  background:rgba(255,255,255,.045);
+  color:#f3efe6;
+  font:650 12px/1 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  cursor:pointer;
+  transition:transform .2s ease,border-color .2s ease,background .2s ease;
+}
+.concierge-show-all:hover,.concierge-results-reset:hover,
+.concierge-show-all.is-active{transform:translateY(-1px);border-color:rgba(212,175,55,.48);background:rgba(212,175,55,.09)}
+.concierge-discovery-step{margin-top:34px}
+.concierge-discovery-step[hidden]{display:none!important}
+.concierge-discovery-options{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+  margin-top:12px;
+}
+.concierge-continent-card{
+  display:grid;
+  grid-template-columns:42px minmax(0,1fr) auto;
+  gap:14px;
+  align-items:center;
+  min-height:112px;
+  padding:18px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:22px;
+  background:rgba(255,255,255,.025);
+  color:#fff;
+  text-align:left;
+  cursor:pointer;
+  transition:transform .25s cubic-bezier(.22,.8,.2,1),border-color .25s ease,background .25s ease,box-shadow .25s ease;
+}
+.concierge-continent-card:hover,.concierge-continent-card.is-active{
+  transform:translateY(-3px);
+  border-color:rgba(212,175,55,.48);
+  background:linear-gradient(145deg,rgba(212,175,55,.10),rgba(255,255,255,.025));
+  box-shadow:0 18px 40px rgba(0,0,0,.18);
+}
+.concierge-continent-icon{
+  width:42px;height:42px;border-radius:50%;
+  background:
+    radial-gradient(circle at 35% 30%,rgba(255,255,255,.55),transparent 10%),
+    radial-gradient(circle at 55% 58%,rgba(212,175,55,.72),transparent 42%),
+    linear-gradient(145deg,#55401e,#17130c);
+  box-shadow:inset 0 0 0 1px rgba(212,175,55,.28);
+}
+.concierge-continent-copy strong{display:block;font-size:17px;line-height:1.2}
+.concierge-continent-copy small{display:block;margin-top:6px;color:#8f8a81;font-size:11px;line-height:1.45}
+.concierge-continent-count{
+  display:grid;place-items:center;min-width:34px;height:34px;padding:0 8px;
+  border-radius:999px;background:rgba(255,255,255,.055);color:#d6d0c4;font-size:11px;font-weight:800
+}
+.concierge-country-options{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}
+.concierge-country-chip{
+  display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:0 14px;
+  border:1px solid rgba(255,255,255,.12);border-radius:999px;
+  background:rgba(255,255,255,.025);color:#eeeae2;cursor:pointer;
+  font:650 12px/1 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  transition:border-color .2s ease,background .2s ease,transform .2s ease;
+}
+.concierge-country-chip small{color:#847f76;font-size:10px;font-weight:650}
+.concierge-country-chip:hover,.concierge-country-chip.is-active{
+  transform:translateY(-1px);border-color:rgba(212,175,55,.5);background:rgba(212,175,55,.09)
+}
+.concierge-results-head{
+  display:flex;align-items:end;justify-content:space-between;gap:20px;
+  margin:34px 0 18px;padding-top:28px;border-top:1px solid rgba(255,255,255,.08)
+}
+.concierge-results-head[hidden]{display:none!important}
+.concierge-results-head h2{margin:5px 0 0;color:#fff;font-size:clamp(1.8rem,3vw,2.7rem)}
+.concierge-overview-grid[hidden]{display:none!important}
+.concierge-overview-grid{opacity:0;transform:translateY(12px);transition:opacity .36s ease,transform .36s ease}
+.concierge-overview-grid.is-visible{opacity:1;transform:none}
+@media(max-width:900px){
+  .concierge-discovery-head{grid-template-columns:1fr}
+  .concierge-show-all{justify-self:start}
+  .concierge-discovery-options{grid-template-columns:1fr}
+  .concierge-continent-card{min-height:94px}
+}
+@media(max-width:620px){
+  .concierge-discovery{padding:22px 18px;border-radius:24px}
+  .concierge-results-head{align-items:flex-start;flex-direction:column}
+  .concierge-results-reset{width:100%}
+}
