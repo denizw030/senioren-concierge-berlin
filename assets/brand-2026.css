@@ -438,3 +438,27 @@ body[data-product="senioren"] .top .brandtext span:before{
   font-size:13px;
   line-height:1.6;
 }
+
+/* Continuation 05 — restore the gold concierge emblem on senior white surfaces. */
+body.senior-product .mark,
+body[data-product="senioren"] .mark,
+body.senior-product .mark.nahwerk-mark,
+body[data-product="senioren"] .mark.nahwerk-mark{
+  background:#f7f3ea center/92% no-repeat url("logo-nahwerk-concierge-gold.svg?v=1")!important;
+  border:1px solid rgba(181,138,45,.30)!important;
+  box-shadow:0 8px 24px rgba(107,79,24,.08)!important;
+}
+body.senior-product .brandtext strong:before,
+body[data-product="senioren"] .brandtext strong:before{
+  color:#d4af37!important;
+}
+body.senior-product .brandtext strong:after,
+body[data-product="senioren"] .brandtext strong:after{
+  color:#8b8f96!important;
+}
+body.senior-product .brandtext span:before,
+body[data-product="senioren"] .brandtext span:before,
+body.senior-product .top .brandtext span:before,
+body[data-product="senioren"] .top .brandtext span:before{
+  color:#858990!important;
+}
