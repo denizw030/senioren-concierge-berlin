@@ -3,9 +3,10 @@
     if (!document.querySelector('link[data-nw-premium-preview]')) {
       const premium = document.createElement('link');
       premium.rel = 'stylesheet';
-      premium.href = 'assets/premium-preview.css?v=1';
+      premium.href = 'assets/premium-preview.css?v=2';
       premium.dataset.nwPremiumPreview = 'true';
       document.head.append(premium);
+      const master=document.createElement('link'); master.rel='stylesheet'; master.href='assets/master-reference-2026.css?v=1'; master.dataset.nwMaster='true'; document.head.append(master);
     }
 
     if (!document.querySelector('.skip-link')) {
@@ -16,6 +17,8 @@
       document.body.prepend(skip);
     }
 
+    document.querySelectorAll('.brand .mark').forEach((mark)=>mark.classList.add('nahwerk-mark'));
+    const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT); const bad=[]; while(walker.nextNode()){if(walker.currentNode.nodeValue?.includes('\\n')) bad.push(walker.currentNode)} bad.forEach((n)=>{n.nodeValue=n.nodeValue.replace(/\\n/g,' ')});
     const main = document.querySelector('main');
     if (main) main.id ||= 'main-content';
 
