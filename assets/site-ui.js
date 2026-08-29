@@ -1,6 +1,6 @@
 (()=>{function css(h){if(document.querySelector('link[href^="'+h+'"]'))return;const l=document.createElement("link");l.rel="stylesheet";l.href=h;document.head.append(l)}function js(h){if(document.querySelector('script[src^="'+h+'"]'))return;const s=document.createElement("script");s.src=h;document.body.append(s)}
 function ready(){
-css("assets/premium-preview.css?v=2");css("assets/master-reference-2026.css?v=1");css("assets/master-components-2026.css?v=1");css("assets/master-senior-2026.css?v=1");
+css("assets/premium-preview.css?v=2");css("assets/master-reference-2026.css?v=1");css("assets/master-components-2026.css?v=1");css("assets/master-cards-2026.css?v=1");css("assets/master-senior-2026.css?v=1");
 document.querySelectorAll(".brand .mark").forEach(m=>m.classList.add("nahwerk-mark"));
 if(!document.querySelector(".skip-link")){const a=document.createElement("a");a.className="skip-link";a.href="#main-content";a.textContent="Direkt zum Inhalt";document.body.prepend(a)}
 const main=document.querySelector("main");if(main)main.id||="main-content";
