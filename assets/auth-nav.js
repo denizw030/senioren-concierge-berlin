@@ -127,6 +127,10 @@
           toggle.setAttribute("aria-expanded", "false");
           toggle.setAttribute("aria-label", "Menü öffnen");
         };
+        toggle.addEventListener("pointerdown", (event) => {
+          event.preventDefault();
+          try { toggle.focus({ preventScroll:true }); } catch (_) { toggle.focus(); }
+        });
         toggle.addEventListener("click", (event) => {
           event.preventDefault();
           event.stopPropagation();
@@ -139,7 +143,7 @@
         addEventListener("resize", () => { if (nav.classList.contains("is-open")) syncMenuTop(); }, { passive:true });
         nav.addEventListener("click", (event) => { if (event.target.closest("a")) close(); });
         document.addEventListener("click", (event) => { if (!event.target.closest(".nav")) close(); });
-        document.addEventListener("keydown", (event) => { if (event.key === "Escape") { close(); toggle.focus(); } });
+        document.addEventListener("keydown", (event) => { if (event.key === "Escape") { close(); try { toggle.focus({ preventScroll:true }); } catch (_) { toggle.focus(); } } });
         nav.before(toggle);
       }
     });
