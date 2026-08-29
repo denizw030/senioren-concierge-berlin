@@ -1,6 +1,6 @@
 (() => {
   const mobileCss = document.createElement("style");
-  mobileCss.textContent = `.top .nav{min-height:84px!important;align-items:flex-end!important;padding-top:10px!important;padding-bottom:0!important}.top .brand{align-self:center!important;margin-bottom:6px}.top .links{align-self:flex-end!important;gap:6px!important}.top .links a,.top .links .auth-link{min-height:42px!important;margin:0 0 3px!important;padding:11px 10px 9px!important;border:0!important;border-bottom:1px solid transparent!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;transform-origin:center bottom;transition:transform .18s ease,border-color .18s ease,color .18s ease!important}.top .links a:hover{transform:scale(1.04);background:transparent!important;border-bottom-color:#cda84e!important}.top .links a.active{border-bottom-color:#cda84e!important}.top .links .register-link{background:transparent!important;color:inherit!important}.top .links .register-link:hover{background:transparent!important;color:#eed58e!important;border-bottom-color:#cda84e!important}body.senior-product .top .links a:hover,body[data-product="senioren"] .top .links a:hover{background:transparent!important;border-bottom-color:#a77c29!important}body.senior-product .top .links .register-link,body[data-product="senioren"] .top .links .register-link{color:inherit!important}@media(max-width:1280px){.top .nav{position:relative!important;align-items:center!important;flex-wrap:nowrap!important;justify-content:space-between!important;padding-bottom:8px!important}.top .brand{margin-bottom:0}.top .nav-toggle{display:block!important;flex:0 0 auto!important;margin-left:auto!important}.top .links{display:none!important;position:absolute!important;top:calc(100% - 1px)!important;left:20px!important;right:20px!important;width:auto!important;grid-template-columns:1fr!important;flex-direction:column!important;align-items:stretch!important;text-align:left!important;background:#090909!important}.top .links.is-open{display:flex!important}.top .links a,.top .links .auth-link{margin:0!important;padding:14px 16px!important;transform:none!important}}@media(max-width:620px){.top .links{left:10px!important;right:10px!important}}`;
+  mobileCss.textContent = `.top .nav{min-height:84px!important;align-items:flex-end!important;padding-top:10px!important;padding-bottom:0!important}.top .brand{align-self:center!important;margin-bottom:6px}.top .links{align-self:flex-end!important;gap:6px!important}.top .links a,.top .links .auth-link{min-height:42px!important;margin:0 0 3px!important;padding:11px 10px 9px!important;border:0!important;border-bottom:1px solid transparent!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;transform-origin:center bottom;transition:transform .18s ease,border-color .18s ease,color .18s ease!important}.top .links a:hover{transform:scale(1.04);background:transparent!important;border-bottom-color:#cda84e!important}.top .links a.active{border-bottom-color:#cda84e!important}.top .links .register-link{background:transparent!important;color:inherit!important}.top .links .register-link:hover{background:transparent!important;color:#eed58e!important;border-bottom-color:#cda84e!important}body.senior-product .top .links a:hover,body[data-product="senioren"] .top .links a:hover{background:transparent!important;border-bottom-color:#a77c29!important}body.senior-product .top .links .register-link,body[data-product="senioren"] .top .links .register-link{color:inherit!important}@media(max-width:1280px){.top{position:sticky!important;top:0!important;z-index:60!important}.top .nav{position:relative!important;align-items:center!important;flex-wrap:nowrap!important;justify-content:space-between!important;padding-bottom:8px!important}.top .brand{margin-bottom:0}.top .nav-toggle{display:block!important;flex:0 0 auto!important;margin-left:auto!important}.top .links{display:none!important;position:fixed!important;top:var(--nw-mobile-menu-top,84px)!important;left:clamp(10px,3vw,28px)!important;right:clamp(10px,3vw,28px)!important;width:auto!important;max-height:calc(100dvh - var(--nw-mobile-menu-top,84px) - 12px)!important;overflow:auto!important;overscroll-behavior:contain;grid-template-columns:1fr!important;flex-direction:column!important;align-items:stretch!important;text-align:left!important;background:#090909!important}.top .links.is-open{display:flex!important}.top .links a,.top .links .auth-link{margin:0!important;padding:14px 16px!important;transform:none!important}}@media(max-width:620px){.top .links{left:10px!important;right:10px!important}}`;
   document.head.appendChild(mobileCss);
   const SESSION_KEY = "scb_web_session";
   const PRODUCT_KEY = "nahwerk_product";
@@ -117,6 +117,11 @@
             if (window.scrollX !== x || window.scrollY !== y) window.scrollTo({ left:x, top:y, behavior:"auto" });
           });
         };
+        const syncMenuTop = () => {
+          const header = nav.closest("header.top");
+          const bottom = header ? Math.max(0, header.getBoundingClientRect().bottom) : 84;
+          nav.style.setProperty("--nw-mobile-menu-top", `${Math.round(bottom)}px`);
+        };
         const close = () => {
           preserveViewport(() => nav.classList.remove("is-open"));
           toggle.setAttribute("aria-expanded", "false");
@@ -126,10 +131,12 @@
           event.preventDefault();
           event.stopPropagation();
           const open = !nav.classList.contains("is-open");
+          if (open) syncMenuTop();
           preserveViewport(() => nav.classList.toggle("is-open", open));
           toggle.setAttribute("aria-expanded", String(open));
           toggle.setAttribute("aria-label", open ? "Menü schließen" : "Menü öffnen");
         });
+        addEventListener("resize", () => { if (nav.classList.contains("is-open")) syncMenuTop(); }, { passive:true });
         nav.addEventListener("click", (event) => { if (event.target.closest("a")) close(); });
         document.addEventListener("click", (event) => { if (!event.target.closest(".nav")) close(); });
         document.addEventListener("keydown", (event) => { if (event.key === "Escape") { close(); toggle.focus(); } });
