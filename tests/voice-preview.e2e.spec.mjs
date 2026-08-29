@@ -28,7 +28,7 @@ for(const viewport of viewports){
   }
 }
 
-test("all 23 image and audio assets return successfully",async({page})=>{
+test("all current product image and audio assets return successfully",async({page})=>{
   await page.goto("http://127.0.0.1:4173/index.html",{waitUntil:"networkidle"});
   const result=await page.evaluate(async()=>{
     const profiles=window.NAHWERKCarousel.profiles;
@@ -101,4 +101,44 @@ test("protected concierge settings keeps voice integration in source",async({req
   expect(html).toContain("data-concierge-carousel");
   expect(html).toContain("concierge-voice-preview.js");
   expect(html).toContain("concierge-carousel.js");
+});
+
+test("24-persona audition page exposes every tuned voice including Lars",async({page})=>{
+  await page.goto("http://127.0.0.1:4173/voice-audition.html",{waitUntil:"networkidle"});
+  const controls=page.locator(".voice-audition-card .nw-voice-preview-control");
+  await expect(controls).toHaveCount(24);
+  for(const key of ["nilo","lukas","hartmut","frida","lars"]){
+    const control=page.locator(`.voice-audition-card[data-key="${key}"] .nw-voice-preview-control`);
+    await expect(control).toHaveAttribute("data-provisional","true");
+    await expect(control.locator(".nw-voice-preview-label")).toContainText("Teststimme");
+  }
+  const lars=page.locator('[data-concierge-key="lars"] .nw-voice-preview-button');
+  await lars.click();
+  await expect(lars).toHaveAttribute("data-state","playing",{timeout:5000});
+  await lars.click();
+  await expect(lars).toHaveAttribute("data-state","stopped");
+});
+
+test("all 24 audition MP3s return successfully",async({page})=>{
+  await page.goto("http://127.0.0.1:4173/voice-audition.html",{waitUntil:"networkidle"});
+  const result=await page.evaluate(async()=>{
+    const cards=[...document.querySelectorAll(".voice-audition-card")];
+    const checks=[];
+    for(const card of cards){
+      const key=card.dataset.key;
+      const button=card.querySelector(".nw-voice-preview-button");
+      const control=button?.closest(".nw-voice-preview-control");
+      const profileKey=control?.dataset.conciergeKey;
+      const url="assets/concierges/voice-samples/"+key+".mp3?v=persona-20260829-1";
+      const response=await fetch(url,{cache:"no-store"});
+      checks.push({key,profileKey,status:response.status,bytes:(await response.arrayBuffer()).byteLength});
+    }
+    return checks;
+  });
+  expect(result).toHaveLength(24);
+  for(const check of result){
+    expect(check.profileKey).toBe(check.key);
+    expect(check.status,check.key).toBe(200);
+    expect(check.bytes,check.key).toBeGreaterThan(50000);
+  }
 });
