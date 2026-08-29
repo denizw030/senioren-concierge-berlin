@@ -63,9 +63,9 @@ test("voice controls live in dedicated action rows, never on concierge images",(
 test("every real concierge surface loads preview assets before carousel",()=>{
   for(const page of pages){
     const html=read(page);
-    const css=html.indexOf("concierge-voice-preview.css?v=3");
-    const js=html.indexOf("concierge-voice-preview.js?v=3");
-    const carousel=html.indexOf("concierge-carousel.js?v=9");
+    const css=html.indexOf("concierge-voice-preview.css?v=4");
+    const js=html.indexOf("concierge-voice-preview.js?v=4");
+    const carousel=html.indexOf("concierge-carousel.js?v=10");
     assert.ok(css>=0,page+" missing preview CSS");
     assert.ok(js>=0,page+" missing preview JS");
     assert.ok(carousel>js,page+" must load preview JS before carousel");
@@ -78,4 +78,14 @@ test("frontend contains no OpenAI endpoint or API key",()=>{
   assert.doesNotMatch(text,/api\.openai\.com/i);
   assert.doesNotMatch(text,/sk-[A-Za-z0-9_-]{12,}/);
   assert.doesNotMatch(text,/OPENAI_API_KEY/);
+});
+
+
+test("rejected senior voices are marked for rework",()=>{
+  const src=read("assets/concierge-carousel.js");
+  assert.match(src,/\["hartmut","Hartmut",[\s\S]{0,120}"voice_rework"/);
+  assert.match(src,/\["frida","Frida",[\s\S]{0,120}"voice_rework"/);
+  const ui=read("assets/concierge-voice-preview.js");
+  assert.match(ui,/Stimme wird überarbeitet/);
+  assert.match(ui,/button\.disabled = true/);
 });
