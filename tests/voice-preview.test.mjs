@@ -5,9 +5,9 @@ import path from "node:path";
 
 const root=process.cwd();
 const profiles=[
-["nilo","Nilo","cedar","hearing_test"],["mira","Mira","marin","hearing_test"],["lena","Lena","coral","hearing_test"],["lukas","Lukas","alloy","hearing_test"],
+["nilo","Nilo","onyx","hearing_test"],["mira","Mira","marin","hearing_test"],["lena","Lena","coral","hearing_test"],["lukas","Lukas","ash","hearing_test"],
 ["hartmut","Hartmut","ballad","voice_rework"],["frida","Frida","sage","voice_rework"],["asha","Asha","shimmer","hearing_test"],["sari","Sari","nova","hearing_test"],
-["leyla","Leyla","coral","hearing_test"],["noor","Noor","sage","hearing_test"],["sofia","Sofia","verse","hearing_test"],["camille","Camille","marin","hearing_test"],
+["leyla","Leyla","coral","hearing_test"],["noor","Noor","sage","hearing_test"],["sofia","Sofia","verse","hearing_test"],["camille","Camille","nova","hearing_test"],
 ["anna","Anna","nova","hearing_test"],["olena","Olena","shimmer","hearing_test"],["mei","Mei","sage","hearing_test"],["amara","Amara","coral","hearing_test"],
 ["kwame","Kwame","cedar","hearing_test"],["zuri","Zuri","shimmer","hearing_test"],["jabari","Jabari","onyx","hearing_test"],["arjun","Arjun","ash","hearing_test"],
 ["wei","Wei","echo","hearing_test"],["yuki","Yuki","marin","hearing_test"],["ren","Ren","alloy","hearing_test"]
@@ -24,7 +24,7 @@ test("canonical catalog contains exactly 23 voice mappings",()=>{
     const row=src.slice(start,start+240);
     assert.ok(row.includes('"'+voice+'","'+status+'"'),key+" voice/status mismatch");
   }
-  assert.ok(src.includes("voice-samples/\${key}.mp3?v=persona-20260829-1"));
+  assert.ok(src.includes("voice-samples/\${key}.mp3?v=persona-20260829-2"));
 });
 
 test("all 24 persona-tuned static MP3 samples exist and are non-empty",()=>{
@@ -145,4 +145,15 @@ test("dark pages restore multi-colour ambient depth and responsive gutter",()=>{
 test("registration action is a centered 44px flex control",()=>{
   const css=read("assets/concierge-carousel.css");
   assert.match(css,/\.nw-carousel-status\{[\s\S]*align-items:center;[\s\S]*justify-content:center;[\s\S]*height:44px;/);
+});
+
+test("quality-gated greetings are reflected in the catalog",()=>{
+  const src=read("assets/concierge-carousel.js");
+  assert.match(src,/Hola, ich bin Nilo/);
+  assert.match(src,/Namaste, ich bin Asha/);
+  assert.match(src,/Merhaba, ich bin Leyla/);
+  assert.match(src,/Bonjour, ich bin Camille/);
+  assert.match(src,/\["nilo","Nilo",[\s\S]{0,100}"onyx"/);
+  assert.match(src,/\["lukas","Lukas",[\s\S]{0,100}"ash"/);
+  assert.match(src,/\["camille","Camille",[\s\S]{0,100}"nova"/);
 });
