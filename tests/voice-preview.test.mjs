@@ -63,9 +63,9 @@ test("voice controls live in dedicated action rows, never on concierge images",(
 test("every real concierge surface loads preview assets before carousel",()=>{
   for(const page of pages){
     const html=read(page);
-    const css=html.indexOf("concierge-voice-preview.css?v=2");
-    const js=html.indexOf("concierge-voice-preview.js?v=2");
-    const carousel=html.indexOf("concierge-carousel.js?v=8");
+    const css=html.indexOf("concierge-voice-preview.css?v=3");
+    const js=html.indexOf("concierge-voice-preview.js?v=3");
+    const carousel=html.indexOf("concierge-carousel.js?v=9");
     assert.ok(css>=0,page+" missing preview CSS");
     assert.ok(js>=0,page+" missing preview JS");
     assert.ok(carousel>js,page+" must load preview JS before carousel");
