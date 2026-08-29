@@ -169,7 +169,7 @@ test("senior page starts on Frida with Hartmut visible beside her",async({page})
   await expect(active).toContainText("Frida");
   const hartmut=page.locator(".nw-carousel-card").filter({hasText:"Hartmut"});
   await expect(hartmut).toBeVisible();
-  const frida=page.locator('[data-concierge-key="frida"] .nw-voice-preview-control');
+  const frida=page.locator('.nw-voice-preview-control[data-concierge-key="frida"]');
   await expect(frida).toHaveAttribute("data-provisional","true");
   await expect(frida.locator(".nw-voice-preview-button")).toBeEnabled();
   await expect(frida.locator(".nw-voice-preview-badge")).toHaveText("Test");
@@ -186,8 +186,13 @@ for(const surface of ["/index.html","/prime-concierge.html","/senioren-concierge
     });
     await page.waitForTimeout(50);
     const before=await page.evaluate(()=>window.scrollY);
+    const header=page.locator("header.top");
     const toggle=page.locator(".nav-toggle");
+    await expect(header).toBeVisible();
     await expect(toggle).toBeVisible();
+    const headerBox=await header.boundingBox();
+    expect(headerBox.y).toBeGreaterThanOrEqual(-2);
+    expect(headerBox.y).toBeLessThanOrEqual(2);
     await toggle.click();
     await expect(toggle).toHaveAttribute("aria-expanded","true");
     await expect(page.locator(".links")).toHaveClass(/is-open/);
@@ -265,4 +270,26 @@ test("dark overview hero contains multi-colour ambient background",async({page})
   const background=await page.locator(".home-hero").evaluate(el=>getComputedStyle(el).backgroundImage);
   expect(background).toContain("radial-gradient");
   expect(background.split("radial-gradient").length-1).toBeGreaterThanOrEqual(3);
+});
+
+test("mobile menu panel is viewport anchored beneath the sticky header",async({page})=>{
+  await page.setViewportSize({width:1024,height:900});
+  await page.goto("http://127.0.0.1:4173/senioren-concierge.html",{waitUntil:"networkidle"});
+  await page.evaluate(()=>{document.documentElement.style.scrollBehavior="auto";window.scrollTo(0,420);});
+  await page.waitForTimeout(50);
+  const before=await page.evaluate(()=>window.scrollY);
+  const header=page.locator("header.top");
+  const toggle=page.locator(".nav-toggle");
+  const headerBox=await header.boundingBox();
+  expect(headerBox.y).toBeGreaterThanOrEqual(-2);
+  expect(headerBox.y).toBeLessThanOrEqual(2);
+  await toggle.click();
+  const menu=page.locator(".top .links.is-open");
+  await expect(menu).toBeVisible();
+  const position=await menu.evaluate(el=>getComputedStyle(el).position);
+  expect(position).toBe("fixed");
+  const menuBox=await menu.boundingBox();
+  const liveHeaderBox=await header.boundingBox();
+  expect(Math.abs(menuBox.y-(liveHeaderBox.y+liveHeaderBox.height))).toBeLessThanOrEqual(3);
+  expect(Math.abs((await page.evaluate(()=>window.scrollY))-before)).toBeLessThanOrEqual(2);
 });
