@@ -168,7 +168,7 @@ body[data-product="senioren"] .metric,
 body.senior-product .metric { border-color:var(--nw-line-light)!important; }
 .reveal { opacity:0; transform:translateY(18px); transition:opacity .7s var(--nw-ease),transform .7s var(--nw-ease); }
 .reveal.is-visible { opacity:1; transform:none; }
-body.menu-open { overflow:hidden; }
+body.menu-open { overflow:visible; }
 @media(max-width:1180px){
   .links { top:100%!important; left:0!important; right:0!important; padding:14px!important; background:rgba(12,12,10,.98)!important; border-radius:0 0 18px 18px!important; box-shadow:var(--nw-shadow)!important; }
   body[data-product="senioren"] .links,body.senior-product .links { background:rgba(247,243,234,.99)!important; }
@@ -264,4 +264,136 @@ body:not(.senior-product):not([data-product="senioren"]) .footer{
       linear-gradient(180deg,#080807,#060605);
   }
   .request-grid{grid-template-columns:1fr}.request-card.featured{grid-column:auto}.request-card{min-height:210px}
+}
+
+/* Continuation 03 — shared brand, responsive shell and ambient depth. */
+:root{--nw-gutter:clamp(20px,3.5vw,48px)}
+.wrap{
+  width:min(calc(100% - var(--nw-gutter) - var(--nw-gutter)),var(--nw-content))!important;
+  max-width:var(--nw-content);
+  margin-inline:auto;
+  padding-inline:0!important;
+}
+.brandtext strong:before,
+body.senior-product .brandtext strong:before,
+body[data-product="senioren"] .brandtext strong:before{
+  content:"NAH"!important;
+  display:inline!important;
+  color:#d4af37!important;
+  background:none!important;
+  -webkit-text-fill-color:currentColor!important;
+  font-family:Georgia,"Times New Roman",serif!important;
+  font-size:23px!important;
+  font-weight:500!important;
+  line-height:1!important;
+  letter-spacing:.13em!important;
+}
+.brandtext strong:after,
+body.senior-product .brandtext strong:after,
+body[data-product="senioren"] .brandtext strong:after{
+  content:"WERK";
+  display:inline;
+  color:#c6c9cf;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:23px;
+  font-weight:500;
+  line-height:1;
+  letter-spacing:.13em;
+}
+.brandtext span:before,
+.top .brandtext span:before{
+  color:#b9bcc2!important;
+}
+body.senior-product .brandtext span:before,
+body[data-product="senioren"] .brandtext span:before,
+body.senior-product .top .brandtext span:before,
+body[data-product="senioren"] .top .brandtext span:before{
+  color:#73767b!important;
+}
+body:not(.senior-product):not([data-product="senioren"]) main{
+  background:
+    radial-gradient(900px 620px at 96% 9%,rgba(58,111,224,.115),transparent 63%),
+    radial-gradient(820px 560px at 4% 34%,rgba(131,67,174,.09),transparent 66%),
+    radial-gradient(760px 520px at 82% 69%,rgba(34,153,157,.075),transparent 67%),
+    radial-gradient(900px 560px at 104% 18%,rgba(212,175,55,.10),transparent 64%),
+    linear-gradient(180deg,#080807 0%,#0b0a09 48%,#060605 100%)!important;
+}
+body:not(.senior-product):not([data-product="senioren"]) :is(.home-hero,.concierge-overview-hero,.services-hero){
+  background:
+    radial-gradient(640px 500px at 78% 30%,rgba(58,111,224,.15),transparent 64%),
+    radial-gradient(560px 430px at 92% 60%,rgba(42,164,158,.105),transparent 66%),
+    radial-gradient(520px 400px at 58% 5%,rgba(130,71,180,.10),transparent 68%),
+    radial-gradient(620px 430px at 70% 46%,rgba(212,175,55,.12),transparent 67%),
+    linear-gradient(145deg,#070707,#0d0c0b 58%,#060606)!important;
+}
+.home-hero .concierge-stage{position:relative;isolation:isolate}
+.home-hero .concierge-stage:before{
+  content:"";
+  position:absolute;
+  z-index:0;
+  inset:9% 0 5%;
+  border-radius:42%;
+  background:
+    radial-gradient(circle at 38% 42%,rgba(76,115,238,.30),transparent 34%),
+    radial-gradient(circle at 68% 36%,rgba(41,171,166,.22),transparent 35%),
+    radial-gradient(circle at 54% 69%,rgba(147,76,191,.20),transparent 38%),
+    radial-gradient(circle at 48% 50%,rgba(212,175,55,.18),transparent 55%);
+  filter:blur(52px);
+  opacity:.72;
+  pointer-events:none;
+}
+.home-hero .portrait{position:relative;z-index:1}
+.services-page .services-hero:after{display:none!important}
+.services-hero-layout{
+  display:grid;
+  grid-template-columns:minmax(0,1.02fr) minmax(360px,.98fr);
+  gap:clamp(34px,6vw,84px);
+  align-items:center;
+}
+.services-hero-copy{position:relative;z-index:2;max-width:760px}
+.services-hero-photo{
+  position:relative;
+  z-index:2;
+  margin:0;
+  aspect-ratio:4/3;
+  overflow:hidden;
+  border:1px solid rgba(212,175,55,.24);
+  border-radius:30px;
+  background:#111;
+  box-shadow:0 34px 90px rgba(0,0,0,.35);
+}
+.services-hero-photo:before{
+  content:"";
+  position:absolute;
+  z-index:0;
+  inset:-22%;
+  background:
+    radial-gradient(circle at 25% 30%,rgba(61,117,235,.20),transparent 36%),
+    radial-gradient(circle at 78% 36%,rgba(46,161,154,.16),transparent 38%),
+    radial-gradient(circle at 54% 80%,rgba(138,72,181,.14),transparent 42%);
+  filter:blur(28px);
+}
+.services-hero-photo img{
+  position:relative;
+  z-index:1;
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+}
+@media(max-width:1000px){
+  .services-hero-layout{grid-template-columns:1fr}
+  .services-hero-photo{width:min(100%,760px)}
+}
+@media(max-width:720px){
+  :root{--nw-gutter:20px}
+  .brandtext strong:before,
+  body.senior-product .brandtext strong:before,
+  body[data-product="senioren"] .brandtext strong:before,
+  .brandtext strong:after,
+  body.senior-product .brandtext strong:after,
+  body[data-product="senioren"] .brandtext strong:after{font-size:19px!important}
+  .services-hero-photo{border-radius:24px}
+  .home-hero .concierge-stage:before{filter:blur(36px);opacity:.6}
 }
