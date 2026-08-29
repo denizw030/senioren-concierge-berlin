@@ -296,3 +296,96 @@ test("mobile menu panel is viewport anchored beneath the sticky header",async({p
   expect(Math.abs(menuBox.y-(liveHeaderBox.y+liveHeaderBox.height))).toBeLessThanOrEqual(3);
   expect(Math.abs((await page.evaluate(()=>window.scrollY))-before)).toBeLessThanOrEqual(2);
 });
+
+test("language selector starts native and replays immediately after switching",async({page})=>{
+  await page.goto("http://127.0.0.1:4173/index.html",{waitUntil:"networkidle"});
+  const root=page.locator("[data-concierge-carousel]");
+  await root.evaluate(el=>el._nahwerkCarousel.select("mira"));
+  const control=page.locator('.nw-voice-preview-control[data-concierge-key="mira"]');
+  const select=control.locator(".nw-voice-preview-language-select");
+  const button=control.locator(".nw-voice-preview-button");
+  await expect(select).toHaveValue("es");
+  await expect(select.locator("option")).toHaveCount(3);
+  await button.click();
+  await expect(button).toHaveAttribute("data-state","playing",{timeout:5000});
+  await select.selectOption("de");
+  await expect(select).toHaveValue("de");
+  await expect(button).toHaveAttribute("data-state","playing",{timeout:5000});
+});
+
+test("all multilingual preview files are reachable",async({page})=>{
+  await page.goto("http://127.0.0.1:4173/index.html",{waitUntil:"networkidle"});
+  const result=await page.evaluate(async()=>{
+    const checks=[];
+    for(const profile of window.NAHWERKCarousel.profiles){
+      for(const [lang,url] of Object.entries(profile.sampleAudioByLanguage||{})){
+        const response=await fetch(url,{cache:"no-store"});
+        checks.push({key:profile.key,lang,status:response.status,bytes:(await response.arrayBuffer()).byteLength});
+      }
+    }
+    return checks;
+  });
+  expect(result).toHaveLength(65);
+  for(const check of result){
+    expect(check.status,`${check.key}/${check.lang}`).toBe(200);
+    expect(check.bytes,`${check.key}/${check.lang}`).toBeGreaterThan(20000);
+  }
+});
+
+test("carousel portrait click opens registration for that concierge",async({page})=>{
+  await page.goto("http://127.0.0.1:4173/index.html",{waitUntil:"networkidle"});
+  const active=page.locator(".nw-carousel-card.is-active .nw-carousel-select");
+  const profile=await page.locator("[data-concierge-carousel]").evaluate(el=>el._nahwerkCarousel.selected.key);
+  await Promise.all([
+    page.waitForURL(url=>url.pathname.endsWith("/registrieren.html")&&url.searchParams.get("concierge")===profile),
+    active.click()
+  ]);
+});
+
+test("overview portrait click opens registration directly",async({page})=>{
+  await page.goto("http://127.0.0.1:4173/concierges.html",{waitUntil:"networkidle"});
+  const card=page.locator(".concierge-overview-card").first();
+  const key=await card.locator(".concierge-overview-voice").getAttribute("data-concierge-key");
+  await Promise.all([
+    page.waitForURL(url=>url.pathname.endsWith("/registrieren.html")&&url.searchParams.get("concierge")===key),
+    card.locator(".concierge-overview-card-media").click()
+  ]);
+});
+
+test("senior header uses realistic gold-man emblem and black WERK/CONCIERGE",async({page})=>{
+  await page.goto("http://127.0.0.1:4173/senioren-concierge.html",{waitUntil:"networkidle"});
+  const result=await page.locator(".top .brand").evaluate(el=>{
+    const strong=el.querySelector(".brandtext strong");
+    const sub=el.querySelector(".brandtext span");
+    const mark=el.querySelector(".mark");
+    return {
+      nah:getComputedStyle(strong,"::before").color,
+      werk:getComputedStyle(strong,"::after").color,
+      concierge:getComputedStyle(sub,"::before").color,
+      mark:getComputedStyle(mark).backgroundImage
+    };
+  });
+  expect(result.nah).not.toBe(result.werk);
+  expect(result.werk).toBe("rgb(23, 19, 13)");
+  expect(result.concierge).toBe("rgb(23, 19, 13)");
+  expect(result.mark).toContain("NAHWERKConcierge-Logo.png");
+});
+
+test("senior registration first paint stays light",async({page})=>{
+  await page.goto("http://127.0.0.1:4173/registrieren.html?produkt=senioren",{waitUntil:"domcontentloaded"});
+  const initial=await page.evaluate(()=>({
+    html:getComputedStyle(document.documentElement).backgroundColor,
+    body:getComputedStyle(document.body).backgroundColor
+  }));
+  expect(initial.html).toBe("rgb(255, 253, 249)");
+  expect(initial.body).toBe("rgb(255, 253, 249)");
+});
+
+test("app-free copy explicitly mentions no extra app and future free NAHWERK app",async({page})=>{
+  await page.goto("http://127.0.0.1:4173/index.html",{waitUntil:"networkidle"});
+  await expect(page.locator("body")).toContainText("Keine zusätzliche App notwendig");
+  await expect(page.locator("body")).toContainText("NAHWERK App ist in Entwicklung");
+  await page.goto("http://127.0.0.1:4173/senioren-concierge.html",{waitUntil:"networkidle"});
+  await expect(page.locator("body")).toContainText("Keine zusätzliche App notwendig");
+  await expect(page.locator(".senior-app-note")).toContainText("kostenlos");
+});
