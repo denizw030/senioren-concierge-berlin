@@ -1,0 +1,52 @@
+name: Normalize shared asset versions
+
+on:
+  push:
+    branches:
+      - staging/website-concierge-voice-preview-01
+    paths:
+      - .github/workflows/normalize-shared-assets.yml
+
+permissions:
+  contents: write
+
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: staging/website-concierge-voice-preview-01
+      - name: Normalize cache versions
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          replacements={
+            "brand-2026.css?v=13":"brand-2026.css?v=16",
+            "brand-2026.css?v=14":"brand-2026.css?v=16",
+            "brand-2026.css?v=15":"brand-2026.css?v=16",
+            "auth-nav.js?v=27":"auth-nav.js?v=28",
+            "site-ui.js?v=3":"site-ui.js?v=5",
+            "site-ui.js?v=4":"site-ui.js?v=5",
+            "concierge-carousel.css?v=5":"concierge-carousel.css?v=6",
+            "concierge-overview.css?v=6":"concierge-overview.css?v=7",
+          }
+          for p in Path(".").glob("*.html"):
+            text=p.read_text()
+            before=text
+            for old,new in replacements.items():
+              text=text.replace(old,new)
+            if text!=before:
+              p.write_text(text)
+          PY
+          git config user.name "NAHWERK UX QA"
+          git config user.email "actions@users.noreply.github.com"
+          git add '*.html'
+          if git diff --cached --quiet; then
+            echo "No cache versions to update"
+            exit 0
+          fi
+          git commit -m "Normalize shared UX cache versions"
+          git push origin HEAD:staging/website-concierge-voice-preview-01
