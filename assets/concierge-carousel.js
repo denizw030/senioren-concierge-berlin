@@ -1,34 +1,34 @@
 (() => {
   const profiles = [
-    ["nilo","Nilo","Klar, ruhig und strukturiert.","onyx","hearing_test","Hola, ich bin Nilo. Ich begleite Sie ruhig, klar und zuverlässig im Alltag."],
-    ["mira","Mira","Warm, verständlich und aufmerksam.","marin","hearing_test","Hallo, ich bin Mira. Ich begleite Sie aufmerksam, warm und zuverlässig im Alltag."],
-    ["lena","Lena","Modern, empathisch und lösungsorientiert.","coral","hearing_test","Hallo, ich bin Lena. Ich helfe Ihnen freundlich, klar und lösungsorientiert weiter."],
-    ["lukas","Lukas","Souverän, direkt und zuverlässig.","ash","hearing_test","Hallo, ich bin Lukas. Ich unterstütze Sie klar, souverän und zuverlässig."],
-    ["hartmut","Hartmut","Ruhig, erfahren und geduldig.","ballad","voice_rework","Guten Tag, ich bin Hartmut. Ich begleite Sie ruhig, verständlich und mit Geduld."],
-    ["frida","Frida","Herzlich, klar und zugewandt.","sage","voice_rework","Guten Tag, ich bin Frida. Ich bin gern mit Ruhe, Herzlichkeit und Erfahrung für Sie da."],
-    ["asha","Asha","Empathisch, aufmerksam und besonnen.","shimmer","hearing_test","Namaste, ich bin Asha. Ich unterstütze Sie freundlich, aufmerksam und mit viel Ruhe."],
-    ["sari","Sari","Freundlich, ruhig und lösungsorientiert.","nova","hearing_test","Hallo, ich bin Sari. Ich helfe Ihnen freundlich, ruhig und lösungsorientiert."],
-    ["leyla","Leyla","Warm, direkt und verlässlich.","coral","hearing_test","Merhaba, ich bin Leyla. Ich begleite Sie warm, direkt und zuverlässig."],
-    ["noor","Noor","Aufmerksam, feinfühlig und strukturiert.","sage","hearing_test","Hallo, ich bin Noor. Ich begleite Sie aufmerksam, feinfühlig und strukturiert."],
-    ["sofia","Sofia","Lebendig, herzlich und klar.","verse","hearing_test","Hallo, ich bin Sofia. Ich helfe Ihnen herzlich, lebendig und klar."],
-    ["camille","Camille","Elegant, ruhig und präzise.","nova","hearing_test","Bonjour, ich bin Camille. Ich begleite Sie ruhig, elegant und aufmerksam."],
-    ["anna","Anna","Pragmatisch, freundlich und zuverlässig.","nova","hearing_test","Hallo, ich bin Anna. Ich unterstütze Sie pragmatisch, freundlich und zuverlässig."],
-    ["olena","Olena","Einfühlsam, klar und ausdauernd.","shimmer","hearing_test","Hallo, ich bin Olena. Ich begleite Sie einfühlsam, klar und ausdauernd."],
-    ["mei","Mei","Bedacht, modern und aufmerksam.","sage","hearing_test","Hallo, ich bin Mei. Ich unterstütze Sie bedacht, aufmerksam und präzise."],
-    ["amara","Amara","Souverän, herzlich und lösungsstark.","coral","hearing_test","Hallo, ich bin Amara. Ich begleite Sie souverän, herzlich und lösungsstark."],
-    ["kwame","Kwame","Gelassen, verbindlich und strukturiert.","cedar","hearing_test","Hallo, ich bin Kwame. Ich unterstütze Sie gelassen, verbindlich und strukturiert."],
-    ["zuri","Zuri","Positiv, aufmerksam und klar.","shimmer","hearing_test","Hallo, ich bin Zuri. Ich helfe Ihnen positiv, aufmerksam und klar."],
-    ["jabari","Jabari","Ruhig, selbstbewusst und zuverlässig.","onyx","hearing_test","Hallo, ich bin Jabari. Ich begleite Sie ruhig, selbstbewusst und zuverlässig."],
-    ["arjun","Arjun","Analytisch, freundlich und lösungsorientiert.","ash","hearing_test","Hallo, ich bin Arjun. Ich unterstütze Sie analytisch, freundlich und lösungsorientiert."],
-    ["wei","Wei","Präzise, besonnen und effizient.","echo","hearing_test","Hallo, ich bin Wei. Ich begleite Sie präzise, besonnen und effizient."],
-    ["yuki","Yuki","Ruhig, modern und detailbewusst.","marin","hearing_test","Hallo, ich bin Yuki. Ich unterstütze Sie ruhig, modern und detailbewusst."],
-    ["ren","Ren","Klar, ausgeglichen und zuverlässig.","alloy","hearing_test","Hallo, ich bin Ren. Ich begleite Sie klar, ausgeglichen und zuverlässig."]
+    ["nilo","Nilo","Warm, ruhig, modern und strukturiert.","cedar","approved","Hola, ich bin Nilo. Ich begleite Sie ruhig, klar und zuverlässig im Alltag."],
+    ["mira","Mira","Jung, elegant, warm und aufmerksam.","marin","hearing_test","Hola, ich bin Mira. Ich begleite Sie warm, aufmerksam und zuverlässig im Alltag."],
+    ["lena","Lena","Warm, empathisch, natürlich und zugänglich.","coral","hearing_test","Hallo, ich bin Lena. Ich helfe Ihnen freundlich, klar und lösungsorientiert weiter."],
+    ["lukas","Lukas","Souverän, ruhig, direkt und modern.","alloy","hearing_test","Hallo, ich bin Lukas. Ich unterstütze Sie klar, souverän und zuverlässig."],
+    ["hartmut","Hartmut","Tief, voll, erfahren, würdevoll und ruhig.","onyx","approved","Guten Tag, ich bin Hartmut. Ich begleite Sie ruhig, verständlich und mit Erfahrung."],
+    ["frida","Frida","Reif, warm, würdevoll, ruhig und nicht gebrechlich.","sage","hearing_test","Guten Tag, ich bin Frida. Ich bin gern mit Ruhe, Herzlichkeit und Erfahrung für Sie da."],
+    ["asha","Asha","Jung, hell-modern, warm und selbstbewusst.","shimmer","hearing_test","Namaste, ich bin Asha. Ich unterstütze Sie freundlich, aufmerksam und mit viel Ruhe."],
+    ["sari","Sari","Sanft-modern, freundlich und aufmerksam.","coral","hearing_test","Halo, ich bin Sari. Ich helfe Ihnen freundlich, ruhig und aufmerksam weiter."],
+    ["leyla","Leyla","Elegant, selbstbewusst, warm und modern.","marin","hearing_test","Merhaba, ich bin Leyla. Ich begleite Sie warm, direkt und zuverlässig."],
+    ["noor","Noor","Ruhig, elegant, diskret und aufmerksam.","sage","hearing_test","Marhaba, ich bin Noor. Ich begleite Sie ruhig, aufmerksam und strukturiert."],
+    ["sofia","Sofia","Lebendig, jung, warm und herzlich.","shimmer","hearing_test","Hola, ich bin Sofia. Ich helfe Ihnen herzlich, lebendig und klar."],
+    ["camille","Camille","Elegant, modern, kultiviert und präzise.","marin","hearing_test","Bonjour, ich bin Camille. Ich begleite Sie ruhig, elegant und aufmerksam."],
+    ["anna","Anna","Warm, praktisch, klar und zuverlässig.","coral","hearing_test","Dzień dobry, ich bin Anna. Ich unterstütze Sie pragmatisch, freundlich und zuverlässig."],
+    ["olena","Olena","Ruhig, warm, modern und einfühlsam.","shimmer","hearing_test","Pryvit, ich bin Olena. Ich begleite Sie einfühlsam, klar und zuverlässig."],
+    ["mei","Mei","Ruhig, präzise, modern und bedacht.","sage","hearing_test","Nǐ hǎo, ich bin Mei. Ich unterstütze Sie bedacht, aufmerksam und präzise."],
+    ["amara","Amara","Warm, souverän, modern und herzlich.","coral","hearing_test","Hallo, ich bin Amara. Ich begleite Sie souverän, herzlich und lösungsorientiert."],
+    ["kwame","Kwame","Geerdet, ruhig, warm und souverän.","cedar","hearing_test","Hallo, ich bin Kwame. Ich unterstütze Sie gelassen, verbindlich und strukturiert."],
+    ["zuri","Zuri","Modern, lebendig, warm und aufmerksam.","shimmer","hearing_test","Hallo, ich bin Zuri. Ich helfe Ihnen positiv, aufmerksam und klar."],
+    ["jabari","Jabari","Selbstbewusst, ruhig, direkt und zuverlässig.","alloy","hearing_test","Hallo, ich bin Jabari. Ich begleite Sie ruhig, selbstbewusst und zuverlässig."],
+    ["arjun","Arjun","Geerdet, warm, souverän und analytisch.","cedar","hearing_test","Namaste, ich bin Arjun. Ich unterstütze Sie analytisch, freundlich und lösungsorientiert."],
+    ["wei","Wei","Ruhig, kultiviert, zurückhaltend und präzise.","ballad","hearing_test","Nǐ hǎo, ich bin Wei. Ich begleite Sie präzise, besonnen und effizient."],
+    ["yuki","Yuki","Jung, freundlich, klar und modern.","marin","hearing_test","Konnichiwa, ich bin Yuki. Ich unterstütze Sie ruhig, modern und detailbewusst."],
+    ["ren","Ren","Ruhig, modern, männlich und präzise.","alloy","hearing_test","Konnichiwa, ich bin Ren. Ich begleite Sie klar, ausgeglichen und zuverlässig."]
   ].map(([key,name,description,voice,voiceStatus,sampleText]) => ({
     key,name,description,voice,voiceStatus,
     image:`assets/concierges/large/${key}.webp`,
     cardImage:`assets/concierges/card/${key}.webp`,
     largeImage:`assets/concierges/large/${key}.webp`,
-    sampleAudio:`assets/concierges/voice-samples/${key}.mp3?v=persona-20260829-2`,
+    sampleAudio:`assets/concierges/voice-samples/${key}.mp3?v=persona-runtime-20260829-1`,
     sampleText
   }));
   const byKey = Object.fromEntries(profiles.map(profile => [profile.key,profile]));
@@ -146,7 +146,7 @@
       const profile=profiles[active]; name.textContent=profile.name; description.textContent=profile.description;
       const provisional=profile.voiceStatus!=="approved";
       voiceNote.hidden=!provisional;
-      voiceNote.textContent=profile.voiceStatus==="voice_rework"?"Diese Stimme wird neu ausgewählt und ist vorübergehend nicht abspielbar.":provisional?"Die Hörprobe ist noch nicht final freigegeben.":"";
+      voiceNote.textContent=provisional?"Die Hörprobe ist noch nicht final freigegeben.":"";
       status.hidden=variant!=="selection"&&!registerUrl;
       status.textContent=registerUrl?"Registrieren":"Ausgewählt";
       status.disabled=!registerUrl;
