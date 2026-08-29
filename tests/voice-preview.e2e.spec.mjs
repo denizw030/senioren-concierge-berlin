@@ -68,7 +68,7 @@ test("starting another sample stops the previous one",async({page})=>{
   await nilo.click();
   await expect(nilo).toHaveAttribute("data-state","playing",{timeout:5000});
   await root.evaluate(el=>el._nahwerkCarousel.select("mira"));
-  await expect(nilo).toHaveAttribute("data-state","stopped");
+  await expect(page.locator('[data-concierge-key="nilo"] .nw-voice-preview-button')).toHaveCount(0);
   const mira=page.locator('[data-concierge-key="mira"] .nw-voice-preview-button');
   await mira.click();
   await expect(mira).toHaveAttribute("data-state","playing",{timeout:5000});
@@ -89,7 +89,7 @@ test("provisional voices are explicitly labelled as test voices",async({page})=>
   for(const key of ["jabari","arjun"]){
     const control=page.locator(`.nw-voice-preview-control[data-concierge-key="${key}"]`);
     await expect(control).toHaveAttribute("data-provisional","true");
-    await expect(control.locator(".nw-voice-preview-label")).toContainText("Teststimme");
+    await expect(control.locator(".nw-voice-preview-badge")).toHaveText("Test");
   }
 });
 
@@ -110,7 +110,7 @@ test("24-persona audition page exposes every tuned voice including Lars",async({
   for(const key of ["nilo","lukas","hartmut","frida","lars"]){
     const control=page.locator(`.voice-audition-card[data-key="${key}"] .nw-voice-preview-control`);
     await expect(control).toHaveAttribute("data-provisional","true");
-    await expect(control.locator(".nw-voice-preview-label")).toContainText("Teststimme");
+    await expect(control.locator(".nw-voice-preview-badge")).toHaveText("Test");
   }
   const lars=page.locator('[data-concierge-key="lars"] .nw-voice-preview-button');
   await lars.click();
