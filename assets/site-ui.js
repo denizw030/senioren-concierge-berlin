@@ -6,7 +6,7 @@
       premium.href = 'assets/premium-preview.css?v=2';
       premium.dataset.nwPremiumPreview = 'true';
       document.head.append(premium);
-      const master=document.createElement('link'); master.rel='stylesheet'; master.href='assets/master-reference-2026.css?v=1'; master.dataset.nwMaster='true'; document.head.append(master);
+      const master=document.createElement('link'); master.rel='stylesheet'; master.href='assets/master-reference-2026.css?v=1'; master.dataset.nwMaster='true'; document.head.append(master); const components=document.createElement('link'); components.rel='stylesheet'; components.href='assets/master-components-2026.css?v=1'; document.head.append(components); const senior=document.createElement('link'); senior.rel='stylesheet'; senior.href='assets/master-senior-2026.css?v=1'; document.head.append(senior);
     }
 
     if (!document.querySelector('.skip-link')) {
