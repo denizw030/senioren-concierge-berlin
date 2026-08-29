@@ -72,7 +72,7 @@ test("every real concierge surface loads preview assets before carousel",()=>{
     const html=read(page);
     const css=html.indexOf("concierge-voice-preview.css?v=5");
     const js=html.indexOf("concierge-voice-preview.js?v=5");
-    const carousel=html.indexOf("concierge-carousel.js?v=13");
+    const carousel=html.indexOf("concierge-carousel.js?v=14");
     assert.ok(css>=0,page+" missing preview CSS");
     assert.ok(js>=0,page+" missing preview JS");
     assert.ok(carousel>js,page+" must load preview JS before carousel");
