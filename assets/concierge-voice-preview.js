@@ -3,10 +3,12 @@
   const entries = new Set();
 
   const isProvisional = profile => profile.voiceStatus && profile.voiceStatus !== "approved";
+  const isRework = profile => profile.voiceStatus === "voice_rework";
 
   function visibleCopy(entry, state) {
     if (state === "loading") return "Wird geladen";
     if (state === "playing") return "Stoppen";
+    if (isRework(entry.profile)) return "Stimme wird überarbeitet";
     if (state === "error") return "Nicht verfügbar";
     return "Stimme anhören";
   }
@@ -20,8 +22,13 @@
     button.setAttribute("aria-pressed", state === "playing" ? "true" : "false");
     const action = state === "playing" ? "stoppen" : "anhören";
     const prefix = isProvisional(profile) ? "Teststimme" : "Stimme";
-    button.setAttribute("aria-label", `${prefix} von ${profile.name} ${action}`);
-    button.title = `${prefix} von ${profile.name} ${action}`;
+    if (isRework(profile)) {
+      button.setAttribute("aria-label", `Stimme von ${profile.name} wird überarbeitet`);
+      button.title = `Stimme von ${profile.name} wird überarbeitet`;
+    } else {
+      button.setAttribute("aria-label", `${prefix} von ${profile.name} ${action}`);
+      button.title = `${prefix} von ${profile.name} ${action}`;
+    }
     copy.textContent = visibleCopy(entry, state);
   }
 
@@ -53,7 +60,7 @@
   }
 
   async function toggle(entry) {
-    if (!entry?.profile?.sampleAudio) return;
+    if (!entry?.profile?.sampleAudio || isRework(entry.profile)) return;
     if (entry.state === "playing" || entry.state === "loading") {
       stop(entry);
       return;
@@ -77,7 +84,9 @@
     control.className = `nw-voice-preview-control ${options.className || ""}`.trim();
     control.dataset.conciergeKey = profile.key;
     const provisional = isProvisional(profile);
+    const rework = isRework(profile);
     if (provisional) control.dataset.provisional = "true";
+    if (rework) control.dataset.rework = "true";
 
     const button = document.createElement("button");
     button.type = "button";
@@ -92,8 +101,9 @@
         <span class="icon-error">!</span>
       </span>
       <span class="nw-voice-preview-copy"></span>
-      ${provisional ? '<span class="nw-voice-preview-badge" aria-hidden="true">Test</span>' : ""}
+      ${provisional && !rework ? '<span class="nw-voice-preview-badge" aria-hidden="true">Test</span>' : ""}
     `;
+    if (rework) button.disabled = true;
     const copy = button.querySelector(".nw-voice-preview-copy");
     control.appendChild(button);
 
