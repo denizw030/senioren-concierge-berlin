@@ -5,12 +5,12 @@ import path from "node:path";
 
 const root=process.cwd();
 const profiles=[
-["nilo","Nilo","cedar","approved"],["mira","Mira","marin","approved"],["lena","Lena","coral","approved"],["lukas","Lukas","alloy","approved"],
-["hartmut","Hartmut","ballad","hearing_test"],["frida","Frida","sage","approved"],["asha","Asha","shimmer","hearing_test"],["sari","Sari","coral","approved"],
-["leyla","Leyla","marin","approved"],["noor","Noor","sage","approved"],["sofia","Sofia","shimmer","approved"],["camille","Camille","marin","approved"],
-["anna","Anna","coral","hearing_test_optional"],["olena","Olena","shimmer","hearing_test"],["mei","Mei","sage","approved"],["amara","Amara","coral","hearing_test"],
-["kwame","Kwame","cedar","validation"],["zuri","Zuri","shimmer","hearing_test"],["jabari","Jabari","alloy","hearing_test"],["arjun","Arjun","cedar","validation"],
-["wei","Wei","ballad","hearing_test"],["yuki","Yuki","marin","validation"],["ren","Ren","alloy","hearing_test_optional"]
+["nilo","Nilo","cedar","hearing_test"],["mira","Mira","marin","hearing_test"],["lena","Lena","coral","hearing_test"],["lukas","Lukas","alloy","hearing_test"],
+["hartmut","Hartmut","ballad","hearing_test"],["frida","Frida","sage","hearing_test"],["asha","Asha","shimmer","hearing_test"],["sari","Sari","nova","hearing_test"],
+["leyla","Leyla","coral","hearing_test"],["noor","Noor","sage","hearing_test"],["sofia","Sofia","verse","hearing_test"],["camille","Camille","marin","hearing_test"],
+["anna","Anna","nova","hearing_test"],["olena","Olena","shimmer","hearing_test"],["mei","Mei","sage","hearing_test"],["amara","Amara","coral","hearing_test"],
+["kwame","Kwame","cedar","hearing_test"],["zuri","Zuri","shimmer","hearing_test"],["jabari","Jabari","onyx","hearing_test"],["arjun","Arjun","ash","hearing_test"],
+["wei","Wei","echo","hearing_test"],["yuki","Yuki","marin","hearing_test"],["ren","Ren","alloy","hearing_test"]
 ];
 const pages=["index.html","prime-concierge.html","senioren-concierge.html","concierges.html","registrieren.html","concierge-anpassen.html"];
 const read=p=>fs.readFileSync(path.join(root,p),"utf8");
@@ -24,11 +24,13 @@ test("canonical catalog contains exactly 23 voice mappings",()=>{
     const row=src.slice(start,start+240);
     assert.ok(row.includes('"'+voice+'","'+status+'"'),key+" voice/status mismatch");
   }
-  assert.ok(src.includes("voice-samples/\${key}.mp3"));
+  assert.ok(src.includes("voice-samples/\${key}.mp3?v=persona-20260829-1"));
 });
 
-test("all 23 static MP3 samples exist and are non-empty",()=>{
-  for(const [key] of profiles){
+test("all 24 persona-tuned static MP3 samples exist and are non-empty",()=>{
+  const audioKeys=[...profiles.map(([key])=>key),"lars"];
+  assert.equal(audioKeys.length,24);
+  for(const key of audioKeys){
     const file=path.join(root,"assets/concierges/voice-samples",key+".mp3");
     const stat=fs.statSync(file);
     assert.ok(stat.size>50000,key+" sample unexpectedly small");
