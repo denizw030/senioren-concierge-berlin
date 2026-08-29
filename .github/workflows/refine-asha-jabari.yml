@@ -1,0 +1,35 @@
+name: Refine Asha and Jabari voice QA
+on:
+  push:
+    branches: [staging/website-concierge-voice-preview-01]
+    paths: [.github/workflows/refine-asha-jabari.yml]
+permissions:
+  contents: read
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate and score
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://btqklftjmwtqqqdmwlnk.supabase.co/functions/v1/nw-voice-refine-qa-20260829/refineQa-20260829-v1"
+          mkdir -p /tmp/refine
+          : > /tmp/refine/results.txt
+          for key in asha jabari; do
+            for variant in 0 1; do
+              mp3="/tmp/refine/${key}-${variant}.mp3"
+              json="/tmp/refine/${key}-${variant}.json"
+              curl --fail --silent --show-error "$base/generate/${key}/${variant}" -o "$mp3"
+              curl --fail --silent --show-error -X POST -H "content-type: audio/mpeg" --data-binary "@$mp3" "$base/evaluate/${key}/${variant}" -o "$json"
+              age=$(jq -r '.age_fit//0' "$json"); pitch=$(jq -r '.pitch_fit//0' "$json"); accent=$(jq -r '.accent_fit//0' "$json"); persona=$(jq -r '.persona_fit//0' "$json"); natural=$(jq -r '.naturalness//0' "$json"); intel=$(jq -r '.intelligibility//0' "$json"); premium=$(jq -r '.premium//0' "$json"); perceived=$(jq -r '.perceived_age//0' "$json"); voice=$(jq -r '.voice//"unknown"' "$json")
+              score=$((age*2+pitch*3+accent*3+persona*2+natural*2+intel*2+premium))
+              echo "${key} variant=${variant} voice=${voice} perceived_age=${perceived} age=${age} pitch=${pitch} accent=${accent} persona=${persona} natural=${natural} intelligibility=${intel} premium=${premium} score=${score}" | tee -a /tmp/refine/results.txt
+            done
+          done
+          cat /tmp/refine/results.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: refine-asha-jabari
+          path: /tmp/refine
