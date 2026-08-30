@@ -624,3 +624,31 @@ body:not(.login-image-page):not(.senior-product):not([data-product="senioren"]) 
   content:none!important;
   background:none!important;
 }
+
+
+/* Global responsive containment for buttons, grids and form controls. */
+*,*::before,*::after{box-sizing:border-box}
+main :is(.card,.product,.mini-plan,.step,.contactitem,.formcard,.preview,.logincard,.resetcard,.usagebox,.legalbox,.price-card,.package-card,.request-card),
+main :is(.grid,.actions,.contactbox,.setup-choice,.pricing-grid,.request-grid){
+  min-width:0;
+}
+.actions{
+  max-width:100%!important;
+  flex-wrap:wrap!important;
+}
+.actions>.btn,.actions>.ref-btn{
+  width:min(100%,var(--nw-cta-width))!important;
+  min-width:0!important;
+  max-width:100%!important;
+  flex:0 1 var(--nw-cta-width)!important;
+}
+:is(input,select,textarea,button,.btn,.ref-btn){
+  max-width:100%;
+  box-sizing:border-box;
+}
+@media(max-width:760px){
+  .actions>.btn,.actions>.ref-btn{
+    width:100%!important;
+    flex-basis:100%!important;
+  }
+}
