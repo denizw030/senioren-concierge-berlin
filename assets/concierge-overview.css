@@ -291,7 +291,15 @@
   pointer-events:none;
 }
 .co-globe canvas{
+  display:block!important;
   width:min(100%,350px)!important;
+  aspect-ratio:1!important;
+  border-radius:50%!important;
+  background:
+    radial-gradient(circle at 34% 28%,rgba(56,139,194,.28),transparent 34%),
+    radial-gradient(circle at 70% 34%,rgba(116,73,190,.16),transparent 48%),
+    radial-gradient(circle at 48% 78%,rgba(33,137,161,.11),transparent 54%),
+    linear-gradient(145deg,#102d49 0%,#07192a 58%,#02070d 100%)!important;
   filter:
     drop-shadow(0 30px 38px rgba(0,0,0,.58))
     drop-shadow(0 0 18px rgba(72,155,207,.09))
