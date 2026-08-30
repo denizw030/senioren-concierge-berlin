@@ -60,3 +60,36 @@ body[data-product="senioren"] .nw-carousel-status:not(:disabled):hover,body.seni
   .nw-carousel-actions{align-items:stretch}
   .nw-carousel-voice-host{justify-content:center}
 }
+
+/* Registration selection needs extra vertical room for the language selector. */
+.nw-carousel[data-variant="selection"] .nw-carousel-info{
+  min-height:210px!important;
+  padding:12px 22px 24px!important;
+  overflow:visible!important;
+}
+.nw-carousel[data-variant="selection"] .nw-carousel-actions{
+  width:100%;
+  display:grid!important;
+  grid-template-columns:minmax(0,280px) 126px;
+  justify-content:center!important;
+  align-items:start!important;
+  gap:10px!important;
+}
+.nw-carousel[data-variant="selection"] .nw-carousel-voice-host{
+  width:100%;
+  min-width:0;
+}
+.nw-carousel[data-variant="selection"] .nw-carousel-status{
+  width:126px;
+  min-width:126px;
+}
+@media(max-width:620px){
+  .nw-carousel[data-variant="selection"] .nw-carousel-info{min-height:238px!important;padding-inline:8px!important}
+  .nw-carousel[data-variant="selection"] .nw-carousel-actions{
+    grid-template-columns:1fr!important;
+    justify-items:center!important;
+  }
+  .nw-carousel[data-variant="selection"] .nw-carousel-status{
+    width:min(100%,280px);
+  }
+}

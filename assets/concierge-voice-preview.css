@@ -60,3 +60,31 @@ body.senior-product .nw-voice-preview-language-select,
   .nw-voice-preview-language{grid-template-columns:60px minmax(0,1fr)}
   .nw-voice-preview-language-select{height:36px}
 }
+
+/* Robust multilingual selector geometry, especially inside registration. */
+.nw-voice-preview-control{
+  width:min(100%,280px)!important;
+  max-width:280px!important;
+  box-sizing:border-box!important;
+}
+.nw-voice-preview-language{
+  width:100%!important;
+  grid-template-columns:58px minmax(0,1fr)!important;
+  box-sizing:border-box!important;
+}
+.nw-voice-preview-language-select{
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+  height:38px!important;
+  min-height:38px!important;
+  box-sizing:border-box!important;
+  padding:0 32px 0 12px!important;
+  line-height:1.2!important;
+  overflow:visible!important;
+}
+.nw-carousel[data-variant="selection"] .nw-voice-preview-button{
+  width:100%!important;
+  min-height:44px!important;
+  box-sizing:border-box!important;
+}
