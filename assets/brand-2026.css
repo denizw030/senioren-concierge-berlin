@@ -616,3 +616,11 @@ main :is(h1,h2,h3,h4,h5,h6,legend,blockquote,.price,.home-title){
     justify-content:space-between!important;
   }
 }
+
+/* Retire the old generic circular hero artwork on modern dark pages.
+   The login hero keeps its dedicated concierge artwork; senior pages keep their own light system. */
+body:not(.login-image-page):not(.senior-product):not([data-product="senioren"]) .hero:after{
+  display:none!important;
+  content:none!important;
+  background:none!important;
+}
