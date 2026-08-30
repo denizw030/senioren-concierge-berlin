@@ -7,27 +7,27 @@
   const profiles = [
     ["nilo","Nilo","Warm, ruhig, modern und strukturiert.","cedar","approved","Hola, ich bin Nilo.","es"],
     ["mira","Mira","Jung, elegant, warm und aufmerksam.","marin","hearing_test","Hola, ich bin Mira.","es"],
+    ["sofia","Sofia","Lebendig, jung, warm und herzlich.","shimmer","hearing_test","Hola, ich bin Sofia.","es"],
     ["lena","Lena","Warm, empathisch, natürlich und zugänglich.","coral","hearing_test","Hallo, ich bin Lena.","de"],
     ["lukas","Lukas","Souverän, ruhig, direkt und modern.","alloy","hearing_test","Hallo, ich bin Lukas.","de"],
     ["hartmut","Hartmut","Tief, voll, erfahren, würdevoll und ruhig.","onyx","approved","Guten Tag, ich bin Hartmut.","de"],
     ["frida","Frida","Reif, warm, würdevoll, ruhig und nicht gebrechlich.","sage","hearing_test","Guten Tag, ich bin Frida.","de"],
-    ["asha","Asha","Jung, hell-modern, warm und selbstbewusst.","shimmer","hearing_test","Namaste, ich bin Asha.","hi"],
-    ["sari","Sari","Sanft-modern, freundlich und aufmerksam.","coral","hearing_test","Halo, ich bin Sari.","id"],
-    ["leyla","Leyla","Elegant, selbstbewusst, warm und modern.","marin","hearing_test","Merhaba, ich bin Leyla.","tr"],
-    ["noor","Noor","Ruhig, elegant, diskret und aufmerksam.","sage","hearing_test","Marhaba, ich bin Noor.","ar"],
-    ["sofia","Sofia","Lebendig, jung, warm und herzlich.","shimmer","hearing_test","Hola, ich bin Sofia.","es"],
     ["camille","Camille","Elegant, modern, kultiviert und präzise.","marin","hearing_test","Bonjour, ich bin Camille.","fr"],
     ["anna","Anna","Warm, praktisch, klar und zuverlässig.","coral","hearing_test","Dzień dobry, ich bin Anna.","pl"],
     ["olena","Olena","Ruhig, warm, modern und einfühlsam.","shimmer","hearing_test","Pryvit, ich bin Olena.","uk"],
+    ["leyla","Leyla","Elegant, selbstbewusst, warm und modern.","marin","hearing_test","Merhaba, ich bin Leyla.","tr"],
+    ["asha","Asha","Jung, hell-modern, warm und selbstbewusst.","shimmer","hearing_test","Namaste, ich bin Asha.","hi"],
+    ["arjun","Arjun","Geerdet, warm, souverän und analytisch.","cedar","hearing_test","Sat Sri Akal, ich bin Arjun.","pa"],
+    ["sari","Sari","Sanft-modern, freundlich und aufmerksam.","coral","hearing_test","Halo, ich bin Sari.","id"],
+    ["noor","Noor","Ruhig, elegant, diskret und aufmerksam.","sage","hearing_test","Marhaba, ich bin Noor.","ar"],
     ["mei","Mei","Ruhig, präzise, modern und bedacht.","sage","hearing_test","Nǐ hǎo, ich bin Mei.","zh"],
+    ["wei","Wei","Ruhig, kultiviert, zurückhaltend und präzise.","ballad","hearing_test","Nǐ hǎo, ich bin Wei.","zh"],
+    ["yuki","Yuki","Jung, freundlich, klar und modern.","marin","hearing_test","Konnichiwa, ich bin Yuki.","ja"],
+    ["ren","Ren","Ruhig, modern, männlich und präzise.","alloy","hearing_test","Konnichiwa, ich bin Ren.","ja"]
     ["amara","Amara","Warm, souverän, modern und herzlich.","coral","hearing_test","Akwaaba, ich bin Amara.","tw"],
     ["kwame","Kwame","Geerdet, ruhig, warm und souverän.","cedar","hearing_test","Akwaaba, ich bin Kwame.","tw"],
     ["zuri","Zuri","Modern, lebendig, warm und aufmerksam.","shimmer","hearing_test","Jambo, ich bin Zuri.","sw"],
     ["jabari","Jabari","Selbstbewusst, ruhig, direkt und zuverlässig.","alloy","hearing_test","Jambo, ich bin Jabari.","sw"],
-    ["arjun","Arjun","Geerdet, warm, souverän und analytisch.","cedar","hearing_test","Sat Sri Akal, ich bin Arjun.","pa"],
-    ["wei","Wei","Ruhig, kultiviert, zurückhaltend und präzise.","ballad","hearing_test","Nǐ hǎo, ich bin Wei.","zh"],
-    ["yuki","Yuki","Jung, freundlich, klar und modern.","marin","hearing_test","Konnichiwa, ich bin Yuki.","ja"],
-    ["ren","Ren","Ruhig, modern, männlich und präzise.","alloy","hearing_test","Konnichiwa, ich bin Ren.","ja"]
   ].map(([key,name,description,voice,voiceStatus,sampleText,nativeLanguage]) => {
     const previewLanguageCodes=[...new Set([nativeLanguage,"de","en"])];
     const sampleAudioByLanguage=Object.fromEntries(previewLanguageCodes.map(code=>[
