@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="assets/site.css?v=24">
   <link rel="stylesheet" href="assets/brand-2026.css?v=23">
   <link rel="stylesheet" href="assets/nahwerk-logo-v2.css?v=8">
-  <link rel="stylesheet" href="assets/email-concierge.css?v=2">
+  <link rel="stylesheet" href="assets/email-concierge.css?v=3">
 </head>
 <body class="email-concierge-page">
 <header class="top"><div class="wrap nav"><a class="brand" href="index.html" aria-label="NAHWERK Concierge – Startseite"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Hauptnavigation"><a href="index.html">Übersicht</a><a href="prime-concierge.html">Persönlicher Concierge</a><a href="concierges.html">Concierges</a><a href="senioren-concierge.html">Senioren Concierge</a><a href="angehoerige.html">Für Angehörige</a><a href="leistungen.html">Leistungen</a><a href="kontakt.html">Kontakt</a><a class="auth-link login-link" href="anmelden.html">Anmelden</a><a class="auth-link register-link" href="registrieren.html">Registrieren</a></nav></div></header>
@@ -19,7 +19,7 @@
   <section class="email-hero">
     <div class="eyebrow">Mein NAHWERK</div>
     <h1>E-Mails einfach dem Concierge überlassen.</h1>
-    <p>Verbinde dein verfügbares E-Mail-Konto sicher mit dem jeweiligen Anbieter. Danach kannst du deinen NAHWERK Concierge auch über WhatsApp bitten, E-Mails zu suchen, Wichtiges zusammenzufassen oder automatische Hinweise einzurichten. Gmail ist bereits technisch angebunden; weitere Anbieter werden erst nach vollständiger Prüfung freigeschaltet.</p>
+    <p>Verbinde dein E-Mail-Konto sicher mit dem jeweiligen Anbieter. Danach kann dein NAHWERK Concierge auf deinen Wunsch E-Mails suchen, Wichtiges zusammenfassen und Antworten vorbereiten. Die hier vorbereiteten Verbindungen befinden sich noch im geschützten STAGING-Test und werden erst nach realer Prüfung öffentlich freigeschaltet.</p>
   </section>
 
 
@@ -28,7 +28,7 @@
     <div class="email-section-head">
       <div>
         <h2 id="providerHeading">Deine E-Mail-Konten an einem Ort.</h2>
-        <p>Wähle deinen Anbieter. Gmail ist bereits technisch angebunden; weitere Anbieter werden erst freigeschaltet, wenn die jeweilige Verbindung vollständig geprüft ist.</p>
+        <p>Wähle deinen Anbieter. Gmail und die vorbereiteten IMAP/SMTP-Anbieter befinden sich noch im geschützten STAGING-Test. Öffentlich freigeschaltet wird ein Anbieter erst nach vollständigem realen E2E-Test.</p>
       </div>
     </div>
     <div class="provider-grid">
@@ -42,50 +42,50 @@
         <span class="provider-copy"><strong>Outlook / Microsoft 365</strong><small>OAuth-Anbindung in Vorbereitung</small></span>
         <span class="provider-state">Bald</span>
       </button>
-      <button class="provider-card is-unavailable" type="button" data-provider="yahoo" disabled aria-disabled="true">
+      <button class="provider-card is-test" type="button" data-provider="yahoo">
         <span class="provider-mark yahoo-mark" aria-hidden="true">Y!</span>
-        <span class="provider-copy"><strong>Yahoo Mail</strong><small>Anbindung in Vorbereitung</small></span>
-        <span class="provider-state">Bald</span>
+        <span class="provider-copy"><strong>Yahoo Mail</strong><small>Verbindung für STAGING-Test vorbereitet</small></span>
+        <span class="provider-state test">Testbereit</span>
       </button>
-      <button class="provider-card is-unavailable" type="button" data-provider="icloud" disabled aria-disabled="true">
+      <button class="provider-card is-test" type="button" data-provider="icloud">
         <span class="provider-mark icloud-mark" aria-hidden="true">☁</span>
-        <span class="provider-copy"><strong>iCloud Mail</strong><small>Anbindung in Vorbereitung</small></span>
-        <span class="provider-state">Bald</span>
+        <span class="provider-copy"><strong>iCloud Mail</strong><small>Verbindung für STAGING-Test vorbereitet</small></span>
+        <span class="provider-state test">Testbereit</span>
       </button>
-      <button class="provider-card is-unavailable" type="button" data-provider="gmx" disabled aria-disabled="true">
+      <button class="provider-card is-test" type="button" data-provider="gmx">
         <span class="provider-mark gmx-mark" aria-hidden="true">GMX</span>
-        <span class="provider-copy"><strong>GMX</strong><small>IMAP/SMTP-Assistent geplant</small></span>
-        <span class="provider-state">Bald</span>
+        <span class="provider-copy"><strong>GMX</strong><small>Verbindung für STAGING-Test vorbereitet</small></span>
+        <span class="provider-state test">Testbereit</span>
       </button>
-      <button class="provider-card is-unavailable" type="button" data-provider="webde" disabled aria-disabled="true">
+      <button class="provider-card is-test" type="button" data-provider="webde">
         <span class="provider-mark webde-mark" aria-hidden="true">WEB</span>
-        <span class="provider-copy"><strong>WEB.DE</strong><small>IMAP/SMTP-Assistent geplant</small></span>
-        <span class="provider-state">Bald</span>
+        <span class="provider-copy"><strong>WEB.DE</strong><small>Verbindung für STAGING-Test vorbereitet</small></span>
+        <span class="provider-state test">Testbereit</span>
       </button>
-      <button class="provider-card is-unavailable" type="button" data-provider="strato" disabled aria-disabled="true">
+      <button class="provider-card is-test" type="button" data-provider="strato">
         <span class="provider-mark strato-mark" aria-hidden="true">S</span>
-        <span class="provider-copy"><strong>STRATO</strong><small>IMAP/SMTP-Assistent geplant</small></span>
-        <span class="provider-state">Bald</span>
+        <span class="provider-copy"><strong>STRATO</strong><small>Verbindung für STAGING-Test vorbereitet</small></span>
+        <span class="provider-state test">Testbereit</span>
       </button>
-      <button class="provider-card is-unavailable" type="button" data-provider="ionos" disabled aria-disabled="true">
+      <button class="provider-card is-test" type="button" data-provider="ionos">
         <span class="provider-mark other-mark" aria-hidden="true">I</span>
-        <span class="provider-copy"><strong>IONOS</strong><small>Provider-konforme Verbindung in Vorbereitung</small></span>
-        <span class="provider-state">Bald</span>
+        <span class="provider-copy"><strong>IONOS</strong><small>Verbindung für STAGING-Test vorbereitet</small></span>
+        <span class="provider-state test">Testbereit</span>
       </button>
-      <button class="provider-card is-unavailable" type="button" data-provider="telekom" disabled aria-disabled="true">
+      <button class="provider-card is-test" type="button" data-provider="telekom">
         <span class="provider-mark other-mark" aria-hidden="true">T</span>
-        <span class="provider-copy"><strong>Telekom / Magenta Mail</strong><small>Provider-konforme Verbindung in Vorbereitung</small></span>
-        <span class="provider-state">Bald</span>
+        <span class="provider-copy"><strong>Telekom / Magenta Mail</strong><small>Verbindung für STAGING-Test vorbereitet</small></span>
+        <span class="provider-state test">Testbereit</span>
       </button>
-      <button class="provider-card is-unavailable" type="button" data-provider="zoho" disabled aria-disabled="true">
+      <button class="provider-card is-test" type="button" data-provider="zoho">
         <span class="provider-mark other-mark" aria-hidden="true">Z</span>
-        <span class="provider-copy"><strong>Zoho Mail</strong><small>OAuth-Anbindung in Vorbereitung</small></span>
-        <span class="provider-state">Bald</span>
+        <span class="provider-copy"><strong>Zoho Mail</strong><small>Verbindung für STAGING-Test vorbereitet</small></span>
+        <span class="provider-state test">Testbereit</span>
       </button>
-      <button class="provider-card is-unavailable" type="button" data-provider="fastmail" disabled aria-disabled="true">
+      <button class="provider-card is-test" type="button" data-provider="fastmail">
         <span class="provider-mark other-mark" aria-hidden="true">F</span>
-        <span class="provider-copy"><strong>Fastmail</strong><small>OAuth-Anbindung in Vorbereitung</small></span>
-        <span class="provider-state">Bald</span>
+        <span class="provider-copy"><strong>Fastmail</strong><small>Verbindung für STAGING-Test vorbereitet</small></span>
+        <span class="provider-state test">Testbereit</span>
       </button>
       <button class="provider-card is-unavailable" type="button" data-provider="other" disabled aria-disabled="true">
         <span class="provider-mark other-mark" aria-hidden="true">+</span>
@@ -99,7 +99,7 @@
     <article class="email-card wide">
       <div class="eyebrow">Verbindung</div>
       <div class="email-status"><span class="email-dot" id="emailStatusDot"></span><span id="emailStatusText">Status wird geprüft …</span></div>
-      <p class="email-muted" id="emailStatusMeta">Die Verbindung wird sicher geprüft.</p>
+      <p class="email-muted" id="emailStatusMeta">Die Verbindung wird sicher geprüft.</p><div class="email-connection-list" id="emailConnectionList" aria-live="polite"></div>
       <div class="email-actions">
         <button class="email-btn primary" id="connectGoogle" type="button">Gmail verbinden</button>
         <button class="email-btn danger" id="disconnectGoogle" type="button" hidden>Gmail trennen</button>
@@ -257,12 +257,54 @@
   </section>
 </main>
 
+
+<dialog class="email-connect-dialog" id="emailConnectDialog" aria-labelledby="emailConnectTitle">
+  <form class="email-connect-panel" id="emailConnectForm" method="dialog" autocomplete="off">
+    <button class="email-connect-close" id="emailConnectClose" type="button" aria-label="Verbindungsassistent schließen">×</button>
+    <div class="email-connect-badge" id="emailConnectBadge">E-Mail</div>
+    <div class="eyebrow">Sichere Verbindung · STAGING</div>
+    <h2 id="emailConnectTitle">E-Mail-Konto verbinden</h2>
+    <p class="email-connect-intro" id="emailConnectIntro"></p>
+    <div class="email-connect-steps" id="emailConnectSteps"></div>
+    <div class="email-field">
+      <label for="emailConnectAddress">E-Mail-Adresse</label>
+      <input id="emailConnectAddress" name="email" type="email" inputmode="email" autocomplete="off" spellcheck="false" required>
+    </div>
+    <div class="email-field">
+      <label for="emailConnectSecret" id="emailConnectSecretLabel">App-/E-Mail-Programm-Passwort</label>
+      <input id="emailConnectSecret" name="secret" type="password" autocomplete="new-password" required>
+      <small class="email-connect-hint" id="emailConnectSecretHint"></small>
+    </div>
+    <div class="email-connect-zoho" id="emailConnectZoho" hidden>
+      <div class="email-fields">
+        <div class="email-field">
+          <label for="zohoAccountType">Zoho-Kontotyp</label>
+          <select id="zohoAccountType"><option value="personal">Persönlich / Standard</option><option value="organization">Organisation</option></select>
+        </div>
+        <div class="email-field">
+          <label for="zohoDatacenter">Zoho-Rechenzentrum</label>
+          <select id="zohoDatacenter"><option value="eu" selected>Europa (.eu)</option><option value="com">Global (.com)</option><option value="in">Indien (.in)</option><option value="com.au">Australien (.com.au)</option><option value="jp">Japan (.jp)</option><option value="ca">Kanada (.ca)</option><option value="sa">Saudi-Arabien (.sa)</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="email-connect-security">
+      <strong>Geschützt gespeichert</strong>
+      <span>Das Verbindungskennwort wird nicht im Browser gespeichert. Es wird serverseitig in den geschützten NAHWERK-Vault übertragen. Wo der Anbieter ein App- oder E-Mail-Programm-Passwort anbietet, verwende bitte nicht dein normales Hauptpasswort.</span>
+    </div>
+    <div class="email-actions">
+      <button class="email-btn primary" id="emailConnectSubmit" type="submit">Verbindung sicher prüfen</button>
+      <button class="email-btn secondary" id="emailConnectCancel" type="button">Abbrechen</button>
+    </div>
+    <p class="email-connect-result" id="emailConnectResult" role="status" aria-live="polite"></p>
+  </form>
+</dialog>
+
 <div class="email-toast" id="emailToast" role="status" aria-live="polite"></div>
 
 <footer class="footer"><div class="wrap"><div class="footbottom"><span>© 2026 NAHWERK Concierge</span><div class="legalnav"><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a><a href="agb.html">AGB</a><a href="widerruf.html">Widerruf</a><a href="ki-transparenz.html">KI-Transparenz</a><a href="datenloeschung.html">Datenlöschung</a></div></div></div></footer>
 
 <script src="assets/auth-nav.js?v=34"></script>
-<script src="assets/email-concierge.js?v=1"></script>
+<script src="assets/email-concierge.js?v=2"></script>
 <script src="assets/site-ui.js?v=5"></script>
 </body>
 </html>
