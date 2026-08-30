@@ -4,6 +4,22 @@
   let currentConnection = null;
   let currentSettings = null;
   let rules = [];
+  let connections = [];
+  let selectedProvider = null;
+
+  const IMAP_PROVIDERS = new Set(["yahoo","icloud","gmx","webde","strato","ionos","telekom","zoho","fastmail"]);
+  const PROVIDERS = {
+    gmail:{label:"Gmail",badge:"M"},
+    yahoo:{label:"Yahoo Mail",badge:"Y!",secretLabel:"Yahoo App-Passwort",hint:"Erstelle bei Yahoo ein App-Passwort für den Drittanbieter-Zugriff.",steps:["App-Passwort im Yahoo-Konto erstellen.","Yahoo-E-Mail-Adresse und App-Passwort hier eingeben.","NAHWERK prüft IMAP und SMTP direkt."]},
+    icloud:{label:"iCloud Mail",badge:"☁",secretLabel:"App-spezifisches Passwort",hint:"Für iCloud ist ein app-spezifisches Passwort erforderlich. Die Zwei-Faktor-Authentifizierung muss aktiviert sein.",steps:["Apple Zwei-Faktor-Authentifizierung aktivieren.","Ein app-spezifisches Passwort für NAHWERK erzeugen.","iCloud-Adresse und dieses App-Passwort hier eingeben."]},
+    gmx:{label:"GMX",badge:"GMX",secretLabel:"App-/E-Mail-Passwort",hint:"Aktiviere zuerst den Zugriff über POP3/IMAP. Wenn dein Konto App-Passwörter unterstützt, verwende ein separates App-Passwort.",steps:["IMAP-Zugriff in GMX aktivieren.","Wenn verfügbar, ein separates App-Passwort erzeugen.","GMX-Adresse und dieses Passwort hier eingeben."]},
+    webde:{label:"WEB.DE",badge:"WEB",secretLabel:"App-/E-Mail-Passwort",hint:"Aktiviere zuerst den Zugriff über POP3/IMAP. Wenn dein Konto App-Passwörter unterstützt, verwende ein separates App-Passwort.",steps:["IMAP-Zugriff in WEB.DE aktivieren.","Wenn verfügbar, ein separates App-Passwort erzeugen.","WEB.DE-Adresse und dieses Passwort hier eingeben."]},
+    telekom:{label:"Telekom / Magenta Mail",badge:"T",secretLabel:"Passwort für E-Mail-Programme",hint:"Verwende ausdrücklich das separate „Passwort für E-Mail-Programme“, nicht dein normales Telekom-Kennwort.",steps:["Im Telekom-Konto ein „Passwort für E-Mail-Programme“ festlegen.","E-Mail-Adresse und dieses separate Passwort eingeben.","NAHWERK prüft die sichere Verbindung."]},
+    fastmail:{label:"Fastmail",badge:"F",secretLabel:"Fastmail App-Passwort",hint:"Fastmail verlangt für IMAP/SMTP ein App-Passwort. Ein Tarif mit IMAP/SMTP-Unterstützung ist erforderlich.",steps:["In Fastmail ein App-Passwort erzeugen.","Fastmail-Adresse und App-Passwort hier eingeben.","NAHWERK prüft IMAP und SMTP."]},
+    zoho:{label:"Zoho Mail",badge:"Z",secretLabel:"Zoho App-/Mail-Passwort",hint:"Bei 2FA, SAML oder föderierter Anmeldung brauchst du ein app-spezifisches Passwort. Wähle außerdem Kontotyp und Rechenzentrum.",steps:["IMAP in Zoho aktivieren.","Bei 2FA/SAML ein app-spezifisches Passwort erzeugen.","Kontotyp, Rechenzentrum, Adresse und Passwort angeben."]},
+    ionos:{label:"IONOS",badge:"I",secretLabel:"Mailbox-Passwort",hint:"Für IONOS wird das Kennwort des jeweiligen E-Mail-Postfachs verwendet.",steps:["Ein separates Test-Postfach ist empfohlen.","Postfach-Adresse und Mailbox-Passwort eingeben.","NAHWERK prüft IMAP und SMTP verschlüsselt."]},
+    strato:{label:"STRATO",badge:"S",secretLabel:"Mailbox-Passwort",hint:"Für STRATO wird das Kennwort des jeweiligen E-Mail-Postfachs verwendet.",steps:["Ein separates Test-Postfach ist empfohlen.","Postfach-Adresse und Mailbox-Passwort eingeben.","NAHWERK prüft IMAP und SMTP verschlüsselt."]}
+  };
 
   const $ = (id) => document.getElementById(id);
   const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m]));
@@ -42,28 +58,136 @@
     document.querySelector(".email-shell")?.classList.toggle("email-loading", !!on);
   }
 
-  function renderStatus(data) {
-    currentConnection = data?.connection || null;
-    const connected = !!data?.connected;
-    $("emailStatusDot")?.classList.toggle("on", connected);
-    if ($("emailStatusText")) $("emailStatusText").textContent = connected ? "Gmail verbunden" : "Noch kein Gmail verbunden";
-    if ($("emailStatusMeta")) {
-      if (connected) {
-        const email = currentConnection?.provider_email || "Google-Konto";
-        $("emailStatusMeta").textContent = email + " · sicher über Google OAuth verbunden";
-      } else if (currentConnection?.status === "REAUTH_REQUIRED") {
-        $("emailStatusMeta").textContent = "Die Verbindung muss erneut bestätigt werden.";
-      } else {
-        $("emailStatusMeta").textContent = "Verbinde dein Gmail-Konto, damit dein NAHWERK Concierge E-Mails auf deinen Wunsch durchsuchen kann.";
-      }
+  function providerLabel(key) {
+    if (key === "google") return "Gmail";
+    if (key === "microsoft") return "Outlook / Microsoft 365";
+    return PROVIDERS[key]?.label || key;
+  }
+
+  function renderConnections() {
+    const root = $("emailConnectionList");
+    if (!root) return;
+    const active = connections.filter((x) => x && x.status === "CONNECTED");
+    if (!active.length) {
+      root.innerHTML = '<div class="email-muted">Noch kein E-Mail-Konto verbunden.</div>';
+      return;
     }
-    if ($("connectGoogle")) $("connectGoogle").hidden = connected;
-    if ($("disconnectGoogle")) $("disconnectGoogle").hidden = !connected;
+    root.innerHTML = active.map((item) => `
+      <div class="email-connection-row" data-connection-id="${esc(item.id)}">
+        <div><strong>${esc(providerLabel(item.provider))}</strong><small>${esc(item.provider_email || "")} · Verbunden</small></div>
+        <button class="email-btn danger" type="button" data-disconnect-id="${esc(item.id)}" data-disconnect-provider="${esc(item.provider)}">Trennen</button>
+      </div>`).join("");
+  }
+
+  function renderStatus(data) {
+    connections = Array.isArray(data?.connections) ? data.connections : [];
+    const active = connections.filter((x) => x?.status === "CONNECTED");
+    const gmailConnection = active.find((x) => x.provider === "google") || null;
+    currentConnection = gmailConnection || active[0] || null;
+    const connected = active.length > 0;
+
+    $("emailStatusDot")?.classList.toggle("on", connected);
+    if ($("emailStatusText")) {
+      $("emailStatusText").textContent = connected
+        ? (active.length === 1 ? "1 E-Mail-Konto verbunden" : active.length + " E-Mail-Konten verbunden")
+        : "Noch kein E-Mail-Konto verbunden";
+    }
+    if ($("emailStatusMeta")) {
+      $("emailStatusMeta").textContent = connected
+        ? "Deine aktiven Verbindungen wurden serverseitig geprüft."
+        : "Wähle oben einen testbereiten Anbieter und verbinde ein separates Testkonto.";
+    }
+
+    if ($("connectGoogle")) $("connectGoogle").hidden = !!gmailConnection;
+    if ($("disconnectGoogle")) $("disconnectGoogle").hidden = true;
     if ($("emailSettingsCard")) $("emailSettingsCard").hidden = !connected;
     if ($("emailRulesCard")) $("emailRulesCard").hidden = !connected;
-    const providerStatus = $("gmailProviderStatus");
-    if (providerStatus) providerStatus.textContent = connected ? "Verbunden" : "Bereit zum Verbinden";
-    document.querySelector('[data-provider="gmail"]')?.classList.toggle("is-connected", connected);
+
+    document.querySelectorAll("[data-provider]").forEach((card) => {
+      const key = card.dataset.provider;
+      const backendKey = key === "gmail" ? "google" : key;
+      const item = active.find((x) => x.provider === backendKey);
+      card.classList.toggle("is-connected", !!item);
+      const state = card.querySelector(".provider-state");
+      if (item && state) state.textContent = "Verbunden";
+    });
+    const gmailStatus = $("gmailProviderStatus");
+    if (gmailStatus) gmailStatus.textContent = gmailConnection ? "Verbunden" : "Technisch in STAGING angebunden";
+    renderConnections();
+  }
+
+  function openProviderDialog(provider) {
+    const cfg = PROVIDERS[provider];
+    const dialog = $("emailConnectDialog");
+    if (!cfg || !dialog || !IMAP_PROVIDERS.has(provider)) return;
+    selectedProvider = provider;
+    $("emailConnectBadge").textContent = cfg.badge;
+    $("emailConnectTitle").textContent = cfg.label + " verbinden";
+    $("emailConnectIntro").textContent = "Der Assistent prüft die Verbindung direkt gegen " + cfg.label + ". Erst eine erfolgreiche IMAP- und SMTP-Prüfung wird als verbunden gespeichert.";
+    $("emailConnectSecretLabel").textContent = cfg.secretLabel || "App-/E-Mail-Programm-Passwort";
+    $("emailConnectSecretHint").textContent = cfg.hint || "";
+    $("emailConnectSteps").innerHTML = (cfg.steps || []).map((step, i) => `<div class="email-connect-step"><b>${i + 1}</b><span>${esc(step)}</span></div>`).join("");
+    $("emailConnectZoho").hidden = provider !== "zoho";
+    $("emailConnectAddress").value = "";
+    $("emailConnectSecret").value = "";
+    $("emailConnectResult").textContent = "";
+    $("emailConnectResult").classList.remove("is-error");
+    dialog.showModal();
+    setTimeout(() => $("emailConnectAddress")?.focus(), 50);
+  }
+
+  function closeProviderDialog() {
+    const dialog = $("emailConnectDialog");
+    if (!dialog) return;
+    if ($("emailConnectSecret")) $("emailConnectSecret").value = "";
+    if ($("emailConnectResult")) $("emailConnectResult").textContent = "";
+    selectedProvider = null;
+    if (dialog.open) dialog.close();
+  }
+
+  async function connectImapProvider(event) {
+    event.preventDefault();
+    if (!selectedProvider || !IMAP_PROVIDERS.has(selectedProvider)) return;
+    const address = $("emailConnectAddress")?.value.trim() || "";
+    const secretInput = $("emailConnectSecret");
+    const secret = secretInput?.value || "";
+    const result = $("emailConnectResult");
+    if (!address.includes("@") || !secret) {
+      if (result) {
+        result.textContent = "Bitte E-Mail-Adresse und das passende Anbieter-/App-Passwort eingeben.";
+        result.classList.add("is-error");
+      }
+      return;
+    }
+    const payload = { provider:selectedProvider, email:address, secret };
+    if (selectedProvider === "zoho") {
+      payload.zoho_datacenter = $("zohoDatacenter")?.value || "eu";
+      payload.zoho_organization = ($("zohoAccountType")?.value || "personal") === "organization";
+    }
+
+    const submit = $("emailConnectSubmit");
+    if (submit) submit.disabled = true;
+    if (result) {
+      result.classList.remove("is-error");
+      result.textContent = "Sichere IMAP- und SMTP-Verbindung wird geprüft …";
+    }
+    try {
+      const data = await api("/connect/imap", { method:"POST", body:JSON.stringify(payload) });
+      if (!data?.connected) throw new Error("provider_verification_failed");
+      if (result) result.textContent = "Verbindung erfolgreich geprüft.";
+      toast(providerLabel(selectedProvider) + " wurde sicher verbunden.");
+      if (secretInput) secretInput.value = "";
+      await loadAll();
+      setTimeout(closeProviderDialog, 450);
+    } catch (_) {
+      if (secretInput) secretInput.value = "";
+      if (result) {
+        result.textContent = "Die Verbindung konnte nicht bestätigt werden. Prüfe App-/E-Mail-Programm-Passwort, IMAP-Freigabe und Anbieter-Einstellungen.";
+        result.classList.add("is-error");
+      }
+    } finally {
+      if (submit) submit.disabled = false;
+    }
   }
 
   function renderSettings(settings) {
@@ -148,7 +272,7 @@
     try {
       const status = await api("/status");
       renderStatus(status);
-      if (status.connected) {
+      if (connections.some((x) => x?.status === "CONNECTED")) {
         const [settings, ruleData] = await Promise.all([api("/settings"), api("/rules")]);
         renderSettings(settings.settings);
         renderRules(ruleData);
@@ -167,18 +291,52 @@
   document.addEventListener("DOMContentLoaded", () => {
     document.querySelector(".provider-grid")?.addEventListener("click", (event) => {
       const card = event.target.closest("[data-provider]");
-      if (!card) return;
+      if (!card || card.disabled) return;
       const provider = card.dataset.provider;
       if (provider === "gmail") {
-        if (currentConnection) {
-          $("emailSettingsCard")?.scrollIntoView({ behavior:"smooth", block:"start" });
+        const gmail = connections.find((x) => x?.provider === "google" && x.status === "CONNECTED");
+        if (gmail) {
+          $("emailConnectionList")?.scrollIntoView({ behavior:"smooth", block:"center" });
         } else {
           $("connectGoogle")?.click();
         }
         return;
       }
-      const labels = {outlook:"Outlook / Microsoft 365",yahoo:"Yahoo Mail",icloud:"iCloud Mail",gmx:"GMX",webde:"WEB.DE",strato:"STRATO",ionos:"IONOS",telekom:"Telekom / Magenta Mail",zoho:"Zoho Mail",fastmail:"Fastmail",other:"dieser Anbieter"};
-      toast((labels[provider] || "Dieser Anbieter") + " wird erst freigeschaltet, wenn die Verbindung vollständig geprüft ist.");
+      if (IMAP_PROVIDERS.has(provider)) {
+        const existing = connections.find((x) => x?.provider === provider && x.status === "CONNECTED");
+        if (existing) {
+          $("emailConnectionList")?.scrollIntoView({ behavior:"smooth", block:"center" });
+        } else {
+          openProviderDialog(provider);
+        }
+      }
+    });
+
+    $("emailConnectForm")?.addEventListener("submit", connectImapProvider);
+    $("emailConnectClose")?.addEventListener("click", closeProviderDialog);
+    $("emailConnectCancel")?.addEventListener("click", closeProviderDialog);
+    $("emailConnectDialog")?.addEventListener("cancel", (event) => { event.preventDefault(); closeProviderDialog(); });
+    $("emailConnectDialog")?.addEventListener("close", () => {
+      if ($("emailConnectSecret")) $("emailConnectSecret").value = "";
+      selectedProvider = null;
+    });
+
+    $("emailConnectionList")?.addEventListener("click", async (event) => {
+      const button = event.target.closest("[data-disconnect-id]");
+      if (!button) return;
+      const id = button.dataset.disconnectId;
+      const provider = button.dataset.disconnectProvider;
+      if (!id || !confirm(providerLabel(provider) + " wirklich vom NAHWERK E-Mail Concierge trennen?")) return;
+      button.disabled = true;
+      try {
+        await api("/disconnect", { method:"POST", body:JSON.stringify({ connection_id:id }) });
+        toast(providerLabel(provider) + " wurde getrennt.");
+        await loadAll();
+      } catch (_) {
+        toast("Die Verbindung konnte gerade nicht getrennt werden.");
+      } finally {
+        button.disabled = false;
+      }
     });
 
     $("connectGoogle")?.addEventListener("click", async () => {
@@ -194,11 +352,12 @@
     });
 
     $("disconnectGoogle")?.addEventListener("click", async () => {
-      if (!currentConnection?.id) return;
+      const gmail = connections.find((x) => x?.provider === "google" && x.status === "CONNECTED");
+      if (!gmail?.id) return;
       if (!confirm("Gmail wirklich vom NAHWERK E-Mail Concierge trennen?")) return;
       setBusy(true);
       try {
-        await api("/disconnect", { method:"POST", body:JSON.stringify({ connection_id:currentConnection.id }) });
+        await api("/disconnect", { method:"POST", body:JSON.stringify({ connection_id:gmail.id }) });
         toast("Gmail wurde getrennt.");
         await loadAll();
       } catch (_) {
