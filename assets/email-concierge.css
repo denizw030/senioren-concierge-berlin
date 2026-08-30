@@ -40,3 +40,38 @@
 .email-toast.show{opacity:1;transform:translateY(0)}
 .email-loading{opacity:.55;pointer-events:none}
 @media(max-width:760px){.email-grid,.email-fields{grid-template-columns:1fr}.email-card.wide{grid-column:auto}.email-rule{grid-template-columns:1fr}.email-rule-actions{justify-content:flex-start}.email-shell{padding-left:14px;padding-right:14px}}
+
+.email-provider-section{margin:24px 0 8px}
+.email-section-head{display:flex;justify-content:space-between;gap:20px;align-items:end;margin:6px 0 16px}
+.email-section-head h2{margin:0 0 6px;font-size:clamp(28px,4vw,44px);letter-spacing:-.025em}
+.email-section-head p{max-width:780px;margin:0;color:var(--muted);line-height:1.6}
+.provider-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.provider-card{appearance:none;width:100%;border:1px solid var(--line);border-radius:18px;background:#fff;padding:16px;display:grid;grid-template-columns:48px 1fr auto;gap:12px;align-items:center;text-align:left;box-shadow:0 12px 32px rgba(32,25,21,.045);cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.provider-card:hover{transform:translateY(-2px);box-shadow:0 18px 40px rgba(32,25,21,.08);border-color:#cfc4b9}
+.provider-card.is-live{border-color:#d8c796;background:linear-gradient(180deg,#fff,#fffcf5)}
+.provider-mark{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-weight:900;font-size:17px;background:#f4f1ed;color:#1f1d1a}
+.gmail-mark{background:#fff1f0;color:#c83b31;border:1px solid #f0d1cf;font-size:24px}
+.outlook-mark{background:#edf6ff;color:#1264a3}
+.yahoo-mark{background:#f3edff;color:#6001d2}
+.icloud-mark{background:#eef7ff;color:#4295d1;font-size:23px}
+.gmx-mark{background:#fff3d9;color:#173b78;font-size:12px}
+.webde-mark{background:#fff5de;color:#1f4f87;font-size:12px}
+.strato-mark{background:#fff0f2;color:#bf0d3e}
+.other-mark{background:#f1f1f1;color:#333;font-size:24px}
+.provider-copy{min-width:0}
+.provider-copy strong,.provider-copy small{display:block}
+.provider-copy strong{font-size:14px}
+.provider-copy small{margin-top:3px;color:var(--muted);font-size:11px;line-height:1.35}
+.provider-state{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;padding:6px 8px;border-radius:999px;background:#f0eeeb;color:#7b736d}
+.provider-state.live{background:#edf8f0;color:#247443}
+.trust-card h2,.campaign-card h2{font-size:clamp(27px,4vw,42px);letter-spacing:-.025em}
+.trust-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.trust-item{display:grid;grid-template-columns:36px 1fr;gap:12px;padding:15px;border:1px solid #e8e1da;border-radius:16px;background:#fcfbfa}
+.trust-item p{margin:4px 0 0;color:var(--muted);font-size:13px;line-height:1.5}
+.trust-icon{width:36px;height:36px;border-radius:12px;background:#181615;color:#fff;display:grid;place-items:center;font-size:12px;font-weight:900}
+.campaign-card{display:grid;grid-template-columns:1.35fr .9fr;gap:24px;align-items:center;background:linear-gradient(135deg,#171514,#2a2521);color:#fff;border-color:#2e2925}
+.campaign-card .eyebrow,.campaign-card p{color:#d6cec6}
+.campaign-proof{display:grid;gap:9px}
+.campaign-proof span{display:block;padding:12px 14px;border-radius:13px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);font-size:13px;font-weight:800}
+@media(max-width:980px){.provider-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.provider-grid,.trust-grid,.campaign-card{grid-template-columns:1fr}.provider-card{grid-template-columns:44px 1fr auto}.provider-mark{width:44px;height:44px}}
