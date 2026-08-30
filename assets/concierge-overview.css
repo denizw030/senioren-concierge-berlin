@@ -13,3 +13,17 @@
     radial-gradient(circle at 50% 70%,rgba(27,68,108,.13),transparent 42%),
     linear-gradient(150deg,#151513,#090909 72%)!important;
 }
+
+.co-pill,.co-detail-cta{
+  box-sizing:border-box;
+  width:var(--nw-cta-width,228px);
+  min-width:var(--nw-cta-width,228px);
+  min-height:var(--nw-cta-height,48px);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+@media(max-width:760px){
+  .co-pill,.co-detail-cta{width:100%;min-width:0}
+}
