@@ -247,3 +247,74 @@
   .concierge-overview-actions{padding:11px!important}
   .concierge-overview-note{padding-inline:8px!important}
 }
+
+
+/* Premium globe presentation — 2026-08-30 */
+.concierge-overview-page .co-regions{
+  padding-top:clamp(58px,6.5vw,88px)!important;
+}
+.co-globe{
+  position:relative;
+  isolation:isolate;
+  min-height:330px;
+}
+.co-globe:before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  left:50%;
+  top:50%;
+  width:min(88%,330px);
+  aspect-ratio:1;
+  transform:translate(-50%,-48%);
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 34% 30%,rgba(69,155,207,.13),transparent 42%),
+    radial-gradient(circle at 70% 35%,rgba(115,71,189,.10),transparent 48%),
+    radial-gradient(circle at 52% 76%,rgba(203,58,87,.045),transparent 54%);
+  filter:blur(15px);
+  opacity:.9;
+  pointer-events:none;
+}
+.co-globe:after{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  left:50%;
+  bottom:9%;
+  width:min(58%,230px);
+  height:24px;
+  transform:translateX(-50%);
+  border-radius:50%;
+  background:radial-gradient(ellipse,rgba(0,0,0,.42),rgba(0,0,0,0) 72%);
+  filter:blur(7px);
+  pointer-events:none;
+}
+.co-globe canvas{
+  width:min(100%,350px)!important;
+  filter:
+    drop-shadow(0 30px 38px rgba(0,0,0,.58))
+    drop-shadow(0 0 18px rgba(72,155,207,.09))
+    saturate(1.04)
+    contrast(1.035)!important;
+  transform:translateZ(0);
+  transition:transform .34s cubic-bezier(.22,1,.36,1),filter .34s ease;
+}
+.co-region-card:hover .co-globe canvas,
+.co-region-card.is-active .co-globe canvas{
+  transform:translateY(-3px) scale(1.018);
+  filter:
+    drop-shadow(0 34px 46px rgba(0,0,0,.62))
+    drop-shadow(0 0 24px rgba(87,165,211,.13))
+    saturate(1.07)
+    contrast(1.045)!important;
+}
+@media(max-width:900px){
+  .co-globe{min-height:310px}
+  .co-globe canvas{width:min(100%,335px)!important}
+}
+@media(max-width:520px){
+  .concierge-overview-page .co-regions{padding-top:48px!important}
+  .co-globe{min-height:285px}
+  .co-globe canvas{width:min(100%,310px)!important}
+}
