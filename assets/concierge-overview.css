@@ -326,3 +326,36 @@
   .co-globe{min-height:285px}
   .co-globe canvas{width:min(100%,310px)!important}
 }
+
+
+/* Static vector globes — 2026-08-30 */
+.co-globe-img{
+  display:block;
+  width:min(100%,350px)!important;
+  height:auto;
+  aspect-ratio:1;
+  border-radius:50%;
+  object-fit:contain;
+  filter:
+    drop-shadow(0 30px 38px rgba(0,0,0,.58))
+    drop-shadow(0 0 18px rgba(72,155,207,.09))
+    saturate(1.04)
+    contrast(1.035);
+  transform:translateZ(0);
+  transition:transform .34s cubic-bezier(.22,1,.36,1),filter .34s ease;
+}
+.co-region-card:hover .co-globe-img,
+.co-region-card.is-active .co-globe-img{
+  transform:translateY(-3px) scale(1.018);
+  filter:
+    drop-shadow(0 34px 46px rgba(0,0,0,.62))
+    drop-shadow(0 0 24px rgba(87,165,211,.13))
+    saturate(1.07)
+    contrast(1.045);
+}
+@media(max-width:900px){
+  .co-globe-img{width:min(100%,335px)!important}
+}
+@media(max-width:520px){
+  .co-globe-img{width:min(100%,310px)!important}
+}
