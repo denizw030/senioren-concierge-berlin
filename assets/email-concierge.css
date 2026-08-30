@@ -125,3 +125,38 @@
 
 .provider-card.is-unavailable{cursor:not-allowed;opacity:.68}
 .provider-card.is-unavailable:hover{transform:none}
+
+
+/* STAGING multi-provider onboarding — scoped to Email Concierge only */
+.provider-card.is-test{border-color:rgba(215,169,52,.28)}
+.provider-card.is-test:hover{border-color:rgba(243,207,115,.62)}
+.provider-state.test{background:rgba(215,169,52,.12);color:#f3cf73;border:1px solid rgba(215,169,52,.24)}
+.email-connection-list{display:grid;gap:10px;margin-top:16px}
+.email-connection-row{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;padding:13px 15px;border:1px solid #303030;border-radius:16px;background:#111112}
+.email-connection-row strong{display:block;color:#fff;font-size:14px}
+.email-connection-row small{display:block;margin-top:3px;color:#aaa8a2;font-size:12px}
+.email-connection-row .email-btn{min-height:38px;padding:8px 12px;font-size:12px}
+.email-connect-dialog{width:min(94vw,680px);max-height:92vh;padding:0;border:1px solid rgba(255,255,255,.12);border-radius:30px;background:rgba(10,10,11,.96);color:#f5f5f2;box-shadow:0 40px 120px rgba(0,0,0,.58);overflow:auto}
+.email-connect-dialog::backdrop{background:rgba(0,0,0,.70);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.email-connect-panel{position:relative;padding:clamp(24px,5vw,42px);background:radial-gradient(circle at 85% 8%,rgba(215,169,52,.14),transparent 32%)}
+.email-connect-close{position:absolute;top:18px;right:18px;width:38px;height:38px;border:1px solid #383838;border-radius:50%;background:#171718;color:#fff;font-size:24px;line-height:1;cursor:pointer}
+.email-connect-close:hover{border-color:#d7a934}
+.email-connect-badge{display:grid;place-items:center;width:54px;height:54px;margin-bottom:20px;border-radius:17px;background:linear-gradient(135deg,#f3cf73,#d99823);color:#17100a;font-weight:900;letter-spacing:-.04em}
+.email-connect-panel h2{margin:8px 0 10px;color:#fff;font:720 clamp(28px,5vw,42px)/1.05 -apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif;letter-spacing:-.035em}
+.email-connect-intro{margin:0 0 18px;color:#b9b6af;line-height:1.6}
+.email-connect-steps{display:grid;gap:8px;margin:0 0 22px}
+.email-connect-step{display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:start;padding:10px 12px;border-radius:13px;background:rgba(255,255,255,.04);color:#d8d4cc;font-size:13px;line-height:1.45}
+.email-connect-step b{display:grid;place-items:center;width:26px;height:26px;border-radius:9px;background:rgba(215,169,52,.14);color:#f3cf73;font-size:11px}
+.email-connect-hint{display:block;margin-top:7px;color:#8f8d88;font-size:11px;line-height:1.45}
+.email-connect-zoho{margin-top:14px}
+.email-connect-security{display:grid;gap:5px;margin-top:18px;padding:15px 16px;border:1px solid rgba(215,169,52,.25);border-radius:16px;background:rgba(215,169,52,.07)}
+.email-connect-security strong{color:#f3cf73;font-size:13px}
+.email-connect-security span{color:#b9b6af;font-size:12px;line-height:1.5}
+.email-connect-result{min-height:20px;margin:12px 0 0;color:#f3cf73;font-size:12px}
+.email-connect-result.is-error{color:#f0b9bd}
+@media(max-width:620px){
+  .email-connect-dialog{width:calc(100vw - 20px);max-height:94vh;border-radius:24px}
+  .email-connect-panel{padding:24px 18px 28px}
+  .email-connection-row{grid-template-columns:1fr}
+  .email-connection-row .email-btn{justify-self:start}
+}
