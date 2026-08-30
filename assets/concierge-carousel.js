@@ -59,7 +59,7 @@
     let dragX=0,pointerStart=0,dragging=false,moved=false,wheelLock=false;
     const loaded = new Set();
     root.dataset.variant=variant;
-    root.classList.add("nw-carousel");
+    root.classList.add("nw-carousel","nw-carousel-master");
     root.setAttribute("role","region");
     root.setAttribute("aria-label",root.dataset.label||"KI-Concierge auswählen");
     root.innerHTML=`<button class="nw-carousel-arrow prev" type="button" aria-label="Vorherigen Concierge anzeigen">‹</button><div class="nw-carousel-stage" tabindex="0" aria-roledescription="Karussell"><div class="nw-carousel-track"></div></div><button class="nw-carousel-arrow next" type="button" aria-label="Nächsten Concierge anzeigen">›</button><div class="nw-carousel-info" aria-live="polite"><h3 class="nw-carousel-name"></h3><p class="nw-carousel-description"></p><p class="nw-carousel-language-note">Die Hörprobe startet in der Herkunftssprache. Die Sprache können Sie direkt darunter wechseln.</p><p class="nw-carousel-voice-note" hidden></p><div class="nw-carousel-actions"><span class="nw-carousel-voice-host"></span><button class="nw-carousel-status" type="button" hidden>Ausgewählt</button></div></div>${inputName?`<input type="hidden" name="${inputName}" value="${profiles[active].key}">`:""}`;
@@ -138,7 +138,7 @@
     function positionCards(){
       const gap=cardSpacing;
       cards.forEach((card,index)=>{
-        const relative=circularDelta(active,index),x=relative*gap+dragX,distance=Math.abs(x/gap),scale=Math.max(.56,1-distance*.2),opacity=distance>3.6?0:Math.max(.28,1-distance*.2);
+        const relative=circularDelta(active,index),x=relative*gap+dragX,distance=Math.abs(x/gap),scale=Math.max(.54,1-distance*.19),opacity=distance>3.6?0:Math.max(.24,1-distance*.18);
         card.style.setProperty("--nw-card-x",`${x}px`);
         card.style.setProperty("--nw-card-scale",String(scale));
         card.style.opacity=String(opacity);
