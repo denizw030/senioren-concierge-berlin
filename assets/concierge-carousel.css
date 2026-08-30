@@ -93,3 +93,75 @@ body[data-product="senioren"] .nw-carousel-status:not(:disabled):hover,body.seni
     width:min(100%,280px);
   }
 }
+
+
+/* Premium symmetric voice/action layout — 2026-08-30 */
+.nw-carousel-actions{
+  width:100%;
+  display:grid!important;
+  grid-template-columns:minmax(0,280px)!important;
+  justify-content:center!important;
+  justify-items:stretch!important;
+  align-items:stretch!important;
+  gap:10px!important;
+  min-height:0!important;
+  margin-top:10px!important;
+}
+.nw-carousel-voice-host{
+  display:flex!important;
+  width:100%!important;
+  min-width:0!important;
+  align-items:stretch!important;
+  justify-content:center!important;
+}
+.nw-carousel-voice-host .nw-voice-preview-control{
+  width:100%!important;
+  max-width:280px!important;
+}
+.nw-carousel-status{
+  width:100%!important;
+  min-width:0!important;
+  max-width:280px!important;
+  height:44px!important;
+  min-height:44px!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+}
+.nw-carousel[data-variant="selection"] .nw-carousel-actions{
+  width:100%!important;
+  grid-template-columns:minmax(0,280px)!important;
+  justify-content:center!important;
+  justify-items:stretch!important;
+  align-items:stretch!important;
+  gap:10px!important;
+}
+.nw-carousel[data-variant="selection"] .nw-carousel-voice-host{
+  width:100%!important;
+  min-width:0!important;
+}
+.nw-carousel[data-variant="selection"] .nw-carousel-status{
+  width:100%!important;
+  min-width:0!important;
+  max-width:280px!important;
+}
+.nw-carousel[data-variant="selection"] .nw-carousel-info{
+  min-height:278px!important;
+  padding:12px 22px 24px!important;
+  overflow:visible!important;
+}
+@media(max-width:620px){
+  .nw-carousel-actions,
+  .nw-carousel[data-variant="selection"] .nw-carousel-actions{
+    grid-template-columns:minmax(0,min(100%,280px))!important;
+    justify-items:stretch!important;
+  }
+  .nw-carousel-status,
+  .nw-carousel[data-variant="selection"] .nw-carousel-status{
+    width:100%!important;
+    max-width:280px!important;
+  }
+  .nw-carousel[data-variant="selection"] .nw-carousel-info{
+    min-height:292px!important;
+    padding-inline:8px!important;
+  }
+}
