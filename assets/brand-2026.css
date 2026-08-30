@@ -604,3 +604,15 @@ h1,h2,h3,.home-title,.formcard h1,.formcard legend,
   text-align:center!important;
 }
 .odysx-info-bar img{flex:0 0 auto}
+
+/* Content typography: no serif display faces outside the brand wordmark. */
+main :is(h1,h2,h3,h4,h5,h6,legend,blockquote,.price,.home-title){
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif!important;
+}
+/* When exactly three CTAs exist, place them left / center / right on wide screens. */
+@media(min-width:761px){
+  .actions:has(> :nth-child(3):last-child){
+    width:100%!important;
+    justify-content:space-between!important;
+  }
+}
