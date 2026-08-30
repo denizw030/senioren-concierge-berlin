@@ -109,7 +109,11 @@
       const item = active.find((x) => x.provider === backendKey);
       card.classList.toggle("is-connected", !!item);
       const state = card.querySelector(".provider-state");
-      if (item && state) state.textContent = "Verbunden";
+      if (state) {
+        if (item) state.textContent = "Verbunden";
+        else if (key === "gmail") state.textContent = "Im Test";
+        else if (IMAP_PROVIDERS.has(key)) state.textContent = "Testbereit";
+      }
     });
     const gmailStatus = $("gmailProviderStatus");
     if (gmailStatus) gmailStatus.textContent = gmailConnection ? "Verbunden" : "Technisch in STAGING angebunden";
