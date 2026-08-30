@@ -120,3 +120,13 @@
 @media(max-width:520px){
   .concierge-overview-grid{grid-template-columns:1fr!important}
 }
+
+
+/* Tablet landscape: avoid squeezing country list + detail into two narrow columns. */
+@media(max-width:1100px){
+  .co-country-workspace{grid-template-columns:1fr!important}
+  .co-country-detail{grid-template-columns:minmax(150px,.72fr) minmax(0,1.28fr)!important}
+}
+@media(max-width:640px){
+  .co-country-detail{grid-template-columns:1fr!important}
+}
