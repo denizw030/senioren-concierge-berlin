@@ -269,9 +269,83 @@
           padding: 78px 0;
         }
       }
+    
+      /* OVERVIEW RECOVERY — restore the original hero portrait and the
+         restrained multi-tone premium atmosphere that made the overview
+         feel more dimensional than a single flat black surface. */
+      body.overview-page {
+        background: #070706 !important;
+      }
+      body.overview-page main {
+        background:
+          radial-gradient(920px 620px at 94% 7%, rgba(61, 117, 235, 0.09), transparent 64%),
+          radial-gradient(820px 560px at 4% 33%, rgba(135, 74, 182, 0.07), transparent 66%),
+          radial-gradient(760px 520px at 84% 68%, rgba(45, 160, 156, 0.06), transparent 67%),
+          radial-gradient(900px 560px at 104% 18%, rgba(212, 175, 55, 0.09), transparent 64%),
+          linear-gradient(180deg, #080807 0%, #0b0a09 48%, #060605 100%) !important;
+      }
+      body.overview-page .home-hero {
+        background:
+          radial-gradient(640px 500px at 78% 30%, rgba(58, 111, 224, 0.14), transparent 64%),
+          radial-gradient(560px 430px at 92% 60%, rgba(42, 164, 158, 0.09), transparent 66%),
+          radial-gradient(520px 400px at 58% 5%, rgba(130, 71, 180, 0.08), transparent 68%),
+          radial-gradient(620px 430px at 70% 46%, rgba(212, 175, 55, 0.13), transparent 67%),
+          linear-gradient(145deg, #070707, #0d0c0b 58%, #060606) !important;
+      }
+      body.overview-page .trust {
+        background:
+          linear-gradient(180deg, rgba(20, 19, 16, 0.96), rgba(10, 10, 9, 0.98)) !important;
+        border-top: 1px solid rgba(212, 175, 55, 0.08);
+      }
+      body.overview-page main > .home-section {
+        background:
+          radial-gradient(700px 420px at 92% 12%, rgba(61, 117, 235, 0.055), transparent 67%),
+          radial-gradient(620px 360px at 7% 88%, rgba(142, 76, 183, 0.045), transparent 69%),
+          linear-gradient(180deg, rgba(10, 10, 9, 0.96), rgba(7, 7, 6, 0.98)) !important;
+      }
+      body.overview-page main > .home-section:nth-of-type(even) {
+        background:
+          radial-gradient(720px 420px at 9% 14%, rgba(43, 157, 153, 0.055), transparent 68%),
+          radial-gradient(620px 360px at 91% 82%, rgba(212, 175, 55, 0.055), transparent 70%),
+          linear-gradient(180deg, rgba(12, 12, 10, 0.97), rgba(8, 8, 7, 0.99)) !important;
+      }
+      body.overview-page .product-band.personal {
+        background:
+          radial-gradient(760px 500px at 82% 30%, rgba(58, 111, 224, 0.08), transparent 64%),
+          radial-gradient(680px 460px at 10% 80%, rgba(43, 157, 153, 0.055), transparent 67%),
+          radial-gradient(circle at 75% 30%, rgba(212, 175, 55, 0.14), transparent 31%),
+          linear-gradient(145deg, #0d0d0b, #090907) !important;
+      }
+      body.overview-page .product-band.senior {
+        background:
+          radial-gradient(640px 360px at 88% 18%, rgba(212, 175, 55, 0.10), transparent 66%),
+          linear-gradient(145deg, #f7f1e6, #eee5d8) !important;
+        color: var(--nw-ink) !important;
+      }
+      body.overview-page .situation,
+      body.overview-page .release-card {
+        background:
+          radial-gradient(circle at 100% 0%, rgba(61, 117, 235, 0.055), transparent 36%),
+          radial-gradient(circle at 0% 100%, rgba(212, 175, 55, 0.055), transparent 40%),
+          linear-gradient(145deg, #171714, #0d0d0b) !important;
+      }
+      body.overview-page .final-cta {
+        background:
+          radial-gradient(circle at 86% 18%, rgba(212, 175, 55, 0.20), transparent 32%),
+          radial-gradient(circle at 12% 84%, rgba(132, 73, 177, 0.07), transparent 42%),
+          linear-gradient(145deg, #171611, #0c0c0a) !important;
+      }
+      body.overview-page .portrait {
+        background: #0a0907 url("assets/Primconcierge-NAHWERK-ODYSX.png?v=14")
+          center top / cover no-repeat !important;
+        box-shadow:
+          0 35px 100px rgba(0, 0, 0, 0.42),
+          0 0 60px rgba(212, 175, 55, 0.10) !important;
+      }
+
     </style>
   </head>
-  <body>
+  <body class="overview-page">
     <header class="top"><div class="wrap nav"><a class="brand" href="index.html" aria-label="NAHWERK Concierge – Startseite"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Hauptnavigation"><a class="active" href="index.html">Übersicht</a><a href="prime-concierge.html">Persönlicher Concierge</a><a href="concierges.html">Concierges</a><a href="senioren-concierge.html">Senioren Concierge</a><a href="angehoerige.html">Für Angehörige</a><a href="leistungen.html">Leistungen</a><a href="kontakt.html">Kontakt</a><a class="auth-link login-link" href="anmelden.html">Anmelden</a><a class="auth-link register-link" href="registrieren.html">Registrieren</a></nav></div></header>
     <main>
       <section class="home-hero">
@@ -293,7 +367,11 @@
             </div>
           </div>
           <div class="concierge-stage" aria-label="NAHWERK Concierge">
-            <div data-concierge-carousel data-variant="compact" data-register-url="registrieren.html?produkt=prime" data-label="Persönliche NAHWERK Concierges"></div>
+            <div
+              class="portrait"
+              role="img"
+              aria-label="Darstellung eines NAHWERK Concierges"
+            ></div>
           </div>
         </div>
       </section>
