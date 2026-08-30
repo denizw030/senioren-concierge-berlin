@@ -88,3 +88,32 @@ body.senior-product .nw-voice-preview-language-select,
   min-height:44px!important;
   box-sizing:border-box!important;
 }
+
+
+/* Global control containment: voice previews must never exceed their host. */
+.nw-voice-preview-control,
+.nw-voice-preview-button,
+.nw-voice-preview-language,
+.nw-voice-preview-language-select{
+  box-sizing:border-box!important;
+  min-width:0!important;
+  max-width:100%!important;
+}
+.nw-voice-preview-control{
+  width:100%!important;
+}
+.nw-voice-preview-button{
+  width:100%!important;
+}
+.nw-voice-preview-copy{
+  min-width:0!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.nw-voice-preview-language{
+  width:100%!important;
+  grid-template-columns:58px minmax(0,1fr)!important;
+}
+.nw-voice-preview-language-select{
+  width:100%!important;
+}
