@@ -378,3 +378,60 @@
   cursor:pointer!important;
   touch-action:manipulation;
 }
+
+
+/* Interactive region globe — replaces only the three region cards. */
+.co-region-globe-grid{
+  grid-template-columns:1fr!important;
+  justify-items:center;
+}
+.co-interactive-region-card{
+  width:min(100%,720px);
+  min-height:540px;
+  box-sizing:border-box;
+  cursor:default!important;
+}
+.co-interactive-region-card .co-region-title small{
+  width:auto;
+  min-width:0;
+  padding:0 12px;
+}
+.co-interactive-globe canvas{
+  cursor:grab;
+  touch-action:pan-y;
+  user-select:none;
+  -webkit-user-select:none;
+}
+.co-interactive-globe canvas.is-dragging{
+  cursor:grabbing;
+}
+.co-region-controls{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:center;
+}
+.co-region-button{
+  appearance:none;
+  -webkit-appearance:none;
+  justify-self:auto;
+  background:transparent;
+  font-family:inherit;
+  cursor:pointer;
+}
+.co-region-button.is-active{
+  border-color:rgba(212,175,55,.72);
+  background:rgba(212,175,55,.08);
+}
+@media(max-width:520px){
+  .co-interactive-region-card{
+    min-height:500px;
+  }
+  .co-region-controls{
+    gap:7px;
+  }
+  .co-region-button{
+    flex:1 1 calc(50% - 7px);
+    justify-content:center;
+  }
+}
