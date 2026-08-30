@@ -111,6 +111,62 @@
         gap: 16px;
         margin: 14px 0 15px;
       }
+      .registration-concierge-picker {
+        min-height: 560px;
+        width: 100%;
+        min-width: 0;
+        overflow: visible;
+      }
+      .registration-carousel-fallback {
+        display: flex;
+        gap: 14px;
+        width: 100%;
+        overflow-x: auto;
+        padding: 16px 4px 20px;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+      }
+      .registration-carousel-fallback::-webkit-scrollbar { display: none; }
+      .registration-carousel-fallback-card {
+        flex: 0 0 clamp(160px, 24vw, 220px);
+        padding: 0;
+        overflow: hidden;
+        scroll-snap-align: center;
+        border: 1px solid rgba(189,143,47,.28);
+        border-radius: 22px;
+        background: #10100e;
+        color: #fff;
+        box-shadow: 0 18px 48px rgba(0,0,0,.24);
+        text-align: center;
+      }
+      .registration-carousel-fallback-card img {
+        display: block;
+        width: 100%;
+        aspect-ratio: 3 / 4;
+        object-fit: cover;
+        object-position: center top;
+        background: #0b0b09;
+      }
+      .registration-carousel-fallback-card span {
+        display: block;
+        padding: 11px 12px 13px;
+        font-size: 14px;
+        font-weight: 700;
+      }
+      .registration-carousel-fallback-note {
+        margin: 4px 0 0;
+        color: #8f8b83;
+        font-size: 12px;
+        text-align: center;
+      }
+      .registration-concierge-picker.nw-carousel {
+        min-height: 0;
+      }
+      .registration-concierge-picker.nw-carousel .registration-carousel-fallback,
+      .registration-concierge-picker.nw-carousel .registration-carousel-fallback-note {
+        display: none !important;
+      }
       .concierge-choice .concierge-card {
         position: relative;
         display: block;
@@ -527,7 +583,7 @@
     <link rel="stylesheet" href="assets/brand-2026.css?v=23" />
     <link rel="stylesheet" href="assets/nahwerk-logo-v2.css?v=8" />
     <link rel="stylesheet" href="assets/concierge-voice-preview.css?v=8" />
-<link rel="stylesheet" href="assets/concierge-carousel.css?v=9" />
+<link rel="stylesheet" href="assets/concierge-carousel.css?v=11" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="de_DE" />
     <meta property="og:title" content="NAHWERK Concierge" />
@@ -616,13 +672,13 @@
                 Möglichkeiten bleiben bei allen Profilen gleich.
               </p>
               <div
-                class="concierge-choice"
+                class="concierge-choice registration-concierge-picker"
                 data-concierge-carousel
                 data-variant="selection"
                 data-input-name="conciergeChoice"
                 data-selected="nilo"
                 data-label="Persönlichen KI-Concierge auswählen"
-              ></div>
+              ><div class="registration-carousel-fallback" aria-label="Concierge-Auswahl"><button class="registration-carousel-fallback-card" type="button" data-fallback-concierge="nilo" aria-label="Nilo auswählen"><img src="assets/concierges/card/nilo.webp" alt="Portrait von Nilo, NAHWERK Concierge"><span>Nilo</span></button><button class="registration-carousel-fallback-card" type="button" data-fallback-concierge="mira" aria-label="Mira auswählen"><img src="assets/concierges/card/mira.webp" alt="Portrait von Mira, NAHWERK Concierge"><span>Mira</span></button><button class="registration-carousel-fallback-card" type="button" data-fallback-concierge="sofia" aria-label="Sofia auswählen"><img src="assets/concierges/card/sofia.webp" alt="Portrait von Sofia, NAHWERK Concierge"><span>Sofia</span></button><button class="registration-carousel-fallback-card" type="button" data-fallback-concierge="lena" aria-label="Lena auswählen"><img src="assets/concierges/card/lena.webp" alt="Portrait von Lena, NAHWERK Concierge" loading="lazy"><span>Lena</span></button><button class="registration-carousel-fallback-card" type="button" data-fallback-concierge="lukas" aria-label="Lukas auswählen"><img src="assets/concierges/card/lukas.webp" alt="Portrait von Lukas, NAHWERK Concierge" loading="lazy"><span>Lukas</span></button><button class="registration-carousel-fallback-card" type="button" data-fallback-concierge="hartmut" aria-label="Hartmut auswählen"><img src="assets/concierges/card/hartmut.webp" alt="Portrait von Hartmut, NAHWERK Concierge" loading="lazy"><span>Hartmut</span></button><button class="registration-carousel-fallback-card" type="button" data-fallback-concierge="frida" aria-label="Frida auswählen"><img src="assets/concierges/card/frida.webp" alt="Portrait von Frida, NAHWERK Concierge" loading="lazy"><span>Frida</span></button><button class="registration-carousel-fallback-card" type="button" data-fallback-concierge="camille" aria-label="Camille auswählen"><img src="assets/concierges/card/camille.webp" alt="Portrait von Camille, NAHWERK Concierge" loading="lazy"><span>Camille</span></button><button class="registration-carousel-fallback-card" type="button" data-fallback-concierge="anna" aria-label="Anna auswählen"><img src="assets/concierges/card/anna.webp" alt="Portrait von Anna, NAHWERK Concierge" loading="lazy"><span>Anna</span></button><button class="registration-carousel-fallback-card" type="button" data-fallback-concierge="olena" aria-label="Olena auswählen"><img src="assets/concierges/card/olena.webp" alt="Portrait von Olena, NAHWERK Concierge" loading="lazy"><span>Olena</span></button><button class="registration-carousel-fallback-card" type="button" data-fallback-concierge="leyla" aria-label="Leyla auswählen"><img src="assets/concierges/card/leyla.webp" alt="Portrait von Leyla, NAHWERK Concierge" loading="lazy"><span>Leyla</span></button><button class="registration-carousel-fallback-card" type="button" data-fallback-concierge="asha" aria-label="Asha auswählen"><img src="assets/concierges/card/asha.webp" alt="Portrait von Asha, NAHWERK Concierge" loading="lazy"><span>Asha</span></button><button class="registration-carousel-fallback-card" type="button" data-fallback-concierge="arjun" aria-label="Arjun auswählen"><img src="assets/concierges/card/arjun.webp" alt="Portrait von Arjun, NAHWERK Concierge" loading="lazy"><span>Arjun</span></button><button class="registration-carousel-fallback-card" type="button" data-fallback-concierge="sari" aria-label="Sari auswählen"><img src="assets/concierges/card/sari.webp" alt="Portrait von Sari, NAHWERK Concierge" loading="lazy"><span>Sari</span></button><button class="registration-carousel-fallback-card" type="button" data-fallback-concierge="noor" aria-label="Noor auswählen"><img src="assets/concierges/card/noor.webp" alt="Portrait von Noor, NAHWERK Concierge" loading="lazy"><span>Noor</span></button><button class="registration-carousel-fallback-card" type="button" data-fallback-concierge="mei" aria-label="Mei auswählen"><img src="assets/concierges/card/mei.webp" alt="Portrait von Mei, NAHWERK Concierge" loading="lazy"><span>Mei</span></button><button class="registration-carousel-fallback-card" type="button" data-fallback-concierge="wei" aria-label="Wei auswählen"><img src="assets/concierges/card/wei.webp" alt="Portrait von Wei, NAHWERK Concierge" loading="lazy"><span>Wei</span></button><button class="registration-carousel-fallback-card" type="button" data-fallback-concierge="yuki" aria-label="Yuki auswählen"><img src="assets/concierges/card/yuki.webp" alt="Portrait von Yuki, NAHWERK Concierge" loading="lazy"><span>Yuki</span></button><button class="registration-carousel-fallback-card" type="button" data-fallback-concierge="ren" aria-label="Ren auswählen"><img src="assets/concierges/card/ren.webp" alt="Portrait von Ren, NAHWERK Concierge" loading="lazy"><span>Ren</span></button><button class="registration-carousel-fallback-card" type="button" data-fallback-concierge="amara" aria-label="Amara auswählen"><img src="assets/concierges/card/amara.webp" alt="Portrait von Amara, NAHWERK Concierge" loading="lazy"><span>Amara</span></button><button class="registration-carousel-fallback-card" type="button" data-fallback-concierge="kwame" aria-label="Kwame auswählen"><img src="assets/concierges/card/kwame.webp" alt="Portrait von Kwame, NAHWERK Concierge" loading="lazy"><span>Kwame</span></button><button class="registration-carousel-fallback-card" type="button" data-fallback-concierge="zuri" aria-label="Zuri auswählen"><img src="assets/concierges/card/zuri.webp" alt="Portrait von Zuri, NAHWERK Concierge" loading="lazy"><span>Zuri</span></button><button class="registration-carousel-fallback-card" type="button" data-fallback-concierge="jabari" aria-label="Jabari auswählen"><img src="assets/concierges/card/jabari.webp" alt="Portrait von Jabari, NAHWERK Concierge" loading="lazy"><span>Jabari</span></button></div><p class="registration-carousel-fallback-note">Concierge-Auswahl wird geladen …</p></div>
               <span class="tiny"
                 >Alle 23 Profile gehören zum selben NAHWERK-Concierge-System.
                 Die Auswahl bestimmt vor allem Ansprache, Stimme und
@@ -937,8 +993,8 @@
         </div>
       </div>
     </footer>
-    <script src="assets/concierge-voice-preview.js?v=5"></script>
-<script src="assets/concierge-carousel.js?v=15"></script>
+    <script src="assets/concierge-voice-preview.js?v=6"></script>
+<script src="assets/concierge-carousel.js?v=18"></script>
     <script src="assets/auth-nav.js?v=32"></script>
     <script src="assets/onboarding.js?v=15"></script>
     <script>
