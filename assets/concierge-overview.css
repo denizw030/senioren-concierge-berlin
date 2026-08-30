@@ -130,3 +130,59 @@
 @media(max-width:640px){
   .co-country-detail{grid-template-columns:1fr!important}
 }
+
+
+/* Country flag accents — 2026-08-30 */
+.co-country-chip{
+  grid-template-columns:26px minmax(0,1fr)!important;
+  column-gap:9px!important;
+}
+.co-country-chip:before{
+  content:none!important;
+  display:none!important;
+}
+.co-country-flag{
+  grid-column:1;
+  grid-row:1 / span 2;
+  align-self:center;
+  display:grid;
+  place-items:center;
+  width:24px;
+  height:17px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:4px;
+  background:rgba(255,255,255,.045);
+  box-shadow:0 2px 7px rgba(0,0,0,.26);
+  font-size:17px;
+  line-height:1;
+  filter:saturate(.86) contrast(.98);
+  transform:translateZ(0);
+}
+.co-country-flag.is-region{
+  color:#c8ad69;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif;
+  font-size:15px;
+  font-weight:500;
+  background:rgba(212,175,55,.045);
+  border-color:rgba(212,175,55,.22);
+}
+.co-country-name{
+  grid-column:2;
+  min-width:0;
+}
+.co-country-chip small{
+  grid-column:2!important;
+}
+.co-country-chip:hover .co-country-flag,
+.co-country-chip.is-active .co-country-flag{
+  border-color:rgba(212,175,55,.42);
+  box-shadow:0 2px 9px rgba(0,0,0,.3),0 0 0 1px rgba(212,175,55,.06);
+  filter:saturate(.94) contrast(1);
+}
+.co-country-chip.is-active .co-country-flag{
+  transform:scale(1.035);
+}
+@media(max-width:520px){
+  .co-country-flag{width:23px;height:16px;font-size:16px}
+}
