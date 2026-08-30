@@ -61,6 +61,9 @@
     if ($("disconnectGoogle")) $("disconnectGoogle").hidden = !connected;
     if ($("emailSettingsCard")) $("emailSettingsCard").hidden = !connected;
     if ($("emailRulesCard")) $("emailRulesCard").hidden = !connected;
+    const providerStatus = $("gmailProviderStatus");
+    if (providerStatus) providerStatus.textContent = connected ? "Verbunden" : "Bereit zum Verbinden";
+    document.querySelector('[data-provider="gmail"]')?.classList.toggle("is-connected", connected);
   }
 
   function renderSettings(settings) {
@@ -162,6 +165,22 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
+    document.querySelector(".provider-grid")?.addEventListener("click", (event) => {
+      const card = event.target.closest("[data-provider]");
+      if (!card) return;
+      const provider = card.dataset.provider;
+      if (provider === "gmail") {
+        if (currentConnection) {
+          $("emailSettingsCard")?.scrollIntoView({ behavior:"smooth", block:"start" });
+        } else {
+          $("connectGoogle")?.click();
+        }
+        return;
+      }
+      const labels = {outlook:"Outlook / Microsoft 365",yahoo:"Yahoo Mail",icloud:"iCloud Mail",gmx:"GMX",webde:"WEB.DE",strato:"STRATO",other:"dieser Anbieter"};
+      toast((labels[provider] || "Dieser Anbieter") + " wird erst freigeschaltet, wenn die Verbindung vollständig geprüft ist.");
+    });
+
     $("connectGoogle")?.addEventListener("click", async () => {
       setBusy(true);
       try {
