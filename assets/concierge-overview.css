@@ -27,3 +27,96 @@
 @media(max-width:760px){
   .co-pill,.co-detail-cta{width:100%;min-width:0}
 }
+
+
+/* =========================================================
+   Responsive overflow guard — 2026-08-30
+   Prevent controls from escaping concierge/result cards.
+   ========================================================= */
+.concierge-overview-grid{
+  grid-template-columns:repeat(auto-fill,minmax(230px,260px))!important;
+  justify-content:start!important;
+  align-items:start!important;
+}
+.concierge-overview-card,
+.concierge-overview-profile,
+.concierge-overview-card-copy,
+.concierge-overview-actions,
+.co-country-workspace,
+.co-country-list,
+.co-country-detail,
+.co-detail-copy{
+  min-width:0!important;
+  max-width:100%!important;
+  box-sizing:border-box!important;
+}
+.concierge-overview-actions{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  gap:8px!important;
+  padding:10px!important;
+  overflow:hidden!important;
+}
+.concierge-overview-actions > *{
+  min-width:0!important;
+  max-width:100%!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+}
+.concierge-overview-actions .nw-voice-preview-control{
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+}
+.concierge-overview-actions .nw-voice-preview-button,
+.concierge-overview-select{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+}
+.concierge-overview-select{
+  padding:0 12px!important;
+  text-align:center!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+.concierge-overview-actions .nw-voice-preview-language{
+  width:100%!important;
+  min-width:0!important;
+  grid-template-columns:54px minmax(0,1fr)!important;
+}
+.concierge-overview-actions .nw-voice-preview-language-select{
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+}
+.co-country-grid{min-width:0!important}
+.co-country-chip{min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
+.co-country-chip span,.co-country-chip small,.co-detail-copy p,.co-detail-copy li{
+  overflow-wrap:anywhere;
+}
+.co-pill,.co-detail-cta{
+  max-width:100%!important;
+  min-width:0!important;
+}
+@media(max-width:1120px){
+  .concierge-overview-grid{
+    grid-template-columns:repeat(auto-fill,minmax(220px,250px))!important;
+  }
+}
+@media(max-width:760px){
+  .concierge-overview-grid{
+    grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr))!important;
+  }
+  .co-results-head{
+    align-items:stretch!important;
+  }
+  .co-results-head .co-pill{
+    width:100%!important;
+  }
+}
+@media(max-width:520px){
+  .concierge-overview-grid{grid-template-columns:1fr!important}
+}
