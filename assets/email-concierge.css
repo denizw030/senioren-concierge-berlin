@@ -122,3 +122,6 @@
 .campaign-card{background:linear-gradient(135deg,#17130c,#090909);border-color:rgba(215,169,52,.34)}
 .campaign-proof span{background:rgba(255,255,255,.055);border-color:rgba(215,169,52,.18)}
 @media(max-width:760px){.email-shell{padding-left:20px;padding-right:20px}.email-hero:after{width:280px;height:280px;right:-90px}}
+
+.provider-card.is-unavailable{cursor:not-allowed;opacity:.68}
+.provider-card.is-unavailable:hover{transform:none}
