@@ -30,6 +30,59 @@
     <p>Verbinde dein Gmail-Konto einmal sicher mit Google. Danach kannst du deinen NAHWERK Concierge auch über WhatsApp bitten, E-Mails zu suchen, Wichtiges zusammenzufassen oder automatische Hinweise einzurichten.</p>
   </section>
 
+
+  <section class="email-provider-section" aria-labelledby="providerHeading">
+    <div class="eyebrow">E-Mail-Anbieter</div>
+    <div class="email-section-head">
+      <div>
+        <h2 id="providerHeading">Deine E-Mail-Konten an einem Ort.</h2>
+        <p>Wähle deinen Anbieter. Gmail ist bereits technisch angebunden; weitere Anbieter werden erst freigeschaltet, wenn die jeweilige Verbindung vollständig geprüft ist.</p>
+      </div>
+    </div>
+    <div class="provider-grid">
+      <button class="provider-card is-live" type="button" data-provider="gmail">
+        <span class="provider-mark gmail-mark" aria-hidden="true">M</span>
+        <span class="provider-copy"><strong>Gmail</strong><small id="gmailProviderStatus">Bereit zum Verbinden</small></span>
+        <span class="provider-state live">Verfügbar</span>
+      </button>
+      <button class="provider-card" type="button" data-provider="outlook">
+        <span class="provider-mark outlook-mark" aria-hidden="true">O</span>
+        <span class="provider-copy"><strong>Outlook / Microsoft 365</strong><small>OAuth-Anbindung in Vorbereitung</small></span>
+        <span class="provider-state">Bald</span>
+      </button>
+      <button class="provider-card" type="button" data-provider="yahoo">
+        <span class="provider-mark yahoo-mark" aria-hidden="true">Y!</span>
+        <span class="provider-copy"><strong>Yahoo Mail</strong><small>Anbindung in Vorbereitung</small></span>
+        <span class="provider-state">Bald</span>
+      </button>
+      <button class="provider-card" type="button" data-provider="icloud">
+        <span class="provider-mark icloud-mark" aria-hidden="true">☁</span>
+        <span class="provider-copy"><strong>iCloud Mail</strong><small>Anbindung in Vorbereitung</small></span>
+        <span class="provider-state">Bald</span>
+      </button>
+      <button class="provider-card" type="button" data-provider="gmx">
+        <span class="provider-mark gmx-mark" aria-hidden="true">GMX</span>
+        <span class="provider-copy"><strong>GMX</strong><small>IMAP/SMTP-Assistent geplant</small></span>
+        <span class="provider-state">Bald</span>
+      </button>
+      <button class="provider-card" type="button" data-provider="webde">
+        <span class="provider-mark webde-mark" aria-hidden="true">WEB</span>
+        <span class="provider-copy"><strong>WEB.DE</strong><small>IMAP/SMTP-Assistent geplant</small></span>
+        <span class="provider-state">Bald</span>
+      </button>
+      <button class="provider-card" type="button" data-provider="strato">
+        <span class="provider-mark strato-mark" aria-hidden="true">S</span>
+        <span class="provider-copy"><strong>STRATO</strong><small>IMAP/SMTP-Assistent geplant</small></span>
+        <span class="provider-state">Bald</span>
+      </button>
+      <button class="provider-card" type="button" data-provider="other">
+        <span class="provider-mark other-mark" aria-hidden="true">+</span>
+        <span class="provider-copy"><strong>Anderer Anbieter</strong><small>Allgemeine IMAP/SMTP-Verbindung</small></span>
+        <span class="provider-state">Bald</span>
+      </button>
+    </div>
+  </section>
+
   <section class="email-grid">
     <article class="email-card wide">
       <div class="eyebrow">Verbindung</div>
@@ -157,6 +210,35 @@
       <div class="email-rule-list" id="emailRuleList"><div class="empty">Regeln werden geladen …</div></div>
     </article>
 
+
+    <article class="email-card wide trust-card">
+      <div class="eyebrow">Vertrauen & Kontrolle</div>
+      <h2>Deine E-Mails. Dein Concierge. Deine Freigabe.</h2>
+      <div class="trust-grid">
+        <div class="trust-item"><span class="trust-icon">1</span><div><strong>Passwort bleibt beim Anbieter</strong><p>Bei OAuth-Anbietern wie Google erfolgt die Anmeldung direkt beim Anbieter. NAHWERK erhält dein Google-Passwort nicht.</p></div></div>
+        <div class="trust-item"><span class="trust-icon">2</span><div><strong>Du bestimmst die Berechtigungen</strong><p>Lesen, WhatsApp-Zugriff und proaktive Hinweise lassen sich getrennt steuern.</p></div></div>
+        <div class="trust-item"><span class="trust-icon">3</span><div><strong>Versand nur nach Freigabe</strong><p>Antworten werden zuerst als konkreter Entwurf gezeigt. Erst deine ausdrückliche Zustimmung erlaubt den Versand.</p></div></div>
+        <div class="trust-item"><span class="trust-icon">4</span><div><strong>Verbindung jederzeit trennbar</strong><p>Ein verbundenes Konto kann wieder getrennt werden; Zugriffsrechte werden nicht als unumkehrbare Freigabe behandelt.</p></div></div>
+      </div>
+      <div class="email-actions">
+        <a class="email-btn secondary" href="trust-center.html">NAHWERK Trust Center öffnen</a>
+        <a class="email-btn secondary" href="datenschutz.html">Datenschutz ansehen</a>
+      </div>
+    </article>
+
+    <article class="email-card wide campaign-card">
+      <div class="campaign-copy">
+        <div class="eyebrow">So erklären wir es Kunden</div>
+        <h2>Wir wollen nicht, dass du uns einfach vertraust.</h2>
+        <p>Deshalb bleibt die Anmeldung bei Google, Microsoft & Co. beim jeweiligen Anbieter – und du behältst die Kontrolle darüber, was dein Concierge darf.</p>
+      </div>
+      <div class="campaign-proof">
+        <span>Kein Google-Passwort an NAHWERK</span>
+        <span>Klare Berechtigungen</span>
+        <span>Kein E-Mail-Versand ohne Freigabe</span>
+      </div>
+    </article>
+
     <article class="email-card wide">
       <div class="email-note"><strong>Sende-Schutz:</strong> Dein Concierge darf E-Mails lesen, suchen, zusammenfassen und Entwürfe vorbereiten. Eine E-Mail wird erst versendet, nachdem dir der konkrete Entwurf gezeigt wurde und du ihn ausdrücklich freigegeben hast.</div>
     </article>
@@ -166,7 +248,7 @@
 <div class="email-toast" id="emailToast" role="status" aria-live="polite"></div>
 
 <footer class="footer">
-  <div class="wrap"><div class="footbottom"><span>© 2026 NAHWERK Concierge</span><span><a href="datenschutz.html">Datenschutz</a> · <a href="datenloeschung.html">Datenlöschung</a></span></div></div>
+  <div class="wrap"><div class="footbottom"><span>© 2026 NAHWERK Concierge</span><span><a href="trust-center.html">Trust Center</a> · <a href="datenschutz.html">Datenschutz</a> · <a href="datenloeschung.html">Datenlöschung</a></span></div></div>
 </footer>
 
 <script src="assets/auth-nav.js?v=28"></script>
