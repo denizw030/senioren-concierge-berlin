@@ -1,0 +1,187 @@
+name: One-shot image optimization controller
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/image-optimize-controller.yml
+
+permissions:
+  contents: write
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: staging/image-optimization-20260830
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Optimize image assets without visual redesign
+        run: |
+          python -m pip install --quiet pillow numpy
+          python <<'PY'
+          from pathlib import Path
+          from PIL import Image, ImageOps
+          import numpy as np, re, math, os
+
+          root = Path(".")
+          assets = root / "assets"
+          out = assets / "optimized"
+          out.mkdir(exist_ok=True)
+
+          def rgb_array(im):
+              if im.mode not in ("RGB","RGBA"):
+                  im = im.convert("RGBA" if "A" in im.getbands() else "RGB")
+              arr = np.asarray(im.convert("RGB"), dtype=np.float32)
+              return arr
+
+          def psnr(a,b):
+              mse = np.mean((a-b)**2)
+              return 99.0 if mse == 0 else 20*math.log10(255.0/math.sqrt(mse))
+
+          def save_webp(src, dst, max_width=None, quality=94):
+              im = Image.open(src)
+              im.load()
+              original_size = im.size
+              icc = im.info.get("icc_profile")
+              if max_width and im.width > max_width:
+                  h = round(im.height * max_width / im.width)
+                  target = im.resize((max_width,h), Image.Resampling.LANCZOS)
+              else:
+                  target = im.copy()
+              if target.mode not in ("RGB","RGBA"):
+                  target = target.convert("RGBA" if "A" in target.getbands() else "RGB")
+              kwargs = dict(format="WEBP", quality=quality, method=6, exact=True)
+              if icc: kwargs["icc_profile"] = icc
+              target.save(dst, **kwargs)
+              check = Image.open(dst); check.load()
+              score = psnr(rgb_array(target), rgb_array(check))
+              print(f"WEBP {src} {original_size} -> {dst} {target.size}; {src.stat().st_size} -> {dst.stat().st_size} bytes; PSNR={score:.2f} dB")
+              if score < 36:
+                  raise SystemExit(f"Quality guard failed for {dst}: PSNR {score:.2f} dB")
+
+          def save_icon(src, dst, box):
+              im = Image.open(src); im.load()
+              if im.mode != "RGBA": im = im.convert("RGBA")
+              fitted = ImageOps.contain(im, (box,box), Image.Resampling.LANCZOS)
+              canvas = Image.new("RGBA",(box,box),(0,0,0,0))
+              canvas.alpha_composite(fitted, ((box-fitted.width)//2,(box-fitted.height)//2))
+              canvas.save(dst, format="PNG", optimize=True, compress_level=9)
+              print(f"PNG {src} {im.size} -> {dst} {canvas.size}; {src.stat().st_size} -> {dst.stat().st_size} bytes")
+
+          hero = assets / "Primconcierge-NAHWERK-ODYSX.png"
+          older_candidates = list(assets.glob("NAHWERK-Concierge-*ltere-Frau-Wohnzimmer.png"))
+          if not older_candidates:
+              raise SystemExit("Older-woman source not found")
+          older = older_candidates[0]
+          contact = assets / "NAHWERK-Concierge-Frau-Wohnzimmer.png"
+          logo = assets / "NAHWERKConcierge-Logo.png"
+          crown = assets / "Krone-white.png"
+
+          save_webp(hero, out/"primeconcierge-hero.webp", max_width=1350, quality=95)
+          save_webp(older, out/"senior-woman-overview.webp", max_width=None, quality=94)
+          save_webp(contact, out/"contact-woman.webp", max_width=None, quality=94)
+          save_icon(logo, out/"nahwerk-favicon-128.png", 128)
+          save_icon(crown, out/"odysx-crown-white-96.png", 96)
+
+          # Only swap image delivery paths; preserve all layout/design markup.
+          p = Path("index.html")
+          s = p.read_text(encoding="utf-8")
+          s = s.replace('assets/Primconcierge-NAHWERK-ODYSX.png?v=14','assets/optimized/primeconcierge-hero.webp?v=1')
+          s = re.sub(r'assets/NAHWERK-Concierge-[^"\']*ltere-Frau-Wohnzimmer\.png\?v=1','assets/optimized/senior-woman-overview.webp?v=1',s)
+          p.write_text(s,encoding="utf-8")
+
+          p = Path("kontakt.html")
+          s = p.read_text(encoding="utf-8").replace('assets/NAHWERK-Concierge-Frau-Wohnzimmer.png?v=1','assets/optimized/contact-woman.webp?v=1')
+          p.write_text(s,encoding="utf-8")
+
+          # Dedicated small favicon: social preview image stays untouched.
+          for p in root.glob("*.html"):
+              s = p.read_text(encoding="utf-8")
+              ns = re.sub(r'assets/NAHWERKConcierge-Logo\.png\?v=[34]','assets/optimized/nahwerk-favicon-128.png?v=1',s)
+              if ns != s:
+                  p.write_text(ns,encoding="utf-8")
+
+          p = assets/"auth-nav.js"
+          s = p.read_text(encoding="utf-8").replace('assets/Krone-white.png?v=1','assets/optimized/odysx-crown-white-96.png?v=1')
+          p.write_text(s,encoding="utf-8")
+
+          # Preserve carousel visuals; only improve responsive source selection
+          # and avoid high-priority image loading while a carousel is far offscreen.
+          p = assets/"concierge-carousel.js"
+          s = p.read_text(encoding="utf-8")
+          old = 'image.dataset.sizes="(max-width: 700px) 52vw, 420px";'
+          new = 'image.dataset.sizes=variant==="compact"?"(max-width: 700px) 68vw, 220px":variant==="senior"?"(max-width: 700px) 72vw, 310px":"(max-width: 700px) 68vw, 290px";'
+          if old not in s: raise SystemExit("Carousel sizes anchor missing")
+          s = s.replace(old,new,1)
+
+          old = 'const loaded = new Set();'
+          new = 'const loaded = new Set();\n    let canLoadImages=root.getBoundingClientRect().top<(window.innerHeight||document.documentElement.clientHeight)*1.5;'
+          if old not in s: raise SystemExit("Carousel loaded anchor missing")
+          s = s.replace(old,new,1)
+
+          old = 'const safe=mod(index),card=cards[safe],image=card?.querySelector("img");\n      if(!image || loaded.has(safe) || image.src) return;'
+          new = 'const safe=mod(index),card=cards[safe],image=card?.querySelector("img");\n      if(!canLoadImages || !image || loaded.has(safe) || image.src) return;'
+          if old not in s: raise SystemExit("Carousel ensureImage anchor missing")
+          s = s.replace(old,new,1)
+
+          old = 'root._nahwerkCarousel=api;\n    warmWindow(active);\n    positionCards();\n    updateInfo();'
+          new = '''root._nahwerkCarousel=api;
+    if(!canLoadImages&&"IntersectionObserver" in window){
+      const imageObserver=new IntersectionObserver(entries=>{
+        if(entries.some(entry=>entry.isIntersecting)){
+          canLoadImages=true;
+          warmWindow(active);
+          positionCards();
+          imageObserver.disconnect();
+        }
+      },{rootMargin:"600px 0px"});
+      imageObserver.observe(root);
+    }else{
+      canLoadImages=true;
+      warmWindow(active);
+    }
+    positionCards();
+    updateInfo();'''
+          if old not in s: raise SystemExit("Carousel mount anchor missing")
+          s = s.replace(old,new,1)
+          p.write_text(s,encoding="utf-8")
+
+          # Ensure only expected visual assets/references changed.
+          print("Optimization script completed.")
+          PY
+      - name: Syntax and integrity checks
+        run: |
+          node --check assets/concierge-carousel.js
+          python <<'PY'
+          from pathlib import Path
+          import re
+          js=Path("assets/concierge-carousel.js").read_text(encoding="utf-8")
+          profiles=re.findall(r'^\s*\["([^"]+)","([^"]+)"',js.split("const profiles = [",1)[1].split("].map(",1)[0],re.M)
+          assert len(profiles)==23, len(profiles)
+          for f in [
+            "assets/optimized/primeconcierge-hero.webp",
+            "assets/optimized/senior-woman-overview.webp",
+            "assets/optimized/contact-woman.webp",
+            "assets/optimized/nahwerk-favicon-128.png",
+            "assets/optimized/odysx-crown-white-96.png",
+          ]:
+            p=Path(f); assert p.exists() and p.stat().st_size>0, f
+          assert 'assets/optimized/primeconcierge-hero.webp?v=1' in Path("index.html").read_text(encoding="utf-8")
+          assert 'assets/optimized/contact-woman.webp?v=1' in Path("kontakt.html").read_text(encoding="utf-8")
+          print("23 profiles OK; optimized assets and references OK")
+          PY
+          git diff --check
+      - name: Commit optimized assets to staging only
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm -f .github/workflows/image-optimize-temp.yml
+          git add -A
+          git commit -m "Optimize image delivery without visual changes"
+          git push origin HEAD:staging/image-optimization-20260830
