@@ -8,7 +8,7 @@
   const LOGOUT_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/logout";
   const PROTECTED = new Set(["konto.html", "concierge-anpassen.html"]);
   const CONTEXT_PAGES = new Set(["pakete.html", "registrieren.html", "anmelden.html", "konto.html", "concierge-anpassen.html"]);
-  const NAV = [["index.html", "Übersicht"], ["prime-concierge.html", "Persönlicher Concierge"], ["concierges.html", "Alle Concierges"], ["senioren-concierge.html", "Senioren Concierge"], ["senioren-concierge.html#angehoerige", "Für Angehörige"], ["kontakt.html", "Kontakt"]];
+  const NAV = [["index.html", "Übersicht"], ["prime-concierge.html", "Persönlicher Concierge"], ["concierges.html", "Concierges"], ["senioren-concierge.html", "Senioren Concierge"], ["senioren-concierge.html#angehoerige", "Für Angehörige"], ["leistungen.html", "Leistungen"], ["kontakt.html", "Kontakt"]];
   const page = () => location.pathname.split("/").pop() || "index.html";
   function productContext(current = page()) {
     const requested = new URLSearchParams(location.search).get("produkt");
@@ -66,7 +66,6 @@
     bar.className = "odysx-info-bar";
     bar.setAttribute("role", "note");
     bar.innerHTML = '<img src="assets/Krone.png?v=1" alt="" aria-hidden="true" style="width:24px;height:24px;object-fit:contain;display:block;flex:0 0 auto"><span>Eine Marke von <strong>ODYSX</strong></span><img class="odysx-crown-logo" src="assets/Krone-white.png?v=1" alt="ODYSX Krone">';
-    Object.assign(bar.style, { boxSizing: "border-box", width: "100%", minHeight: "32px", padding: "4px 20px", background: "#242424", borderTop: "1px solid #343434", borderBottom: "1px solid #3a3a3a", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", gap: "9px", textAlign: "center", font: "500 13px/18px Arial,sans-serif", letterSpacing: ".25px", position: "relative", zIndex: "49" });
     header.insertAdjacentElement("afterend", bar);
   }
   function normalizeShell() {
@@ -97,8 +96,8 @@
         nav.appendChild(out);
       } else {
         const suffix = `?produkt=${product}`;
-        nav.appendChild(makeLink(`anmelden.html${suffix}`, "Anmelden", current === "anmelden.html" ? "active auth-link login-link" : ""));
-        nav.appendChild(makeLink(`registrieren.html${suffix}`, "Registrieren", current === "registrieren.html" ? "active" : ""));
+        nav.appendChild(makeLink(`anmelden.html${suffix}`, "Anmelden", `${current === "anmelden.html" ? "active " : ""}auth-link login-link`.trim()));
+        nav.appendChild(makeLink(`registrieren.html${suffix}`, "Registrieren", `${current === "registrieren.html" ? "active " : ""}auth-link register-link`.trim()));
       }
       nav.id ||= "main-navigation";
       if (!nav.previousElementSibling?.classList.contains("nav-toggle")) {
