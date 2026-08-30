@@ -191,6 +191,16 @@
       .step-home p {
         color: var(--nw-muted-dark);
       }
+      .overview-story-image {
+        display: block;
+        width: 100%;
+        max-width: 1100px;
+        height: auto;
+        margin: clamp(36px, 5vw, 64px) auto 0;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: clamp(20px, 2.4vw, 30px);
+        box-shadow: 0 28px 80px rgba(0, 0, 0, 0.32);
+      }
       .release-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -545,6 +555,13 @@
               >So funktioniert's im Detail</a
             >
           </div>
+          <img
+            class="overview-story-image"
+            src="assets/NAHWERK-Concierge-junge-Frau-Küche.png"
+            alt="Junge Frau in einer Küche blickt überrascht auf ihr Smartphone"
+            loading="lazy"
+            decoding="async"
+          />
         </div>
       </section>
       <section class="home-section">
