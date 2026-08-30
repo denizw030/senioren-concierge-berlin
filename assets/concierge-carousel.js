@@ -23,7 +23,7 @@
     ["mei","Mei","Ruhig, präzise, modern und bedacht.","sage","hearing_test","Nǐ hǎo, ich bin Mei.","zh"],
     ["wei","Wei","Ruhig, kultiviert, zurückhaltend und präzise.","ballad","hearing_test","Nǐ hǎo, ich bin Wei.","zh"],
     ["yuki","Yuki","Jung, freundlich, klar und modern.","marin","hearing_test","Konnichiwa, ich bin Yuki.","ja"],
-    ["ren","Ren","Ruhig, modern, männlich und präzise.","alloy","hearing_test","Konnichiwa, ich bin Ren.","ja"]
+    ["ren","Ren","Ruhig, modern, männlich und präzise.","alloy","hearing_test","Konnichiwa, ich bin Ren.","ja"],
     ["amara","Amara","Warm, souverän, modern und herzlich.","coral","hearing_test","Akwaaba, ich bin Amara.","tw"],
     ["kwame","Kwame","Geerdet, ruhig, warm und souverän.","cedar","hearing_test","Akwaaba, ich bin Kwame.","tw"],
     ["zuri","Zuri","Modern, lebendig, warm und aufmerksam.","shimmer","hearing_test","Jambo, ich bin Zuri.","sw"],
