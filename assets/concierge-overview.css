@@ -359,3 +359,17 @@
 @media(max-width:520px){
   .co-globe-img{width:min(100%,310px)!important}
 }
+
+
+/* Reliable globe tap/click target — 2026-08-30 */
+.co-globe,
+.co-globe-img{
+  pointer-events:none!important;
+  user-select:none!important;
+  -webkit-user-select:none!important;
+  -webkit-user-drag:none!important;
+}
+.co-region-card{
+  cursor:pointer!important;
+  touch-action:manipulation;
+}
