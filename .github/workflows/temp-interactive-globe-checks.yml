@@ -1,0 +1,39 @@
+name: Temporary interactive globe checks
+on:
+  push:
+    branches:
+      - temp/interactive-region-globe
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: temp/interactive-region-globe
+      - name: JavaScript syntax
+        run: node --check assets/concierge-overview.js
+      - name: Scoped regression assertions
+        shell: python
+        run: |
+          from pathlib import Path
+          h=Path("concierges.html").read_text()
+          j=Path("assets/concierge-overview.js").read_text()
+          c=Path("assets/concierge-overview.css").read_text()
+          assert h.count('id="interactiveRegionGlobe"') == 1
+          assert h.count('class="co-region-card co-interactive-region-card"') == 1
+          for r in ("Europa","Asien","Afrika","Amerika","Ozeanien"):
+              assert h.count(f'data-region="{r}"') == 1
+          assert 'europa-premium.svg' not in h
+          assert 'asien-premium.svg' not in h
+          assert 'afrika-premium.svg' not in h
+          assert 'id="countryStep"' in h and 'id="countryOptions"' in h
+          assert 'M={Europa:' in j and 'Asien:{c:' in j and 'Afrika:{c:' in j
+          assert 'Amerika:["North America","South America"]' in j
+          assert 'Ozeanien:["Oceania"]' in j
+          assert 'Demnächst verfügbar' in j
+          assert 'pointerdown' in j and 'pointermove' in j and 'pointerup' in j
+          assert 'requestAnimationFrame(frame)' in j
+          assert 'prefers-reduced-motion' in j
+          assert 'touch-action:pan-y' in c
+          assert '.co-region-globe-grid' in c
+          print("Scoped interactive globe assertions: PASS")
