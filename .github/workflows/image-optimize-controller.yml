@@ -131,23 +131,7 @@ jobs:
           s = s.replace(old,new,1)
 
           old = 'root._nahwerkCarousel=api;\n    warmWindow(active);\n    positionCards();\n    updateInfo();'
-          new = '''root._nahwerkCarousel=api;
-    if(!canLoadImages&&"IntersectionObserver" in window){
-      const imageObserver=new IntersectionObserver(entries=>{
-        if(entries.some(entry=>entry.isIntersecting)){
-          canLoadImages=true;
-          warmWindow(active);
-          positionCards();
-          imageObserver.disconnect();
-        }
-      },{rootMargin:"600px 0px"});
-      imageObserver.observe(root);
-    }else{
-      canLoadImages=true;
-      warmWindow(active);
-    }
-    positionCards();
-    updateInfo();'''
+          new = 'root._nahwerkCarousel=api;\\n    if(!canLoadImages&&"IntersectionObserver" in window){\\n      const imageObserver=new IntersectionObserver(entries=>{\\n        if(entries.some(entry=>entry.isIntersecting)){\\n          canLoadImages=true;\\n          warmWindow(active);\\n          positionCards();\\n          imageObserver.disconnect();\\n        }\\n      },{rootMargin:"600px 0px"});\\n      imageObserver.observe(root);\\n    }else{\\n      canLoadImages=true;\\n      warmWindow(active);\\n    }\\n    positionCards();\\n    updateInfo();'
           if old not in s: raise SystemExit("Carousel mount anchor missing")
           s = s.replace(old,new,1)
           p.write_text(s,encoding="utf-8")
