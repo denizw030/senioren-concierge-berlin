@@ -111,31 +111,6 @@ jobs:
           s = p.read_text(encoding="utf-8").replace('assets/Krone-white.png?v=1','assets/optimized/odysx-crown-white-96.png?v=1')
           p.write_text(s,encoding="utf-8")
 
-          # Preserve carousel visuals; only improve responsive source selection
-          # and avoid high-priority image loading while a carousel is far offscreen.
-          p = assets/"concierge-carousel.js"
-          s = p.read_text(encoding="utf-8")
-          old = 'image.dataset.sizes="(max-width: 700px) 52vw, 420px";'
-          new = 'image.dataset.sizes=variant==="compact"?"(max-width: 700px) 68vw, 220px":variant==="senior"?"(max-width: 700px) 72vw, 310px":"(max-width: 700px) 68vw, 290px";'
-          if old not in s: raise SystemExit("Carousel sizes anchor missing")
-          s = s.replace(old,new,1)
-
-          old = 'const loaded = new Set();'
-          new = 'const loaded = new Set();\n    let canLoadImages=root.getBoundingClientRect().top<(window.innerHeight||document.documentElement.clientHeight)*1.5;'
-          if old not in s: raise SystemExit("Carousel loaded anchor missing")
-          s = s.replace(old,new,1)
-
-          old = 'const safe=mod(index),card=cards[safe],image=card?.querySelector("img");\n      if(!image || loaded.has(safe) || image.src) return;'
-          new = 'const safe=mod(index),card=cards[safe],image=card?.querySelector("img");\n      if(!canLoadImages || !image || loaded.has(safe) || image.src) return;'
-          if old not in s: raise SystemExit("Carousel ensureImage anchor missing")
-          s = s.replace(old,new,1)
-
-          old = 'root._nahwerkCarousel=api;\n    warmWindow(active);\n    positionCards();\n    updateInfo();'
-          new = 'root._nahwerkCarousel=api;\\n    if(!canLoadImages&&"IntersectionObserver" in window){\\n      const imageObserver=new IntersectionObserver(entries=>{\\n        if(entries.some(entry=>entry.isIntersecting)){\\n          canLoadImages=true;\\n          warmWindow(active);\\n          positionCards();\\n          imageObserver.disconnect();\\n        }\\n      },{rootMargin:"600px 0px"});\\n      imageObserver.observe(root);\\n    }else{\\n      canLoadImages=true;\\n      warmWindow(active);\\n    }\\n    positionCards();\\n    updateInfo();'
-          if old not in s: raise SystemExit("Carousel mount anchor missing")
-          s = s.replace(old,new,1)
-          p.write_text(s,encoding="utf-8")
-
           # Ensure only expected visual assets/references changed.
           print("Optimization script completed.")
           PY
