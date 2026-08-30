@@ -652,3 +652,74 @@ main :is(.grid,.actions,.contactbox,.setup-choice,.pricing-grid,.request-grid){
     flex-basis:100%!important;
   }
 }
+
+
+/* =========================================================
+   NAHWERK ambient color atmosphere — 2026-08-30
+   Color-only layer. No layout, typography or component geometry.
+   Senior Concierge is intentionally excluded.
+   ========================================================= */
+body:not(.senior-product):not([data-product="senioren"]){
+  background:
+    radial-gradient(1100px 760px at 12% 8%,rgba(26,105,176,.075),transparent 62%),
+    radial-gradient(980px 720px at 82% 12%,rgba(103,67,190,.075),transparent 64%),
+    radial-gradient(900px 680px at 58% 78%,rgba(177,39,92,.045),transparent 66%),
+    #070706!important;
+}
+body:not(.senior-product):not([data-product="senioren"]) .hero,
+body:not(.senior-product):not([data-product="senioren"]) .home-hero{
+  background:
+    radial-gradient(760px 520px at 10% 36%,rgba(18,100,180,.13),transparent 63%),
+    radial-gradient(720px 520px at 68% 24%,rgba(120,65,196,.12),transparent 62%),
+    radial-gradient(620px 440px at 88% 72%,rgba(184,46,76,.075),transparent 64%),
+    radial-gradient(520px 380px at 44% 78%,rgba(28,149,161,.055),transparent 65%),
+    linear-gradient(145deg,#070707 0%,#0a090d 58%,#060708 100%)!important;
+}
+body:not(.senior-product):not([data-product="senioren"]) .section,
+body:not(.senior-product):not([data-product="senioren"]) .home-section{
+  background:
+    radial-gradient(760px 520px at 8% 20%,rgba(23,103,174,.055),transparent 66%),
+    radial-gradient(720px 500px at 88% 72%,rgba(113,67,181,.06),transparent 66%),
+    radial-gradient(560px 420px at 54% 44%,rgba(181,41,77,.032),transparent 68%),
+    #070706!important;
+}
+body:not(.senior-product):not([data-product="senioren"]) .section.alt,
+body:not(.senior-product):not([data-product="senioren"]) .home-section:nth-of-type(even){
+  background:
+    radial-gradient(760px 520px at 84% 18%,rgba(98,56,181,.075),transparent 64%),
+    radial-gradient(620px 460px at 18% 78%,rgba(21,125,166,.06),transparent 66%),
+    radial-gradient(600px 430px at 62% 76%,rgba(188,43,72,.045),transparent 67%),
+    #0b0a0d!important;
+}
+body:not(.senior-product):not([data-product="senioren"]) .product-band.personal{
+  background:
+    radial-gradient(780px 540px at 14% 28%,rgba(24,105,177,.08),transparent 63%),
+    radial-gradient(720px 520px at 82% 30%,rgba(120,62,190,.085),transparent 64%),
+    radial-gradient(600px 420px at 62% 82%,rgba(184,43,76,.05),transparent 67%),
+    #08080a!important;
+}
+body:not(.senior-product):not([data-product="senioren"]).concierge-overview-page,
+body:not(.senior-product):not([data-product="senioren"]).concierge-overview-page .co-regions{
+  background:
+    radial-gradient(900px 620px at 10% 16%,rgba(22,107,178,.06),transparent 65%),
+    radial-gradient(840px 600px at 88% 54%,rgba(112,62,189,.065),transparent 66%),
+    radial-gradient(660px 480px at 48% 88%,rgba(189,43,78,.038),transparent 68%),
+    #070706!important;
+}
+body:not(.senior-product):not([data-product="senioren"]).concierge-overview-page .co-hero{
+  background:
+    radial-gradient(760px 540px at 8% 32%,rgba(19,104,184,.12),transparent 63%),
+    radial-gradient(720px 520px at 72% 24%,rgba(121,67,196,.115),transparent 62%),
+    radial-gradient(640px 460px at 90% 74%,rgba(190,47,78,.07),transparent 65%),
+    radial-gradient(520px 400px at 44% 84%,rgba(25,145,158,.045),transparent 67%),
+    linear-gradient(145deg,#060607,#0a0910 60%,#060708)!important;
+}
+@media(max-width:760px){
+  body:not(.senior-product):not([data-product="senioren"]){
+    background:
+      radial-gradient(620px 500px at 10% 8%,rgba(26,105,176,.06),transparent 64%),
+      radial-gradient(620px 500px at 88% 18%,rgba(103,67,190,.06),transparent 66%),
+      radial-gradient(560px 460px at 52% 82%,rgba(177,39,92,.035),transparent 68%),
+      #070706!important;
+  }
+}
