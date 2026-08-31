@@ -355,8 +355,8 @@
       }
       .plan-option input:checked + .plan-option-card {
         border-color: #e6b43a;
-        background: rgba(230, 180, 58, 0.1);
-        box-shadow: 0 0 0 2px rgba(230, 180, 58, 0.12);
+        background: rgba(24, 55, 101, 0.2);
+        box-shadow: 0 0 0 2px rgba(121, 151, 194, 0.1);
       }
       .plan-option input:focus-visible + .plan-option-card {
         outline: 3px solid rgba(230, 180, 58, 0.38);
@@ -539,54 +539,57 @@
       /* Page-scoped surface treatment: colors/contours only. */
       body.registration-page main{
         background:
-          radial-gradient(920px 620px at 94% 7%,rgba(38,82,166,.16),transparent 64%),
-          radial-gradient(780px 540px at 5% 44%,rgba(48,65,106,.055),transparent 68%),
-          radial-gradient(700px 500px at 84% 88%,rgba(108,77,42,.004),transparent 70%),
-          linear-gradient(180deg,#05070a 0%,#08101a 52%,#05070a 100%)!important;
+          radial-gradient(920px 620px at 94% 7%,rgba(35,78,160,.18),transparent 64%),
+          radial-gradient(780px 540px at 5% 44%,rgba(50,62,110,.055),transparent 68%),
+          radial-gradient(720px 500px at 82% 86%,rgba(20,91,110,.035),transparent 70%),
+          linear-gradient(180deg,#05080d 0%,#08111c 52%,#05080c 100%)!important;
       }
       body.registration-page main>.section{
         background:
-          radial-gradient(760px 480px at 92% 10%,rgba(34,75,153,.13),transparent 67%),
-          radial-gradient(680px 430px at 8% 86%,rgba(91,70,44,.004),transparent 72%),
-          rgba(5,8,12,.988)!important;
+          radial-gradient(760px 480px at 92% 10%,rgba(32,72,150,.15),transparent 67%),
+          radial-gradient(680px 430px at 8% 86%,rgba(44,58,104,.035),transparent 72%),
+          rgba(5,9,14,.99)!important;
       }
       body.registration-page .formcard,
       body.registration-page .preview,
       body.registration-page .planbox{
-        border-color:rgba(132,151,177,.14)!important;
+        border-color:rgba(126,148,178,.14)!important;
         box-shadow:
-          inset 0 1px 0 rgba(176,194,220,.030),
-          0 24px 64px rgba(0,0,0,.38)!important;
+          inset 0 1px 0 rgba(174,195,222,.03),
+          0 24px 64px rgba(0,0,0,.40)!important;
       }
       body.registration-page .formcard{
         background:
-          radial-gradient(circle at 100% 0%,rgba(34,76,158,.14),transparent 40%),
-          radial-gradient(circle at 0% 100%,rgba(99,75,45,.004),transparent 46%),
-          linear-gradient(145deg,#0d151f,#09111a)!important;
+          radial-gradient(circle at 100% 0%,rgba(34,72,144,.13),transparent 42%),
+          radial-gradient(circle at 0% 100%,rgba(21,89,108,.025),transparent 52%),
+          linear-gradient(145deg,#0b1119,#080d14)!important;
       }
       body.registration-page .preview{
         background:
-          radial-gradient(circle at 100% 0%,rgba(33,78,151,.13),transparent 42%),
-          radial-gradient(circle at 0% 100%,rgba(95,72,44,.004),transparent 48%),
-          linear-gradient(145deg,#0c141e,#091019)!important;
+          radial-gradient(circle at 100% 0%,rgba(33,71,140,.12),transparent 43%),
+          radial-gradient(circle at 0% 100%,rgba(22,83,103,.022),transparent 54%),
+          linear-gradient(145deg,#0b1119,#080d14)!important;
       }
       body.registration-page .planbox{
         background:
-          radial-gradient(circle at 100% 0%,rgba(34,75,153,.14),transparent 43%),
-          radial-gradient(circle at 0% 100%,rgba(103,76,44,.005),transparent 50%),
-          linear-gradient(145deg,#0d151f,#09111a)!important;
+          radial-gradient(circle at 100% 0%,rgba(32,70,140,.12),transparent 44%),
+          radial-gradient(circle at 0% 100%,rgba(31,56,103,.035),transparent 54%),
+          linear-gradient(145deg,#0b121b,#081019)!important;
       }
       body.registration-page .preview .msg{
-        border-color:rgba(128,148,174,.13)!important;
+        border-color:rgba(124,146,174,.14)!important;
         background:
           radial-gradient(circle at 100% 0%,rgba(34,72,144,.11),transparent 45%),
           linear-gradient(145deg,#0b1119,#080d14)!important;
+        box-shadow:0 12px 32px rgba(0,0,0,.24)!important;
       }
-      body.registration-page .selfhint{
-        border-left-color:rgba(255,255,255,.13)!important;
+      body.registration-page .selfhint,
+      body.registration-page .plan-selection-note,
+      body.registration-page .status,
+      body.registration-page .progressive-panel{
         background:
-          radial-gradient(circle at 100% 0%,rgba(34,72,141,.09),transparent 47%),
-          #0b1119!important;
+          radial-gradient(circle at 100% 0%,rgba(31,68,135,.08),transparent 48%),
+          linear-gradient(145deg,#0b1119,#080d14)!important;
       }
       body.registration-page .plan-change-button{
         border-color:rgba(132,151,176,.13)!important;
@@ -596,49 +599,64 @@
       }
       body.registration-page .plan-option-card,
       body.registration-page .plan-option input:checked+.plan-option-card{
-        border-color:rgba(127,146,171,.13)!important;
+        border-color:rgba(125,145,172,.14)!important;
         background:
-          radial-gradient(circle at 100% 0%,rgba(33,71,142,.095),transparent 47%),
+          radial-gradient(circle at 100% 0%,rgba(31,68,137,.10),transparent 48%),
           linear-gradient(145deg,#0b121b,#081019)!important;
+        box-shadow:0 12px 30px rgba(0,0,0,.16)!important;
       }
       body.registration-page .plan-option:hover .plan-option-card{
-        border-color:rgba(154,132,94,.26)!important;
+        border-color:rgba(154,132,94,.24)!important;
       }
       body.registration-page .setup-choice label,
       body.registration-page .setup-choice label.selected{
-        border-color:rgba(127,146,171,.13)!important;
+        border-color:rgba(125,145,172,.14)!important;
         background:
-          radial-gradient(circle at 100% 0%,rgba(32,70,139,.085),transparent 49%),
+          radial-gradient(circle at 100% 0%,rgba(30,67,136,.09),transparent 50%),
           linear-gradient(145deg,#0b121b,#081019)!important;
+        box-shadow:0 10px 28px rgba(0,0,0,.14)!important;
       }
       body.registration-page .setup-choice label:hover{
-        border-color:rgba(154,132,94,.24)!important;
+        border-color:rgba(154,132,94,.22)!important;
+      }
+      body.registration-page .concierge-choice .concierge-card,
+      body.registration-page .nw-carousel-card{
+        border-color:rgba(124,144,170,.13)!important;
+        background:
+          radial-gradient(circle at 100% 0%,rgba(30,67,135,.085),transparent 50%),
+          linear-gradient(145deg,#0b121b,#081019)!important;
+        box-shadow:0 18px 44px rgba(0,0,0,.27)!important;
       }
       body.registration-page .concierge-choice .concierge-card.selected,
       body.registration-page .concierge-choice .concierge-card:has(input:checked){
-        border-color:rgba(132,151,176,.13)!important;
-        box-shadow:0 18px 44px rgba(0,0,0,.31)!important;
+        border-color:rgba(130,150,176,.15)!important;
+        background:
+          radial-gradient(circle at 100% 0%,rgba(32,70,140,.10),transparent 49%),
+          linear-gradient(145deg,#0b121b,#081019)!important;
+        box-shadow:0 18px 44px rgba(0,0,0,.32)!important;
       }
       body.registration-page .concierge-choice .concierge-card:hover{
-        border-color:rgba(154,132,94,.24)!important;
+        border-color:rgba(154,132,94,.22)!important;
       }
       body.registration-page .nw-carousel-card.is-active{
         box-shadow:
-          0 34px 86px rgba(0,0,0,.55),
-          0 0 0 1px rgba(132,151,176,.11)!important;
+          0 34px 86px rgba(0,0,0,.56),
+          0 0 0 1px rgba(130,150,176,.12)!important;
       }
       body.registration-page .nw-carousel-card:hover{
         box-shadow:
-          0 34px 86px rgba(0,0,0,.55),
-          0 0 0 1px rgba(154,132,94,.26)!important;
+          0 34px 86px rgba(0,0,0,.56),
+          0 0 0 1px rgba(154,132,94,.24)!important;
       }
       body.registration-page .nw-carousel-arrow,
       body.registration-page .nw-carousel-status{
-        border-color:rgba(222,224,228,.13)!important;
+        border-color:rgba(130,150,176,.14)!important;
+        background:rgba(8,14,21,.90)!important;
       }
       body.registration-page .nw-carousel-arrow:hover,
       body.registration-page .nw-carousel-status:not(:disabled):hover{
-        border-color:rgba(158,132,88,.27)!important;
+        border-color:rgba(158,132,88,.25)!important;
+        background:rgba(13,20,29,.94)!important;
       }
       body.registration-page a.btn:hover,
       body.registration-page button:not(:disabled):hover{
