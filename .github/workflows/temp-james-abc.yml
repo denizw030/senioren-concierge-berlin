@@ -1,0 +1,36 @@
+name: Temporary James A-B-C voice test
+on:
+  push:
+    branches:
+      - temp/james-voice-abc
+permissions:
+  contents: write
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: temp/james-voice-abc
+      - name: Generate James A B C
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets/concierges/voice-tests
+          base="https://btqklftjmwtqqqdmwlnk.supabase.co/functions/v1/nw-james-abc-20260831"
+          for variant in a b c; do
+            out="assets/concierges/voice-tests/james-${variant}.mp3"
+            curl --fail --silent --show-error --location --retry 2 "$base/$variant" -o "$out"
+            size=$(wc -c < "$out")
+            echo "James $variant: $size bytes"
+            test "$size" -gt 20000
+          done
+      - name: Commit James A B C
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "NAHWERK James Voice Test"
+          git config user.email "actions@users.noreply.github.com"
+          git add assets/concierges/voice-tests/james-a.mp3 assets/concierges/voice-tests/james-b.mp3 assets/concierges/voice-tests/james-c.mp3
+          git commit -m "Generate James A-B-C voice test"
+          git push origin HEAD:temp/james-voice-abc
