@@ -453,7 +453,7 @@
     try {
       const response = await fetch(WEBHOOK_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(request) });
       const body = await response.json().catch(() => ({}));
-      if (response.status === 202 && body.ok && body.status === "verification_required" && body.request_id) {
+      if (response.ok && body.ok === true && body.status === "verification_required" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(body.request_id || ""))) {
         beginVerification(body, request, password);
         return;
       }
