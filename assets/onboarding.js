@@ -274,6 +274,130 @@
     $("status").innerHTML = message;
   }
 
+  let pendingVerification = null;
+
+  function ensureVerificationUi() {
+    let panel = $("webVerificationPanel");
+    if (panel) return panel;
+    panel = document.createElement("div");
+    panel.className = "field";
+    panel.id = "webVerificationPanel";
+    panel.hidden = true;
+    panel.innerHTML = `
+      <label for="webVerificationCode"><strong>Bestätigungscode</strong></label>
+      <input id="webVerificationCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="6-stelliger Code" aria-describedby="webVerificationHint" />
+      <span class="tiny" id="webVerificationHint">Der Code wurde per WhatsApp gesendet und ist 10 Minuten gültig.</span>
+      <button class="btn red" type="button" id="webVerificationSubmit">Code bestätigen</button>
+    `;
+    $("registrationSubmit").before(panel);
+    $("webVerificationSubmit").addEventListener("click", submitVerification);
+    $("webVerificationCode").addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        submitVerification();
+      }
+    });
+    return panel;
+  }
+
+  function beginVerification(body, request, password) {
+    pendingVerification = { request_id: String(body.request_id || ""), request, password };
+    const panel = ensureVerificationUi();
+    panel.hidden = false;
+    $("registrationSubmit").hidden = true;
+    const input = $("webVerificationCode");
+    input.value = "";
+    show("<strong>Bestätigung erforderlich.</strong><br>Wir haben einen sechsstelligen Code per WhatsApp gesendet. Bitte geben Sie ihn hier ein.");
+    input.focus();
+  }
+
+  function resetVerificationUi() {
+    pendingVerification = null;
+    const panel = $("webVerificationPanel");
+    if (panel) panel.hidden = true;
+    $("registrationSubmit").hidden = false;
+    updatePlanUi();
+  }
+
+  async function submitVerification() {
+    if (!pendingVerification) return;
+    const input = $("webVerificationCode");
+    const button = $("webVerificationSubmit");
+    const code = String(input.value || "").replace(/\s+/g, "");
+    if (!/^\d{6}$/.test(code)) {
+      return show("<strong>Bitte geben Sie den sechsstelligen Bestätigungscode ein.</strong>", true);
+    }
+
+    const { request_id, request, password } = pendingVerification;
+    const verificationRequest = {
+      request_id,
+      verification_code: code,
+      email: request.email,
+      web_password: password,
+      web_password_repeat: password,
+      phone: request.phone || request.supported_whatsapp,
+      first_name: request.supported_person_first_name || request.account_holder_first_name,
+      last_name: request.supported_person_last_name || request.account_holder_last_name
+    };
+
+    button.disabled = true;
+    button.textContent = "Code wird geprüft …";
+    show("<strong>Code wird geprüft …</strong><br>Bitte lassen Sie diese Seite kurz geöffnet.");
+
+    try {
+      const response = await fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(verificationRequest)
+      });
+      const body = await response.json().catch(() => ({}));
+
+      if (response.status === 201 && body.ok && body.status === "web_account_linked") {
+        localStorage.setItem("scb_onboarding_sent", "1");
+        localStorage.setItem("scb_onboarding_result", JSON.stringify(body));
+        if (await login(request.email, password)) {
+          show("<strong>Fertig.</strong><br>Die WhatsApp-Identität wurde bestätigt und der Web-Zugang wurde angelegt. Sie werden zum Kundenbereich weitergeleitet.");
+          return setTimeout(() => { location.href = "konto.html"; }, 500);
+        }
+        show("<strong>Der Web-Zugang wurde angelegt.</strong><br>Bitte melden Sie sich jetzt mit Ihrer E-Mail-Adresse und Ihrem Passwort an.", true);
+        return setTimeout(() => { location.href = "anmelden.html"; }, 1800);
+      }
+
+      if (response.status === 401 && body.status === "verification_failed") {
+        input.select();
+        return show("<strong>Der Bestätigungscode ist nicht gültig.</strong><br>Bitte prüfen Sie den sechsstelligen Code aus der WhatsApp-Nachricht und versuchen Sie es erneut.", true);
+      }
+      if (response.status === 429 && body.status === "verification_rate_limited") {
+        return show("<strong>Zu viele Bestätigungsversuche.</strong><br>Bitte versuchen Sie es später erneut.", true);
+      }
+      if (response.status === 400 && body.status === "invalid_verification_request") {
+        return show("<strong>Die Bestätigungsanfrage ist nicht vollständig.</strong><br>Bitte prüfen Sie den Code und versuchen Sie es erneut.", true);
+      }
+      if (response.status === 409 && body.status === "web_access_exists") {
+        resetVerificationUi();
+        return show('<strong>Für diese Person besteht bereits ein Web-Zugang.</strong><br><a href="anmelden.html">Zur Anmeldung</a>', true);
+      }
+      if (response.status === 409 && body.status === "email_in_use") {
+        resetVerificationUi();
+        return show('<strong>Für diese E-Mail-Adresse besteht bereits ein Konto.</strong><br><a href="anmelden.html">Zur Anmeldung</a>', true);
+      }
+      if (response.status === 409 && body.status === "identity_link_failed") {
+        resetVerificationUi();
+        return show("<strong>Die Bestätigung war erfolgreich, die Verknüpfung konnte aber nicht abgeschlossen werden.</strong><br>Bitte starten Sie die Registrierung erneut.", true);
+      }
+      if (body.status === "auth_setup_failed") {
+        resetVerificationUi();
+        return show("<strong>Die Identität wurde bestätigt, der Web-Zugang konnte aber nicht vollständig angelegt werden.</strong><br>Bitte starten Sie die Registrierung erneut.", true);
+      }
+      throw new Error(`HTTP ${response.status}`);
+    } catch (_) {
+      show("<strong>Der Bestätigungscode konnte gerade nicht geprüft werden.</strong><br>Bitte versuchen Sie es erneut.", true);
+    } finally {
+      button.disabled = false;
+      button.textContent = "Code bestätigen";
+    }
+  }
+
   async function login(email, password) {
     const response = await fetch(LOGIN_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }) });
     const body = await response.json().catch(() => ({}));
@@ -282,6 +406,7 @@
     return true;
   }
 
+  ensureVerificationUi();
   setupConciergeSelection();
   setupPlanSelection();
   sessionStorage.setItem("nahwerk_product", product);
@@ -328,6 +453,10 @@
     try {
       const response = await fetch(WEBHOOK_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(request) });
       const body = await response.json().catch(() => ({}));
+      if (response.status === 202 && body.ok && body.status === "verification_required" && body.request_id) {
+        beginVerification(body, request, password);
+        return;
+      }
       if (response.status === 201 && body.ok) {
         localStorage.setItem("scb_onboarding_sent", "1");
         localStorage.setItem("scb_onboarding_result", JSON.stringify(body));
