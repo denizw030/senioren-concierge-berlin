@@ -177,9 +177,17 @@
       @media (max-width: 1000px) {
         .senior-hero-layout {
           grid-template-columns: 1fr;
+          position: relative;
+        }
+        .senior-image-hero h1 {
+          max-width: min(11ch, calc(100% - clamp(170px, 34vw, 330px)));
         }
         .senior-hero-photo {
-          max-width: 760px;
+          position: absolute;
+          top: 30px;
+          right: 0;
+          width: clamp(150px, 30vw, 290px);
+          max-width: none;
           aspect-ratio: 16/10;
         }
         .senior-story,
