@@ -9,7 +9,7 @@
   <link rel="icon" type="image/svg+xml" href="assets/NAHWERK_Concierge_Gold_Transparent.svg?v=1">
   <link rel="stylesheet" href="assets/site.css?v=24">
   <link rel="stylesheet" href="assets/brand-2026.css?v=23">
-  <link rel="stylesheet" href="assets/nahwerk-logo-v2.css?v=8">
+  <link rel="stylesheet" href="assets/nahwerk-logo-v2.css?v=8">\n  <link rel="stylesheet" href="assets/concierge-overview.css?v=22">
   <style>
     .nw-world-page{background:#070706;color:#f5f2eb}
     .nw-world-page main{overflow:hidden}
@@ -344,8 +344,25 @@
           <p class="nw-world-lead">Persönliche Unterstützung – dort, wo Sie sie brauchen.</p>
           <p class="nw-world-intro">NAHWERK wird schrittweise international verfügbar. Diese Seite zeigt den tatsächlich freigegebenen Stand, kommende Ausbaustufen und welche Unterstützung grenzüberschreitend relevant ist.</p>
         </div>
-        <div class="nw-world-globe-wrap" aria-label="NAHWERK Weltkugel als Symbol für internationale Verfügbarkeit">
-          <img class="nw-world-globe" src="assets/globes/europa-premium.svg" alt="Hochwertige NAHWERK Weltkugel mit Fokus auf Europa">
+        <div class="co-region-grid co-region-globe-grid" id="continentOptions" data-world-only="true">
+          <div class="co-region-card co-interactive-region-card">
+            <span class="co-region-title">
+              <strong id="interactiveRegionName">Europa</strong>
+              <small id="interactiveRegionAvailability">Verfügbar</small>
+            </span>
+            <span class="co-region-copy" id="interactiveRegionCopy">Persönliche Unterstützung in ganz Europa.</span>
+            <span class="co-globe co-interactive-globe">
+              <canvas id="interactiveRegionGlobe" data-globe="Europa" aria-label="Interaktive Weltkugel zur Regionsauswahl"></canvas>
+            </span>
+            <div class="co-region-controls" role="group" aria-label="Region wählen">
+              <button class="co-region-cta co-region-button is-active" data-region="Europa" type="button" aria-pressed="true">Europa</button>
+              <button class="co-region-cta co-region-button" data-region="Asien" type="button" aria-pressed="false">Asien</button>
+              <button class="co-region-cta co-region-button" data-region="Afrika" type="button" aria-pressed="false">Afrika</button>
+              <button class="co-region-cta co-region-button" data-region="Nordamerika" type="button" aria-pressed="false">Nordamerika</button>
+              <button class="co-region-cta co-region-button" data-region="Südamerika" type="button" aria-pressed="false">Südamerika</button>
+              <button class="co-region-cta co-region-button" data-region="Australien" type="button" aria-pressed="false">Australien</button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -460,6 +477,7 @@
   </main>
 
   <footer class="footer"><div class="wrap"><div class="footbottom"><span>© 2026 NAHWERK Concierge</span><span>Eine Marke von ODYSX</span></div></div></footer>
+  <script src="assets/concierge-overview.js?v=21"></script>
   <script src="assets/auth-nav.js?v=32"></script>
   <script src="assets/site-ui.js?v=5"></script>
 </body>
