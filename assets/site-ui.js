@@ -32,6 +32,10 @@
       document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
     } else document.querySelectorAll('.reveal').forEach((el) => el.classList.add('is-visible'));
 
+    document.querySelectorAll('.links a[href="concierges.html"]').forEach((link) => {
+      link.textContent = 'NAHWERK weltweit';
+    });
+
     const nav = document.querySelector('.links');
     const toggle = document.querySelector('.nav-toggle');
     if (!nav || !toggle) return;
