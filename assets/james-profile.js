@@ -2,14 +2,14 @@
   const profile = Object.freeze({
     key: "james",
     name: "James",
-    role: "Prime Telephone Concierge",
+    role: "Prime Telephone Agent",
     origin: "United Kingdom",
     tagline: "Ruhig. Präzise. Diskret.",
-    description: "James ist die feste Stimme des NAHWERK Telefon-Concierge. Seine Persona ist von klassischem britischem Executive Service, diskreter Sicherheitskommunikation und hochwertiger persönlicher Betreuung geprägt.",
-    seniorDescription: "James ist der ruhige persönliche Telefon-Concierge von NAHWERK. Er ist für Menschen gedacht, die ihr Anliegen lieber aussprechen und Fragen in Ruhe besprechen möchten.",
+    description: "James ist der spezialisierte NAHWERK Telefon-Agent für Anrufe im Auftrag des Kunden und für vorgesehene Anrufassistenz. Er ersetzt nicht den persönlich ausgewählten Concierge, sondern übernimmt Telefonaufgaben nach außen mit ruhiger, präziser Gesprächsführung.",
+    seniorDescription: "James ist der spezialisierte Telefon-Agent für Telefonaufträge und vorgesehene Anrufassistenz. Wenn Sie selbst NAHWERK anrufen, sprechen Sie weiterhin mit Ihrem ausgewählten persönlichen Concierge.",
     background: "Sein fiktiver beruflicher Hintergrund verbindet britischen Executive Service, diskrete Sicherheitskommunikation und persönliche Betreuung auf höchstem Niveau.",
     quote: "James bleibt auch dann ruhig, wenn die Situation es gerade nicht ist.",
-    strengths: ["Persönliche Organisation","Verständliche Erklärungen","Ruhige Gesprächsführung","Diskrete Unterstützung","Strukturierte Rückfragen","Orientierung in unübersichtlichen Situationen"],
+    strengths: ["Externe Telefonaufträge","Restaurants, Behörden und Dienstleister","Ruhige Gesprächsführung","Diskrete Unterstützung","Strukturierte Rückfragen","Anrufassistenz"],
     voice: "cedar",
     voiceId: "cedar",
     voiceStatus: "hearing_test",
@@ -18,7 +18,7 @@
     runtimeModel: "gpt-realtime",
     defaultLanguage: "de",
     voiceOrigin: "British RP",
-    voiceStyle: "prime_telephone_concierge",
+    voiceStyle: "prime_telephone_agent",
     voiceInstructions: "Männlich, britisch geprägt, mitteltief bis tief, extrem kontrolliert, strategisch ruhig, präzise, kultiviert und autoritativ ohne Aggression. Keine James-Bond-Imitation, kein Butler-Klischee, keine Werbestimme. Deutsch sauber aussprechen, mit nur leichter britischer Herkunft.",
     nativeLanguage: "de",
     nativeLanguageLabel: "Deutsch",
@@ -38,9 +38,9 @@
     el.innerHTML = `
       <button class="nw-james-dialog-close" type="button" aria-label="James-Profil schließen">×</button>
       <div class="nw-james-dialog-layout">
-        <figure class="nw-james-dialog-media"><img src="${profile.image}" width="1229" height="1536" alt="NAHWERK Telefon-Concierge James in professionellem Anzug mit Headset"></figure>
+        <figure class="nw-james-dialog-media"><img src="${profile.image}" width="1229" height="1536" alt="James, spezialisierter NAHWERK Telefon-Agent in professionellem Anzug mit Headset"></figure>
         <div class="nw-james-dialog-copy">
-          <span class="nw-james-dialog-kicker">NAHWERK Telefon-Concierge</span>
+          <span class="nw-james-dialog-kicker">NAHWERK Telefon-Agent</span>
           <h2 id="nwJamesDialogName">${profile.name}</h2>
           <p class="nw-james-dialog-role">${profile.role}</p>
           <p class="nw-james-dialog-tagline">„${profile.tagline}“</p>
@@ -69,7 +69,7 @@
       trigger.classList.add("nw-james-profile-trigger");
       trigger.setAttribute("role", "button");
       trigger.setAttribute("tabindex", "0");
-      trigger.setAttribute("aria-label", "James – Telefon-Concierge-Profil und Stimme öffnen");
+      trigger.setAttribute("aria-label", "James – Telefon-Agent-Profil und Stimme öffnen");
       trigger.addEventListener("click", () => openJames(trigger));
       trigger.addEventListener("keydown", event => { if (event.key !== "Enter" && event.key !== " ") return; event.preventDefault(); openJames(trigger); });
     });
