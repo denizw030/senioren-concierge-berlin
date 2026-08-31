@@ -535,6 +535,112 @@
       property="og:description"
       content="Persönliche, verständliche Concierge-Unterstützung direkt über WhatsApp."
     />
+  
+    <style>
+      /* Page-scoped surface treatment: colors/contours only. */
+      body.registration-page main{
+        background:
+          radial-gradient(920px 620px at 94% 7%,rgba(61,117,235,.05),transparent 65%),
+          radial-gradient(780px 540px at 5% 44%,rgba(132,73,177,.04),transparent 68%),
+          radial-gradient(700px 500px at 84% 88%,rgba(43,157,153,.035),transparent 69%),
+          linear-gradient(180deg,#080807 0%,#0a0909 52%,#070706 100%)!important;
+      }
+      body.registration-page main>.section{
+        background:
+          radial-gradient(760px 480px at 92% 10%,rgba(61,117,235,.04),transparent 68%),
+          radial-gradient(680px 430px at 8% 86%,rgba(132,73,177,.035),transparent 70%),
+          rgba(8,8,7,.97)!important;
+      }
+      body.registration-page .formcard,
+      body.registration-page .preview,
+      body.registration-page .planbox{
+        border-color:rgba(255,255,255,.10)!important;
+        box-shadow:
+          inset 0 1px 0 rgba(255,255,255,.025),
+          0 24px 64px rgba(0,0,0,.25)!important;
+      }
+      body.registration-page .formcard{
+        background:
+          radial-gradient(circle at 100% 0%,rgba(61,117,235,.045),transparent 34%),
+          radial-gradient(circle at 0% 100%,rgba(132,73,177,.035),transparent 38%),
+          linear-gradient(145deg,#171714,#0d0d0b)!important;
+      }
+      body.registration-page .preview{
+        background:
+          radial-gradient(circle at 100% 0%,rgba(43,157,153,.04),transparent 36%),
+          radial-gradient(circle at 0% 100%,rgba(212,175,55,.04),transparent 40%),
+          linear-gradient(145deg,#151513,#0c0c0b)!important;
+      }
+      body.registration-page .planbox{
+        background:
+          radial-gradient(circle at 100% 0%,rgba(61,117,235,.04),transparent 38%),
+          radial-gradient(circle at 0% 100%,rgba(212,175,55,.04),transparent 42%),
+          linear-gradient(145deg,#171613,#0d0d0b)!important;
+      }
+      body.registration-page .preview .msg{
+        border-color:rgba(255,255,255,.10)!important;
+        background:
+          radial-gradient(circle at 100% 0%,rgba(61,117,235,.035),transparent 40%),
+          linear-gradient(145deg,#0d0d0d,#090909)!important;
+      }
+      body.registration-page .selfhint{
+        border-left-color:rgba(255,255,255,.13)!important;
+        background:
+          radial-gradient(circle at 100% 0%,rgba(132,73,177,.035),transparent 42%),
+          #121210!important;
+      }
+      body.registration-page .plan-change-button{
+        border-color:rgba(255,255,255,.15)!important;
+      }
+      body.registration-page .plan-change-button:hover{
+        border-color:rgba(212,175,55,.50)!important;
+      }
+      body.registration-page .plan-option-card,
+      body.registration-page .plan-option input:checked+.plan-option-card{
+        border-color:rgba(255,255,255,.14)!important;
+      }
+      body.registration-page .plan-option:hover .plan-option-card{
+        border-color:rgba(212,175,55,.48)!important;
+      }
+      body.registration-page .setup-choice label,
+      body.registration-page .setup-choice label.selected{
+        border-color:rgba(255,255,255,.14)!important;
+      }
+      body.registration-page .setup-choice label:hover{
+        border-color:rgba(212,175,55,.46)!important;
+      }
+      body.registration-page .concierge-choice .concierge-card.selected,
+      body.registration-page .concierge-choice .concierge-card:has(input:checked){
+        border-color:rgba(255,255,255,.15)!important;
+        box-shadow:0 18px 44px rgba(0,0,0,.22)!important;
+      }
+      body.registration-page .concierge-choice .concierge-card:hover{
+        border-color:rgba(212,175,55,.46)!important;
+      }
+      body.registration-page .nw-carousel-card.is-active{
+        box-shadow:
+          0 34px 86px rgba(0,0,0,.48),
+          0 0 0 1px rgba(255,255,255,.12)!important;
+      }
+      body.registration-page .nw-carousel-card:hover{
+        box-shadow:
+          0 34px 86px rgba(0,0,0,.48),
+          0 0 0 1px rgba(212,175,55,.48)!important;
+      }
+      body.registration-page .nw-carousel-arrow,
+      body.registration-page .nw-carousel-status{
+        border-color:rgba(255,255,255,.15)!important;
+      }
+      body.registration-page .nw-carousel-arrow:hover,
+      body.registration-page .nw-carousel-status:not(:disabled):hover{
+        border-color:rgba(212,175,55,.48)!important;
+      }
+      body.registration-page a.btn:hover,
+      body.registration-page button:not(:disabled):hover{
+        outline:1px solid rgba(212,175,55,.44);
+        outline-offset:1px;
+      }
+    </style>
   </head>
   <body class="registration-page">
     <header class="top"><div class="wrap nav"><a class="brand" href="index.html" aria-label="NAHWERK Concierge – Startseite"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Hauptnavigation"><a href="index.html">Übersicht</a><a href="prime-concierge.html">Persönlicher Concierge</a><a href="concierges.html">Concierges</a><a href="senioren-concierge.html">Senioren Concierge</a><a href="angehoerige.html">Für Angehörige</a><a href="leistungen.html">Leistungen</a><a href="kontakt.html">Kontakt</a><a class="auth-link login-link" href="anmelden.html">Anmelden</a><a class="active auth-link register-link" href="registrieren.html">Registrieren</a></nav></div></header>
