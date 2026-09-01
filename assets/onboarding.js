@@ -1,7 +1,9 @@
 (() => {
   const WEBHOOK_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/anmelden";
   const LOGIN_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/login/password";
+  const MFA_MANAGE_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-mfa-manage";
   const SESSION_KEY = "scb_web_session";
+  const SECURITY_PROMPT_KEY = "nw_post_registration_security_prompt";
   const form = document.getElementById("signupForm");
   if (!form) return;
 
@@ -430,11 +432,33 @@
     }
   }
 
+  async function initializeSecurityRecommendation(sessionToken) {
+    localStorage.setItem(SECURITY_PROMPT_KEY, "1");
+    try {
+      await fetch(MFA_MANAGE_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + sessionToken
+        },
+        body: JSON.stringify({ action: "nudge_init" })
+      });
+    } catch (_) {}
+  }
+
   async function login(email, password) {
     const response = await fetch(LOGIN_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }) });
     const body = await response.json().catch(() => ({}));
     if (!(response.ok && body.ok && body.status === "logged_in" && body.session_token)) return false;
-    localStorage.setItem(SESSION_KEY, JSON.stringify({ session_token: body.session_token, customer_account_id: body.customer_account_id, person_id: body.person_id, role: body.role, expires_at: body.expires_at }));
+    localStorage.setItem(SESSION_KEY, JSON.stringify({
+      session_token: body.session_token,
+      customer_account_id: body.customer_account_id,
+      person_id: body.person_id,
+      role: body.role,
+      expires_at: body.expires_at,
+      product_context: body.product_context || (body.brand === "senioren_concierge" ? "senioren" : body.brand === "prime_concierge" ? "prime" : product)
+    }));
+    await initializeSecurityRecommendation(body.session_token);
     return true;
   }
 
