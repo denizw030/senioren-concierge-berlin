@@ -1268,7 +1268,29 @@
           padding:17px;
         }
       }
-</style></head>
+</style>
+    <style>
+      .mfa-panel .safety-card-head{align-items:flex-start}
+      .mfa-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+      .mfa-form,.mfa-setup{margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}
+      .mfa-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;max-width:760px}
+      .mfa-form .field{margin:0}
+      .mfa-setup-grid{display:grid;grid-template-columns:220px minmax(0,1fr);gap:22px;align-items:start}
+      .mfa-qr-wrap{background:#fff;border-radius:16px;padding:14px;width:220px;min-height:220px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 28px rgba(0,0,0,.12)}
+      .mfa-qr{display:block;width:192px;height:192px;object-fit:contain}
+      .mfa-secret{display:inline-block;margin-top:8px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;font:600 13px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;word-break:break-all;user-select:all}
+      .mfa-code{max-width:220px;letter-spacing:.24em;text-align:center;font-variant-numeric:tabular-nums;font-size:20px}
+      .mfa-feedback{margin-top:14px;font-size:13px;line-height:1.55;min-height:20px}
+      .mfa-feedback.is-error{color:#b55353}
+      .mfa-feedback.is-success{color:#3f7c59}
+      .mfa-inline-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+      .mfa-step-copy{margin:0 0 14px}
+      @media(max-width:720px){
+        .mfa-setup-grid,.mfa-form-grid{grid-template-columns:1fr}
+        .mfa-qr-wrap{width:100%;max-width:260px}
+      }
+    </style>
+</head>
   <body>
     <script>
       (() => {
@@ -1525,7 +1547,65 @@
                   <div class="value" id="mfaStatus">Wird geladen …</div>
                   <p class="muted" id="mfaMeta">Der Status der Zwei-Faktor-Authentifizierung wird sicher aus Ihrem Konto geladen.</p>
                 </div>
+                <div class="mfa-actions" id="mfaPrimaryActions" hidden>
+                  <button class="btn red" type="button" id="mfaEnableButton">2-Faktor-Authentifizierung aktivieren</button>
+                  <button class="btn light" type="button" id="mfaDisableButton" hidden>2-Faktor-Authentifizierung deaktivieren</button>
+                </div>
               </div>
+
+              <form class="mfa-form" id="mfaStartForm" hidden>
+                <p class="muted mfa-step-copy">Bestätigen Sie zuerst Ihr aktuelles Passwort. Danach erhalten Sie einen QR-Code für Ihre Authenticator-App.</p>
+                <div class="mfa-form-grid">
+                  <div class="field">
+                    <label for="mfaCurrentPassword">Aktuelles Passwort</label>
+                    <input id="mfaCurrentPassword" type="password" autocomplete="current-password" minlength="1" required />
+                  </div>
+                </div>
+                <div class="mfa-inline-actions">
+                  <button class="btn red" type="submit" id="mfaStartButton">QR-Code erstellen</button>
+                  <button class="btn light" type="button" id="mfaStartCancelButton">Abbrechen</button>
+                </div>
+              </form>
+
+              <div class="mfa-setup" id="mfaSetup" hidden>
+                <div class="mfa-setup-grid">
+                  <div class="mfa-qr-wrap"><img class="mfa-qr" id="mfaQr" alt="QR-Code für die Authenticator-App" /></div>
+                  <div>
+                    <h3 style="margin-top:0">Authenticator-App verbinden</h3>
+                    <p class="muted">Scannen Sie den QR-Code mit einer Authenticator-App. Falls das Scannen nicht möglich ist, können Sie den Schlüssel manuell eingeben.</p>
+                    <div><span class="muted">Manueller Schlüssel</span><br /><code class="mfa-secret" id="mfaSecret"></code></div>
+                    <form id="mfaVerifyForm" style="margin-top:18px">
+                      <div class="field">
+                        <label for="mfaSetupCode">6-stelliger Code</label>
+                        <input class="mfa-code" id="mfaSetupCode" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required />
+                      </div>
+                      <div class="mfa-inline-actions">
+                        <button class="btn red" type="submit" id="mfaVerifyButton">Aktivierung bestätigen</button>
+                        <button class="btn light" type="button" id="mfaEnrollCancelButton">Abbrechen</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              <form class="mfa-form" id="mfaDisableForm" hidden>
+                <p class="muted mfa-step-copy">Zum Deaktivieren bestätigen Sie Ihr aktuelles Passwort und einen gültigen Code aus Ihrer Authenticator-App.</p>
+                <div class="mfa-form-grid">
+                  <div class="field">
+                    <label for="mfaDisablePassword">Aktuelles Passwort</label>
+                    <input id="mfaDisablePassword" type="password" autocomplete="current-password" required />
+                  </div>
+                  <div class="field">
+                    <label for="mfaDisableCode">6-stelliger Code</label>
+                    <input class="mfa-code" id="mfaDisableCode" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required />
+                  </div>
+                </div>
+                <div class="mfa-inline-actions">
+                  <button class="btn red" type="submit" id="mfaDisableConfirmButton">Deaktivierung bestätigen</button>
+                  <button class="btn light" type="button" id="mfaDisableCancelButton">Abbrechen</button>
+                </div>
+              </form>
+              <div class="mfa-feedback" id="mfaFeedback" aria-live="polite"></div>
             </article>
             <article class="card wide safety-card safety-panel" id="safetyCard" data-account-panel="safety" role="tabpanel" aria-labelledby="accountTabSafety" hidden aria-expanded="false">
               <div class="safety-card-head">
@@ -1797,7 +1877,7 @@
         }
 
         const PROFILE_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-profile";
-        const MFA_STATUS_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-mfa-status";
+        const MFA_STATUS_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-mfa-status";\n        const MFA_MANAGE_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-mfa-manage";
         const SAFETY_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/safety";
         const safetyCard = document.getElementById("safetyCard");
         const safetyForm = document.getElementById("safetyForm");
@@ -1826,9 +1906,79 @@
         const mfaStatus = document.getElementById("mfaStatus");
         const mfaMeta = document.getElementById("mfaMeta");
 
+        const mfaPrimaryActions = document.getElementById("mfaPrimaryActions");
+        const mfaEnableButton = document.getElementById("mfaEnableButton");
+        const mfaDisableButton = document.getElementById("mfaDisableButton");
+        const mfaStartForm = document.getElementById("mfaStartForm");
+        const mfaCurrentPassword = document.getElementById("mfaCurrentPassword");
+        const mfaStartButton = document.getElementById("mfaStartButton");
+        const mfaStartCancelButton = document.getElementById("mfaStartCancelButton");
+        const mfaSetup = document.getElementById("mfaSetup");
+        const mfaQr = document.getElementById("mfaQr");
+        const mfaSecret = document.getElementById("mfaSecret");
+        const mfaVerifyForm = document.getElementById("mfaVerifyForm");
+        const mfaSetupCode = document.getElementById("mfaSetupCode");
+        const mfaVerifyButton = document.getElementById("mfaVerifyButton");
+        const mfaEnrollCancelButton = document.getElementById("mfaEnrollCancelButton");
+        const mfaDisableForm = document.getElementById("mfaDisableForm");
+        const mfaDisablePassword = document.getElementById("mfaDisablePassword");
+        const mfaDisableCode = document.getElementById("mfaDisableCode");
+        const mfaDisableConfirmButton = document.getElementById("mfaDisableConfirmButton");
+        const mfaDisableCancelButton = document.getElementById("mfaDisableCancelButton");
+        const mfaFeedback = document.getElementById("mfaFeedback");
+        let mfaEnrollmentToken = "";
+
+        function setMfaFeedback(message = "", kind = "") {
+          mfaFeedback.textContent = message;
+          mfaFeedback.className = "mfa-feedback" + (kind ? " is-" + kind : "");
+        }
+
+        function resetMfaForms() {
+          mfaEnrollmentToken = "";
+          mfaStartForm.hidden = true;
+          mfaSetup.hidden = true;
+          mfaDisableForm.hidden = true;
+          mfaCurrentPassword.value = "";
+          mfaSetupCode.value = "";
+          mfaDisablePassword.value = "";
+          mfaDisableCode.value = "";
+          mfaQr.removeAttribute("src");
+          mfaSecret.textContent = "";
+        }
+
+        function normalizeSixDigitInput(input) {
+          input.value = input.value.replace(/\D/g, "").slice(0, 6);
+        }
+        mfaSetupCode.addEventListener("input", () => normalizeSixDigitInput(mfaSetupCode));
+        mfaDisableCode.addEventListener("input", () => normalizeSixDigitInput(mfaDisableCode));
+
+        async function mfaManage(action, payload = {}) {
+          const token = sessionToken();
+          if (!token) throw new Error("invalid_session");
+          const response = await fetch(MFA_MANAGE_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + token
+            },
+            body: JSON.stringify({ action, ...payload })
+          });
+          const body = await response.json().catch(() => ({}));
+          if (!response.ok || body?.ok !== true) {
+            const error = new Error(String(body?.status || "mfa_request_failed"));
+            error.httpStatus = response.status;
+            error.responseBody = body;
+            throw error;
+          }
+          return body;
+        }
+
         async function loadMfaStatus() {
           const token = sessionToken();
+          resetMfaForms();
+          setMfaFeedback("");
           if (!token) {
+            mfaPrimaryActions.hidden = true;
             mfaStatus.textContent = "Nicht verfügbar";
             mfaMeta.textContent = "Für die Statusprüfung ist eine gültige Sitzung erforderlich.";
             return;
@@ -1843,24 +1993,177 @@
 
             const mfa = body?.mfa || {};
             if (mfa.available !== true) {
+              mfaPrimaryActions.hidden = true;
               mfaStatus.textContent = "Nicht verfügbar";
               mfaMeta.textContent = "Die Zwei-Faktor-Authentifizierung konnte diesem Konto noch nicht eindeutig zugeordnet werden.";
               return;
             }
 
+            mfaPrimaryActions.hidden = false;
             if (mfa.enabled === true) {
               mfaStatus.textContent = "Aktiviert";
-              mfaMeta.textContent = "Ihr Konto ist mit einem zusätzlichen zweiten Faktor geschützt.";
+              mfaMeta.textContent = "Ihr Konto ist mit einem zusätzlichen zweiten Faktor geschützt. Bei der nächsten Anmeldung wird der Authenticator-Code zwingend abgefragt.";
+              mfaEnableButton.hidden = true;
+              mfaDisableButton.hidden = false;
               return;
             }
 
             mfaStatus.textContent = "Empfohlen · Noch nicht aktiviert";
-            mfaMeta.textContent = "Zusätzlicher Schutz mit einer Authenticator-App wird empfohlen. Die Aktivierung wird erst angeboten, wenn der zweite Faktor im Anmeldeprozess vollständig erzwungen wird.";
+            mfaMeta.textContent = "Schützen Sie Ihr Konto zusätzlich mit einer Authenticator-App. Die Aktivierung ist freiwillig und wird nach der Einrichtung bei jeder Anmeldung erzwungen.";
+            mfaEnableButton.hidden = false;
+            mfaDisableButton.hidden = true;
           } catch (_) {
+            mfaPrimaryActions.hidden = true;
             mfaStatus.textContent = "Nicht verfügbar";
             mfaMeta.textContent = "Der Status der Zwei-Faktor-Authentifizierung konnte gerade nicht geladen werden.";
           }
         }
+
+        mfaEnableButton.addEventListener("click", () => {
+          resetMfaForms();
+          setMfaFeedback("");
+          mfaStartForm.hidden = false;
+          mfaCurrentPassword.focus();
+        });
+
+        mfaStartCancelButton.addEventListener("click", () => {
+          resetMfaForms();
+          setMfaFeedback("");
+        });
+
+        mfaStartForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          if (!mfaStartForm.reportValidity()) return;
+          const password = mfaCurrentPassword.value;
+          mfaStartButton.disabled = true;
+          mfaStartButton.textContent = "Wird vorbereitet …";
+          setMfaFeedback("Authenticator-Einrichtung wird sicher vorbereitet.");
+          try {
+            const body = await mfaManage("enroll_start", { password });
+            mfaCurrentPassword.value = "";
+            mfaEnrollmentToken = String(body.enrollment_token || "");
+            if (!mfaEnrollmentToken || !body.qr_svg || !body.secret) throw new Error("invalid_enrollment_response");
+            const qr = String(body.qr_svg);
+            mfaQr.src = qr.startsWith("data:") ? qr : "data:image/svg+xml;charset=utf-8," + encodeURIComponent(qr);
+            mfaSecret.textContent = String(body.secret);
+            mfaStartForm.hidden = true;
+            mfaSetup.hidden = false;
+            setMfaFeedback("QR-Code erstellt. Scannen Sie ihn und bestätigen Sie anschließend den 6-stelligen Code.", "success");
+            mfaSetupCode.focus();
+          } catch (error) {
+            const status = error instanceof Error ? error.message : "";
+            if (status === "reauthentication_failed") {
+              setMfaFeedback("Das aktuelle Passwort konnte nicht bestätigt werden.", "error");
+            } else if (status === "already_enabled") {
+              setMfaFeedback("Die Zwei-Faktor-Authentifizierung ist bereits aktiviert.", "success");
+              await loadMfaStatus();
+            } else if (status === "too_many_attempts") {
+              setMfaFeedback("Zu viele Versuche. Bitte warten Sie einige Minuten.", "error");
+            } else {
+              setMfaFeedback("Die Einrichtung konnte gerade nicht gestartet werden. Bitte versuchen Sie es erneut.", "error");
+            }
+          } finally {
+            mfaCurrentPassword.value = "";
+            mfaStartButton.disabled = false;
+            mfaStartButton.textContent = "QR-Code erstellen";
+          }
+        });
+
+        mfaVerifyForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          normalizeSixDigitInput(mfaSetupCode);
+          if (!mfaVerifyForm.reportValidity() || !mfaEnrollmentToken) return;
+          mfaVerifyButton.disabled = true;
+          mfaVerifyButton.textContent = "Code wird geprüft …";
+          setMfaFeedback("Code wird geprüft.");
+          try {
+            const body = await mfaManage("enroll_verify", {
+              enrollment_token: mfaEnrollmentToken,
+              code: mfaSetupCode.value
+            });
+            if (body?.status !== "mfa_enabled" || body?.mfa?.enabled !== true) throw new Error("mfa_enable_not_confirmed");
+            resetMfaForms();
+            setMfaFeedback("2-Faktor-Authentifizierung wurde erfolgreich aktiviert.", "success");
+            await loadMfaStatus();
+          } catch (error) {
+            const status = error instanceof Error ? error.message : "";
+            if (status === "invalid_mfa_code") {
+              setMfaFeedback("Der Code ist nicht korrekt oder nicht mehr gültig.", "error");
+              mfaSetupCode.select();
+            } else if (status === "enrollment_expired") {
+              resetMfaForms();
+              setMfaFeedback("Die Einrichtung ist abgelaufen. Bitte starten Sie sie erneut.", "error");
+            } else if (status === "too_many_attempts") {
+              setMfaFeedback("Zu viele Versuche. Bitte warten Sie einige Minuten.", "error");
+            } else {
+              setMfaFeedback("Die Aktivierung konnte nicht abgeschlossen werden. Bitte versuchen Sie es erneut.", "error");
+            }
+          } finally {
+            mfaVerifyButton.disabled = false;
+            mfaVerifyButton.textContent = "Aktivierung bestätigen";
+          }
+        });
+
+        mfaEnrollCancelButton.addEventListener("click", async () => {
+          const token = mfaEnrollmentToken;
+          resetMfaForms();
+          setMfaFeedback("");
+          if (!token) return;
+          try {
+            await mfaManage("enroll_cancel", { enrollment_token: token });
+          } catch (_) {}
+        });
+
+        mfaDisableButton.addEventListener("click", () => {
+          resetMfaForms();
+          setMfaFeedback("");
+          mfaDisableForm.hidden = false;
+          mfaDisablePassword.focus();
+        });
+
+        mfaDisableCancelButton.addEventListener("click", () => {
+          resetMfaForms();
+          setMfaFeedback("");
+        });
+
+        mfaDisableForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          normalizeSixDigitInput(mfaDisableCode);
+          if (!mfaDisableForm.reportValidity()) return;
+          const password = mfaDisablePassword.value;
+          const code = mfaDisableCode.value;
+          mfaDisableConfirmButton.disabled = true;
+          mfaDisableConfirmButton.textContent = "Wird deaktiviert …";
+          setMfaFeedback("Deaktivierung wird sicher geprüft.");
+          try {
+            const body = await mfaManage("disable", { password, code });
+            if (body?.mfa?.enabled === true) {
+              setMfaFeedback("Ein Faktor wurde entfernt, mindestens ein weiterer zweiter Faktor ist noch aktiv.", "success");
+            } else {
+              setMfaFeedback("2-Faktor-Authentifizierung wurde deaktiviert.", "success");
+            }
+            resetMfaForms();
+            await loadMfaStatus();
+          } catch (error) {
+            const status = error instanceof Error ? error.message : "";
+            if (status === "reauthentication_failed") {
+              setMfaFeedback("Das aktuelle Passwort konnte nicht bestätigt werden.", "error");
+            } else if (status === "invalid_mfa_code") {
+              setMfaFeedback("Der Authenticator-Code ist nicht korrekt oder nicht mehr gültig.", "error");
+              mfaDisableCode.select();
+            } else if (status === "too_many_attempts") {
+              setMfaFeedback("Zu viele Versuche. Bitte warten Sie einige Minuten.", "error");
+            } else {
+              setMfaFeedback("Die Zwei-Faktor-Authentifizierung konnte gerade nicht deaktiviert werden.", "error");
+            }
+          } finally {
+            mfaDisablePassword.value = "";
+            mfaDisableCode.value = "";
+            mfaDisableConfirmButton.disabled = false;
+            mfaDisableConfirmButton.textContent = "Deaktivierung bestätigen";
+          }
+        });
+
         const RECEPTION_URL = "https://btqklftjmwtqqqdmwlnk.supabase.co/functions/v1/nahwerk-customer-portal-staging/portal/telephone-reception";
         const RECEPTION_CONTACT_URL = RECEPTION_URL + "/contact-trust";
         function receptionToken() {
