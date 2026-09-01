@@ -455,7 +455,14 @@
     event.preventDefault();
     if (!planBookable()) return show(`<strong>${selectedPlan().code} ist ausgewählt, aber der sichere Checkout ist noch nicht freigegeben.</strong><br>Bitte wählen Sie FREE oder ändern Sie den Tarif oben. Es wurde nichts kostenpflichtig bestellt.`, true);
     const password = $("webPassword").value;
-    if (password.length < 10 || password.length > 128) return show("<strong>Das Passwort muss zwischen 10 und 128 Zeichen lang sein.</strong>", true);
+    const strongPassword =
+      password.length >= 12 &&
+      password.length <= 128 &&
+      /\p{Ll}/u.test(password) &&
+      /\p{Lu}/u.test(password) &&
+      /\p{N}/u.test(password) &&
+      /[^\p{L}\p{N}\s]/u.test(password);
+    if (!strongPassword) return show("<strong>Bitte wählen Sie ein stärkeres Passwort.</strong><br>Mindestens 12 Zeichen mit Groß- und Kleinbuchstaben, Zahl und Sonderzeichen.", true);
     if (!form.reportValidity()) return;
     const self = isSelf();
     const p = person();
