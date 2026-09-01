@@ -1782,7 +1782,7 @@
         <button class="btn light security-nudge-later" type="button" id="securityNudgeLater">Später einrichten</button>
       </div>
     </div>
-    <script src="assets/auth-nav.js?v=36"></script>
+    <script src="assets/auth-nav.js?v=37"></script>
     <script>
       (() => {
         const ACCOUNT_PREVIEW_KEY = "nw_account_theme_preview";
@@ -3226,7 +3226,24 @@
 
         setAccountTab("overview");
         hydrateProfileCache();
-        loadProfile().finally(scheduleOverviewBackground);
+        (async () => {
+          const auth = window.SCBAuth;
+          if (auth?.validateSession) {
+            const valid = await auth.validateSession().catch(() => false);
+            if (!valid) return;
+            const prefetched = auth.getValidatedProfile?.();
+            if (prefetched?.ok === true) {
+              renderProfilePayload(prefetched);
+              storeProfileCache(prefetched);
+              profileStatusBadge.textContent = "Sicher verbunden";
+              showProfileStatus("");
+              scheduleOverviewBackground();
+              return;
+            }
+          }
+          await loadProfile();
+          scheduleOverviewBackground();
+        })();
 
         try {
           const d = JSON.parse(
