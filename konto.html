@@ -1595,6 +1595,31 @@
             document.body.classList.toggle("senior-product", senior);
           }
         }
+        function applyAuthoritativeAccountTheme(brand) {
+          const preview = sessionStorage.getItem(ACCOUNT_PREVIEW_KEY);
+          if (preview === "prime" || preview === "senioren") return;
+
+          const product = brand === "senioren_concierge"
+            ? "senioren"
+            : brand === "prime_concierge"
+              ? "prime"
+              : null;
+          if (!product) return;
+
+          const senior = product === "senioren";
+          document.body.dataset.product = product;
+          document.body.classList.toggle("senior-product", senior);
+
+          try {
+            const stored = JSON.parse(localStorage.getItem("scb_web_session") || "null");
+            if (stored?.session_token) {
+              stored.product_context = product;
+              localStorage.setItem("scb_web_session", JSON.stringify(stored));
+            }
+            sessionStorage.setItem("nahwerk_product", product);
+          } catch (_) {}
+        }
+
         function setAccountTab(name, focus = false) {
           const validName = accountTabs.some((tab) => tab.dataset.accountTab === name) ? name : "overview";
           accountTabs.forEach((tab) => {
@@ -1834,6 +1859,7 @@
             });
             const body = await response.json().catch(() => ({}));
             if (!response.ok || body?.ok !== true) throw new Error("profile_load_failed");
+            applyAuthoritativeAccountTheme(body.brand);
             applyProfile(body.profile || {});
             applyPlanAndUsage(body.plan || null, body.usage || null);
             profileStatusBadge.textContent = "Sicher verbunden";
