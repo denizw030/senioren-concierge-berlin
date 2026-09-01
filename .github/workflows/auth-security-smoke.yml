@@ -1,0 +1,33 @@
+name: NAHWERK Auth Security Smoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/auth-security-smoke.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  auth-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check login inline JavaScript syntax
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          page=Path("anmelden.html").read_text(encoding="utf-8")
+          marker="<script>(()=>{"
+          start=page.index(marker)+len("<script>")
+          end=page.index("</script><script src=\"assets/site-ui.js?v=5\">",start)
+          Path("/tmp/nahwerk-login-inline.js").write_text(page[start:end],encoding="utf-8")
+          PY
+          node --check /tmp/nahwerk-login-inline.js
+      - name: Run auth security tests
+        run: node --test tests/auth-security.test.mjs
