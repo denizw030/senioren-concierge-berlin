@@ -5,6 +5,7 @@
   const SESSION_KEY = "scb_web_session";
   const PRODUCT_KEY = "nahwerk_product";
   const CHECK_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/session/check";
+  const PROFILE_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-profile";
   const LOGOUT_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/logout";
   const PROTECTED = new Set(["konto.html", "concierge-anpassen.html"]);
   const CONTEXT_PAGES = new Set(["pakete.html", "registrieren.html", "anmelden.html", "konto.html", "concierge-anpassen.html"]);
@@ -227,9 +228,25 @@
       const response = await fetch(CHECK_URL, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.session_token}` }, body: "{}" });
       const body = await response.json().catch(() => ({}));
       if (response.ok && body.ok && body.status === "session_valid") {
-        const first_name = safeFirstName(body.first_name || body.profile?.first_name || body.person?.first_name || session.first_name);
-        const product_context = body.product_context || session.product_context || null;
-        validatedSession = { session_token: body.session_token || session.session_token, customer_account_id: body.customer_account_id, person_id: body.person_id, role: body.role, expires_at: body.expires_at, first_name, product_context };
+        const session_token = body.session_token || session.session_token;
+        let first_name = safeFirstName(body.first_name || body.profile?.first_name || body.person?.first_name || session.first_name);
+        let product_context = body.product_context || session.product_context || null;
+        try {
+          const profileResponse = await fetch(PROFILE_URL, {
+            method: "GET",
+            headers: { Authorization: "Bearer " + session_token }
+          });
+          const profileBody = await profileResponse.json().catch(() => ({}));
+          if (profileResponse.ok && profileBody?.ok === true) {
+            first_name = safeFirstName(profileBody?.profile?.first_name) || first_name;
+            if (profileBody?.brand === "senioren_concierge") product_context = "senioren";
+            else if (profileBody?.brand) product_context = "prime";
+          }
+        } catch (_) {}
+        if (product_context === "senioren" || product_context === "prime") {
+          sessionStorage.setItem(PRODUCT_KEY, product_context);
+        }
+        validatedSession = { session_token, customer_account_id: body.customer_account_id, person_id: body.person_id, role: body.role, expires_at: body.expires_at, first_name, product_context };
         sessionValidated = true;
         localStorage.setItem(SESSION_KEY, JSON.stringify(validatedSession));
         return true;
