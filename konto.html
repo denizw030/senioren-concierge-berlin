@@ -208,6 +208,8 @@
         padding: 44px 0;
         position: relative;
         z-index: 1;
+        touch-action: pan-y;
+        -webkit-overflow-scrolling: touch;
       }
       .safety-time-wheel::-webkit-scrollbar {
         display: none;
@@ -218,7 +220,6 @@
         align-items: center;
         justify-content: center;
         scroll-snap-align: center;
-        scroll-snap-stop: always;
         font-size: 22px;
         font-variant-numeric: tabular-nums;
         opacity: .34;
@@ -1702,27 +1703,46 @@
           requestAnimationFrame(updateSafetyWheelSelection);
         }
         function bindSafetyWheel(element) {
-          let timer = null;
+          let frame = 0;
+          let settleTimer = 0;
+
           element.addEventListener("scroll", () => {
-            window.clearTimeout(timer);
-            timer = window.setTimeout(() => {
-              const value = wheelValue(element);
-              element.scrollTo({ top: value * 44, behavior: "smooth" });
-              updateSafetyWheelSelection();
-            }, 70);
+            if (frame) cancelAnimationFrame(frame);
+            frame = requestAnimationFrame(updateSafetyWheelSelection);
+            window.clearTimeout(settleTimer);
+            settleTimer = window.setTimeout(updateSafetyWheelSelection, 140);
           }, { passive: true });
+
+          element.addEventListener("wheel", (event) => {
+            event.stopPropagation();
+          }, { passive: true });
+
+          element.addEventListener("touchstart", (event) => {
+            event.stopPropagation();
+          }, { passive: true });
+
+          element.addEventListener("touchmove", (event) => {
+            event.stopPropagation();
+          }, { passive: true });
+
           element.addEventListener("keydown", (event) => {
             if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
             event.preventDefault();
+            event.stopPropagation();
             const max = element === safetyHourWheel ? 23 : 59;
             const delta = event.key === "ArrowDown" ? 1 : -1;
             const next = Math.max(0, Math.min(max, wheelValue(element) + delta));
             element.scrollTo({ top: next * 44, behavior: "smooth" });
           });
+
           element.addEventListener("click", (event) => {
+            event.stopPropagation();
             const option = event.target.closest(".safety-time-option");
             if (!option) return;
-            element.scrollTo({ top: Number(option.dataset.value) * 44, behavior: "smooth" });
+            element.scrollTo({
+              top: Number(option.dataset.value) * 44,
+              behavior: "smooth"
+            });
           });
         }
         buildSafetyTimeWheel(safetyHourWheel, 23);
