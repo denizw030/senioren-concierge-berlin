@@ -110,6 +110,134 @@
         font-size: 12px;
         font-weight: 700;
       }
+      .reception-panel {
+        border: 1px solid var(--line);
+      }
+      .reception-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 18px;
+      }
+      .reception-status {
+        display: inline-flex;
+        align-items: center;
+        min-height: 30px;
+        padding: 6px 10px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+      .reception-status::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        margin-right: 7px;
+        border-radius: 50%;
+        background: var(--gold);
+      }
+      .reception-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 16px;
+      }
+      .reception-field {
+        display: block;
+      }
+      .reception-field > span,
+      .reception-contacts-title {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 12px;
+        font-weight: 800;
+      }
+      .reception-field select {
+        width: 100%;
+        min-height: 44px;
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+      }
+      .reception-checks {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px 16px;
+        margin-top: 18px;
+      }
+      .reception-check {
+        display: flex;
+        align-items: flex-start;
+        gap: 9px;
+        font-size: 13px;
+        line-height: 1.45;
+      }
+      .reception-check input {
+        width: 18px;
+        height: 18px;
+        margin-top: 1px;
+        flex: 0 0 auto;
+      }
+      .reception-setup {
+        margin-top: 16px;
+        padding: 14px 16px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+      }
+      .reception-contacts {
+        margin-top: 18px;
+        padding-top: 18px;
+        border-top: 1px solid var(--line);
+      }
+      .reception-contact-list {
+        display: grid;
+        gap: 9px;
+      }
+      .reception-contact {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 12px 13px;
+        border: 1px solid var(--line);
+        border-radius: 11px;
+      }
+      .reception-contact strong,
+      .reception-contact span {
+        display: block;
+      }
+      .reception-contact .muted {
+        margin-top: 2px;
+      }
+      .reception-save-status {
+        display: block;
+        min-height: 20px;
+        margin-top: 11px;
+        font-size: 13px;
+      }
+      body:not(.senior-product):not([data-product="senioren"]) .reception-status,
+      body:not(.senior-product):not([data-product="senioren"]) .reception-setup,
+      body:not(.senior-product):not([data-product="senioren"]) .reception-contact,
+      body:not(.senior-product):not([data-product="senioren"]) .reception-field select {
+        border-color: rgba(133,154,182,.16);
+        background: rgba(7,13,20,.42);
+      }
+      body.senior-product .reception-status,
+      body[data-product="senioren"] .reception-status,
+      body.senior-product .reception-setup,
+      body[data-product="senioren"] .reception-setup,
+      body.senior-product .reception-contact,
+      body[data-product="senioren"] .reception-contact,
+      body.senior-product .reception-field select,
+      body[data-product="senioren"] .reception-field select {
+        background: rgba(255,255,255,.58);
+      }
       .safety-card {
         cursor: pointer;
         transition: border-color .18s ease, box-shadow .18s ease;
@@ -1273,6 +1401,78 @@
                 >
               </div>
             </article>
+            <article class="card wide reception-panel" id="telephoneReceptionCard" data-account-panel="concierge" role="tabpanel" aria-labelledby="accountTabConcierge" hidden>
+              <div class="reception-head">
+                <div>
+                  <div class="eyebrow">Telefonannahme</div>
+                  <h3>Persönliche Telefonannahme</h3>
+                  <p class="muted">Ihr Telefon-Concierge kann Anrufe zuerst annehmen, Name und Anliegen erfassen, Nachrichten aufnehmen und passende Anrufe weiterleiten.</p>
+                </div>
+                <span class="reception-status" id="receptionStatus">Wird geladen …</span>
+              </div>
+              <form id="telephoneReceptionForm">
+                <label class="reception-check">
+                  <input id="receptionEnabled" type="checkbox" />
+                  <span><strong>Telefonannahme aktivieren</strong><br><span class="muted">Eine Aktivierung ist erst möglich, wenn die Telefonroute vollständig eingerichtet ist.</span></span>
+                </label>
+                <div class="reception-grid">
+                  <label class="reception-field">
+                    <span>Modus</span>
+                    <select id="receptionMode">
+                      <option value="luxury_reception">Persönliche Telefonannahme</option>
+                      <option value="senior_protection">Telefonannahme mit erweitertem Schutz</option>
+                    </select>
+                  </label>
+                  <label class="reception-field">
+                    <span>Telefon-Concierge</span>
+                    <select id="receptionPersona">
+                      <option value="konrad">Konrad</option>
+                      <option value="james">James</option>
+                    </select>
+                  </label>
+                  <label class="reception-field">
+                    <span>Unbekannte Anrufer</span>
+                    <select id="receptionUnknownPolicy">
+                      <option value="screen_then_transfer">Prüfen und bei Eignung weiterleiten</option>
+                      <option value="screen_then_message">Prüfen und Nachricht aufnehmen</option>
+                      <option value="message_only">Nur Nachricht aufnehmen</option>
+                    </select>
+                  </label>
+                  <label class="reception-field">
+                    <span>Vertrauenswürdige Kontakte</span>
+                    <select id="receptionTrustedPolicy">
+                      <option value="screen_then_transfer">Prüfen und weiterleiten</option>
+                      <option value="direct_transfer">Bevorzugt direkt weiterleiten</option>
+                      <option value="message_only">Nur Nachricht aufnehmen</option>
+                    </select>
+                  </label>
+                </div>
+                <div class="reception-checks">
+                  <label class="reception-check"><input id="receptionMessageTaking" type="checkbox" /><span>Nachrichten aufnehmen</span></label>
+                  <label class="reception-check"><input id="receptionTransfer" type="checkbox" /><span>Geeignete Anrufe weiterleiten</span></label>
+                  <label class="reception-check"><input id="receptionNotifyScreened" type="checkbox" /><span>Über vorsortierte Anrufe informieren</span></label>
+                  <label class="reception-check"><input id="receptionNotifySuspicious" type="checkbox" /><span>Bei auffälligen Anrufmustern informieren</span></label>
+                </div>
+                <div class="reception-setup" id="receptionSetupNotice">
+                  <strong>Telefonannahme noch nicht eingerichtet.</strong>
+                  <div class="muted" id="receptionSetupMeta">Der Status der Telefonroute wird sicher geprüft.</div>
+                  <div class="actions" id="receptionSetupActions">
+                    <a class="btn light" href="kontakt.html">Einrichtung anfragen</a>
+                  </div>
+                </div>
+                <div class="reception-contacts">
+                  <span class="reception-contacts-title">Vertrauenswürdige Kontakte</span>
+                  <p class="muted">Bestehende Kontakte werden weiterverwendet. Es wird kein zweites Kontaktsystem angelegt.</p>
+                  <div class="reception-contact-list" id="receptionContactList">
+                    <div class="empty">Kontakte werden geladen …</div>
+                  </div>
+                </div>
+                <div class="actions">
+                  <button class="btn red" type="submit" id="receptionSaveButton">Einstellungen speichern</button>
+                </div>
+                <span class="reception-save-status" id="receptionSaveStatus" aria-live="polite"></span>
+              </form>
+            </article>
             <div class="account-panel-heading" data-account-panel="usage" hidden><div class="eyebrow">Nutzung</div><h2>Ihre aktuelle Nutzung.</h2><p>Nur tatsächlich verfügbare Verbrauchsdaten werden angezeigt.</p></div>
             <article class="card wide usage-panel" data-account-panel="usage" role="tabpanel" aria-labelledby="accountTabUsage" hidden>
               <div class="eyebrow">Nutzung diesen Kalendermonat</div>
@@ -1575,6 +1775,30 @@
             return "";
           }
         }
+        const RECEPTION_URL = "https://btqklftjmwtqqqdmwlnk.supabase.co/functions/v1/nahwerk-customer-portal-staging/portal/telephone-reception";
+        const RECEPTION_CONTACT_URL = RECEPTION_URL + "/contact-trust";
+        function receptionToken() {
+          return sessionStorage.getItem("nw_reception_staging_token") || sessionToken();
+        }
+        const receptionForm = document.getElementById("telephoneReceptionForm");
+        const receptionStatus = document.getElementById("receptionStatus");
+        const receptionEnabled = document.getElementById("receptionEnabled");
+        const receptionMode = document.getElementById("receptionMode");
+        const receptionPersona = document.getElementById("receptionPersona");
+        const receptionUnknownPolicy = document.getElementById("receptionUnknownPolicy");
+        const receptionTrustedPolicy = document.getElementById("receptionTrustedPolicy");
+        const receptionMessageTaking = document.getElementById("receptionMessageTaking");
+        const receptionTransfer = document.getElementById("receptionTransfer");
+        const receptionNotifyScreened = document.getElementById("receptionNotifyScreened");
+        const receptionNotifySuspicious = document.getElementById("receptionNotifySuspicious");
+        const receptionSetupNotice = document.getElementById("receptionSetupNotice");
+        const receptionSetupMeta = document.getElementById("receptionSetupMeta");
+        const receptionSetupActions = document.getElementById("receptionSetupActions");
+        const receptionContactList = document.getElementById("receptionContactList");
+        const receptionSaveButton = document.getElementById("receptionSaveButton");
+        const receptionSaveStatus = document.getElementById("receptionSaveStatus");
+        let receptionRoutingReady = false;
+        let receptionLoaded = false;
         const personalDataForm = document.getElementById("personalDataForm");
         const profileFirstName = document.getElementById("profileFirstName");
         const profileLastName = document.getElementById("profileLastName");
@@ -1886,9 +2110,198 @@
           }
         });
 
+        function receptionRow(value) {
+          if (Array.isArray(value)) return value[0] || {};
+          return value && typeof value === "object" ? value : {};
+        }
+        function setReceptionSaveStatus(message, error = false) {
+          receptionSaveStatus.textContent = message || "";
+          receptionSaveStatus.style.color = error ? "#b85b5b" : "inherit";
+        }
+        function setReceptionControlsDisabled(disabled) {
+          [
+            receptionEnabled,
+            receptionMode,
+            receptionPersona,
+            receptionUnknownPolicy,
+            receptionTrustedPolicy,
+            receptionMessageTaking,
+            receptionTransfer,
+            receptionNotifyScreened,
+            receptionNotifySuspicious,
+            receptionSaveButton
+          ].forEach((el) => { if (el) el.disabled = disabled; });
+        }
+        function receptionStatusLabel(profile) {
+          const setup = profile?.setup || {};
+          if (!setup.routing_ready) return "Nicht eingerichtet";
+          if (profile?.configured_enabled && profile?.enabled) return "Aktiv";
+          if (profile?.configured_enabled === false) return "Bereit zur Einrichtung";
+          return "Deaktiviert";
+        }
+        function renderReceptionContacts(contacts) {
+          const rows = Array.isArray(contacts) ? contacts : [];
+          if (!rows.length) {
+            receptionContactList.innerHTML = '<div class="empty">Noch keine aktiven Kontakte vorhanden.</div>';
+            return;
+          }
+          receptionContactList.innerHTML = "";
+          rows.forEach((contact) => {
+            const row = document.createElement("label");
+            row.className = "reception-contact";
+            const copy = document.createElement("span");
+            const name = document.createElement("strong");
+            name.textContent = contact.contact_name || "Kontakt";
+            const meta = document.createElement("span");
+            meta.className = "muted";
+            meta.textContent = [contact.relationship, contact.phone_e164].filter(Boolean).join(" · ");
+            copy.append(name, meta);
+            const check = document.createElement("input");
+            check.type = "checkbox";
+            check.checked = Boolean(contact.reception_trusted);
+            check.setAttribute("aria-label", (contact.contact_name || "Kontakt") + " als vertrauenswürdig markieren");
+            check.addEventListener("change", async () => {
+              const token = receptionToken();
+              if (!token) {
+                check.checked = !check.checked;
+                setReceptionSaveStatus("Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.", true);
+                return;
+              }
+              check.disabled = true;
+              try {
+                const response = await fetch(RECEPTION_CONTACT_URL, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+                  body: JSON.stringify({ contact_id: contact.id, trusted: check.checked })
+                });
+                if (!response.ok) throw new Error("contact_trust_failed");
+                setReceptionSaveStatus("Vertrauenskontakt aktualisiert.");
+              } catch (_) {
+                check.checked = !check.checked;
+                setReceptionSaveStatus("Der Vertrauensstatus konnte gerade nicht gespeichert werden.", true);
+              } finally {
+                check.disabled = false;
+              }
+            });
+            row.append(copy, check);
+            receptionContactList.appendChild(row);
+          });
+        }
+        function renderReception(profileValue, contacts) {
+          const profile = receptionRow(profileValue);
+          const setup = profile.setup || {};
+          receptionRoutingReady = Boolean(setup.routing_ready);
+          receptionLoaded = true;
+          receptionStatus.textContent = receptionStatusLabel(profile);
+          receptionEnabled.checked = Boolean(profile.configured_enabled ?? profile.enabled);
+          receptionMode.value = profile.mode === "senior_protection" ? "senior_protection" : "luxury_reception";
+          receptionPersona.value = profile.persona_key === "james" ? "james" : "konrad";
+          receptionUnknownPolicy.value = ["screen_then_transfer","screen_then_message","message_only"].includes(profile.unknown_caller_policy) ? profile.unknown_caller_policy : "screen_then_message";
+          receptionTrustedPolicy.value = ["screen_then_transfer","direct_transfer","message_only"].includes(profile.trusted_contact_policy) ? profile.trusted_contact_policy : "screen_then_transfer";
+          receptionMessageTaking.checked = profile.message_taking_enabled !== false;
+          receptionTransfer.checked = profile.transfer_enabled !== false;
+          receptionNotifyScreened.checked = profile.notify_on_every_screened_call !== false;
+          receptionNotifySuspicious.checked = profile.notify_on_suspicious_call !== false;
+          receptionSetupNotice.hidden = receptionRoutingReady;
+          receptionSetupMeta.textContent = receptionRoutingReady
+            ? "Telefonroute ist bereit."
+            : "Eine Aktivierung ist erst möglich, wenn eine aktive Telefonannahme-Nummer und – falls Weiterleitung aktiviert ist – ein verifizierter Telefon-Endpunkt vorhanden sind.";
+          receptionSetupActions.hidden = receptionRoutingReady;
+          renderReceptionContacts(contacts);
+          setReceptionControlsDisabled(false);
+          receptionEnabled.disabled = !receptionRoutingReady && !receptionEnabled.checked;
+        }
+        async function loadTelephoneReception() {
+          const token = receptionToken();
+          if (!token) {
+            receptionStatus.textContent = "Nicht eingerichtet";
+            receptionSetupMeta.textContent = "Für die Einrichtung ist eine gültige Sitzung erforderlich.";
+            receptionContactList.innerHTML = '<div class="empty">Kontakte sind ohne gültige Sitzung nicht verfügbar.</div>';
+            setReceptionControlsDisabled(true);
+            return;
+          }
+          setReceptionControlsDisabled(true);
+          receptionStatus.textContent = "Wird geladen …";
+          try {
+            const response = await fetch(RECEPTION_URL, {
+              method: "GET",
+              headers: { Authorization: "Bearer " + token }
+            });
+            const body = await response.json().catch(() => ({}));
+            if (!response.ok || body?.ok !== true) throw new Error(body?.error || "reception_load_failed");
+            renderReception(body.reception, body.contacts);
+          } catch (_) {
+            receptionStatus.textContent = "Nicht eingerichtet";
+            receptionSetupNotice.hidden = false;
+            receptionSetupActions.hidden = false;
+            receptionSetupMeta.textContent = "Die Telefonannahme ist im aktuellen Web-Zugang noch nicht freigeschaltet.";
+            receptionContactList.innerHTML = '<div class="empty">Vertrauenskontakte konnten noch nicht geladen werden.</div>';
+            setReceptionControlsDisabled(true);
+            setReceptionSaveStatus("Telefonannahme noch nicht eingerichtet.");
+          }
+        }
+        receptionForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const token = receptionToken();
+          if (!token) {
+            setReceptionSaveStatus("Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.", true);
+            return;
+          }
+          if (receptionEnabled.checked && !receptionRoutingReady) {
+            setReceptionSaveStatus("Die Telefonannahme kann erst aktiviert werden, wenn die Telefonroute eingerichtet ist.", true);
+            receptionSetupNotice.hidden = false;
+            return;
+          }
+          receptionSaveButton.disabled = true;
+          receptionSaveButton.textContent = "Wird gespeichert …";
+          setReceptionSaveStatus("Einstellungen werden gespeichert …");
+          try {
+            const response = await fetch(RECEPTION_URL, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+              body: JSON.stringify({
+                enabled: receptionEnabled.checked,
+                mode: receptionMode.value,
+                persona_key: receptionPersona.value,
+                screening_level: receptionMode.value === "senior_protection" ? "enhanced" : "standard",
+                unknown_caller_policy: receptionUnknownPolicy.value,
+                suspicious_caller_policy: "block_and_notify",
+                trusted_contact_policy: receptionTrustedPolicy.value,
+                transfer_enabled: receptionTransfer.checked,
+                message_taking_enabled: receptionMessageTaking.checked,
+                notify_on_every_screened_call: receptionNotifyScreened.checked,
+                notify_on_suspicious_call: receptionNotifySuspicious.checked
+              })
+            });
+            const body = await response.json().catch(() => ({}));
+            if (!response.ok || body?.ok !== true) {
+              if (String(body?.error || "").includes("telephone_reception_routing_not_ready")) {
+                receptionRoutingReady = false;
+                receptionEnabled.checked = false;
+                receptionSetupNotice.hidden = false;
+                throw new Error("routing_not_ready");
+              }
+              throw new Error("reception_update_failed");
+            }
+            renderReception(body.reception, Array.from(receptionContactList.querySelectorAll(".reception-contact")).length ? null : []);
+            await loadTelephoneReception();
+            setReceptionSaveStatus("Gespeichert.");
+          } catch (error) {
+            const routing = error instanceof Error && error.message === "routing_not_ready";
+            setReceptionSaveStatus(
+              routing ? "Die Telefonroute ist noch nicht vollständig eingerichtet." : "Die Änderung konnte gerade nicht gespeichert werden.",
+              true
+            );
+          } finally {
+            receptionSaveButton.disabled = false;
+            receptionSaveButton.textContent = "Einstellungen speichern";
+          }
+        });
+
         setAccountTab("overview");
         loadProfile();
         loadSafety();
+        loadTelephoneReception();
 
         try {
           const d = JSON.parse(
