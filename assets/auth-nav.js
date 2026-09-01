@@ -47,7 +47,16 @@
     } catch (_) {}
     return null;
   }
-  const isLoggedIn = () => sessionValidated && !!validatedSession?.session_token;
+  function getRenderableSession() {
+    const session = validatedSession?.session_token ? validatedSession : getSession();
+    if (!session?.session_token) return null;
+    if (session.expires_at) {
+      const expiresAt = new Date(session.expires_at).getTime();
+      if (Number.isFinite(expiresAt) && expiresAt <= Date.now()) return null;
+    }
+    return session;
+  }
+  const isLoggedIn = () => !!getRenderableSession()?.session_token;
   function clearLocalAuth() {
     sessionValidated = false;
     validatedSession = null;
@@ -70,9 +79,24 @@
     const name = String(value || "").trim().split(/\s+/)[0] || "";
     return /^[A-Za-zÀ-ÖØ-öø-ÿĀ-ž'’.-]{1,40}$/.test(name) ? name : "";
   }
-  function sessionFirstName(session = validatedSession) {
+  function sessionFirstName(session = getRenderableSession()) {
     const serverName = safeFirstName(session?.first_name || session?.profile?.first_name || session?.person?.first_name);
     if (serverName) return serverName;
+    try {
+      const cached = JSON.parse(localStorage.getItem("nw_account_profile_cache_v1") || "null");
+      const cacheMatches =
+        cached?.payload?.profile &&
+        (!session?.person_id || String(cached.person_id || "") === String(session.person_id)) &&
+        (!session?.customer_account_id || String(cached.customer_account_id || "") === String(session.customer_account_id));
+      if (cacheMatches) {
+        const cachedName = safeFirstName(
+          cached.payload.profile.first_name ||
+          cached.payload.profile.given_name ||
+          cached.payload.profile.name
+        );
+        if (cachedName) return cachedName;
+      }
+    } catch (_) {}
     try {
       const draft = JSON.parse(localStorage.getItem("scb_onboarding") || "null");
       return safeFirstName(draft?.account_holder_first_name || draft?.owner?.first_name || draft?.first_name);
