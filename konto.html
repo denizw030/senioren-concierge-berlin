@@ -2083,8 +2083,8 @@
             });
             if (body?.status !== "mfa_enabled" || body?.mfa?.enabled !== true) throw new Error("mfa_enable_not_confirmed");
             resetMfaForms();
-            setMfaFeedback("2-Faktor-Authentifizierung wurde erfolgreich aktiviert.", "success");
             await loadMfaStatus();
+            setMfaFeedback("2-Faktor-Authentifizierung wurde erfolgreich aktiviert.", "success");
           } catch (error) {
             const status = error instanceof Error ? error.message : "";
             if (status === "invalid_mfa_code") {
@@ -2137,13 +2137,15 @@
           setMfaFeedback("Deaktivierung wird sicher geprüft.");
           try {
             const body = await mfaManage("disable", { password, code });
-            if (body?.mfa?.enabled === true) {
-              setMfaFeedback("Ein Faktor wurde entfernt, mindestens ein weiterer zweiter Faktor ist noch aktiv.", "success");
-            } else {
-              setMfaFeedback("2-Faktor-Authentifizierung wurde deaktiviert.", "success");
-            }
+            const stillEnabled = body?.mfa?.enabled === true;
             resetMfaForms();
             await loadMfaStatus();
+            setMfaFeedback(
+              stillEnabled
+                ? "Ein Faktor wurde entfernt, mindestens ein weiterer zweiter Faktor ist noch aktiv."
+                : "2-Faktor-Authentifizierung wurde deaktiviert.",
+              "success"
+            );
           } catch (error) {
             const status = error instanceof Error ? error.message : "";
             if (status === "reauthentication_failed") {
