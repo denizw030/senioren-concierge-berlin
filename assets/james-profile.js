@@ -23,10 +23,10 @@
     nativeLanguage: "de",
     nativeLanguageLabel: "Deutsch",
     sampleText: "Guten Tag. James. Ihr NAHWERK Telefon-Concierge. Sagen Sie mir einfach, worum es geht. Ich höre zu, ordne die Situation und wir entscheiden anschließend in Ruhe über den nächsten Schritt.",
-    sampleAudio: "assets/concierges/voice-samples/james-de.mp3?v=james-20260831-1",
-    sampleAudioByLanguage: { de: "assets/concierges/voice-samples/james-de.mp3?v=james-20260831-1" },
+    sampleAudio: "assets/voice/samples/james-de.mp3?v=james-20260831-1",
+    sampleAudioByLanguage: { de: "assets/voice/samples/james-de.mp3?v=james-20260831-1" },
     previewLanguages: [{ code: "de", label: "Deutsch" }],
-    image: "assets/NAHWERK-Telefon-Concierge-Agent.jpg"
+    image: "assets/voice/telephone-concierge-agent.jpg"
   });
   window.NAHWERK_JAMES_PROFILE = profile;
   let dialog = null, lastTrigger = null;
@@ -61,7 +61,7 @@
   }
   function openJames(trigger) { lastTrigger = trigger; if (!dialog) dialog = createDialog(); if (!dialog.open) dialog.showModal(); }
   function bind() {
-    const images = [...document.querySelectorAll('img[src*="NAHWERK-Telefon-Concierge-Agent"]')];
+    const images = [...document.querySelectorAll('img[src*="telephone-concierge-agent"]')];
     images.forEach(image => {
       const trigger = image.closest(".nw-phone-media") || image;
       if (trigger.dataset.jamesProfileReady === "1") return;
