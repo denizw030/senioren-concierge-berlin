@@ -1270,6 +1270,18 @@
       }
 </style></head>
   <body>
+    <script>
+      (() => {
+        try {
+          const session = JSON.parse(localStorage.getItem("scb_web_session") || "null");
+          const product = session?.product_context;
+          if (product !== "senioren" && product !== "prime") return;
+          sessionStorage.setItem("nahwerk_product", product);
+          document.body.dataset.product = product;
+          document.body.classList.toggle("senior-product", product === "senioren");
+        } catch (_) {}
+      })();
+    </script>
     <header class="top"><div class="wrap nav"><a class="brand" href="index.html" aria-label="NAHWERK Concierge – Startseite"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Hauptnavigation"><a href="index.html">Übersicht</a><a href="prime-concierge.html">Persönlicher Concierge</a><a href="concierges.html">Concierges</a><a href="senioren-concierge.html">Senioren Concierge</a><a href="angehoerige.html">Für Angehörige</a><a href="leistungen.html">Leistungen</a><a href="kontakt.html">Kontakt</a><a class="active auth-link login-link" href="anmelden.html">Anmelden</a><a class="auth-link register-link" href="registrieren.html">Registrieren</a></nav></div></header>
     <main>
       <section class="hero account-hero">
@@ -1579,7 +1591,7 @@
         </div>
       </div>
     </footer>
-    <script src="assets/auth-nav.js?v=34"></script>
+    <script src="assets/auth-nav.js?v=35"></script>
     <script>
       (() => {
         const ACCOUNT_PREVIEW_KEY = "nw_account_theme_preview";
@@ -2375,5 +2387,5 @@
         } catch (e) {}
       })();
     </script>
-  <script>(()=>{try{const s=JSON.parse(localStorage.getItem("scb_web_session")||"null");if(s?.product_context==="senioren"){document.body.classList.add("senior-product");document.body.dataset.product="senioren"}}catch(_){}})();</script><script src="assets/site-ui.js?v=5"></script></body>
+  <script src="assets/site-ui.js?v=5"></script></body>
 </html>
