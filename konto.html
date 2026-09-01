@@ -302,6 +302,213 @@
           radial-gradient(680px 430px at 8% 86%,rgba(44,58,104,.035),transparent 72%),
           rgba(5,9,14,.99)!important;
       }
+    </style><style id="konto-premium-2026">
+      /* Kundenbereich: moderner Premium-Look, ausschließlich seitenlokal. */
+      body:not(.senior-product):not([data-product="senioren"]) .hero .wrap{
+        position:relative;
+      }
+      .dash{
+        gap:20px;
+      }
+      .dash>.card{
+        position:relative;
+        overflow:hidden;
+        border-radius:22px!important;
+        border:1px solid rgba(135,154,180,.15)!important;
+        background:
+          radial-gradient(520px 280px at 100% 0%,rgba(42,82,155,.12),transparent 62%),
+          linear-gradient(145deg,rgba(12,20,31,.98),rgba(7,13,20,.99))!important;
+        box-shadow:
+          inset 0 1px 0 rgba(220,230,245,.035),
+          0 18px 54px rgba(0,0,0,.24)!important;
+      }
+      .dash>.card::before{
+        content:"";
+        position:absolute;
+        inset:0 0 auto 0;
+        height:1px;
+        background:linear-gradient(90deg,transparent,rgba(215,169,52,.34),transparent);
+        pointer-events:none;
+      }
+      .dash>.card:hover{
+        border-color:rgba(181,151,91,.27)!important;
+        box-shadow:
+          inset 0 1px 0 rgba(220,230,245,.045),
+          0 24px 70px rgba(0,0,0,.31)!important;
+      }
+      .dash>.card .eyebrow{
+        letter-spacing:.14em;
+      }
+      .dash>.card .value{
+        letter-spacing:-.015em;
+      }
+      .warning{
+        border:1px solid rgba(134,153,178,.13)!important;
+        border-left:3px solid rgba(215,169,52,.72)!important;
+        border-radius:16px!important;
+        background:
+          radial-gradient(500px 220px at 100% 0%,rgba(40,79,150,.10),transparent 64%),
+          rgba(8,14,22,.86)!important;
+        box-shadow:0 14px 38px rgba(0,0,0,.16)!important;
+      }
+      .usagebox{
+        border-radius:18px!important;
+        background:rgba(7,13,20,.66)!important;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.025)!important;
+      }
+      .bar{
+        height:8px!important;
+        background:rgba(255,255,255,.055)!important;
+      }
+      .bar>span{
+        background:linear-gradient(90deg,#b98b24,#e8be54)!important;
+      }
+      .empty,.recommend{
+        border-radius:14px!important;
+        border-style:solid!important;
+        background:rgba(6,12,19,.62)!important;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.018)!important;
+      }
+      .prefchip{
+        border:1px solid rgba(190,158,86,.18)!important;
+        background:rgba(215,169,52,.06)!important;
+        color:#e6c66f!important;
+      }
+      .safety-card{
+        border-color:rgba(142,160,185,.16)!important;
+      }
+      .safety-edit{
+        border-color:rgba(156,174,198,.22)!important;
+        background:rgba(255,255,255,.025)!important;
+      }
+      .profile-card{
+        padding:0!important;
+      }
+      .profile-head{
+        display:flex;
+        align-items:flex-start;
+        justify-content:space-between;
+        gap:24px;
+        padding:26px 28px 22px;
+        border-bottom:1px solid rgba(137,155,179,.12);
+      }
+      .profile-head-copy{
+        max-width:680px;
+      }
+      .profile-head h3{
+        margin:4px 0 8px;
+        font-size:26px;
+        letter-spacing:-.035em;
+      }
+      .profile-status{
+        flex:0 0 auto;
+        display:inline-flex;
+        align-items:center;
+        gap:7px;
+        min-height:34px;
+        padding:7px 11px;
+        border:1px solid rgba(134,153,178,.16);
+        border-radius:999px;
+        background:rgba(255,255,255,.025);
+        color:#c9c6bd;
+        font-size:12px;
+        font-weight:700;
+      }
+      .profile-status::before{
+        content:"";
+        width:7px;
+        height:7px;
+        border-radius:50%;
+        background:#d7a934;
+        box-shadow:0 0 0 4px rgba(215,169,52,.08);
+      }
+      .profile-form{
+        padding:26px 28px 28px;
+      }
+      .profile-grid{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:16px;
+      }
+      .profile-field{
+        min-width:0;
+      }
+      .profile-field label{
+        display:block;
+        margin-bottom:7px;
+        color:#d6d3cc;
+        font-size:12px;
+        font-weight:750;
+        letter-spacing:.02em;
+      }
+      .profile-field input{
+        width:100%;
+        min-height:50px;
+        padding:12px 14px;
+        border:1px solid rgba(127,148,176,.15);
+        border-radius:12px;
+        background:
+          radial-gradient(circle at 100% 0%,rgba(31,68,135,.055),transparent 48%),
+          #080d14;
+        color:#f4f2ec;
+        font:inherit;
+        outline:none;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.02);
+        transition:border-color .18s ease,box-shadow .18s ease,background .18s ease;
+      }
+      .profile-field input:hover{
+        border-color:rgba(174,151,102,.28);
+      }
+      .profile-field input:focus{
+        border-color:rgba(215,169,52,.48);
+        box-shadow:0 0 0 3px rgba(215,169,52,.09);
+      }
+      .profile-field input[readonly]{
+        color:#a7a49d;
+        background:rgba(255,255,255,.018);
+        cursor:default;
+      }
+      .profile-help{
+        margin:8px 0 0;
+        color:#817f79;
+        font-size:11px;
+        line-height:1.5;
+      }
+      .profile-actions{
+        display:flex;
+        align-items:center;
+        gap:12px;
+        margin-top:22px;
+        flex-wrap:wrap;
+      }
+      .profile-save-status{
+        min-height:20px;
+        color:#aaa69d;
+        font-size:12px;
+        line-height:1.45;
+      }
+      .profile-save-status.is-success{
+        color:#d9c482;
+      }
+      .profile-save-status.is-error{
+        color:#e7a5a5;
+      }
+      @media(max-width:700px){
+        .profile-head{
+          padding:22px;
+          gap:16px;
+          flex-direction:column;
+        }
+        .profile-form{
+          padding:22px;
+        }
+        .profile-grid{
+          grid-template-columns:1fr;
+        }
+        .profile-status{
+          align-self:flex-start;
+        }
+      }
     </style></head>
   <body>
     <header class="top"><div class="wrap nav"><a class="brand" href="index.html" aria-label="NAHWERK Concierge – Startseite"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Hauptnavigation"><a href="index.html">Übersicht</a><a href="prime-concierge.html">Persönlicher Concierge</a><a href="concierges.html">Concierges</a><a href="senioren-concierge.html">Senioren Concierge</a><a href="angehoerige.html">Für Angehörige</a><a href="leistungen.html">Leistungen</a><a href="kontakt.html">Kontakt</a><a class="active auth-link login-link" href="anmelden.html">Anmelden</a><a class="auth-link register-link" href="registrieren.html">Registrieren</a></nav></div></header>
@@ -326,6 +533,42 @@
             n8n/Supabase wird separat angebunden.
           </div>
           <div class="dash">
+            <article class="card wide profile-card" id="personalDataCard">
+              <div class="profile-head">
+                <div class="profile-head-copy">
+                  <div class="eyebrow">Mein Konto</div>
+                  <h3>Persönliche Daten</h3>
+                  <p class="muted">Vor- und Nachname können Sie hier direkt aktualisieren. E-Mail und WhatsApp bleiben aus Sicherheitsgründen geschützt.</p>
+                </div>
+                <span class="profile-status" id="profileStatusBadge">Sicher verbunden</span>
+              </div>
+              <form class="profile-form" id="personalDataForm">
+                <div class="profile-grid">
+                  <div class="profile-field">
+                    <label for="profileFirstName">Vorname</label>
+                    <input id="profileFirstName" type="text" autocomplete="given-name" required maxlength="80" />
+                  </div>
+                  <div class="profile-field">
+                    <label for="profileLastName">Nachname</label>
+                    <input id="profileLastName" type="text" autocomplete="family-name" maxlength="80" />
+                  </div>
+                  <div class="profile-field">
+                    <label for="profileEmail">E-Mail-Adresse</label>
+                    <input id="profileEmail" type="email" readonly aria-readonly="true" />
+                    <p class="profile-help">Login-relevant. Eine Änderung wird später über einen gesicherten E-Mail-Wechsel angeboten.</p>
+                  </div>
+                  <div class="profile-field">
+                    <label for="profileWhatsapp">WhatsApp / Telefonnummer</label>
+                    <input id="profileWhatsapp" type="text" readonly aria-readonly="true" />
+                    <p class="profile-help">Identitätsrelevant. Änderungen erfolgen nur über einen gesicherten Nummernwechsel.</p>
+                  </div>
+                </div>
+                <div class="profile-actions">
+                  <button class="btn red" type="submit" id="profileSaveButton">Änderungen speichern</button>
+                  <span class="profile-save-status" id="profileSaveStatus" aria-live="polite"></span>
+                </div>
+              </form>
+            </article>
             <article class="card">
               <div class="eyebrow">Paket</div>
               <div class="value" id="planName">FREE · 0 € / MONAT</div>
@@ -572,6 +815,7 @@
             .join("");
         }
 
+        const PROFILE_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-profile";
         const SAFETY_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/safety";
         const safetyCard = document.getElementById("safetyCard");
         const safetyForm = document.getElementById("safetyForm");
@@ -595,6 +839,92 @@
             return "";
           }
         }
+        const personalDataForm = document.getElementById("personalDataForm");
+        const profileFirstName = document.getElementById("profileFirstName");
+        const profileLastName = document.getElementById("profileLastName");
+        const profileEmail = document.getElementById("profileEmail");
+        const profileWhatsapp = document.getElementById("profileWhatsapp");
+        const profileSaveButton = document.getElementById("profileSaveButton");
+        const profileSaveStatus = document.getElementById("profileSaveStatus");
+        const profileStatusBadge = document.getElementById("profileStatusBadge");
+
+        function showProfileStatus(message, kind = "") {
+          profileSaveStatus.textContent = message;
+          profileSaveStatus.className = "profile-save-status" + (kind ? " is-" + kind : "");
+        }
+        function applyProfile(profile) {
+          profileFirstName.value = profile?.first_name || "";
+          profileLastName.value = profile?.last_name || "";
+          profileEmail.value = profile?.email || "";
+          profileWhatsapp.value = profile?.whatsapp_number || "";
+          const displayName = [profile?.first_name, profile?.last_name].filter(Boolean).join(" ");
+          if (displayName) {
+            const recipient = document.getElementById("ownerName");
+            if (recipient && (!recipient.textContent.trim() || recipient.textContent.trim() === "–")) recipient.textContent = displayName;
+          }
+        }
+        async function loadProfile() {
+          const token = sessionToken();
+          if (!token) return;
+          profileStatusBadge.textContent = "Wird geladen";
+          try {
+            const response = await fetch(PROFILE_URL, {
+              method: "GET",
+              headers: { Authorization: "Bearer " + token }
+            });
+            const body = await response.json().catch(() => ({}));
+            if (!response.ok || body?.ok !== true) throw new Error("profile_load_failed");
+            applyProfile(body.profile || {});
+            profileStatusBadge.textContent = "Sicher verbunden";
+          } catch (_) {
+            profileStatusBadge.textContent = "Nicht verfügbar";
+            showProfileStatus("Die persönlichen Daten konnten gerade nicht geladen werden.", "error");
+          }
+        }
+        personalDataForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const token = sessionToken();
+          if (!token) {
+            showProfileStatus("Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.", "error");
+            return;
+          }
+          profileSaveButton.disabled = true;
+          profileSaveButton.textContent = "Wird gespeichert …";
+          showProfileStatus("Änderungen werden sicher gespeichert …");
+          try {
+            const response = await fetch(PROFILE_URL, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + token
+              },
+              body: JSON.stringify({
+                first_name: profileFirstName.value.trim(),
+                last_name: profileLastName.value.trim()
+              })
+            });
+            const body = await response.json().catch(() => ({}));
+            if (!response.ok || body?.ok !== true) throw new Error("profile_update_failed");
+            applyProfile(body.profile || {});
+            try {
+              const session = JSON.parse(localStorage.getItem("scb_web_session") || "null");
+              if (session) {
+                session.first_name = body?.profile?.first_name || "";
+                localStorage.setItem("scb_web_session", JSON.stringify(session));
+              }
+            } catch (_) {}
+            document.querySelectorAll(".nw-account-name").forEach((node) => {
+              node.textContent = body?.profile?.first_name || "Konto";
+            });
+            showProfileStatus("Gespeichert.", "success");
+          } catch (_) {
+            showProfileStatus("Die Änderung konnte gerade nicht gespeichert werden. Bitte versuchen Sie es erneut.", "error");
+          } finally {
+            profileSaveButton.disabled = false;
+            profileSaveButton.textContent = "Änderungen speichern";
+          }
+        });
+
         function normalizedTimes(value) {
           if (Array.isArray(value)) return value.join(", ");
           return value == null ? "" : String(value);
@@ -715,6 +1045,7 @@
           }
         });
 
+        loadProfile();
         loadSafety();
 
         try {
