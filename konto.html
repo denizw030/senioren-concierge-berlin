@@ -1836,6 +1836,11 @@
             panel.hidden = panel.dataset.accountPanel !== validName;
           });
           if (validName !== "safety") setSafetyFormOpen(false);
+          if (validName === "safety") {
+            ensureSafetyLoaded();
+            ensureMfaLoaded();
+          }
+          if (validName === "concierge") ensureReceptionLoaded();
         }
         accountTabs.forEach((tab, index) => {
           tab.addEventListener("click", () => setAccountTab(tab.dataset.accountTab));
@@ -1979,6 +1984,7 @@
         }
 
         const PROFILE_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-profile";
+        const PROFILE_CACHE_KEY = "nw_account_profile_cache_v1";
         const MFA_STATUS_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-mfa-status";
         const MFA_MANAGE_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-mfa-manage";
         const SAFETY_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/safety";
@@ -2004,6 +2010,69 @@
             return JSON.parse(localStorage.getItem("scb_web_session") || "null")?.session_token || "";
           } catch (_) {
             return "";
+          }
+        }
+        function accountSession() {
+          try {
+            return JSON.parse(localStorage.getItem("scb_web_session") || "null");
+          } catch (_) {
+            return null;
+          }
+        }
+        let profileCacheApplied = false;
+        function renderProfilePayload(body) {
+          applyAuthoritativeAccountTheme(body?.brand);
+          applyProfile(body?.profile || {});
+          const customerNumber = document.getElementById("customerNumber");
+          if (customerNumber) customerNumber.textContent = body?.customer_number || "Nicht verfügbar";
+          applyPlanAndUsage(body?.plan || null, body?.usage || null);
+        }
+        function storeProfileCache(body) {
+          const session = accountSession();
+          if (!session?.customer_account_id || !session?.person_id || !body?.customer_account_id) return;
+          if (String(session.customer_account_id) !== String(body.customer_account_id)) return;
+          try {
+            localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify({
+              saved_at: Date.now(),
+              person_id: String(session.person_id),
+              customer_account_id: String(session.customer_account_id),
+              payload: {
+                profile: body.profile || {},
+                customer_account_id: body.customer_account_id,
+                customer_number: body.customer_number || "",
+                brand: body.brand || null,
+                plan: body.plan || null,
+                usage: body.usage || null
+              }
+            }));
+            session.customer_number = body.customer_number || "";
+            localStorage.setItem("scb_web_session", JSON.stringify(session));
+          } catch (_) {}
+        }
+        function hydrateProfileCache() {
+          const session = accountSession();
+          if (!session?.session_token || !session?.customer_account_id || !session?.person_id) return false;
+          if (session.expires_at && new Date(session.expires_at).getTime() <= Date.now()) return false;
+          try {
+            const cached = JSON.parse(localStorage.getItem(PROFILE_CACHE_KEY) || "null");
+            const matches =
+              cached &&
+              String(cached.person_id || "") === String(session.person_id) &&
+              String(cached.customer_account_id || "") === String(session.customer_account_id) &&
+              cached.payload;
+            if (!matches) {
+              if (session.customer_number) {
+                const customerNumber = document.getElementById("customerNumber");
+                if (customerNumber) customerNumber.textContent = session.customer_number;
+              }
+              return false;
+            }
+            renderProfilePayload(cached.payload);
+            profileStatusBadge.textContent = "Sicher verbunden";
+            profileCacheApplied = true;
+            return true;
+          } catch (_) {
+            return false;
           }
         }
         const SECURITY_PROMPT_KEY = "nw_post_registration_security_prompt";
@@ -2638,8 +2707,8 @@
         }
         async function loadProfile() {
           const token = sessionToken();
-          if (!token) return;
-          profileStatusBadge.textContent = "Wird geladen";
+          if (!token) return false;
+          if (!profileCacheApplied) profileStatusBadge.textContent = "Wird geladen";
           try {
             const response = await fetch(PROFILE_URL, {
               method: "GET",
@@ -2647,13 +2716,16 @@
             });
             const body = await response.json().catch(() => ({}));
             if (!response.ok || body?.ok !== true) throw new Error("profile_load_failed");
-            applyAuthoritativeAccountTheme(body.brand);
-            applyProfile(body.profile || {});
-            const customerNumber = document.getElementById("customerNumber");
-            if (customerNumber) customerNumber.textContent = body.customer_number || "Nicht verfügbar";
-            applyPlanAndUsage(body.plan || null, body.usage || null);
+            renderProfilePayload(body);
+            storeProfileCache(body);
             profileStatusBadge.textContent = "Sicher verbunden";
+            showProfileStatus("");
+            return true;
           } catch (_) {
+            if (profileCacheApplied) {
+              profileStatusBadge.textContent = "Zuletzt synchronisiert";
+              return false;
+            }
             profileStatusBadge.textContent = "Nicht verfügbar";
             showProfileStatus("Die persönlichen Daten konnten gerade nicht geladen werden.", "error");
             document.getElementById("planName").textContent = "Tarif derzeit nicht verfügbar";
@@ -2663,6 +2735,7 @@
             document.getElementById("contactStatus").textContent = "Nicht verfügbar";
             document.getElementById("planStatusMeta").textContent = "Bitte laden Sie die Seite später erneut.";
             document.getElementById("usageState").textContent = "Aktueller Verbrauch derzeit nicht verfügbar. Es werden keine Werte geschätzt.";
+            return false;
           }
         }
         personalDataForm.addEventListener("submit", async (event) => {
@@ -2689,7 +2762,8 @@
             });
             const body = await response.json().catch(() => ({}));
             if (!response.ok || body?.ok !== true) throw new Error("profile_update_failed");
-            applyProfile(body.profile || {});
+            renderProfilePayload(body);
+            storeProfileCache(body);
             try {
               const session = JSON.parse(localStorage.getItem("scb_web_session") || "null");
               if (session) {
@@ -3116,11 +3190,43 @@
           }
         });
 
+        let mfaLoadStarted = false;
+        let safetyLoadStarted = false;
+        let receptionLoadStarted = false;
+
+        function ensureMfaLoaded() {
+          if (mfaLoadStarted) return;
+          mfaLoadStarted = true;
+          bootstrapSecurityRecommendation().catch(() => {
+            mfaLoadStarted = false;
+          });
+        }
+        function ensureSafetyLoaded() {
+          if (safetyLoadStarted) return;
+          safetyLoadStarted = true;
+          loadSafety().catch(() => {
+            safetyLoadStarted = false;
+          });
+        }
+        function ensureReceptionLoaded() {
+          if (receptionLoadStarted || receptionLoaded) return;
+          receptionLoadStarted = true;
+          loadTelephoneReception().finally(() => {
+            if (!receptionLoaded) receptionLoadStarted = false;
+          });
+        }
+        function scheduleOverviewBackground() {
+          const run = () => ensureSafetyLoaded();
+          if ("requestIdleCallback" in window) {
+            window.requestIdleCallback(run, { timeout: 1200 });
+          } else {
+            window.setTimeout(run, 700);
+          }
+        }
+
         setAccountTab("overview");
-        loadProfile();
-        bootstrapSecurityRecommendation();
-        loadSafety();
-        loadTelephoneReception();
+        hydrateProfileCache();
+        loadProfile().finally(scheduleOverviewBackground);
 
         try {
           const d = JSON.parse(
