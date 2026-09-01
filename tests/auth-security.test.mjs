@@ -21,13 +21,19 @@ test("login completes enrolled MFA only through the second verification step", (
   assert.match(login, /body\.status==='mfa_required'\|\|body\.mfa_required===true/);
   assert.match(login, /localStorage\.removeItem\(SESSION_KEY\)/);
   assert.match(login, /let pendingMfa=null/);
+  assert.match(login, /web\/login\/mfa\/challenge/);
   assert.match(login, /web\/login\/mfa\/verify/);
   assert.match(login, /body\.mfa_verified===true&&completeLogin\(body\)/);
   assert.match(login, /autocomplete="one-time-code"/);
   assert.match(login, /pattern="\[0-9\]\{6\}"/);
-  assert.match(login, /body\.mfa_method==='phone'/);
+  assert.match(login, /mfaChoiceSms/);
+  assert.match(login, /mfaChoiceTotp/);
+  assert.match(login, /startMfaChallenge\('sms'\)/);
+  assert.match(login, /startMfaChallenge\('totp'\)/);
+  assert.match(login, /mfa_method:pendingMfa\.method/);
   assert.match(login, /mfaCodeLabel\.textContent='SMS-Code'/);
   assert.match(login, /Code aus der Authenticator-App/);
+  assert.match(login, /Andere Methode wählen/);
   assert.match(login, /Zusätzliche Bestätigung erforderlich/);
 });
 
@@ -57,6 +63,7 @@ test("account security supports intelligent MFA recommendations and method choic
   assert.match(account, /functions\/v1\/web-mfa-manage/);
   assert.match(account, /id="mfaEnableButton"/);
   assert.match(account, /id="mfaDisableButton"/);
+  assert.match(account, /id="mfaDisableSmsButton"/);
   assert.match(account, /id="mfaSmsMethod"/);
   assert.match(account, /id="mfaTotpMethod"/);
   assert.match(account, /id="securityNudge"/);
@@ -71,10 +78,25 @@ test("account security supports intelligent MFA recommendations and method choic
   assert.match(account, /mfaManage\("enroll_cancel"/);
   assert.match(account, /mfaManage\("nudge_later"/);
   assert.match(account, /mfaManage\("disable"/);
-  assert.match(account, /beginMfaMethod\("phone"\)/);
+  assert.match(account, /mfaManage\("sms_disable_start"/);
+  assert.match(account, /mfaManage\("sms_disable_verify"/);
+  assert.match(account, /beginMfaMethod\("sms"\)/);
   assert.match(account, /beginMfaMethod\("totp"\)/);
+  assert.match(account, /mfa_sms_code_sent/);
+  assert.match(account, /id="mfaSmsDisableStartForm"/);
+  assert.match(account, /id="mfaSmsDisableVerifyForm"/);
   assert.match(account, /Empfohlen · Noch nicht aktiviert/);
-  assert.equal(/localStorage\.setItem\([^\n]*(enrollment_token|mfaEnrollmentToken)/.test(account), false);
+  assert.equal(/localStorage\.setItem\([^\n]*(enrollment_token|mfaEnrollmentToken|mfaSmsChallengeId)/.test(account), false);
+});
+
+
+test("custom SMS MFA remains server-driven and email stays recovery-only", () => {
+  const account = read("konto.html");
+  assert.match(account, /methods\?\.sms/);
+  assert.match(account, /SMS-Bestätigung wurde erfolgreich aktiviert/);
+  assert.match(account, /Passwort-Wiederherstellung/);
+  assert.match(account, /nicht als gleichwertiger zweiter Faktor/);
+  assert.equal(/localStorage\.setItem\([^\n]*(challenge_id|mfaSmsDisableChallengeId)/.test(account), false);
 });
 
 test("registration queues the security recommendation only after a successful login", () => {
