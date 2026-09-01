@@ -2001,6 +2001,7 @@
         const mfaPrimaryActions = document.getElementById("mfaPrimaryActions");
         const mfaEnableButton = document.getElementById("mfaEnableButton");
         const mfaDisableButton = document.getElementById("mfaDisableButton");
+        const mfaDisableSmsButton = document.getElementById("mfaDisableSmsButton");
         const mfaMethodChooser = document.getElementById("mfaMethodChooser");
         const mfaSmsMethod = document.getElementById("mfaSmsMethod");
         const mfaTotpMethod = document.getElementById("mfaTotpMethod");
@@ -2028,6 +2029,15 @@
         const mfaDisableCode = document.getElementById("mfaDisableCode");
         const mfaDisableConfirmButton = document.getElementById("mfaDisableConfirmButton");
         const mfaDisableCancelButton = document.getElementById("mfaDisableCancelButton");
+        const mfaSmsDisableStartForm = document.getElementById("mfaSmsDisableStartForm");
+        const mfaSmsDisablePassword = document.getElementById("mfaSmsDisablePassword");
+        const mfaSmsDisableSendButton = document.getElementById("mfaSmsDisableSendButton");
+        const mfaSmsDisableCancelButton = document.getElementById("mfaSmsDisableCancelButton");
+        const mfaSmsDisableVerifyForm = document.getElementById("mfaSmsDisableVerifyForm");
+        const mfaSmsDisableMaskedPhone = document.getElementById("mfaSmsDisableMaskedPhone");
+        const mfaSmsDisableCode = document.getElementById("mfaSmsDisableCode");
+        const mfaSmsDisableConfirmButton = document.getElementById("mfaSmsDisableConfirmButton");
+        const mfaSmsDisableVerifyCancelButton = document.getElementById("mfaSmsDisableVerifyCancelButton");
         const mfaFeedback = document.getElementById("mfaFeedback");
         const securityNudge = document.getElementById("securityNudge");
         const securityNudgeSms = document.getElementById("securityNudgeSms");
@@ -2035,6 +2045,8 @@
         const securityNudgeLater = document.getElementById("securityNudgeLater");
 
         let mfaEnrollmentToken = "";
+        let mfaSmsChallengeId = "";
+        let mfaSmsDisableChallengeId = "";
         let mfaSelectedMethod = "totp";
         let lastMfaPayload = null;
 
@@ -2043,30 +2055,58 @@
           mfaFeedback.className = "mfa-feedback" + (kind ? " is-" + kind : "");
         }
 
+        function normalizeSixDigitInput(input) {
+          input.value = input.value.replace(/\D/g, "").slice(0, 6);
+        }
+
+        function mfaFactorTypes() {
+          return Array.isArray(lastMfaPayload?.mfa?.factor_types) ? lastMfaPayload.mfa.factor_types : [];
+        }
+
+        function smsMfaAvailable() {
+          return lastMfaPayload?.mfa?.methods?.sms?.available === true;
+        }
+
+        function smsMfaEnrolled() {
+          return lastMfaPayload?.mfa?.methods?.sms?.enrolled === true || mfaFactorTypes().includes("sms");
+        }
+
+        function totpMfaAvailable() {
+          return lastMfaPayload?.mfa?.methods?.totp?.available !== false;
+        }
+
+        function totpMfaEnrolled() {
+          return lastMfaPayload?.mfa?.methods?.totp?.enrolled === true || mfaFactorTypes().includes("totp");
+        }
+
         function resetMfaForms() {
           mfaEnrollmentToken = "";
+          mfaSmsChallengeId = "";
+          mfaSmsDisableChallengeId = "";
           mfaMethodChooser.hidden = true;
           mfaStartForm.hidden = true;
           mfaSetup.hidden = true;
           mfaPhoneSetup.hidden = true;
           mfaDisableForm.hidden = true;
+          mfaSmsDisableStartForm.hidden = true;
+          mfaSmsDisableVerifyForm.hidden = true;
           mfaCurrentPassword.value = "";
           mfaSetupCode.value = "";
           mfaPhoneCode.value = "";
           mfaDisablePassword.value = "";
           mfaDisableCode.value = "";
+          mfaSmsDisablePassword.value = "";
+          mfaSmsDisableCode.value = "";
           mfaQr.removeAttribute("src");
           mfaSecret.textContent = "";
           mfaMaskedPhone.textContent = "Ihre hinterlegte Mobilnummer";
-        }
-
-        function normalizeSixDigitInput(input) {
-          input.value = input.value.replace(/\D/g, "").slice(0, 6);
+          mfaSmsDisableMaskedPhone.textContent = "Ihre hinterlegte Mobilnummer";
         }
 
         mfaSetupCode.addEventListener("input", () => normalizeSixDigitInput(mfaSetupCode));
         mfaPhoneCode.addEventListener("input", () => normalizeSixDigitInput(mfaPhoneCode));
         mfaDisableCode.addEventListener("input", () => normalizeSixDigitInput(mfaDisableCode));
+        mfaSmsDisableCode.addEventListener("input", () => normalizeSixDigitInput(mfaSmsDisableCode));
 
         async function mfaManage(action, payload = {}) {
           const token = sessionToken();
@@ -2089,33 +2129,32 @@
           return body;
         }
 
-        function phoneMfaAvailable() {
-          return lastMfaPayload?.mfa?.methods?.phone?.available === true;
-        }
-
-        function totpMfaAvailable() {
-          return lastMfaPayload?.mfa?.methods?.totp?.available !== false;
-        }
-
         function showMfaMethodChooser() {
           resetMfaForms();
           setMfaFeedback("");
-          mfaSmsMethod.hidden = !phoneMfaAvailable();
-          mfaTotpMethod.hidden = !totpMfaAvailable();
+          mfaSmsMethod.hidden = !smsMfaAvailable() || smsMfaEnrolled();
+          mfaTotpMethod.hidden = !totpMfaAvailable() || totpMfaEnrolled();
+          if (mfaSmsMethod.hidden && mfaTotpMethod.hidden) {
+            setMfaFeedback("Alle verfügbaren Bestätigungsmethoden sind bereits eingerichtet.", "success");
+            return;
+          }
           mfaMethodChooser.hidden = false;
         }
 
         function beginMfaMethod(method) {
-          if (method === "phone" && !phoneMfaAvailable()) {
-            setMfaFeedback("SMS-Bestätigung ist für dieses Konto noch nicht verfügbar.", "error");
+          if (method === "sms" && (!smsMfaAvailable() || smsMfaEnrolled())) {
+            setMfaFeedback("SMS-Bestätigung ist für dieses Konto aktuell nicht verfügbar oder bereits aktiviert.", "error");
             return;
           }
-          if (method === "totp" && !totpMfaAvailable()) return;
+          if (method === "totp" && (!totpMfaAvailable() || totpMfaEnrolled())) {
+            setMfaFeedback("Die Authenticator-App ist bereits eingerichtet.", "success");
+            return;
+          }
 
           resetMfaForms();
           setMfaFeedback("");
           mfaSelectedMethod = method;
-          if (method === "phone") {
+          if (method === "sms") {
             mfaStartCopy.textContent = "Bestätigen Sie zuerst Ihr aktuelles Passwort. Danach senden wir einen 6-stelligen SMS-Code an Ihre hinterlegte Mobilnummer.";
             mfaStartButton.textContent = "SMS-Code senden";
           } else {
@@ -2145,10 +2184,17 @@
             hideSecurityNudge();
             return;
           }
-          securityNudgeSms.hidden = body?.mfa?.methods?.phone?.available !== true;
+          securityNudgeSms.hidden = body?.mfa?.methods?.sms?.available !== true;
           securityNudgeTotp.hidden = body?.mfa?.methods?.totp?.available === false;
           securityNudge.hidden = false;
           mfaManage("nudge_seen").catch(() => {});
+        }
+
+        function activeMethodLabel() {
+          const labels = [];
+          if (totpMfaEnrolled()) labels.push("Authenticator-App");
+          if (smsMfaEnrolled()) labels.push("SMS-Code");
+          return labels.join(" und ");
         }
 
         async function loadMfaStatus() {
@@ -2183,27 +2229,29 @@
             }
 
             mfaPrimaryActions.hidden = false;
+            const canAddSms = smsMfaAvailable() && !smsMfaEnrolled();
+            const canAddTotp = totpMfaAvailable() && !totpMfaEnrolled();
+
             if (mfa.enabled === true) {
-              const methods = Array.isArray(mfa.factor_types) ? mfa.factor_types : [];
-              const methodLabel = methods.includes("phone")
-                ? "SMS-Code"
-                : methods.includes("totp")
-                  ? "Authenticator-App"
-                  : "zweiten Faktor";
+              const label = activeMethodLabel() || "einer zusätzlichen Bestätigung";
               mfaStatus.textContent = "Aktiviert";
-              mfaMeta.textContent = "Ihr Konto ist mit " + methodLabel + " geschützt. Bei der nächsten Anmeldung wird die zusätzliche Bestätigung zwingend abgefragt.";
-              mfaEnableButton.hidden = true;
-              mfaDisableButton.hidden = false;
+              mfaMeta.textContent = "Ihr Konto ist mit " + label + " geschützt. Bei der nächsten Anmeldung wird eine aktive zweite Methode zwingend verlangt.";
+              mfaEnableButton.hidden = !(canAddSms || canAddTotp);
+              mfaEnableButton.textContent = "Weitere Methode hinzufügen";
+              mfaDisableButton.hidden = !totpMfaEnrolled();
+              mfaDisableSmsButton.hidden = !smsMfaEnrolled();
               hideSecurityNudge();
               return;
             }
 
             mfaStatus.textContent = "Empfohlen · Noch nicht aktiviert";
-            mfaMeta.textContent = phoneMfaAvailable()
-              ? "Wählen Sie zwischen einem SMS-Code und einer Authenticator-App. Die Aktivierung ist freiwillig; nach der Einrichtung wird der zweite Faktor bei der Anmeldung zwingend verlangt."
-              : "Sie können Ihr Konto zusätzlich mit einer Authenticator-App schützen. Weitere Methoden werden nur angeboten, wenn sie für Ihr Konto vollständig verfügbar sind.";
+            mfaMeta.textContent = smsMfaAvailable()
+              ? "Wählen Sie zwischen SMS-Code und Authenticator-App. Die Aktivierung ist freiwillig; nach der Einrichtung wird der zweite Faktor bei der Anmeldung zwingend verlangt."
+              : "Sie können Ihr Konto zusätzlich mit einer Authenticator-App schützen. SMS wird nur angeboten, wenn eine geeignete Mobilnummer sicher hinterlegt ist.";
             mfaEnableButton.hidden = false;
+            mfaEnableButton.textContent = "Kontoschutz einrichten";
             mfaDisableButton.hidden = true;
+            mfaDisableSmsButton.hidden = true;
             applySecurityRecommendation(body);
           } catch (_) {
             lastMfaPayload = null;
@@ -2230,7 +2278,7 @@
           setMfaFeedback("");
         });
         mfaTotpMethod.addEventListener("click", () => beginMfaMethod("totp"));
-        mfaSmsMethod.addEventListener("click", () => beginMfaMethod("phone"));
+        mfaSmsMethod.addEventListener("click", () => beginMfaMethod("sms"));
 
         mfaStartCancelButton.addEventListener("click", () => {
           resetMfaForms();
@@ -2243,24 +2291,28 @@
 
           const password = mfaCurrentPassword.value;
           mfaStartButton.disabled = true;
-          mfaStartButton.textContent = mfaSelectedMethod === "phone" ? "SMS wird gesendet …" : "Wird vorbereitet …";
-          setMfaFeedback(mfaSelectedMethod === "phone" ? "SMS-Bestätigung wird sicher vorbereitet." : "Authenticator-Einrichtung wird sicher vorbereitet.");
+          mfaStartButton.textContent = mfaSelectedMethod === "sms" ? "SMS wird gesendet …" : "Wird vorbereitet …";
+          setMfaFeedback(mfaSelectedMethod === "sms" ? "SMS-Bestätigung wird sicher vorbereitet." : "Authenticator-Einrichtung wird sicher vorbereitet.");
 
           try {
             const body = await mfaManage("enroll_start", { password, method: mfaSelectedMethod });
             mfaCurrentPassword.value = "";
-            mfaEnrollmentToken = String(body.enrollment_token || "");
-            if (!mfaEnrollmentToken) throw new Error("invalid_enrollment_response");
-
             mfaStartForm.hidden = true;
-            if (mfaSelectedMethod === "phone") {
-              if (body?.status !== "mfa_phone_code_sent") throw new Error("invalid_phone_enrollment_response");
+
+            if (mfaSelectedMethod === "sms") {
+              if (body?.status !== "mfa_sms_code_sent" || !body.challenge_id) {
+                throw new Error("invalid_sms_enrollment_response");
+              }
+              mfaSmsChallengeId = String(body.challenge_id);
               mfaMaskedPhone.textContent = String(body.masked_phone || "Ihre hinterlegte Mobilnummer");
               mfaPhoneSetup.hidden = false;
               setMfaFeedback("SMS-Code wurde gesendet. Geben Sie ihn zur Aktivierung ein.", "success");
               mfaPhoneCode.focus();
             } else {
-              if (!body.qr_svg || !body.secret) throw new Error("invalid_enrollment_response");
+              mfaEnrollmentToken = String(body.enrollment_token || "");
+              if (!mfaEnrollmentToken || !body.qr_svg || !body.secret) {
+                throw new Error("invalid_enrollment_response");
+              }
               const qr = String(body.qr_svg);
               mfaQr.src = qr.startsWith("data:") ? qr : "data:image/svg+xml;charset=utf-8," + encodeURIComponent(qr);
               mfaSecret.textContent = String(body.secret);
@@ -2273,11 +2325,10 @@
             if (status === "reauthentication_failed") {
               setMfaFeedback("Das aktuelle Passwort konnte nicht bestätigt werden.", "error");
             } else if (status === "already_enabled") {
-              setMfaFeedback("Die Zwei-Faktor-Authentifizierung ist bereits aktiviert.", "success");
+              setMfaFeedback("Diese Bestätigungsmethode ist bereits aktiviert.", "success");
               await loadMfaStatus();
-            } else if (status === "phone_mfa_unavailable") {
+            } else if (status === "sms_mfa_unavailable" || status === "phone_unavailable") {
               setMfaFeedback("SMS-Bestätigung ist für dieses Konto noch nicht verfügbar. Sie können stattdessen die Authenticator-App verwenden.", "error");
-              mfaSelectedMethod = "totp";
             } else if (status === "too_many_attempts") {
               setMfaFeedback("Zu viele Versuche. Bitte warten Sie einige Minuten.", "error");
             } else {
@@ -2286,40 +2337,43 @@
           } finally {
             mfaCurrentPassword.value = "";
             mfaStartButton.disabled = false;
-            mfaStartButton.textContent = mfaSelectedMethod === "phone" ? "SMS-Code senden" : "QR-Code erstellen";
+            mfaStartButton.textContent = mfaSelectedMethod === "sms" ? "SMS-Code senden" : "QR-Code erstellen";
           }
         });
 
         async function verifyEnrollment(codeInput, button, idleText) {
           normalizeSixDigitInput(codeInput);
-          if (!/^\d{6}$/.test(codeInput.value) || !mfaEnrollmentToken) return;
+          if (!/^\d{6}$/.test(codeInput.value)) return;
+          if (mfaSelectedMethod === "sms" && !mfaSmsChallengeId) return;
+          if (mfaSelectedMethod === "totp" && !mfaEnrollmentToken) return;
 
           button.disabled = true;
           button.textContent = "Code wird geprüft …";
           setMfaFeedback("Code wird geprüft.");
 
           try {
-            const body = await mfaManage("enroll_verify", {
-              enrollment_token: mfaEnrollmentToken,
-              code: codeInput.value
-            });
+            const payload = mfaSelectedMethod === "sms"
+              ? { method: "sms", challenge_id: mfaSmsChallengeId, code: codeInput.value }
+              : { method: "totp", enrollment_token: mfaEnrollmentToken, code: codeInput.value };
+            const body = await mfaManage("enroll_verify", payload);
             if (body?.status !== "mfa_enabled" || body?.mfa?.enabled !== true) {
               throw new Error("mfa_enable_not_confirmed");
             }
+            const method = String(body?.method || mfaSelectedMethod);
             resetMfaForms();
             await loadMfaStatus();
             setMfaFeedback(
-              body?.method === "phone"
+              method === "sms"
                 ? "SMS-Bestätigung wurde erfolgreich aktiviert."
                 : "Authenticator-App wurde erfolgreich aktiviert.",
               "success"
             );
           } catch (error) {
             const status = error instanceof Error ? error.message : "";
-            if (status === "invalid_mfa_code") {
+            if (status === "invalid_mfa_code" || status === "invalid_code") {
               setMfaFeedback("Der Code ist nicht korrekt oder nicht mehr gültig.", "error");
               codeInput.select();
-            } else if (status === "enrollment_expired") {
+            } else if (status === "enrollment_expired" || status === "challenge_expired" || status === "challenge_not_found") {
               resetMfaForms();
               setMfaFeedback("Die Einrichtung ist abgelaufen. Bitte starten Sie sie erneut.", "error");
             } else if (status === "too_many_attempts") {
@@ -2336,22 +2390,27 @@
         mfaVerifyForm.addEventListener("submit", async (event) => {
           event.preventDefault();
           if (!mfaVerifyForm.reportValidity()) return;
+          mfaSelectedMethod = "totp";
           await verifyEnrollment(mfaSetupCode, mfaVerifyButton, "Aktivierung bestätigen");
         });
 
         mfaPhoneVerifyForm.addEventListener("submit", async (event) => {
           event.preventDefault();
           if (!mfaPhoneVerifyForm.reportValidity()) return;
+          mfaSelectedMethod = "sms";
           await verifyEnrollment(mfaPhoneCode, mfaPhoneVerifyButton, "SMS-Code bestätigen");
         });
 
         async function cancelEnrollment() {
+          const method = mfaSelectedMethod;
           const token = mfaEnrollmentToken;
           resetMfaForms();
           setMfaFeedback("");
-          if (!token) return;
           try {
-            await mfaManage("enroll_cancel", { enrollment_token: token });
+            await mfaManage("enroll_cancel", {
+              method,
+              enrollment_token: method === "totp" ? token : undefined
+            });
           } catch (_) {}
         }
 
@@ -2359,7 +2418,7 @@
         mfaPhoneCancelButton.addEventListener("click", cancelEnrollment);
 
         securityNudgeTotp.addEventListener("click", () => openSecuritySetupFromNudge("totp"));
-        securityNudgeSms.addEventListener("click", () => openSecuritySetupFromNudge("phone"));
+        securityNudgeSms.addEventListener("click", () => openSecuritySetupFromNudge("sms"));
         securityNudgeLater.addEventListener("click", async () => {
           securityNudgeLater.disabled = true;
           securityNudgeLater.textContent = "Wird gespeichert …";
@@ -2394,16 +2453,16 @@
           const code = mfaDisableCode.value;
           mfaDisableConfirmButton.disabled = true;
           mfaDisableConfirmButton.textContent = "Wird deaktiviert …";
-          setMfaFeedback("Deaktivierung wird sicher geprüft.");
+          setMfaFeedback("Authenticator-App wird sicher geprüft.");
           try {
-            const body = await mfaManage("disable", { password, code });
+            const body = await mfaManage("disable", { method: "totp", password, code });
             const stillEnabled = body?.mfa?.enabled === true;
             resetMfaForms();
             await loadMfaStatus();
             setMfaFeedback(
               stillEnabled
-                ? "Ein Faktor wurde entfernt, mindestens ein weiterer zweiter Faktor ist noch aktiv."
-                : "2-Faktor-Authentifizierung wurde deaktiviert.",
+                ? "Authenticator-App wurde entfernt. Eine weitere Bestätigungsmethode bleibt aktiv."
+                : "Authenticator-App wurde deaktiviert.",
               "success"
             );
           } catch (error) {
@@ -2416,13 +2475,105 @@
             } else if (status === "too_many_attempts") {
               setMfaFeedback("Zu viele Versuche. Bitte warten Sie einige Minuten.", "error");
             } else {
-              setMfaFeedback("Die Zwei-Faktor-Authentifizierung konnte gerade nicht deaktiviert werden.", "error");
+              setMfaFeedback("Die Authenticator-App konnte gerade nicht deaktiviert werden.", "error");
             }
           } finally {
             mfaDisablePassword.value = "";
             mfaDisableCode.value = "";
             mfaDisableConfirmButton.disabled = false;
             mfaDisableConfirmButton.textContent = "Deaktivierung bestätigen";
+          }
+        });
+
+        mfaDisableSmsButton.addEventListener("click", () => {
+          resetMfaForms();
+          setMfaFeedback("");
+          mfaSmsDisableStartForm.hidden = false;
+          mfaSmsDisablePassword.focus();
+        });
+
+        mfaSmsDisableCancelButton.addEventListener("click", () => {
+          resetMfaForms();
+          setMfaFeedback("");
+        });
+
+        mfaSmsDisableVerifyCancelButton.addEventListener("click", () => {
+          resetMfaForms();
+          setMfaFeedback("");
+        });
+
+        mfaSmsDisableStartForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          if (!mfaSmsDisableStartForm.reportValidity()) return;
+          const password = mfaSmsDisablePassword.value;
+          mfaSmsDisableSendButton.disabled = true;
+          mfaSmsDisableSendButton.textContent = "SMS wird gesendet …";
+          setMfaFeedback("Deaktivierung wird sicher vorbereitet.");
+          try {
+            const body = await mfaManage("sms_disable_start", { password });
+            if (body?.status !== "mfa_sms_disable_code_sent" || !body.challenge_id) {
+              throw new Error("sms_disable_start_failed");
+            }
+            mfaSmsDisableChallengeId = String(body.challenge_id);
+            mfaSmsDisableMaskedPhone.textContent = String(body.masked_phone || "Ihre hinterlegte Mobilnummer");
+            mfaSmsDisablePassword.value = "";
+            mfaSmsDisableStartForm.hidden = true;
+            mfaSmsDisableVerifyForm.hidden = false;
+            setMfaFeedback("SMS-Code wurde gesendet. Bestätigen Sie ihn, um SMS als zweiten Faktor zu entfernen.", "success");
+            mfaSmsDisableCode.focus();
+          } catch (error) {
+            const status = error instanceof Error ? error.message : "";
+            if (status === "reauthentication_failed") {
+              setMfaFeedback("Das aktuelle Passwort konnte nicht bestätigt werden.", "error");
+            } else if (status === "too_many_attempts") {
+              setMfaFeedback("Zu viele Versuche. Bitte warten Sie einige Minuten.", "error");
+            } else {
+              setMfaFeedback("Die SMS-Deaktivierung konnte gerade nicht gestartet werden.", "error");
+            }
+          } finally {
+            mfaSmsDisablePassword.value = "";
+            mfaSmsDisableSendButton.disabled = false;
+            mfaSmsDisableSendButton.textContent = "SMS-Code senden";
+          }
+        });
+
+        mfaSmsDisableVerifyForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          normalizeSixDigitInput(mfaSmsDisableCode);
+          if (!mfaSmsDisableVerifyForm.reportValidity() || !mfaSmsDisableChallengeId) return;
+          mfaSmsDisableConfirmButton.disabled = true;
+          mfaSmsDisableConfirmButton.textContent = "Wird deaktiviert …";
+          setMfaFeedback("SMS-Code wird geprüft.");
+          try {
+            const body = await mfaManage("sms_disable_verify", {
+              challenge_id: mfaSmsDisableChallengeId,
+              code: mfaSmsDisableCode.value
+            });
+            const stillEnabled = body?.mfa?.enabled === true;
+            resetMfaForms();
+            await loadMfaStatus();
+            setMfaFeedback(
+              stillEnabled
+                ? "SMS-Bestätigung wurde entfernt. Eine weitere Bestätigungsmethode bleibt aktiv."
+                : "SMS-Bestätigung wurde deaktiviert.",
+              "success"
+            );
+          } catch (error) {
+            const status = error instanceof Error ? error.message : "";
+            if (status === "invalid_code" || status === "invalid_mfa_code") {
+              setMfaFeedback("Der SMS-Code ist nicht korrekt oder nicht mehr gültig.", "error");
+              mfaSmsDisableCode.select();
+            } else if (status === "challenge_expired" || status === "challenge_not_found") {
+              resetMfaForms();
+              setMfaFeedback("Der SMS-Code ist abgelaufen. Bitte starten Sie die Deaktivierung erneut.", "error");
+            } else if (status === "too_many_attempts") {
+              setMfaFeedback("Zu viele Versuche. Bitte warten Sie einige Minuten.", "error");
+            } else {
+              setMfaFeedback("Die SMS-Bestätigung konnte gerade nicht deaktiviert werden.", "error");
+            }
+          } finally {
+            mfaSmsDisableConfirmButton.disabled = false;
+            mfaSmsDisableConfirmButton.textContent = "SMS-Bestätigung deaktivieren";
           }
         });
 
