@@ -40,3 +40,13 @@ test("protected account pages still validate the existing web session", () => {
   assert.match(authNav, /web\/session\/check/);
   assert.match(authNav, /response\.ok && body\.ok && body\.status === "session_valid"/);
 });
+
+
+test("account security shows real MFA status without fake activation", () => {
+  const account = read("konto.html");
+  assert.match(account, /id="mfaCard"/);
+  assert.match(account, /functions\/v1\/web-mfa-status/);
+  assert.match(account, /async function loadMfaStatus\(\)/);
+  assert.match(account, /Empfohlen · Noch nicht aktiviert/);
+  assert.equal(account.includes('id="mfaEnableButton"'), false);
+});
