@@ -1778,7 +1778,7 @@
         const RECEPTION_URL = "https://btqklftjmwtqqqdmwlnk.supabase.co/functions/v1/nahwerk-customer-portal-staging/portal/telephone-reception";
         const RECEPTION_CONTACT_URL = RECEPTION_URL + "/contact-trust";
         function receptionToken() {
-          return sessionStorage.getItem("nw_reception_staging_token") || sessionToken();
+          return sessionToken();
         }
         const receptionForm = document.getElementById("telephoneReceptionForm");
         const receptionStatus = document.getElementById("receptionStatus");
