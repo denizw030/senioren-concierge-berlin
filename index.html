@@ -236,6 +236,8 @@
         margin-right: 0;
         margin-bottom: var(--nw-space);
         padding: clamp(38px, 7vw, 80px);
+        padding-left: max(20px, calc((100vw - var(--nw-content)) / 2));
+        padding-right: max(20px, calc((100vw - var(--nw-content)) / 2));
         border-radius: var(--nw-r-lg);
         background: radial-gradient(
             circle at 85% 20%,
@@ -261,6 +263,10 @@
         }
       }
       @media (max-width: 760px) {
+        .final-cta {
+          padding-left: 16px;
+          padding-right: 16px;
+        }
         .hero-grid,
         .product-band-grid,
         .steps,
