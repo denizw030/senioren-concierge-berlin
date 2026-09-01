@@ -1,34 +1,48 @@
 <!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Anmelden | Nahwerk Concierge</title><meta name="description" content="Im Nahwerk-Concierge-Kundenbereich anmelden."><link rel="stylesheet" href="assets/site.css?v=24"><style>.loginwrap{max-width:560px;margin:0 auto}.logincard{padding:32px}.field{margin-bottom:17px}.field input{padding:13px 14px;font:inherit}.password-wrap{position:relative}.password-wrap input{padding-right:54px}.password-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:38px;height:38px;border:0;background:transparent;cursor:pointer;border-radius:8px;display:flex;align-items:center;justify-content:center}.status{display:none;margin-top:16px;padding:14px;border-radius:9px;line-height:1.5}.tiny{font-size:12px;line-height:1.6}.split{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap;margin-top:15px}</style><link rel="canonical" href="https://nahwerkconcierge.com/anmelden.html"><link rel="icon" type="image/svg+xml" href="assets/NAHWERK_Concierge_Gold_Transparent.svg?v=1"><link rel="stylesheet" href="assets/brand-2026.css?v=23"><link rel="stylesheet" href="assets/nahwerk-logo-v2.css?v=8"><meta property="og:type" content="website"><meta property="og:locale" content="de_DE"><meta property="og:title" content="NAHWERK Concierge"><meta property="og:description" content="Persönliche, verständliche Concierge-Unterstützung direkt über WhatsApp."><style>
       /* Page-scoped surface treatment: colors/contours only. */
-      body.login-image-page main{
+      body.login-image-page:not(.senior-product):not([data-product="senioren"]) main{
         background:
-          radial-gradient(880px 580px at 94% 8%,rgba(61,117,235,.05),transparent 65%),
-          radial-gradient(720px 500px at 5% 68%,rgba(132,73,177,.04),transparent 68%),
-          radial-gradient(660px 460px at 82% 90%,rgba(43,157,153,.035),transparent 69%),
-          linear-gradient(180deg,#080807 0%,#0a0909 52%,#070706 100%)!important;
+          radial-gradient(920px 620px at 94% 7%,rgba(35,78,160,.18),transparent 64%),
+          radial-gradient(780px 540px at 5% 44%,rgba(50,62,110,.055),transparent 68%),
+          radial-gradient(720px 500px at 82% 86%,rgba(20,91,110,.035),transparent 70%),
+          linear-gradient(180deg,#05080d 0%,#08111c 52%,#05080c 100%)!important;
       }
-      body.login-image-page .hero{
+      body.login-image-page:not(.senior-product):not([data-product="senioren"]) .hero{
         background:
-          radial-gradient(700px 500px at 78% 28%,rgba(61,117,235,.085),transparent 64%),
-          radial-gradient(600px 430px at 12% 82%,rgba(132,73,177,.05),transparent 68%),
-          radial-gradient(520px 380px at 88% 70%,rgba(212,175,55,.065),transparent 67%),
-          linear-gradient(145deg,#070707,#0d0c0b 58%,#060606)!important;
+          radial-gradient(700px 500px at 78% 28%,rgba(34,72,144,.13),transparent 64%),
+          radial-gradient(600px 430px at 12% 82%,rgba(44,58,104,.035),transparent 68%),
+          radial-gradient(520px 380px at 88% 70%,rgba(20,91,110,.025),transparent 67%),
+          linear-gradient(145deg,#070b11,#0b131d 58%,#06090d)!important;
       }
-      body.login-image-page main>.section{
+      body.login-image-page:not(.senior-product):not([data-product="senioren"]) main>.section{
         background:
-          radial-gradient(700px 430px at 88% 16%,rgba(61,117,235,.035),transparent 68%),
-          radial-gradient(620px 390px at 10% 86%,rgba(132,73,177,.03),transparent 70%),
-          rgba(8,8,7,.97)!important;
+          radial-gradient(760px 480px at 92% 10%,rgba(32,72,150,.15),transparent 67%),
+          radial-gradient(680px 430px at 8% 86%,rgba(44,58,104,.035),transparent 72%),
+          rgba(5,9,14,.99)!important;
       }
-      body.login-image-page .logincard{
-        border-color:rgba(255,255,255,.10)!important;
+      body.login-image-page:not(.senior-product):not([data-product="senioren"]) .logincard{
+        border-color:rgba(126,148,178,.14)!important;
         background:
-          radial-gradient(circle at 100% 0%,rgba(61,117,235,.05),transparent 38%),
-          radial-gradient(circle at 0% 100%,rgba(212,175,55,.04),transparent 42%),
-          linear-gradient(145deg,#171714,#0d0d0b)!important;
+          radial-gradient(circle at 100% 0%,rgba(34,72,144,.13),transparent 42%),
+          radial-gradient(circle at 0% 100%,rgba(21,89,108,.025),transparent 52%),
+          linear-gradient(145deg,#0b1119,#080d14)!important;
         box-shadow:
-          inset 0 1px 0 rgba(255,255,255,.025),
-          0 24px 64px rgba(0,0,0,.26)!important;
+          inset 0 1px 0 rgba(174,195,222,.03),
+          0 24px 64px rgba(0,0,0,.40)!important;
+      }
+      body.login-image-page:not(.senior-product):not([data-product="senioren"]) .field input{
+        border-color:rgba(124,146,174,.14)!important;
+        background:
+          radial-gradient(circle at 100% 0%,rgba(31,68,135,.055),transparent 48%),
+          #080d14!important;
+        box-shadow:inset 0 1px 0 rgba(174,195,222,.018)!important;
+      }
+      body.login-image-page:not(.senior-product):not([data-product="senioren"]) .status{
+        border-color:rgba(124,146,174,.14)!important;
+        background:
+          radial-gradient(circle at 100% 0%,rgba(31,68,135,.08),transparent 48%),
+          linear-gradient(145deg,#0b1119,#080d14)!important;
+        box-shadow:0 12px 30px rgba(0,0,0,.16)!important;
       }
       body.login-image-page a.btn:hover,
       body.login-image-page button:not(:disabled):hover{
