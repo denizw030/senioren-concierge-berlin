@@ -139,7 +139,7 @@ a {
   font-size: 0 !important;
   color: transparent !important;
   background: #050505 center/95% no-repeat
-    url("logo-nahwerk-concierge-gold.svg") !important;
+    url("logos/nahwerk-concierge-gold.svg") !important;
   border: 0 !important;
   box-shadow: 0 0 26px rgba(215, 169, 52, 0.09) !important;
 }
@@ -169,7 +169,7 @@ a {
   color: #e2b03a;
 }
 .senior-product .mark {
-  background: #fff center/cover no-repeat url("logo-senioren-concierge.webp") !important;
+  background: #fff center/cover no-repeat url("logos/senioren-concierge.webp") !important;
   border: 1px solid #d7b86c !important;
 }
 .senior-product .brandtext strong:before {
@@ -729,7 +729,7 @@ h3 {
   width: min(330px, 27vw);
   aspect-ratio: 1;
   background: center/100% 100% no-repeat
-    url("persoenlicher-concierge.png?v=1");
+    url("prime/personal-concierge.png?v=1");
   -webkit-clip-path: circle(42% at 50% 45%);
   clip-path: circle(42% at 50% 45%);
   filter: drop-shadow(0 0 26px rgba(255, 255, 255, 0.13));
@@ -737,7 +737,7 @@ h3 {
   pointer-events: none;
 }
 .senior-product .hero:after {
-  background: center/cover no-repeat url("logo-senioren-concierge.webp");
+  background: center/cover no-repeat url("logos/senioren-concierge.webp");
   -webkit-clip-path: none;
   clip-path: none;
   border-radius: 50%;
