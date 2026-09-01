@@ -12,51 +12,82 @@
   const productLabel = product === "senioren" ? "Senioren Concierge" : "Persönlicher Concierge";
   const PLAN_ALIASES = {
     kostenlos: "free",
-    standard: "plus",
-    premium: "familie",
-    "premium-plus": "familie",
-    superior: "familie"
+    "premium-plus": "premium_plus",
+    premiumplus: "premium_plus"
   };
   const PLANS = {
     free: {
       code: "FREE",
       title: "FREE · 0 € / MONAT",
       price: "0 € / Monat",
-      usage: "50 Dialoge pro Monat",
+      usage: "50 App-Dialoge · 20 WhatsApp-Dialoge",
       state: "Verfügbar",
       bookable: true,
       benefits: [
         "Dauerhaft kostenlos",
-        "50 Dialoge pro Monat",
+        "50 App-Dialoge pro Monat",
+        "20 WhatsApp-Dialoge pro Monat",
         "Direkt in WhatsApp",
         "Text- und Sprachnachrichten",
         "Keine Zahlungsdaten und keine automatische kostenpflichtige Umwandlung"
       ]
     },
-    plus: {
-      code: "PLUS",
-      title: "PLUS · 19,99 € / MONAT",
-      price: "19,99 € / Monat",
-      usage: "200 Dialoge pro Monat",
+    standard: {
+      code: "STANDARD",
+      title: "STANDARD · 5,99 € / MONAT",
+      price: "5,99 € / Monat",
+      usage: "100 App-Dialoge · 30 WhatsApp-Dialoge",
       state: "Checkout folgt",
       bookable: false,
       benefits: [
-        "200 Dialoge pro Monat",
+        "100 App-Dialoge pro Monat",
+        "30 WhatsApp-Dialoge pro Monat",
         "Für regelmäßige Concierge-Nutzung",
         "Preis, Laufzeit und Zahlung werden vor dem Checkout klar angezeigt",
         "Keine Bestellung ohne ausdrückliche Bestätigung"
       ]
     },
-    komfort: {
-      code: "KOMFORT",
-      title: "KOMFORT · 34,99 € / MONAT",
-      price: "34,99 € / Monat",
-      usage: "350 Dialoge pro Monat",
+    plus: {
+      code: "PLUS",
+      title: "PLUS · 10,99 € / MONAT",
+      price: "10,99 € / Monat",
+      usage: "180 App-Dialoge · 50 WhatsApp-Dialoge",
       state: "Checkout folgt",
       bookable: false,
       benefits: [
-        "350 Dialoge pro Monat",
+        "180 App-Dialoge pro Monat",
+        "50 WhatsApp-Dialoge pro Monat",
         "Für intensive Concierge-Nutzung",
+        "Preis, Laufzeit und Zahlung werden vor dem Checkout klar angezeigt",
+        "Keine Bestellung ohne ausdrückliche Bestätigung"
+      ]
+    },
+    premium: {
+      code: "PREMIUM",
+      title: "PREMIUM · 19,99 € / MONAT",
+      price: "19,99 € / Monat",
+      usage: "400 App-Dialoge · 100 WhatsApp-Dialoge",
+      state: "Checkout folgt",
+      bookable: false,
+      benefits: [
+        "400 App-Dialoge pro Monat",
+        "100 WhatsApp-Dialoge pro Monat",
+        "Für umfangreiche Concierge-Nutzung",
+        "Preis, Laufzeit und Zahlung werden vor dem Checkout klar angezeigt",
+        "Keine Bestellung ohne ausdrückliche Bestätigung"
+      ]
+    },
+    premium_plus: {
+      code: "PREMIUM PLUS",
+      title: "PREMIUM PLUS · 34,99 € / MONAT",
+      price: "34,99 € / Monat",
+      usage: "750 App-Dialoge · 160 WhatsApp-Dialoge",
+      state: "Checkout folgt",
+      bookable: false,
+      benefits: [
+        "750 App-Dialoge pro Monat",
+        "160 WhatsApp-Dialoge pro Monat",
+        "Für besonders intensive Concierge-Nutzung",
         "Preis, Laufzeit und Zahlung werden vor dem Checkout klar angezeigt",
         "Keine Bestellung ohne ausdrückliche Bestätigung"
       ]
@@ -65,11 +96,12 @@
       code: "FAMILIE",
       title: "FAMILIE · 59,99 € / MONAT",
       price: "59,99 € / Monat",
-      usage: "600 Dialoge gemeinsam",
+      usage: "1.200 App-Dialoge · 300 WhatsApp-Dialoge",
       state: "Checkout folgt",
       bookable: false,
       benefits: [
-        "600 gemeinsam nutzbare Dialoge pro Monat",
+        "1.200 gemeinsam nutzbare App-Dialoge pro Monat",
+        "300 gemeinsam nutzbare WhatsApp-Dialoge pro Monat",
         "Für Familien und unterstützte Angehörige",
         "Berechtigungen und Privatsphäre bleiben getrennt",
         "Keine Bestellung ohne ausdrückliche Bestätigung"

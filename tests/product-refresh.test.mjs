@@ -51,13 +51,23 @@ test("senior and personal pages advertise useful real-world requests with approv
 
 test("current launch tariff matrix is consistent in packages and registration", () => {
   for (const value of [
-    "50 Dialoge pro Monat",
+    "50 App-Dialoge",
+    "20 WhatsApp-Dialoge",
+    "5,99 € / Monat",
+    "100 App-Dialoge",
+    "30 WhatsApp-Dialoge",
+    "10,99 € / Monat",
+    "180 App-Dialoge",
+    "50 WhatsApp-Dialoge",
     "19,99 € / Monat",
-    "200 Dialoge pro Monat",
+    "400 App-Dialoge",
+    "100 WhatsApp-Dialoge",
     "34,99 € / Monat",
-    "350 Dialoge pro Monat",
+    "750 App-Dialoge",
+    "160 WhatsApp-Dialoge",
     "59,99 € / Monat",
-    "600 Dialoge gemeinsam"
+    "1.200 App-Dialoge",
+    "300 WhatsApp-Dialoge"
   ]) {
     assert.equal(visibleText(packages).includes(value), true, `${value} is shown on package page`);
     assert.equal(onboarding.includes(value), true, `${value} is used in registration`);

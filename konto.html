@@ -78,6 +78,11 @@
         background: var(--red);
         width: 0;
       }
+      .usage-detail {
+        display: block;
+        margin-top: 8px;
+        font-weight: 700;
+      }
       .privacy-note {
         font-size: 12px;
         color: var(--muted);
@@ -508,7 +513,7 @@
         letter-spacing:-.03em;
       }
       .usagegrid{
-        grid-template-columns:repeat(4,minmax(0,1fr))!important;
+        grid-template-columns:repeat(2,minmax(0,1fr))!important;
         gap:12px!important;
         margin-top:18px!important;
       }
@@ -1204,23 +1209,16 @@
             </article>
             <article class="card summary-card plan-summary" data-account-panel="overview">
               <div class="eyebrow">Paket</div>
-              <div class="value" id="planName">FREE · 0 € / MONAT</div>
-              <p class="muted" id="planMeta">
-                Dauerhaft kostenlos · 50 Dialoge pro Monat · direkt in WhatsApp ·
-                Text- und Sprachnachrichten · keine Zahlungsdaten und keine
-                automatische kostenpflichtige Umwandlung.
-              </p>
+              <div class="value" id="planName">Tarif wird geladen …</div>
+              <p class="muted" id="planMeta">Tarifdaten werden sicher geladen …</p>
             </article>
             <article class="card summary-card status-summary" data-account-panel="overview">
               <div class="eyebrow">Status</div>
               <div class="value">
                 <span class="statusdot"></span
-                ><span id="contactStatus">FREE aktiv</span>
+                ><span id="contactStatus">Wird geladen …</span>
               </div>
-              <p class="muted">
-                Keine zeitliche Befristung. Keine Zahlungsdaten und keine
-                automatische kostenpflichtige Umwandlung.
-              </p>
+              <p class="muted" id="planStatusMeta">Tarifstatus wird geladen …</p>
             </article>
             <article class="card summary-card person-summary" data-account-panel="overview">
               <div class="eyebrow">Unterstützte Person</div>
@@ -1279,58 +1277,26 @@
             <article class="card wide usage-panel" data-account-panel="usage" role="tabpanel" aria-labelledby="accountTabUsage" hidden>
               <div class="eyebrow">Nutzung diesen Kalendermonat</div>
               <h3>Aktueller Verbrauch</h3>
-              <div class="empty" id="usageState">Live-Verbrauchsdaten sind für dieses Konto noch nicht angebunden. Es werden keine erfundenen Werte angezeigt.</div>
+              <div class="empty" id="usageState">Tarif- und Verbrauchsdaten werden sicher geladen …</div>
               <div class="usagegrid" id="usageGrid" hidden>
                 <div class="usagebox">
-                  <span class="muted">Dialoge</span>
-                  <div class="big">
-                    <span id="dialoguesUsed">–</span> /
-                    <span id="dialoguesLimit">–</span>
-                  </div>
-                  <div class="bar"><span id="dialoguesBar"></span></div>
-                  <span class="muted" id="dialoguesRemaining"
-                    >–</span
-                  >
+                  <span class="muted">APP-DIALOGE</span>
+                  <div class="big" id="appUsageSummary">–</div>
+                  <div class="bar" id="appUsageBarTrack" hidden><span id="appUsageBar"></span></div>
+                  <span class="muted usage-detail" id="appUsageDetail">–</span>
                 </div>
                 <div class="usagebox">
-                  <span class="muted">Bildgenerierungen</span>
-                  <div class="big">
-                    <span id="imagesUsed">–</span> /
-                    <span id="imagesLimit">–</span>
-                  </div>
-                  <div class="bar"><span id="imagesBar"></span></div>
-                  <span class="muted" id="imagesRemaining"
-                    >–</span
-                  >
-                </div>
-                <div class="usagebox">
-                  <span class="muted">Foto-/Dokument-Digitalisierungen</span>
-                  <div class="big">
-                    <span id="docsUsed">–</span> / <span id="docsLimit">–</span>
-                  </div>
-                  <div class="bar"><span id="docsBar"></span></div>
-                  <span class="muted" id="docsRemaining"
-                    >–</span
-                  >
-                </div>
-                <div class="usagebox">
-                  <span class="muted">Erinnerungen (Wecker oder Termine)</span>
-                  <div class="big">
-                    <span id="remindersUsed">–</span> /
-                    <span id="remindersLimit">–</span>
-                  </div>
-                  <div class="bar"><span id="remindersBar"></span></div>
-                  <span class="muted" id="remindersRemaining"
-                    >–</span
-                  >
+                  <span class="muted">WHATSAPP-DIALOGE</span>
+                  <div class="big" id="whatsappUsageSummary">–</div>
+                  <div class="bar" id="whatsappUsageBarTrack" hidden><span id="whatsappUsageBar"></span></div>
+                  <span class="muted usage-detail" id="whatsappUsageDetail">–</span>
                 </div>
               </div>
               <div class="recommend" id="recommendation">
                 <strong>Monatlicher Neustart</strong><br /><span class="muted"
-                  >Die FREE-Kontingente werden zu Beginn jedes Kalendermonats
+                  >Die Dialogkontingente werden zu Beginn jedes Kalendermonats
                   automatisch zurückgesetzt. Allgemeine Kundenservice- und
-                  Accountfragen belasten das Senioren-Dialogkontingent
-                  nicht.</span
+                  Accountfragen belasten das Dialogkontingent nicht.</span
                 >
               </div>
               <p class="privacy-note">
@@ -1487,41 +1453,78 @@
         function pct(a, b) {
           return b ? Math.min(100, Math.round((a / b) * 100)) : 0;
         }
-        function setUsage(u) {
+        function numberOrNull(value) {
+          if (value === null || value === undefined || value === "") return null;
+          const parsed = Number(value);
+          return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
+        }
+        function formatCount(value) {
+          return Number(value).toLocaleString("de-DE");
+        }
+        function formatPrice(cents) {
+          const value = numberOrNull(cents);
+          if (value === null) return "–";
+          return (value / 100).toLocaleString("de-DE", {
+            minimumFractionDigits: value === 0 ? 0 : 2,
+            maximumFractionDigits: 2
+          }) + " €";
+        }
+        function renderChannelUsage(prefix, usedValue, limitValue) {
+          const used = numberOrNull(usedValue);
+          const limit = numberOrNull(limitValue);
+          const summary = document.getElementById(prefix + "UsageSummary");
+          const detail = document.getElementById(prefix + "UsageDetail");
+          const track = document.getElementById(prefix + "UsageBarTrack");
+          const bar = document.getElementById(prefix + "UsageBar");
+
+          if (limit === null) {
+            summary.textContent = "Kontingent nicht verfügbar";
+            detail.textContent = "Die Tarifdaten konnten derzeit nicht geladen werden.";
+            track.hidden = true;
+            return { used: null, limit: null, remaining: null };
+          }
+          if (used === null) {
+            summary.textContent = formatCount(limit) + " Dialoge Kontingent";
+            detail.textContent = "Aktueller Verbrauch derzeit nicht verfügbar";
+            track.hidden = true;
+            return { used: null, limit, remaining: null };
+          }
+
+          const remaining = Math.max(0, limit - used);
+          summary.textContent = formatCount(used) + " von " + formatCount(limit) + " genutzt";
+          detail.textContent = formatCount(remaining) + " Dialoge übrig";
+          track.hidden = false;
+          bar.style.width = pct(used, limit) + "%";
+          return { used, limit, remaining };
+        }
+        function setUsage(plan, usage) {
           document.getElementById("usageState").hidden = true;
           document.getElementById("usageGrid").hidden = false;
-          const du = Number(u.dialogues_used || 0),
-            dl = Number(u.dialogue_limit || 0),
-            iu = Number(u.image_generations_used || 0),
-            il = Number(u.image_generation_limit || 0),
-            xu = Number(u.document_digitizations_used || 0),
-            xl = Number(u.document_digitization_limit || 0),
-            ru = Number(u.reminders_used || 0),
-            rl = Number(u.reminder_limit || 0);
-          document.getElementById("dialoguesUsed").textContent = du;
-          document.getElementById("dialoguesLimit").textContent = dl;
-          document.getElementById("dialoguesRemaining").textContent =
-            Math.max(0, dl - du) + " Dialoge übrig";
-          document.getElementById("dialoguesBar").style.width =
-            pct(du, dl) + "%";
-          document.getElementById("imagesUsed").textContent = iu;
-          document.getElementById("imagesLimit").textContent = il;
-          document.getElementById("imagesRemaining").textContent =
-            Math.max(0, il - iu) + " Bildgenerierungen übrig";
-          document.getElementById("imagesBar").style.width = pct(iu, il) + "%";
-          document.getElementById("docsUsed").textContent = xu;
-          document.getElementById("docsLimit").textContent = xl;
-          document.getElementById("docsRemaining").textContent =
-            Math.max(0, xl - xu) + " Digitalisierungen übrig";
-          document.getElementById("docsBar").style.width = pct(xu, xl) + "%";
-          document.getElementById("remindersUsed").textContent = ru;
-          document.getElementById("remindersLimit").textContent = rl;
-          document.getElementById("remindersRemaining").textContent =
-            Math.max(0, rl - ru) + " Erinnerungen übrig";
-          document.getElementById("remindersBar").style.width =
-            pct(ru, rl) + "%";
+          const app = renderChannelUsage("app", usage?.app_dialogues_used, plan?.app_dialogue_limit);
+          const whatsapp = renderChannelUsage("whatsapp", usage?.whatsapp_dialogues_used, plan?.whatsapp_dialogue_limit);
           const overviewUsage = document.getElementById("overviewUsage");
-          if (overviewUsage) overviewUsage.textContent = dl ? du + " / " + dl + " Dialoge" : "Nutzung verfügbar";
+          if (overviewUsage) {
+            if (whatsapp.remaining !== null) {
+              overviewUsage.textContent = formatCount(whatsapp.remaining) + " von " + formatCount(whatsapp.limit) + " WhatsApp-Dialogen übrig";
+            } else if (app.limit !== null && whatsapp.limit !== null) {
+              overviewUsage.textContent = "Tarifkontingent: " + formatCount(app.limit) + " App · " + formatCount(whatsapp.limit) + " WhatsApp";
+            } else {
+              overviewUsage.textContent = "Nutzung derzeit nicht verfügbar";
+            }
+          }
+        }
+        function applyPlanAndUsage(plan, usage) {
+          if (!plan?.code) return;
+          const label = String(plan.code).replace(/_/g, " ");
+          const appLimit = numberOrNull(plan.app_dialogue_limit);
+          const whatsappLimit = numberOrNull(plan.whatsapp_dialogue_limit);
+          document.getElementById("planName").textContent = label + " · " + formatPrice(plan.monthly_price_cents) + " / MONAT";
+          document.getElementById("planMeta").textContent = appLimit !== null && whatsappLimit !== null
+            ? formatCount(appLimit) + " App-Dialoge · " + formatCount(whatsappLimit) + " WhatsApp-Dialoge pro Monat."
+            : "Die Tarifkontingente konnten derzeit nicht geladen werden.";
+          document.getElementById("contactStatus").textContent = label + " aktiv";
+          document.getElementById("planStatusMeta").textContent = "Ihr aktuell gebuchter Tarif ist diesem Konto sicher zugeordnet.";
+          setUsage(plan, usage || null);
         }
         function prefSummary(p) {
           if (!p) return;
@@ -1608,10 +1611,16 @@
             const body = await response.json().catch(() => ({}));
             if (!response.ok || body?.ok !== true) throw new Error("profile_load_failed");
             applyProfile(body.profile || {});
+            applyPlanAndUsage(body.plan || null, body.usage || null);
             profileStatusBadge.textContent = "Sicher verbunden";
           } catch (_) {
             profileStatusBadge.textContent = "Nicht verfügbar";
             showProfileStatus("Die persönlichen Daten konnten gerade nicht geladen werden.", "error");
+            document.getElementById("planName").textContent = "Tarif derzeit nicht verfügbar";
+            document.getElementById("planMeta").textContent = "Die Tarifdaten konnten gerade nicht geladen werden.";
+            document.getElementById("contactStatus").textContent = "Nicht verfügbar";
+            document.getElementById("planStatusMeta").textContent = "Bitte laden Sie die Seite später erneut.";
+            document.getElementById("usageState").textContent = "Aktueller Verbrauch derzeit nicht verfügbar. Es werden keine Werte geschätzt.";
           }
         }
         personalDataForm.addEventListener("submit", async (event) => {
@@ -1918,8 +1927,6 @@
               document.getElementById("profileInfo").textContent =
                 d.recipient.note;
           }
-          const u = JSON.parse(localStorage.getItem("scb_usage") || "null");
-          if (u) setUsage(u);
           prefSummary(
             JSON.parse(
               localStorage.getItem("nahwerk_concierge_preferences") || "null",
