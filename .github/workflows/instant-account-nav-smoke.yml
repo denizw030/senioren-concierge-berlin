@@ -1,0 +1,44 @@
+name: NAHWERK Instant Account Nav Smoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/instant-account-nav-smoke.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check auth navigation syntax and first-paint contract
+        run: |
+          node --check assets/auth-nav.js
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          js=Path("assets/auth-nav.js").read_text(encoding="utf-8")
+          assert "function getRenderableSession()" in js
+          assert "const hasRenderableSession = () => !!getRenderableSession()?.session_token" in js
+          assert "const isLoggedIn = () => sessionValidated && !!validatedSession?.session_token" in js
+          assert 'localStorage.getItem("nw_account_profile_cache_v1")' in js
+          dom=js.index('document.addEventListener("DOMContentLoaded"')
+          norm=js.index("normalizeShell();",dom)
+          validate=js.index("await validateSession();",dom)
+          assert norm < validate, "navigation must render before network validation"
+          refs=[]
+          for path in Path(".").glob("*.html"):
+              text=path.read_text(encoding="utf-8")
+              versions=re.findall(r'assets/auth-nav\.js\?v=(\d+)',text)
+              if versions:
+                  refs.append((path.name,versions))
+                  assert all(v=="39" for v in versions), f"{path}: stale auth-nav version {versions}"
+          print("AUTH_NAV_REFERENCED_PAGES="+str(len(refs)))
+          print("INSTANT_ACCOUNT_FIRST_PAINT=GREEN")
+          PY
