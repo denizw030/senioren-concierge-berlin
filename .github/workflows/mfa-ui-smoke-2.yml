@@ -1,0 +1,38 @@
+name: NAHWERK MFA UI Smoke 2
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/mfa-ui-smoke-2.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check account inline JavaScript syntax
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          page=Path("konto.html").read_text(encoding="utf-8")
+          scripts=[]
+          start=0
+          while True:
+              i=page.find("<script>",start)
+              if i<0: break
+              j=page.find("</script>",i)
+              if j<0: raise SystemExit("unterminated script")
+              scripts.append(page[i+8:j])
+              start=j+9
+          Path("/tmp/konto-inline.js").write_text("\n".join(scripts),encoding="utf-8")
+          PY
+          node --check /tmp/konto-inline.js
+      - name: Run auth security regression tests
+        run: node --test tests/auth-security.test.mjs
