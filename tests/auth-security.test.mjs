@@ -11,15 +11,20 @@ const onboarding = read("assets/onboarding.js");
 const authNav = read("assets/auth-nav.js");
 
 test("login only creates a local session after a successful backend login", () => {
-  assert.match(login, /body\.status==='logged_in'&&body\.session_token&&body\.mfa_required!==true/);
+  assert.match(login, /body\.status!=='logged_in'\|\|!body\.session_token/);
   assert.match(login, /localStorage\.setItem\(SESSION_KEY,JSON\.stringify/);
   assert.match(login, /body\.status==='invalid_credentials'/);
   assert.match(login, /res\.status===429/);
 });
 
-test("login fails closed whenever MFA is required", () => {
+test("login completes enrolled MFA only through the second verification step", () => {
   assert.match(login, /body\.status==='mfa_required'\|\|body\.mfa_required===true/);
   assert.match(login, /localStorage\.removeItem\(SESSION_KEY\)/);
+  assert.match(login, /let pendingMfa=null/);
+  assert.match(login, /web\/login\/mfa\/verify/);
+  assert.match(login, /body\.mfa_verified===true&&completeLogin\(body\)/);
+  assert.match(login, /autocomplete="one-time-code"/);
+  assert.match(login, /pattern="\[0-9\]\{6\}"/);
   assert.match(login, /Zusätzliche Bestätigung erforderlich/);
 });
 
