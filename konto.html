@@ -1583,6 +1583,7 @@
     <script>
       (() => {
         const ACCOUNT_PREVIEW_KEY = "nw_account_theme_preview";
+        sessionStorage.removeItem(ACCOUNT_PREVIEW_KEY);
         const accountTabs = Array.from(document.querySelectorAll("[data-account-tab]"));
         const accountPanels = Array.from(document.querySelectorAll("[data-account-panel]"));
 
