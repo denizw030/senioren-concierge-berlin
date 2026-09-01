@@ -124,7 +124,7 @@
     const bar = document.createElement("div");
     bar.className = "odysx-info-bar";
     bar.setAttribute("role", "note");
-    bar.innerHTML = '<img src="assets/Krone.png?v=1" alt="" aria-hidden="true" style="width:24px;height:24px;object-fit:contain;display:block;flex:0 0 auto"><span>Eine Marke von <strong>ODYSX</strong></span><img class="odysx-crown-logo" src="assets/optimized/odysx-crown-white-96.png?v=1" alt="ODYSX Krone">';
+    bar.innerHTML = '<img src="assets/logos/crown.png?v=1" alt="" aria-hidden="true" style="width:24px;height:24px;object-fit:contain;display:block;flex:0 0 auto"><span>Eine Marke von <strong>ODYSX</strong></span><img class="odysx-crown-logo" src="assets/logos/crown-white-96.png?v=1" alt="ODYSX Krone">';
     header.insertAdjacentElement("afterend", bar);
   }
   function normalizeShell() {
@@ -301,7 +301,7 @@
         if (index) {
           const label = document.createElement("span");
           label.className = "whatsapp-label";
-          label.innerHTML = '<img class="whatsapp-mark" src="assets/whatsapp-mark.svg?v=1" alt="" aria-hidden="true">WhatsApp';
+          label.innerHTML = '<img class="whatsapp-mark" src="assets/icons/whatsapp-mark.svg?v=1" alt="" aria-hidden="true">WhatsApp';
           fragment.appendChild(label);
         }
         if (part) fragment.appendChild(document.createTextNode(part));

@@ -74,7 +74,7 @@ body.senior-product .nav-toggle {
 .login-image-page .hero:after {
   width:min(360px,30vw);
   aspect-ratio:4/5;
-  background:#080706 center top/cover no-repeat url("Primconcierge-NAHWERK-ODYSX.png?v=14")!important;
+  background:#080706 center top/cover no-repeat url("prime/prime-concierge-odysx.png?v=14")!important;
   border:1px solid rgba(200,164,93,.38);
   border-radius:28px;
   clip-path:none!important;
@@ -403,7 +403,7 @@ body.senior-product .mark,
 body[data-product="senioren"] .mark,
 body.senior-product .mark.nahwerk-mark,
 body[data-product="senioren"] .mark.nahwerk-mark{
-  background:#f7f3ea center/92% no-repeat url("logo-nahwerk-concierge-gold.svg")!important;
+  background:#f7f3ea center/92% no-repeat url("logos/nahwerk-concierge-gold.svg")!important;
   border:1px solid rgba(181,138,45,.34)!important;
   box-shadow:0 8px 24px rgba(107,79,24,.08)!important;
 }
@@ -413,7 +413,7 @@ body.senior-product .mark,
 body[data-product="senioren"] .mark,
 body.senior-product .mark.nahwerk-mark,
 body[data-product="senioren"] .mark.nahwerk-mark{
-  background:#090807 center/cover no-repeat url("NAHWERKConcierge-Logo.png?v=1")!important;
+  background:#090807 center/cover no-repeat url("logos/nahwerk-concierge.png?v=1")!important;
   border:1px solid rgba(181,138,45,.34)!important;
   box-shadow:0 8px 24px rgba(107,79,24,.10)!important;
 }
@@ -444,7 +444,7 @@ body.senior-product .mark,
 body[data-product="senioren"] .mark,
 body.senior-product .mark.nahwerk-mark,
 body[data-product="senioren"] .mark.nahwerk-mark{
-  background:#f7f3ea center/92% no-repeat url("logo-nahwerk-concierge-gold.svg?v=1")!important;
+  background:#f7f3ea center/92% no-repeat url("logos/nahwerk-concierge-gold.svg?v=1")!important;
   border:1px solid rgba(181,138,45,.30)!important;
   box-shadow:0 8px 24px rgba(107,79,24,.08)!important;
 }
