@@ -1518,6 +1518,15 @@
               </p>
             </article>
             <div class="account-panel-heading" data-account-panel="safety" hidden><div class="eyebrow">Sicherheit</div><h2>Check-ins und Vertrauenskontakt.</h2><p>Ihre wichtigsten Sicherheitseinstellungen auf einen Blick. Details öffnen Sie erst über „Bearbeiten“.</p></div>
+            <article class="card wide mfa-panel" id="mfaCard" data-account-panel="safety" hidden>
+              <div class="safety-card-head">
+                <div>
+                  <div class="eyebrow">Kontoschutz</div>
+                  <div class="value" id="mfaStatus">Wird geladen …</div>
+                  <p class="muted" id="mfaMeta">Der Status der Zwei-Faktor-Authentifizierung wird sicher aus Ihrem Konto geladen.</p>
+                </div>
+              </div>
+            </article>
             <article class="card wide safety-card safety-panel" id="safetyCard" data-account-panel="safety" role="tabpanel" aria-labelledby="accountTabSafety" hidden aria-expanded="false">
               <div class="safety-card-head">
                 <div>
@@ -1788,6 +1797,7 @@
         }
 
         const PROFILE_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-profile";
+        const MFA_STATUS_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-mfa-status";
         const SAFETY_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/safety";
         const safetyCard = document.getElementById("safetyCard");
         const safetyForm = document.getElementById("safetyForm");
@@ -1811,6 +1821,44 @@
             return JSON.parse(localStorage.getItem("scb_web_session") || "null")?.session_token || "";
           } catch (_) {
             return "";
+          }
+        }
+        const mfaStatus = document.getElementById("mfaStatus");
+        const mfaMeta = document.getElementById("mfaMeta");
+
+        async function loadMfaStatus() {
+          const token = sessionToken();
+          if (!token) {
+            mfaStatus.textContent = "Nicht verfügbar";
+            mfaMeta.textContent = "Für die Statusprüfung ist eine gültige Sitzung erforderlich.";
+            return;
+          }
+          try {
+            const response = await fetch(MFA_STATUS_URL, {
+              method: "GET",
+              headers: { Authorization: "Bearer " + token }
+            });
+            const body = await response.json().catch(() => ({}));
+            if (!response.ok || body?.ok !== true) throw new Error("mfa_status_load_failed");
+
+            const mfa = body?.mfa || {};
+            if (mfa.available !== true) {
+              mfaStatus.textContent = "Nicht verfügbar";
+              mfaMeta.textContent = "Die Zwei-Faktor-Authentifizierung konnte diesem Konto noch nicht eindeutig zugeordnet werden.";
+              return;
+            }
+
+            if (mfa.enabled === true) {
+              mfaStatus.textContent = "Aktiviert";
+              mfaMeta.textContent = "Ihr Konto ist mit einem zusätzlichen zweiten Faktor geschützt.";
+              return;
+            }
+
+            mfaStatus.textContent = "Empfohlen · Noch nicht aktiviert";
+            mfaMeta.textContent = "Zusätzlicher Schutz mit einer Authenticator-App wird empfohlen. Die Aktivierung wird erst angeboten, wenn der zweite Faktor im Anmeldeprozess vollständig erzwungen wird.";
+          } catch (_) {
+            mfaStatus.textContent = "Nicht verfügbar";
+            mfaMeta.textContent = "Der Status der Zwei-Faktor-Authentifizierung konnte gerade nicht geladen werden.";
           }
         }
         const RECEPTION_URL = "https://btqklftjmwtqqqdmwlnk.supabase.co/functions/v1/nahwerk-customer-portal-staging/portal/telephone-reception";
@@ -2339,6 +2387,7 @@
 
         setAccountTab("overview");
         loadProfile();
+        loadMfaStatus();
         loadSafety();
         loadTelephoneReception();
 
