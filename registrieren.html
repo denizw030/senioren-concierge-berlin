@@ -817,7 +817,9 @@
                     id="webPassword"
                     type="password"
                     autocomplete="new-password"
-                    minlength="10"
+                    minlength="12"
+                    maxlength="128"
+                    aria-describedby="webPasswordHint"
                     required
                   /><button
                     class="password-toggle"
@@ -838,7 +840,7 @@
                     </svg>
                   </button>
                 </div>
-                <div class="tiny passwordhint">Mindestens 10 Zeichen.</div>
+                <div class="tiny passwordhint" id="webPasswordHint">Mindestens 12 Zeichen, mit Groß- und Kleinbuchstaben, Zahl und Sonderzeichen.</div>
               </div>
             </div>
             <div class="field" id="ownerPhoneField">
