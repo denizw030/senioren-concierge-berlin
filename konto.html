@@ -942,7 +942,198 @@
           padding-top:16px;
         }
       }
-    </style></head>
+    
+      /* Account-Center navigation: one deliberate workspace at a time. */
+      .account-tabs-shell{
+        position:sticky;
+        top:84px;
+        z-index:24;
+        margin:0 0 20px;
+        padding:8px;
+        border-radius:16px;
+        backdrop-filter:blur(20px) saturate(125%);
+        -webkit-backdrop-filter:blur(20px) saturate(125%);
+      }
+      .account-tabs{
+        display:flex;
+        align-items:center;
+        gap:4px;
+        overflow-x:auto;
+        overscroll-behavior-x:contain;
+        scrollbar-width:none;
+      }
+      .account-tabs::-webkit-scrollbar{display:none}
+      .account-tab{
+        flex:0 0 auto;
+        min-height:42px;
+        padding:0 15px;
+        border:0;
+        border-radius:11px;
+        background:transparent;
+        color:inherit;
+        font:inherit;
+        font-size:13px;
+        font-weight:650;
+        white-space:nowrap;
+        cursor:pointer;
+        transition:background .18s ease,color .18s ease,box-shadow .18s ease;
+      }
+      .account-tab[aria-selected="true"]{
+        font-weight:750;
+      }
+      [data-account-panel][hidden]{
+        display:none!important;
+      }
+      .account-overview-highlights{
+        grid-column:1/-1;
+        display:grid;
+        grid-template-columns:repeat(3,minmax(0,1fr));
+        gap:12px;
+      }
+      .account-overview-link{
+        appearance:none;
+        width:100%;
+        min-height:122px;
+        padding:20px;
+        border-radius:18px;
+        text-align:left;
+        font:inherit;
+        cursor:pointer;
+        transition:border-color .2s ease,background .2s ease,box-shadow .2s ease;
+      }
+      .account-overview-link .eyebrow{
+        display:block;
+        margin-bottom:12px;
+      }
+      .account-overview-link strong{
+        display:block;
+        margin-bottom:7px;
+        font-size:clamp(1.06rem,1.5vw,1.26rem);
+        line-height:1.2;
+        letter-spacing:-.025em;
+      }
+      .account-overview-link span:last-child{
+        display:block;
+        font-size:12px;
+        line-height:1.5;
+      }
+      .account-panel-heading{
+        grid-column:1/-1;
+        margin:2px 0 0;
+        padding:3px 2px 4px;
+      }
+      .account-panel-heading h2{
+        margin:6px 0 8px!important;
+        font-size:clamp(1.8rem,3vw,2.7rem)!important;
+        line-height:1.05!important;
+        letter-spacing:-.045em!important;
+      }
+      .account-panel-heading p{
+        margin:0;
+        max-width:720px;
+        font-size:13px;
+        line-height:1.6;
+      }
+      body:not(.senior-product):not([data-product="senioren"]) .account-tabs-shell{
+        border:1px solid rgba(132,152,178,.13);
+        background:rgba(7,12,19,.76);
+        box-shadow:0 14px 42px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,255,255,.025);
+      }
+      body:not(.senior-product):not([data-product="senioren"]) .account-tab{
+        color:#a9a8a3;
+      }
+      body:not(.senior-product):not([data-product="senioren"]) .account-tab:hover{
+        color:#f1eee7;
+        background:rgba(255,255,255,.035);
+      }
+      body:not(.senior-product):not([data-product="senioren"]) .account-tab[aria-selected="true"]{
+        color:#f4f1e9;
+        background:linear-gradient(145deg,rgba(30,42,58,.92),rgba(15,23,34,.96));
+        box-shadow:inset 0 0 0 1px rgba(198,166,99,.20);
+      }
+      body:not(.senior-product):not([data-product="senioren"]) .account-overview-link{
+        border:1px solid rgba(133,154,182,.13);
+        background:
+          radial-gradient(300px 160px at 100% 0%,rgba(39,80,155,.09),transparent 66%),
+          rgba(7,13,20,.72);
+        color:#f2efe8;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.018);
+      }
+      body:not(.senior-product):not([data-product="senioren"]) .account-overview-link:hover{
+        border-color:rgba(188,157,96,.27);
+        background:
+          radial-gradient(300px 160px at 100% 0%,rgba(39,80,155,.13),transparent 66%),
+          rgba(9,16,25,.86);
+      }
+      body:not(.senior-product):not([data-product="senioren"]) .account-overview-link span:last-child,
+      body:not(.senior-product):not([data-product="senioren"]) .account-panel-heading p{
+        color:#969690;
+      }
+      body.senior-product .account-tabs-shell,
+      body[data-product="senioren"] .account-tabs-shell{
+        border:1px solid rgba(112,87,39,.14);
+        background:rgba(249,246,239,.82);
+        box-shadow:0 14px 36px rgba(72,54,23,.07),inset 0 1px 0 rgba(255,255,255,.78);
+      }
+      body.senior-product .account-tab,
+      body[data-product="senioren"] .account-tab{
+        color:#726b60;
+      }
+      body.senior-product .account-tab:hover,
+      body[data-product="senioren"] .account-tab:hover{
+        color:#2c281f;
+        background:rgba(112,87,39,.055);
+      }
+      body.senior-product .account-tab[aria-selected="true"],
+      body[data-product="senioren"] .account-tab[aria-selected="true"]{
+        color:#2c281f;
+        background:rgba(255,255,255,.82);
+        box-shadow:inset 0 0 0 1px rgba(150,111,43,.17),0 5px 14px rgba(76,57,25,.055);
+      }
+      body.senior-product .account-overview-link,
+      body[data-product="senioren"] .account-overview-link{
+        border:1px solid rgba(112,87,39,.13);
+        background:
+          radial-gradient(280px 150px at 100% 0%,rgba(202,155,57,.10),transparent 68%),
+          rgba(255,255,255,.60);
+        color:#28231b;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.72);
+      }
+      body.senior-product .account-overview-link:hover,
+      body[data-product="senioren"] .account-overview-link:hover{
+        border-color:rgba(156,116,44,.27);
+        background:
+          radial-gradient(280px 150px at 100% 0%,rgba(202,155,57,.14),transparent 68%),
+          rgba(255,255,255,.78);
+      }
+      body.senior-product .account-overview-link span:last-child,
+      body[data-product="senioren"] .account-overview-link span:last-child,
+      body.senior-product .account-panel-heading p,
+      body[data-product="senioren"] .account-panel-heading p{
+        color:#6d665c;
+      }
+      @media(max-width:700px){
+        .account-tabs-shell{
+          top:72px;
+          margin:0 -2px 16px;
+          padding:6px;
+          border-radius:14px;
+        }
+        .account-tab{
+          min-height:40px;
+          padding:0 13px;
+          font-size:12.5px;
+        }
+        .account-overview-highlights{
+          grid-template-columns:1fr;
+          gap:10px;
+        }
+        .account-overview-link{
+          min-height:100px;
+          padding:17px;
+        }
+      }
+</style></head>
   <body>
     <header class="top"><div class="wrap nav"><a class="brand" href="index.html" aria-label="NAHWERK Concierge – Startseite"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Hauptnavigation"><a href="index.html">Übersicht</a><a href="prime-concierge.html">Persönlicher Concierge</a><a href="concierges.html">Concierges</a><a href="senioren-concierge.html">Senioren Concierge</a><a href="angehoerige.html">Für Angehörige</a><a href="leistungen.html">Leistungen</a><a href="kontakt.html">Kontakt</a><a class="active auth-link login-link" href="anmelden.html">Anmelden</a><a class="auth-link register-link" href="registrieren.html">Registrieren</a></nav></div></header>
     <main>
@@ -958,13 +1149,22 @@
       </section>
       <section class="section account-section">
         <div class="wrap">
-          <div class="warning account-session-note" id="modeNotice">
+          <div class="account-tabs-shell">
+            <nav class="account-tabs" role="tablist" aria-label="Kundenbereich">
+              <button class="account-tab" type="button" role="tab" id="accountTabOverview" aria-controls="accountPanelOverview" aria-selected="true" data-account-tab="overview">Übersicht</button>
+              <button class="account-tab" type="button" role="tab" id="accountTabConcierge" aria-controls="accountPanelConcierge" aria-selected="false" data-account-tab="concierge">Concierge</button>
+              <button class="account-tab" type="button" role="tab" id="accountTabSafety" aria-controls="accountPanelSafety" aria-selected="false" data-account-tab="safety">Sicherheit</button>
+              <button class="account-tab" type="button" role="tab" id="accountTabUsage" aria-controls="accountPanelUsage" aria-selected="false" data-account-tab="usage">Nutzung</button>
+              <button class="account-tab" type="button" role="tab" id="accountTabPersonal" aria-controls="accountPanelPersonal" aria-selected="false" data-account-tab="personal">Persönliche Daten</button>
+            </nav>
+          </div>
+          <div class="warning account-session-note" id="modeNotice" data-account-panel="overview" role="tabpanel" aria-labelledby="accountTabOverview">
             <strong>Sicher verbunden.</strong> Persönliche Daten und
             Sicherheitseinstellungen werden über Ihre serverseitig geprüfte
             Sitzung geladen. Nicht verfügbare Nutzungswerte werden nicht geschätzt.
           </div>
           <div class="dash">
-            <article class="card wide profile-card" id="personalDataCard">
+            <article class="card wide profile-card" id="personalDataCard" data-account-panel="personal" role="tabpanel" aria-labelledby="accountTabPersonal" hidden>
               <div class="profile-head">
                 <div class="profile-head-copy">
                   <div class="eyebrow">Mein Konto</div>
@@ -1000,7 +1200,7 @@
                 </div>
               </form>
             </article>
-            <article class="card summary-card plan-summary">
+            <article class="card summary-card plan-summary" data-account-panel="overview">
               <div class="eyebrow">Paket</div>
               <div class="value" id="planName">FREE · 0 € / MONAT</div>
               <p class="muted" id="planMeta">
@@ -1009,7 +1209,7 @@
                 automatische kostenpflichtige Umwandlung.
               </p>
             </article>
-            <article class="card summary-card status-summary">
+            <article class="card summary-card status-summary" data-account-panel="overview">
               <div class="eyebrow">Status</div>
               <div class="value">
                 <span class="statusdot"></span
@@ -1020,17 +1220,39 @@
                 automatische kostenpflichtige Umwandlung.
               </p>
             </article>
-            <article class="card summary-card person-summary">
+            <article class="card summary-card person-summary" data-account-panel="overview">
               <div class="eyebrow">Unterstützte Person</div>
               <div class="value" id="recipientName">Noch nicht angelegt</div>
               <p class="muted" id="recipientMeta">–</p>
             </article>
-            <article class="card summary-card owner-summary">
+            <article class="card summary-card owner-summary" data-account-panel="overview">
               <div class="eyebrow">Eingerichtet von</div>
               <div class="value" id="ownerName">–</div>
               <p class="muted" id="ownerMeta">–</p>
             </article>
-            <article class="card wide personalize concierge-panel">
+            <div class="account-overview-highlights" data-account-panel="overview">
+              <button class="account-overview-link" type="button" data-open-account-tab="concierge">
+                <span class="eyebrow">Concierge</span>
+                <strong id="overviewConcierge">Concierge verwalten</strong>
+                <span>Ansprache, Stimme und persönliche Einstellungen öffnen.</span>
+              </button>
+              <button class="account-overview-link" type="button" data-open-account-tab="safety">
+                <span class="eyebrow">Sicherheit</span>
+                <strong id="overviewSafety">Wird geladen …</strong>
+                <span id="overviewSafetyMeta">Check-ins und Vertrauenskontakt anzeigen.</span>
+              </button>
+              <button class="account-overview-link" type="button" data-open-account-tab="usage">
+                <span class="eyebrow">Nutzung</span>
+                <strong id="overviewUsage">Keine Live-Daten</strong>
+                <span>Monatliche Nutzung und verfügbare Kontingente anzeigen.</span>
+              </button>
+            </div>
+            <div class="account-panel-heading" data-account-panel="concierge" hidden>
+              <div class="eyebrow">Concierge</div>
+              <h2>Ihr persönlicher Concierge.</h2>
+              <p>Kommunikationsstil und persönliche Einstellungen gezielt verwalten.</p>
+            </div>
+            <article class="card wide personalize concierge-panel" data-account-panel="concierge" role="tabpanel" aria-labelledby="accountTabConcierge" hidden>
               <div class="eyebrow">Mein Concierge</div>
               <div class="value">
                 Ihr Concierge passt sich Ihnen an – nicht umgekehrt.
@@ -1051,7 +1273,8 @@
                 >
               </div>
             </article>
-            <article class="card wide usage-panel">
+            <div class="account-panel-heading" data-account-panel="usage" hidden><div class="eyebrow">Nutzung</div><h2>Ihre aktuelle Nutzung.</h2><p>Nur tatsächlich verfügbare Verbrauchsdaten werden angezeigt.</p></div>
+            <article class="card wide usage-panel" data-account-panel="usage" role="tabpanel" aria-labelledby="accountTabUsage" hidden>
               <div class="eyebrow">Nutzung diesen Kalendermonat</div>
               <h3>Aktueller Verbrauch</h3>
               <div class="empty" id="usageState">Live-Verbrauchsdaten sind für dieses Konto noch nicht angebunden. Es werden keine erfundenen Werte angezeigt.</div>
@@ -1114,7 +1337,8 @@
                 WhatsApp-Gesprächs.
               </p>
             </article>
-            <article class="card wide safety-card safety-panel" id="safetyCard" tabindex="0" aria-expanded="false">
+            <div class="account-panel-heading" data-account-panel="safety" hidden><div class="eyebrow">Sicherheit</div><h2>Check-ins und Vertrauenskontakt.</h2><p>Ihre wichtigsten Sicherheitseinstellungen auf einen Blick. Details öffnen Sie erst über „Bearbeiten“.</p></div>
+            <article class="card wide safety-card safety-panel" id="safetyCard" data-account-panel="safety" role="tabpanel" aria-labelledby="accountTabSafety" hidden tabindex="0" aria-expanded="false">
               <div class="safety-card-head">
                 <div>
                   <div class="eyebrow">Sicherheit</div>
@@ -1156,18 +1380,18 @@
                 <div class="safety-save-status" id="safetySaveStatus" aria-live="polite"></div>
               </form>
             </article>
-            <article class="card wide info-panel">
+            <article class="card wide info-panel" data-account-panel="overview">
               <h3>Gespeicherte Informationen</h3>
               <div class="empty" id="profileInfo">
                 Noch keine Geräte oder weiteren Informationen hinterlegt.
               </div>
             </article>
-            <article class="card wide info-panel">
+            <article class="card wide info-panel" data-account-panel="overview">
               <h3>Offene Anliegen</h3>
               <div class="empty">Aktuell keine offenen Anliegen.</div>
             </article>
           </div>
-          <div class="actions account-actions">
+          <div class="actions account-actions" data-account-panel="overview">
             <a class="btn red" href="concierge-anpassen.html"
               >Concierge anpassen</a
             ><a class="btn light" href="pakete.html">Tarife vergleichen</a
@@ -1190,6 +1414,63 @@
     <script src="assets/auth-nav.js?v=34"></script>
     <script>
       (() => {
+        const ACCOUNT_PREVIEW_KEY = "nw_account_theme_preview";
+        const accountTabs = Array.from(document.querySelectorAll("[data-account-tab]"));
+        const accountPanels = Array.from(document.querySelectorAll("[data-account-panel]"));
+
+        function applyAccountPreview() {
+          const preview = sessionStorage.getItem(ACCOUNT_PREVIEW_KEY);
+          if (preview !== "prime" && preview !== "senioren") return;
+          document.body.dataset.product = preview;
+          document.body.classList.toggle("senior-product", preview === "senioren");
+        }
+        function setAccountTab(name, focus = false) {
+          const validName = accountTabs.some((tab) => tab.dataset.accountTab === name) ? name : "overview";
+          accountTabs.forEach((tab) => {
+            const active = tab.dataset.accountTab === validName;
+            tab.setAttribute("aria-selected", String(active));
+            tab.tabIndex = active ? 0 : -1;
+            if (active && focus) tab.focus({ preventScroll: true });
+          });
+          accountPanels.forEach((panel) => {
+            panel.hidden = panel.dataset.accountPanel !== validName;
+          });
+          if (validName !== "safety") setSafetyFormOpen(false);
+        }
+        accountTabs.forEach((tab, index) => {
+          tab.addEventListener("click", () => setAccountTab(tab.dataset.accountTab));
+          tab.addEventListener("keydown", (event) => {
+            if (event.key !== "ArrowLeft" && event.key !== "ArrowRight" && event.key !== "Home" && event.key !== "End") return;
+            event.preventDefault();
+            let next = index;
+            if (event.key === "ArrowRight") next = (index + 1) % accountTabs.length;
+            if (event.key === "ArrowLeft") next = (index - 1 + accountTabs.length) % accountTabs.length;
+            if (event.key === "Home") next = 0;
+            if (event.key === "End") next = accountTabs.length - 1;
+            setAccountTab(accountTabs[next].dataset.accountTab, true);
+          });
+        });
+        document.querySelectorAll("[data-open-account-tab]").forEach((button) => {
+          button.addEventListener("click", () => setAccountTab(button.dataset.openAccountTab));
+        });
+
+        window.NAHWERKAccountPreview = Object.freeze({
+          prime() {
+            sessionStorage.setItem(ACCOUNT_PREVIEW_KEY, "prime");
+            applyAccountPreview();
+          },
+          senioren() {
+            sessionStorage.setItem(ACCOUNT_PREVIEW_KEY, "senioren");
+            applyAccountPreview();
+          },
+          reset() {
+            sessionStorage.removeItem(ACCOUNT_PREVIEW_KEY);
+            location.reload();
+          }
+        });
+        applyAccountPreview();
+        setAccountTab("overview");
+
         function pct(a, b) {
           return b ? Math.min(100, Math.round((a / b) * 100)) : 0;
         }
@@ -1226,6 +1507,8 @@
             Math.max(0, rl - ru) + " Erinnerungen übrig";
           document.getElementById("remindersBar").style.width =
             pct(ru, rl) + "%";
+          const overviewUsage = document.getElementById("overviewUsage");
+          if (overviewUsage) overviewUsage.textContent = dl ? du + " / " + dl + " Dialoge" : "Nutzung verfügbar";
         }
         function prefSummary(p) {
           if (!p) return;
@@ -1480,6 +1763,12 @@
           setSafetyWheelTime(times || "08:00");
           safetyContactName.value = s.trusted_contact_name || "";
           safetyContactPhone.value = s.trusted_contact_phone || "";
+          const overviewSafety = document.getElementById("overviewSafety");
+          const overviewSafetyMeta = document.getElementById("overviewSafetyMeta");
+          if (overviewSafety) overviewSafety.textContent = enabled ? "Aktiviert" : "Deaktiviert";
+          if (overviewSafetyMeta) overviewSafetyMeta.textContent = enabled
+            ? (next ? "Nächster Check-in: " + next : "Check-ins sind aktiviert.")
+            : "Check-ins sind derzeit ausgeschaltet.";
         }
         function showSafetySaveStatus(message, error = false) {
           safetySaveStatus.textContent = message;
@@ -1581,6 +1870,8 @@
               const key = String(selected).toLowerCase();
               const conciergeName = conciergeNames[key] || String(selected).trim().replace(/[-_]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
               document.querySelector(".personalize .value").textContent = `${conciergeName} ist Ihr persönlicher KI-Concierge.`;
+              const overviewConcierge = document.getElementById("overviewConcierge");
+              if (overviewConcierge) overviewConcierge.textContent = conciergeName;
             }
             document.getElementById("recipientName").textContent =
               d.recipient?.name || "–";
