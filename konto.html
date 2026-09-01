@@ -172,6 +172,86 @@
       .safety-save-status.is-visible {
         display: block;
       }
+      .safety-time-picker {
+        position: relative;
+        width: min(100%, 240px);
+        height: 154px;
+        display: grid;
+        grid-template-columns: 1fr 22px 1fr;
+        align-items: center;
+        margin-top: 8px;
+        padding: 8px 14px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+        background: rgba(255,255,255,.02);
+      }
+      .safety-time-picker::before,
+      .safety-time-picker::after {
+        content: "";
+        position: absolute;
+        left: 12px;
+        right: 12px;
+        height: 1px;
+        background: rgba(145,155,170,.18);
+        pointer-events: none;
+        z-index: 2;
+      }
+      .safety-time-picker::before { top: 55px; }
+      .safety-time-picker::after { bottom: 55px; }
+      .safety-time-wheel {
+        height: 132px;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scroll-snap-type: y mandatory;
+        scrollbar-width: none;
+        padding: 44px 0;
+        position: relative;
+        z-index: 1;
+      }
+      .safety-time-wheel::-webkit-scrollbar {
+        display: none;
+      }
+      .safety-time-option {
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        scroll-snap-align: center;
+        scroll-snap-stop: always;
+        font-size: 22px;
+        font-variant-numeric: tabular-nums;
+        opacity: .34;
+        transition: opacity .12s ease, transform .12s ease, font-size .12s ease;
+        user-select: none;
+        cursor: grab;
+      }
+      .safety-time-option.is-selected {
+        opacity: 1;
+        transform: scale(1.05);
+        font-size: 28px;
+        font-weight: 600;
+      }
+      .safety-time-separator {
+        position: relative;
+        z-index: 3;
+        text-align: center;
+        font-size: 28px;
+        font-weight: 600;
+        line-height: 1;
+        pointer-events: none;
+      }
+      .safety-time-hidden {
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        padding: 0 !important;
+        margin: -1px !important;
+        overflow: hidden !important;
+        clip: rect(0,0,0,0) !important;
+        white-space: nowrap !important;
+        border: 0 !important;
+      }
       @media (max-width: 700px) {
         .dash,
         .usagegrid,
@@ -1051,8 +1131,13 @@
                 </label>
                 <div class="safety-form-grid">
                   <div>
-                    <label for="safetyTimes">Check-in-Uhrzeit</label>
-                    <input id="safetyTimes" type="text" inputmode="numeric" placeholder="08:00" />
+                    <label for="safetyTimePicker">Check-in-Uhrzeit</label>
+                    <div class="safety-time-picker" id="safetyTimePicker" role="group" aria-label="Check-in-Uhrzeit einstellen">
+                      <div class="safety-time-wheel" id="safetyHourWheel" tabindex="0" aria-label="Stunde"></div>
+                      <div class="safety-time-separator" aria-hidden="true">:</div>
+                      <div class="safety-time-wheel" id="safetyMinuteWheel" tabindex="0" aria-label="Minute"></div>
+                    </div>
+                    <input class="safety-time-hidden" id="safetyTimes" type="text" inputmode="numeric" tabindex="-1" aria-hidden="true" />
                   </div>
                   <div>
                     <label for="safetyContactName">Vertrauenskontakt</label>
@@ -1174,6 +1259,8 @@
         const safetyNext = document.getElementById("safetyNext");
         const safetyEnabled = document.getElementById("safetyEnabled");
         const safetyTimes = document.getElementById("safetyTimes");
+        const safetyHourWheel = document.getElementById("safetyHourWheel");
+        const safetyMinuteWheel = document.getElementById("safetyMinuteWheel");
         const safetyContactName = document.getElementById("safetyContactName");
         const safetyContactPhone = document.getElementById("safetyContactPhone");
         const safetyEditButton = document.getElementById("safetyEditButton");
@@ -1279,6 +1366,87 @@
           if (Array.isArray(value)) return value.join(", ");
           return value == null ? "" : String(value);
         }
+        function firstTime(value) {
+          const match = normalizedTimes(value).match(/(?:^|\D)([01]?\d|2[0-3]):([0-5]\d)(?:\D|$)/);
+          return match
+            ? { hour: Number(match[1]), minute: Number(match[2]) }
+            : { hour: 8, minute: 0 };
+        }
+        function buildSafetyTimeWheel(element, max) {
+          element.innerHTML = "";
+          for (let value = 0; value <= max; value += 1) {
+            const option = document.createElement("div");
+            option.className = "safety-time-option";
+            option.dataset.value = String(value);
+            option.textContent = String(value).padStart(2, "0");
+            option.setAttribute("role", "option");
+            element.appendChild(option);
+          }
+        }
+        function wheelValue(element) {
+          const center = element.scrollTop + element.clientHeight / 2;
+          let best = 0;
+          let bestDistance = Infinity;
+          element.querySelectorAll(".safety-time-option").forEach((option) => {
+            const optionCenter = option.offsetTop + option.offsetHeight / 2;
+            const distance = Math.abs(optionCenter - center);
+            if (distance < bestDistance) {
+              bestDistance = distance;
+              best = Number(option.dataset.value);
+            }
+          });
+          return best;
+        }
+        function updateSafetyWheelSelection() {
+          const hour = wheelValue(safetyHourWheel);
+          const minute = wheelValue(safetyMinuteWheel);
+          [safetyHourWheel, safetyMinuteWheel].forEach((wheel) => {
+            const selected = wheel === safetyHourWheel ? hour : minute;
+            wheel.querySelectorAll(".safety-time-option").forEach((option) => {
+              const isSelected = Number(option.dataset.value) === selected;
+              option.classList.toggle("is-selected", isSelected);
+              option.setAttribute("aria-selected", String(isSelected));
+            });
+          });
+          safetyTimes.value =
+            String(hour).padStart(2, "0") + ":" + String(minute).padStart(2, "0");
+        }
+        function setSafetyWheelTime(value, smooth = false) {
+          const { hour, minute } = firstTime(value);
+          const rowHeight = 44;
+          safetyHourWheel.scrollTo({ top: hour * rowHeight, behavior: smooth ? "smooth" : "auto" });
+          safetyMinuteWheel.scrollTo({ top: minute * rowHeight, behavior: smooth ? "smooth" : "auto" });
+          requestAnimationFrame(updateSafetyWheelSelection);
+        }
+        function bindSafetyWheel(element) {
+          let timer = null;
+          element.addEventListener("scroll", () => {
+            window.clearTimeout(timer);
+            timer = window.setTimeout(() => {
+              const value = wheelValue(element);
+              element.scrollTo({ top: value * 44, behavior: "smooth" });
+              updateSafetyWheelSelection();
+            }, 70);
+          }, { passive: true });
+          element.addEventListener("keydown", (event) => {
+            if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
+            event.preventDefault();
+            const max = element === safetyHourWheel ? 23 : 59;
+            const delta = event.key === "ArrowDown" ? 1 : -1;
+            const next = Math.max(0, Math.min(max, wheelValue(element) + delta));
+            element.scrollTo({ top: next * 44, behavior: "smooth" });
+          });
+          element.addEventListener("click", (event) => {
+            const option = event.target.closest(".safety-time-option");
+            if (!option) return;
+            element.scrollTo({ top: Number(option.dataset.value) * 44, behavior: "smooth" });
+          });
+        }
+        buildSafetyTimeWheel(safetyHourWheel, 23);
+        buildSafetyTimeWheel(safetyMinuteWheel, 59);
+        bindSafetyWheel(safetyHourWheel);
+        bindSafetyWheel(safetyMinuteWheel);
+        setSafetyWheelTime("08:00");
         function formatNext(value) {
           if (!value) return "";
           const date = new Date(value);
@@ -1306,6 +1474,7 @@
             : (enabled && s.backend_active === true ? "Backend aktiv" : "");
           safetyEnabled.checked = enabled;
           safetyTimes.value = times;
+          setSafetyWheelTime(times || "08:00");
           safetyContactName.value = s.trusted_contact_name || "";
           safetyContactPhone.value = s.trusted_contact_phone || "";
         }
