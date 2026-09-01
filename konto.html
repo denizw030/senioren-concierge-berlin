@@ -1457,6 +1457,9 @@
           safetyForm.hidden = !open;
           safetyCard.setAttribute("aria-expanded", String(open));
           safetyEditButton.textContent = open ? "Schließen" : "Bearbeiten";
+          if (open) {
+            requestAnimationFrame(() => setSafetyWheelTime(safetyTimes.value || "08:00"));
+          }
         }
         function renderSafety(raw) {
           const s = raw?.data || raw?.safety || raw || {};
