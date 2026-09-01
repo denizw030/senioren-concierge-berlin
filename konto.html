@@ -20,6 +20,11 @@
         font-weight: 800;
         margin-top: 5px;
       }
+      .customer-number-summary .value {
+        font-variant-numeric: tabular-nums;
+        letter-spacing: .035em;
+        user-select: all;
+      }
       .muted {
         color: var(--muted);
         font-size: 13px;
@@ -1407,6 +1412,11 @@
               </div>
               <p class="muted" id="planStatusMeta">Tarifstatus wird geladen …</p>
             </article>
+            <article class="card summary-card customer-number-summary" data-account-panel="overview">
+              <div class="eyebrow">Kundennummer</div>
+              <div class="value" id="customerNumber">Wird geladen …</div>
+              <p class="muted">Diese Nummer können Sie zur sicheren Verknüpfung Ihres Telefonzugangs verwenden.</p>
+            </article>
             <article class="card summary-card person-summary" data-account-panel="overview">
               <div class="eyebrow">Unterstützte Person</div>
               <div class="value" id="recipientName">Noch nicht angelegt</div>
@@ -2639,6 +2649,8 @@
             if (!response.ok || body?.ok !== true) throw new Error("profile_load_failed");
             applyAuthoritativeAccountTheme(body.brand);
             applyProfile(body.profile || {});
+            const customerNumber = document.getElementById("customerNumber");
+            if (customerNumber) customerNumber.textContent = body.customer_number || "Nicht verfügbar";
             applyPlanAndUsage(body.plan || null, body.usage || null);
             profileStatusBadge.textContent = "Sicher verbunden";
           } catch (_) {
@@ -2646,6 +2658,8 @@
             showProfileStatus("Die persönlichen Daten konnten gerade nicht geladen werden.", "error");
             document.getElementById("planName").textContent = "Tarif derzeit nicht verfügbar";
             document.getElementById("planMeta").textContent = "Die Tarifdaten konnten gerade nicht geladen werden.";
+            const customerNumber = document.getElementById("customerNumber");
+            if (customerNumber) customerNumber.textContent = "Nicht verfügbar";
             document.getElementById("contactStatus").textContent = "Nicht verfügbar";
             document.getElementById("planStatusMeta").textContent = "Bitte laden Sie die Seite später erneut.";
             document.getElementById("usageState").textContent = "Aktueller Verbrauch derzeit nicht verfügbar. Es werden keine Werte geschätzt.";
