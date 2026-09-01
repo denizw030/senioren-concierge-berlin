@@ -56,7 +56,8 @@
     }
     return session;
   }
-  const isLoggedIn = () => !!getRenderableSession()?.session_token;
+  const hasRenderableSession = () => !!getRenderableSession()?.session_token;
+  const isLoggedIn = () => sessionValidated && !!validatedSession?.session_token;
   function clearLocalAuth() {
     sessionValidated = false;
     validatedSession = null;
@@ -128,7 +129,7 @@
     const shell = nav.closest(".nav");
     if (!shell) return;
     shell.querySelectorAll(":scope > .nw-account-cluster-mobile").forEach((element) => element.remove());
-    if (!isLoggedIn()) return;
+    if (!hasRenderableSession()) return;
     const cluster = document.createElement("div");
     cluster.className = "nw-account-cluster nw-account-cluster-mobile";
     cluster.append(makeAccountLink("nw-account-mobile"), makeLogoutButton("nw-account-logout-mobile"));
@@ -176,7 +177,7 @@
     document.querySelectorAll("nav.links").forEach((nav) => {
       nav.innerHTML = "";
       NAV.forEach(([href, label]) => nav.appendChild(makeLink(href, label, current === href ? "active" : "")));
-      if (isLoggedIn()) {
+      if (hasRenderableSession()) {
         const accountCluster = document.createElement("span");
         accountCluster.className = "nw-account-cluster nw-account-cluster-desktop";
         accountCluster.append(
@@ -239,7 +240,7 @@
     document.querySelectorAll("nav.links").forEach((nav) => syncMobileAccount(nav));
     ensureOdysxBar();
     document.querySelectorAll(".footbottom > span:first-child").forEach((element) => { element.textContent = "© 2026 Nahwerk Concierge"; });
-    document.querySelectorAll('.footer a[href="anmelden.html"],.footer a[href="registrieren.html"]').forEach((link) => { if (isLoggedIn()) link.remove(); });
+    document.querySelectorAll('.footer a[href="anmelden.html"],.footer a[href="registrieren.html"]').forEach((link) => { if (hasRenderableSession()) link.remove(); });
   }
   function updateNav() {
     normalizeShell();
