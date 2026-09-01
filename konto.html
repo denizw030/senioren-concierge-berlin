@@ -182,7 +182,106 @@
           grid-column: auto;
         }
       }
-    </style>
+    
+      /* Page-scoped surface treatment: colors/contours only.
+         Exact palette reference: registrieren.html */
+      body:not(.senior-product):not([data-product="senioren"]) main {
+        background:
+          radial-gradient(920px 620px at 94% 7%,rgba(35,78,160,.18),transparent 64%),
+          radial-gradient(780px 540px at 5% 44%,rgba(50,62,110,.055),transparent 68%),
+          radial-gradient(720px 500px at 82% 86%,rgba(20,91,110,.035),transparent 70%),
+          linear-gradient(180deg,#05080d 0%,#08111c 52%,#05080c 100%) !important;
+      }
+      body:not(.senior-product):not([data-product="senioren"]) .hero {
+        background:
+          radial-gradient(920px 620px at 94% 7%,rgba(35,78,160,.18),transparent 64%),
+          radial-gradient(780px 540px at 5% 44%,rgba(50,62,110,.055),transparent 68%),
+          radial-gradient(720px 500px at 82% 86%,rgba(20,91,110,.035),transparent 70%),
+          linear-gradient(180deg,#05080d 0%,#08111c 52%,#05080c 100%) !important;
+      }
+      body:not(.senior-product):not([data-product="senioren"]) main>.section {
+        background:
+          radial-gradient(760px 480px at 92% 10%,rgba(32,72,150,.15),transparent 67%),
+          radial-gradient(680px 430px at 8% 86%,rgba(44,58,104,.035),transparent 72%),
+          rgba(5,9,14,.99) !important;
+      }
+      body:not(.senior-product):not([data-product="senioren"]) .card,
+      body:not(.senior-product):not([data-product="senioren"]) .usagebox {
+        border-color:rgba(126,148,178,.14) !important;
+        background:
+          radial-gradient(circle at 100% 0%,rgba(34,72,144,.13),transparent 42%),
+          radial-gradient(circle at 0% 100%,rgba(21,89,108,.025),transparent 52%),
+          linear-gradient(145deg,#0b1119,#080d14) !important;
+        box-shadow:
+          inset 0 1px 0 rgba(174,195,222,.03),
+          0 24px 64px rgba(0,0,0,.40) !important;
+      }
+      body:not(.senior-product):not([data-product="senioren"]) .warning,
+      body:not(.senior-product):not([data-product="senioren"]) .empty,
+      body:not(.senior-product):not([data-product="senioren"]) .recommend,
+      body:not(.senior-product):not([data-product="senioren"]) .safety-save-status {
+        border-color:rgba(124,146,174,.14) !important;
+        background:
+          radial-gradient(circle at 100% 0%,rgba(31,68,135,.08),transparent 48%),
+          linear-gradient(145deg,#0b1119,#080d14) !important;
+        box-shadow:0 12px 30px rgba(0,0,0,.16) !important;
+      }
+      body:not(.senior-product):not([data-product="senioren"]) .warning {
+        border-left-color:var(--gold) !important;
+      }
+      body:not(.senior-product):not([data-product="senioren"]) .empty {
+        border-color:rgba(125,145,172,.22) !important;
+        color:#aaa69d !important;
+      }
+      body:not(.senior-product):not([data-product="senioren"]) .muted,
+      body:not(.senior-product):not([data-product="senioren"]) .privacy-note {
+        color:#aaa69d !important;
+      }
+      body:not(.senior-product):not([data-product="senioren"]) .personalize {
+        border-color:rgba(126,148,178,.14) !important;
+        background:
+          radial-gradient(circle at 100% 0%,rgba(34,72,144,.13),transparent 42%),
+          radial-gradient(circle at 0% 100%,rgba(21,89,108,.025),transparent 52%),
+          linear-gradient(145deg,#0b1119,#080d14) !important;
+      }
+      body:not(.senior-product):not([data-product="senioren"]) .prefchip {
+        background:
+          radial-gradient(circle at 100% 0%,rgba(31,68,135,.08),transparent 48%),
+          #080d14 !important;
+        color:#f4d98f !important;
+      }
+      body:not(.senior-product):not([data-product="senioren"]) .bar {
+        background:#080d14 !important;
+      }
+      body:not(.senior-product):not([data-product="senioren"]) .bar>span {
+        background:#e6b43a !important;
+      }
+      body:not(.senior-product):not([data-product="senioren"]) .safety-form {
+        border-top-color:rgba(125,145,172,.14) !important;
+      }
+      body:not(.senior-product):not([data-product="senioren"]) .safety-form input[type="text"],
+      body:not(.senior-product):not([data-product="senioren"]) .safety-form input[type="tel"] {
+        border-color:rgba(124,146,174,.14) !important;
+        background:
+          radial-gradient(circle at 100% 0%,rgba(31,68,135,.055),transparent 48%),
+          #080d14 !important;
+        color:#f3f3ef !important;
+        box-shadow:inset 0 1px 0 rgba(174,195,222,.018) !important;
+      }
+      body:not(.senior-product):not([data-product="senioren"]) .safety-form input[type="text"]:hover,
+      body:not(.senior-product):not([data-product="senioren"]) .safety-form input[type="tel"]:hover {
+        border-color:rgba(154,132,94,.24) !important;
+      }
+      body:not(.senior-product):not([data-product="senioren"]) .safety-form input[type="text"]:focus,
+      body:not(.senior-product):not([data-product="senioren"]) .safety-form input[type="tel"]:focus {
+        border-color:rgba(212,175,55,.58) !important;
+        box-shadow:0 0 0 3px rgba(215,169,52,.12) !important;
+      }
+      body:not(.senior-product):not([data-product="senioren"]) a.btn:hover,
+      body:not(.senior-product):not([data-product="senioren"]) button:not(:disabled):hover {
+        outline-color:rgba(212,175,55,.44) !important;
+      }
+</style>
   <link rel="canonical" href="https://nahwerkconcierge.com/konto.html"><link rel="icon" type="image/svg+xml" href="assets/NAHWERK_Concierge_Gold_Transparent.svg?v=1"><link rel="stylesheet" href="assets/brand-2026.css?v=23"><link rel="stylesheet" href="assets/nahwerk-logo-v2.css?v=8"><meta property="og:type" content="website"><meta property="og:locale" content="de_DE"><meta property="og:title" content="NAHWERK Concierge"><meta property="og:description" content="Persönliche, verständliche Concierge-Unterstützung direkt über WhatsApp."></head>
   <body>
     <header class="top"><div class="wrap nav"><a class="brand" href="index.html" aria-label="NAHWERK Concierge – Startseite"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Hauptnavigation"><a href="index.html">Übersicht</a><a href="prime-concierge.html">Persönlicher Concierge</a><a href="concierges.html">Concierges</a><a href="senioren-concierge.html">Senioren Concierge</a><a href="angehoerige.html">Für Angehörige</a><a href="leistungen.html">Leistungen</a><a href="kontakt.html">Kontakt</a><a class="active auth-link login-link" href="anmelden.html">Anmelden</a><a class="auth-link register-link" href="registrieren.html">Registrieren</a></nav></div></header>
