@@ -25,6 +25,9 @@ test("login completes enrolled MFA only through the second verification step", (
   assert.match(login, /body\.mfa_verified===true&&completeLogin\(body\)/);
   assert.match(login, /autocomplete="one-time-code"/);
   assert.match(login, /pattern="\[0-9\]\{6\}"/);
+  assert.match(login, /body\.mfa_method==='phone'/);
+  assert.match(login, /mfaCodeLabel\.textContent='SMS-Code'/);
+  assert.match(login, /Code aus der Authenticator-App/);
   assert.match(login, /Zusätzliche Bestätigung erforderlich/);
 });
 
