@@ -1,4 +1,4 @@
-name: NAHWERK Custom SMS MFA Smoke
+name: NAHWERK Custom SMS MFA Smoke Rerun
 
 on:
   push:
