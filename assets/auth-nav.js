@@ -14,6 +14,14 @@
   let validatedSession = null;
   const page = () => location.pathname.split("/").pop() || "index.html";
   function productContext(current = page()) {
+    if (PROTECTED.has(current)) {
+      const accountProduct = getSession()?.product_context;
+      if (accountProduct === "senioren" || accountProduct === "prime") {
+        sessionStorage.setItem(PRODUCT_KEY, accountProduct);
+        return accountProduct;
+      }
+    }
+
     const requested = new URLSearchParams(location.search).get("produkt");
     if (requested === "senioren" || requested === "prime") {
       sessionStorage.setItem(PRODUCT_KEY, requested);
