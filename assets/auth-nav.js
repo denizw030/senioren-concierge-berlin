@@ -12,6 +12,8 @@
   const NAV = [["index.html", "Übersicht"], ["prime-concierge.html", "Persönlicher Concierge"], ["concierges.html", "Concierges"], ["senioren-concierge.html", "Senioren Concierge"], ["senioren-concierge.html#angehoerige", "Für Angehörige"], ["leistungen.html", "Leistungen"], ["kontakt.html", "Kontakt"]];
   let sessionValidated = false;
   let validatedSession = null;
+  let validationPromise = null;
+  let lastValidatedProfile = null;
   const page = () => location.pathname.split("/").pop() || "index.html";
   function productContext(current = page()) {
     if (PROTECTED.has(current)) {
@@ -49,7 +51,10 @@
   function clearLocalAuth() {
     sessionValidated = false;
     validatedSession = null;
+    validationPromise = null;
+    lastValidatedProfile = null;
     localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem("nw_account_profile_cache_v1");
     sessionStorage.removeItem(SESSION_KEY);
     localStorage.removeItem("scb_onboarding_sent");
     localStorage.removeItem("scb_onboarding_result");
@@ -242,37 +247,84 @@
       });
     });
   }
-  async function validateSession() {
+  async function performSessionValidation() {
     const session = getSession();
-    if (!session?.session_token) { sessionValidated = false; validatedSession = null; return false; }
+    if (!session?.session_token) {
+      sessionValidated = false;
+      validatedSession = null;
+      lastValidatedProfile = null;
+      return false;
+    }
+
     try {
-      const response = await fetch(CHECK_URL, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.session_token}` }, body: "{}" });
+      if (page() === "konto.html") {
+        const profileResponse = await fetch(PROFILE_URL, {
+          method: "GET",
+          headers: { Authorization: "Bearer " + session.session_token }
+        });
+        const profileBody = await profileResponse.json().catch(() => ({}));
+        if (profileResponse.ok && profileBody?.ok === true && profileBody?.customer_account_id) {
+          const product_context = profileBody?.brand === "senioren_concierge"
+            ? "senioren"
+            : profileBody?.brand
+              ? "prime"
+              : session.product_context || null;
+          const first_name = safeFirstName(profileBody?.profile?.first_name || session.first_name);
+          validatedSession = {
+            ...session,
+            customer_account_id: profileBody.customer_account_id,
+            person_id: profileBody.person_id || session.person_id,
+            first_name,
+            product_context
+          };
+          sessionValidated = true;
+          lastValidatedProfile = profileBody;
+          if (product_context === "senioren" || product_context === "prime") {
+            sessionStorage.setItem(PRODUCT_KEY, product_context);
+          }
+          localStorage.setItem(SESSION_KEY, JSON.stringify(validatedSession));
+          return true;
+        }
+        if (profileResponse.status === 401 || profileResponse.status === 403) {
+          clearLocalAuth();
+          return false;
+        }
+        sessionValidated = false;
+        validatedSession = null;
+        return false;
+      }
+
+      const response = await fetch(CHECK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.session_token}` },
+        body: "{}"
+      });
       const body = await response.json().catch(() => ({}));
       if (response.ok && body.ok && body.status === "session_valid") {
         const session_token = body.session_token || session.session_token;
-        let first_name = safeFirstName(body.first_name || body.profile?.first_name || body.person?.first_name || session.first_name);
-        let product_context = body.product_context || session.product_context || null;
-        try {
-          const profileResponse = await fetch(PROFILE_URL, {
-            method: "GET",
-            headers: { Authorization: "Bearer " + session_token }
-          });
-          const profileBody = await profileResponse.json().catch(() => ({}));
-          if (profileResponse.ok && profileBody?.ok === true) {
-            first_name = safeFirstName(profileBody?.profile?.first_name) || first_name;
-            if (profileBody?.brand === "senioren_concierge") product_context = "senioren";
-            else if (profileBody?.brand) product_context = "prime";
-          }
-        } catch (_) {}
+        const first_name = safeFirstName(body.first_name || body.profile?.first_name || body.person?.first_name || session.first_name);
+        const product_context = body.product_context || session.product_context || null;
         if (product_context === "senioren" || product_context === "prime") {
           sessionStorage.setItem(PRODUCT_KEY, product_context);
         }
-        validatedSession = { session_token, customer_account_id: body.customer_account_id, person_id: body.person_id, role: body.role, expires_at: body.expires_at, first_name, product_context };
+        validatedSession = {
+          session_token,
+          customer_account_id: body.customer_account_id,
+          person_id: body.person_id,
+          role: body.role,
+          expires_at: body.expires_at,
+          first_name,
+          product_context
+        };
         sessionValidated = true;
+        lastValidatedProfile = null;
         localStorage.setItem(SESSION_KEY, JSON.stringify(validatedSession));
         return true;
       }
-      if (response.status === 401 || response.status === 403) { clearLocalAuth(); return false; }
+      if (response.status === 401 || response.status === 403) {
+        clearLocalAuth();
+        return false;
+      }
     } catch (_) {
       sessionValidated = false;
       validatedSession = null;
@@ -280,6 +332,11 @@
     }
     clearLocalAuth();
     return false;
+  }
+
+  function validateSession() {
+    if (!validationPromise) validationPromise = performSessionValidation();
+    return validationPromise;
   }
   function decorateWhatsApp(root = document.body) {
     if (!root) return;
@@ -329,5 +386,14 @@
       if (PROTECTED.has(current)) location.replace("anmelden.html");
     }
   });
-  window.SCBAuth = { getSession, isLoggedIn, validateSession, logout, clearLocalAuth, productContext, SESSION_KEY };
+  window.SCBAuth = {
+    getSession,
+    isLoggedIn,
+    validateSession,
+    getValidatedProfile: () => lastValidatedProfile,
+    logout,
+    clearLocalAuth,
+    productContext,
+    SESSION_KEY
+  };
 })();
