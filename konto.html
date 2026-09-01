@@ -105,6 +105,73 @@
         font-size: 12px;
         font-weight: 700;
       }
+      .safety-card {
+        cursor: pointer;
+        transition: border-color .18s ease, box-shadow .18s ease;
+      }
+      .safety-card:hover,
+      .safety-card:focus-within {
+        border-color: rgba(212,175,55,.55);
+      }
+      .safety-card-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+      }
+      .safety-edit {
+        flex: 0 0 auto;
+      }
+      .safety-next {
+        margin-top: 8px;
+      }
+      .safety-form {
+        margin-top: 20px;
+        padding-top: 18px;
+        border-top: 1px solid var(--line);
+      }
+      .safety-form[hidden] {
+        display: none;
+      }
+      .safety-form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+      .safety-form label {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+      .safety-form input[type="text"],
+      .safety-form input[type="tel"] {
+        width: 100%;
+        padding: 12px 13px;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+      }
+      .safety-toggle {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+      .safety-toggle input {
+        width: 18px;
+        height: 18px;
+      }
+      .safety-save-status {
+        display: none;
+        margin-top: 12px;
+        font-size: 13px;
+      }
+      .safety-save-status.is-visible {
+        display: block;
+      }
       @media (max-width: 700px) {
         .dash,
         .usagegrid {
@@ -254,10 +321,42 @@
                 WhatsApp-Gesprächs.
               </p>
             </article>
-            <article class="card wide">
-              <div class="eyebrow">Sicherheit</div>
-              <div class="value" id="safetyStatus">Deaktiviert</div>
-              <p class="muted" id="safetyMeta">Optionale Check-ins sind standardmäßig ausgeschaltet. Die Funktion ersetzt keinen medizinischen Notruf oder Hausnotruf; in akuten Notfällen gilt 112.</p>
+            <article class="card wide safety-card" id="safetyCard" tabindex="0" aria-expanded="false">
+              <div class="safety-card-head">
+                <div>
+                  <div class="eyebrow">Sicherheit</div>
+                  <div class="value" id="safetyStatus">Wird geladen …</div>
+                  <p class="muted" id="safetyMeta">Die aktuellen Sicherheitseinstellungen werden aus Ihrem NAHWERK-Konto geladen.</p>
+                  <p class="muted safety-next" id="safetyNext"></p>
+                </div>
+                <button class="btn light safety-edit" type="button" id="safetyEditButton">Bearbeiten</button>
+              </div>
+              <form class="safety-form" id="safetyForm" hidden>
+                <label class="safety-toggle">
+                  <input type="checkbox" id="safetyEnabled" />
+                  <span>Check-ins aktivieren</span>
+                </label>
+                <div class="safety-form-grid">
+                  <div>
+                    <label for="safetyTimes">Check-in-Uhrzeit</label>
+                    <input id="safetyTimes" type="text" inputmode="numeric" placeholder="08:00" />
+                  </div>
+                  <div>
+                    <label for="safetyContactName">Vertrauenskontakt</label>
+                    <input id="safetyContactName" type="text" autocomplete="name" />
+                  </div>
+                  <div>
+                    <label for="safetyContactPhone">Telefon / WhatsApp</label>
+                    <input id="safetyContactPhone" type="tel" autocomplete="tel" />
+                  </div>
+                </div>
+                <p class="muted">Die Funktion ersetzt keinen medizinischen Notruf oder Hausnotruf; in akuten Notfällen gilt 112.</p>
+                <div class="actions">
+                  <button class="btn red" type="submit" id="safetySaveButton">Änderungen speichern</button>
+                  <button class="btn light" type="button" id="safetyCancelButton">Abbrechen</button>
+                </div>
+                <div class="safety-save-status" id="safetySaveStatus" aria-live="polite"></div>
+              </form>
             </article>
             <article class="card wide">
               <h3>Gespeicherte Informationen</h3>
@@ -352,6 +451,152 @@
             .map((x) => '<span class="prefchip">' + x + "</span>")
             .join("");
         }
+
+        const SAFETY_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/safety";
+        const safetyCard = document.getElementById("safetyCard");
+        const safetyForm = document.getElementById("safetyForm");
+        const safetyStatus = document.getElementById("safetyStatus");
+        const safetyMeta = document.getElementById("safetyMeta");
+        const safetyNext = document.getElementById("safetyNext");
+        const safetyEnabled = document.getElementById("safetyEnabled");
+        const safetyTimes = document.getElementById("safetyTimes");
+        const safetyContactName = document.getElementById("safetyContactName");
+        const safetyContactPhone = document.getElementById("safetyContactPhone");
+        const safetyEditButton = document.getElementById("safetyEditButton");
+        const safetyCancelButton = document.getElementById("safetyCancelButton");
+        const safetySaveButton = document.getElementById("safetySaveButton");
+        const safetySaveStatus = document.getElementById("safetySaveStatus");
+        let lastSafety = null;
+
+        function sessionToken() {
+          try {
+            return JSON.parse(localStorage.getItem("scb_web_session") || "null")?.session_token || "";
+          } catch (_) {
+            return "";
+          }
+        }
+        function normalizedTimes(value) {
+          if (Array.isArray(value)) return value.join(", ");
+          return value == null ? "" : String(value);
+        }
+        function formatNext(value) {
+          if (!value) return "";
+          const date = new Date(value);
+          if (Number.isNaN(date.getTime())) return String(value);
+          return date.toLocaleString("de-DE", { dateStyle: "medium", timeStyle: "short" });
+        }
+        function setSafetyFormOpen(open) {
+          safetyForm.hidden = !open;
+          safetyCard.setAttribute("aria-expanded", String(open));
+          safetyEditButton.textContent = open ? "Schließen" : "Bearbeiten";
+        }
+        function renderSafety(raw) {
+          const s = raw?.data || raw?.safety || raw || {};
+          lastSafety = s;
+          const enabled = s.safety_enabled === true;
+          const times = normalizedTimes(s.checkin_times);
+          const parts = [times, s.trusted_contact_name, s.trusted_contact_phone].filter(Boolean);
+          safetyStatus.textContent = enabled ? "Aktiviert" : "Deaktiviert";
+          safetyMeta.textContent = enabled
+            ? (parts.join(" · ") || "Check-ins sind aktiviert.")
+            : "Check-ins sind derzeit ausgeschaltet.";
+          const next = formatNext(s.next_checkin_at);
+          safetyNext.textContent = enabled && next
+            ? "Nächster Check-in: " + next + (s.backend_active === true ? " · Backend aktiv" : "")
+            : (enabled && s.backend_active === true ? "Backend aktiv" : "");
+          safetyEnabled.checked = enabled;
+          safetyTimes.value = times;
+          safetyContactName.value = s.trusted_contact_name || "";
+          safetyContactPhone.value = s.trusted_contact_phone || "";
+        }
+        function showSafetySaveStatus(message, error = false) {
+          safetySaveStatus.textContent = message;
+          safetySaveStatus.classList.add("is-visible");
+          safetySaveStatus.style.color = error ? "#b85b5b" : "inherit";
+        }
+        async function loadSafety() {
+          const token = sessionToken();
+          if (!token) return;
+          try {
+            const response = await fetch(SAFETY_URL, {
+              method: "GET",
+              headers: { Authorization: "Bearer " + token }
+            });
+            const body = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error("safety_load_failed");
+            renderSafety(body);
+          } catch (_) {
+            safetyStatus.textContent = "Nicht verfügbar";
+            safetyMeta.textContent = "Die Sicherheitseinstellungen konnten gerade nicht geladen werden.";
+            safetyNext.textContent = "";
+          }
+        }
+
+        safetyEditButton.addEventListener("click", (event) => {
+          event.stopPropagation();
+          setSafetyFormOpen(safetyForm.hidden);
+        });
+        safetyCancelButton.addEventListener("click", (event) => {
+          event.stopPropagation();
+          if (lastSafety) renderSafety(lastSafety);
+          safetySaveStatus.classList.remove("is-visible");
+          setSafetyFormOpen(false);
+        });
+        safetyCard.addEventListener("click", (event) => {
+          if (event.target.closest("button,input,label,form")) return;
+          setSafetyFormOpen(safetyForm.hidden);
+        });
+        safetyCard.addEventListener("keydown", (event) => {
+          if (event.target !== safetyCard) return;
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            setSafetyFormOpen(safetyForm.hidden);
+          }
+        });
+        safetyForm.addEventListener("click", (event) => event.stopPropagation());
+        safetyForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          const token = sessionToken();
+          if (!token) {
+            showSafetySaveStatus("Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.", true);
+            return;
+          }
+          safetySaveButton.disabled = true;
+          safetySaveButton.textContent = "Wird gespeichert …";
+          showSafetySaveStatus("Änderungen werden gespeichert …");
+          try {
+            const response = await fetch(SAFETY_URL, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + token
+              },
+              body: JSON.stringify({
+                safety_enabled: safetyEnabled.checked,
+                checkin_times: safetyTimes.value.trim(),
+                trusted_contact_name: safetyContactName.value.trim(),
+                trusted_contact_phone: safetyContactPhone.value.trim()
+              })
+            });
+            const body = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error("safety_update_failed");
+            await loadSafety();
+            showSafetySaveStatus("Gespeichert.");
+            setTimeout(() => {
+              safetySaveStatus.classList.remove("is-visible");
+              setSafetyFormOpen(false);
+            }, 700);
+          } catch (_) {
+            showSafetySaveStatus("Die Änderung konnte gerade nicht gespeichert werden. Bitte versuchen Sie es erneut.", true);
+          } finally {
+            safetySaveButton.disabled = false;
+            safetySaveButton.textContent = "Änderungen speichern";
+          }
+        });
+
+        loadSafety();
+
         try {
           const d = JSON.parse(
             localStorage.getItem("scb_onboarding") || "null",
@@ -362,10 +607,6 @@
               const conciergeNames = { nilo: "Nilo", mira: "Mira", lena: "Lena", lukas: "Lukas" };
               const conciergeName = conciergeNames[String(selected).toLowerCase()] || "Nilo";
               document.querySelector(".personalize .value").textContent = `${conciergeName} ist Ihr persönlicher KI-Concierge.`;
-            }
-            if (d.safety_enabled) {
-              document.getElementById("safetyStatus").textContent = "Aktiviert";
-              document.getElementById("safetyMeta").textContent = [d.checkin_times, d.trusted_contact_name, d.trusted_contact_phone].filter(Boolean).join(" · ") || "Aktiviert; Details werden nach Backend-Anbindung angezeigt.";
             }
             document.getElementById("recipientName").textContent =
               d.recipient?.name || "–";
