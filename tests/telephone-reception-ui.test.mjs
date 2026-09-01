@@ -33,8 +33,8 @@ test("parallel account theme and usage work remains present", () => {
   assert.match(account, /window\.NAHWERKAccountPreview = Object\.freeze/);
   assert.match(account, /id="appUsageSummary"/);
   assert.match(account, /id="whatsappUsageSummary"/);
-  assert.match(account, /FREE/);
-  assert.match(account, /PREMIUM PLUS/);
+  assert.match(account, /id="usageState"/);
+  assert.match(account, /Aktueller Verbrauch derzeit nicht verfügbar/);
 });
 
 test("public pages describe reception without fraud-prevention guarantees", () => {
