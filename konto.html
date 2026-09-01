@@ -1573,7 +1573,8 @@
                 </div>
                 <div class="mfa-actions" id="mfaPrimaryActions" hidden>
                   <button class="btn red" type="button" id="mfaEnableButton">Kontoschutz einrichten</button>
-                  <button class="btn light" type="button" id="mfaDisableButton" hidden>2-Faktor-Authentifizierung deaktivieren</button>
+                  <button class="btn light" type="button" id="mfaDisableButton" hidden>Authenticator-App deaktivieren</button>
+                  <button class="btn light" type="button" id="mfaDisableSmsButton" hidden>SMS-Bestätigung deaktivieren</button>
                 </div>
               </div>
 
@@ -1653,6 +1654,36 @@
                   <button class="btn light" type="button" id="mfaDisableCancelButton">Abbrechen</button>
                 </div>
               </form>
+
+              <form class="mfa-form" id="mfaSmsDisableStartForm" hidden>
+                <p class="muted mfa-step-copy">Zum Deaktivieren der SMS-Bestätigung bestätigen Sie zuerst Ihr aktuelles Passwort. Danach senden wir einen Sicherheitscode an Ihre hinterlegte Mobilnummer.</p>
+                <div class="mfa-form-grid">
+                  <div class="field">
+                    <label for="mfaSmsDisablePassword">Aktuelles Passwort</label>
+                    <input id="mfaSmsDisablePassword" type="password" autocomplete="current-password" required />
+                  </div>
+                </div>
+                <div class="mfa-inline-actions">
+                  <button class="btn red" type="submit" id="mfaSmsDisableSendButton">SMS-Code senden</button>
+                  <button class="btn light" type="button" id="mfaSmsDisableCancelButton">Abbrechen</button>
+                </div>
+              </form>
+
+              <form class="mfa-form" id="mfaSmsDisableVerifyForm" hidden>
+                <p class="muted mfa-step-copy">Geben Sie den 6-stelligen Code ein, den wir an <strong id="mfaSmsDisableMaskedPhone">Ihre hinterlegte Mobilnummer</strong> gesendet haben.</p>
+                <div class="mfa-form-grid">
+                  <div class="field">
+                    <label for="mfaSmsDisableCode">6-stelliger SMS-Code</label>
+                    <input class="mfa-code" id="mfaSmsDisableCode" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required />
+                  </div>
+                </div>
+                <div class="mfa-inline-actions">
+                  <button class="btn red" type="submit" id="mfaSmsDisableConfirmButton">SMS-Bestätigung deaktivieren</button>
+                  <button class="btn light" type="button" id="mfaSmsDisableVerifyCancelButton">Abbrechen</button>
+                </div>
+              </form>
+
+              <p class="muted" style="margin:16px 0 0">Ihre E-Mail-Adresse bleibt für die bestehende Passwort-Wiederherstellung verfügbar. Sie wird nicht als gleichwertiger zweiter Faktor dargestellt.</p>
               <div class="mfa-feedback" id="mfaFeedback" aria-live="polite"></div>
             </article>
             <article class="card wide safety-card safety-panel" id="safetyCard" data-account-panel="safety" role="tabpanel" aria-labelledby="accountTabSafety" hidden aria-expanded="false">
