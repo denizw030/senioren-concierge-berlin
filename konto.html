@@ -470,6 +470,7 @@
         padding-top:24px;
       }
       .safety-panel{
+        cursor:default!important;
         grid-column:span 5!important;
         min-height:318px;
         padding:28px!important;
@@ -1339,7 +1340,7 @@
               </p>
             </article>
             <div class="account-panel-heading" data-account-panel="safety" hidden><div class="eyebrow">Sicherheit</div><h2>Check-ins und Vertrauenskontakt.</h2><p>Ihre wichtigsten Sicherheitseinstellungen auf einen Blick. Details öffnen Sie erst über „Bearbeiten“.</p></div>
-            <article class="card wide safety-card safety-panel" id="safetyCard" data-account-panel="safety" role="tabpanel" aria-labelledby="accountTabSafety" hidden tabindex="0" aria-expanded="false">
+            <article class="card wide safety-card safety-panel" id="safetyCard" data-account-panel="safety" role="tabpanel" aria-labelledby="accountTabSafety" hidden aria-expanded="false">
               <div class="safety-card-head">
                 <div>
                   <div class="eyebrow">Sicherheit</div>
@@ -1422,8 +1423,11 @@
         function applyAccountPreview() {
           const preview = sessionStorage.getItem(ACCOUNT_PREVIEW_KEY);
           if (preview !== "prime" && preview !== "senioren") return;
-          document.body.dataset.product = preview;
-          document.body.classList.toggle("senior-product", preview === "senioren");
+          const senior = preview === "senioren";
+          if (document.body.dataset.product !== preview) document.body.dataset.product = preview;
+          if (document.body.classList.contains("senior-product") !== senior) {
+            document.body.classList.toggle("senior-product", senior);
+          }
         }
         function setAccountTab(name, focus = false) {
           const validName = accountTabs.some((tab) => tab.dataset.accountTab === name) ? name : "overview";
@@ -1470,7 +1474,15 @@
           }
         });
         applyAccountPreview();
-        setAccountTab("overview");
+        const previewObserver = new MutationObserver(() => {
+          const preview = sessionStorage.getItem(ACCOUNT_PREVIEW_KEY);
+          if (preview !== "prime" && preview !== "senioren") return;
+          const senior = preview === "senioren";
+          if (document.body.dataset.product !== preview || document.body.classList.contains("senior-product") !== senior) {
+            applyAccountPreview();
+          }
+        });
+        previewObserver.observe(document.body, { attributes: true, attributeFilter: ["class", "data-product"] });
 
         function pct(a, b) {
           return b ? Math.min(100, Math.round((a / b) * 100)) : 0;
@@ -1823,17 +1835,6 @@
           safetySaveStatus.classList.remove("is-visible");
           setSafetyFormOpen(false);
         });
-        safetyCard.addEventListener("click", (event) => {
-          if (event.target.closest("button,input,label,form")) return;
-          setSafetyFormOpen(safetyForm.hidden);
-        });
-        safetyCard.addEventListener("keydown", (event) => {
-          if (event.target !== safetyCard) return;
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            setSafetyFormOpen(safetyForm.hidden);
-          }
-        });
         safetyForm.addEventListener("click", (event) => event.stopPropagation());
         safetyForm.addEventListener("submit", async (event) => {
           event.preventDefault();
@@ -1876,6 +1877,7 @@
           }
         });
 
+        setAccountTab("overview");
         loadProfile();
         loadSafety();
 
