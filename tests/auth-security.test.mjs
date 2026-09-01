@@ -47,11 +47,22 @@ test("protected account pages still validate the existing web session", () => {
 });
 
 
-test("account security shows real MFA status without fake activation", () => {
+test("account security supports real MFA enrollment and secure removal", () => {
   const account = read("konto.html");
   assert.match(account, /id="mfaCard"/);
   assert.match(account, /functions\/v1\/web-mfa-status/);
-  assert.match(account, /async function loadMfaStatus\(\)/);
+  assert.match(account, /functions\/v1\/web-mfa-manage/);
+  assert.match(account, /id="mfaEnableButton"/);
+  assert.match(account, /id="mfaDisableButton"/);
+  assert.match(account, /id="mfaQr"/);
+  assert.match(account, /id="mfaSecret"/);
+  assert.match(account, /autocomplete="current-password"/);
+  assert.match(account, /autocomplete="one-time-code"/);
+  assert.match(account, /mfaManage\("enroll_start"/);
+  assert.match(account, /mfaManage\("enroll_verify"/);
+  assert.match(account, /mfaManage\("enroll_cancel"/);
+  assert.match(account, /mfaManage\("disable"/);
+  assert.match(account, /Bei der nächsten Anmeldung wird der Authenticator-Code zwingend abgefragt/);
   assert.match(account, /Empfohlen · Noch nicht aktiviert/);
-  assert.equal(account.includes('id="mfaEnableButton"'), false);
+  assert.equal(/localStorage\.setItem\([^\n]*(enrollment_token|mfaEnrollmentToken)/.test(account), false);
 });
