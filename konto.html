@@ -1290,6 +1290,30 @@
         .mfa-qr-wrap{width:100%;max-width:260px}
       }
     </style>
+
+    <style>
+      .mfa-method-chooser{margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}
+      .mfa-method-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;max-width:760px}
+      .mfa-method{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;padding:16px 18px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.035);color:inherit;cursor:pointer;font:inherit}
+      .mfa-method strong{font-size:15px}
+      .mfa-method span{font-size:12px;color:var(--muted);line-height:1.45}
+      .mfa-method:hover{border-color:rgba(193,154,78,.5)}
+      .security-nudge[hidden]{display:none}
+      .security-nudge{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(3,7,12,.66);backdrop-filter:blur(10px)}
+      .security-nudge-card{width:min(560px,100%);border:1px solid rgba(193,154,78,.24);border-radius:22px;padding:28px;background:var(--paper,#fff);box-shadow:0 28px 90px rgba(0,0,0,.28)}
+      body:not(.senior-product) .security-nudge-card{background:#0b111b;color:#f7f8fa;border-color:rgba(255,255,255,.12)}
+      .security-nudge-card h2{margin:7px 0 10px;font-size:27px;line-height:1.15}
+      .security-nudge-card p{margin:0;color:var(--muted);line-height:1.6}
+      body:not(.senior-product) .security-nudge-card p{color:#aeb8c7}
+      .security-nudge-methods{display:grid;gap:10px;margin-top:20px}
+      .security-nudge-method{width:100%;display:flex;justify-content:space-between;gap:16px;align-items:center;text-align:left;padding:15px 16px;border:1px solid var(--line);border-radius:14px;background:transparent;color:inherit;cursor:pointer;font:inherit}
+      body:not(.senior-product) .security-nudge-method{border-color:rgba(255,255,255,.12)}
+      .security-nudge-method strong{display:block}
+      .security-nudge-method span{display:block;margin-top:3px;font-size:12px;color:var(--muted)}
+      body:not(.senior-product) .security-nudge-method span{color:#9eabba}
+      .security-nudge-later{margin-top:14px;width:100%}
+      @media(max-width:720px){.mfa-method-grid{grid-template-columns:1fr}.security-nudge-card{padding:22px}}
+    </style>
 </head>
   <body>
     <script>
@@ -1548,13 +1572,22 @@
                   <p class="muted" id="mfaMeta">Der Status der Zwei-Faktor-Authentifizierung wird sicher aus Ihrem Konto geladen.</p>
                 </div>
                 <div class="mfa-actions" id="mfaPrimaryActions" hidden>
-                  <button class="btn red" type="button" id="mfaEnableButton">2-Faktor-Authentifizierung aktivieren</button>
+                  <button class="btn red" type="button" id="mfaEnableButton">Kontoschutz einrichten</button>
                   <button class="btn light" type="button" id="mfaDisableButton" hidden>2-Faktor-Authentifizierung deaktivieren</button>
                 </div>
               </div>
 
+              <div class="mfa-method-chooser" id="mfaMethodChooser" hidden>
+                <p class="muted mfa-step-copy">Wählen Sie, wie Sie Ihre Anmeldung zusätzlich bestätigen möchten.</p>
+                <div class="mfa-method-grid">
+                  <button class="mfa-method" type="button" id="mfaSmsMethod" hidden><strong>SMS-Code</strong><span>Ein 6-stelliger Code wird an Ihre hinterlegte Mobilnummer gesendet.</span></button>
+                  <button class="mfa-method" type="button" id="mfaTotpMethod"><strong>Authenticator-App</strong><span>Besonders sicher, funktioniert auch ohne Mobilfunkempfang.</span></button>
+                </div>
+                <div class="mfa-inline-actions"><button class="btn light" type="button" id="mfaMethodCancelButton">Abbrechen</button></div>
+              </div>
+
               <form class="mfa-form" id="mfaStartForm" hidden>
-                <p class="muted mfa-step-copy">Bestätigen Sie zuerst Ihr aktuelles Passwort. Danach erhalten Sie einen QR-Code für Ihre Authenticator-App.</p>
+                <p class="muted mfa-step-copy" id="mfaStartCopy">Bestätigen Sie zuerst Ihr aktuelles Passwort.</p>
                 <div class="mfa-form-grid">
                   <div class="field">
                     <label for="mfaCurrentPassword">Aktuelles Passwort</label>
@@ -1586,6 +1619,21 @@
                     </form>
                   </div>
                 </div>
+              </div>
+
+              <div class="mfa-setup" id="mfaPhoneSetup" hidden>
+                <h3 style="margin-top:0">SMS-Code bestätigen</h3>
+                <p class="muted">Wir haben einen 6-stelligen Code an <strong id="mfaMaskedPhone">Ihre hinterlegte Mobilnummer</strong> gesendet.</p>
+                <form id="mfaPhoneVerifyForm" style="margin-top:18px">
+                  <div class="field">
+                    <label for="mfaPhoneCode">6-stelliger SMS-Code</label>
+                    <input class="mfa-code" id="mfaPhoneCode" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required />
+                  </div>
+                  <div class="mfa-inline-actions">
+                    <button class="btn red" type="submit" id="mfaPhoneVerifyButton">SMS-Code bestätigen</button>
+                    <button class="btn light" type="button" id="mfaPhoneCancelButton">Abbrechen</button>
+                  </div>
+                </form>
               </div>
 
               <form class="mfa-form" id="mfaDisableForm" hidden>
@@ -1680,6 +1728,18 @@
         </div>
       </div>
     </footer>
+    <div class="security-nudge" id="securityNudge" hidden role="dialog" aria-modal="true" aria-labelledby="securityNudgeTitle">
+      <div class="security-nudge-card">
+        <div class="eyebrow">Empfohlener Kontoschutz</div>
+        <h2 id="securityNudgeTitle">Konto zusätzlich schützen</h2>
+        <p>Ihr Zugang ist eingerichtet. Sie können jetzt eine zweite Bestätigung hinzufügen. Das ist freiwillig, erhöht den Schutz Ihres Kontos aber deutlich.</p>
+        <div class="security-nudge-methods">
+          <button class="security-nudge-method" type="button" id="securityNudgeSms" hidden><span><strong>Per SMS-Code</strong><span>Einfach: Code auf dem Handy empfangen.</span></span><span aria-hidden="true">›</span></button>
+          <button class="security-nudge-method" type="button" id="securityNudgeTotp"><span><strong>Mit Authenticator-App</strong><span>Besonders sicher und unabhängig vom Mobilfunknetz.</span></span><span aria-hidden="true">›</span></button>
+        </div>
+        <button class="btn light security-nudge-later" type="button" id="securityNudgeLater">Später einrichten</button>
+      </div>
+    </div>
     <script src="assets/auth-nav.js?v=36"></script>
     <script>
       (() => {
