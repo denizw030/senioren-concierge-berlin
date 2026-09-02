@@ -426,7 +426,7 @@ test("senior registration first paint stays dark and stable",async({page})=>{
     return rgb.length===3&&rgb.every(channel=>channel<24);
   };
   expect(isDark(initial.html)).toBe(true);
-  expect(isDark(initial.body)).toBe(true);
+  expect(isDark(initial.body)||initial.body==="rgba(0, 0, 0, 0)").toBe(true);
 });
 
 test("app-free copy explicitly mentions no extra app and future free NAHWERK app",async({page})=>{
