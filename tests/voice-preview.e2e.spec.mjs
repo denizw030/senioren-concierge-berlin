@@ -22,12 +22,27 @@ for(const viewport of viewports){
       const box=await page.locator(".nw-voice-preview-button").first().boundingBox();
       expect(box.width).toBeGreaterThanOrEqual(44);
       expect(box.height).toBeGreaterThanOrEqual(44);
+      const revealTargets=page.locator("main > section, .footer");
+      for(let i=0;i<await revealTargets.count();i++){
+        const target=revealTargets.nth(i);
+        await target.scrollIntoViewIfNeeded();
+        await expect(target).toHaveClass(/is-visible/);
+      }
+      await page.evaluate(()=>window.scrollTo(0,0));
+      await page.waitForTimeout(80);
       await page.screenshot({path:`test-results/screenshots/${viewport.name}-${surface.replaceAll("/","_")}.png`,fullPage:true});
       expect(errors).toEqual([]);
     });
   }
 }
 
+
+test("runtime navigation keeps the Concierges label",async({page})=>{
+  for(const surface of ["/index.html","/prime-concierge.html","/senioren-concierge.html","/concierges.html","/registrieren.html"]){
+    await page.goto(`http://127.0.0.1:4173${surface}`,{waitUntil:"networkidle"});
+    await expect(page.locator('.top .links a[href="concierges.html"]')).toHaveText("Concierges");
+  }
+});
 
 test("world page renders region controls without browser errors",async({page})=>{
   const errors=[];
