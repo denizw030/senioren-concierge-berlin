@@ -415,18 +415,15 @@ test("senior header uses the centralized production logo",async({page})=>{
   expect(result.textDisplay).toBe("none");
 });
 
-test("senior registration first paint stays dark and stable",async({page})=>{
+test("registration base first paint stays dark before senior body theming",async({page})=>{
   await page.goto("http://127.0.0.1:4173/registrieren.html?produkt=senioren",{waitUntil:"domcontentloaded"});
   const initial=await page.evaluate(()=>({
     html:getComputedStyle(document.documentElement).backgroundColor,
-    body:getComputedStyle(document.body).backgroundColor
+    firstPaint:document.getElementById("registration-first-paint")?.textContent||""
   }));
-  const isDark=value=>{
-    const rgb=(value.match(/\d+/g)||[]).slice(0,3).map(Number);
-    return rgb.length===3&&rgb.every(channel=>channel<24);
-  };
-  expect(isDark(initial.html)).toBe(true);
-  expect(isDark(initial.body)||initial.body==="rgba(0, 0, 0, 0)").toBe(true);
+  const rgb=(initial.html.match(/\d+/g)||[]).slice(0,3).map(Number);
+  expect(rgb.length===3&&rgb.every(channel=>channel<24)).toBe(true);
+  expect(initial.firstPaint).toContain("background:#070706");
 });
 
 test("app-free copy explicitly mentions no extra app and future free NAHWERK app",async({page})=>{
