@@ -1,5 +1,20 @@
 (() => {
+  const analytics = () => window.NahwerkAnalytics;
   const ready = () => {
+    void analytics()?.track("page_view");
+    document.addEventListener("click", (event) => {
+      const el = event.target instanceof Element ? event.target.closest("a,button,[role='button']") : null;
+      if (!el) return;
+      const href = el.getAttribute("href") || "";
+      const isPrimaryCta =
+        el.classList.contains("btn") ||
+        /registrieren|anmelden|pakete|kontakt|prime-concierge|senioren-concierge/.test(href);
+      if (!isPrimaryCta) return;
+      void analytics()?.track("cta_click", {
+        funnel_name: /registrieren/.test(href) ? "registration" : null,
+        funnel_step: /registrieren/.test(href) ? "cta" : null
+      });
+    }, { passive: true });
     if (!document.querySelector('link[data-nw-premium-preview]')) {
       const premium = document.createElement('link');
       premium.rel = 'stylesheet';
