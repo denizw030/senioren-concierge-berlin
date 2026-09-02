@@ -19,7 +19,12 @@
           radial-gradient(680px 430px at 8% 86%,rgba(44,58,104,.035),transparent 72%),
           rgba(5,9,14,.99)!important;
       }
-    </style></head><body><header class="top"><div class="wrap nav"><a class="brand" href="index.html" aria-label="NAHWERK Concierge – Startseite"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Hauptnavigation"><a href="index.html">Übersicht</a><a href="prime-concierge.html">Persönlicher Concierge</a><a href="concierges.html">Concierges</a><a href="senioren-concierge.html">Senioren Concierge</a><a href="angehoerige.html">Für Angehörige</a><a href="leistungen.html">Leistungen</a><a href="kontakt.html">Kontakt</a><a class="auth-link login-link" href="anmelden.html">Anmelden</a><a class="auth-link register-link" href="registrieren.html">Registrieren</a></nav></div></header><main><section class="hero"><div class="wrap"><div class="eyebrow">Persönlich statt allgemein</div><h1>Nilo und Mira passen sich dem Menschen an – nicht umgekehrt.</h1><p>Angehörige und die unterstützte Person können festlegen, wie Nilo oder Mira erklären, sprechen und reagieren soll. Dadurch muss nicht jede mögliche Lebenssituation vorprogrammiert werden.</p></div></section><section class="section"><div class="wrap"><div class="family"><strong>Wichtig:</strong> Diese Einstellungen betreffen Kommunikationsstil und hilfreichen Kontext. Sie sind nicht dafür gedacht, eine Person heimlich zu überwachen oder Entscheidungen gegen ihren Willen festzulegen. Die unterstützte Person soll ihre eigenen Präferenzen jederzeit ändern können.</div><form id="prefsForm"><div class="settings"><section class="setting wide"><label>Concierge wechseln</label><div class="concierge-choice" data-concierge-carousel data-variant="selection" data-input-name="conciergeChoice" data-selected="nilo" data-label="KI-Concierge wechseln"></div><p class="note">Sie können jederzeit wechseln. Die grundlegenden Fähigkeiten und das persönliche Kundengedächtnis bleiben gleich.</p></section><section class="setting"><label for="addressing">Ansprache</label><select id="addressing"><option value="du">Du – mit Vornamen</option><option value="sie">Sie – mit Anrede und Nachnamen</option></select><p class="note">Beispiel: „Hallo Maria“ oder „Hallo Frau Müller“.</p></section><section class="setting"><label for="speechSpeed">Sprechtempo bei Sprachmemos</label><select id="speechSpeed"><option value="normal">Normal</option><option value="slightly_slow">Etwas langsamer</option><option value="slow">Langsam</option><option value="very_slow">Sehr langsam und mit Pausen</option></select><p class="note">Nilo und Mira sollen diese Präferenz bei zukünftigen Audioantworten berücksichtigen.</p></section><section class="setting"><label for="detailLevel">Erklärstil</label><select id="detailLevel"><option value="balanced">Normal und verständlich</option><option value="simple">Sehr einfach, wenig Fachbegriffe</option><option value="step_by_step">Immer Schritt für Schritt</option><option value="brief">Kurz und knapp</option></select></section><section class="setting"><label for="questionStyle">Wenn etwas unklar ist</label><select id="questionStyle"><option value="ask_first">Lieber einmal nachfragen</option><option value="best_effort">Erst bestmöglich helfen, dann nachfragen</option></select></section><section class="setting wide"><label>Zusätzliche feste Wünsche</label><div class="checks"><label class="checkitem"><input type="checkbox" id="noJargon">Keine unnötigen Fachbegriffe</label><label class="checkitem"><input type="checkbox" id="repeatSteps">Wichtige Schritte am Ende kurz wiederholen</label><label class="checkitem"><input type="checkbox" id="oneStep">Bei Technik immer nur einen Schritt gleichzeitig geben</label><label class="checkitem"><input type="checkbox" id="confirmSuccess">Nach einem Schritt fragen, ob es funktioniert hat</label><label class="checkitem"><input type="checkbox" id="preferAudio">Wenn sinnvoll, eher als Sprachmemo antworten</label><label class="checkitem"><input type="checkbox" id="safetyCautious">Bei Unsicherheit besonders vorsichtig formulieren</label></div></section><section class="setting wide"><label for="customInstructions">So soll Nilo oder Mira mit dieser Person umgehen</label><textarea id="customInstructions" placeholder="Zum Beispiel: Meine Mutter wird schnell nervös, wenn zu viele Schritte auf einmal kommen. Bitte immer nur einen Schritt nennen und erst weitermachen, wenn sie bestätigt hat, dass es funktioniert hat."></textarea><p class="note">Hier können individuelle Wünsche frei beschrieben werden. Nilo und Mira sollen sie als persönliche Kommunikationspräferenz berücksichtigen, soweit sie sicher und mit dem Dienst vereinbar sind.</p></section><section class="setting wide"><label for="helpfulContext">Hilfreicher persönlicher Kontext</label><textarea id="helpfulContext" placeholder="Zum Beispiel: Nutzt ein Samsung Galaxy A55. Fernseher ist ein Samsung-Modell. Versteht technische Begriffe nur teilweise. Liest lieber kurze Nachrichten."></textarea><p class="note">Bitte nur Informationen eintragen, die für die Unterstützung tatsächlich hilfreich sind. Keine unnötigen sensiblen Daten.</p></section><section class="setting wide"><div class="example"><strong>So wirkt sich das aus</strong><p id="exampleText">Nilo und Mira erklären verständlich und in normalem Tempo. Bei Unklarheiten fragt er lieber einmal nach.</p></div></section></div><div class="savebar"><button class="btn red" type="submit">Einstellungen speichern</button><a class="btn light" href="konto.html">Zurück zum Kundenbereich</a><div class="saved" id="saved">Einstellungen gespeichert.</div></div></form></div></section></main><footer class="footer">
+    </style><style id="managed-concierge-prefs-2026">
+  #prefsForm[aria-busy="true"]{opacity:.72;pointer-events:none}
+  #prefsForm .setting.is-readonly{opacity:.72}
+  #conciergeContextBanner.is-warning{border-color:rgba(181,137,46,.45)}
+  #conciergeContextBanner.is-error{border-color:rgba(180,55,55,.5)}
+</style></head><body><header class="top"><div class="wrap nav"><a class="brand" href="index.html" aria-label="NAHWERK Concierge – Startseite"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Hauptnavigation"><a href="index.html">Übersicht</a><a href="prime-concierge.html">Persönlicher Concierge</a><a href="concierges.html">Concierges</a><a href="senioren-concierge.html">Senioren Concierge</a><a href="angehoerige.html">Für Angehörige</a><a href="leistungen.html">Leistungen</a><a href="kontakt.html">Kontakt</a><a class="auth-link login-link" href="anmelden.html">Anmelden</a><a class="auth-link register-link" href="registrieren.html">Registrieren</a></nav></div></header><main><section class="hero"><div class="wrap"><div class="eyebrow">Persönlich statt allgemein</div><h1>Nilo und Mira passen sich dem Menschen an – nicht umgekehrt.</h1><p>Angehörige und die unterstützte Person können festlegen, wie Nilo oder Mira erklären, sprechen und reagieren soll. Dadurch muss nicht jede mögliche Lebenssituation vorprogrammiert werden.</p></div></section><section class="section"><div class="wrap"><div class="family"><strong>Wichtig:</strong> Diese Einstellungen betreffen Kommunikationsstil und hilfreichen Kontext. Sie sind nicht dafür gedacht, eine Person heimlich zu überwachen oder Entscheidungen gegen ihren Willen festzulegen. Die unterstützte Person soll ihre eigenen Präferenzen jederzeit ändern können.</div><div class="family" id="conciergeContextBanner" style="margin-top:18px" hidden><strong id="conciergeContextTitle">Gesicherter Personen-Kontext</strong><span id="conciergeContextText" style="display:block;margin-top:6px"></span></div><form id="prefsForm"><div class="settings"><section class="setting wide"><label>Concierge wechseln</label><div class="concierge-choice" data-concierge-carousel data-variant="selection" data-input-name="conciergeChoice" data-selected="nilo" data-label="KI-Concierge wechseln"></div><p class="note">Sie können jederzeit wechseln. Die grundlegenden Fähigkeiten und das persönliche Kundengedächtnis bleiben gleich.</p></section><section class="setting"><label for="addressing">Ansprache</label><select id="addressing"><option value="du">Du – mit Vornamen</option><option value="sie">Sie – mit Anrede und Nachnamen</option></select><p class="note">Beispiel: „Hallo Maria“ oder „Hallo Frau Müller“.</p></section><section class="setting"><label for="speechSpeed">Sprechtempo bei Sprachmemos</label><select id="speechSpeed"><option value="normal">Normal</option><option value="slightly_slow">Etwas langsamer</option><option value="slow">Langsam</option><option value="very_slow">Sehr langsam und mit Pausen</option></select><p class="note">Nilo und Mira sollen diese Präferenz bei zukünftigen Audioantworten berücksichtigen.</p></section><section class="setting"><label for="detailLevel">Erklärstil</label><select id="detailLevel"><option value="balanced">Normal und verständlich</option><option value="simple">Sehr einfach, wenig Fachbegriffe</option><option value="step_by_step">Immer Schritt für Schritt</option><option value="brief">Kurz und knapp</option></select></section><section class="setting"><label for="questionStyle">Wenn etwas unklar ist</label><select id="questionStyle"><option value="ask_first">Lieber einmal nachfragen</option><option value="best_effort">Erst bestmöglich helfen, dann nachfragen</option></select></section><section class="setting wide"><label>Zusätzliche feste Wünsche</label><div class="checks"><label class="checkitem"><input type="checkbox" id="noJargon">Keine unnötigen Fachbegriffe</label><label class="checkitem"><input type="checkbox" id="repeatSteps">Wichtige Schritte am Ende kurz wiederholen</label><label class="checkitem"><input type="checkbox" id="oneStep">Bei Technik immer nur einen Schritt gleichzeitig geben</label><label class="checkitem"><input type="checkbox" id="confirmSuccess">Nach einem Schritt fragen, ob es funktioniert hat</label><label class="checkitem"><input type="checkbox" id="preferAudio">Wenn sinnvoll, eher als Sprachmemo antworten</label><label class="checkitem"><input type="checkbox" id="safetyCautious">Bei Unsicherheit besonders vorsichtig formulieren</label></div></section><section class="setting wide"><label for="customInstructions">So soll Nilo oder Mira mit dieser Person umgehen</label><textarea id="customInstructions" placeholder="Zum Beispiel: Meine Mutter wird schnell nervös, wenn zu viele Schritte auf einmal kommen. Bitte immer nur einen Schritt nennen und erst weitermachen, wenn sie bestätigt hat, dass es funktioniert hat."></textarea><p class="note">Hier können individuelle Wünsche frei beschrieben werden. Nilo und Mira sollen sie als persönliche Kommunikationspräferenz berücksichtigen, soweit sie sicher und mit dem Dienst vereinbar sind.</p></section><section class="setting wide"><label for="helpfulContext">Hilfreicher persönlicher Kontext</label><textarea id="helpfulContext" placeholder="Zum Beispiel: Nutzt ein Samsung Galaxy A55. Fernseher ist ein Samsung-Modell. Versteht technische Begriffe nur teilweise. Liest lieber kurze Nachrichten."></textarea><p class="note">Bitte nur Informationen eintragen, die für die Unterstützung tatsächlich hilfreich sind. Keine unnötigen sensiblen Daten.</p></section><section class="setting wide"><div class="example"><strong>So wirkt sich das aus</strong><p id="exampleText">Nilo und Mira erklären verständlich und in normalem Tempo. Bei Unklarheiten fragt er lieber einmal nach.</p></div></section></div><div class="savebar"><button class="btn red" type="submit">Einstellungen speichern</button><a class="btn light" href="konto.html">Zurück zum Kundenbereich</a><div class="saved" id="saved">Einstellungen gespeichert.</div></div></form></div></section></main><footer class="footer">
       <div class="wrap">
         <div class="footergrid">
           <div>
@@ -60,4 +65,202 @@
         </div>
       </div>
     </footer><script src="assets/concierge-voice-preview.js?v=5"></script>
-<script src="assets/concierge-carousel.js?v=20"></script><script>(()=>{const f=document.getElementById('prefsForm'),saved=document.getElementById('saved'),ids=['addressing','speechSpeed','detailLevel','questionStyle','noJargon','repeatSteps','oneStep','confirmSuccess','preferAudio','safetyCautious','customInstructions','helpfulContext'];function read(){const x={conciergeChoice:f.querySelector('[name="conciergeChoice"]')?.value||'nilo'};ids.forEach(id=>{const el=document.getElementById(id);x[id]=el.type==='checkbox'?el.checked:el.value});return x}function apply(x){if(!x)return;if(x.conciergeChoice){(()=>{const c=f.querySelector('[data-concierge-carousel]');c.dataset.selected=x.conciergeChoice;c._nahwerkCarousel?.select(x.conciergeChoice)})()}ids.forEach(id=>{const el=document.getElementById(id);if(!(id in x))return;if(el.type==='checkbox')el.checked=!!x[id];else el.value=x[id]})}function render(){const x=read();let parts=[];if(x.detailLevel==='step_by_step'||x.oneStep)parts.push('Nilo und Mira erklären immer Schritt für Schritt');else if(x.detailLevel==='simple')parts.push('Nilo und Mira erklären besonders einfach und ohne Fachsprache');else if(x.detailLevel==='brief')parts.push('Nilo und Mira antworten möglichst kurz');else parts.push('Nilo und Mira erklären verständlich');if(x.speechSpeed==='slightly_slow')parts.push('Sprachmemos etwas langsamer');if(x.speechSpeed==='slow')parts.push('Sprachmemos langsam');if(x.speechSpeed==='very_slow')parts.push('Sprachmemos sehr langsam und mit Pausen');if(x.questionStyle==='ask_first')parts.push('bei Unklarheiten fragt er lieber einmal nach');if(x.confirmSuccess)parts.push('nach Schritten prüft er, ob es funktioniert hat');document.getElementById('exampleText').textContent=parts.join(', ')+'.'}try{apply(JSON.parse(localStorage.getItem('nahwerk_concierge_preferences')||'null'))}catch(e){}f.addEventListener('input',render);f.addEventListener('change',render);f.addEventListener('submit',e=>{e.preventDefault();const data={...read(),updatedAt:new Date().toISOString(),source:'customer_portal'};localStorage.setItem('nahwerk_concierge_preferences',JSON.stringify(data));saved.style.display='block';setTimeout(()=>saved.style.display='none',3500)});render()})();</script><script src="assets/auth-nav.js?v=40"></script><script>(()=>{try{const s=JSON.parse(localStorage.getItem("scb_web_session")||"null");if(s?.product_context==="senioren"){document.body.classList.add("senior-product");document.body.dataset.product="senioren"}}catch(_){}})();</script><script src="assets/site-ui.js?v=5"></script></body></html>
+<script src="assets/concierge-carousel.js?v=20"></script>
+<script src="assets/auth-nav.js?v=40"></script>
+<script>
+(() => {
+  const API_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-concierge-preferences";
+  const CONTEXT_KEY = "nw_selected_account_context_v1";
+  const f = document.getElementById("prefsForm");
+  const saved = document.getElementById("saved");
+  const banner = document.getElementById("conciergeContextBanner");
+  const bannerTitle = document.getElementById("conciergeContextTitle");
+  const bannerText = document.getElementById("conciergeContextText");
+  const ids = ["addressing","speechSpeed","detailLevel","questionStyle","noJargon","repeatSteps","oneStep","confirmSuccess","preferAudio","safetyCautious","customInstructions","helpfulContext"];
+  let activeAccountId = "";
+  let canWrite = false;
+
+  function session() {
+    try { return JSON.parse(sessionStorage.getItem("scb_web_session") || "null"); }
+    catch (_) { return null; }
+  }
+  function selectedContext() {
+    const s = session();
+    if (!s?.person_id) return null;
+    try {
+      const x = JSON.parse(sessionStorage.getItem(CONTEXT_KEY) || "null");
+      if (!x || String(x.actor_person_id || "") !== String(s.person_id)) return null;
+      return x;
+    } catch (_) { return null; }
+  }
+  function read() {
+    const x = { conciergeChoice: f.querySelector('[name="conciergeChoice"]')?.value || "nilo" };
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      x[id] = el.type === "checkbox" ? el.checked : el.value;
+    });
+    return x;
+  }
+  function apply(x) {
+    if (!x) return;
+    if (x.conciergeChoice) {
+      const carousel = f.querySelector("[data-concierge-carousel]");
+      if (carousel) {
+        carousel.dataset.selected = x.conciergeChoice;
+        carousel._nahwerkCarousel?.select(x.conciergeChoice);
+      }
+    }
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el || !(id in x)) return;
+      if (el.type === "checkbox") el.checked = !!x[id];
+      else el.value = x[id];
+    });
+  }
+  function render() {
+    const x = read();
+    const parts = [];
+    if (x.detailLevel === "step_by_step" || x.oneStep) parts.push("Nilo und Mira erklären immer Schritt für Schritt");
+    else if (x.detailLevel === "simple") parts.push("Nilo und Mira erklären besonders einfach und ohne Fachsprache");
+    else if (x.detailLevel === "brief") parts.push("Nilo und Mira antworten möglichst kurz");
+    else parts.push("Nilo und Mira erklären verständlich");
+    if (x.speechSpeed === "slightly_slow") parts.push("Sprachmemos etwas langsamer");
+    if (x.speechSpeed === "slow") parts.push("Sprachmemos langsam");
+    if (x.speechSpeed === "very_slow") parts.push("Sprachmemos sehr langsam und mit Pausen");
+    if (x.questionStyle === "ask_first") parts.push("bei Unklarheiten fragt er lieber einmal nach");
+    if (x.confirmSuccess) parts.push("nach Schritten prüft er, ob es funktioniert hat");
+    document.getElementById("exampleText").textContent = parts.join(", ") + ".";
+  }
+  function setBusy(value) {
+    f.setAttribute("aria-busy", String(value));
+    f.querySelectorAll("input,select,textarea,button").forEach((el) => {
+      if (value) el.disabled = true;
+      else if (canWrite) el.disabled = false;
+    });
+  }
+  function setWritable(value, reason = "") {
+    canWrite = value === true;
+    f.querySelectorAll("input,select,textarea,button").forEach((el) => {
+      el.disabled = !canWrite;
+      el.closest(".setting")?.classList.toggle("is-readonly", !canWrite);
+    });
+    const ctx = selectedContext();
+    banner.hidden = false;
+    banner.classList.toggle("is-warning", !canWrite);
+    banner.classList.remove("is-error");
+    const name = String(ctx?.display_name || "").trim();
+    const managed = ctx?.is_self === false;
+    bannerTitle.textContent = managed
+      ? "Einstellungen für " + (name || "verwaltete Person")
+      : "Ihre Concierge-Einstellungen";
+    if (canWrite) {
+      bannerText.textContent = managed
+        ? "Sie verwalten diese Einstellungen im freigegebenen Personen-Kontext. Das Login der Person und die Zahlung bleiben davon getrennt."
+        : "Diese Einstellungen werden sicher Ihrem eigenen Personenprofil zugeordnet.";
+    } else {
+      bannerText.textContent = reason === "target_permission_required"
+        ? "Die Person hat ihren eigenen Zugang übernommen. Änderungen sind erst wieder möglich, wenn sie die Family-Berechtigung für Concierge-Einstellungen ausdrücklich freigibt."
+        : "Diese Einstellungen können in diesem Personen-Kontext derzeit nur gelesen werden.";
+    }
+  }
+  function show(message, error = false) {
+    saved.textContent = message;
+    saved.style.display = "block";
+    saved.style.opacity = "1";
+    if (error) banner?.classList.add("is-error");
+    window.clearTimeout(show.timer);
+    show.timer = window.setTimeout(() => {
+      if (!error) saved.style.display = "none";
+    }, 3500);
+  }
+  async function load() {
+    setBusy(true);
+    const auth = window.SCBAuth;
+    const valid = auth?.validateSession ? await auth.validateSession().catch(() => false) : false;
+    if (!valid) return;
+    const s = session();
+    const ctx = selectedContext();
+    activeAccountId = String(ctx?.customer_account_id || s?.customer_account_id || "");
+    if (!s?.session_token || !activeAccountId) {
+      setWritable(false, "invalid_context");
+      show("Der sichere Personen-Kontext konnte nicht geladen werden.", true);
+      return;
+    }
+
+    try {
+      const response = await fetch(API_URL + "?customer_account_id=" + encodeURIComponent(activeAccountId), {
+        method: "GET",
+        headers: { Authorization: "Bearer " + s.session_token }
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok || body?.ok !== true) throw new Error(body?.status || "load_failed");
+      apply(body.preferences || {});
+      setWritable(body.can_write === true, body.write_reason || "");
+      render();
+    } catch (_) {
+      setWritable(false, "load_failed");
+      show("Die Concierge-Einstellungen konnten nicht sicher geladen werden.", true);
+    } finally {
+      f.setAttribute("aria-busy", "false");
+    }
+  }
+
+  f.addEventListener("input", render);
+  f.addEventListener("change", render);
+  f.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!canWrite) {
+      show("Für Änderungen fehlt die erforderliche Freigabe.", true);
+      return;
+    }
+    const s = session();
+    if (!s?.session_token || !activeAccountId) {
+      show("Ihre Sitzung ist nicht mehr verfügbar.", true);
+      return;
+    }
+    setBusy(true);
+    try {
+      const response = await fetch(API_URL, {
+        method: "PUT",
+        headers: {
+          "Authorization": "Bearer " + s.session_token,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          customer_account_id: activeAccountId,
+          preferences: read()
+        })
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok || body?.ok !== true) {
+        if (response.status === 403) setWritable(false, body?.reason_code || body?.write_reason || "target_permission_required");
+        throw new Error(body?.status || "save_failed");
+      }
+      apply(body.preferences || {});
+      setWritable(body.can_write === true, body.write_reason || "");
+      render();
+      show("Einstellungen sicher gespeichert.");
+    } catch (_) {
+      show("Die Einstellungen konnten nicht gespeichert werden.", true);
+    } finally {
+      f.setAttribute("aria-busy", "false");
+      if (canWrite) f.querySelectorAll("input,select,textarea,button").forEach((el) => el.disabled = false);
+    }
+  });
+
+  render();
+  load();
+})();
+</script>
+<script>
+(() => {
+  try {
+    const s = JSON.parse(sessionStorage.getItem("scb_web_session") || localStorage.getItem("scb_web_session") || "null");
+    if (s?.product_context === "senioren") {
+      document.body.classList.add("senior-product");
+      document.body.dataset.product = "senioren";
+    }
+  } catch (_) {}
+})();
+</script>
+<script src="assets/site-ui.js?v=5"></script></body></html>
