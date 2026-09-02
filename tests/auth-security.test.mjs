@@ -46,6 +46,8 @@ test("password reset response does not reveal whether an account exists", () => 
 });
 
 test("registration keeps the hardened passphrase policy and never persists the password in its draft", () => {
+  assert.match(onboarding, /functions\/v1\/web-registration-secure/);
+  assert.equal(onboarding.includes("webhook/senioren-concierge/anmelden"), false);
   assert.match(registration, /minlength="15"/);
   assert.match(registration, /maxlength="128"/);
   assert.match(onboarding, /passwordLength < 15 \|\| passwordLength > 128/);
