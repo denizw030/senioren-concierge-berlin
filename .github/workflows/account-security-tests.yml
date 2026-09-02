@@ -1,0 +1,42 @@
+name: Account Security Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "anmelden.html"
+      - "registrieren.html"
+      - "passwort-zuruecksetzen.html"
+      - "konto.html"
+      - "assets/auth-nav.js"
+      - "assets/onboarding.js"
+      - "tests/auth-security.test.mjs"
+      - "tests/password-policy.test.mjs"
+      - ".github/workflows/account-security-tests.yml"
+  pull_request:
+    paths:
+      - "anmelden.html"
+      - "registrieren.html"
+      - "passwort-zuruecksetzen.html"
+      - "konto.html"
+      - "assets/auth-nav.js"
+      - "assets/onboarding.js"
+      - "tests/auth-security.test.mjs"
+      - "tests/password-policy.test.mjs"
+      - ".github/workflows/account-security-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  account-security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Run account security regression tests
+        run: node --test tests/password-policy.test.mjs tests/auth-security.test.mjs
