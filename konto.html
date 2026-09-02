@@ -3312,6 +3312,7 @@
             phone: s.trusted_contact_phone || ""
           });
           const savedContacts = Array.isArray(contacts) ? contacts.filter((contact) => contact && contact.phone) : [];
+          const savedContactCount = savedContacts.length || (s.trusted_contact_phone ? 1 : 0);
           if (safetyVisibleStatus) safetyVisibleStatus.textContent = enabled ? "Aktiviert" : "Deaktiviert";
           if (safetySummaryIntro) safetySummaryIntro.textContent = enabled
             ? "Ihre Sicherheitsabfragen und die anschließende Kontaktkette sind eingerichtet."
@@ -3322,7 +3323,7 @@
             if (safetySummaryTimes) safetySummaryTimes.textContent = times.length ? times.join(" · ") : "Keine Uhrzeit gespeichert";
             if (safetySummaryResponse) safetySummaryResponse.textContent = customerDelay + " Minuten";
             if (safetySummaryCalls) safetySummaryCalls.textContent = "Bis zu 2 Kundenanrufe · je max. 20 Sekunden";
-            if (safetySummaryContacts) safetySummaryContacts.textContent = savedContacts.length + (savedContacts.length === 1 ? " Kontakt hinterlegt" : " Kontakte hinterlegt");
+            if (safetySummaryContacts) safetySummaryContacts.textContent = savedContactCount + (savedContactCount === 1 ? " Kontakt hinterlegt" : " Kontakte hinterlegt");
             if (safetySummaryEscalation) safetySummaryEscalation.textContent = emergencyDelay + " Minuten nach dem 2. erfolglosen Kundenanruf";
           }
           if (safetyChainEscalation) safetyChainEscalation.textContent = "Bleiben beide Kundenanrufe ohne sichere persönliche Erreichbarkeit, wartet NAHWERK " + emergencyDelay + " Minuten und beginnt anschließend mit Ihren Sicherheitskontakten.";
