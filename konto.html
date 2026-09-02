@@ -311,6 +311,7 @@
         line-height: 1.5;
       }
       .safety-form .safety-toggle {
+        position: relative;
         display: inline-flex !important;
         align-items: center;
         gap: 10px;
@@ -521,9 +522,10 @@
         border-radius: 14px;
         background: rgba(255,255,255,.018);
       }
-      .safety-contact-field {
+      .safety-form .safety-contact-field {
         display: grid;
         gap: 6px;
+        margin: 0;
       }
       .safety-contact-field > span {
         font-size: 11px;
@@ -3350,8 +3352,17 @@
           safetySaveButton.disabled = true;
           safetySaveButton.textContent = "Wird gespeichert …";
           showSafetySaveStatus("Änderungen werden gespeichert …");
+          const previousContacts = Array.isArray(lastSafetyContacts)
+            ? lastSafetyContacts.map((contact) => ({
+                name: contact.name || "",
+                phone: contact.phone || "",
+                relationship: contact.relationship || ""
+              }))
+            : [];
+          let contactsSaved = false;
           try {
             const savedContacts = await saveSafetyContacts(token, contacts);
+            contactsSaved = true;
             const response = await fetch(SAFETY_URL, {
               method: "POST",
               headers: {
@@ -3378,6 +3389,9 @@
               setSafetyFormOpen(false);
             }, 700);
           } catch (error) {
+            if (contactsSaved) {
+              await saveSafetyContacts(token, previousContacts).catch(() => {});
+            }
             const status = error instanceof Error ? error.message : "";
             if (status === "contacts_save_failed" || status === "invalid_contact" || status === "duplicate_contact_phone") {
               showSafetySaveStatus("Die Sicherheitskontakte konnten nicht gespeichert werden. Bitte prüfen Sie die Angaben.", true);
