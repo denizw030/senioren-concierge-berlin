@@ -9,10 +9,13 @@ const login = read("anmelden.html");
 const registration = read("registrieren.html");
 const onboarding = read("assets/onboarding.js");
 const authNav = read("assets/auth-nav.js");
+const account = read("konto.html");
+const reset = read("passwort-zuruecksetzen.html");
 
 test("login only creates a session-scoped session after a successful backend login", () => {
   assert.match(login, /body\.status!=='logged_in'\|\|!body\.session_token/);
-  assert.match(login, /localStorage\.setItem\(SESSION_KEY,JSON\.stringify/);
+  assert.match(login, /sessionStorage\.setItem\(SESSION_KEY,JSON\.stringify/);
+  assert.equal(/localStorage\.setItem\(SESSION_KEY/.test(login), false);
   assert.match(login, /body\.status==='invalid_credentials'/);
   assert.match(login, /res\.status===429/);
 });
@@ -20,99 +23,78 @@ test("login only creates a session-scoped session after a successful backend log
 test("login completes enrolled MFA only through the second verification step", () => {
   assert.match(login, /body\.status==='mfa_required'\|\|body\.mfa_required===true/);
   assert.match(login, /localStorage\.removeItem\(SESSION_KEY\)/);
-  assert.match(login, /let pendingMfa=null/);
+  assert.match(login, /sessionStorage\.removeItem\(SESSION_KEY\)/);
   assert.match(login, /web\/login\/mfa\/challenge/);
   assert.match(login, /web\/login\/mfa\/verify/);
   assert.match(login, /body\.mfa_verified===true&&completeLogin\(body\)/);
-  assert.match(login, /autocomplete="one-time-code"/);
-  assert.match(login, /pattern="\[0-9\]\{6\}"/);
   assert.match(login, /mfaChoiceSms/);
   assert.match(login, /mfaChoiceTotp/);
   assert.match(login, /startMfaChallenge\('sms'\)/);
   assert.match(login, /startMfaChallenge\('totp'\)/);
-  assert.match(login, /mfa_method:pendingMfa\.method/);
-  assert.match(login, /mfaCodeLabel\.textContent='SMS-Code'/);
-  assert.match(login, /Code aus der Authenticator-App/);
-  assert.match(login, /Andere Methode wählen/);
-  assert.match(login, /Zusätzliche Bestätigung erforderlich/);
+});
+
+test("login exposes the secure recovery-code path without bypassing password verification", () => {
+  assert.match(login, /web-mfa-recovery-code-secure/);
+  assert.match(login, /id="mfaRecoverySubmit"/);
+  assert.match(login, /password,recovery_code/);
+  assert.match(login, /NWRC-/);
+  assert.match(login, /Danach müssen Sie sofort eine neue Zwei-Faktor-Methode einrichten/);
 });
 
 test("password reset response does not reveal whether an account exists", () => {
   assert.match(login, /Wenn für diese Adresse ein Konto besteht/);
 });
 
-test("registration keeps the strong password policy and never persists the password in its draft", () => {
-  assert.match(registration, /minlength="12"/);
+test("registration keeps the hardened passphrase policy and never persists the password in its draft", () => {
+  assert.match(registration, /minlength="15"/);
   assert.match(registration, /maxlength="128"/);
-  assert.match(onboarding, /password\.length >= 12/);
+  assert.match(onboarding, /passwordLength < 15 \|\| passwordLength > 128/);
+  assert.match(onboarding, /blockedPasswords = new Set/);
   assert.match(onboarding, /web_password: undefined/);
   assert.match(onboarding, /web_password_repeat: undefined/);
+  assert.match(registration, /assets\/onboarding\.js\?v=21/);
 });
 
 test("raw web session tokens are not persisted in localStorage", () => {
-  const account = read("konto.html");
-  assert.equal(/localStorage\\.setItem\\(SESSION_KEY/.test(login), false);
-  assert.equal(/localStorage\\.setItem\\(SESSION_KEY/.test(onboarding), false);
-  assert.equal(/localStorage\\.(getItem|setItem)\\("scb_web_session"/.test(account), false);
-  assert.match(authNav, /sessionStorage\\.getItem\\(SESSION_KEY/);
-  assert.match(authNav, /sessionStorage\\.setItem\\(SESSION_KEY/);
-  assert.match(authNav, /localStorage\\.removeItem\\(SESSION_KEY/);
-  assert.match(authNav, /JSON\\.stringify\\(\\{ action: "logout" \\}\\)/);
+  assert.equal(/localStorage\.setItem\(SESSION_KEY/.test(login), false);
+  assert.equal(/localStorage\.setItem\(SESSION_KEY/.test(onboarding), false);
+  assert.equal(/localStorage\.(getItem|setItem)\("scb_web_session"/.test(account), false);
+  assert.match(authNav, /sessionStorage\.getItem\(SESSION_KEY/);
+  assert.match(authNav, /sessionStorage\.setItem\(SESSION_KEY/);
+  assert.match(authNav, /localStorage\.removeItem\(SESSION_KEY/);
+  assert.match(authNav, /JSON\.stringify\(\{ action: "logout" \}\)/);
 });
 
-test("protected account pages still validate the existing web session", () => {
+test("protected account pages validate against the secure session layer", () => {
   assert.match(authNav, /const PROTECTED = new Set\(\["konto\.html", "concierge-anpassen\.html"\]\)/);
-  assert.match(authNav, /web\/session\/check/);
+  assert.match(authNav, /functions\/v1\/web-session-secure/);
   assert.match(authNav, /response\.ok && body\.ok && body\.status === "session_valid"/);
 });
 
-
-test("account security supports intelligent MFA recommendations and method choice", () => {
-  const account = read("konto.html");
+test("account security supports MFA enrollment, disable, cross-factor recovery and recovery codes", () => {
   assert.match(account, /id="mfaCard"/);
   assert.match(account, /functions\/v1\/web-mfa-status/);
   assert.match(account, /functions\/v1\/web-mfa-manage/);
-  assert.match(account, /id="mfaEnableButton"/);
-  assert.match(account, /id="mfaDisableButton"/);
-  assert.match(account, /id="mfaDisableSmsButton"/);
-  assert.match(account, /id="mfaSmsMethod"/);
-  assert.match(account, /id="mfaTotpMethod"/);
-  assert.match(account, /id="securityNudge"/);
-  assert.match(account, /id="securityNudgeLater"/);
-  assert.match(account, /id="mfaQr"/);
-  assert.match(account, /id="mfaSecret"/);
-  assert.match(account, /id="mfaPhoneCode"/);
-  assert.match(account, /autocomplete="current-password"/);
-  assert.match(account, /autocomplete="one-time-code"/);
   assert.match(account, /mfaManage\("enroll_start"/);
   assert.match(account, /mfaManage\("enroll_verify"/);
   assert.match(account, /mfaManage\("enroll_cancel"/);
-  assert.match(account, /mfaManage\("nudge_later"/);
   assert.match(account, /mfaManage\("disable"/);
   assert.match(account, /mfaManage\("sms_disable_start"/);
   assert.match(account, /mfaManage\("sms_disable_verify"/);
-  assert.match(account, /beginMfaMethod\("sms"\)/);
-  assert.match(account, /beginMfaMethod\("totp"\)/);
-  assert.match(account, /mfa_sms_code_sent/);
-  assert.match(account, /id="mfaSmsDisableStartForm"/);
-  assert.match(account, /id="mfaSmsDisableVerifyForm"/);
-  assert.match(account, /Empfohlen · Noch nicht aktiviert/);
-  assert.equal(/localStorage\.setItem\([^\n]*(enrollment_token|mfaEnrollmentToken|mfaSmsChallengeId)/.test(account), false);
+  assert.match(account, /mfaManage\("cross_reset_totp_start"/);
+  assert.match(account, /mfaManage\("cross_reset_totp_verify"/);
+  assert.match(account, /mfaManage\("cross_reset_sms"/);
+  assert.match(account, /mfaManage\("recovery_codes_totp"/);
+  assert.match(account, /mfaManage\("recovery_codes_sms_start"/);
+  assert.match(account, /mfaManage\("recovery_codes_sms_verify"/);
+  assert.match(account, /id="mfaRecoveryCodesOutput"/);
+  assert.match(account, /navigator\.clipboard\.writeText/);
+  assert.equal(/localStorage\.setItem\([^\n]*(challenge_id|mfaEnrollmentToken|mfaRecoveryCodesSmsChallengeId)/.test(account), false);
 });
 
-
-test("custom SMS MFA remains server-driven and email stays recovery-only", () => {
-  const account = read("konto.html");
-  assert.match(account, /methods\?\.sms/);
-  assert.match(account, /SMS-Bestätigung wurde erfolgreich aktiviert/);
-  assert.match(account, /Passwort-Wiederherstellung/);
-  assert.match(account, /nicht als gleichwertiger zweiter Faktor/);
-  assert.equal(/localStorage\.setItem\([^\n]*(challenge_id|mfaSmsDisableChallengeId)/.test(account), false);
-});
-
-test("registration queues the security recommendation only after a successful login", () => {
-  assert.match(onboarding, /nw_post_registration_security_prompt/);
-  assert.match(onboarding, /initializeSecurityRecommendation\(body\.session_token\)/);
-  assert.match(onboarding, /body: JSON\.stringify\(\{ action: "nudge_init" \}\)/);
-  assert.match(registration, /assets\/onboarding\.js\?v=19/);
+test("password recovery is server-side and revokes sessions", () => {
+  assert.match(reset, /web-password-recovery-secure/);
+  assert.match(reset, /minlength="15"/);
+  assert.match(reset, /signOut\(\{scope:'global'\}\)/);
+  assert.equal(reset.includes("auth.updateUser({password:p})"), false);
 });
