@@ -10,7 +10,7 @@ const registration = read("registrieren.html");
 const onboarding = read("assets/onboarding.js");
 const authNav = read("assets/auth-nav.js");
 
-test("login only creates a local session after a successful backend login", () => {
+test("login only creates a session-scoped session after a successful backend login", () => {
   assert.match(login, /body\.status!=='logged_in'\|\|!body\.session_token/);
   assert.match(login, /localStorage\.setItem\(SESSION_KEY,JSON\.stringify/);
   assert.match(login, /body\.status==='invalid_credentials'/);
@@ -47,6 +47,17 @@ test("registration keeps the strong password policy and never persists the passw
   assert.match(onboarding, /password\.length >= 12/);
   assert.match(onboarding, /web_password: undefined/);
   assert.match(onboarding, /web_password_repeat: undefined/);
+});
+
+test("raw web session tokens are not persisted in localStorage", () => {
+  const account = read("konto.html");
+  assert.equal(/localStorage\\.setItem\\(SESSION_KEY/.test(login), false);
+  assert.equal(/localStorage\\.setItem\\(SESSION_KEY/.test(onboarding), false);
+  assert.equal(/localStorage\\.(getItem|setItem)\\("scb_web_session"/.test(account), false);
+  assert.match(authNav, /sessionStorage\\.getItem\\(SESSION_KEY/);
+  assert.match(authNav, /sessionStorage\\.setItem\\(SESSION_KEY/);
+  assert.match(authNav, /localStorage\\.removeItem\\(SESSION_KEY/);
+  assert.match(authNav, /JSON\\.stringify\\(\\{ action: "logout" \\}\\)/);
 });
 
 test("protected account pages still validate the existing web session", () => {
