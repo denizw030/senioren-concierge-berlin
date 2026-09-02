@@ -13,7 +13,7 @@ test("registration uses the hardened passphrase policy", () => {
   assert.match(registration, /id="webPassword"[\s\S]*maxlength="128"/);
   assert.match(registration, /Mindestens 15 Zeichen/);
   assert.match(registration, /Sonderzeichen sind nicht vorgeschrieben/);
-  assert.match(registration, /assets\/onboarding\.js\?v=21/);
+  assert.match(registration, /assets\/onboarding\.js\?v=22/);
 
   assert.match(onboarding, /const passwordLength = \[\.\.\.password\]\.length/);
   assert.match(onboarding, /passwordLength < 15 \|\| passwordLength > 128/);
