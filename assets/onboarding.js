@@ -482,14 +482,30 @@
     event.preventDefault();
     if (!planBookable()) return show(`<strong>${selectedPlan().code} ist ausgewählt, aber der sichere Checkout ist noch nicht freigegeben.</strong><br>Bitte wählen Sie FREE oder ändern Sie den Tarif oben. Es wurde nichts kostenpflichtig bestellt.`, true);
     const password = $("webPassword").value;
-    const strongPassword =
-      password.length >= 12 &&
-      password.length <= 128 &&
-      /\p{Ll}/u.test(password) &&
-      /\p{Lu}/u.test(password) &&
-      /\p{N}/u.test(password) &&
-      /[^\p{L}\p{N}\s]/u.test(password);
-    if (!strongPassword) return show("<strong>Bitte wählen Sie ein stärkeres Passwort.</strong><br>Mindestens 12 Zeichen mit Groß- und Kleinbuchstaben, Zahl und Sonderzeichen.", true);
+    const passwordLength = [...password].length;
+    const normalizedPassword = password.toLowerCase();
+    const blockedPasswords = new Set([
+      "passwordpassword",
+      "password123456",
+      "123456789012345",
+      "1234567890123456",
+      "qwertyuiopasdfgh",
+      "qwertyuiop123456",
+      "letmeinletmein",
+      "iloveyouiloveyou",
+      "welcome123456789",
+      "adminadminadmin",
+      "changemechangeme",
+      "nahwerkconcierge",
+      "nahwerk concierge"
+    ]);
+    const emailLocalPart = String($("email")?.value || "").trim().toLowerCase().split("@")[0] || "";
+    if (passwordLength < 15 || passwordLength > 128) {
+      return show("<strong>Bitte wählen Sie ein stärkeres Passwort.</strong><br>Das Passwort muss 15 bis 128 Zeichen lang sein.", true);
+    }
+    if (blockedPasswords.has(normalizedPassword) || (emailLocalPart.length >= 8 && normalizedPassword === emailLocalPart)) {
+      return show("<strong>Bitte wählen Sie ein weniger vorhersehbares Passwort.</strong><br>Verwenden Sie eine lange, individuelle Passphrase.", true);
+    }
     if (!form.reportValidity()) return;
     const self = isSelf();
     const p = person();
