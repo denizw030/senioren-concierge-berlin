@@ -1,1 +1,48 @@
-.mark,.mark.nahwerk-mark,.home-reference .mark,.home-reference .mark.nahwerk-mark,.senior-product .mark,.senior-product .mark.nahwerk-mark,body[data-product="senioren"] .mark,body[data-product="senioren"] .mark.nahwerk-mark{background:transparent center/contain no-repeat url("logos/nahwerk-concierge-gold-transparent.svg?v=1")!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+/* NAHWERK production website logos — centralized to avoid per-page markup drift. */
+.top .brand,
+.home-reference .top .brand{
+  display:block!important;
+  width:clamp(210px,18vw,260px)!important;
+  height:64px!important;
+  min-width:0!important;
+  flex:0 0 auto;
+  background:transparent left center/contain no-repeat url("logos/NAHWERK-CONCIERGE-Website-Logo.webp")!important;
+}
+
+.top .brand .mark,
+.top .brand .brandtext,
+.home-reference .top .brand .mark,
+.home-reference .top .brand .brandtext{
+  display:none!important;
+}
+
+.footer .brand{
+  display:block!important;
+  width:clamp(175px,16vw,220px)!important;
+  height:52px!important;
+  min-width:0!important;
+  margin:0 0 10px!important;
+  background:transparent left center/contain no-repeat url("logos/NAHWERK-CONCIERGE-Website-Logo-Schrift.webp")!important;
+}
+
+.footer .brand .mark,
+.footer .brand .brandtext{
+  display:none!important;
+}
+
+.senior-product .footer{
+  background:#020202!important;
+  border-top-color:#262626!important;
+}
+
+@media(max-width:620px){
+  .top .brand,
+  .home-reference .top .brand{
+    width:205px!important;
+    height:54px!important;
+  }
+  .footer .brand{
+    width:185px!important;
+    height:46px!important;
+  }
+}
