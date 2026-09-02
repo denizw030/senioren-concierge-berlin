@@ -128,7 +128,9 @@ test("carousel and overview use one clipped radius owner",()=>{
   assert.match(carousel,/isolation:isolate/);
   assert.match(carousel,/aspect-ratio:480\/722;/);
   assert.match(carousel,/object-fit:cover/);
-  assert.match(overview,/\.concierge-overview-card\{/);\n  assert.match(overview,/border-radius:19px/);\n  assert.match(overview,/\.concierge-overview-card\{[^}]*overflow:hidden/);
+  assert.match(overview,/\.concierge-overview-card\{/);
+  assert.match(overview,/border-radius:19px/);
+  assert.match(overview,/\.concierge-overview-card\{[^}]*overflow:hidden/);
 });
 
 test("optimized lifestyle assets are assigned by audience",()=>{
