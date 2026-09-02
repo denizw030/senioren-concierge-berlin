@@ -2219,6 +2219,7 @@
           return activeAccountContext?.selected?.is_self === false;
         }
         function setManagedContextRestrictions(managed) {
+          managedSafetyAuthorized = false;
           const lockedTabs = new Set(["concierge", "safety", "personal", "access"]);
           accountTabs.forEach((tab) => {
             const locked = managed && lockedTabs.has(tab.dataset.accountTab);
@@ -2229,9 +2230,52 @@
             button.disabled = managed && lockedTabs.has(button.dataset.openAccountTab);
           });
           if (managedContextNotice) managedContextNotice.hidden = !managed;
+          if (!managed) {
+            safetyCustomerDelay.disabled = false;
+            safetyEmergencyDelay.disabled = false;
+          }
+        }
+        function setManagedSafetyAvailable(available) {
+          managedSafetyAuthorized = available === true;
+          if (!isManagedAccountContext()) return;
+          const tab = accountTabs.find((item) => item.dataset.accountTab === "safety");
+          if (tab) {
+            tab.disabled = !managedSafetyAuthorized;
+            tab.setAttribute("aria-disabled", String(!managedSafetyAuthorized));
+          }
+          document.querySelectorAll('[data-open-account-tab="safety"]').forEach((button) => {
+            button.disabled = !managedSafetyAuthorized;
+          });
+          safetyCustomerDelay.disabled = true;
+          safetyEmergencyDelay.disabled = true;
+          safetyCustomerDelay.title = "Diese Verzögerung wird im verwalteten Personen-Kontext nicht geändert.";
+          safetyEmergencyDelay.title = "Diese Verzögerung wird im verwalteten Personen-Kontext nicht geändert.";
+        }
+        async function probeManagedSafetyAccess() {
+          if (!isManagedAccountContext()) return false;
+          const token = sessionToken();
+          const accountId = activeAccountContext?.selected?.customer_account_id;
+          if (!token || !accountId) return false;
+          try {
+            const response = await fetch(MANAGED_SAFETY_URL + "?customer_account_id=" + encodeURIComponent(accountId), {
+              method: "GET",
+              headers: { Authorization: "Bearer " + token }
+            });
+            const body = await response.json().catch(() => ({}));
+            const allowed = response.ok && body?.ok === true && body?.can_write === true;
+            setManagedSafetyAvailable(allowed);
+            if (allowed) {
+              lastSafetyContacts = Array.isArray(body?.safety?.contacts) ? body.safety.contacts : [];
+            }
+            return allowed;
+          } catch (_) {
+            setManagedSafetyAvailable(false);
+            return false;
+          }
         }
         function setAccountTab(name, focus = false) {
-          if (isManagedAccountContext() && ["concierge", "safety", "personal", "access"].includes(name)) name = "overview";
+          if (isManagedAccountContext() && ["concierge", "personal", "access"].includes(name)) name = "overview";
+          if (isManagedAccountContext() && name === "safety" && !managedSafetyAuthorized) name = "overview";
           const validName = accountTabs.some((tab) => tab.dataset.accountTab === name) ? name : "overview";
           accountTabs.forEach((tab) => {
             const active = tab.dataset.accountTab === validName;
@@ -2245,7 +2289,7 @@
           if (validName !== "safety") setSafetyFormOpen(false);
           if (validName === "safety") {
             ensureSafetyLoaded();
-            ensureMfaLoaded();
+            if (!isManagedAccountContext()) ensureMfaLoaded();
           }
           if (validName === "concierge") ensureReceptionLoaded();
           if (validName === "access") ensureFamilyPermissionsLoaded();
@@ -2410,6 +2454,8 @@
         const MFA_MANAGE_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-mfa-manage";
         const SAFETY_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/safety";
         const SAFETY_CONTACTS_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-safety-contacts";
+        const MANAGED_SAFETY_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-managed-safety-context";
+        let managedSafetyAuthorized = false;
         const safetyCard = document.getElementById("safetyCard");
         const safetyForm = document.getElementById("safetyForm");
         const safetyStatus = document.getElementById("safetyStatus");
@@ -2635,6 +2681,7 @@
             recipientMeta.textContent = [relation, "Eigener Tarif", "Eigene Nutzung"].filter(Boolean).join(" · ");
           }
           const managed = body?.selected?.is_self === false;
+          safetyLoadStarted = false;
           familyPermissionsLoaded = false;
           if (familyAccessStatus) familyAccessStatus.textContent = "Wird geladen";
           if (familyAccessMeta) familyAccessMeta.textContent = "";
@@ -2651,7 +2698,10 @@
               relationship: accountMeta?.relationship ? String(accountMeta.relationship) : ""
             }));
           } catch (_) {}
-          if (managed) setAccountTab("overview");
+          if (managed) {
+            setAccountTab("overview");
+            probeManagedSafetyAccess();
+          }
         }
         async function selectAccountContext(customerAccountId, accountMeta = null) {
           const token = sessionToken();
@@ -3733,6 +3783,31 @@
           const token = sessionToken();
           if (!token) return;
           try {
+            if (isManagedAccountContext()) {
+              const accountId = activeAccountContext?.selected?.customer_account_id;
+              if (!accountId || !managedSafetyAuthorized) throw new Error("managed_safety_not_authorized");
+              const response = await fetch(MANAGED_SAFETY_URL + "?customer_account_id=" + encodeURIComponent(accountId), {
+                method: "GET",
+                headers: { Authorization: "Bearer " + token }
+              });
+              const body = await response.json().catch(() => ({}));
+              if (!response.ok || body?.ok !== true) {
+                setManagedSafetyAvailable(false);
+                throw new Error(String(body?.status || "managed_safety_load_failed"));
+              }
+              const managedSafety = body.safety || {};
+              const contacts = Array.isArray(managedSafety.contacts) ? managedSafety.contacts : [];
+              lastSafetyContacts = contacts;
+              renderSafety({
+                safety_enabled: managedSafety.enabled === true,
+                checkin_times: Array.isArray(managedSafety.checkin_times) ? managedSafety.checkin_times : [],
+                next_checkin_at: managedSafety.next_checkin_at || null,
+                backend_active: managedSafety.enabled === true
+              }, contacts);
+              safetyCustomerDelay.disabled = true;
+              safetyEmergencyDelay.disabled = true;
+              return;
+            }
             const [safetyResponse, contacts] = await Promise.all([
               fetch(SAFETY_URL, {
                 method: "GET",
@@ -3803,6 +3878,55 @@
           const phones = contacts.map((contact) => contact.phone);
           if (new Set(phones).size !== phones.length) {
             showSafetySaveStatus("Dieselbe Telefonnummer kann nicht mehrfach als Sicherheitskontakt verwendet werden.", true);
+            return;
+          }
+
+          if (isManagedAccountContext()) {
+            const accountId = activeAccountContext?.selected?.customer_account_id;
+            if (!managedSafetyAuthorized || !accountId) {
+              showSafetySaveStatus("Für diese Person fehlt die erforderliche Safety-Freigabe.", true);
+              return;
+            }
+            safetySaveButton.disabled = true;
+            safetySaveButton.textContent = "Wird gespeichert …";
+            showSafetySaveStatus("Änderungen werden gespeichert …");
+            try {
+              const response = await fetch(MANAGED_SAFETY_URL, {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: "Bearer " + token
+                },
+                body: JSON.stringify({
+                  customer_account_id: accountId,
+                  enabled: safetyEnabled.checked,
+                  checkin_times: times,
+                  contacts,
+                  timezone: "Europe/Berlin"
+                })
+              });
+              const body = await response.json().catch(() => ({}));
+              if (!response.ok || body?.ok !== true) {
+                if (response.status === 403) setManagedSafetyAvailable(false);
+                throw new Error(String(body?.status || "managed_safety_save_failed"));
+              }
+              const managedContacts = Array.isArray(body?.safety?.contacts) ? body.safety.contacts : contacts;
+              lastSafetyContacts = managedContacts;
+              safetyLoadStarted = false;
+              await loadSafety();
+              showSafetySaveStatus("Gespeichert.");
+              setTimeout(() => {
+                safetySaveStatus.classList.remove("is-visible");
+                setSafetyFormOpen(false);
+              }, 700);
+            } catch (_) {
+              showSafetySaveStatus("Die Safety-Einstellungen dieser Person konnten nicht gespeichert werden.", true);
+            } finally {
+              safetySaveButton.disabled = false;
+              safetySaveButton.textContent = "Änderungen speichern";
+              safetyCustomerDelay.disabled = true;
+              safetyEmergencyDelay.disabled = true;
+            }
             return;
           }
 
