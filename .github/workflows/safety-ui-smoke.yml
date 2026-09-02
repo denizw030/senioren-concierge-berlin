@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
     paths:
+      - "konto.html"
+      - "tests/account-usage.test.mjs"
       - ".github/workflows/safety-ui-smoke.yml"
 
 permissions:
@@ -41,7 +43,14 @@ jobs:
               'customer_call_delay_minutes: customerDelay',
               'emergency_contact_delay_minutes: emergencyDelay',
               'maximal 20 Sekunden',
-              'höchstens 10 Versuche',
+              'höchstens 5 Versuche',
+              'Bis zu 2 Kundenanrufe',
+              'id="safetySummaryGrid"',
+              'id="safetySummaryCalls"',
+              'id="safetyChainEscalation"',
+              'safety-panel{grid-column:1/-1!important;width:100%}',
+              'id="safetyCustomerDelay" type="number" min="1" max="60" step="1" value="5"',
+              'id="safetyEmergencyDelay" type="number" min="1" max="60" step="1" value="3"',
               'Mailbox',
               'safetyToggleLabel.textContent = enabled ? "Deaktivieren" : "Aktivieren"',
               'const enteredContacts = rawContacts.filter',
@@ -49,6 +58,8 @@ jobs:
           ):
               assert marker in html, marker
 
+          assert 'höchstens 10 Versuche' not in html
+          assert 'value="15" inputmode="numeric"' not in html
           assert 'data-safety-contact="name" type="text" autocomplete="name" maxlength="120" required' not in html
           assert 'data-safety-contact="phone" type="tel" autocomplete="tel" required' not in html
 
