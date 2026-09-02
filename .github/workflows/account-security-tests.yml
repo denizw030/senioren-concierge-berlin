@@ -40,3 +40,9 @@ jobs:
           node-version: "22"
       - name: Run account security regression tests
         run: node --test tests/password-policy.test.mjs tests/auth-security.test.mjs
+      - name: Verify live login client is deployed
+        run: |
+          curl -fsS "https://nahwerkconcierge.com/anmelden.html?sha=${GITHUB_SHA}" -o /tmp/live-login.html
+          grep -q "functions/v1/web-login-secure" /tmp/live-login.html
+          grep -q "functions/v1/web-password-recovery-request-secure" /tmp/live-login.html
+          ! grep -q "webhook/senioren-concierge/web/login/password" /tmp/live-login.html
