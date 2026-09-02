@@ -1,6 +1,6 @@
 (() => {
   const WEBHOOK_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-registration-secure";
-  const LOGIN_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/login/password";
+  const LOGIN_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-login-secure";
   const MFA_MANAGE_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-mfa-manage";
   const SESSION_KEY = "scb_web_session";
   const SECURITY_PROMPT_KEY = "nw_post_registration_security_prompt";
