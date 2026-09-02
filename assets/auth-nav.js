@@ -4,9 +4,9 @@
   document.head.appendChild(mobileCss);
   const SESSION_KEY = "scb_web_session";
   const PRODUCT_KEY = "nahwerk_product";
-  const CHECK_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/session/check";
+  const CHECK_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-session-secure";
   const PROFILE_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-profile";
-  const LOGOUT_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/logout";
+  const LOGOUT_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-session-secure";
   const PROTECTED = new Set(["konto.html", "concierge-anpassen.html"]);
   const CONTEXT_PAGES = new Set(["pakete.html", "registrieren.html", "anmelden.html", "konto.html", "concierge-anpassen.html"]);
   const NAV = [["index.html", "Übersicht"], ["prime-concierge.html", "Persönlicher Concierge"], ["concierges.html", "Concierges"], ["senioren-concierge.html", "Senioren Concierge"], ["senioren-concierge.html#angehoerige", "Für Angehörige"], ["leistungen.html", "Leistungen"], ["kontakt.html", "Kontakt"]];
@@ -42,9 +42,20 @@
   }
   function getSession() {
     try {
-      const session = JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
+      const session = JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null");
       if (session?.session_token) return session;
     } catch (_) {}
+    try {
+      const legacy = JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
+      if (legacy?.session_token) {
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(legacy));
+        localStorage.removeItem(SESSION_KEY);
+        return legacy;
+      }
+      localStorage.removeItem(SESSION_KEY);
+    } catch (_) {
+      localStorage.removeItem(SESSION_KEY);
+    }
     return null;
   }
   function getRenderableSession() {
@@ -141,7 +152,7 @@
     const session = getSession();
     if (session?.session_token) {
       try {
-        await fetch(LOGOUT_URL, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.session_token}` }, body: "{}" });
+        await fetch(LOGOUT_URL, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.session_token}` }, body: JSON.stringify({ action: "logout" }) });
       } catch (_) {}
     }
     clearLocalAuth();
@@ -307,7 +318,7 @@
           if (product_context === "senioren" || product_context === "prime") {
             sessionStorage.setItem(PRODUCT_KEY, product_context);
           }
-          localStorage.setItem(SESSION_KEY, JSON.stringify(validatedSession));
+          sessionStorage.setItem(SESSION_KEY, JSON.stringify(validatedSession));
           return true;
         }
         if (profileResponse.status === 401 || profileResponse.status === 403) {
@@ -343,7 +354,7 @@
         };
         sessionValidated = true;
         lastValidatedProfile = null;
-        localStorage.setItem(SESSION_KEY, JSON.stringify(validatedSession));
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(validatedSession));
         return true;
       }
       if (response.status === 401 || response.status === 403) {
