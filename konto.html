@@ -1884,6 +1884,7 @@
                   <button class="btn red" type="button" id="mfaEnableButton">Kontoschutz einrichten</button>
                   <button class="btn light" type="button" id="mfaDisableButton" hidden>Authenticator-App deaktivieren</button>
                   <button class="btn light" type="button" id="mfaDisableSmsButton" hidden>SMS-Bestätigung deaktivieren</button>
+                  <button class="btn light" type="button" id="mfaRecoveryButton" hidden>Methode verloren?</button>
                 </div>
               </div>
 
@@ -1989,6 +1990,61 @@
                 <div class="mfa-inline-actions">
                   <button class="btn red" type="submit" id="mfaSmsDisableConfirmButton">SMS-Bestätigung deaktivieren</button>
                   <button class="btn light" type="button" id="mfaSmsDisableVerifyCancelButton">Abbrechen</button>
+                </div>
+              </form>
+
+              <div class="mfa-method-chooser" id="mfaRecoveryChooser" hidden>
+                <p class="muted mfa-step-copy">Wenn Sie den Zugriff auf eine Bestätigungsmethode verloren haben, können Sie sie mit Ihrem Passwort und der weiterhin verfügbaren zweiten Methode sicher zurücksetzen.</p>
+                <div class="mfa-method-grid">
+                  <button class="mfa-method" type="button" id="mfaRecoverTotpButton"><strong>Authenticator-App verloren</strong><span>Mit aktuellem Passwort und SMS-Code bestätigen.</span></button>
+                  <button class="mfa-method" type="button" id="mfaRecoverSmsButton"><strong>Handy / SMS verloren</strong><span>Mit aktuellem Passwort und Authenticator-Code bestätigen.</span></button>
+                </div>
+                <div class="mfa-inline-actions"><button class="btn light" type="button" id="mfaRecoveryCancelButton">Abbrechen</button></div>
+              </div>
+
+              <form class="mfa-form" id="mfaRecoverTotpStartForm" hidden>
+                <p class="muted mfa-step-copy">Bestätigen Sie Ihr aktuelles Passwort. Danach senden wir einen Sicherheitscode an Ihre weiterhin hinterlegte SMS-Nummer.</p>
+                <div class="mfa-form-grid">
+                  <div class="field">
+                    <label for="mfaRecoverTotpPassword">Aktuelles Passwort</label>
+                    <input id="mfaRecoverTotpPassword" type="password" autocomplete="current-password" required />
+                  </div>
+                </div>
+                <div class="mfa-inline-actions">
+                  <button class="btn red" type="submit" id="mfaRecoverTotpSendButton">SMS-Code senden</button>
+                  <button class="btn light" type="button" id="mfaRecoverTotpCancelButton">Abbrechen</button>
+                </div>
+              </form>
+
+              <form class="mfa-form" id="mfaRecoverTotpVerifyForm" hidden>
+                <p class="muted mfa-step-copy">Geben Sie den 6-stelligen Code ein, den wir an <strong id="mfaRecoverTotpMaskedPhone">Ihre hinterlegte Mobilnummer</strong> gesendet haben.</p>
+                <div class="mfa-form-grid">
+                  <div class="field">
+                    <label for="mfaRecoverTotpCode">6-stelliger SMS-Code</label>
+                    <input class="mfa-code" id="mfaRecoverTotpCode" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required />
+                  </div>
+                </div>
+                <div class="mfa-inline-actions">
+                  <button class="btn red" type="submit" id="mfaRecoverTotpConfirmButton">Authenticator-App zurücksetzen</button>
+                  <button class="btn light" type="button" id="mfaRecoverTotpVerifyCancelButton">Abbrechen</button>
+                </div>
+              </form>
+
+              <form class="mfa-form" id="mfaRecoverSmsForm" hidden>
+                <p class="muted mfa-step-copy">Bestätigen Sie Ihr aktuelles Passwort und einen gültigen Code aus Ihrer Authenticator-App. Danach wird die verlorene SMS-Methode entfernt und Sie müssen sich neu anmelden.</p>
+                <div class="mfa-form-grid">
+                  <div class="field">
+                    <label for="mfaRecoverSmsPassword">Aktuelles Passwort</label>
+                    <input id="mfaRecoverSmsPassword" type="password" autocomplete="current-password" required />
+                  </div>
+                  <div class="field">
+                    <label for="mfaRecoverSmsCode">6-stelliger Authenticator-Code</label>
+                    <input class="mfa-code" id="mfaRecoverSmsCode" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required />
+                  </div>
+                </div>
+                <div class="mfa-inline-actions">
+                  <button class="btn red" type="submit" id="mfaRecoverSmsConfirmButton">SMS-Methode zurücksetzen</button>
+                  <button class="btn light" type="button" id="mfaRecoverSmsCancelButton">Abbrechen</button>
                 </div>
               </form>
 
@@ -2899,6 +2955,25 @@
         const mfaSmsDisableCode = document.getElementById("mfaSmsDisableCode");
         const mfaSmsDisableConfirmButton = document.getElementById("mfaSmsDisableConfirmButton");
         const mfaSmsDisableVerifyCancelButton = document.getElementById("mfaSmsDisableVerifyCancelButton");
+        const mfaRecoveryButton = document.getElementById("mfaRecoveryButton");
+        const mfaRecoveryChooser = document.getElementById("mfaRecoveryChooser");
+        const mfaRecoverTotpButton = document.getElementById("mfaRecoverTotpButton");
+        const mfaRecoverSmsButton = document.getElementById("mfaRecoverSmsButton");
+        const mfaRecoveryCancelButton = document.getElementById("mfaRecoveryCancelButton");
+        const mfaRecoverTotpStartForm = document.getElementById("mfaRecoverTotpStartForm");
+        const mfaRecoverTotpPassword = document.getElementById("mfaRecoverTotpPassword");
+        const mfaRecoverTotpSendButton = document.getElementById("mfaRecoverTotpSendButton");
+        const mfaRecoverTotpCancelButton = document.getElementById("mfaRecoverTotpCancelButton");
+        const mfaRecoverTotpVerifyForm = document.getElementById("mfaRecoverTotpVerifyForm");
+        const mfaRecoverTotpMaskedPhone = document.getElementById("mfaRecoverTotpMaskedPhone");
+        const mfaRecoverTotpCode = document.getElementById("mfaRecoverTotpCode");
+        const mfaRecoverTotpConfirmButton = document.getElementById("mfaRecoverTotpConfirmButton");
+        const mfaRecoverTotpVerifyCancelButton = document.getElementById("mfaRecoverTotpVerifyCancelButton");
+        const mfaRecoverSmsForm = document.getElementById("mfaRecoverSmsForm");
+        const mfaRecoverSmsPassword = document.getElementById("mfaRecoverSmsPassword");
+        const mfaRecoverSmsCode = document.getElementById("mfaRecoverSmsCode");
+        const mfaRecoverSmsConfirmButton = document.getElementById("mfaRecoverSmsConfirmButton");
+        const mfaRecoverSmsCancelButton = document.getElementById("mfaRecoverSmsCancelButton");
         const mfaFeedback = document.getElementById("mfaFeedback");
         const securityNudge = document.getElementById("securityNudge");
         const securityNudgeEyebrow = document.getElementById("securityNudgeEyebrow");
@@ -2911,6 +2986,7 @@
         let mfaEnrollmentToken = "";
         let mfaSmsChallengeId = "";
         let mfaSmsDisableChallengeId = "";
+        let mfaRecoveryTotpChallengeId = "";
         let mfaSelectedMethod = "totp";
         let lastMfaPayload = null;
 
@@ -2947,6 +3023,7 @@
           mfaEnrollmentToken = "";
           mfaSmsChallengeId = "";
           mfaSmsDisableChallengeId = "";
+          mfaRecoveryTotpChallengeId = "";
           mfaMethodChooser.hidden = true;
           mfaStartForm.hidden = true;
           mfaSetup.hidden = true;
@@ -2954,6 +3031,10 @@
           mfaDisableForm.hidden = true;
           mfaSmsDisableStartForm.hidden = true;
           mfaSmsDisableVerifyForm.hidden = true;
+          mfaRecoveryChooser.hidden = true;
+          mfaRecoverTotpStartForm.hidden = true;
+          mfaRecoverTotpVerifyForm.hidden = true;
+          mfaRecoverSmsForm.hidden = true;
           mfaCurrentPassword.value = "";
           mfaSetupCode.value = "";
           mfaPhoneCode.value = "";
@@ -2961,6 +3042,10 @@
           mfaDisableCode.value = "";
           mfaSmsDisablePassword.value = "";
           mfaSmsDisableCode.value = "";
+          mfaRecoverTotpPassword.value = "";
+          mfaRecoverTotpCode.value = "";
+          mfaRecoverSmsPassword.value = "";
+          mfaRecoverSmsCode.value = "";
           mfaQr.removeAttribute("src");
           mfaSecret.textContent = "";
           mfaMaskedPhone.textContent = "Ihre hinterlegte Mobilnummer";
@@ -2971,6 +3056,8 @@
         mfaPhoneCode.addEventListener("input", () => normalizeSixDigitInput(mfaPhoneCode));
         mfaDisableCode.addEventListener("input", () => normalizeSixDigitInput(mfaDisableCode));
         mfaSmsDisableCode.addEventListener("input", () => normalizeSixDigitInput(mfaSmsDisableCode));
+        mfaRecoverTotpCode.addEventListener("input", () => normalizeSixDigitInput(mfaRecoverTotpCode));
+        mfaRecoverSmsCode.addEventListener("input", () => normalizeSixDigitInput(mfaRecoverSmsCode));
 
         async function mfaManage(action, payload = {}) {
           const token = sessionToken();
@@ -3112,6 +3199,7 @@
               mfaEnableButton.textContent = "Weitere Methode hinzufügen";
               mfaDisableButton.hidden = !totpMfaEnrolled();
               mfaDisableSmsButton.hidden = !smsMfaEnrolled();
+              mfaRecoveryButton.hidden = !(totpMfaEnrolled() && smsMfaEnrolled());
               hideSecurityNudge();
               return;
             }
@@ -3129,6 +3217,7 @@
             mfaEnableButton.textContent = enrollmentRequired ? "Jetzt einrichten" : "Kontoschutz einrichten";
             mfaDisableButton.hidden = true;
             mfaDisableSmsButton.hidden = true;
+            mfaRecoveryButton.hidden = true;
             applySecurityRecommendation(body);
           } catch (_) {
             lastMfaPayload = null;
@@ -3455,6 +3544,165 @@
           } finally {
             mfaSmsDisableConfirmButton.disabled = false;
             mfaSmsDisableConfirmButton.textContent = "SMS-Bestätigung deaktivieren";
+          }
+        });
+
+        function finishMfaCrossRecovery(message) {
+          try {
+            sessionStorage.removeItem("scb_web_session");
+            localStorage.removeItem("scb_web_session");
+          } catch (_) {}
+          setMfaFeedback(message + " Sie werden zur sicheren Neuanmeldung weitergeleitet.", "success");
+          setTimeout(() => { location.href = "anmelden.html?security=mfa-recovery"; }, 450);
+        }
+
+        mfaRecoveryButton.addEventListener("click", () => {
+          resetMfaForms();
+          setMfaFeedback("");
+          if (!(totpMfaEnrolled() && smsMfaEnrolled())) {
+            setMfaFeedback("Ein automatischer Reset ist nur möglich, wenn eine zweite aktive Bestätigungsmethode verfügbar ist.", "error");
+            return;
+          }
+          mfaRecoveryChooser.hidden = false;
+        });
+
+        mfaRecoveryCancelButton.addEventListener("click", () => {
+          resetMfaForms();
+          setMfaFeedback("");
+        });
+
+        mfaRecoverTotpButton.addEventListener("click", () => {
+          resetMfaForms();
+          setMfaFeedback("");
+          mfaRecoverTotpStartForm.hidden = false;
+          mfaRecoverTotpPassword.focus();
+        });
+
+        mfaRecoverSmsButton.addEventListener("click", () => {
+          resetMfaForms();
+          setMfaFeedback("");
+          mfaRecoverSmsForm.hidden = false;
+          mfaRecoverSmsPassword.focus();
+        });
+
+        mfaRecoverTotpCancelButton.addEventListener("click", () => {
+          resetMfaForms();
+          setMfaFeedback("");
+        });
+        mfaRecoverTotpVerifyCancelButton.addEventListener("click", () => {
+          resetMfaForms();
+          setMfaFeedback("");
+        });
+        mfaRecoverSmsCancelButton.addEventListener("click", () => {
+          resetMfaForms();
+          setMfaFeedback("");
+        });
+
+        mfaRecoverTotpStartForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          if (!mfaRecoverTotpStartForm.reportValidity()) return;
+          mfaRecoverTotpSendButton.disabled = true;
+          mfaRecoverTotpSendButton.textContent = "SMS wird gesendet …";
+          try {
+            const body = await mfaManage("cross_reset_totp_start", {
+              password: mfaRecoverTotpPassword.value
+            });
+            if (body?.status !== "mfa_recovery_sms_code_sent" || !body.challenge_id) {
+              throw new Error("mfa_recovery_start_failed");
+            }
+            mfaRecoveryTotpChallengeId = String(body.challenge_id);
+            mfaRecoverTotpMaskedPhone.textContent = String(body.masked_phone || "Ihre hinterlegte Mobilnummer");
+            mfaRecoverTotpPassword.value = "";
+            mfaRecoverTotpStartForm.hidden = true;
+            mfaRecoverTotpVerifyForm.hidden = false;
+            setMfaFeedback("SMS-Code wurde gesendet. Bestätigen Sie ihn, um die verlorene Authenticator-App sicher zurückzusetzen.", "success");
+            mfaRecoverTotpCode.focus();
+          } catch (error) {
+            const status = error instanceof Error ? error.message : "";
+            if (status === "reauthentication_failed") {
+              setMfaFeedback("Das aktuelle Passwort konnte nicht bestätigt werden.", "error");
+            } else if (status === "too_many_attempts") {
+              setMfaFeedback("Zu viele Versuche. Bitte warten Sie einige Minuten.", "error");
+            } else if (status === "cross_factor_recovery_unavailable") {
+              setMfaFeedback("Für diesen automatischen Reset muss SMS weiterhin als zweite Methode aktiv sein.", "error");
+            } else {
+              setMfaFeedback("Der sichere Reset konnte nicht gestartet werden.", "error");
+            }
+          } finally {
+            mfaRecoverTotpPassword.value = "";
+            mfaRecoverTotpSendButton.disabled = false;
+            mfaRecoverTotpSendButton.textContent = "SMS-Code senden";
+          }
+        });
+
+        mfaRecoverTotpVerifyForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          normalizeSixDigitInput(mfaRecoverTotpCode);
+          if (!mfaRecoverTotpVerifyForm.reportValidity() || !mfaRecoveryTotpChallengeId) return;
+          mfaRecoverTotpConfirmButton.disabled = true;
+          mfaRecoverTotpConfirmButton.textContent = "Wird zurückgesetzt …";
+          try {
+            const body = await mfaManage("cross_reset_totp_verify", {
+              challenge_id: mfaRecoveryTotpChallengeId,
+              code: mfaRecoverTotpCode.value
+            });
+            if (body?.status !== "mfa_factor_reset" || body?.reset_method !== "totp") {
+              throw new Error("mfa_recovery_not_confirmed");
+            }
+            finishMfaCrossRecovery("Die verlorene Authenticator-App wurde entfernt.");
+          } catch (error) {
+            const status = error instanceof Error ? error.message : "";
+            if (status === "invalid_code" || status === "invalid_mfa_code") {
+              setMfaFeedback("Der SMS-Code ist nicht korrekt oder nicht mehr gültig.", "error");
+              mfaRecoverTotpCode.select();
+            } else if (status === "challenge_expired" || status === "challenge_not_found") {
+              resetMfaForms();
+              setMfaFeedback("Der SMS-Code ist abgelaufen. Bitte starten Sie den Reset erneut.", "error");
+            } else if (status === "too_many_attempts") {
+              setMfaFeedback("Zu viele Versuche. Bitte warten Sie einige Minuten.", "error");
+            } else {
+              setMfaFeedback("Die Authenticator-App konnte nicht zurückgesetzt werden.", "error");
+            }
+          } finally {
+            mfaRecoverTotpConfirmButton.disabled = false;
+            mfaRecoverTotpConfirmButton.textContent = "Authenticator-App zurücksetzen";
+          }
+        });
+
+        mfaRecoverSmsForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          normalizeSixDigitInput(mfaRecoverSmsCode);
+          if (!mfaRecoverSmsForm.reportValidity()) return;
+          mfaRecoverSmsConfirmButton.disabled = true;
+          mfaRecoverSmsConfirmButton.textContent = "Wird zurückgesetzt …";
+          try {
+            const body = await mfaManage("cross_reset_sms", {
+              password: mfaRecoverSmsPassword.value,
+              code: mfaRecoverSmsCode.value
+            });
+            if (body?.status !== "mfa_factor_reset" || body?.reset_method !== "sms") {
+              throw new Error("mfa_recovery_not_confirmed");
+            }
+            finishMfaCrossRecovery("Die verlorene SMS-Methode wurde entfernt.");
+          } catch (error) {
+            const status = error instanceof Error ? error.message : "";
+            if (status === "reauthentication_failed") {
+              setMfaFeedback("Das aktuelle Passwort konnte nicht bestätigt werden.", "error");
+            } else if (status === "invalid_mfa_code") {
+              setMfaFeedback("Der Authenticator-Code ist nicht korrekt oder nicht mehr gültig.", "error");
+              mfaRecoverSmsCode.select();
+            } else if (status === "too_many_attempts") {
+              setMfaFeedback("Zu viele Versuche. Bitte warten Sie einige Minuten.", "error");
+            } else if (status === "cross_factor_recovery_unavailable") {
+              setMfaFeedback("Für diesen automatischen Reset muss die Authenticator-App weiterhin aktiv sein.", "error");
+            } else {
+              setMfaFeedback("Die SMS-Methode konnte nicht zurückgesetzt werden.", "error");
+            }
+          } finally {
+            mfaRecoverSmsPassword.value = "";
+            mfaRecoverSmsCode.value = "";
+            mfaRecoverSmsConfirmButton.disabled = false;
+            mfaRecoverSmsConfirmButton.textContent = "SMS-Methode zurücksetzen";
           }
         });
 
