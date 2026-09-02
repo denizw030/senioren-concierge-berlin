@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-const surfaces=["/index.html","/prime-concierge.html","/senioren-concierge.html","/concierges.html","/registrieren.html"];
+const surfaces=["/index.html","/prime-concierge.html","/senioren-concierge.html","/registrieren.html"];
 const viewports=[
   {name:"desktop",width:1440,height:1000},
   {name:"tablet",width:1024,height:900},
@@ -15,10 +15,6 @@ for(const viewport of viewports){
       page.on("pageerror",error=>errors.push(String(error)));
       page.on("console",message=>{if(message.type()==="error")errors.push(message.text())});
       await page.goto(`http://127.0.0.1:4173${surface}`,{waitUntil:"networkidle"});
-      if(surface==="/concierges.html"){
-        await expect(page.locator("#conciergeOverviewGrid")).toBeHidden();
-        await page.locator("#showAllConcierges").click();
-      }
       const voiceButtons=page.locator(".nw-voice-preview-button");
       if(await voiceButtons.count()===0){const diag=await page.evaluate(()=>({root:!!document.querySelector("[data-concierge-carousel]"),carousel:!!window.NAHWERKCarousel,voice:!!window.NAHWERKVoicePreview}));console.log("VOICE_DIAG",surface,diag,errors);}
       await expect(voiceButtons.first()).toBeVisible();
@@ -32,6 +28,15 @@ for(const viewport of viewports){
   }
 }
 
+
+test("world page renders region controls without browser errors",async({page})=>{
+  const errors=[];
+  page.on("pageerror",error=>errors.push(String(error)));
+  page.on("console",message=>{if(message.type()==="error")errors.push(message.text())});
+  await page.goto("http://127.0.0.1:4173/concierges.html",{waitUntil:"networkidle"});
+  await expect(page.locator(".co-region-button")).toHaveCount(6);
+  expect(errors).toEqual([]);
+});
 
 for(const viewport of [
   {name:"desktop",width:1440,height:1000},
@@ -190,7 +195,7 @@ test("all 23 runtime MP3s and Lars reserve return successfully",async({page})=>{
   const result=await page.evaluate(async()=>{
     const profiles=[...window.NAHWERK_CONCIERGES,{
       key:"lars",
-      sampleAudio:"assets/concierges/voice-samples/lars.mp3?v=reserve-20260829-1"
+      sampleAudio:"assets/voice/samples/lars.mp3?v=reserve-20260829-1"
     }];
     const checks=[];
     for(const profile of profiles){
@@ -206,21 +211,22 @@ test("all 23 runtime MP3s and Lars reserve return successfully",async({page})=>{
   }
 });
 
-test("senior page starts on Frida with Hartmut visible beside her",async({page})=>{
+test("senior page keeps both page-specific carousel starts",async({page})=>{
   await page.setViewportSize({width:1024,height:900});
   await page.goto("http://127.0.0.1:4173/senioren-concierge.html",{waitUntil:"networkidle"});
-  const root=page.locator("[data-concierge-carousel]");
-  await expect(root).toHaveAttribute("data-variant","senior");
-  expect(await root.evaluate(el=>el._nahwerkCarousel.selected.key)).toBe("frida");
-  const active=page.locator(".nw-carousel-card.is-active");
-  await expect(active).toContainText("Frida");
-  const hartmut=page.locator(".nw-carousel-card").filter({hasText:"Hartmut"});
-  await expect(hartmut).toBeVisible();
-  const frida=page.locator('.nw-voice-preview-control[data-concierge-key="frida"]');
+  const intro=page.locator('[data-concierge-carousel][data-label="Persönliche NAHWERK Concierges für Senioren"]');
+  const selection=page.locator(".senior-concierge-selection [data-concierge-carousel]");
+  await expect(intro).toHaveCount(1);
+  await expect(selection).toHaveCount(1);
+  expect(await intro.evaluate(el=>el._nahwerkCarousel.selected.key)).toBe("hartmut");
+  expect(await selection.evaluate(el=>el._nahwerkCarousel.selected.key)).toBe("frida");
+  await expect(intro.locator(".nw-carousel-card.is-active")).toContainText("Hartmut");
+  await expect(selection.locator(".nw-carousel-card.is-active")).toContainText("Frida");
+  const frida=selection.locator('.nw-voice-preview-control[data-concierge-key="frida"]');
   await expect(frida).toHaveAttribute("data-provisional","true");
   await expect(frida.locator(".nw-voice-preview-button")).toBeEnabled();
   await expect(frida.locator(".nw-voice-preview-badge")).toHaveText("Test");
-  await page.screenshot({path:"test-results/screenshots/tablet-senior-initial-frida-hartmut.png",fullPage:true});
+  await page.screenshot({path:"test-results/screenshots/tablet-senior-carousel-starts.png",fullPage:true});
 });
 
 for(const surface of ["/index.html","/prime-concierge.html","/senioren-concierge.html","/concierges.html","/registrieren.html"]){
@@ -257,7 +263,7 @@ for(const surface of ["/index.html","/prime-concierge.html","/senioren-concierge
 test("carousel shell clips images uniformly and registration is optically centered",async({page})=>{
   await page.setViewportSize({width:1024,height:900});
   await page.goto("http://127.0.0.1:4173/senioren-concierge.html",{waitUntil:"networkidle"});
-  const style=await page.locator(".nw-carousel-card.is-active").evaluate(card=>{
+  const style=await page.locator(".senior-concierge-selection .nw-carousel-card.is-active").evaluate(card=>{
     const image=card.querySelector("img");
     const button=document.querySelector(".nw-carousel-status");
     const cs=getComputedStyle(card),is=getComputedStyle(image),bs=getComputedStyle(button);
@@ -311,7 +317,7 @@ test("services and senior lifestyle imagery is visible and responsive",async({pa
   await page.goto("http://127.0.0.1:4173/senioren-concierge.html",{waitUntil:"networkidle"});
   await expect(page.locator(".senior-hero-photo img")).toHaveAttribute("src",/assets\/lifestyle\/senior-man-phone\.webp/);
   await page.goto("http://127.0.0.1:4173/index.html",{waitUntil:"networkidle"});
-  await expect(page.locator(".product-band.senior .product-band-image")).toHaveAttribute("src",/assets\/lifestyle\/senior-woman-sofa\.webp/);
+  await expect(page.locator(".product-band.senior .product-band-image")).toHaveAttribute("src",/assets\/lifestyle\/senior-woman-overview\.webp/);
 });
 
 test("dark overview hero contains multi-colour ambient background",async({page})=>{
@@ -389,44 +395,38 @@ test("carousel portrait click opens registration for that concierge",async({page
   ]);
 });
 
-test("overview portrait click opens registration directly",async({page})=>{
+test("world page region controls work without legacy concierge grid",async({page})=>{
   await page.goto("http://127.0.0.1:4173/concierges.html",{waitUntil:"networkidle"});
-  await page.locator("#showAllConcierges").click();
-  const card=page.locator(".concierge-overview-card").first();
-  const key=await card.locator(".concierge-overview-voice").getAttribute("data-concierge-key");
-  await Promise.all([
-    page.waitForURL(url=>url.pathname.endsWith("/registrieren.html")&&url.searchParams.get("concierge")===key),
-    card.locator(".concierge-overview-card-media").click()
-  ]);
+  await expect(page.locator(".co-region-button")).toHaveCount(6);
+  await expect(page.locator("#conciergeOverviewGrid")).toHaveCount(0);
+  await page.locator('.co-region-button[data-region="Asien"]').click();
+  await expect(page.locator("#interactiveRegionName")).toHaveText("Asien");
 });
 
-test("senior header uses gold emblem with darker grey WERK and CONCIERGE",async({page})=>{
+test("senior header uses the centralized production logo",async({page})=>{
   await page.goto("http://127.0.0.1:4173/senioren-concierge.html",{waitUntil:"networkidle"});
-  const result=await page.locator(".top .brand").evaluate(el=>{
-    const strong=el.querySelector(".brandtext strong");
-    const sub=el.querySelector(".brandtext span");
-    const mark=el.querySelector(".mark");
-    return {
-      nah:getComputedStyle(strong,"::before").color,
-      werk:getComputedStyle(strong,"::after").color,
-      concierge:getComputedStyle(sub,"::before").color,
-      mark:getComputedStyle(mark).backgroundImage
-    };
-  });
-  expect(result.nah).not.toBe(result.werk);
-  expect(result.werk).toBe("rgb(139, 143, 150)");
-  expect(result.concierge).toBe("rgb(133, 137, 144)");
-  expect(result.mark).toContain("logo-nahwerk-concierge-gold.svg");
+  const result=await page.locator(".top .brand").evaluate(el=>({
+    background:getComputedStyle(el).backgroundImage,
+    markDisplay:getComputedStyle(el.querySelector(".mark")).display,
+    textDisplay:getComputedStyle(el.querySelector(".brandtext")).display
+  }));
+  expect(result.background).toContain("NAHWERK-CONCIERGE-Website-Logo.webp");
+  expect(result.markDisplay).toBe("none");
+  expect(result.textDisplay).toBe("none");
 });
 
-test("senior registration first paint stays light",async({page})=>{
+test("senior registration first paint stays dark and stable",async({page})=>{
   await page.goto("http://127.0.0.1:4173/registrieren.html?produkt=senioren",{waitUntil:"domcontentloaded"});
   const initial=await page.evaluate(()=>({
     html:getComputedStyle(document.documentElement).backgroundColor,
     body:getComputedStyle(document.body).backgroundColor
   }));
-  expect(initial.html).toBe("rgb(255, 253, 249)");
-  expect(initial.body).toBe("rgb(255, 253, 249)");
+  const isDark=value=>{
+    const rgb=(value.match(/\d+/g)||[]).slice(0,3).map(Number);
+    return rgb.length===3&&rgb.every(channel=>channel<24);
+  };
+  expect(isDark(initial.html)).toBe(true);
+  expect(isDark(initial.body)).toBe(true);
 });
 
 test("app-free copy explicitly mentions no extra app and future free NAHWERK app",async({page})=>{
@@ -438,27 +438,15 @@ test("app-free copy explicitly mentions no extra app and future free NAHWERK app
   await expect(page.locator(".senior-app-note")).toContainText("kostenlos");
 });
 
-test("concierge discovery drills from continent to country and only shows full grid on request",async({page})=>{
+test("concierge world page exposes six responsive region choices",async({page})=>{
   await page.goto("http://127.0.0.1:4173/concierges.html",{waitUntil:"networkidle"});
-  const grid=page.locator("#conciergeOverviewGrid");
-  await expect(grid).toBeHidden();
-  await expect(page.locator(".concierge-overview-card")).toHaveCount(0);
-  await expect(page.locator(".concierge-continent-card")).toHaveCount(3);
-
-  await page.locator('.concierge-continent-card[data-continent="Europa"]').click();
-  await expect(page.locator("#countryStep")).toBeVisible();
-  const germany=page.locator(".concierge-country-chip").filter({hasText:"Deutschland"});
-  await expect(germany).toBeVisible();
-  await germany.click();
-  await expect(grid).toBeVisible();
-  await expect(page.locator(".concierge-overview-card")).toHaveCount(4);
-  await expect(page.locator(".concierge-overview-card")).toContainText(["Lena","Lukas","Hartmut","Frida"]);
-
-  await page.locator("#conciergeResultsReset").click();
-  await expect(grid).toBeHidden();
-  await page.locator("#showAllConcierges").click();
-  await expect(grid).toBeVisible();
-  await expect(page.locator(".concierge-overview-card")).toHaveCount(23);
+  const regions=page.locator(".co-region-button");
+  await expect(regions).toHaveCount(6);
+  await expect(page.locator("#conciergeOverviewGrid")).toHaveCount(0);
+  await expect(page.locator("#showAllConcierges")).toHaveCount(0);
+  await expect(page.locator("#interactiveRegionName")).toHaveText("Europa");
+  await regions.filter({hasText:"Afrika"}).click();
+  await expect(page.locator("#interactiveRegionName")).toHaveText("Afrika");
 });
 
 test("family setup exposes optional personal message and previews it",async({page})=>{
