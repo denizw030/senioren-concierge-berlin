@@ -1565,7 +1565,25 @@
       .account-tab:disabled,.account-overview-link:disabled{cursor:not-allowed;opacity:.48}
       @media(max-width:720px){.managed-person-context{grid-template-columns:1fr}}
     </style>
-</head>
+<style id="family-access-2026">
+      .access-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+      .access-panel-head h3{margin:4px 0 0}
+      .access-list{display:grid;gap:12px;margin-top:18px}
+      .access-person{padding:16px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025)}
+      .access-person-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
+      .access-person-name strong,.access-person-name span{display:block}
+      .access-person-name span{margin-top:4px;color:var(--muted);font-size:12px}
+      .access-badges{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+      .access-badge{display:inline-flex;align-items:center;min-height:26px;padding:0 9px;border:1px solid var(--line);border-radius:999px;font-size:11px;font-weight:800}
+      .access-rights{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+      .access-right{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid var(--line);border-radius:12px}
+      .access-right input{margin-top:3px;flex:0 0 auto}
+      .access-right strong,.access-right span{display:block}
+      .access-right span{margin-top:3px;color:var(--muted);font-size:12px;line-height:1.45}
+      .access-state{margin-top:12px;font-size:12px;color:var(--muted)}
+      .access-empty{padding:18px;border:1px dashed var(--line);border-radius:13px;color:var(--muted)}
+      @media(max-width:720px){.access-rights{grid-template-columns:1fr}.access-person-head{flex-direction:column}.access-badges{justify-content:flex-start}}
+</style></head>
   <body>
     <script>
       (() => {
@@ -1620,6 +1638,7 @@
               <button class="account-tab" type="button" role="tab" id="accountTabSafety" aria-controls="accountPanelSafety" aria-selected="false" data-account-tab="safety">Sicherheit</button>
               <button class="account-tab" type="button" role="tab" id="accountTabUsage" aria-controls="accountPanelUsage" aria-selected="false" data-account-tab="usage">Nutzung</button>
               <button class="account-tab" type="button" role="tab" id="accountTabPersonal" aria-controls="accountPanelPersonal" aria-selected="false" data-account-tab="personal">Persönliche Daten</button>
+              <button class="account-tab" type="button" role="tab" id="accountTabAccess" aria-controls="accountPanelAccess" aria-selected="false" data-account-tab="access">Zugänge</button>
             </nav>
           </div>
           <div class="warning account-session-note" id="modeNotice" data-account-panel="overview" role="tabpanel" aria-labelledby="accountTabOverview">
@@ -1663,6 +1682,25 @@
                   <span class="profile-save-status" id="profileSaveStatus" aria-live="polite"></span>
                 </div>
               </form>
+            </article>
+            <div class="account-panel-heading" data-account-panel="access" hidden>
+              <div class="eyebrow">Personen & Zugänge</div>
+              <h2>Wer darf was verwalten?</h2>
+              <p>Sie entscheiden selbst, welche verknüpfte Person bestimmte Einstellungen für Sie verwalten darf. Zahlung und Login bleiben davon unabhängig.</p>
+            </div>
+            <article class="card wide access-panel" id="familyAccessCard" data-account-panel="access" role="tabpanel" aria-labelledby="accountTabAccess" hidden>
+              <div class="access-panel-head">
+                <div>
+                  <div class="eyebrow">Family-Freigaben</div>
+                  <h3>Zugriffsrechte verwalten</h3>
+                  <p class="muted">Freigaben gelten nur für die ausgewählten Bereiche und können jederzeit wieder entzogen werden.</p>
+                </div>
+                <span class="profile-status" id="familyAccessStatus">Wird geladen</span>
+              </div>
+              <div class="access-list" id="familyAccessList">
+                <div class="access-empty">Verknüpfte Personen werden sicher geladen …</div>
+              </div>
+              <p class="access-state" id="familyAccessMeta" aria-live="polite"></p>
             </article>
             <article class="card summary-card plan-summary" data-account-panel="overview">
               <div class="eyebrow">Paket</div>
@@ -2181,7 +2219,7 @@
           return activeAccountContext?.selected?.is_self === false;
         }
         function setManagedContextRestrictions(managed) {
-          const lockedTabs = new Set(["concierge", "safety", "personal"]);
+          const lockedTabs = new Set(["concierge", "safety", "personal", "access"]);
           accountTabs.forEach((tab) => {
             const locked = managed && lockedTabs.has(tab.dataset.accountTab);
             tab.disabled = locked;
@@ -2193,7 +2231,7 @@
           if (managedContextNotice) managedContextNotice.hidden = !managed;
         }
         function setAccountTab(name, focus = false) {
-          if (isManagedAccountContext() && ["concierge", "safety", "personal"].includes(name)) name = "overview";
+          if (isManagedAccountContext() && ["concierge", "safety", "personal", "access"].includes(name)) name = "overview";
           const validName = accountTabs.some((tab) => tab.dataset.accountTab === name) ? name : "overview";
           accountTabs.forEach((tab) => {
             const active = tab.dataset.accountTab === validName;
@@ -2210,6 +2248,7 @@
             ensureMfaLoaded();
           }
           if (validName === "concierge") ensureReceptionLoaded();
+          if (validName === "access") ensureFamilyPermissionsLoaded();
         }
         accountTabs.forEach((tab, index) => {
           tab.addEventListener("click", () => setAccountTab(tab.dataset.accountTab));
@@ -2359,6 +2398,12 @@
         const personContextSelect = document.getElementById("personContextSelect");
         const personContextMeta = document.getElementById("personContextMeta");
         const managedContextNotice = document.getElementById("managedContextNotice");
+        const FAMILY_PERMISSIONS_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-family-permissions";
+        const familyAccessList = document.getElementById("familyAccessList");
+        const familyAccessStatus = document.getElementById("familyAccessStatus");
+        const familyAccessMeta = document.getElementById("familyAccessMeta");
+        let familyPermissionsLoaded = false;
+
         const PROFILE_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-profile";
         const PROFILE_CACHE_KEY = "nw_account_profile_cache_v1";
         const MFA_STATUS_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-mfa-status";
@@ -2409,6 +2454,168 @@
             return null;
           }
         }
+        function activeSelfAccountId() {
+          if (activeAccountContext?.selected?.is_self === true && activeAccountContext?.selected?.customer_account_id) {
+            return String(activeAccountContext.selected.customer_account_id);
+          }
+          const session = accountSession();
+          return String(session?.customer_account_id || "");
+        }
+        function accessBadge(text) {
+          const span = document.createElement("span");
+          span.className = "access-badge";
+          span.textContent = text;
+          return span;
+        }
+        function renderFamilyPermissions(payload) {
+          const actors = Array.isArray(payload?.actors) ? payload.actors : [];
+          familyAccessList.innerHTML = "";
+          familyAccessStatus.textContent = "Sicher verbunden";
+          familyAccessMeta.textContent = actors.length
+            ? "Änderungen werden sofort serverseitig gespeichert und protokolliert."
+            : "Aktuell ist keine weitere Person mit diesem Konto verknüpft.";
+
+          if (!actors.length) {
+            const empty = document.createElement("div");
+            empty.className = "access-empty";
+            empty.textContent = "Keine weiteren verwaltenden Personen vorhanden.";
+            familyAccessList.appendChild(empty);
+            return;
+          }
+
+          actors.forEach((actor) => {
+            const row = document.createElement("div");
+            row.className = "access-person";
+            row.dataset.actorPersonId = String(actor.actor_person_id || "");
+
+            const head = document.createElement("div");
+            head.className = "access-person-head";
+            const nameWrap = document.createElement("div");
+            nameWrap.className = "access-person-name";
+            const name = document.createElement("strong");
+            name.textContent = actor.display_name || "Verknüpfte Person";
+            const meta = document.createElement("span");
+            meta.textContent = actor.role === "account_owner" ? "Verwalter / Kontozugang" : (actor.role || "Verknüpfter Zugang");
+            nameWrap.append(name, meta);
+
+            const badges = document.createElement("div");
+            badges.className = "access-badges";
+            if (actor.is_payer) badges.appendChild(accessBadge("Zahler"));
+            if (actor.can_manage_plan) badges.appendChild(accessBadge("Tarifverwaltung"));
+            if (actor.can_view_usage) badges.appendChild(accessBadge("Nutzung sichtbar"));
+            head.append(nameWrap, badges);
+
+            const rights = document.createElement("div");
+            rights.className = "access-rights";
+            [
+              {
+                permission:"manage_preferences",
+                checked:Boolean(actor.manage_preferences),
+                title:"Concierge-Einstellungen verwalten",
+                copy:"Ansprache, Sprechtempo, Erklärstil und persönliche Concierge-Präferenzen."
+              },
+              {
+                permission:"manage_safety",
+                checked:Boolean(actor.manage_safety),
+                title:"Sicherheitseinstellungen verwalten",
+                copy:"Freigabe wird serverseitig gespeichert. Der verwaltete Safety-Editor bleibt bis zur vollständigen Safety-Kontextanbindung geschützt."
+              }
+            ].forEach((item) => {
+              const label = document.createElement("label");
+              label.className = "access-right";
+              const input = document.createElement("input");
+              input.type = "checkbox";
+              input.checked = item.checked;
+              input.dataset.familyPermission = item.permission;
+              input.disabled = Boolean(actor.has_wildcard_permission);
+              const copy = document.createElement("span");
+              const strong = document.createElement("strong");
+              strong.textContent = item.title;
+              const small = document.createElement("span");
+              small.textContent = actor.has_wildcard_permission
+                ? item.copy + " Dieses Recht ist aktuell Teil einer globalen Freigabe und kann hier nicht einzeln verändert werden."
+                : item.copy;
+              copy.append(strong, small);
+              label.append(input, copy);
+              rights.appendChild(label);
+            });
+
+            row.append(head, rights);
+            familyAccessList.appendChild(row);
+          });
+        }
+        async function loadFamilyPermissions() {
+          if (isManagedAccountContext()) return false;
+          const token = sessionToken();
+          const accountId = activeSelfAccountId();
+          if (!token || !accountId) return false;
+          familyAccessStatus.textContent = "Wird geladen";
+          try {
+            const response = await fetch(FAMILY_PERMISSIONS_URL + "?customer_account_id=" + encodeURIComponent(accountId), {
+              method: "GET",
+              headers: { Authorization: "Bearer " + token }
+            });
+            const body = await response.json().catch(() => ({}));
+            if (!response.ok || body?.ok !== true) throw new Error(String(body?.status || "family_permissions_load_failed"));
+            renderFamilyPermissions(body);
+            familyPermissionsLoaded = true;
+            return true;
+          } catch (_) {
+            familyAccessStatus.textContent = "Nicht verfügbar";
+            familyAccessList.innerHTML = '<div class="access-empty">Die Zugriffsrechte konnten gerade nicht sicher geladen werden.</div>';
+            familyAccessMeta.textContent = "";
+            familyPermissionsLoaded = false;
+            return false;
+          }
+        }
+        function ensureFamilyPermissionsLoaded() {
+          if (familyPermissionsLoaded) return;
+          loadFamilyPermissions();
+        }
+        familyAccessList?.addEventListener("change", async (event) => {
+          const input = event.target.closest("[data-family-permission]");
+          if (!input) return;
+          const row = input.closest(".access-person");
+          const actorPersonId = String(row?.dataset.actorPersonId || "");
+          const permission = String(input.dataset.familyPermission || "");
+          const enabled = input.checked;
+          const token = sessionToken();
+          const accountId = activeSelfAccountId();
+          if (!token || !accountId || !actorPersonId) {
+            input.checked = !enabled;
+            familyAccessMeta.textContent = "Ihre Sitzung oder der sichere Kontokontext ist nicht mehr verfügbar.";
+            return;
+          }
+
+          input.disabled = true;
+          familyAccessMeta.textContent = "Freigabe wird sicher gespeichert …";
+          try {
+            const response = await fetch(FAMILY_PERMISSIONS_URL, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + token
+              },
+              body: JSON.stringify({
+                customer_account_id: accountId,
+                actor_person_id: actorPersonId,
+                permission,
+                enabled
+              })
+            });
+            const body = await response.json().catch(() => ({}));
+            if (!response.ok || body?.ok !== true) throw new Error(String(body?.status || "permission_update_failed"));
+            renderFamilyPermissions(body);
+            familyAccessMeta.textContent = enabled ? "Freigabe erteilt." : "Freigabe widerrufen.";
+          } catch (error) {
+            input.checked = !enabled;
+            input.disabled = false;
+            const status = error instanceof Error ? error.message : "";
+            familyAccessMeta.textContent = status === "wildcard_permission_requires_full_revoke"
+              ? "Diese Berechtigung gehört zu einer globalen Freigabe und kann nicht einzeln verändert werden."
+              : "Die Freigabe konnte gerade nicht geändert werden.";
+          }
+        });
         function contextDisplayName(account) {
           const name = [account?.target_first_name, account?.target_last_name].filter(Boolean).join(" ").trim();
           return name || "Person";
@@ -2426,6 +2633,9 @@
             recipientMeta.textContent = [relation, "Eigener Tarif", "Eigene Nutzung"].filter(Boolean).join(" · ");
           }
           const managed = body?.selected?.is_self === false;
+          familyPermissionsLoaded = false;
+          if (familyAccessStatus) familyAccessStatus.textContent = "Wird geladen";
+          if (familyAccessMeta) familyAccessMeta.textContent = "";
           setManagedContextRestrictions(managed);
           if (!managed && body?.snapshot) storeProfileCache(body.snapshot);
           try {
