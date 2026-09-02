@@ -1570,7 +1570,7 @@
     <script>
       (() => {
         try {
-          const session = JSON.parse(localStorage.getItem("scb_web_session") || "null");
+          const session = JSON.parse(sessionStorage.getItem("scb_web_session") || "null");
           const product = session?.product_context;
           if (product !== "senioren" && product !== "prime") return;
           sessionStorage.setItem("nahwerk_product", product);
@@ -2134,7 +2134,7 @@
         <button class="btn light security-nudge-later" type="button" id="securityNudgeLater">Später einrichten</button>
       </div>
     </div>
-    <script src="assets/auth-nav.js?v=39"></script>
+    <script src="assets/auth-nav.js?v=40"></script>
     <script>
       (() => {
         const ACCOUNT_PREVIEW_KEY = "nw_account_theme_preview";
@@ -2167,10 +2167,10 @@
           document.body.classList.toggle("senior-product", senior);
 
           try {
-            const stored = JSON.parse(localStorage.getItem("scb_web_session") || "null");
+            const stored = JSON.parse(sessionStorage.getItem("scb_web_session") || "null");
             if (stored?.session_token) {
               stored.product_context = product;
-              localStorage.setItem("scb_web_session", JSON.stringify(stored));
+              sessionStorage.setItem("scb_web_session", JSON.stringify(stored));
             }
             sessionStorage.setItem("nahwerk_product", product);
           } catch (_) {}
@@ -2396,14 +2396,14 @@
 
         function sessionToken() {
           try {
-            return JSON.parse(localStorage.getItem("scb_web_session") || "null")?.session_token || "";
+            return JSON.parse(sessionStorage.getItem("scb_web_session") || "null")?.session_token || "";
           } catch (_) {
             return "";
           }
         }
         function accountSession() {
           try {
-            return JSON.parse(localStorage.getItem("scb_web_session") || "null");
+            return JSON.parse(sessionStorage.getItem("scb_web_session") || "null");
           } catch (_) {
             return null;
           }
@@ -2547,7 +2547,7 @@
               }
             }));
             session.customer_number = body.customer_number || "";
-            localStorage.setItem("scb_web_session", JSON.stringify(session));
+            sessionStorage.setItem("scb_web_session", JSON.stringify(session));
           } catch (_) {}
         }
         function hydrateProfileCache() {
@@ -3270,10 +3270,10 @@
             renderProfilePayload(body);
             storeProfileCache(body);
             try {
-              const session = JSON.parse(localStorage.getItem("scb_web_session") || "null");
+              const session = JSON.parse(sessionStorage.getItem("scb_web_session") || "null");
               if (session) {
                 session.first_name = body?.profile?.first_name || "";
-                localStorage.setItem("scb_web_session", JSON.stringify(session));
+                sessionStorage.setItem("scb_web_session", JSON.stringify(session));
               }
             } catch (_) {}
             document.querySelectorAll(".nw-account-name").forEach((node) => {
