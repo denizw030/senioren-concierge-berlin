@@ -12,6 +12,15 @@ const authNav = read("assets/auth-nav.js");
 const account = read("konto.html");
 const reset = read("passwort-zuruecksetzen.html");
 
+test("website login uses the secure Supabase login and recovery endpoints", () => {
+  assert.match(login, /functions\/v1\/web-login-secure/);
+  assert.match(login, /functions\/v1\/web-password-recovery-request-secure/);
+  assert.equal(login.includes("webhook/senioren-concierge/web/login/password"), false);
+  assert.equal(login.includes("webhook/senioren-concierge/web/login/mfa/challenge"), false);
+  assert.equal(login.includes("webhook/senioren-concierge/web/login/mfa/verify"), false);
+  assert.match(onboarding, /functions\/v1\/web-login-secure/);
+});
+
 test("login only creates a session-scoped session after a successful backend login", () => {
   assert.match(login, /body\.status!=='logged_in'\|\|!body\.session_token/);
   assert.match(login, /sessionStorage\.setItem\(SESSION_KEY,JSON\.stringify/);
