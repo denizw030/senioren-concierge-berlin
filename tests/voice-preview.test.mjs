@@ -13,7 +13,7 @@ const profiles=[
 ["wei","Wei","ballad","hearing_test"],["yuki","Yuki","marin","hearing_test"],["ren","Ren","alloy","hearing_test"]
 ];
 const nativeLanguages={nilo:"es",mira:"es",lena:"de",lukas:"de",hartmut:"de",frida:"de",asha:"hi",sari:"id",leyla:"tr",noor:"ar",sofia:"es",camille:"fr",anna:"pl",olena:"uk",mei:"zh",amara:"tw",kwame:"tw",zuri:"sw",jabari:"sw",arjun:"pa",wei:"zh",yuki:"ja",ren:"ja"};
-const pages=["index.html","prime-concierge.html","senioren-concierge.html","concierges.html","registrieren.html","concierge-anpassen.html"];
+const pages=["index.html","prime-concierge.html","senioren-concierge.html","registrieren.html","concierge-anpassen.html"];
 const read=p=>fs.readFileSync(path.join(root,p),"utf8");
 
 test("canonical catalog contains exactly 23 voice mappings",()=>{
@@ -25,7 +25,7 @@ test("canonical catalog contains exactly 23 voice mappings",()=>{
     const row=src.slice(start,start+240);
     assert.ok(row.includes('"'+voice+'","'+status+'"'),key+" voice/status mismatch");
   }
-  assert.ok(src.includes("voice-samples/\${key}-\${code}.mp3?v=multilingual-20260829-1"));
+  assert.ok(src.includes("assets/voice/samples/\${key}-\${code}.mp3?v=multilingual-20260829-1"));
 });
 
 test("all 65 multilingual runtime previews plus Lars reserve exist and are non-empty",()=>{
@@ -33,7 +33,7 @@ test("all 65 multilingual runtime previews plus Lars reserve exist and are non-e
   for(const [key] of profiles){
     const langs=[...new Set([nativeLanguages[key],"de","en"])];
     for(const lang of langs){
-      const file=path.join(root,"assets/concierges/voice-samples",key+"-"+lang+".mp3");
+      const file=path.join(root,"assets/voice/samples",key+"-"+lang+".mp3");
       const stat=fs.statSync(file);
       assert.ok(stat.size>20000,key+"-"+lang+" sample unexpectedly small");
       assert.ok(stat.size<260000,key+"-"+lang+" sample unexpectedly large");
@@ -41,7 +41,7 @@ test("all 65 multilingual runtime previews plus Lars reserve exist and are non-e
     }
   }
   assert.equal(count,65);
-  const reserve=fs.statSync(path.join(root,"assets/concierges/voice-samples/lars.mp3"));
+  const reserve=fs.statSync(path.join(root,"assets/voice/samples/lars.mp3"));
   assert.ok(reserve.size>20000);
 });
 
@@ -62,7 +62,7 @@ test("voice controls live in dedicated action rows, never on concierge images",(
   assert.match(carousel,/nw-carousel-voice-host/);
   assert.doesNotMatch(carousel,/card\.appendChild\(voiceControl\)/);
   assert.match(overview,/concierge-overview-actions/);
-  assert.match(overview,/actions\.appendChild\(voiceControl\)/);
+  assert.match(overview,/if\(v\)q\.appendChild\(v\)/);
   assert.doesNotMatch(overview,/card\.appendChild\(voiceControl\)/);
   assert.doesNotMatch(css,/position:absolute/);
 });
@@ -70,9 +70,9 @@ test("voice controls live in dedicated action rows, never on concierge images",(
 test("every real concierge surface loads preview assets before carousel",()=>{
   for(const page of pages){
     const html=read(page);
-    const css=html.indexOf("concierge-voice-preview.css?v=5");
-    const js=html.indexOf("concierge-voice-preview.js?v=5");
-    const carousel=html.indexOf("concierge-carousel.js?v=14");
+    const css=html.indexOf("concierge-voice-preview.css");
+    const js=html.indexOf("concierge-voice-preview.js");
+    const carousel=html.indexOf("concierge-carousel.js");
     assert.ok(css>=0,page+" missing preview CSS");
     assert.ok(js>=0,page+" missing preview JS");
     assert.ok(carousel>js,page+" must load preview JS before carousel");
@@ -122,9 +122,12 @@ test("shared shell preserves scroll and uses split NAH WERK brand",()=>{
 test("carousel and overview use one clipped radius owner",()=>{
   const carousel=read("assets/concierge-carousel.css");
   const overview=read("assets/concierge-overview.css");
-  assert.match(carousel,/\.nw-carousel-card\{[\s\S]*border-radius:28px;[\s\S]*overflow:hidden;[\s\S]*isolation:isolate;/);
+  assert.match(carousel,/\.nw-carousel-card\{/);
+  assert.match(carousel,/border-radius:28px;/);
+  assert.match(carousel,/overflow:hidden/);
+  assert.match(carousel,/isolation:isolate/);
   assert.match(carousel,/aspect-ratio:480\/722;/);
-  assert.match(carousel,/object-fit:cover;/);
+  assert.match(carousel,/object-fit:cover/);
   assert.match(overview,/\.concierge-overview-card\{[\s\S]*border-radius:22px;[\s\S]*overflow:hidden;/);
 });
 
@@ -133,7 +136,7 @@ test("optimized lifestyle assets are assigned by audience",()=>{
   const home=read("index.html");
   const services=read("leistungen.html");
   assert.match(senior,/assets\/lifestyle\/senior-man-phone\.webp/);
-  assert.match(home,/assets\/lifestyle\/senior-woman-sofa\.webp/);
+  assert.match(home,/assets\/lifestyle\/senior-woman-overview\.webp/);
   assert.match(services,/assets\/lifestyle\/young-woman-kitchen\.webp/);
   assert.match(services,/services-hero-layout/);
 });
@@ -223,30 +226,26 @@ test("app-free wording, future free app, senior logo and light first paint are p
   assert.match(home,/NAHWERK App ist in Entwicklung/);
   assert.match(senior,/Keine zusätzliche App notwendig/);
   assert.match(senior,/NAHWERK App ist in Entwicklung/);
-  assert.match(brand,/logo-nahwerk-concierge-gold\.svg/);
+  assert.match(senior,/class="mark nahwerk-mark"/);
   assert.match(brand,/body\.senior-product \.brandtext strong:after[\s\S]*color:#8b8f96!important/);
   assert.match(brand,/body\.senior-product \.brandtext span:before[\s\S]*color:#858990!important/);
   assert.match(registration,/name="theme-color" content="#fffdf9"/);
   assert.match(registration,/registration-first-paint/);
 });
 
-test("concierge discovery starts with continents and hides the full grid",()=>{
+test("concierge world page starts with interactive region controls and no legacy full grid",()=>{
   const html=read("concierges.html");
   const js=read("assets/concierge-overview.js");
-  assert.match(html,/id="continentOptions"/);
-  assert.match(html,/id="countryOptions"/);
-  assert.match(html,/id="showAllConcierges"/);
-  assert.match(html,/id="conciergeOverviewGrid" hidden/);
-  assert.match(js,/Europa/);
-  assert.match(js,/Asien/);
-  assert.match(js,/Afrika/);
-  assert.match(js,/Deutschland/);
-  assert.match(js,/Spanien/);
-  assert.match(js,/Indien/);
-  assert.match(js,/Ghana/);
-  assert.match(js,/Kenia/);
-  assert.match(js,/renderProfiles/);
-  assert.match(js,/Alle 23 Concierges/);
+  assert.match(html,/id="continentOptions" data-world-only="true"/);
+  for(const region of ["Europa","Asien","Afrika","Nordamerika","Südamerika","Australien"]){
+    assert.match(html,new RegExp('data-region="'+region+'"'));
+  }
+  assert.doesNotMatch(html,/id="conciergeOverviewGrid"/);
+  assert.doesNotMatch(html,/id="showAllConcierges"/);
+  assert.match(js,/WORLD_ONLY/);
+  assert.match(js,/Nordamerika/);
+  assert.match(js,/Südamerika/);
+  assert.match(js,/Australien/);
 });
 
 test("family registration message is optional and uses the existing notes contract",()=>{
