@@ -134,11 +134,11 @@
         </div>
       </div>
     </footer><script src="assets/auth-nav.js?v=40"></script><script>(()=>{
-const LOGIN_URL='https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/login/password';
-const MFA_CHALLENGE_URL='https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/login/mfa/challenge';
-const MFA_VERIFY_URL='https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/login/mfa/verify';
+const LOGIN_URL='https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-login-secure';
+const MFA_CHALLENGE_URL=LOGIN_URL;
+const MFA_VERIFY_URL=LOGIN_URL;
 const MFA_RECOVERY_CODE_URL='https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-mfa-recovery-code-secure';
-const RESET_URL='https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/password/reset/request';
+const RESET_URL='https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-password-recovery-request-secure';
 const SESSION_KEY='scb_web_session';
 const ENTRY_PRODUCT=new URLSearchParams(location.search).get('produkt')==='senioren'?'senioren':null;
 const form=document.getElementById('loginForm');
