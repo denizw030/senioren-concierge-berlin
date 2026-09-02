@@ -2221,13 +2221,21 @@
         function setManagedContextRestrictions(managed) {
           managedSafetyAuthorized = false;
           const lockedTabs = new Set(["concierge", "safety", "personal", "access"]);
+          const usageLocked = managed && activeAccountContext?.actor?.can_view_usage !== true;
           accountTabs.forEach((tab) => {
-            const locked = managed && lockedTabs.has(tab.dataset.accountTab);
+            const locked = managed && (
+              lockedTabs.has(tab.dataset.accountTab) ||
+              (tab.dataset.accountTab === "usage" && usageLocked)
+            );
             tab.disabled = locked;
             tab.setAttribute("aria-disabled", String(locked));
           });
           document.querySelectorAll("[data-open-account-tab]").forEach((button) => {
-            button.disabled = managed && lockedTabs.has(button.dataset.openAccountTab);
+            const target = button.dataset.openAccountTab;
+            button.disabled = managed && (
+              lockedTabs.has(target) ||
+              (target === "usage" && usageLocked)
+            );
           });
           if (managedContextNotice) managedContextNotice.hidden = !managed;
           if (!managed) {
@@ -2276,6 +2284,7 @@
         function setAccountTab(name, focus = false) {
           if (isManagedAccountContext() && ["concierge", "personal", "access"].includes(name)) name = "overview";
           if (isManagedAccountContext() && name === "safety" && !managedSafetyAuthorized) name = "overview";
+          if (isManagedAccountContext() && name === "usage" && activeAccountContext?.actor?.can_view_usage !== true) name = "overview";
           const validName = accountTabs.some((tab) => tab.dataset.accountTab === name) ? name : "overview";
           accountTabs.forEach((tab) => {
             const active = tab.dataset.accountTab === validName;
@@ -2678,7 +2687,10 @@
           if (recipientName) recipientName.textContent = displayName || "–";
           if (recipientMeta) {
             const relation = accountMeta?.relationship ? String(accountMeta.relationship) : "";
-            recipientMeta.textContent = [relation, "Eigener Tarif", "Eigene Nutzung"].filter(Boolean).join(" · ");
+            const accessParts = [relation];
+            if (body?.actor?.is_payer === true || body?.actor?.can_manage_plan === true) accessParts.push("Tarif sichtbar");
+            if (body?.actor?.can_view_usage === true) accessParts.push("Nutzung sichtbar");
+            recipientMeta.textContent = accessParts.filter(Boolean).join(" · ") || "Getrennter Personen-Kontext";
           }
           const managed = body?.selected?.is_self === false;
           safetyLoadStarted = false;
