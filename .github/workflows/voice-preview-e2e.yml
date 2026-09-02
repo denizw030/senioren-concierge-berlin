@@ -19,7 +19,12 @@ jobs:
         with:
           node-version: "20"
       - name: Static regression tests
-        run: node --test tests/voice-preview.test.mjs tests/account-usage.test.mjs tests/product-refresh.test.mjs tests/registration-ux.test.mjs
+        run: node --test tests/voice-preview.test.mjs tests/account-usage.test.mjs tests/product-refresh.test.mjs tests/registration-ux.test.mjs tests/auth-security.test.mjs
+      - name: Secure login endpoint smoke
+        run: |
+          status=$(curl -sS -o /tmp/login-smoke.json -w "%{http_code}"             -H "Origin: https://nahwerkconcierge.com"             -H "Content-Type: application/json"             -X POST             --data '{"email":"login-smoke-invalid@nahwerk.invalid","password":"invalid-login-smoke-password"}'             https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-login-secure)
+          test "$status" = "401"
+          grep -q '"status":"invalid_credentials"' /tmp/login-smoke.json
       - name: Install Playwright
         run: |
           npm install --no-save @playwright/test@1.55.0
