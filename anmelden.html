@@ -133,7 +133,7 @@
           <span>Persönlicher Concierge über WhatsApp</span>
         </div>
       </div>
-    </footer><script src="assets/auth-nav.js?v=39"></script><script>(()=>{
+    </footer><script src="assets/auth-nav.js?v=40"></script><script>(()=>{
 const LOGIN_URL='https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/login/password';
 const MFA_CHALLENGE_URL='https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/login/mfa/challenge';
 const MFA_VERIFY_URL='https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/login/mfa/verify';
@@ -173,7 +173,8 @@ function show(msg,error=false){
 function completeLogin(body){
   if(!body||body.ok!==true||body.status!=='logged_in'||!body.session_token||body.mfa_required===true)return false;
   const productContext=body.product_context==='senioren'||body.brand==='senioren_concierge'?'senioren':body.product_context==='prime'||body.brand==='prime_concierge'?'prime':ENTRY_PRODUCT;
-  localStorage.setItem(SESSION_KEY,JSON.stringify({
+  localStorage.removeItem(SESSION_KEY);
+  sessionStorage.setItem(SESSION_KEY,JSON.stringify({
     session_token:body.session_token,
     customer_account_id:body.customer_account_id,
     person_id:body.person_id,
@@ -232,6 +233,7 @@ function showMfaChoice(){
 
 function enterMfa(body){
   localStorage.removeItem(SESSION_KEY);
+  sessionStorage.removeItem(SESSION_KEY);
   const mfa_token=String(body.mfa_token||'');
   const methods=(Array.isArray(body.mfa_methods)?body.mfa_methods:[body.mfa_method]).filter(m=>m==='sms'||m==='totp');
   const method=String(body.mfa_method||'');
