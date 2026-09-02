@@ -44,8 +44,13 @@ jobs:
               'höchstens 10 Versuche',
               'Mailbox',
               'safetyToggleLabel.textContent = enabled ? "Deaktivieren" : "Aktivieren"',
+              'const enteredContacts = rawContacts.filter',
+              'await saveSafetyContacts(token, previousContacts).catch',
           ):
               assert marker in html, marker
+
+          assert 'data-safety-contact="name" type="text" autocomplete="name" maxlength="120" required' not in html
+          assert 'data-safety-contact="phone" type="tel" autocomplete="tel" required' not in html
 
           # Existing backend contract remains.
           assert 'const SAFETY_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/safety";' in html
