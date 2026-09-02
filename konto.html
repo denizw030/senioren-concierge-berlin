@@ -1610,7 +1610,8 @@
           </div>
           <div class="warning managed-context-notice" id="managedContextNotice" hidden data-account-panel="overview">
             <strong>Verwaltetes Profil.</strong>
-            Tarif und Nutzung werden ausschließlich aus dem Konto dieser Person geladen. Bereiche, die noch nicht sicher auf den ausgewählten Personen-Kontext umgestellt sind, bleiben gesperrt und können dadurch nicht versehentlich ein anderes Konto verändern.
+            Tarif und Nutzung werden ausschließlich aus dem Konto dieser Person geladen. Concierge-Präferenzen können im gesicherten Personen-Kontext verwaltet werden; Safety, Telefonannahme und persönliche Stammdaten bleiben bis zur jeweiligen Rechtefreigabe gesperrt.
+            <div class="actions" style="margin-top:12px"><a class="btn light" id="managedConciergeLink" href="concierge-anpassen.html">Concierge-Einstellungen dieser Person</a></div>
           </div>
           <div class="account-tabs-shell">
             <nav class="account-tabs" role="tablist" aria-label="Kundenbereich">
@@ -2430,7 +2431,11 @@
           try {
             sessionStorage.setItem(ACCOUNT_CONTEXT_STORAGE_KEY, JSON.stringify({
               actor_person_id: body?.actor?.person_id || accountSession()?.person_id || "",
-              customer_account_id: body?.selected?.customer_account_id || ""
+              customer_account_id: body?.selected?.customer_account_id || "",
+              target_person_id: body?.selected?.person_id || "",
+              is_self: body?.selected?.is_self === true,
+              display_name: displayName || "",
+              relationship: accountMeta?.relationship ? String(accountMeta.relationship) : ""
             }));
           } catch (_) {}
           if (managed) setAccountTab("overview");
