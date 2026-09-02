@@ -293,14 +293,69 @@
         font: inherit;
       }
       .safety-toggle {
-        display: flex;
+        display: inline-flex;
         align-items: center;
         gap: 10px;
         margin-bottom: 16px;
+        cursor: pointer;
+        user-select: none;
       }
       .safety-toggle input {
-        width: 18px;
-        height: 18px;
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .safety-switch-track {
+        position: relative;
+        width: 46px;
+        height: 26px;
+        flex: 0 0 46px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(255,255,255,.10);
+        transition: background .2s ease, border-color .2s ease, box-shadow .2s ease;
+      }
+      .safety-switch-thumb {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #f4f1e9;
+        box-shadow: 0 2px 7px rgba(0,0,0,.30);
+        transition: transform .2s cubic-bezier(.2,.8,.2,1);
+      }
+      .safety-toggle input:checked + .safety-switch-track {
+        border-color: var(--gold);
+        background: var(--gold);
+        box-shadow: 0 0 0 1px rgba(212,175,55,.10), 0 4px 16px rgba(212,175,55,.16);
+      }
+      .safety-toggle input:checked + .safety-switch-track .safety-switch-thumb {
+        transform: translateX(20px);
+      }
+      .safety-toggle input:focus-visible + .safety-switch-track {
+        outline: 3px solid var(--gold2);
+        outline-offset: 3px;
+      }
+      .safety-toggle-text {
+        min-width: 82px;
+        margin: 0!important;
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .safety-status-accessible {
+        position: absolute!important;
+        width: 1px!important;
+        height: 1px!important;
+        padding: 0!important;
+        margin: -1px!important;
+        overflow: hidden!important;
+        clip: rect(0,0,0,0)!important;
+        white-space: nowrap!important;
+        border: 0!important;
       }
       .safety-save-status {
         display: none;
@@ -1084,6 +1139,25 @@
       }
     
       /* Account-Center navigation: one deliberate workspace at a time. */
+      .account-setup-by{
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        gap:4px;
+        margin:0 0 12px;
+        text-align:center;
+      }
+      .account-setup-by .eyebrow{
+        margin:0;
+      }
+      .account-setup-name{
+        display:block;
+        margin:0;
+        font-size:15px!important;
+        line-height:1.25!important;
+        letter-spacing:-.015em;
+      }
       .account-tabs-shell{
         position:sticky;
         top:84px;
@@ -1253,6 +1327,9 @@
         color:#6d665c;
       }
       @media(max-width:700px){
+        .account-setup-by{
+          margin-bottom:10px;
+        }
         .account-tabs-shell{
           top:72px;
           margin:0 -2px 16px;
@@ -1348,6 +1425,10 @@
       </section>
       <section class="section account-section">
         <div class="wrap">
+          <div class="account-setup-by" aria-label="Eingerichtet von">
+            <span class="eyebrow">Eingerichtet von</span>
+            <strong class="value account-setup-name" id="ownerName">–</strong>
+          </div>
           <div class="account-tabs-shell">
             <nav class="account-tabs" role="tablist" aria-label="Kundenbereich">
               <button class="account-tab" type="button" role="tab" id="accountTabOverview" aria-controls="accountPanelOverview" aria-selected="true" data-account-tab="overview">Übersicht</button>
@@ -1422,11 +1503,6 @@
               <div class="value" id="recipientName">Noch nicht angelegt</div>
               <p class="muted" id="recipientMeta">–</p>
             </article>
-            <article class="card summary-card owner-summary" data-account-panel="overview">
-              <div class="eyebrow">Eingerichtet von</div>
-              <div class="value" id="ownerName">–</div>
-              <p class="muted" id="ownerMeta">–</p>
-            </article>
             <div class="account-overview-highlights" data-account-panel="overview">
               <button class="account-overview-link" type="button" data-open-account-tab="concierge">
                 <span class="eyebrow">Concierge</span>
@@ -1436,7 +1512,7 @@
               <button class="account-overview-link" type="button" data-open-account-tab="safety">
                 <span class="eyebrow">Sicherheit</span>
                 <strong id="overviewSafety">Wird geladen …</strong>
-                <span id="overviewSafetyMeta">Check-ins und Vertrauenskontakt anzeigen.</span>
+                <span id="overviewSafetyMeta">Sicherheitsfunktion und Vertrauenskontakt anzeigen.</span>
               </button>
               <button class="account-overview-link" type="button" data-open-account-tab="usage">
                 <span class="eyebrow">Nutzung</span>
@@ -1574,7 +1650,7 @@
                 WhatsApp-Gesprächs.
               </p>
             </article>
-            <div class="account-panel-heading" data-account-panel="safety" hidden><div class="eyebrow">Sicherheit</div><h2>Check-ins und Vertrauenskontakt.</h2><p>Ihre wichtigsten Sicherheitseinstellungen auf einen Blick. Details öffnen Sie erst über „Bearbeiten“.</p></div>
+            <div class="account-panel-heading" data-account-panel="safety" hidden><div class="eyebrow">Sicherheit</div><h2>Sicherheit und Vertrauenskontakt.</h2><p>Ihre wichtigsten Sicherheitseinstellungen auf einen Blick. Details öffnen Sie erst über „Bearbeiten“.</p></div>
             <article class="card wide mfa-panel" id="mfaCard" data-account-panel="safety" hidden>
               <div class="safety-card-head">
                 <div>
@@ -1701,21 +1777,22 @@
               <div class="safety-card-head">
                 <div>
                   <div class="eyebrow">Sicherheit</div>
-                  <div class="value" id="safetyStatus">Wird geladen …</div>
-                  <p class="muted" id="safetyMeta">Die aktuellen Sicherheitseinstellungen werden aus Ihrem NAHWERK-Konto geladen.</p>
-                  <p class="muted safety-next" id="safetyNext"></p>
+                  <div class="safety-status-accessible" id="safetyStatus" aria-live="polite">Wird geladen …</div>
+                  <p class="safety-status-accessible" id="safetyMeta">Die aktuellen Sicherheitseinstellungen werden aus Ihrem NAHWERK-Konto geladen.</p>
+                  <p class="safety-status-accessible" id="safetyNext"></p>
                 </div>
                 <button class="btn light safety-edit" type="button" id="safetyEditButton">Bearbeiten</button>
               </div>
               <form class="safety-form" id="safetyForm" hidden>
-                <label class="safety-toggle">
+                <label class="safety-toggle" for="safetyEnabled">
                   <input type="checkbox" id="safetyEnabled" />
-                  <span>Check-ins aktivieren</span>
+                  <span class="safety-switch-track" aria-hidden="true"><span class="safety-switch-thumb"></span></span>
+                  <span class="safety-toggle-text" id="safetyToggleLabel">Aktivieren</span>
                 </label>
                 <div class="safety-form-grid">
                   <div>
-                    <label for="safetyTimePicker">Check-in-Uhrzeit</label>
-                    <div class="safety-time-picker" id="safetyTimePicker" role="group" aria-label="Check-in-Uhrzeit einstellen">
+                    <label for="safetyTimePicker">Uhrzeit</label>
+                    <div class="safety-time-picker" id="safetyTimePicker" role="group" aria-label="Uhrzeit einstellen">
                       <div class="safety-time-wheel" id="safetyHourWheel" tabindex="0" aria-label="Stunde"></div>
                       <div class="safety-time-separator" aria-hidden="true">:</div>
                       <div class="safety-time-wheel" id="safetyMinuteWheel" tabindex="0" aria-label="Minute"></div>
@@ -2024,6 +2101,7 @@
         const safetyMeta = document.getElementById("safetyMeta");
         const safetyNext = document.getElementById("safetyNext");
         const safetyEnabled = document.getElementById("safetyEnabled");
+        const safetyToggleLabel = document.getElementById("safetyToggleLabel");
         const safetyTimes = document.getElementById("safetyTimes");
         const safetyHourWheel = document.getElementById("safetyHourWheel");
         const safetyMinuteWheel = document.getElementById("safetyMinuteWheel");
@@ -2939,13 +3017,14 @@
           const parts = [times, s.trusted_contact_name, s.trusted_contact_phone].filter(Boolean);
           safetyStatus.textContent = enabled ? "Aktiviert" : "Deaktiviert";
           safetyMeta.textContent = enabled
-            ? (parts.join(" · ") || "Check-ins sind aktiviert.")
-            : "Check-ins sind derzeit ausgeschaltet.";
+            ? (parts.join(" · ") || "Sicherheitsfunktion ist aktiviert.")
+            : "Sicherheitsfunktion ist ausgeschaltet.";
           const next = formatNext(s.next_checkin_at);
           safetyNext.textContent = enabled && next
-            ? "Nächster Check-in: " + next + (s.backend_active === true ? " · Backend aktiv" : "")
+            ? "Nächste Ausführung: " + next + (s.backend_active === true ? " · Backend aktiv" : "")
             : (enabled && s.backend_active === true ? "Backend aktiv" : "");
           safetyEnabled.checked = enabled;
+          safetyToggleLabel.textContent = enabled ? "Deaktivieren" : "Aktivieren";
           safetyTimes.value = times;
           setSafetyWheelTime(times || "08:00");
           safetyContactName.value = s.trusted_contact_name || "";
@@ -2954,8 +3033,8 @@
           const overviewSafetyMeta = document.getElementById("overviewSafetyMeta");
           if (overviewSafety) overviewSafety.textContent = enabled ? "Aktiviert" : "Deaktiviert";
           if (overviewSafetyMeta) overviewSafetyMeta.textContent = enabled
-            ? (next ? "Nächster Check-in: " + next : "Check-ins sind aktiviert.")
-            : "Check-ins sind derzeit ausgeschaltet.";
+            ? (next ? "Nächste Ausführung: " + next : "Sicherheitsfunktion ist aktiviert.")
+            : "Sicherheitsfunktion ist ausgeschaltet.";
         }
         function showSafetySaveStatus(message, error = false) {
           safetySaveStatus.textContent = message;
@@ -2980,6 +3059,9 @@
           }
         }
 
+        safetyEnabled.addEventListener("change", () => {
+          safetyToggleLabel.textContent = safetyEnabled.checked ? "Deaktivieren" : "Aktivieren";
+        });
         safetyEditButton.addEventListener("click", (event) => {
           event.stopPropagation();
           setSafetyFormOpen(safetyForm.hidden);
@@ -3302,12 +3384,6 @@
               .join(" · ");
             document.getElementById("ownerName").textContent =
               d.owner?.name || "–";
-            document.getElementById("ownerMeta").textContent = [
-              d.owner?.email,
-              d.owner?.phone,
-            ]
-              .filter(Boolean)
-              .join(" · ");
             if (d.recipient?.note)
               document.getElementById("profileInfo").textContent =
                 d.recipient.note;
