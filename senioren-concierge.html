@@ -31,6 +31,10 @@
     <link rel="stylesheet" href="assets/phone-concierge-sections.css?v=1" />
     <link rel="stylesheet" href="assets/james-profile.css?v=1" />
     <style>
+      /* Page-scoped neutral base: prevents the global dark main background from showing between senior sections. */
+      body.senior-product > main {
+        background: #f7f3ea !important;
+      }
       .senior-image-hero {
         min-height: calc(100svh - 100px);
         display: grid;
