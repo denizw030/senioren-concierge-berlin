@@ -128,7 +128,7 @@ test("carousel and overview use one clipped radius owner",()=>{
   assert.match(carousel,/isolation:isolate/);
   assert.match(carousel,/aspect-ratio:480\/722;/);
   assert.match(carousel,/object-fit:cover/);
-  assert.match(overview,/\.concierge-overview-card\{[\s\S]*border-radius:22px;[\s\S]*overflow:hidden;/);
+  assert.match(overview,/\.concierge-overview-card\{/);\n  assert.match(overview,/border-radius:19px/);\n  assert.match(overview,/\.concierge-overview-card\{[^}]*overflow:hidden/);
 });
 
 test("optimized lifestyle assets are assigned by audience",()=>{
@@ -217,7 +217,7 @@ test("portrait clicks route to registration while voice controls stay separate",
   assert.match(overview,/registrieren\.html\?produkt=prime&concierge=/);
 });
 
-test("app-free wording, future free app, senior logo and light first paint are present",()=>{
+test("app-free wording, future free app, senior logo and stable dark first paint are present",()=>{
   const home=read("index.html");
   const senior=read("senioren-concierge.html");
   const brand=read("assets/brand-2026.css");
@@ -229,7 +229,7 @@ test("app-free wording, future free app, senior logo and light first paint are p
   assert.match(senior,/class="mark nahwerk-mark"/);
   assert.match(brand,/body\.senior-product \.brandtext strong:after[\s\S]*color:#8b8f96!important/);
   assert.match(brand,/body\.senior-product \.brandtext span:before[\s\S]*color:#858990!important/);
-  assert.match(registration,/name="theme-color" content="#fffdf9"/);
+  assert.match(registration,/name="theme-color" content="#070706"/);
   assert.match(registration,/registration-first-paint/);
 });
 
