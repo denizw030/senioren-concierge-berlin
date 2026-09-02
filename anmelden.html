@@ -171,6 +171,7 @@ function show(msg,error=false){
 }
 
 function completeLogin(body){
+  void window.NahwerkAnalytics?.track("login_complete", { funnel_name: "login", funnel_step: "complete" });
   if(!body||body.ok!==true||body.status!=='logged_in'||!body.session_token||body.mfa_required===true)return false;
   const productContext=body.product_context==='senioren'||body.brand==='senioren_concierge'?'senioren':body.product_context==='prime'||body.brand==='prime_concierge'?'prime':ENTRY_PRODUCT;
   localStorage.removeItem(SESSION_KEY);
@@ -356,6 +357,7 @@ mfaChoiceTotp.addEventListener('click',()=>startMfaChallenge('totp'));
 mfaBack.addEventListener('click',showMfaChoice);
 
 form.addEventListener('submit',async e=>{
+  void window.NahwerkAnalytics?.track("login_start", { funnel_name: "login", funnel_step: "start" });
   e.preventDefault();
   if(pendingMfa){
     if(!mfaStep.hidden)await verifyMfa();
@@ -413,4 +415,4 @@ forgot.addEventListener('click',async e=>{
     forgot.style.pointerEvents='auto';
   }
 });
-})();</script><script src="assets/site-ui.js?v=5"></script></body></html>
+})();</script><script src="assets/nahwerk-analytics.js?v=1"></script><script src="assets/site-ui.js?v=5"></script></body></html>

@@ -387,6 +387,7 @@
       const body = await response.json().catch(() => ({}));
 
       if (response.status === 201 && body.ok && body.status === "web_account_linked") {
+        void window.NahwerkAnalytics?.track("registration_complete", { funnel_name: "registration", funnel_step: "complete" });
         localStorage.setItem("scb_onboarding_sent", "1");
         localStorage.setItem("scb_onboarding_result", JSON.stringify(body));
         if (await login(request.email, password)) {
@@ -477,6 +478,7 @@
     render();
   });
   form.addEventListener("submit", async (event) => {
+    void window.NahwerkAnalytics?.track("registration_start", { funnel_name: "registration", funnel_step: "start" });
     event.preventDefault();
     if (!planBookable()) return show(`<strong>${selectedPlan().code} ist ausgewählt, aber der sichere Checkout ist noch nicht freigegeben.</strong><br>Bitte wählen Sie FREE oder ändern Sie den Tarif oben. Es wurde nichts kostenpflichtig bestellt.`, true);
     const password = $("webPassword").value;
@@ -522,6 +524,7 @@
         return;
       }
       if (response.status === 201 && body.ok) {
+        void window.NahwerkAnalytics?.track("registration_complete", { funnel_name: "registration", funnel_step: "complete" });
         localStorage.setItem("scb_onboarding_sent", "1");
         localStorage.setItem("scb_onboarding_result", JSON.stringify(body));
         if (await login(request.email, password)) {

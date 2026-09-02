@@ -1,5 +1,37 @@
 (() => {
-  const ready = () => {
+  const analytics = () => window.NahwerkAnalytics;
+  const ensureAnalytics = () => new Promise((resolve) => {
+    if (analytics()) return resolve(analytics());
+    const existing = document.querySelector('script[data-nw-analytics-client]');
+    if (existing) {
+      existing.addEventListener('load', () => resolve(analytics()), { once:true });
+      existing.addEventListener('error', () => resolve(null), { once:true });
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'assets/nahwerk-analytics.js?v=1';
+    script.async = true;
+    script.dataset.nwAnalyticsClient = 'true';
+    script.onload = () => resolve(analytics());
+    script.onerror = () => resolve(null);
+    document.head.appendChild(script);
+  });
+  const ready = async () => {
+    const a = await ensureAnalytics();
+    void a?.track("page_view");
+    document.addEventListener("click", (event) => {
+      const el = event.target instanceof Element ? event.target.closest("a,button,[role='button']") : null;
+      if (!el) return;
+      const href = el.getAttribute("href") || "";
+      const isPrimaryCta =
+        el.classList.contains("btn") ||
+        /registrieren|anmelden|pakete|kontakt|prime-concierge|senioren-concierge/.test(href);
+      if (!isPrimaryCta) return;
+      void analytics()?.track("cta_click", {
+        funnel_name: /registrieren/.test(href) ? "registration" : null,
+        funnel_step: /registrieren/.test(href) ? "cta" : null
+      });
+    }, { passive: true });
     if (!document.querySelector('link[data-nw-premium-preview]')) {
       const premium = document.createElement('link');
       premium.rel = 'stylesheet';
