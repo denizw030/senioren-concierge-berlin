@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: "20"
       - name: Static regression tests
-        run: node --test tests/voice-preview.test.mjs
+        run: node --test tests/voice-preview.test.mjs tests/account-usage.test.mjs tests/product-refresh.test.mjs tests/registration-ux.test.mjs
       - name: Install Playwright
         run: |
           npm install --no-save @playwright/test@1.55.0
