@@ -3141,8 +3141,8 @@
           row.className = "safety-contact-row";
           row.innerHTML = `
             <div class="safety-contact-order"><strong></strong><button class="safety-remove-button" type="button" aria-label="Sicherheitskontakt entfernen">−</button></div>
-            <label class="safety-contact-field"><span>Name</span><input class="safety-contact-input" data-safety-contact="name" type="text" autocomplete="name" maxlength="120" required></label>
-            <label class="safety-contact-field"><span>Telefon</span><input class="safety-contact-input" data-safety-contact="phone" type="tel" autocomplete="tel" required></label>
+            <label class="safety-contact-field"><span>Name</span><input class="safety-contact-input" data-safety-contact="name" type="text" autocomplete="name" maxlength="120"></label>
+            <label class="safety-contact-field"><span>Telefon</span><input class="safety-contact-input" data-safety-contact="phone" type="tel" autocomplete="tel"></label>
             <label class="safety-contact-field"><span>Beziehung (optional)</span><input class="safety-contact-input" data-safety-contact="relationship" type="text" maxlength="100"></label>
           `;
           row.querySelector('[data-safety-contact="name"]').value = String(contact.name || "");
@@ -3314,7 +3314,10 @@
 
           const times = currentSafetyTimes();
           const rawContacts = contactValues();
-          const contacts = rawContacts.map((contact) => ({
+          const enteredContacts = rawContacts.filter((contact) =>
+            Boolean(contact.name || contact.phone || contact.relationship)
+          );
+          const contacts = enteredContacts.map((contact) => ({
             name: contact.name,
             phone: normalizeSafetyPhone(contact.phone),
             relationship: contact.relationship
@@ -3328,7 +3331,7 @@
             showSafetySaveStatus("Bitte hinterlegen Sie mindestens einen Sicherheitskontakt.", true);
             return;
           }
-          if (rawContacts.some((contact) => !contact.name || !normalizeSafetyPhone(contact.phone))) {
+          if (enteredContacts.some((contact) => !contact.name || !normalizeSafetyPhone(contact.phone))) {
             showSafetySaveStatus("Bitte prüfen Sie Name und Telefonnummer aller Sicherheitskontakte.", true);
             return;
           }
