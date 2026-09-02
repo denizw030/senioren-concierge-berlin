@@ -2454,6 +2454,7 @@
             return null;
           }
         }
+        renderActorOwnerName();
         function activeSelfAccountId() {
           if (activeAccountContext?.selected?.is_self === true && activeAccountContext?.selected?.customer_account_id) {
             return String(activeAccountContext.selected.customer_account_id);
@@ -2622,6 +2623,7 @@
         }
         function renderSelectedAccountContext(body, accountMeta = null) {
           activeAccountContext = body;
+          renderActorOwnerName(body?.actor || null);
           renderProfilePayload(body?.snapshot || {});
           const profile = body?.snapshot?.profile || {};
           const displayName = [profile.first_name, profile.last_name].filter(Boolean).join(" ").trim() || contextDisplayName(accountMeta);
@@ -2641,6 +2643,7 @@
           try {
             sessionStorage.setItem(ACCOUNT_CONTEXT_STORAGE_KEY, JSON.stringify({
               actor_person_id: body?.actor?.person_id || accountSession()?.person_id || "",
+              actor_display_name: body?.actor?.display_name || "",
               customer_account_id: body?.selected?.customer_account_id || "",
               target_person_id: body?.selected?.person_id || "",
               is_self: body?.selected?.is_self === true,
@@ -3415,11 +3418,14 @@
           profileLastName.value = profile?.last_name || "";
           profileEmail.value = profile?.email || "";
           profileWhatsapp.value = profile?.whatsapp_number || "";
-          const displayName = [profile?.first_name, profile?.last_name].filter(Boolean).join(" ");
-          if (displayName) {
-            const recipient = document.getElementById("ownerName");
-            if (recipient && (!recipient.textContent.trim() || recipient.textContent.trim() === "–")) recipient.textContent = displayName;
-          }
+        }
+        function renderActorOwnerName(actor = null) {
+          const owner = document.getElementById("ownerName");
+          if (!owner) return;
+          const actorName = String(actor?.display_name || "").trim();
+          const sessionName = String(accountSession()?.first_name || "").trim();
+          const name = actorName || sessionName;
+          if (name) owner.textContent = name;
         }
         async function loadProfile() {
           const token = sessionToken();
