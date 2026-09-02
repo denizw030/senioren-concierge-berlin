@@ -32,6 +32,49 @@ for(const viewport of viewports){
   }
 }
 
+
+for(const viewport of [
+  {name:"desktop",width:1440,height:1000},
+  {name:"mobile",width:390,height:844}
+]){
+  test(`${viewport.name} overview and personal concierge keep their page-specific initial profiles`,async({page})=>{
+    await page.setViewportSize({width:viewport.width,height:viewport.height});
+
+    await page.goto("http://127.0.0.1:4173/index.html",{waitUntil:"networkidle"});
+    const overview=page.locator("[data-concierge-carousel]");
+    await expect(overview).toHaveCount(1);
+    expect(await overview.evaluate(el=>el._nahwerkCarousel.selected.key)).toBe("lena");
+    await overview.locator(".nw-carousel-arrow.next").click();
+    expect(await overview.evaluate(el=>el._nahwerkCarousel.selected.key)).not.toBe("lena");
+    await page.waitForTimeout(150);
+    expect(await overview.evaluate(el=>el._nahwerkCarousel.selected.key)).not.toBe("lena");
+    await page.reload({waitUntil:"networkidle"});
+    expect(await page.locator("[data-concierge-carousel]").evaluate(el=>el._nahwerkCarousel.selected.key)).toBe("lena");
+
+    await page.goto("http://127.0.0.1:4173/prime-concierge.html",{waitUntil:"networkidle"});
+    const prime=page.locator("[data-concierge-carousel]");
+    await expect(prime).toHaveCount(2);
+    expect(await prime.evaluateAll(els=>els.map(el=>el._nahwerkCarousel.selected.key))).toEqual(["leyla","leyla"]);
+    await prime.first().locator(".nw-carousel-arrow.next").click();
+    expect(await prime.first().evaluate(el=>el._nahwerkCarousel.selected.key)).not.toBe("leyla");
+    await page.waitForTimeout(150);
+    expect(await prime.first().evaluate(el=>el._nahwerkCarousel.selected.key)).not.toBe("leyla");
+    await page.reload({waitUntil:"networkidle"});
+    expect(await page.locator("[data-concierge-carousel]").evaluateAll(els=>els.map(el=>el._nahwerkCarousel.selected.key))).toEqual(["leyla","leyla"]);
+  });
+}
+
+test("telephone agent is visibly Alexander on public surfaces and account selector",async({request})=>{
+  for(const surface of ["/index.html","/prime-concierge.html","/senioren-concierge.html","/konto.html"]){
+    const response=await request.get(`http://127.0.0.1:4173${surface}`);
+    expect(response.status()).toBe(200);
+    const html=await response.text();
+    expect(html,surface).toContain("Alexander");
+    expect(html,surface).not.toMatch(/>\s*James\s*</);
+    expect(html,surface).not.toContain('alt="James,');
+  }
+});
+
 test("all current product image and audio assets return successfully",async({page})=>{
   await page.goto("http://127.0.0.1:4173/index.html",{waitUntil:"networkidle"});
   const result=await page.evaluate(async()=>{
