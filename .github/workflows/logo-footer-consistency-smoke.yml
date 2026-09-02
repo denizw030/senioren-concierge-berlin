@@ -1,0 +1,63 @@
+name: NAHWERK Logo Footer Consistency Smoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/logo-footer-consistency-smoke.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify website logos and footer consistency
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          logo_css=Path("assets/nahwerk-logo-v2.css").read_text(encoding="utf-8")
+          assert 'NAHWERK-CONCIERGE-Website-Logo.webp' in logo_css
+          assert 'NAHWERK-CONCIERGE-Website-Logo-Schrift.webp' in logo_css
+          assert Path("assets/logos/NAHWERK-CONCIERGE-Website-Logo.webp").is_file()
+          assert Path("assets/logos/NAHWERK-CONCIERGE-Website-Logo-Schrift.webp").is_file()
+
+          canonical_markers=[
+              'class="footergrid"',
+              '<h4>Angebot</h4>',
+              '<h4>Service</h4>',
+              '<h4>Rechtliches</h4>',
+              'Ihr persönlicher Concierge für Alltag, Organisation und verständliche Unterstützung.',
+              'Persönlicher Concierge über WhatsApp',
+              '© 2026 NAHWERK Concierge',
+          ]
+
+          checked=[]
+          for path in sorted(Path(".").glob("*.html")):
+              text=path.read_text(encoding="utf-8")
+              if '<header' not in text:
+                  continue
+              checked.append(path.name)
+              assert 'assets/nahwerk-logo-v2.css?v=9' in text, f"{path}: logo css is not v9"
+              assert text.count("<footer") == 1, f"{path}: expected exactly one footer"
+              assert text.count("</footer>") == 1, f"{path}: malformed footer"
+              for marker in canonical_markers:
+                  assert marker in text, f"{path}: missing footer marker {marker}"
+
+          stale=[]
+          for path in Path(".").glob("*.html"):
+              text=path.read_text(encoding="utf-8")
+              if re.search(r'assets/nahwerk-logo-v2\.css\?v=(?!9\b)\d+', text):
+                  stale.append(path.name)
+          assert not stale, "stale logo css versions: " + ", ".join(stale)
+
+          assert len(checked) >= 20, f"too few public shell pages checked: {len(checked)}"
+          print("PUBLIC_SHELL_PAGES="+str(len(checked)))
+          print("HEADER_LOGO=GREEN")
+          print("FOOTER_TEXT_LOGO=GREEN")
+          print("FOOTER_CONSISTENCY=GREEN")
+          PY
