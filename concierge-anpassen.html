@@ -193,7 +193,16 @@
         headers: { Authorization: "Bearer " + s.session_token }
       });
       const body = await response.json().catch(() => ({}));
-      if (!response.ok || body?.ok !== true) throw new Error(body?.status || "load_failed");
+      if (!response.ok || body?.ok !== true) {
+        const status = String(body?.status || "");
+        const reason = String(body?.reason_code || body?.write_reason || "");
+        if (status === "preferences_permission_required" || reason === "target_permission_required") {
+          setWritable(false, "target_permission_required");
+          show("Diese Person hat Ihnen den Zugriff auf Concierge-Einstellungen noch nicht freigegeben.", true);
+          return;
+        }
+        throw new Error(status || "load_failed");
+      }
       apply(body.preferences || {});
       setWritable(body.can_write === true, body.write_reason || "");
       render();
