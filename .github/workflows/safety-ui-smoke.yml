@@ -1,0 +1,76 @@
+name: NAHWERK Safety UI Smoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/safety-ui-smoke.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verify safety account UI
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          html=Path("konto.html").read_text(encoding="utf-8")
+
+          # Old wheel is fully gone.
+          for stale in ("safetyTimePicker","safetyHourWheel","safetyMinuteWheel","setSafetyWheelTime","buildSafetyTimeWheel"):
+              assert stale not in html, stale
+
+          # Normal modern time controls and full escalation settings.
+          for marker in (
+              'id="safetyTimeList"',
+              'id="safetyAddTimeButton"',
+              'input.type = "time"',
+              'id="safetyCustomerDelay"',
+              'id="safetyEmergencyDelay"',
+              'id="safetyContactList"',
+              'id="safetyAddContactButton"',
+              'SAFETY_CONTACTS_URL',
+              'customer_call_delay_minutes: customerDelay',
+              'emergency_contact_delay_minutes: emergencyDelay',
+              'maximal 20 Sekunden',
+              'höchstens 10 Versuche',
+              'Mailbox',
+              'safetyToggleLabel.textContent = enabled ? "Deaktivieren" : "Aktivieren"',
+          ):
+              assert marker in html, marker
+
+          # Existing backend contract remains.
+          assert 'const SAFETY_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/safety";' in html
+          assert 'safety_enabled: safetyEnabled.checked' in html
+          assert 'schedule_mode: "recurring"' in html
+
+          # Inline JS syntax.
+          scripts=[]
+          pos=0
+          while True:
+              s=html.find("<script>",pos)
+              if s<0: break
+              e=html.find("</script>",s)
+              assert e>=0
+              scripts.append(html[s+8:e])
+              pos=e+9
+          Path("/tmp/konto-inline.js").write_text("\n".join(scripts),encoding="utf-8")
+          print("SAFETY_UI_STATIC=GREEN")
+          PY
+          node --check /tmp/konto-inline.js
+          node --test tests/account-usage.test.mjs
+          node --test tests/auth-security.test.mjs
+      - name: Verify safety contacts endpoint fails closed
+        run: |
+          code="$(curl -sS -o /tmp/safety-contacts.json -w '%{http_code}' https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-safety-contacts)"
+          test "$code" = "401"
+          grep -q '"invalid_session"' /tmp/safety-contacts.json
+          echo "SAFETY_CONTACTS_FAIL_CLOSED=GREEN"
