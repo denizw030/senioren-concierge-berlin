@@ -292,15 +292,34 @@
         color: inherit;
         font: inherit;
       }
-      .safety-toggle {
-        display: inline-flex;
+      .safety-activation-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 22px;
+        margin-bottom: 18px;
+      }
+      .safety-activation-row > div {
+        display: grid;
+        gap: 4px;
+      }
+      .safety-activation-row > div > strong {
+        font-size: 15px;
+      }
+      .safety-activation-row > div > span {
+        font-size: 12px;
+        line-height: 1.5;
+      }
+      .safety-form .safety-toggle {
+        display: inline-flex !important;
         align-items: center;
         gap: 10px;
-        margin-bottom: 16px;
+        margin: 0 !important;
         cursor: pointer;
         user-select: none;
+        flex: 0 0 auto;
       }
-      .safety-toggle input {
+      .safety-form .safety-toggle input {
         position: absolute;
         width: 1px;
         height: 1px;
@@ -341,7 +360,7 @@
         outline-offset: 3px;
       }
       .safety-toggle-text {
-        min-width: 82px;
+        min-width: 84px;
         margin: 0!important;
         font-size: 13px;
         font-weight: 700;
@@ -357,6 +376,198 @@
         white-space: nowrap!important;
         border: 0!important;
       }
+      .safety-config-section {
+        margin-top: 18px;
+        padding-top: 18px;
+        border-top: 1px solid var(--line);
+      }
+      .safety-config-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 12px;
+      }
+      .safety-config-head > div {
+        display: grid;
+        gap: 4px;
+      }
+      .safety-config-head strong {
+        font-size: 14px;
+      }
+      .safety-config-head .muted {
+        font-size: 12px;
+        line-height: 1.5;
+      }
+      .safety-add-button {
+        min-height: 36px;
+        padding: 0 13px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: border-color .18s ease, background .18s ease;
+      }
+      .safety-add-button:hover {
+        border-color: rgba(212,175,55,.48);
+        background: rgba(212,175,55,.06);
+      }
+      .safety-add-button:disabled {
+        opacity: .45;
+        cursor: not-allowed;
+      }
+      .safety-time-list {
+        display: grid;
+        grid-template-columns: repeat(2,minmax(0,1fr));
+        gap: 10px;
+      }
+      .safety-time-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 8px;
+      }
+      .safety-time-input,
+      .safety-contact-input,
+      .safety-number-field input {
+        width: 100%;
+        min-height: 46px;
+        padding: 0 13px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+      }
+      .safety-time-input {
+        font-variant-numeric: tabular-nums;
+        color-scheme: dark;
+      }
+      body.senior-product .safety-time-input,
+      body[data-product="senioren"] .safety-time-input {
+        color-scheme: light;
+      }
+      .safety-remove-button {
+        width: 38px;
+        height: 38px;
+        display: inline-grid;
+        place-items: center;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        font-size: 18px;
+        line-height: 1;
+        cursor: pointer;
+      }
+      .safety-remove-button:hover {
+        border-color: rgba(184,91,91,.48);
+        background: rgba(184,91,91,.07);
+      }
+      .safety-delay-grid {
+        display: grid;
+        grid-template-columns: repeat(2,minmax(0,1fr));
+        gap: 12px;
+      }
+      .safety-field {
+        display: grid !important;
+        gap: 8px;
+        margin: 0 !important;
+        font-size: 12px;
+      }
+      .safety-number-field {
+        display: grid;
+        grid-template-columns: minmax(0,110px) auto;
+        align-items: center;
+        gap: 9px;
+      }
+      .safety-number-field span {
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .safety-call-rule {
+        display: grid;
+        gap: 4px;
+        margin-top: 12px;
+        padding: 12px 14px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(255,255,255,.025);
+      }
+      .safety-call-rule strong {
+        font-size: 12px;
+      }
+      .safety-call-rule span {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.55;
+      }
+      .safety-contact-list {
+        display: grid;
+        gap: 10px;
+      }
+      .safety-contact-row {
+        display: grid;
+        grid-template-columns: minmax(0,1.05fr) minmax(0,1fr) minmax(0,.8fr) auto;
+        gap: 8px;
+        align-items: end;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: rgba(255,255,255,.018);
+      }
+      .safety-contact-field {
+        display: grid;
+        gap: 6px;
+      }
+      .safety-contact-field > span {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--muted);
+      }
+      .safety-contact-order {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 2px;
+      }
+      .safety-contact-order strong {
+        font-size: 12px;
+        color: var(--gold);
+        letter-spacing: .05em;
+        text-transform: uppercase;
+      }
+      .safety-config-note {
+        margin: 9px 0 0;
+        font-size: 11.5px;
+        line-height: 1.55;
+      }
+      @media(max-width:760px){
+        .safety-activation-row,
+        .safety-config-head {
+          align-items: flex-start;
+        }
+        .safety-activation-row {
+          flex-direction: column;
+        }
+        .safety-delay-grid,
+        .safety-time-list {
+          grid-template-columns: 1fr;
+        }
+        .safety-contact-row {
+          grid-template-columns: 1fr;
+        }
+        .safety-contact-order {
+          grid-column: 1;
+        }
+      }
       .safety-save-status {
         display: none;
         margin-top: 12px;
@@ -364,87 +575,6 @@
       }
       .safety-save-status.is-visible {
         display: block;
-      }
-      .safety-time-picker {
-        position: relative;
-        width: min(100%, 240px);
-        height: 154px;
-        display: grid;
-        grid-template-columns: 1fr 22px 1fr;
-        align-items: center;
-        margin-top: 8px;
-        padding: 8px 14px;
-        border: 1px solid var(--line);
-        border-radius: 16px;
-        overflow: hidden;
-        background: rgba(255,255,255,.02);
-      }
-      .safety-time-picker::before,
-      .safety-time-picker::after {
-        content: "";
-        position: absolute;
-        left: 12px;
-        right: 12px;
-        height: 1px;
-        background: rgba(145,155,170,.18);
-        pointer-events: none;
-        z-index: 2;
-      }
-      .safety-time-picker::before { top: 55px; }
-      .safety-time-picker::after { bottom: 55px; }
-      .safety-time-wheel {
-        height: 132px;
-        overflow-y: auto;
-        overscroll-behavior: contain;
-        scroll-snap-type: y mandatory;
-        scrollbar-width: none;
-        padding: 44px 0;
-        position: relative;
-        z-index: 1;
-        touch-action: pan-y;
-        -webkit-overflow-scrolling: touch;
-      }
-      .safety-time-wheel::-webkit-scrollbar {
-        display: none;
-      }
-      .safety-time-option {
-        height: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        scroll-snap-align: center;
-        font-size: 22px;
-        font-variant-numeric: tabular-nums;
-        opacity: .34;
-        transition: opacity .12s ease, transform .12s ease, font-size .12s ease;
-        user-select: none;
-        cursor: grab;
-      }
-      .safety-time-option.is-selected {
-        opacity: 1;
-        transform: scale(1.05);
-        font-size: 28px;
-        font-weight: 600;
-      }
-      .safety-time-separator {
-        position: relative;
-        z-index: 3;
-        text-align: center;
-        font-size: 28px;
-        font-weight: 600;
-        line-height: 1;
-        pointer-events: none;
-      }
-      .safety-time-hidden {
-        position: absolute !important;
-        width: 1px !important;
-        height: 1px !important;
-        padding: 0 !important;
-        margin: -1px !important;
-        overflow: hidden !important;
-        clip: rect(0,0,0,0) !important;
-        white-space: nowrap !important;
-        border: 0 !important;
       }
       @media (max-width: 700px) {
         .dash,
@@ -1784,30 +1914,71 @@
                 <button class="btn light safety-edit" type="button" id="safetyEditButton">Bearbeiten</button>
               </div>
               <form class="safety-form" id="safetyForm" hidden>
-                <label class="safety-toggle" for="safetyEnabled">
-                  <input type="checkbox" id="safetyEnabled" />
-                  <span class="safety-switch-track" aria-hidden="true"><span class="safety-switch-thumb"></span></span>
-                  <span class="safety-toggle-text" id="safetyToggleLabel">Aktivieren</span>
-                </label>
-                <div class="safety-form-grid">
+                <div class="safety-activation-row">
                   <div>
-                    <label for="safetyTimePicker">Uhrzeit</label>
-                    <div class="safety-time-picker" id="safetyTimePicker" role="group" aria-label="Uhrzeit einstellen">
-                      <div class="safety-time-wheel" id="safetyHourWheel" tabindex="0" aria-label="Stunde"></div>
-                      <div class="safety-time-separator" aria-hidden="true">:</div>
-                      <div class="safety-time-wheel" id="safetyMinuteWheel" tabindex="0" aria-label="Minute"></div>
-                    </div>
-                    <input class="safety-time-hidden" id="safetyTimes" type="text" inputmode="numeric" tabindex="-1" aria-hidden="true" />
+                    <strong>Sicherheitsfunktion</strong>
+                    <span class="muted">Automatische Abfragen und Eskalation nur, wenn Sie diese Funktion aktivieren.</span>
                   </div>
-                  <div>
-                    <label for="safetyContactName">Vertrauenskontakt</label>
-                    <input id="safetyContactName" type="text" autocomplete="name" />
-                  </div>
-                  <div>
-                    <label for="safetyContactPhone">Telefon / WhatsApp</label>
-                    <input id="safetyContactPhone" type="tel" autocomplete="tel" />
-                  </div>
+                  <label class="safety-toggle" for="safetyEnabled">
+                    <input type="checkbox" id="safetyEnabled" />
+                    <span class="safety-switch-track" aria-hidden="true"><span class="safety-switch-thumb"></span></span>
+                    <span class="safety-toggle-text" id="safetyToggleLabel">Aktivieren</span>
+                  </label>
                 </div>
+
+                <section class="safety-config-section" aria-labelledby="safetyTimesHeading">
+                  <div class="safety-config-head">
+                    <div>
+                      <strong id="safetyTimesHeading">Uhrzeiten</strong>
+                      <span class="muted">Zu diesen Zeiten wird die Sicherheitsabfrage per WhatsApp gestartet.</span>
+                    </div>
+                    <button class="safety-add-button" type="button" id="safetyAddTimeButton">+ Uhrzeit hinzufügen</button>
+                  </div>
+                  <div class="safety-time-list" id="safetyTimeList"></div>
+                  <p class="muted safety-config-note">Bis zu 4 Uhrzeiten pro Tag.</p>
+                </section>
+
+                <section class="safety-config-section" aria-labelledby="safetyEscalationHeading">
+                  <div class="safety-config-head">
+                    <div>
+                      <strong id="safetyEscalationHeading">Eskalationszeiten</strong>
+                      <span class="muted">Sie bestimmen, wie lange NAHWERK auf eine Reaktion wartet.</span>
+                    </div>
+                  </div>
+                  <div class="safety-delay-grid">
+                    <label class="safety-field" for="safetyCustomerDelay">
+                      <span>Antwort auf WhatsApp innerhalb</span>
+                      <div class="safety-number-field">
+                        <input id="safetyCustomerDelay" type="number" min="1" max="60" step="1" value="15" inputmode="numeric" />
+                        <span>Minuten</span>
+                      </div>
+                    </label>
+                    <label class="safety-field" for="safetyEmergencyDelay">
+                      <span>Nach erfolglosem Kundenanruf warten</span>
+                      <div class="safety-number-field">
+                        <input id="safetyEmergencyDelay" type="number" min="1" max="60" step="1" value="5" inputmode="numeric" />
+                        <span>Minuten</span>
+                      </div>
+                    </label>
+                  </div>
+                  <div class="safety-call-rule">
+                    <strong>Kundenanruf</strong>
+                    <span>Der KI-Concierge lässt den Anruf maximal 20 Sekunden klingeln. Wird keine Person sicher erreicht, läuft die eingestellte Eskalation weiter.</span>
+                  </div>
+                </section>
+
+                <section class="safety-config-section" aria-labelledby="safetyContactsHeading">
+                  <div class="safety-config-head">
+                    <div>
+                      <strong id="safetyContactsHeading">Sicherheitskontakte</strong>
+                      <span class="muted">Die Reihenfolge bestimmt, wen NAHWERK zuerst kontaktiert.</span>
+                    </div>
+                    <button class="safety-add-button" type="button" id="safetyAddContactButton">+ Sicherheitskontakt hinzufügen</button>
+                  </div>
+                  <div class="safety-contact-list" id="safetyContactList"></div>
+                  <p class="muted safety-config-note">Pro Kontakt erfolgen bei Nichtannahme höchstens 10 Versuche. Erkennt der Anrufbeantworter eine Mailbox, wird direkt mit dem nächsten Sicherheitskontakt fortgefahren. Sobald ein Kontakt die Mitteilung bestätigt, endet die Kontaktserie.</p>
+                </section>
+
                 <p class="muted">Die Funktion ersetzt keinen medizinischen Notruf oder Hausnotruf; in akuten Notfällen gilt 112.</p>
                 <div class="actions">
                   <button class="btn red" type="submit" id="safetySaveButton">Änderungen speichern</button>
@@ -2095,6 +2266,7 @@
         const MFA_STATUS_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-mfa-status";
         const MFA_MANAGE_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-mfa-manage";
         const SAFETY_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/safety";
+        const SAFETY_CONTACTS_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-safety-contacts";
         const safetyCard = document.getElementById("safetyCard");
         const safetyForm = document.getElementById("safetyForm");
         const safetyStatus = document.getElementById("safetyStatus");
@@ -2102,16 +2274,18 @@
         const safetyNext = document.getElementById("safetyNext");
         const safetyEnabled = document.getElementById("safetyEnabled");
         const safetyToggleLabel = document.getElementById("safetyToggleLabel");
-        const safetyTimes = document.getElementById("safetyTimes");
-        const safetyHourWheel = document.getElementById("safetyHourWheel");
-        const safetyMinuteWheel = document.getElementById("safetyMinuteWheel");
-        const safetyContactName = document.getElementById("safetyContactName");
-        const safetyContactPhone = document.getElementById("safetyContactPhone");
+        const safetyTimeList = document.getElementById("safetyTimeList");
+        const safetyAddTimeButton = document.getElementById("safetyAddTimeButton");
+        const safetyCustomerDelay = document.getElementById("safetyCustomerDelay");
+        const safetyEmergencyDelay = document.getElementById("safetyEmergencyDelay");
+        const safetyContactList = document.getElementById("safetyContactList");
+        const safetyAddContactButton = document.getElementById("safetyAddContactButton");
         const safetyEditButton = document.getElementById("safetyEditButton");
         const safetyCancelButton = document.getElementById("safetyCancelButton");
         const safetySaveButton = document.getElementById("safetySaveButton");
         const safetySaveStatus = document.getElementById("safetySaveStatus");
         let lastSafety = null;
+        let lastSafetyContacts = [];
 
         function sessionToken() {
           try {
@@ -2891,110 +3065,162 @@
           }
         });
 
-        function normalizedTimes(value) {
-          if (Array.isArray(value)) return value.join(", ");
-          return value == null ? "" : String(value);
+        function validSafetyTime(value) {
+          return /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(String(value || ""));
         }
-        function firstTime(value) {
-          const match = normalizedTimes(value).match(/(?:^|\D)([01]?\d|2[0-3]):([0-5]\d)(?:\D|$)/);
-          return match
-            ? { hour: Number(match[1]), minute: Number(match[2]) }
-            : { hour: 8, minute: 0 };
+        function normalizeSafetyTimes(value) {
+          const raw = Array.isArray(value)
+            ? value
+            : String(value || "").split(/[;,\s]+/);
+          return [...new Set(raw.map((v) => String(v || "").trim()).filter(validSafetyTime))].slice(0, 4);
         }
-        function buildSafetyTimeWheel(element, max) {
-          element.innerHTML = "";
-          for (let value = 0; value <= max; value += 1) {
-            const option = document.createElement("div");
-            option.className = "safety-time-option";
-            option.dataset.value = String(value);
-            option.textContent = String(value).padStart(2, "0");
-            option.setAttribute("role", "option");
-            element.appendChild(option);
+        function clampSafetyDelay(value, fallback) {
+          const number = Math.round(Number(value));
+          return Number.isFinite(number) ? Math.min(60, Math.max(1, number)) : fallback;
+        }
+        function renderSafetyTimeInputs(values) {
+          const times = normalizeSafetyTimes(values);
+          if (!times.length) times.push("09:00");
+          safetyTimeList.innerHTML = "";
+          times.forEach((time, index) => {
+            const row = document.createElement("div");
+            row.className = "safety-time-row";
+            const input = document.createElement("input");
+            input.type = "time";
+            input.className = "safety-time-input";
+            input.value = time;
+            input.step = "60";
+            input.required = true;
+            input.setAttribute("aria-label", "Uhrzeit " + (index + 1));
+            const remove = document.createElement("button");
+            remove.type = "button";
+            remove.className = "safety-remove-button";
+            remove.setAttribute("aria-label", "Uhrzeit entfernen");
+            remove.textContent = "−";
+            remove.disabled = times.length <= 1;
+            remove.addEventListener("click", () => {
+              row.remove();
+              refreshSafetyTimeControls();
+            });
+            row.append(input, remove);
+            safetyTimeList.appendChild(row);
+          });
+          refreshSafetyTimeControls();
+        }
+        function refreshSafetyTimeControls() {
+          const rows = Array.from(safetyTimeList.querySelectorAll(".safety-time-row"));
+          rows.forEach((row) => {
+            const button = row.querySelector(".safety-remove-button");
+            if (button) button.disabled = rows.length <= 1;
+          });
+          safetyAddTimeButton.disabled = rows.length >= 4;
+        }
+        function currentSafetyTimes() {
+          return Array.from(safetyTimeList.querySelectorAll(".safety-time-input"))
+            .map((input) => input.value)
+            .filter(validSafetyTime)
+            .filter((value, index, list) => list.indexOf(value) === index)
+            .slice(0, 4);
+        }
+        function normalizeSafetyPhone(value) {
+          let phone = String(value || "").trim().replace(/^whatsapp:/i, "").replace(/[\s()\-./]/g, "");
+          if (phone.startsWith("00")) phone = "+" + phone.slice(2);
+          else if (/^0\d+$/.test(phone)) phone = "+49" + phone.slice(1);
+          else if (/^49\d+$/.test(phone)) phone = "+" + phone;
+          return /^\+[1-9]\d{6,14}$/.test(phone) ? phone : "";
+        }
+        function contactValues() {
+          return Array.from(safetyContactList.querySelectorAll(".safety-contact-row")).map((row) => ({
+            name: row.querySelector('[data-safety-contact="name"]')?.value.trim() || "",
+            phone: row.querySelector('[data-safety-contact="phone"]')?.value.trim() || "",
+            relationship: row.querySelector('[data-safety-contact="relationship"]')?.value.trim() || ""
+          }));
+        }
+        function addSafetyContact(contact = {}) {
+          const row = document.createElement("div");
+          row.className = "safety-contact-row";
+          row.innerHTML = `
+            <div class="safety-contact-order"><strong></strong><button class="safety-remove-button" type="button" aria-label="Sicherheitskontakt entfernen">−</button></div>
+            <label class="safety-contact-field"><span>Name</span><input class="safety-contact-input" data-safety-contact="name" type="text" autocomplete="name" maxlength="120" required></label>
+            <label class="safety-contact-field"><span>Telefon</span><input class="safety-contact-input" data-safety-contact="phone" type="tel" autocomplete="tel" required></label>
+            <label class="safety-contact-field"><span>Beziehung (optional)</span><input class="safety-contact-input" data-safety-contact="relationship" type="text" maxlength="100"></label>
+          `;
+          row.querySelector('[data-safety-contact="name"]').value = String(contact.name || "");
+          row.querySelector('[data-safety-contact="phone"]').value = String(contact.phone || "");
+          row.querySelector('[data-safety-contact="relationship"]').value = String(contact.relationship || "");
+          row.querySelector(".safety-remove-button").addEventListener("click", () => {
+            row.remove();
+            refreshSafetyContacts();
+          });
+          safetyContactList.appendChild(row);
+          refreshSafetyContacts();
+        }
+        function renderSafetyContacts(contacts, legacy = null) {
+          const rows = Array.isArray(contacts) ? contacts : [];
+          safetyContactList.innerHTML = "";
+          rows.forEach((contact) => addSafetyContact(contact));
+          if (!rows.length && legacy?.phone) {
+            addSafetyContact({ name: legacy.name || "Sicherheitskontakt", phone: legacy.phone, relationship: "" });
           }
+          if (!safetyContactList.children.length) addSafetyContact();
+          refreshSafetyContacts();
         }
-        function wheelValue(element) {
-          const center = element.scrollTop + element.clientHeight / 2;
-          let best = 0;
-          let bestDistance = Infinity;
-          element.querySelectorAll(".safety-time-option").forEach((option) => {
-            const optionCenter = option.offsetTop + option.offsetHeight / 2;
-            const distance = Math.abs(optionCenter - center);
-            if (distance < bestDistance) {
-              bestDistance = distance;
-              best = Number(option.dataset.value);
-            }
-          });
-          return best;
-        }
-        function updateSafetyWheelSelection() {
-          const hour = wheelValue(safetyHourWheel);
-          const minute = wheelValue(safetyMinuteWheel);
-          [safetyHourWheel, safetyMinuteWheel].forEach((wheel) => {
-            const selected = wheel === safetyHourWheel ? hour : minute;
-            wheel.querySelectorAll(".safety-time-option").forEach((option) => {
-              const isSelected = Number(option.dataset.value) === selected;
-              option.classList.toggle("is-selected", isSelected);
-              option.setAttribute("aria-selected", String(isSelected));
-            });
-          });
-          safetyTimes.value =
-            String(hour).padStart(2, "0") + ":" + String(minute).padStart(2, "0");
-        }
-        function setSafetyWheelTime(value, smooth = false) {
-          const { hour, minute } = firstTime(value);
-          const rowHeight = 44;
-          safetyHourWheel.scrollTo({ top: hour * rowHeight, behavior: smooth ? "smooth" : "auto" });
-          safetyMinuteWheel.scrollTo({ top: minute * rowHeight, behavior: smooth ? "smooth" : "auto" });
-          requestAnimationFrame(updateSafetyWheelSelection);
-        }
-        function bindSafetyWheel(element) {
-          let frame = 0;
-          let settleTimer = 0;
-
-          element.addEventListener("scroll", () => {
-            if (frame) cancelAnimationFrame(frame);
-            frame = requestAnimationFrame(updateSafetyWheelSelection);
-            window.clearTimeout(settleTimer);
-            settleTimer = window.setTimeout(updateSafetyWheelSelection, 140);
-          }, { passive: true });
-
-          element.addEventListener("wheel", (event) => {
-            event.stopPropagation();
-          }, { passive: true });
-
-          element.addEventListener("touchstart", (event) => {
-            event.stopPropagation();
-          }, { passive: true });
-
-          element.addEventListener("touchmove", (event) => {
-            event.stopPropagation();
-          }, { passive: true });
-
-          element.addEventListener("keydown", (event) => {
-            if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
-            event.preventDefault();
-            event.stopPropagation();
-            const max = element === safetyHourWheel ? 23 : 59;
-            const delta = event.key === "ArrowDown" ? 1 : -1;
-            const next = Math.max(0, Math.min(max, wheelValue(element) + delta));
-            element.scrollTo({ top: next * 44, behavior: "smooth" });
-          });
-
-          element.addEventListener("click", (event) => {
-            event.stopPropagation();
-            const option = event.target.closest(".safety-time-option");
-            if (!option) return;
-            element.scrollTo({
-              top: Number(option.dataset.value) * 44,
-              behavior: "smooth"
-            });
+        function refreshSafetyContacts() {
+          const rows = Array.from(safetyContactList.querySelectorAll(".safety-contact-row"));
+          rows.forEach((row, index) => {
+            const title = row.querySelector(".safety-contact-order strong");
+            if (title) title.textContent = (index + 1) + ". Sicherheitskontakt";
           });
         }
-        buildSafetyTimeWheel(safetyHourWheel, 23);
-        buildSafetyTimeWheel(safetyMinuteWheel, 59);
-        bindSafetyWheel(safetyHourWheel);
-        bindSafetyWheel(safetyMinuteWheel);
-        setSafetyWheelTime("08:00");
+        async function loadSafetyContacts(token) {
+          const response = await fetch(SAFETY_CONTACTS_URL, {
+            method: "GET",
+            headers: { Authorization: "Bearer " + token }
+          });
+          const body = await response.json().catch(() => ({}));
+          if (!response.ok || body?.ok !== true) throw new Error("safety_contacts_load_failed");
+          return Array.isArray(body.contacts) ? body.contacts : [];
+        }
+        async function saveSafetyContacts(token, contacts) {
+          const response = await fetch(SAFETY_CONTACTS_URL, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + token
+            },
+            body: JSON.stringify({ contacts })
+          });
+          const body = await response.json().catch(() => ({}));
+          if (!response.ok || body?.ok !== true) throw new Error(String(body?.status || "safety_contacts_save_failed"));
+          return Array.isArray(body.contacts) ? body.contacts : [];
+        }
+        safetyAddTimeButton.addEventListener("click", () => {
+          if (safetyTimeList.querySelectorAll(".safety-time-row").length >= 4) return;
+          const row = document.createElement("div");
+          row.className = "safety-time-row";
+          const input = document.createElement("input");
+          input.type = "time";
+          input.className = "safety-time-input";
+          input.value = "09:00";
+          input.step = "60";
+          input.required = true;
+          input.setAttribute("aria-label", "Weitere Uhrzeit");
+          const remove = document.createElement("button");
+          remove.type = "button";
+          remove.className = "safety-remove-button";
+          remove.setAttribute("aria-label", "Uhrzeit entfernen");
+          remove.textContent = "−";
+          remove.addEventListener("click", () => { row.remove(); refreshSafetyTimeControls(); });
+          row.append(input, remove);
+          safetyTimeList.appendChild(row);
+          refreshSafetyTimeControls();
+          input.focus();
+        });
+        safetyAddContactButton.addEventListener("click", () => {
+          addSafetyContact();
+          const rows = safetyContactList.querySelectorAll(".safety-contact-row");
+          rows[rows.length - 1]?.querySelector('[data-safety-contact="name"]')?.focus();
+        });
         function formatNext(value) {
           if (!value) return "";
           const date = new Date(value);
@@ -3006,29 +3232,29 @@
           safetyCard.setAttribute("aria-expanded", String(open));
           safetyEditButton.textContent = open ? "Schließen" : "Bearbeiten";
           if (open) {
-            requestAnimationFrame(() => setSafetyWheelTime(safetyTimes.value || "08:00"));
+            requestAnimationFrame(() => safetyTimeList.querySelector(".safety-time-input")?.focus({ preventScroll: true }));
           }
         }
-        function renderSafety(raw) {
+        function renderSafety(raw, contacts = lastSafetyContacts) {
           const s = raw?.data || raw?.safety || raw || {};
           lastSafety = s;
           const enabled = s.safety_enabled === true;
-          const times = normalizedTimes(s.checkin_times);
-          const parts = [times, s.trusted_contact_name, s.trusted_contact_phone].filter(Boolean);
+          const times = normalizeSafetyTimes(s.checkin_times);
           safetyStatus.textContent = enabled ? "Aktiviert" : "Deaktiviert";
-          safetyMeta.textContent = enabled
-            ? (parts.join(" · ") || "Sicherheitsfunktion ist aktiviert.")
-            : "Sicherheitsfunktion ist ausgeschaltet.";
+          safetyMeta.textContent = enabled ? "Sicherheitsfunktion ist aktiviert." : "Sicherheitsfunktion ist ausgeschaltet.";
           const next = formatNext(s.next_checkin_at);
           safetyNext.textContent = enabled && next
             ? "Nächste Ausführung: " + next + (s.backend_active === true ? " · Backend aktiv" : "")
             : (enabled && s.backend_active === true ? "Backend aktiv" : "");
           safetyEnabled.checked = enabled;
           safetyToggleLabel.textContent = enabled ? "Deaktivieren" : "Aktivieren";
-          safetyTimes.value = times;
-          setSafetyWheelTime(times || "08:00");
-          safetyContactName.value = s.trusted_contact_name || "";
-          safetyContactPhone.value = s.trusted_contact_phone || "";
+          renderSafetyTimeInputs(times);
+          safetyCustomerDelay.value = String(clampSafetyDelay(s.customer_call_delay_minutes ?? s.safety_escalation_minutes, 15));
+          safetyEmergencyDelay.value = String(clampSafetyDelay(s.emergency_contact_delay_minutes, 5));
+          renderSafetyContacts(contacts, {
+            name: s.trusted_contact_name || "",
+            phone: s.trusted_contact_phone || ""
+          });
           const overviewSafety = document.getElementById("overviewSafety");
           const overviewSafetyMeta = document.getElementById("overviewSafetyMeta");
           if (overviewSafety) overviewSafety.textContent = enabled ? "Aktiviert" : "Deaktiviert";
@@ -3045,13 +3271,17 @@
           const token = sessionToken();
           if (!token) return;
           try {
-            const response = await fetch(SAFETY_URL, {
-              method: "GET",
-              headers: { Authorization: "Bearer " + token }
-            });
-            const body = await response.json().catch(() => ({}));
-            if (!response.ok) throw new Error("safety_load_failed");
-            renderSafety(body);
+            const [safetyResponse, contacts] = await Promise.all([
+              fetch(SAFETY_URL, {
+                method: "GET",
+                headers: { Authorization: "Bearer " + token }
+              }),
+              loadSafetyContacts(token)
+            ]);
+            const body = await safetyResponse.json().catch(() => ({}));
+            if (!safetyResponse.ok) throw new Error("safety_load_failed");
+            lastSafetyContacts = contacts;
+            renderSafety(body, contacts);
           } catch (_) {
             safetyStatus.textContent = "Nicht verfügbar";
             safetyMeta.textContent = "Die Sicherheitseinstellungen konnten gerade nicht geladen werden.";
@@ -3068,7 +3298,7 @@
         });
         safetyCancelButton.addEventListener("click", (event) => {
           event.stopPropagation();
-          if (lastSafety) renderSafety(lastSafety);
+          if (lastSafety) renderSafety(lastSafety, lastSafetyContacts);
           safetySaveStatus.classList.remove("is-visible");
           setSafetyFormOpen(false);
         });
@@ -3081,10 +3311,44 @@
             showSafetySaveStatus("Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.", true);
             return;
           }
+
+          const times = currentSafetyTimes();
+          const rawContacts = contactValues();
+          const contacts = rawContacts.map((contact) => ({
+            name: contact.name,
+            phone: normalizeSafetyPhone(contact.phone),
+            relationship: contact.relationship
+          }));
+
+          if (safetyEnabled.checked && !times.length) {
+            showSafetySaveStatus("Bitte hinterlegen Sie mindestens eine Uhrzeit.", true);
+            return;
+          }
+          if (safetyEnabled.checked && !contacts.length) {
+            showSafetySaveStatus("Bitte hinterlegen Sie mindestens einen Sicherheitskontakt.", true);
+            return;
+          }
+          if (rawContacts.some((contact) => !contact.name || !normalizeSafetyPhone(contact.phone))) {
+            showSafetySaveStatus("Bitte prüfen Sie Name und Telefonnummer aller Sicherheitskontakte.", true);
+            return;
+          }
+          const phones = contacts.map((contact) => contact.phone);
+          if (new Set(phones).size !== phones.length) {
+            showSafetySaveStatus("Dieselbe Telefonnummer kann nicht mehrfach als Sicherheitskontakt verwendet werden.", true);
+            return;
+          }
+
+          const firstContact = contacts[0] || { name: "", phone: "" };
+          const customerDelay = clampSafetyDelay(safetyCustomerDelay.value, 15);
+          const emergencyDelay = clampSafetyDelay(safetyEmergencyDelay.value, 5);
+          safetyCustomerDelay.value = String(customerDelay);
+          safetyEmergencyDelay.value = String(emergencyDelay);
+
           safetySaveButton.disabled = true;
           safetySaveButton.textContent = "Wird gespeichert …";
           showSafetySaveStatus("Änderungen werden gespeichert …");
           try {
+            const savedContacts = await saveSafetyContacts(token, contacts);
             const response = await fetch(SAFETY_URL, {
               method: "POST",
               headers: {
@@ -3093,21 +3357,30 @@
               },
               body: JSON.stringify({
                 safety_enabled: safetyEnabled.checked,
-                checkin_times: safetyTimes.value.trim(),
-                trusted_contact_name: safetyContactName.value.trim(),
-                trusted_contact_phone: safetyContactPhone.value.trim()
+                schedule_mode: "recurring",
+                checkin_times: times,
+                trusted_contact_name: firstContact.name,
+                trusted_contact_phone: firstContact.phone,
+                customer_call_delay_minutes: customerDelay,
+                emergency_contact_delay_minutes: emergencyDelay
               })
             });
             const body = await response.json().catch(() => ({}));
-            if (!response.ok) throw new Error("safety_update_failed");
+            if (!response.ok || body?.ok === false) throw new Error(String(body?.status || "safety_update_failed"));
+            lastSafetyContacts = savedContacts;
             await loadSafety();
             showSafetySaveStatus("Gespeichert.");
             setTimeout(() => {
               safetySaveStatus.classList.remove("is-visible");
               setSafetyFormOpen(false);
             }, 700);
-          } catch (_) {
-            showSafetySaveStatus("Die Änderung konnte gerade nicht gespeichert werden. Bitte versuchen Sie es erneut.", true);
+          } catch (error) {
+            const status = error instanceof Error ? error.message : "";
+            if (status === "contacts_save_failed" || status === "invalid_contact" || status === "duplicate_contact_phone") {
+              showSafetySaveStatus("Die Sicherheitskontakte konnten nicht gespeichert werden. Bitte prüfen Sie die Angaben.", true);
+            } else {
+              showSafetySaveStatus("Die Änderung konnte gerade nicht gespeichert werden. Bitte versuchen Sie es erneut.", true);
+            }
           } finally {
             safetySaveButton.disabled = false;
             safetySaveButton.textContent = "Änderungen speichern";
