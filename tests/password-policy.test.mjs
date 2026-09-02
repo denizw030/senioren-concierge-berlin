@@ -8,21 +8,23 @@ const read = (path) => readFileSync(new URL(path, root), "utf8");
 const registration = read("registrieren.html");
 const onboarding = read("assets/onboarding.js");
 
-test("registration requires a strong password", () => {
-  assert.match(registration, /id="webPassword"[\s\S]*minlength="12"/);
+test("registration uses the hardened passphrase policy", () => {
+  assert.match(registration, /id="webPassword"[\s\S]*minlength="15"/);
   assert.match(registration, /id="webPassword"[\s\S]*maxlength="128"/);
-  assert.match(registration, /Groß- und Kleinbuchstaben, Zahl und Sonderzeichen/);
-  assert.match(registration, /assets\/onboarding\.js\?v=18/);
+  assert.match(registration, /Mindestens 15 Zeichen/);
+  assert.match(registration, /Sonderzeichen sind nicht vorgeschrieben/);
+  assert.match(registration, /assets\/onboarding\.js\?v=21/);
 
-  assert.match(onboarding, /password\.length >= 12/);
-  assert.match(onboarding, /password\.length <= 128/);
-  assert.match(onboarding, /\\p\{Ll\}/);
-  assert.match(onboarding, /\\p\{Lu\}/);
-  assert.match(onboarding, /\\p\{N\}/);
-  assert.match(onboarding, /\[\^\\p\{L\}\\p\{N\}\\s\]/);
+  assert.match(onboarding, /const passwordLength = \[\.\.\.password\]\.length/);
+  assert.match(onboarding, /passwordLength < 15 \|\| passwordLength > 128/);
+  assert.match(onboarding, /blockedPasswords = new Set/);
+  assert.match(onboarding, /nahwerkconcierge/);
+  assert.match(onboarding, /emailLocalPart\.length >= 8/);
 
-  assert.equal(onboarding.includes("password.length < 10"), false);
-  assert.equal(registration.includes("Mindestens 10 Zeichen."), false);
+  assert.equal(onboarding.includes("/\\p{Ll}/u.test(password)"), false);
+  assert.equal(onboarding.includes("/\\p{Lu}/u.test(password)"), false);
+  assert.equal(onboarding.includes("/\\p{N}/u.test(password)"), false);
+  assert.equal(registration.includes("Groß- und Kleinbuchstaben, Zahl und Sonderzeichen"), false);
 });
 
 test("registration draft never persists the password", () => {
