@@ -1,14 +1,14 @@
 (() => {
   const profile = Object.freeze({
     key: "james",
-    name: "James",
+    name: "Alexander",
     role: "Prime Telephone Agent",
     origin: "United Kingdom",
     tagline: "Ruhig. Präzise. Diskret.",
-    description: "James ist der spezialisierte NAHWERK Telefon-Agent für Anrufe im Auftrag des Kunden und für vorgesehene Anrufassistenz. Er ersetzt nicht den persönlich ausgewählten Concierge, sondern übernimmt Telefonaufgaben nach außen mit ruhiger, präziser Gesprächsführung.",
-    seniorDescription: "James ist der spezialisierte Telefon-Agent für Telefonaufträge und vorgesehene Anrufassistenz. Wenn Sie selbst NAHWERK anrufen, sprechen Sie weiterhin mit Ihrem ausgewählten persönlichen Concierge.",
+    description: "Alexander ist der spezialisierte NAHWERK Telefon-Agent für Anrufe im Auftrag des Kunden und für vorgesehene Anrufassistenz. Er ersetzt nicht den persönlich ausgewählten Concierge, sondern übernimmt Telefonaufgaben nach außen mit ruhiger, präziser Gesprächsführung.",
+    seniorDescription: "Alexander ist der spezialisierte Telefon-Agent für Telefonaufträge und vorgesehene Anrufassistenz. Wenn Sie selbst NAHWERK anrufen, sprechen Sie weiterhin mit Ihrem ausgewählten persönlichen Concierge.",
     background: "Sein fiktiver beruflicher Hintergrund verbindet britischen Executive Service, diskrete Sicherheitskommunikation und persönliche Betreuung auf höchstem Niveau.",
-    quote: "James bleibt auch dann ruhig, wenn die Situation es gerade nicht ist.",
+    quote: "Alexander bleibt auch dann ruhig, wenn die Situation es gerade nicht ist.",
     strengths: ["Externe Telefonaufträge","Restaurants, Behörden und Dienstleister","Ruhige Gesprächsführung","Diskrete Unterstützung","Strukturierte Rückfragen","Anrufassistenz"],
     voice: "cedar",
     voiceId: "cedar",
@@ -22,7 +22,7 @@
     voiceInstructions: "Männlich, britisch geprägt, mitteltief bis tief, extrem kontrolliert, strategisch ruhig, präzise, kultiviert und autoritativ ohne Aggression. Keine James-Bond-Imitation, kein Butler-Klischee, keine Werbestimme. Deutsch sauber aussprechen, mit nur leichter britischer Herkunft.",
     nativeLanguage: "de",
     nativeLanguageLabel: "Deutsch",
-    sampleText: "Guten Tag. James. Ihr NAHWERK Telefon-Concierge. Sagen Sie mir einfach, worum es geht. Ich höre zu, ordne die Situation und wir entscheiden anschließend in Ruhe über den nächsten Schritt.",
+    sampleText: "Guten Tag. Alexander. Ihr NAHWERK Telefon-Concierge. Sagen Sie mir einfach, worum es geht. Ich höre zu, ordne die Situation und wir entscheiden anschließend in Ruhe über den nächsten Schritt.",
     sampleAudio: "assets/voice/samples/james-de.mp3?v=james-20260831-1",
     sampleAudioByLanguage: { de: "assets/voice/samples/james-de.mp3?v=james-20260831-1" },
     previewLanguages: [{ code: "de", label: "Deutsch" }],
@@ -36,9 +36,9 @@
     el.className = "nw-james-dialog";
     el.setAttribute("aria-labelledby", "nwJamesDialogName");
     el.innerHTML = `
-      <button class="nw-james-dialog-close" type="button" aria-label="James-Profil schließen">×</button>
+      <button class="nw-james-dialog-close" type="button" aria-label="Alexander-Profil schließen">×</button>
       <div class="nw-james-dialog-layout">
-        <figure class="nw-james-dialog-media"><img src="${profile.image}" width="1229" height="1536" alt="James, spezialisierter NAHWERK Telefon-Agent in professionellem Anzug mit Headset"></figure>
+        <figure class="nw-james-dialog-media"><img src="${profile.image}" width="1229" height="1536" alt="Alexander, spezialisierter NAHWERK Telefon-Agent in professionellem Anzug mit Headset"></figure>
         <div class="nw-james-dialog-copy">
           <span class="nw-james-dialog-kicker">NAHWERK Telefon-Agent</span>
           <h2 id="nwJamesDialogName">${profile.name}</h2>
@@ -48,7 +48,7 @@
           ${senior ? "" : `<p class="nw-james-dialog-background">${profile.background}</p>`}
           <ul class="nw-james-dialog-strengths">${profile.strengths.slice(0, senior ? 3 : 6).map(item => `<li>${item}</li>`).join("")}</ul>
           <blockquote class="nw-james-dialog-quote">„${profile.quote}“</blockquote>
-          <div class="nw-james-dialog-voice"><span>Stimme</span><div class="nw-james-dialog-voice-host"></div><small>Teststimme · feste James-Zuordnung · noch nicht final freigegeben</small></div>
+          <div class="nw-james-dialog-voice"><span>Stimme</span><div class="nw-james-dialog-voice-host"></div><small>Teststimme · feste Alexander-Zuordnung · noch nicht final freigegeben</small></div>
         </div>
       </div>`;
     document.body.appendChild(el);
@@ -69,7 +69,7 @@
       trigger.classList.add("nw-james-profile-trigger");
       trigger.setAttribute("role", "button");
       trigger.setAttribute("tabindex", "0");
-      trigger.setAttribute("aria-label", "James – Telefon-Agent-Profil und Stimme öffnen");
+      trigger.setAttribute("aria-label", "Alexander – Telefon-Agent-Profil und Stimme öffnen");
       trigger.addEventListener("click", () => openJames(trigger));
       trigger.addEventListener("keydown", event => { if (event.key !== "Enter" && event.key !== " ") return; event.preventDefault(); openJames(trigger); });
     });
