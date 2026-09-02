@@ -2163,9 +2163,9 @@
     </footer>
     <div class="security-nudge" id="securityNudge" hidden role="dialog" aria-modal="true" aria-labelledby="securityNudgeTitle">
       <div class="security-nudge-card">
-        <div class="eyebrow">Empfohlener Kontoschutz</div>
+        <div class="eyebrow" id="securityNudgeEyebrow">Empfohlener Kontoschutz</div>
         <h2 id="securityNudgeTitle">Konto zusätzlich schützen</h2>
-        <p>Ihr Zugang ist eingerichtet. Sie können jetzt eine zweite Bestätigung hinzufügen. Das ist freiwillig, erhöht den Schutz Ihres Kontos aber deutlich.</p>
+        <p id="securityNudgeCopy">Ihr Zugang ist eingerichtet. Sie können jetzt eine zweite Bestätigung hinzufügen. Das ist freiwillig, erhöht den Schutz Ihres Kontos aber deutlich.</p>
         <div class="security-nudge-methods">
           <button class="security-nudge-method" type="button" id="securityNudgeSms" hidden><span><strong>Per SMS-Code</strong><span>Einfach: Code auf dem Handy empfangen.</span></span><span aria-hidden="true">›</span></button>
           <button class="security-nudge-method" type="button" id="securityNudgeTotp"><span><strong>Mit Authenticator-App</strong><span>Besonders sicher und unabhängig vom Mobilfunknetz.</span></span><span aria-hidden="true">›</span></button>
@@ -2901,6 +2901,9 @@
         const mfaSmsDisableVerifyCancelButton = document.getElementById("mfaSmsDisableVerifyCancelButton");
         const mfaFeedback = document.getElementById("mfaFeedback");
         const securityNudge = document.getElementById("securityNudge");
+        const securityNudgeEyebrow = document.getElementById("securityNudgeEyebrow");
+        const securityNudgeTitle = document.getElementById("securityNudgeTitle");
+        const securityNudgeCopy = document.getElementById("securityNudgeCopy");
         const securityNudgeSms = document.getElementById("securityNudgeSms");
         const securityNudgeTotp = document.getElementById("securityNudgeTotp");
         const securityNudgeLater = document.getElementById("securityNudgeLater");
@@ -3040,15 +3043,23 @@
         }
 
         function applySecurityRecommendation(body) {
+          const required = body?.enrollment_required === true && body?.mfa?.enabled !== true;
           const due = body?.recommendation?.due === true && body?.mfa?.enabled !== true;
-          if (!due) {
+          if (!required && !due) {
             hideSecurityNudge();
             return;
           }
+          securityNudgeEyebrow.textContent = required ? "Kontoschutz erforderlich" : "Empfohlener Kontoschutz";
+          securityNudgeTitle.textContent = required ? "Zwei-Faktor-Authentifizierung einrichten" : "Konto zusätzlich schützen";
+          securityNudgeCopy.textContent = required
+            ? "Für neue NAHWERK-Zugänge ist eine zweite Bestätigung erforderlich. Richten Sie jetzt SMS-Code oder Authenticator-App ein, bevor Sie den Kundenbereich normal verwenden."
+            : "Ihr Zugang ist eingerichtet. Sie können jetzt eine zweite Bestätigung hinzufügen. Das ist freiwillig, erhöht den Schutz Ihres Kontos aber deutlich.";
+          securityNudgeLater.hidden = required;
           securityNudgeSms.hidden = body?.mfa?.methods?.sms?.available !== true;
           securityNudgeTotp.hidden = body?.mfa?.methods?.totp?.available === false;
+          if (required) setAccountTab("safety");
           securityNudge.hidden = false;
-          mfaManage("nudge_seen").catch(() => {});
+          if (!required) mfaManage("nudge_seen").catch(() => {});
         }
 
         function activeMethodLabel() {
@@ -3105,12 +3116,17 @@
               return;
             }
 
-            mfaStatus.textContent = "Empfohlen · Noch nicht aktiviert";
-            mfaMeta.textContent = smsMfaAvailable()
-              ? "Wählen Sie zwischen SMS-Code und Authenticator-App. Die Aktivierung ist freiwillig; nach der Einrichtung wird der zweite Faktor bei der Anmeldung zwingend verlangt."
-              : "Sie können Ihr Konto zusätzlich mit einer Authenticator-App schützen. SMS wird nur angeboten, wenn eine geeignete Mobilnummer sicher hinterlegt ist.";
+            const enrollmentRequired = body?.enrollment_required === true;
+            mfaStatus.textContent = enrollmentRequired ? "Erforderlich · Noch nicht aktiviert" : "Empfohlen · Noch nicht aktiviert";
+            mfaMeta.textContent = enrollmentRequired
+              ? (smsMfaAvailable()
+                  ? "Für diesen neuen Zugang muss jetzt SMS-Code oder Authenticator-App eingerichtet werden. Erst danach ist der Kundenbereich vollständig freigeschaltet."
+                  : "Für diesen neuen Zugang muss jetzt die Authenticator-App eingerichtet werden. Erst danach ist der Kundenbereich vollständig freigeschaltet.")
+              : (smsMfaAvailable()
+                  ? "Wählen Sie zwischen SMS-Code und Authenticator-App. Die Aktivierung ist freiwillig; nach der Einrichtung wird der zweite Faktor bei der Anmeldung zwingend verlangt."
+                  : "Sie können Ihr Konto zusätzlich mit einer Authenticator-App schützen. SMS wird nur angeboten, wenn eine geeignete Mobilnummer sicher hinterlegt ist.");
             mfaEnableButton.hidden = false;
-            mfaEnableButton.textContent = "Kontoschutz einrichten";
+            mfaEnableButton.textContent = enrollmentRequired ? "Jetzt einrichten" : "Kontoschutz einrichten";
             mfaDisableButton.hidden = true;
             mfaDisableSmsButton.hidden = true;
             applySecurityRecommendation(body);
@@ -3281,13 +3297,17 @@
         securityNudgeTotp.addEventListener("click", () => openSecuritySetupFromNudge("totp"));
         securityNudgeSms.addEventListener("click", () => openSecuritySetupFromNudge("sms"));
         securityNudgeLater.addEventListener("click", async () => {
+          if (lastMfaPayload?.enrollment_required === true) {
+            applySecurityRecommendation(lastMfaPayload);
+            return;
+          }
           securityNudgeLater.disabled = true;
           securityNudgeLater.textContent = "Wird gespeichert …";
           try {
             await mfaManage("nudge_later");
             hideSecurityNudge();
           } catch (_) {
-            hideSecurityNudge();
+            applySecurityRecommendation(lastMfaPayload);
           } finally {
             securityNudgeLater.disabled = false;
             securityNudgeLater.textContent = "Später einrichten";
