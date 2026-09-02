@@ -450,7 +450,8 @@
     const response = await fetch(LOGIN_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }) });
     const body = await response.json().catch(() => ({}));
     if (!(response.ok && body.ok && body.status === "logged_in" && body.session_token)) return false;
-    localStorage.setItem(SESSION_KEY, JSON.stringify({
+    localStorage.removeItem(SESSION_KEY);
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify({
       session_token: body.session_token,
       customer_account_id: body.customer_account_id,
       person_id: body.person_id,
