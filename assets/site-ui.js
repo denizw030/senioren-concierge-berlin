@@ -1,7 +1,24 @@
 (() => {
   const analytics = () => window.NahwerkAnalytics;
-  const ready = () => {
-    void analytics()?.track("page_view");
+  const ensureAnalytics = () => new Promise((resolve) => {
+    if (analytics()) return resolve(analytics());
+    const existing = document.querySelector('script[data-nw-analytics-client]');
+    if (existing) {
+      existing.addEventListener('load', () => resolve(analytics()), { once:true });
+      existing.addEventListener('error', () => resolve(null), { once:true });
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'assets/nahwerk-analytics.js?v=1';
+    script.async = true;
+    script.dataset.nwAnalyticsClient = 'true';
+    script.onload = () => resolve(analytics());
+    script.onerror = () => resolve(null);
+    document.head.appendChild(script);
+  });
+  const ready = async () => {
+    const a = await ensureAnalytics();
+    void a?.track("page_view");
     document.addEventListener("click", (event) => {
       const el = event.target instanceof Element ? event.target.closest("a,button,[role='button']") : null;
       if (!el) return;
