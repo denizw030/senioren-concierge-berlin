@@ -42,7 +42,7 @@ jobs:
               'SAFETY_CONTACTS_URL',
               'customer_call_delay_minutes: customerDelay',
               'emergency_contact_delay_minutes: emergencyDelay',
-              'maximal 20 Sekunden',
+              'höchstens 20 Sekunden',
               'höchstens 5 Versuche',
               'Bis zu 2 Kundenanrufe',
               'id="safetySummaryGrid"',
@@ -62,6 +62,16 @@ jobs:
           assert 'value="15" inputmode="numeric"' not in html
           assert 'data-safety-contact="name" type="text" autocomplete="name" maxlength="120" required' not in html
           assert 'data-safety-contact="phone" type="tel" autocomplete="tel" required' not in html
+
+          # Usage is server-fed, separates channels, prioritizes remaining quota,
+          # and never invents a zero when the consumption value is unavailable.
+          assert 'Dialoge verbleibend' in html
+          assert 'Dialoge im Tarif enthalten' in html
+          assert 'Math.max(0, limit - used)' in html
+          assert 'usage?.app_dialogues_used' in html
+          assert 'usage?.whatsapp_dialogues_used' in html
+          assert '50 Dialoge Kontingent' not in html
+          assert '20 Dialoge Kontingent' not in html
 
           # Existing backend contract remains.
           assert 'const SAFETY_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/safety";' in html
