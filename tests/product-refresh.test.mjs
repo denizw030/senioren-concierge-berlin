@@ -27,12 +27,12 @@ test("all 23 optimized concierge card and large images are present", () => {
   }
 });
 
-test("overview uses deterministic native image loading with a large-image fallback", () => {
+test("overview uses deterministic native image loading", () => {
   assert.equal(overview.includes("IntersectionObserver"), false);
   assert.equal(overview.includes("dataset.src"), false);
-  assert.match(overview, /cardImage\.loading = index < 4 \? "eager" : "lazy"/);
-  assert.match(overview, /cardImage\.src = profile\.cardImage \|\| profile\.image/);
-  assert.match(overview, /cardImage\.src = profile\.largeImage/);
+  assert.match(overview, /im\.loading=i<4\?"eager":"lazy"/);
+  assert.match(overview, /im\.src=p\.cardImage\|\|p\.image/);
+  assert.match(overview, /i\.src=p\.largeImage\|\|p\.image/);
 });
 
 test("dark pages share the premium gold colour atmosphere while senior mode stays excluded", () => {
@@ -73,5 +73,5 @@ test("current launch tariff matrix is consistent in packages and registration", 
     assert.equal(onboarding.includes(value), true, `${value} is used in registration`);
   }
   assert.match(onboarding, /bookable: false/);
-  assert.match(visibleText(packages), /eine kostenpflichtige Bestellung wird erst möglich/);
+  assert.match(visibleText(packages), /Vor einer kostenpflichtigen Bestellung werden Preis, Laufzeit, Widerruf und Zahlung ausdrücklich bestätigt/);
 });
