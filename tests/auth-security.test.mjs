@@ -33,8 +33,8 @@ test("login completes enrolled MFA only through the second verification step", (
   assert.match(login, /body\.status==='mfa_required'\|\|body\.mfa_required===true/);
   assert.match(login, /localStorage\.removeItem\(SESSION_KEY\)/);
   assert.match(login, /sessionStorage\.removeItem\(SESSION_KEY\)/);
-  assert.match(login, /web\/login\/mfa\/challenge/);
-  assert.match(login, /web\/login\/mfa\/verify/);
+  assert.match(login, /const MFA_CHALLENGE_URL=LOGIN_URL/);
+  assert.match(login, /const MFA_VERIFY_URL=LOGIN_URL/);
   assert.match(login, /body\.mfa_verified===true&&completeLogin\(body\)/);
   assert.match(login, /mfaChoiceSms/);
   assert.match(login, /mfaChoiceTotp/);
@@ -63,7 +63,7 @@ test("registration keeps the hardened passphrase policy and never persists the p
   assert.match(onboarding, /blockedPasswords = new Set/);
   assert.match(onboarding, /web_password: undefined/);
   assert.match(onboarding, /web_password_repeat: undefined/);
-  assert.match(registration, /assets\/onboarding\.js\?v=21/);
+  assert.match(registration, /assets\/onboarding\.js\?v=22/);
 });
 
 test("raw web session tokens are not persisted in localStorage", () => {
