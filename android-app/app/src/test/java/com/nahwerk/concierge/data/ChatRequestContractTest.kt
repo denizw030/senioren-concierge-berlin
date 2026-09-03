@@ -10,6 +10,7 @@ class ChatRequestContractTest {
         val request = ChatRequestContract.create(
             message = "  Hallo Concierge  ",
             idFactory = { "fixed-source-message-id" },
+            correlationFactory = { "fixed-correlation-id" },
             nowMillis = { 1234L }
         )
 
@@ -18,6 +19,7 @@ class ChatRequestContractTest {
 
         assertEquals("Hallo Concierge", request.message)
         assertEquals("fixed-source-message-id", request.sourceMessageId)
+        assertEquals("fixed-correlation-id", request.correlationId)
         assertEquals("fixed-source-message-id", firstHeaders["Idempotency-Key"])
         assertEquals("fixed-source-message-id", firstHeaders["X-Client-Request-Id"])
         assertEquals(firstHeaders, retryHeaders)
