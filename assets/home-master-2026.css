@@ -2398,3 +2398,46 @@ body.home-master .master-pricing{
     transform:none!important;
   }
 }
+
+
+/* =========================================================
+   MASTER Phase 5 QA — isolate navigation from legacy mobile shell
+   ========================================================= */
+body.home-master .top .master-links{
+  display:flex;
+  position:static;
+  inset:auto;
+  width:auto;
+  max-height:none;
+  overflow-y:visible;
+  padding:0;
+  flex-direction:row;
+  align-items:center;
+  justify-content:flex-end;
+  background:transparent;
+  border:0;
+  border-radius:0;
+  text-align:inherit;
+}
+body.home-master .top .master-links>a{
+  padding:0;
+}
+@media(max-width:780px){
+  body.home-master .top .master-links{
+    display:flex;
+    position:static;
+    width:auto;
+    max-height:none;
+    padding:0;
+    flex-direction:row;
+    align-items:center;
+    background:transparent;
+    border:0;
+    overflow-x:auto;
+    overflow-y:hidden;
+  }
+  body.home-master .top .master-links>a{
+    padding:0;
+    min-height:44px;
+  }
+}
