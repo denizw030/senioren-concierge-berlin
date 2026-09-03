@@ -140,12 +140,20 @@ class NahwerkApi(
             .put("message", request.message)
             .put("source_message_id", request.sourceMessageId)
             .put("correlation_id", request.correlationId)
-        val r = authorizedRequest(
-            method = "POST",
-            path = "/mobile/chat",
-            body = body,
-            extraHeaders = ChatRequestContract.headers(request)
-        )
+        val r = try {
+            authorizedRequest(
+                method = "POST",
+                path = "/mobile/chat",
+                body = body,
+                extraHeaders = ChatRequestContract.headers(request)
+            )
+        } catch (_: Exception) {
+            return ConciergeResult(
+                ok = false,
+                error = "Concierge nicht erreichbar",
+                sourceMessageId = request.sourceMessageId
+            )
+        }
         val j = r.body.toJson()
         val shadow = j?.optJSONObject("shadow_core")
         val shadowDuplicate = if (shadow?.has("duplicate") == true) shadow.optBoolean("duplicate") else null
