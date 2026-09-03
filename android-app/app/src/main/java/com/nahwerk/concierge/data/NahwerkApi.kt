@@ -137,6 +137,7 @@ class NahwerkApi(
         val body = JSONObject()
             .put("message", request.message)
             .put("source_message_id", request.sourceMessageId)
+            .put("correlation_id", request.correlationId)
         val r = authorizedRequest(
             method = "POST",
             path = "/mobile/chat",
