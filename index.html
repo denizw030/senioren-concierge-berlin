@@ -792,6 +792,49 @@
           object-position: 56% 18% !important;
         }
       }
+
+      /* PUBLIC Hero restore full-width color field */
+      body.overview-page .home-hero {
+        background:
+          radial-gradient(900px 700px at 12% 26%, rgba(30, 82, 128, 0.16), transparent 68%),
+          radial-gradient(780px 620px at 76% 24%, rgba(84, 57, 142, 0.22), transparent 66%),
+          radial-gradient(760px 560px at 58% 78%, rgba(25, 121, 123, 0.12), transparent 69%),
+          radial-gradient(720px 520px at 22% 84%, rgba(188, 143, 67, 0.08), transparent 70%),
+          linear-gradient(110deg, #050709 0%, #07101a 38%, #0d0a18 70%, #070606 100%) !important;
+      }
+      body.overview-page .home-hero::after {
+        background:
+          linear-gradient(
+            90deg,
+            rgba(4, 6, 8, 0.30) 0%,
+            rgba(4, 6, 8, 0.24) 38%,
+            rgba(4, 6, 8, 0.10) 58%,
+            rgba(4, 6, 8, 0.02) 78%,
+            rgba(4, 6, 8, 0) 100%
+          ),
+          linear-gradient(
+            180deg,
+            rgba(3, 4, 6, 0.05) 0%,
+            rgba(3, 4, 6, 0.02) 72%,
+            rgba(3, 4, 6, 0.16) 100%
+          ) !important;
+      }
+      body.overview-page .home-hero .public-hero-portrait {
+        -webkit-mask-image: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(0, 0, 0, 0.30) 8%,
+          #000 22%,
+          #000 100%
+        ) !important;
+        mask-image: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(0, 0, 0, 0.30) 8%,
+          #000 22%,
+          #000 100%
+        ) !important;
+      }
     </style>
   </head>
   <body class="overview-page">
@@ -818,9 +861,9 @@
           <div class="concierge-stage" aria-label="NAHWERK Concierge">
             <img
               class="public-hero-portrait"
-              src="assets/prime/prime-concierge-hero-executive.jpg?v=2"
+              src="assets/prime/prime-concierge-hero-executive-v2.jpg?v=1"
               alt=""
-              width="1229"
+              width="1024"
               height="1536"
               loading="eager"
               decoding="async"
