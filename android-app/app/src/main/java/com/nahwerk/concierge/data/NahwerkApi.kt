@@ -11,8 +11,8 @@ import java.net.URL
 class NahwerkApi(
     private val sessions: SecureSessionStore,
     private val pendingChats: PendingChatStore,
-    private val authBaseUrl: String = authBaseUrl,
-    private val gatewayBaseUrl: String = gatewayBaseUrl
+    private val authBaseUrl: String = BuildConfig.AUTH_BASE_URL,
+    private val gatewayBaseUrl: String = BuildConfig.GATEWAY_BASE_URL
 ) {
     private data class HttpResult(val status: Int, val body: String)
 
