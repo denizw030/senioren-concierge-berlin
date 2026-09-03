@@ -54,6 +54,8 @@ import coil.compose.AsyncImage
 import com.nahwerk.concierge.data.ChatMessage
 import com.nahwerk.concierge.data.HomeContext
 import com.nahwerk.concierge.data.NahwerkApi
+import com.nahwerk.concierge.data.PendingChatRequest
+import com.nahwerk.concierge.data.PendingChatStore
 import com.nahwerk.concierge.data.Reminder
 import com.nahwerk.concierge.data.SecureSessionStore
 import kotlinx.coroutines.delay
@@ -72,7 +74,8 @@ class MainActivity : ComponentActivity() {
 fun NahwerkApp() {
     val appContext = LocalContext.current.applicationContext
     val sessions = remember { SecureSessionStore(appContext) }
-    val api = remember { NahwerkApi(sessions) }
+    val pendingChats = remember { PendingChatStore(appContext) }
+    val api = remember { NahwerkApi(sessions, pendingChats) }
     val scope = rememberCoroutineScope()
 
     var screen by remember { mutableStateOf(if (api.hasSession()) Screen.HOME else Screen.LOGIN) }
@@ -354,6 +357,27 @@ private fun ChatScreen(home: HomeContext, api: NahwerkApi, onBack: () -> Unit) {
     var draft by remember { mutableStateOf("") }
     var sending by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
+    var pendingRequest by remember { mutableStateOf(api.pendingChatRequest()) }
+
+    fun sendRequest(request: PendingChatRequest, ensureUserBubble: Boolean) {
+        if (sending) return
+        if (ensureUserBubble && messages.none { it.role == "user" && it.text == request.message }) {
+            messages.add(ChatMessage("user", request.message))
+        }
+        sending = true
+        error = null
+        scope.launch {
+            val result = api.sendText(request)
+            sending = false
+            if (result.ok && !result.text.isNullOrBlank()) {
+                pendingRequest = null
+                messages.add(ChatMessage("assistant", result.text))
+            } else {
+                pendingRequest = api.pendingChatRequest() ?: request
+                error = result.error ?: "Keine Antwort erhalten. Dieselbe Nachricht kann sicher erneut gesendet werden."
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -379,40 +403,66 @@ private fun ChatScreen(home: HomeContext, api: NahwerkApi, onBack: () -> Unit) {
                     MessageBubble(message)
                 }
             }
+
+            pendingRequest?.let { pending ->
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF4D8))
+                ) {
+                    Column(
+                        Modifier.padding(14.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text("Nicht bestätigte Nachricht", fontWeight = FontWeight.SemiBold)
+                        Text(pending.message, style = MaterialTheme.typography.bodySmall)
+                        Text(
+                            "Ein Retry verwendet exakt dieselbe Nachrichten-ID und erzeugt keinen neuen Concierge-Turn.",
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                        OutlinedButton(
+                            onClick = { sendRequest(pending, ensureUserBubble = true) },
+                            enabled = !sending,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(if (sending) "Erneuter Versand läuft …" else "Sicher erneut senden")
+                        }
+                    }
+                }
+            }
+
             if (!error.isNullOrBlank()) Text(error!!, style = MaterialTheme.typography.bodySmall)
+
             OutlinedTextField(
                 value = draft,
-                onValueChange = { draft = it },
+                onValueChange = { if (it.length <= 4000) draft = it },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text("Nachricht an ${home.concierge.name}") },
                 minLines = 2,
-                maxLines = 5
+                maxLines = 5,
+                enabled = pendingRequest == null
             )
             Button(
                 onClick = {
                     val text = draft.trim()
-                    if (text.isEmpty()) return@Button
-                    messages.add(ChatMessage("user", text))
-                    draft = ""
-                    sending = true
-                    error = null
-                    scope.launch {
-                        val result = api.sendText(text)
-                        sending = false
-                        if (result.ok && !result.text.isNullOrBlank()) {
-                            messages.add(ChatMessage("assistant", result.text))
-                        } else {
-                            error = result.error ?: "Keine Antwort erhalten."
-                        }
+                    if (text.isEmpty() || pendingRequest != null) return@Button
+                    val request = try {
+                        api.createChatRequest(text)
+                    } catch (e: Exception) {
+                        error = e.message ?: "Nachricht konnte nicht vorbereitet werden."
+                        return@Button
                     }
+                    pendingRequest = request
+                    messages.add(ChatMessage("user", request.message))
+                    draft = ""
+                    sendRequest(request, ensureUserBubble = false)
                 },
-                enabled = !sending && draft.isNotBlank(),
+                enabled = !sending && draft.isNotBlank() && pendingRequest == null,
                 modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp)
             ) {
                 if (sending) Text("${home.concierge.name} denkt …") else Text("Senden")
             }
             Text(
-                "Text ist bereits mit dem echten NAHWERK-Staging-Concierge verbunden. Audio und Live-Lippensynchronisation werden erst aktiviert, wenn die Voice-Runtime wieder freigegeben ist.",
+                "Text ist mit dem echten NAHWERK-Staging-Concierge verbunden. Nicht bestätigte Sends bleiben verschlüsselt auf dem Gerät gespeichert und werden beim Retry mit derselben ID wiederverwendet.",
                 style = MaterialTheme.typography.labelSmall
             )
         }
