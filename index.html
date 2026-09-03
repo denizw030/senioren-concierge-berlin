@@ -521,6 +521,37 @@
           height: 390px;
         }
       }
+
+      /* PUBLIC Hero mobile visibility fix */
+      @media (max-width: 760px) {
+        .home-hero .hero-grid {
+          position: static;
+        }
+        .concierge-stage {
+          top: auto;
+          right: 0;
+          bottom: 0;
+          width: 100%;
+          height: 410px;
+        }
+        .portrait,
+        body.overview-page .portrait {
+          background-size: contain !important;
+          background-position: 76% 100% !important;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .concierge-stage {
+          right: 0;
+          width: 100%;
+          height: 370px;
+        }
+        .portrait,
+        body.overview-page .portrait {
+          background-position: 78% 100% !important;
+        }
+      }
     </style>
   </head>
   <body class="overview-page">
