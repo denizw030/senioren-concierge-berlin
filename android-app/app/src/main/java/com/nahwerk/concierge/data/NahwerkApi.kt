@@ -8,14 +8,18 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 
-class NahwerkApi(private val sessions: SecureSessionStore) {
+class NahwerkApi(
+    private val sessions: SecureSessionStore,
+    private val pendingChats: PendingChatStore
+) {
     private data class HttpResult(val status: Int, val body: String)
 
     private suspend fun request(
         method: String,
         url: String,
         body: JSONObject? = null,
-        bearer: String? = null
+        bearer: String? = null,
+        extraHeaders: Map<String, String> = emptyMap()
     ): HttpResult = withContext(Dispatchers.IO) {
         val connection = (URL(url).openConnection() as HttpURLConnection).apply {
             requestMethod = method
@@ -23,6 +27,7 @@ class NahwerkApi(private val sessions: SecureSessionStore) {
             readTimeout = 35_000
             setRequestProperty("Accept", "application/json")
             setRequestProperty("Content-Type", "application/json")
+            extraHeaders.forEach { (name, value) -> setRequestProperty(name, value) }
             if (!bearer.isNullOrBlank()) setRequestProperty("Authorization", "Bearer $bearer")
             doInput = true
             if (body != null) doOutput = true
@@ -83,13 +88,18 @@ class NahwerkApi(private val sessions: SecureSessionStore) {
         return true
     }
 
-    private suspend fun authorizedRequest(method: String, path: String, body: JSONObject? = null): HttpResult {
+    private suspend fun authorizedRequest(
+        method: String,
+        path: String,
+        body: JSONObject? = null,
+        extraHeaders: Map<String, String> = emptyMap()
+    ): HttpResult {
         if (sessions.needsRefresh() && !refreshSession()) return HttpResult(401, "")
         var token = sessions.accessToken() ?: return HttpResult(401, "")
-        var result = request(method, BuildConfig.GATEWAY_BASE_URL + path, body, token)
+        var result = request(method, BuildConfig.GATEWAY_BASE_URL + path, body, token, extraHeaders)
         if (result.status == 401 && refreshSession()) {
             token = sessions.accessToken() ?: return HttpResult(401, "")
-            result = request(method, BuildConfig.GATEWAY_BASE_URL + path, body, token)
+            result = request(method, BuildConfig.GATEWAY_BASE_URL + path, body, token, extraHeaders)
         }
         return result
     }
@@ -119,20 +129,45 @@ class NahwerkApi(private val sessions: SecureSessionStore) {
         )
     }
 
-    suspend fun sendText(text: String): ConciergeResult {
+    fun createChatRequest(text: String): PendingChatRequest = pendingChats.create(text)
+
+    fun pendingChatRequest(): PendingChatRequest? = pendingChats.current()
+
+    suspend fun sendText(request: PendingChatRequest): ConciergeResult {
+        val body = JSONObject()
+            .put("message", request.message)
+            .put("source_message_id", request.sourceMessageId)
         val r = authorizedRequest(
-            "POST",
-            "/mobile/chat",
-            JSONObject().put("message", text)
+            method = "POST",
+            path = "/mobile/chat",
+            body = body,
+            extraHeaders = ChatRequestContract.headers(request)
         )
         val j = r.body.toJson()
+        val shadow = j?.optJSONObject("shadow_core")
+        val shadowDuplicate = if (shadow?.has("duplicate") == true) shadow.optBoolean("duplicate") else null
+        val idempotencyVerified = if (shadow?.has("idempotency_verified") == true) {
+            shadow.optBoolean("idempotency_verified")
+        } else null
+
         if (r.status !in 200..299 || j?.optBoolean("ok") != true) {
-            return ConciergeResult(false, error = j?.optString("error") ?: "Concierge nicht erreichbar")
+            return ConciergeResult(
+                ok = false,
+                error = j?.optString("error") ?: "Concierge nicht erreichbar",
+                sourceMessageId = request.sourceMessageId,
+                shadowDuplicate = shadowDuplicate,
+                idempotencyVerified = idempotencyVerified
+            )
         }
+
+        check(pendingChats.clear(request.sourceMessageId)) { "pending_chat_clear_failed" }
         return ConciergeResult(
             ok = true,
             text = j.optString("reply"),
-            intent = j.optJSONObject("result")?.optString("intent")
+            intent = j.optJSONObject("result")?.optString("intent"),
+            sourceMessageId = request.sourceMessageId,
+            shadowDuplicate = shadowDuplicate,
+            idempotencyVerified = idempotencyVerified
         )
     }
 
@@ -157,7 +192,11 @@ class NahwerkApi(private val sessions: SecureSessionStore) {
         )
     }
 
-    fun logout() = sessions.clear()
+    fun logout() {
+        pendingChats.clearAll()
+        sessions.clear()
+    }
+
     fun hasSession(): Boolean = sessions.hasSession()
 
     private fun parseReminders(array: JSONArray?): List<Reminder> {
