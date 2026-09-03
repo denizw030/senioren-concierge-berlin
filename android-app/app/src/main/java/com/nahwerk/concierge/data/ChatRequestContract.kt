@@ -6,6 +6,7 @@ object ChatRequestContract {
     fun create(
         message: String,
         idFactory: () -> String = { UUID.randomUUID().toString() },
+        correlationFactory: () -> String = { UUID.randomUUID().toString() },
         nowMillis: () -> Long = { System.currentTimeMillis() }
     ): PendingChatRequest {
         val normalized = message.trim()
@@ -14,8 +15,12 @@ object ChatRequestContract {
         val sourceMessageId = idFactory().trim()
         require(sourceMessageId.isNotEmpty()) { "source_message_id_required" }
         require(sourceMessageId.length <= 200) { "source_message_id_too_long" }
+        val correlationId = correlationFactory().trim()
+        require(correlationId.isNotEmpty()) { "correlation_id_required" }
+        require(correlationId.length <= 200) { "correlation_id_too_long" }
         return PendingChatRequest(
             sourceMessageId = sourceMessageId,
+            correlationId = correlationId,
             message = normalized,
             createdAtEpochMillis = nowMillis()
         )
