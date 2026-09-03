@@ -361,6 +361,166 @@
           0 0 60px rgba(212, 175, 55, 0.10) !important;
       }
 
+
+      /* PUBLIC Hero — free executive portrait */
+      .home-hero {
+        min-height: clamp(690px, calc(100svh - 150px), 900px);
+      }
+      .hero-grid {
+        position: relative;
+        z-index: 1;
+        grid-template-columns: minmax(0, 1.02fr) minmax(320px, 0.98fr);
+      }
+      .hero-copy {
+        position: relative;
+        z-index: 3;
+      }
+      .concierge-stage {
+        position: absolute;
+        z-index: 1;
+        top: 0;
+        right: -2vw;
+        bottom: 0;
+        width: min(56vw, 930px);
+        min-height: 0;
+        display: block;
+        pointer-events: none;
+      }
+      .portrait,
+      body.overview-page .portrait {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        aspect-ratio: auto;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background:
+          transparent
+          url("assets/prime/prime-concierge-hero-executive.jpg")
+          center 16% / cover no-repeat !important;
+        box-shadow: none !important;
+        -webkit-mask-image: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(0, 0, 0, 0.34) 7%,
+          #000 22%,
+          #000 100%
+        );
+        mask-image: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(0, 0, 0, 0.34) 7%,
+          #000 22%,
+          #000 100%
+        );
+      }
+      .home-hero::after {
+        content: "";
+        position: absolute;
+        z-index: 2;
+        inset: 0;
+        pointer-events: none;
+        background:
+          linear-gradient(
+            90deg,
+            #070706 0%,
+            #070706 39%,
+            rgba(7, 7, 6, 0.88) 49%,
+            rgba(7, 7, 6, 0.32) 64%,
+            rgba(7, 7, 6, 0.04) 82%,
+            rgba(7, 7, 6, 0) 100%
+          ),
+          linear-gradient(
+            180deg,
+            rgba(7, 7, 6, 0.03) 0%,
+            rgba(7, 7, 6, 0.02) 78%,
+            rgba(7, 7, 6, 0.16) 100%
+          );
+      }
+      .home-hero .hero-grid {
+        position: relative;
+        z-index: 3;
+      }
+
+      @media (max-width: 1050px) {
+        .concierge-stage {
+          right: -8vw;
+          width: 58vw;
+        }
+        .portrait,
+        body.overview-page .portrait {
+          background-position: center 16% !important;
+        }
+        .home-hero::after {
+          background:
+            linear-gradient(
+              90deg,
+              #070706 0%,
+              #070706 43%,
+              rgba(7, 7, 6, 0.80) 55%,
+              rgba(7, 7, 6, 0.25) 74%,
+              rgba(7, 7, 6, 0.03) 100%
+            ),
+            linear-gradient(180deg, transparent 70%, rgba(7, 7, 6, 0.18));
+        }
+      }
+
+      @media (max-width: 760px) {
+        .home-hero {
+          min-height: auto;
+          padding-bottom: 390px;
+        }
+        .hero-grid {
+          display: block;
+        }
+        .concierge-stage {
+          top: auto;
+          right: -24%;
+          bottom: 0;
+          width: 118%;
+          height: 430px;
+        }
+        .portrait,
+        body.overview-page .portrait {
+          background-size: contain !important;
+          background-position: right bottom !important;
+          -webkit-mask-image: linear-gradient(
+            180deg,
+            transparent 0%,
+            rgba(0, 0, 0, 0.40) 13%,
+            #000 30%,
+            #000 100%
+          );
+          mask-image: linear-gradient(
+            180deg,
+            transparent 0%,
+            rgba(0, 0, 0, 0.40) 13%,
+            #000 30%,
+            #000 100%
+          );
+        }
+        .home-hero::after {
+          background: linear-gradient(
+            180deg,
+            #070706 0%,
+            #070706 55%,
+            rgba(7, 7, 6, 0.70) 72%,
+            rgba(7, 7, 6, 0.14) 100%
+          );
+        }
+      }
+
+      @media (max-width: 480px) {
+        .home-hero {
+          padding-bottom: 340px;
+        }
+        .concierge-stage {
+          right: -31%;
+          width: 132%;
+          height: 390px;
+        }
+      }
     </style>
   </head>
   <body class="overview-page">
