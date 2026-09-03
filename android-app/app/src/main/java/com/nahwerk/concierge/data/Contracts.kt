@@ -28,6 +28,7 @@ data class HomeContext(
 
 data class PendingChatRequest(
     val sourceMessageId: String,
+    val correlationId: String,
     val message: String,
     val createdAtEpochMillis: Long
 )
