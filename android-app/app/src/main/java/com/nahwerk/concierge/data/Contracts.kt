@@ -26,11 +26,20 @@ data class HomeContext(
     val reminders: List<Reminder>
 )
 
+data class PendingChatRequest(
+    val sourceMessageId: String,
+    val message: String,
+    val createdAtEpochMillis: Long
+)
+
 data class ConciergeResult(
     val ok: Boolean,
     val text: String? = null,
     val error: String? = null,
-    val intent: String? = null
+    val intent: String? = null,
+    val sourceMessageId: String? = null,
+    val shadowDuplicate: Boolean? = null,
+    val idempotencyVerified: Boolean? = null
 )
 
 data class Reminder(
