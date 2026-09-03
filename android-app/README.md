@@ -38,13 +38,30 @@ The website currently calls n8n endpoints for password login and password-reset 
 6. Add unit, Compose UI and accessibility tests.
 7. Add development/staging/production environment injection without committing secrets.
 
-## Build / QA
-The repository currently does not contain a Gradle Wrapper (`gradlew` plus `gradle/wrapper/*`). Until a wrapper is added, local builds require a compatible Gradle installation.
+## Stable chat retry / idempotency
 
-The isolated GitHub Actions workflow `.github/workflows/android-qa.yml` uses Java 17 and Gradle 8.9 and executes:
+Each new chat send creates one client-side `source_message_id` before any network call. The pending message and ID are synchronously persisted in an Android Keystore-backed encrypted preferences store before the HTTP request starts.
+
+The same pending request is reused for:
+- an HTTP retry after access-token refresh
+- an explicit user retry after a transport/server failure
+- a retry after app restart while the send is still unconfirmed
+
+The request sends the same ID in:
+- JSON body: `source_message_id`
+- HTTP header: `Idempotency-Key`
+- HTTP header: `X-Client-Request-Id`
+
+The pending record is cleared only after a successful gateway response. A new chat send is blocked while an unresolved pending request exists.
+
+## Build / QA
+
+The Gradle Wrapper is included. The isolated GitHub Actions workflow `.github/workflows/android-qa.yml` uses Java 17 and executes:
 
 ```text
-gradle --no-daemon clean testDebugUnitTest lintDebug assembleDebug
+./gradlew --no-daemon clean testDebugUnitTest lintDebug assembleDebug
 ```
 
-Do not describe the project as build-verified unless that command actually completes successfully in an Android-capable environment. Instrumented/emulator tests are not part of this QA workflow yet.
+The workflow uploads the resulting debug APK as `nahwerk-real-concierge-staging-apk`.
+
+Do not describe device/emulator behavior as proven by this build alone. Instrumented/emulator retry E2E remains a separate proof step.
