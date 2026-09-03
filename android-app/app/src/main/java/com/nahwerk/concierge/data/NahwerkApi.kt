@@ -10,7 +10,9 @@ import java.net.URL
 
 class NahwerkApi(
     private val sessions: SecureSessionStore,
-    private val pendingChats: PendingChatStore
+    private val pendingChats: PendingChatStore,
+    private val authBaseUrl: String = authBaseUrl,
+    private val gatewayBaseUrl: String = gatewayBaseUrl
 ) {
     private data class HttpResult(val status: Int, val body: String)
 
@@ -44,7 +46,7 @@ class NahwerkApi(
 
     suspend fun login(email: String, password: String): AuthResult {
         val body = JSONObject().put("email", email.trim()).put("password", password)
-        val r = request("POST", BuildConfig.AUTH_BASE_URL + "/login", body)
+        val r = request("POST", authBaseUrl + "/login", body)
         val j = r.body.toJson()
         if (r.status !in 200..299 || j?.optBoolean("ok") != true) {
             return AuthResult(false, j?.optString("error") ?: "Anmeldung fehlgeschlagen")
@@ -60,7 +62,7 @@ class NahwerkApi(
     suspend fun requestPasswordReset(email: String): Boolean {
         val r = request(
             "POST",
-            BuildConfig.AUTH_BASE_URL + "/reset",
+            authBaseUrl + "/reset",
             JSONObject().put("email", email.trim())
         )
         return r.status in 200..299
@@ -70,7 +72,7 @@ class NahwerkApi(
         val refresh = sessions.refreshToken() ?: return false
         val r = request(
             "POST",
-            BuildConfig.AUTH_BASE_URL + "/refresh",
+            authBaseUrl + "/refresh",
             JSONObject().put("refresh_token", refresh)
         )
         val j = r.body.toJson() ?: return false
@@ -96,10 +98,10 @@ class NahwerkApi(
     ): HttpResult {
         if (sessions.needsRefresh() && !refreshSession()) return HttpResult(401, "")
         var token = sessions.accessToken() ?: return HttpResult(401, "")
-        var result = request(method, BuildConfig.GATEWAY_BASE_URL + path, body, token, extraHeaders)
+        var result = request(method, gatewayBaseUrl + path, body, token, extraHeaders)
         if (result.status == 401 && refreshSession()) {
             token = sessions.accessToken() ?: return HttpResult(401, "")
-            result = request(method, BuildConfig.GATEWAY_BASE_URL + path, body, token, extraHeaders)
+            result = request(method, gatewayBaseUrl + path, body, token, extraHeaders)
         }
         return result
     }
