@@ -2,7 +2,7 @@
   "use strict";
 
   const ENDPOINT =
-    "https://btqklftjmwtqqqdmwlnk.supabase.co/functions/v1/nahwerk-registration-recovery-temp/web-core-shadow";
+    "https://btqklftjmwtqqqdmwlnk.supabase.co/functions/v1/nahwerk-customer-portal-staging/portal/web-core-shadow";
   const SESSION_KEY = "scb_web_session";
   const CHANNEL_SESSION_KEY = "nw_web_shadow_channel_session_v1";
   const PENDING_PREFIX = "nw_web_shadow_pending_v1:";
