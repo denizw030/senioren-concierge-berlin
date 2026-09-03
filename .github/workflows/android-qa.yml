@@ -87,3 +87,94 @@ jobs:
           profile: pixel_2
           disable-animations: true
           script: cd android-app && ./gradlew --no-daemon connectedDebugAndroidTest
+
+  live-gateway-e2e:
+    needs: emulator-retry-fixture
+    if: github.event_name == 'push' && github.ref == 'refs/heads/staging/nw-android-stable-source-message-id-01'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+      - name: Request GitHub OIDC token
+        id: oidc
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const token = await core.getIDToken('nahwerk-mobile-device-e2e')
+            core.setSecret(token)
+            core.setOutput('token', token)
+      - name: Provision ephemeral STAGING mobile login
+        env:
+          OIDC_TOKEN: ${{ steps.oidc.outputs.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          RESP="$RUNNER_TEMP/provision.json"
+          curl --fail --silent --show-error \
+            -X POST \
+            'https://btqklftjmwtqqqdmwlnk.supabase.co/functions/v1/nahwerk-mobile-e2e-temp' \
+            -H "Authorization: Bearer $OIDC_TOKEN" \
+            -H 'Content-Type: application/json' \
+            --data '{"op":"provision"}' \
+            > "$RESP"
+          jq -e '.ok == true and (.access_token | length > 20) and (.auth_user_id | length > 20) and (.test_id | length > 20)' "$RESP" >/dev/null
+          ACCESS_TOKEN="$(jq -r '.access_token' "$RESP")"
+          AUTH_USER_ID="$(jq -r '.auth_user_id' "$RESP")"
+          TEST_ID="$(jq -r '.test_id' "$RESP")"
+          echo "::add-mask::$ACCESS_TOKEN"
+          echo "::add-mask::$AUTH_USER_ID"
+          echo "::add-mask::$TEST_ID"
+          {
+            echo "NW_ACCESS_TOKEN=$ACCESS_TOKEN"
+            echo "NW_AUTH_USER_ID=$AUTH_USER_ID"
+            echo "NW_TEST_ID=$TEST_ID"
+          } >> "$GITHUB_ENV"
+      - name: Enable KVM
+        shell: bash
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Run one installed-app call against real STAGING mobile gateway
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          script: >-
+            cd android-app &&
+            ./gradlew --no-daemon connectedDebugAndroidTest
+            -Pandroid.testInstrumentationRunnerArguments.class=com.nahwerk.concierge.data.PendingChatRetryInstrumentedTest#liveGatewayIngressUsesClientStableIds
+            -Pandroid.testInstrumentationRunnerArguments.live_gateway=1
+            -Pandroid.testInstrumentationRunnerArguments.live_access_token="$NW_ACCESS_TOKEN"
+      - name: Cleanup ephemeral STAGING mobile login
+        if: always()
+        env:
+          OIDC_TOKEN: ${{ steps.oidc.outputs.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -n "${NW_AUTH_USER_ID:-}" && -n "${NW_TEST_ID:-}" ]]; then
+            jq -n \
+              --arg uid "$NW_AUTH_USER_ID" \
+              --arg tid "$NW_TEST_ID" \
+              '{op:"cleanup",auth_user_id:$uid,test_id:$tid}' \
+              > "$RUNNER_TEMP/cleanup.json"
+            curl --fail --silent --show-error \
+              -X POST \
+              'https://btqklftjmwtqqqdmwlnk.supabase.co/functions/v1/nahwerk-mobile-e2e-temp' \
+              -H "Authorization: Bearer $OIDC_TOKEN" \
+              -H 'Content-Type: application/json' \
+              --data-binary @"$RUNNER_TEMP/cleanup.json" \
+              > /dev/null
+          fi

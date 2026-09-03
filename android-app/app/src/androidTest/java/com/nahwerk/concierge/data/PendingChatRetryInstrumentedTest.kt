@@ -12,6 +12,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Assume.assumeTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.TimeUnit
@@ -120,6 +121,51 @@ class PendingChatRetryInstrumentedTest {
             pending.clearAll()
             sessions.clear()
             server.shutdown()
+        }
+    }
+    @Test
+    fun liveGatewayIngressUsesClientStableIds() = runBlocking {
+        val args = InstrumentationRegistry.getArguments()
+        assumeTrue(args.getString("live_gateway") == "1")
+
+        val accessToken = args.getString("live_access_token").orEmpty()
+        assertTrue(accessToken.length > 20)
+
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val sessions = SecureSessionStore(context)
+        val pending = PendingChatStore(context)
+        sessions.clear()
+        pending.clearAll()
+
+        try {
+            sessions.save(
+                accessToken = accessToken,
+                refreshToken = "unused-live-e2e-refresh-token",
+                expiresInSeconds = 3000
+            )
+
+            val api = NahwerkApi(
+                sessions = sessions,
+                pendingChats = pending
+            )
+
+            val request = api.createChatRequest(
+                "Wie viel ist zwei plus zwei? Antworte kurz."
+            )
+
+            val result = api.sendText(request)
+
+            assertTrue(result.ok)
+            assertEquals(request.sourceMessageId, result.sourceMessageId)
+            assertEquals(true, result.idempotencyVerified)
+            assertEquals(false, result.shadowDuplicate)
+            assertTrue(!result.text.isNullOrBlank())
+            assertNull(PendingChatStore(context).current())
+
+            println("NW_LIVE_APP_E2E_OK")
+        } finally {
+            pending.clearAll()
+            sessions.clear()
         }
     }
 }
