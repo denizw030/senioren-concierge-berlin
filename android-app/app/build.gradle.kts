@@ -1,3 +1,26 @@
+val releaseAuthBaseUrl = System.getenv("NAHWERK_RELEASE_AUTH_BASE_URL")?.trim().orEmpty()
+val releaseGatewayBaseUrl = System.getenv("NAHWERK_RELEASE_GATEWAY_BASE_URL")?.trim().orEmpty()
+val releaseKeystorePath = System.getenv("NAHWERK_ANDROID_KEYSTORE_PATH")?.trim().orEmpty()
+val releaseStorePassword = System.getenv("NAHWERK_ANDROID_STORE_PASSWORD")?.trim().orEmpty()
+val releaseKeyAlias = System.getenv("NAHWERK_ANDROID_KEY_ALIAS")?.trim().orEmpty()
+val releaseKeyPassword = System.getenv("NAHWERK_ANDROID_KEY_PASSWORD")?.trim().orEmpty()
+
+val releaseSigningValues = listOf(
+    releaseKeystorePath,
+    releaseStorePassword,
+    releaseKeyAlias,
+    releaseKeyPassword
+)
+val releaseSigningAny = releaseSigningValues.any { it.isNotBlank() }
+val releaseSigningComplete = releaseSigningValues.all { it.isNotBlank() }
+
+require(!releaseSigningAny || releaseSigningComplete) {
+    "Android release signing requires all four NAHWERK_ANDROID_* signing environment variables."
+}
+
+fun buildConfigString(value: String): String =
+    "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -16,6 +39,17 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures { compose = true; buildConfig = true }
+
+    signingConfigs {
+        if (releaseSigningComplete) {
+            create("releaseFromEnvironment") {
+                storeFile = file(releaseKeystorePath)
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+            }
+        }
+    }
     buildTypes {
         debug {
             buildConfigField("String", "AUTH_BASE_URL", "\"https://btqklftjmwtqqqdmwlnk.supabase.co/functions/v1/nahwerk-mobile-auth-staging\"")
@@ -23,8 +57,11 @@ android {
         }
         release {
             isMinifyEnabled = true
-            buildConfigField("String", "AUTH_BASE_URL", "\"\"")
-            buildConfigField("String", "GATEWAY_BASE_URL", "\"\"")
+            buildConfigField("String", "AUTH_BASE_URL", buildConfigString(releaseAuthBaseUrl))
+            buildConfigField("String", "GATEWAY_BASE_URL", buildConfigString(releaseGatewayBaseUrl))
+            if (releaseSigningComplete) {
+                signingConfig = signingConfigs.getByName("releaseFromEnvironment")
+            }
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -42,6 +79,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    compileOnly("com.google.errorprone:error_prone_annotations:2.36.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
     implementation("io.coil-kt:coil-compose:2.7.0")
     debugImplementation("androidx.compose.ui:ui-tooling")

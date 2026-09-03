@@ -1,0 +1,254 @@
+name: Android Distribution Package
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'android-app/**'
+      - '.github/workflows/android-distribution-package.yml'
+  workflow_dispatch:
+    inputs:
+      signed_package:
+        description: 'Build a signed package after all Core gates are GREEN'
+        required: true
+        type: boolean
+        default: false
+      core_gates_ack:
+        description: 'Required for signed package: CORE-GATES-GREEN'
+        required: false
+        type: string
+        default: 'NOT_READY'
+
+permissions:
+  contents: read
+
+jobs:
+  unsigned-candidate:
+    if: ${{ github.event_name == 'pull_request' || inputs.signed_package != true }}
+    runs-on: ubuntu-latest
+    env:
+      NAHWERK_RELEASE_AUTH_BASE_URL: ''
+      NAHWERK_RELEASE_GATEWAY_BASE_URL: ''
+      NAHWERK_ANDROID_KEYSTORE_PATH: ''
+      NAHWERK_ANDROID_STORE_PASSWORD: ''
+      NAHWERK_ANDROID_KEY_ALIAS: ''
+      NAHWERK_ANDROID_KEY_PASSWORD: ''
+    defaults:
+      run:
+        working-directory: android-app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+
+      - name: Verify production-inert candidate guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$NAHWERK_RELEASE_AUTH_BASE_URL"
+          test -z "$NAHWERK_RELEASE_GATEWAY_BASE_URL"
+          test -z "$NAHWERK_ANDROID_KEYSTORE_PATH"
+          test -z "$NAHWERK_ANDROID_STORE_PASSWORD"
+          test -z "$NAHWERK_ANDROID_KEY_ALIAS"
+          test -z "$NAHWERK_ANDROID_KEY_PASSWORD"
+          if find . -type f \( -name '*.jks' -o -name '*.keystore' -o -name '*.p12' -o -name '*.pfx' \) | grep -q .; then
+            echo "Signing material must never be committed to the repository."
+            exit 1
+          fi
+
+      - name: Build unsigned release candidate
+        run: |
+          chmod +x ./gradlew
+          ./gradlew --no-daemon clean testDebugUnitTest lintRelease assembleRelease bundleRelease
+
+      - name: Verify candidate is inert and unsigned
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="$(find app/build/outputs/apk/release -type f -name '*.apk' | head -n 1)"
+          AAB="$(find app/build/outputs/bundle/release -type f -name '*.aab' | head -n 1)"
+          test -n "$APK"
+          test -n "$AAB"
+
+          if unzip -p "$APK" classes.dex 2>/dev/null | strings | grep -F 'btqklftjmwtqqqdmwlnk' >/dev/null; then
+            echo "STAGING endpoint leaked into release candidate APK."
+            exit 1
+          fi
+
+          APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
+          test -x "$APKSIGNER"
+          if "$APKSIGNER" verify "$APK" >/dev/null 2>&1; then
+            echo "Unsigned candidate APK was unexpectedly signed."
+            exit 1
+          fi
+
+          if unzip -l "$AAB" | grep -E 'META-INF/[^ ]+\.(RSA|DSA|EC|SF)$' >/dev/null; then
+            echo "Unsigned candidate AAB contains signing metadata."
+            exit 1
+          fi
+
+      - name: Create candidate package and checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/nahwerk-android-distribution-candidate"
+          mkdir -p "$OUT"
+          APK="$(find app/build/outputs/apk/release -type f -name '*.apk' | head -n 1)"
+          AAB="$(find app/build/outputs/bundle/release -type f -name '*.aab' | head -n 1)"
+          cp "$APK" "$OUT/nahwerk-concierge-release-unsigned.apk"
+          cp "$AAB" "$OUT/nahwerk-concierge-release-unsigned.aab"
+
+          VERSION_NAME="$(grep -E 'versionName = ' app/build.gradle.kts | head -n 1 | sed -E 's/.*"([^"]+)".*/\1/')"
+          VERSION_CODE="$(grep -E 'versionCode = ' app/build.gradle.kts | head -n 1 | sed -E 's/[^0-9]*([0-9]+).*/\1/')"
+
+          jq -n \
+            --arg repository "$GITHUB_REPOSITORY" \
+            --arg commit "$GITHUB_SHA" \
+            --arg version_name "$VERSION_NAME" \
+            --argjson version_code "$VERSION_CODE" \
+            '{
+              schema_version: "nahwerk-android-distribution-candidate-v1",
+              repository: $repository,
+              commit: $commit,
+              version_name: $version_name,
+              version_code: $version_code,
+              signed: false,
+              release_endpoints_configured: false,
+              customer_distribution: false,
+              app_route_cutover: false
+            }' > "$OUT/metadata.json"
+
+          (
+            cd "$OUT"
+            sha256sum nahwerk-concierge-release-unsigned.apk \
+                      nahwerk-concierge-release-unsigned.aab \
+                      metadata.json > SHA256SUMS
+          )
+
+      - name: Upload production-inert distribution candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: nahwerk-android-distribution-candidate
+          path: ${{ runner.temp }}/nahwerk-android-distribution-candidate/
+          if-no-files-found: error
+          retention-days: 14
+
+  signed-package:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.signed_package == true }}
+    runs-on: ubuntu-latest
+    environment: android-production-release
+    env:
+      NAHWERK_RELEASE_AUTH_BASE_URL: ${{ vars.NAHWERK_RELEASE_AUTH_BASE_URL }}
+      NAHWERK_RELEASE_GATEWAY_BASE_URL: ${{ vars.NAHWERK_RELEASE_GATEWAY_BASE_URL }}
+      NAHWERK_ANDROID_STORE_PASSWORD: ${{ secrets.NAHWERK_ANDROID_STORE_PASSWORD }}
+      NAHWERK_ANDROID_KEY_ALIAS: ${{ secrets.NAHWERK_ANDROID_KEY_ALIAS }}
+      NAHWERK_ANDROID_KEY_PASSWORD: ${{ secrets.NAHWERK_ANDROID_KEY_PASSWORD }}
+      NAHWERK_ANDROID_KEYSTORE_B64: ${{ secrets.NAHWERK_ANDROID_KEYSTORE_B64 }}
+    defaults:
+      run:
+        working-directory: android-app
+    steps:
+      - name: Require explicit Core gate acknowledgement
+        shell: bash
+        run: |
+          set -euo pipefail
+          test '${{ inputs.core_gates_ack }}' = 'CORE-GATES-GREEN'
+          test -n "$NAHWERK_RELEASE_AUTH_BASE_URL"
+          test -n "$NAHWERK_RELEASE_GATEWAY_BASE_URL"
+          test -n "$NAHWERK_ANDROID_STORE_PASSWORD"
+          test -n "$NAHWERK_ANDROID_KEY_ALIAS"
+          test -n "$NAHWERK_ANDROID_KEY_PASSWORD"
+          test -n "$NAHWERK_ANDROID_KEYSTORE_B64"
+
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+
+      - name: Materialize release keystore
+        shell: bash
+        run: |
+          set -euo pipefail
+          KEYSTORE="$RUNNER_TEMP/nahwerk-android-release.jks"
+          printf '%s' "$NAHWERK_ANDROID_KEYSTORE_B64" | base64 --decode > "$KEYSTORE"
+          chmod 600 "$KEYSTORE"
+          echo "NAHWERK_ANDROID_KEYSTORE_PATH=$KEYSTORE" >> "$GITHUB_ENV"
+
+      - name: Build signed release package
+        run: |
+          chmod +x ./gradlew
+          ./gradlew --no-daemon clean testDebugUnitTest lintRelease assembleRelease bundleRelease
+
+      - name: Verify signed release package
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="$(find app/build/outputs/apk/release -type f -name '*.apk' | head -n 1)"
+          AAB="$(find app/build/outputs/bundle/release -type f -name '*.aab' | head -n 1)"
+          test -n "$APK"
+          test -n "$AAB"
+
+          APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
+          "$APKSIGNER" verify --verbose "$APK"
+          jarsigner -verify -strict "$AAB"
+
+      - name: Package signed artifacts without publishing
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/nahwerk-android-signed-package"
+          mkdir -p "$OUT"
+          APK="$(find app/build/outputs/apk/release -type f -name '*.apk' | head -n 1)"
+          AAB="$(find app/build/outputs/bundle/release -type f -name '*.aab' | head -n 1)"
+          cp "$APK" "$OUT/nahwerk-concierge-release-signed.apk"
+          cp "$AAB" "$OUT/nahwerk-concierge-release-signed.aab"
+
+          VERSION_NAME="$(grep -E 'versionName = ' app/build.gradle.kts | head -n 1 | sed -E 's/.*"([^"]+)".*/\1/')"
+          VERSION_CODE="$(grep -E 'versionCode = ' app/build.gradle.kts | head -n 1 | sed -E 's/[^0-9]*([0-9]+).*/\1/')"
+
+          jq -n \
+            --arg repository "$GITHUB_REPOSITORY" \
+            --arg commit "$GITHUB_SHA" \
+            --arg version_name "$VERSION_NAME" \
+            --argjson version_code "$VERSION_CODE" \
+            '{
+              schema_version: "nahwerk-android-signed-package-v1",
+              repository: $repository,
+              commit: $commit,
+              version_name: $version_name,
+              version_code: $version_code,
+              signed: true,
+              release_endpoints_configured: true,
+              customer_distribution: false,
+              store_upload: false
+            }' > "$OUT/metadata.json"
+
+          (
+            cd "$OUT"
+            sha256sum nahwerk-concierge-release-signed.apk \
+                      nahwerk-concierge-release-signed.aab \
+                      metadata.json > SHA256SUMS
+          )
+
+      - name: Upload signed package only
+        uses: actions/upload-artifact@v4
+        with:
+          name: nahwerk-android-signed-package
+          path: ${{ runner.temp }}/nahwerk-android-signed-package/
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Remove materialized keystore
+        if: always()
+        shell: bash
+        run: rm -f "$RUNNER_TEMP/nahwerk-android-release.jks"
