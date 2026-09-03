@@ -2449,3 +2449,39 @@ body.home-master .top .master-links>.auth-link{
     padding:9px 13px;
   }
 }
+
+
+/* Phase 5 QA: restore MASTER values over legacy !important brand defaults. */
+body.home-master .wrap{
+  width:min(calc(100% - clamp(40px,7vw,112px)),1320px)!important;
+  max-width:1320px;
+  padding-inline:0!important;
+}
+body.home-master .master-top{
+  background:rgba(9,9,8,.74)!important;
+  border-bottom:1px solid rgba(255,255,255,.075)!important;
+}
+body.home-master .master-top.is-scrolled{
+  background:rgba(9,9,8,.92)!important;
+  border-bottom-color:rgba(255,255,255,.11)!important;
+}
+body.home-master .master-hero h1{
+  font-size:clamp(3.75rem,7.3vw,7.8rem)!important;
+  font-weight:560!important;
+  line-height:.91!important;
+  letter-spacing:-.066em!important;
+}
+@media(max-width:780px){
+  body.home-master .wrap{
+    width:min(calc(100% - 40px),1320px)!important;
+  }
+  body.home-master .master-hero h1{
+    font-size:clamp(3.35rem,15vw,5.2rem)!important;
+    line-height:.93!important;
+  }
+}
+@media(max-width:460px){
+  body.home-master .master-hero h1{
+    font-size:clamp(3rem,15.2vw,4.35rem)!important;
+  }
+}
