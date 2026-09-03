@@ -105,3 +105,39 @@ The real installed-client duplicate retry was intentionally not repeated against
 3. one installed Android emulator ingress call to the real STAGING gateway with client-generated idempotency verified.
 
 The automatic live-gateway CI job was removed after acceptance to prevent accidental future paid/provider calls. Future branch CI is provider-free unless a new explicit final live acceptance is intentionally added.
+
+
+## Distribution candidate
+
+The production-inert distribution path is intentionally separated from customer release.
+
+Current release build contract:
+- release AUTH/GATEWAY endpoints are injected only through build-time environment variables
+- missing release endpoints default to empty strings
+- release signing is injected only through Android signing environment variables
+- missing signing material produces an unsigned candidate
+- no keystore, signing certificate, service-account credential or store secret is committed to the repository
+
+GitHub Actions:
+- `.github/workflows/android-distribution-package.yml`
+- pull requests touching `android-app/**` build an unsigned distribution candidate
+- candidate build executes unit tests, release lint, release APK and release AAB
+- candidate guard rejects committed signing material
+- candidate guard rejects the STAGING Supabase project reference inside the release APK
+- candidate APK must be unsigned
+- candidate AAB must contain no signing metadata
+- output contains unsigned APK, unsigned AAB, metadata.json and SHA256SUMS
+- artifacts are uploaded only to GitHub Actions
+- no Play Store upload
+- no GitHub Release
+- no customer distribution
+- no APP route cutover
+
+A signed package can only be created through an explicit manual workflow dispatch with:
+- `signed_package=true`
+- `core_gates_ack=CORE-GATES-GREEN`
+- protected `android-production-release` environment
+- configured release endpoints
+- complete signing secrets
+
+Even the signed-package job only uploads a private workflow artifact. It does not publish to a store or to customers.
