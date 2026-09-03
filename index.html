@@ -739,6 +739,59 @@
           object-position: 56% 18% !important;
         }
       }
+
+      /* PUBLIC Hero specificity collision fix */
+      body.overview-page .home-hero .concierge-stage {
+        position: absolute !important;
+        z-index: 3 !important;
+        top: 0 !important;
+        right: -2% !important;
+        bottom: 0 !important;
+        left: auto !important;
+        width: 56% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        display: block !important;
+        overflow: hidden !important;
+        isolation: auto !important;
+      }
+      body.overview-page .home-hero .concierge-stage::before {
+        display: none !important;
+      }
+      body.overview-page .home-hero .public-hero-portrait {
+        position: absolute !important;
+        inset: 0 !important;
+        display: block !important;
+        width: 100% !important;
+        height: 100% !important;
+        max-width: none !important;
+        object-fit: cover !important;
+        object-position: 52% 18% !important;
+        opacity: 1 !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+      }
+
+      @media (max-width: 760px) {
+        body.overview-page .home-hero .concierge-stage {
+          right: -14% !important;
+          width: 74% !important;
+        }
+        body.overview-page .home-hero .public-hero-portrait {
+          object-position: 54% 18% !important;
+        }
+      }
+
+      @media (max-width: 480px) {
+        body.overview-page .home-hero .concierge-stage {
+          right: -22% !important;
+          width: 88% !important;
+        }
+        body.overview-page .home-hero .public-hero-portrait {
+          object-position: 56% 18% !important;
+        }
+      }
     </style>
   </head>
   <body class="overview-page">
