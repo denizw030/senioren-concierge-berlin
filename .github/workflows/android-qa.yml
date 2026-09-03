@@ -5,6 +5,7 @@ on:
     branches:
       - codex/nahwerk-android-foundation
       - staging/nw-android-real-concierge-memory-01
+      - staging/nw-android-stable-source-message-id-01
     paths:
       - 'android-app/**'
       - '.github/workflows/android-qa.yml'
