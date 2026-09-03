@@ -2018,7 +2018,7 @@ body.home-master .master-phone-localization i{
 }
 body.home-master .master-phone-regions{
   display:grid;
-  grid-template-columns:1fr 1fr;
+  grid-template-columns:1.1fr .72fr .86fr;
   gap:clamp(36px,7vw,92px);
   padding-top:30px;
 }
