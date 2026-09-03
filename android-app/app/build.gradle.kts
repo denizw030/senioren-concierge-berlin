@@ -11,8 +11,8 @@ android {
         applicationId = "com.nahwerk.concierge"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "0.2.0-staging"
+        versionCode = 3
+        versionName = "0.2.1-staging"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures { compose = true; buildConfig = true }
