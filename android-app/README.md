@@ -40,7 +40,7 @@ The website currently calls n8n endpoints for password login and password-reset 
 
 ## Stable chat retry / idempotency
 
-Each new chat send creates one client-side `source_message_id` before any network call. The pending message and ID are synchronously persisted in an Android Keystore-backed encrypted preferences store before the HTTP request starts.
+Each new chat send creates one client-side `source_message_id` and one `correlation_id` before any network call. The pending message and both IDs are synchronously persisted in an Android Keystore-backed encrypted preferences store before the HTTP request starts.
 
 The same pending request is reused for:
 - an HTTP retry after access-token refresh
@@ -65,3 +65,43 @@ The Gradle Wrapper is included. The isolated GitHub Actions workflow `.github/wo
 The workflow uploads the resulting debug APK as `nahwerk-real-concierge-staging-apk`.
 
 Do not describe device/emulator behavior as proven by this build alone. Instrumented/emulator retry E2E remains a separate proof step.
+
+
+## COST-SAFE retry acceptance
+
+Accepted on branch `staging/nw-android-stable-source-message-id-01` under COST-SAFE-STAGING v1.
+
+Deterministic / emulator proof:
+- GitHub Actions run 33770063294 / job `emulator-retry-fixture`
+- real Android emulator
+- first HTTP attempt terminated by local MockWebServer
+- PendingChatStore survived store/API reinstantiation
+- retry reused the identical `source_message_id`
+- retry reused the identical `correlation_id`
+- retry reused the identical `Idempotency-Key`
+- retry reused the identical `X-Client-Request-Id`
+- pending record cleared only after successful retry
+- 1 instrumentation test, GREEN
+
+Minimal final live proof:
+- branch head used for live proof: `223ae83ef43c28b7e1762fb1fd4e553a0e502810`
+- GitHub Actions run 33771085109 / job `live-gateway-e2e`
+- installed Android test APK on emulator
+- exactly one harmless live request to the real STAGING mobile gateway
+- client assertion required `idempotency_verified=true`
+- client assertion required `shadowDuplicate=false`
+- Core receipt `1f12196a-4f3e-4574-b16e-babe6d31ddf1`
+- Core response state `ANSWER`
+- Core response `Vier.`
+- Core shadow: provider_invoked=false
+- Core shadow: business_side_effects=false
+- Core shadow: action_created=false
+- delivery=false
+- ephemeral auth user and mobile binding cleaned up
+
+The real installed-client duplicate retry was intentionally not repeated against the live gateway. The full retry proof is composed from:
+1. installed Android emulator retry against a deterministic local transport fixture,
+2. previously GREEN real server duplicate/idempotency acceptance,
+3. one installed Android emulator ingress call to the real STAGING gateway with client-generated idempotency verified.
+
+The automatic live-gateway CI job was removed after acceptance to prevent accidental future paid/provider calls. Future branch CI is provider-free unless a new explicit final live acceptance is intentionally added.
