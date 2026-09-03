@@ -2419,8 +2419,12 @@ body.home-master .top .master-links{
   border-radius:0;
   text-align:inherit;
 }
-body.home-master .top .master-links>a{
+body.home-master .top .master-links>a:not(.auth-link){
   padding:0;
+  border-bottom:0;
+}
+body.home-master .top .master-links>.auth-link{
+  padding:10px 17px;
 }
 @media(max-width:780px){
   body.home-master .top .master-links{
@@ -2436,8 +2440,12 @@ body.home-master .top .master-links>a{
     overflow-x:auto;
     overflow-y:hidden;
   }
-  body.home-master .top .master-links>a{
+  body.home-master .top .master-links>a:not(.auth-link){
     padding:0;
     min-height:44px;
+  }
+  body.home-master .top .master-links>.auth-link{
+    min-height:44px;
+    padding:9px 13px;
   }
 }
