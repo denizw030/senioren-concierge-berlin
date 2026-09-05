@@ -1022,6 +1022,20 @@
           object-fit: contain;
           object-position: right bottom;
           transform: none;
+          -webkit-mask-image: linear-gradient(
+            180deg,
+            transparent 0%,
+            rgba(0, 0, 0, 0.42) 5%,
+            #000 14%,
+            #000 100%
+          );
+          mask-image: linear-gradient(
+            180deg,
+            transparent 0%,
+            rgba(0, 0, 0, 0.42) 5%,
+            #000 14%,
+            #000 100%
+          );
         }
       }
 
@@ -1041,6 +1055,15 @@
     <header class="top"><div class="wrap nav"><a class="brand" href="index.html" aria-label="NAHWERK Concierge – Startseite"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Hauptnavigation"><a class="active" href="index.html">Übersicht</a><a href="prime-concierge.html">Persönlicher Concierge</a><a href="concierges.html">Concierges</a><a href="senioren-concierge.html">Senioren Concierge</a><a href="angehoerige.html">Für Angehörige</a><a href="leistungen.html">Leistungen</a><a href="kontakt.html">Kontakt</a><a class="auth-link login-link" href="anmelden.html">Anmelden</a><a class="auth-link register-link" href="registrieren.html">Registrieren</a></nav></div></header>
     <main>
       <section class="home-hero">
+        <img
+          class="overview-hero-artwork"
+          src="assets/prime/prime-concierge-hero-luxury-monogram-v1.webp"
+          alt=""
+          width="1672"
+          height="941"
+          loading="eager"
+          decoding="async"
+        />
         <div class="wrap hero-grid">
           <div class="hero-copy">
             <div class="eyebrow">NAHWERK Concierge</div>
@@ -1058,15 +1081,6 @@
               ><a class="btn light" href="leistungen.html">Was NAHWERK kann</a>
             </div>
           </div>
-          <img
-            class="overview-hero-artwork"
-            src="assets/prime/prime-concierge-hero-luxury-monogram-v1.webp"
-            alt=""
-            width="1672"
-            height="941"
-            loading="eager"
-            decoding="async"
-          />
         </div>
       </section>
       <section class="trust" aria-label="Vorteile">
