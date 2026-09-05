@@ -972,6 +972,18 @@
         transform-origin: 74% 46%;
       }
 
+      @media (min-width: 1680px) {
+        body.overview-page:not(.senior-product):not([data-product="senioren"]) .home-hero {
+          min-height: clamp(920px, 48vw, 1250px) !important;
+        }
+
+        body.overview-page .home-hero .overview-hero-artwork {
+          object-position: center top;
+          transform: none;
+          transform-origin: 74% 0%;
+        }
+      }
+
       /* No split readability panel, no extra aurora and no extra monogram.
          The approved artwork itself is the single visual hero surface. */
       body.overview-page .home-hero::before,
