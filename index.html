@@ -945,6 +945,119 @@
           mask-composite: intersect !important;
         }
       }
+
+      /* OVERVIEW HERO — approved full-width luxury monogram artwork */
+      body.overview-page:not(.senior-product):not([data-product="senioren"]) .home-hero {
+        position: relative !important;
+        overflow: hidden !important;
+        isolation: isolate;
+        min-height: clamp(690px, calc(100svh - 150px), 900px) !important;
+        background: #030304 !important;
+      }
+
+      body.overview-page .home-hero .overview-hero-artwork {
+        position: absolute;
+        z-index: 0;
+        inset: 0;
+        display: block;
+        width: 100%;
+        height: 100%;
+        max-width: none;
+        object-fit: cover;
+        object-position: center center;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      /* The approved artwork already contains its own monogram and local color light.
+         Keep only a restrained black readability veil for the copy area. */
+      body.overview-page .home-hero::before {
+        content: "";
+        position: absolute;
+        z-index: 1;
+        inset: 0;
+        pointer-events: none;
+        background: linear-gradient(
+          90deg,
+          rgba(3, 3, 4, 0.96) 0%,
+          rgba(3, 3, 4, 0.90) 18%,
+          rgba(3, 3, 4, 0.72) 34%,
+          rgba(3, 3, 4, 0.34) 49%,
+          rgba(3, 3, 4, 0.08) 61%,
+          rgba(3, 3, 4, 0) 70%
+        ) !important;
+        -webkit-mask-image: none !important;
+        mask-image: none !important;
+        opacity: 1 !important;
+        filter: none !important;
+      }
+
+      body.overview-page .home-hero::after {
+        display: none !important;
+        content: none !important;
+      }
+
+      body.overview-page .home-hero .hero-grid {
+        position: relative;
+        z-index: 2;
+      }
+
+      body.overview-page .home-hero .hero-copy {
+        position: relative;
+        z-index: 3;
+      }
+
+      /* The person is part of the approved 16:9 artwork; never render the legacy portrait. */
+      body.overview-page .home-hero .concierge-stage,
+      body.overview-page .home-hero .public-hero-portrait,
+      body.overview-page .home-hero .portrait {
+        display: none !important;
+      }
+
+      @media (max-width: 760px) {
+        body.overview-page:not(.senior-product):not([data-product="senioren"]) .home-hero {
+          min-height: auto !important;
+          padding: 88px 0 370px !important;
+          background: #030304 !important;
+        }
+
+        body.overview-page .home-hero .hero-grid {
+          display: block !important;
+          position: relative !important;
+        }
+
+        body.overview-page .home-hero .overview-hero-artwork {
+          inset: auto 0 0 auto;
+          width: 165%;
+          height: auto;
+          max-width: none;
+          object-fit: contain;
+          object-position: right bottom;
+        }
+
+        body.overview-page .home-hero::before {
+          background:
+            linear-gradient(
+              180deg,
+              rgba(3, 3, 4, 0.98) 0%,
+              rgba(3, 3, 4, 0.93) 35%,
+              rgba(3, 3, 4, 0.58) 51%,
+              rgba(3, 3, 4, 0.12) 65%,
+              rgba(3, 3, 4, 0) 76%
+            ) !important;
+        }
+      }
+
+      @media (max-width: 480px) {
+        body.overview-page:not(.senior-product):not([data-product="senioren"]) .home-hero {
+          padding-bottom: 350px !important;
+        }
+
+        body.overview-page .home-hero .overview-hero-artwork {
+          width: 170%;
+        }
+      }
     </style>
   </head>
   <body class="overview-page">
@@ -968,17 +1081,15 @@
               ><a class="btn light" href="leistungen.html">Was NAHWERK kann</a>
             </div>
           </div>
-          <div class="concierge-stage" aria-label="NAHWERK Concierge">
-            <img
-              class="public-hero-portrait"
-              src="assets/prime/prime-concierge-hero-executive-v2.jpg?v=1"
-              alt=""
-              width="1024"
-              height="1536"
-              loading="eager"
-              decoding="async"
-            />
-          </div>
+          <img
+            class="overview-hero-artwork"
+            src="assets/prime/prime-concierge-hero-luxury-monogram-v1.webp"
+            alt=""
+            width="1672"
+            height="941"
+            loading="eager"
+            decoding="async"
+          />
         </div>
       </section>
       <section class="trust" aria-label="Vorteile">
