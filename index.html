@@ -946,13 +946,13 @@
         }
       }
 
-      /* OVERVIEW HERO — approved full-width luxury monogram artwork */
+      /* OVERVIEW HERO — one continuous approved luxury artwork field */
       body.overview-page:not(.senior-product):not([data-product="senioren"]) .home-hero {
         position: relative !important;
         overflow: hidden !important;
         isolation: isolate;
         min-height: clamp(690px, calc(100svh - 150px), 900px) !important;
-        background: #030304 !important;
+        background: #08090a !important;
       }
 
       body.overview-page .home-hero .overview-hero-artwork {
@@ -968,34 +968,21 @@
         border: 0;
         border-radius: 0;
         box-shadow: none;
+        transform: scale(1.045);
+        transform-origin: 74% 46%;
       }
 
-      /* The approved artwork already contains its own monogram and local color light.
-         Keep only a restrained black readability veil for the copy area. */
-      body.overview-page .home-hero::before {
-        content: "";
-        position: absolute;
-        z-index: 1;
-        inset: 0;
-        pointer-events: none;
-        background: linear-gradient(
-          90deg,
-          rgba(3, 3, 4, 0.96) 0%,
-          rgba(3, 3, 4, 0.90) 18%,
-          rgba(3, 3, 4, 0.72) 34%,
-          rgba(3, 3, 4, 0.34) 49%,
-          rgba(3, 3, 4, 0.08) 61%,
-          rgba(3, 3, 4, 0) 70%
-        ) !important;
-        -webkit-mask-image: none !important;
-        mask-image: none !important;
-        opacity: 1 !important;
-        filter: none !important;
-      }
-
+      /* No split readability panel, no extra aurora and no extra monogram.
+         The approved artwork itself is the single visual hero surface. */
+      body.overview-page .home-hero::before,
       body.overview-page .home-hero::after {
         display: none !important;
         content: none !important;
+        background: none !important;
+        -webkit-mask-image: none !important;
+        mask-image: none !important;
+        opacity: 0 !important;
+        filter: none !important;
       }
 
       body.overview-page .home-hero .hero-grid {
@@ -1008,7 +995,7 @@
         z-index: 3;
       }
 
-      /* The person is part of the approved 16:9 artwork; never render the legacy portrait. */
+      /* The person is already part of the approved 16:9 artwork. */
       body.overview-page .home-hero .concierge-stage,
       body.overview-page .home-hero .public-hero-portrait,
       body.overview-page .home-hero .portrait {
@@ -1019,7 +1006,7 @@
         body.overview-page:not(.senior-product):not([data-product="senioren"]) .home-hero {
           min-height: auto !important;
           padding: 88px 0 370px !important;
-          background: #030304 !important;
+          background: #08090a !important;
         }
 
         body.overview-page .home-hero .hero-grid {
@@ -1028,24 +1015,13 @@
         }
 
         body.overview-page .home-hero .overview-hero-artwork {
-          inset: auto 0 0 auto;
-          width: 165%;
+          inset: auto -2% 0 auto;
+          width: 168%;
           height: auto;
           max-width: none;
           object-fit: contain;
           object-position: right bottom;
-        }
-
-        body.overview-page .home-hero::before {
-          background:
-            linear-gradient(
-              180deg,
-              rgba(3, 3, 4, 0.98) 0%,
-              rgba(3, 3, 4, 0.93) 35%,
-              rgba(3, 3, 4, 0.58) 51%,
-              rgba(3, 3, 4, 0.12) 65%,
-              rgba(3, 3, 4, 0) 76%
-            ) !important;
+          transform: none;
         }
       }
 
@@ -1055,7 +1031,8 @@
         }
 
         body.overview-page .home-hero .overview-hero-artwork {
-          width: 170%;
+          right: -3%;
+          width: 172%;
         }
       }
     </style>
