@@ -38,7 +38,7 @@ for(const viewport of viewports){
       const revealTargets=page.locator("main > section, .footer");
       for(let i=0;i<await revealTargets.count();i++){
         const target=revealTargets.nth(i);
-        await target.scrollIntoViewIfNeeded();
+        await target.evaluate(el=>el.scrollIntoView({block:"center",inline:"nearest"}));
         await expect(target).toHaveClass(/is-visible/);
       }
       await page.evaluate(()=>window.scrollTo(0,0));
