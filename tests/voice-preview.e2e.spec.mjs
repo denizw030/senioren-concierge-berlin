@@ -7,6 +7,19 @@ const viewports=[
   {name:"mobile",width:390,height:844}
 ];
 
+test.beforeEach(async({page})=>{
+  await page.route("**/functions/v1/web-profile/analytics",async route=>{
+    await route.fulfill({
+      status:204,
+      headers:{
+        "Access-Control-Allow-Origin":"http://127.0.0.1:4173",
+        "Access-Control-Allow-Methods":"POST, OPTIONS",
+        "Access-Control-Allow-Headers":"Content-Type"
+      }
+    });
+  });
+});
+
 for(const viewport of viewports){
   for(const surface of surfaces){
     test(`${viewport.name} ${surface} renders voice controls without browser errors`,async({page})=>{
@@ -335,11 +348,20 @@ test("services and senior lifestyle imagery is visible and responsive",async({pa
   await expect(page.locator(".product-band.senior .product-band-image")).toHaveAttribute("src",/assets\/lifestyle\/senior-woman-overview\.webp/);
 });
 
-test("dark overview hero contains multi-colour ambient background",async({page})=>{
+test("dark overview hero uses the approved full-field artwork",async({page})=>{
   await page.goto("http://127.0.0.1:4173/index.html",{waitUntil:"networkidle"});
-  const background=await page.locator(".home-hero").evaluate(el=>getComputedStyle(el).backgroundImage);
-  expect(background).toContain("radial-gradient");
-  expect(background.split("radial-gradient").length-1).toBeGreaterThanOrEqual(3);
+  const artwork=page.locator(".home-hero .overview-hero-artwork");
+  await expect(artwork).toBeVisible();
+  const state=await artwork.evaluate(img=>({
+    src:img.getAttribute("src"),
+    complete:img.complete,
+    naturalWidth:img.naturalWidth,
+    objectFit:getComputedStyle(img).objectFit
+  }));
+  expect(state.src).toBe("assets/prime/prime-concierge-hero-luxury-monogram-v1.webp");
+  expect(state.complete).toBe(true);
+  expect(state.naturalWidth).toBeGreaterThan(1000);
+  expect(state.objectFit).toBe("cover");
 });
 
 test("mobile menu panel is viewport anchored beneath the sticky header",async({page})=>{
