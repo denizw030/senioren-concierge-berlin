@@ -68,3 +68,21 @@ body.nw-growth-page[data-product="senioren"] .odysx-info-bar strong{color:#f4d47
 .nw-growth-page .footbottom span{
   color:#fff!important;
 }
+
+/* Component-level contrast proof for the actual homepage/family body classes. */
+.overview-page .nw-carousel-card.is-active>.nw-carousel-select>span,
+.overview-page .is-active>.nw-carousel-select>span{
+  background:#131310!important;
+  color:#fff!important;
+  opacity:1!important;
+  filter:none!important;
+}
+.nw-family-page .footer,
+.nw-family-page .footbottom,
+.nw-family-page .footbottom span{
+  background:#050504!important;
+  color:#fff!important;
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
