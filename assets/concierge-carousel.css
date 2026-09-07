@@ -311,3 +311,6 @@ body.senior-product .nw-carousel-select>span,
 body[data-product="senioren"] .nw-carousel-select>span,
 body.senior-product .nw-carousel-select>span,
 .nw-carousel[data-variant="senior"] .nw-carousel-select>span{background:#fff!important;color:#111!important}
+
+/* Card labels are redundant with image alt/aria-label and the live concierge name below. */
+.nw-carousel-select>span{display:none!important}
