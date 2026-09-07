@@ -96,8 +96,8 @@
     },
     familie: {
       code: "FAMILIE",
-      title: "FAMILIE · 59,99 € / MONAT",
-      price: "59,99 € / Monat",
+      title: "FAMILIE · 59,66 € / MONAT",
+      price: "59,66 € / Monat",
       usage: "1.200 App-Dialoge · 300 WhatsApp-Dialoge",
       state: "Checkout folgt",
       bookable: false,
