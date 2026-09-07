@@ -26,3 +26,9 @@
 @media(max-width:1000px){.nw-capability-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.nw-growth-hero-grid{grid-template-columns:1fr}.nw-capability-banner .wrap{display:block}.nw-capability-banner span{display:block;margin-top:6px}}
 @media(max-width:720px){.nw-growth-section{padding:64px 0}.nw-journey-grid,.nw-capability-grid,.nw-task-grid{grid-template-columns:1fr}.nw-growth-hero{padding-top:82px}.nw-journey-card,.nw-capability-grid article,.nw-proof-card,.nw-intent-prompt{padding:20px}.nw-intent-links,.nw-proof-links{align-items:stretch}.nw-intent-links a,.nw-proof-links a{width:100%;justify-content:center}.nw-registration-progress{display:grid;grid-template-columns:1fr}.nw-registration-progress span,.nw-registration-progress strong{border-radius:12px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}.nw-task-grid button{transition:none!important}}
+
+.nw-growth-page .btn.red{background:#f0cc72!important;color:#17130d!important;border-color:#f0cc72!important}
+.nw-growth-page .btn.light{background:#11100d!important;color:#f6f4ef!important;border-color:#8f8a80!important}
+.nw-growth-page .footbottom{color:#c8c2b8!important}
+.nw-growth-page .odysx-info-bar{background:#0b0b09!important;color:#c8c2b8!important;border-color:#39362f!important}
+.nw-growth-page .odysx-info-bar strong{color:#f0d681!important}
