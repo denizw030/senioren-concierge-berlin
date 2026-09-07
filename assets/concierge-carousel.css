@@ -300,3 +300,8 @@ body[data-product="senioren"] .nw-carousel-status:not(:disabled):hover,body.seni
     transition:none!important;
   }
 }
+
+.nw-carousel-select>span{background:#131310!important;color:#f8f5ee!important}
+body[data-product="senioren"] .nw-carousel-select>span,
+body.senior-product .nw-carousel-select>span,
+.nw-carousel[data-variant="senior"] .nw-carousel-select>span{background:#fffdf9!important;color:#211b12!important}
