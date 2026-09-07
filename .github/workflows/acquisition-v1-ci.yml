@@ -40,6 +40,11 @@ jobs:
           python3 -m http.server 4173 >/tmp/nw-http.log 2>&1 &
           server_pid=$!
           trap 'kill $server_pid' EXIT
+          for attempt in 1 2 3 4 5; do
+            curl -fsS "http://127.0.0.1:4173/index.html" >/dev/null && break
+            sleep 1
+          done
+          curl -fsS "http://127.0.0.1:4173/index.html" >/dev/null
           for page in index.html registrieren.html angehoerige.html pakete.html erster-schritt.html alltag-organisieren.html dokumente-verstehen.html technik-verstehen.html; do
             curl -fsS "http://127.0.0.1:4173/$page" >/dev/null
           done
@@ -55,9 +60,13 @@ jobs:
           node-version: "22"
       - name: Serve preview
         run: |
-          python3 -m http.server 4173 >/tmp/nw-http.log 2>&1 &
+          nohup python3 -m http.server 4173 >/tmp/nw-http.log 2>&1 &
           echo $! > /tmp/nw-http.pid
-          sleep 1
+          for attempt in 1 2 3 4 5; do
+            curl -fsS "http://127.0.0.1:4173/index.html" >/dev/null && break
+            sleep 1
+          done
+          curl -fsS "http://127.0.0.1:4173/index.html" >/dev/null
       - name: Accessibility smoke with axe
         run: |
           npx --yes @axe-core/cli@4.10.2 \
