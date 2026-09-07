@@ -32,7 +32,7 @@
       </div>
       <div class="nw-proof-card">
         <strong>Wie der Erfolg gemessen wird</strong>
-        <p>Der Browser markiert die Aktivierung nicht durch diesen Seitenaufruf. Sobald der Kundenbereich realen App- oder WhatsApp-Verbrauch größer als null aus dem bestehenden Usage-Endpunkt sieht, wird der Aktivierungs-Funnel als „first_task_success“ abgeschlossen.</p>
+        <p>Der Seitenaufruf allein zählt nicht als Aktivierung. NAHWERK erfasst nach der Registrierung zunächst den aktuellen authentifizierten App-/WhatsApp-Nutzungsstand als Ausgangswert. Erst wenn der reale Usage-Endpunkt danach einen höheren Verbrauch meldet, wird „first_task_success“ erfasst. Kann der Ausgangswert nicht sicher geladen werden, bleibt die Messung vorsichtshalber fail-closed und leitet keinen Erfolg aus altem Verbrauch ab.</p>
       </div>
     </div>
   </section>
