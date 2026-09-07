@@ -305,3 +305,9 @@ body[data-product="senioren"] .nw-carousel-status:not(:disabled):hover,body.seni
 body[data-product="senioren"] .nw-carousel-select>span,
 body.senior-product .nw-carousel-select>span,
 .nw-carousel[data-variant="senior"] .nw-carousel-select>span{background:#fffdf9!important;color:#211b12!important}
+
+.nw-carousel-card{opacity:1!important}
+.nw-carousel-select>span{background:#000!important;color:#fff!important;text-shadow:none!important}
+body[data-product="senioren"] .nw-carousel-select>span,
+body.senior-product .nw-carousel-select>span,
+.nw-carousel[data-variant="senior"] .nw-carousel-select>span{background:#fff!important;color:#111!important}
