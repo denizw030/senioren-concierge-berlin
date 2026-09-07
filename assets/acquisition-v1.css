@@ -86,3 +86,13 @@ body.nw-growth-page[data-product="senioren"] .odysx-info-bar strong{color:#f4d47
   filter:none!important;
   text-shadow:none!important;
 }
+
+/* Growth pages must not expose transient low-opacity content to users or a11y tooling. */
+.overview-page main>section.reveal,
+.overview-page .footer.reveal,
+.nw-growth-page main>section.reveal,
+.nw-growth-page .footer.reveal{
+  opacity:1!important;
+  transform:none!important;
+  transition:none!important;
+}
