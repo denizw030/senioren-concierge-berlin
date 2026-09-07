@@ -1583,7 +1583,8 @@
       .access-state{margin-top:12px;font-size:12px;color:var(--muted)}
       .access-empty{padding:18px;border:1px dashed var(--line);border-radius:13px;color:var(--muted)}
       @media(max-width:720px){.access-rights{grid-template-columns:1fr}.access-person-head{flex-direction:column}.access-badges{justify-content:flex-start}}
-</style></head>
+</style>    <link rel="stylesheet" href="assets/acquisition-v1.css?v=1" />
+  </head>
   <body>
     <script>
       (() => {
@@ -2295,6 +2296,8 @@
       </div>
     </div>
     <script src="assets/auth-nav.js?v=40"></script>
+    <script src="assets/nahwerk-analytics.js?v=1"></script>
+    <script src="assets/acquisition-v1.js?v=1"></script>
     <script>
       (() => {
         const ACCOUNT_PREVIEW_KEY = "nw_account_theme_preview";
@@ -2518,6 +2521,7 @@
           document.getElementById("usageGrid").hidden = false;
           const app = renderChannelUsage("app", usage?.app_dialogues_used, plan?.app_dialogue_limit);
           const whatsapp = renderChannelUsage("whatsapp", usage?.whatsapp_dialogues_used, plan?.whatsapp_dialogue_limit);
+          window.NahwerkActivation?.observeUsage?.(usage);
           const overviewUsage = document.getElementById("overviewUsage");
           if (overviewUsage) {
             if (whatsapp.remaining !== null) {
