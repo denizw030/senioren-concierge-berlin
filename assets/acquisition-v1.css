@@ -96,3 +96,7 @@ body.nw-growth-page[data-product="senioren"] .odysx-info-bar strong{color:#f4d47
   transform:none!important;
   transition:none!important;
 }
+
+.nw-growth-page .nw-growth-section:not(.nw-growth-section-light) h2{
+  color:#fff!important;
+}
