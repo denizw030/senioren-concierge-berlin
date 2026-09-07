@@ -6,7 +6,7 @@ Branch: `growth/activation-system-v1-20260907`
 ## North Star
 **Cost per successfully activated customer**
 
-Registration alone is not activation. Browser-side activation completes only when a successful registration marked the session pending and the existing authenticated account usage later reports `app_dialogues_used > 0` or `whatsapp_dialogues_used > 0`.
+Registration alone is not activation. After a successful registration, the first-value page captures the authenticated App/WhatsApp usage counters as a baseline. Browser-side activation completes only when a later authenticated usage response is strictly higher than that post-registration baseline. Existing historical usage therefore cannot produce a false activation. If the baseline cannot be loaded, the detector fails closed and the first later usage observation becomes the baseline instead of success.
 
 Completion event:
 - `event_name=funnel_complete`
@@ -29,10 +29,22 @@ page_view → CTA/intent → registration_view → registration_complete → fir
 - Pricing separates tariff model from channel availability.
 - Registration shows three activation steps without weakening secure auth or enabling paid checkout.
 - First-value page provides concrete task prompts.
-- Account usage is the activation truth source.
+- Authenticated account usage is the activation truth source, evaluated as a post-registration counter delta rather than a cumulative `> 0` check.
 
 ## Experiments
-Session-only `control` / `clarity` assignment is recorded through the existing first-party analytics endpoint. No third-party marketing tracker or cookie is added.
+`control` / `clarity` assignment is generated in memory on the homepage and recorded through the existing first-party analytics endpoint. The analytics visit identifier is also memory-only for the current page load. No analytics cookie, analytics Local/Session Storage identifier, third-party marketing tracker, advertising profile or cross-site tracker is added.
 
 ## Safety boundaries
 No production deployment, provider activation, platform repository write, paid checkout enablement or external business execution is introduced.
+
+
+## Privacy / measurement truth
+- First-party product/funnel analytics is disclosed in `datenschutz.html`.
+- Funnel payload is limited to event name, page path, coarse device class, optional referrer host and pseudonymous per-page identifiers.
+- Activation-local browser state is functional state used to compare the post-registration baseline with later authenticated usage; it is not an advertising identifier.
+
+## Final-Green acceptance additions
+- Historical cumulative usage must not complete activation.
+- A post-registration usage increase must complete activation.
+- Analytics must not persist its visit identifier in browser storage.
+- Accessibility contrast gates cover the homepage concierge selector and family footer.
