@@ -47,3 +47,24 @@ body.nw-growth-page.senior-product .odysx-info-bar span,
 body.nw-growth-page[data-product="senioren"] .odysx-info-bar span{color:#ded9d0!important}
 body.nw-growth-page.senior-product .odysx-info-bar strong,
 body.nw-growth-page[data-product="senioren"] .odysx-info-bar strong{color:#f4d47c!important}
+
+/* FINAL GREEN contrast overrides: preserve growth styling while meeting WCAG AA. */
+.nw-growth-page .nw-carousel-card.is-active>.nw-carousel-select>span,
+.nw-growth-page .is-active>.nw-carousel-select>span{
+  background:#11100d!important;
+  color:#fff!important;
+  opacity:1!important;
+  text-shadow:none!important;
+}
+.nw-growth-page .footer{
+  background:#090908!important;
+  border-top-color:#34312b!important;
+}
+.nw-growth-page .footer,
+.nw-growth-page .footer a,
+.nw-growth-page .footer p,
+.nw-growth-page .footer span,
+.nw-growth-page .footbottom,
+.nw-growth-page .footbottom span{
+  color:#fff!important;
+}
