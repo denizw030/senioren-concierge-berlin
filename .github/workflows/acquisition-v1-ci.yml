@@ -1,0 +1,56 @@
+name: Acquisition Activation V1 CI
+on:
+  push:
+    branches:
+      - "growth/activation-system-v1-*"
+  pull_request:
+    paths:
+      - "index.html"
+      - "registrieren.html"
+      - "konto.html"
+      - "angehoerige.html"
+      - "pakete.html"
+      - "senioren-concierge.html"
+      - "erster-schritt.html"
+      - "alltag-organisieren.html"
+      - "dokumente-verstehen.html"
+      - "technik-verstehen.html"
+      - "assets/acquisition-v1.css"
+      - "assets/acquisition-v1.js"
+      - "assets/onboarding.js"
+      - "tests/acquisition-v1.test.mjs"
+      - "tests/acquisition-v1-acceptance.test.mjs"
+      - ".github/workflows/acquisition-v1-ci.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  implementation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Activation system regression
+        run: node --test tests/acquisition-v1.test.mjs
+      - name: Static HTTP smoke
+        run: |
+          python3 -m http.server 4173 >/tmp/nw-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill $server_pid' EXIT
+          for page in index.html registrieren.html angehoerige.html pakete.html erster-schritt.html alltag-organisieren.html dokumente-verstehen.html technik-verstehen.html; do
+            curl -fsS "http://127.0.0.1:4173/$page" >/dev/null
+          done
+  independent-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: implementation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Independent acquisition acceptance
+        run: node --test tests/acquisition-v1-acceptance.test.mjs
