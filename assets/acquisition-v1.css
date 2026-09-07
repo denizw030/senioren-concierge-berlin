@@ -32,3 +32,18 @@
 .nw-growth-page .footbottom{color:#c8c2b8!important}
 .nw-growth-page .odysx-info-bar{background:#0b0b09!important;color:#c8c2b8!important;border-color:#39362f!important}
 .nw-growth-page .odysx-info-bar strong{color:#f0d681!important}
+
+body.nw-growth-page.senior-product .btn.red,
+body.nw-growth-page[data-product="senioren"] .btn.red{background:#f4d47c!important;color:#17130d!important;border-color:#f4d47c!important}
+body.nw-growth-page.senior-product .btn.light,
+body.nw-growth-page[data-product="senioren"] .btn.light{background:#11100d!important;color:#ffffff!important;border-color:#aaa398!important}
+body.nw-growth-page.senior-product .footbottom,
+body.nw-growth-page[data-product="senioren"] .footbottom{color:#ded9d0!important}
+body.nw-growth-page.senior-product .footbottom span,
+body.nw-growth-page[data-product="senioren"] .footbottom span{color:#ded9d0!important}
+body.nw-growth-page.senior-product .odysx-info-bar,
+body.nw-growth-page[data-product="senioren"] .odysx-info-bar{background:#0b0b09!important;color:#ded9d0!important;border-color:#4b473f!important}
+body.nw-growth-page.senior-product .odysx-info-bar span,
+body.nw-growth-page[data-product="senioren"] .odysx-info-bar span{color:#ded9d0!important}
+body.nw-growth-page.senior-product .odysx-info-bar strong,
+body.nw-growth-page[data-product="senioren"] .odysx-info-bar strong{color:#f4d47c!important}
