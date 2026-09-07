@@ -22,6 +22,9 @@ on:
       - "tests/acquisition-v1-acceptance.test.mjs"
       - ".github/workflows/acquisition-v1-ci.yml"
   workflow_dispatch:
+concurrency:
+  group: acquisition-v1-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
