@@ -27,7 +27,7 @@ permissions:
 jobs:
   implementation:
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -43,6 +43,54 @@ jobs:
           for page in index.html registrieren.html angehoerige.html pakete.html erster-schritt.html alltag-organisieren.html dokumente-verstehen.html technik-verstehen.html; do
             curl -fsS "http://127.0.0.1:4173/$page" >/dev/null
           done
+
+  ux-quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    needs: implementation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Serve preview
+        run: |
+          python3 -m http.server 4173 >/tmp/nw-http.log 2>&1 &
+          echo $! > /tmp/nw-http.pid
+          sleep 1
+      - name: Accessibility smoke with axe
+        run: |
+          npx --yes @axe-core/cli@4.10.2 \
+            http://127.0.0.1:4173/index.html \
+            http://127.0.0.1:4173/registrieren.html \
+            http://127.0.0.1:4173/angehoerige.html \
+            --exit
+      - name: Lighthouse desktop
+        run: |
+          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/index.html \
+            --quiet --chrome-flags="--headless --no-sandbox" \
+            --preset=desktop --only-categories=performance,accessibility \
+            --output=json --output-path=/tmp/lh-desktop.json
+      - name: Lighthouse mobile
+        run: |
+          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/index.html \
+            --quiet --chrome-flags="--headless --no-sandbox" \
+            --only-categories=performance,accessibility \
+            --output=json --output-path=/tmp/lh-mobile.json
+      - name: Enforce quality floors
+        run: |
+          node - <<'NODE'
+          const fs=require("fs");
+          for (const [name,file] of [["desktop","/tmp/lh-desktop.json"],["mobile","/tmp/lh-mobile.json"]]) {
+            const r=JSON.parse(fs.readFileSync(file,"utf8"));
+            const perf=r.categories.performance.score;
+            const a11y=r.categories.accessibility.score;
+            console.log(name,{performance:perf,accessibility:a11y});
+            if (perf < 0.75) throw new Error(name+" performance below 0.75");
+            if (a11y < 0.90) throw new Error(name+" accessibility below 0.90");
+          }
+          NODE
+
   independent-acceptance:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -54,3 +102,21 @@ jobs:
           node-version: "22"
       - name: Independent acquisition acceptance
         run: node --test tests/acquisition-v1-acceptance.test.mjs
+
+  preview-artifact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [implementation, ux-quality, independent-acceptance]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build provider-free preview bundle
+        run: |
+          mkdir -p /tmp/nahwerk-preview
+          cp *.html /tmp/nahwerk-preview/
+          cp -R assets /tmp/nahwerk-preview/assets
+          printf "%s\n" "${GITHUB_SHA}" > /tmp/nahwerk-preview/PREVIEW_HEAD.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: acquisition-activation-v1-preview-${{ github.sha }}
+          path: /tmp/nahwerk-preview
+          retention-days: 7
