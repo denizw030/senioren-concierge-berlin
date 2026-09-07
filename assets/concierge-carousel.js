@@ -138,7 +138,7 @@
     function positionCards(){
       const gap=cardSpacing;
       cards.forEach((card,index)=>{
-        const relative=circularDelta(active,index),x=relative*gap+dragX,distance=Math.abs(x/gap),scale=Math.max(.54,1-distance*.19),opacity=distance>3.6?0:Math.max(.24,1-distance*.18);
+        const relative=circularDelta(active,index),x=relative*gap+dragX,distance=Math.abs(x/gap),scale=Math.max(.54,1-distance*.19),opacity=distance>3.6?0:1;
         card.style.setProperty("--nw-card-x",`${x}px`);
         card.style.setProperty("--nw-card-scale",String(scale));
         card.style.opacity=String(opacity);
