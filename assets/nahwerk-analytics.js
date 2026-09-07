@@ -1,22 +1,15 @@
 (() => {
   const ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-profile/analytics";
-  const VISIT_KEY = "nw_analytics_visit_v1";
   const EVENTS = new Set([
     "page_view","cta_click","funnel_start","funnel_step","funnel_complete",
     "registration_start","registration_complete","login_start","login_complete",
     "checkout_start","checkout_complete","client_error"
   ]);
   const uuid = () => crypto.randomUUID();
+  const PAGE_VISIT_ID = uuid();
   const token = (value,max) => {
     const s=String(value||"").toLowerCase();
     return s && s.length<=max && /^[a-z0-9_:-]+$/.test(s) ? s : null;
-  };
-  const visitId = () => {
-    try {
-      let id=sessionStorage.getItem(VISIT_KEY);
-      if(!id){ id=uuid(); sessionStorage.setItem(VISIT_KEY,id); }
-      return id;
-    } catch (_) { return uuid(); }
   };
   const pagePath = () => {
     const p=location.pathname||"/";
@@ -38,7 +31,7 @@
     if(!event || !EVENTS.has(event)) return false;
     const payload={
       event_key:uuid(),
-      visit_id:visitId(),
+      visit_id:PAGE_VISIT_ID,
       event_name:event,
       page_path:pagePath(),
       device_class:deviceClass()
