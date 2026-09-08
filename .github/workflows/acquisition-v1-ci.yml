@@ -11,6 +11,8 @@ on:
       - "angehoerige.html"
       - "pakete.html"
       - "senioren-concierge.html"
+      - "telefonannahme.html"
+      - "leistungen.html"
       - "erster-schritt.html"
       - "alltag-organisieren.html"
       - "dokumente-verstehen.html"
@@ -18,7 +20,10 @@ on:
       - "assets/acquisition-v1.css"
       - "assets/acquisition-v1.js"
       - "assets/onboarding.js"
+      - "assets/telephone-reception-product.css"
+      - "assets/telephone-reception-product.js"
       - "tests/acquisition-v1.test.mjs"
+      - "tests/telephone-reception-product.test.mjs"
       - "tests/acquisition-v1-acceptance.test.mjs"
       - ".github/workflows/acquisition-v1-ci.yml"
   workflow_dispatch:
@@ -37,7 +42,9 @@ jobs:
         with:
           node-version: "22"
       - name: Activation system regression
-        run: node --test tests/acquisition-v1.test.mjs
+        run: node --test tests/acquisition-v1.test.mjs tests/telephone-reception-product.test.mjs
+      - name: Telephone reception JS syntax
+        run: node --check assets/telephone-reception-product.js
       - name: Static HTTP smoke
         run: |
           python3 -m http.server 4173 >/tmp/nw-http.log 2>&1 &
@@ -48,7 +55,7 @@ jobs:
             sleep 1
           done
           curl -fsS "http://127.0.0.1:4173/index.html" >/dev/null
-          for page in index.html registrieren.html angehoerige.html pakete.html erster-schritt.html alltag-organisieren.html dokumente-verstehen.html technik-verstehen.html; do
+          for page in index.html registrieren.html angehoerige.html pakete.html leistungen.html telefonannahme.html erster-schritt.html alltag-organisieren.html dokumente-verstehen.html technik-verstehen.html; do
             curl -fsS "http://127.0.0.1:4173/$page" >/dev/null
           done
 
@@ -76,6 +83,9 @@ jobs:
             http://127.0.0.1:4173/index.html \
             http://127.0.0.1:4173/registrieren.html \
             http://127.0.0.1:4173/angehoerige.html \
+            http://127.0.0.1:4173/leistungen.html \
+            http://127.0.0.1:4173/pakete.html \
+            http://127.0.0.1:4173/telefonannahme.html \
             --exit
       - name: Lighthouse desktop
         run: |
@@ -89,11 +99,23 @@ jobs:
             --quiet --chrome-flags="--headless --no-sandbox" \
             --only-categories=performance,accessibility \
             --output=json --output-path=/tmp/lh-mobile.json
+      - name: Lighthouse telephone reception desktop
+        run: |
+          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/telefonannahme.html \
+            --quiet --chrome-flags="--headless --no-sandbox" \
+            --preset=desktop --only-categories=performance,accessibility \
+            --output=json --output-path=/tmp/lh-telephone-desktop.json
+      - name: Lighthouse telephone reception mobile
+        run: |
+          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/telefonannahme.html \
+            --quiet --chrome-flags="--headless --no-sandbox" \
+            --only-categories=performance,accessibility \
+            --output=json --output-path=/tmp/lh-telephone-mobile.json
       - name: Enforce quality floors
         run: |
           node - <<'NODE'
           const fs=require("fs");
-          for (const [name,file] of [["desktop","/tmp/lh-desktop.json"],["mobile","/tmp/lh-mobile.json"]]) {
+          for (const [name,file] of [["desktop","/tmp/lh-desktop.json"],["mobile","/tmp/lh-mobile.json"],["telephone-desktop","/tmp/lh-telephone-desktop.json"],["telephone-mobile","/tmp/lh-telephone-mobile.json"]]) {
             const r=JSON.parse(fs.readFileSync(file,"utf8"));
             const perf=r.categories.performance.score;
             const a11y=r.categories.accessibility.score;
