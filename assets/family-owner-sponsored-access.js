@@ -53,7 +53,27 @@
     MOTHER:"Mutter",FATHER:"Vater",GRANDMOTHER:"Großmutter",GRANDFATHER:"Großvater",
     PARTNER:"Partner/in",RELATIVE:"Angehörige/r",OTHER:"Andere"
   });
-  const LANGUAGE_LABELS=Object.freeze({de:"Deutsch",tr:"Türkisch",en:"Englisch",fr:"Französisch",es:"Spanisch"});
+  const LANGUAGE_LABELS=Object.freeze({
+    de:"Deutsch",tr:"Türkisch",en:"Englisch",fr:"Französisch",es:"Spanisch",
+    my:"Burmesisch",ar:"Arabisch",pl:"Polnisch",uk:"Ukrainisch",ru:"Russisch",
+    it:"Italienisch","pt-BR":"Portugiesisch (Brasilien)",pt:"Portugiesisch",
+    el:"Griechisch",fa:"Persisch",hi:"Hindi",ur:"Urdu",vi:"Vietnamesisch",
+    zh:"Chinesisch",ja:"Japanisch",ko:"Koreanisch"
+  });
+  const LANGUAGE_CODES=Object.freeze(("aa ab ae af ak am an ar as av ay az ba be bg bh bi bm bn bo br bs ca ce ch co cr cs cu cv cy da de dv dz ee el en eo es et eu fa ff fi fj fo fr fy ga gd gl gn gu gv ha he hi ho hr ht hu hy hz ia id ie ig ii ik io is it iu ja jv ka kg ki kj kk kl km kn ko kr ks ku kv kw ky la lb lg li ln lo lt lu lv mg mh mi mk ml mn mr ms mt my na nb nd ne ng nl nn no nr nv ny oc oj om or os pa pi pl ps pt qu rm rn ro ru rw sa sc sd se sg si sk sl sm sn so sq sr ss st su sv sw ta te tg th ti tk tl tn to tr ts tt tw ty ug uk ur uz ve vi vo wa wo xh yi yo za zh zu").split(" "));
+  const LANGUAGE_OVERRIDES=Object.freeze({
+    my:{label:"Burmesisch",native:"မြန်မာဘာသာ"},ar:{label:"Arabisch",native:"العربية"},
+    pl:{label:"Polnisch",native:"Polski"},uk:{label:"Ukrainisch",native:"Українська"},
+    ru:{label:"Russisch",native:"Русский"},it:{label:"Italienisch",native:"Italiano"},
+    "pt-BR":{label:"Portugiesisch (Brasilien)",native:"Português (Brasil)"},
+    el:{label:"Griechisch",native:"Ελληνικά"},fa:{label:"Persisch",native:"فارسی"},
+    hi:{label:"Hindi",native:"हिन्दी"},ur:{label:"Urdu",native:"اردو"},
+    vi:{label:"Vietnamesisch",native:"Tiếng Việt"},zh:{label:"Chinesisch",native:"中文"},
+    ja:{label:"Japanisch",native:"日本語"},ko:{label:"Koreanisch",native:"한국어"},
+    tr:{label:"Türkisch",native:"Türkçe"},de:{label:"Deutsch",native:"Deutsch"},
+    en:{label:"Englisch",native:"English"},fr:{label:"Französisch",native:"Français"},
+    es:{label:"Spanisch",native:"Español"}
+  });
   const FEATURE_DEFS=Object.freeze([
     {code:"whatsapp_dialog",label:"WhatsApp-Dialoge",max:1000},
     {code:"app_dialog",label:"App-Dialoge",max:1000},
@@ -102,14 +122,49 @@
     try{const row=JSON.parse(storage?.getItem(SESSION_KEY)||"null");return row?.session_token?String(row.session_token):""}catch{return ""}
   }
   function operatorContextAllowed(body){
-    return body?.ok===true&&body?.operator?.role==="OWNER"&&body?.operator?.can_manage_sponsored_people===true&&body?.browser_actor_authority===false;
+    const manager=body?.family_manager;
+    return body?.ok===true&&body?.browser_actor_authority===false
+      &&manager?.can_manage_family_people===true
+      &&["OWNER","CUSTOMER"].includes(String(manager?.role||"").toUpperCase());
   }
-  function canManageEntitlements(body){return operatorContextAllowed(body)&&body?.operator?.can_manage_sponsored_entitlements===true}
+  function canManageEntitlements(body){
+    return operatorContextAllowed(body)
+      &&body?.family_manager?.role==="OWNER"
+      &&body?.family_manager?.can_manage_sponsored_entitlements===true;
+  }
   function normalizeLanguage(value){
     const raw=String(value??"").trim().replace(/_/g,"-");
     if(!raw||raw.length>35||!/^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/.test(raw))return null;
     const parts=raw.split("-");
     return [parts[0].toLowerCase(),...parts.slice(1).map((part)=>part.length===2?part.toUpperCase():part)].join("-");
+  }
+  function languagePickerEntries(){
+    const codes=[...LANGUAGE_CODES,"pt-BR"];
+    const germanNames=typeof Intl!=="undefined"&&Intl.DisplayNames
+      ? new Intl.DisplayNames(["de"],{type:"language"}):null;
+    const seen=new Set(),entries=[];
+    for(const code of codes){
+      const normalized=normalizeLanguage(code);
+      if(!normalized||seen.has(normalized))continue;
+      seen.add(normalized);
+      const override=LANGUAGE_OVERRIDES[normalized];
+      const label=override?.label||germanNames?.of(normalized)||normalized;
+      let nativeName=override?.native||"";
+      if(!nativeName&&typeof Intl!=="undefined"&&Intl.DisplayNames){
+        try{nativeName=new Intl.DisplayNames([normalized.split("-")[0]],{type:"language"}).of(normalized)||""}catch{}
+      }
+      const display=nativeName&&nativeName.toLocaleLowerCase()!==String(label).toLocaleLowerCase()
+        ? label+" · "+nativeName
+        : String(label);
+      entries.push({code:normalized,label:String(label),nativeName:String(nativeName||""),display});
+    }
+    return entries.sort((a,b)=>a.label.localeCompare(b.label,"de"));
+  }
+  function resolveLanguagePickerValue(value,entries=languagePickerEntries()){
+    const raw=String(value||"").trim();
+    if(!raw)return null;
+    const direct=entries.find((entry)=>entry.display===raw||entry.label===raw||entry.nativeName===raw);
+    return direct?.code||null;
   }
   function plausiblePhone(value){
     const raw=String(value??"").trim();
@@ -272,9 +327,9 @@
 
   globalThis.NAHWERKFamilyOwnerTestHooks=Object.freeze({
     PLATFORM_CONTRACT,PLATFORM_CONTRACT_SHA,PREPARED_FAMILY_GATEWAY_BASE,RUNTIME_CONFIG_ENDPOINT,PAGES_RUNTIME_CONFIG_ENDPOINT,runtimeGatewayBase:FAMILY_GATEWAY_BASE,
-    RELATIONSHIPS,LANGUAGE_LABELS,FEATURE_DEFS,FEATURE_CODES,INVITE_STATES,ACCESS_STATES,STATE_LABELS,
+    RELATIONSHIPS,LANGUAGE_LABELS,LANGUAGE_CODES,LANGUAGE_OVERRIDES,FEATURE_DEFS,FEATURE_CODES,INVITE_STATES,ACCESS_STATES,STATE_LABELS,
     FORBIDDEN_AUTHORITY_FIELDS,INVITE_FIELDS,INERT_MESSAGE,sessionToken,operatorContextAllowed,canManageEntitlements,
-    normalizeLanguage,plausiblePhone,conciergeCatalogFrom,buildEntitlements,invitationPayload,containsAuthorityFields,
+    normalizeLanguage,languagePickerEntries,resolveLanguagePickerValue,plausiblePhone,conciergeCatalogFrom,buildEntitlements,invitationPayload,containsAuthorityFields,
     runtimeConfigGateway,loadRuntimeGateway,getOperatorContext,getManagedPeople,getInvitations,createInvitation,getEntitlements,getUsage,updateEntitlements,
     transition,revokeInvitation,stateLabel,relationLabel,languageLabel,mergeServerPeople,usageRows,pendingIdempotency
   });
@@ -286,8 +341,8 @@
   const addButton=document.getElementById("familyPersonAddButton"),form=document.getElementById("familyPersonForm"),
     cancelButton=document.getElementById("familyPersonCancelButton"),formStatus=document.getElementById("familyPersonFormStatus"),
     ownerStatus=document.getElementById("familyOwnerStatus"),peopleList=document.getElementById("familyManagedPeopleList"),
-    languageSelect=document.getElementById("familyPreferredLanguage"),customLanguageWrap=document.getElementById("familyCustomLanguageWrap"),
-    customLanguage=document.getElementById("familyCustomLanguage"),conciergeSelect=document.getElementById("familyConciergeChoice"),
+    languageSelect=document.getElementById("familyPreferredLanguage"),languageOptions=document.getElementById("familyLanguageOptions"),
+    conciergeSelect=document.getElementById("familyConciergeChoice"),
     consent=document.getElementById("familyContactConsent"),detail=document.getElementById("familyManagedDetail"),
     detailTitle=document.getElementById("familyManagedDetailTitle"),detailUsage=document.getElementById("familyManagedUsage"),
     detailQuota=document.getElementById("familyManagedQuotaGrid"),quotaSave=document.getElementById("familyManagedQuotaSave"),
@@ -300,14 +355,26 @@
     const catalog=conciergeCatalogFrom(globalThis.NAHWERK_CONCIERGES);
     conciergeSelect.innerHTML='<option value="">Concierge auswählen</option>'+catalog.map((item)=>'<option value="'+item.key+'">'+item.name+'</option>').join("");
   }
+  function populateLanguages(){
+    const entries=languagePickerEntries();
+    languageOptions.innerHTML="";
+    for(const entry of entries){
+      const option=document.createElement("option");
+      option.value=entry.display;
+      option.dataset.languageCode=entry.code;
+      languageOptions.append(option);
+    }
+    const defaultEntry=entries.find((entry)=>entry.code==="de");
+    if(defaultEntry&&!languageSelect.value)languageSelect.value=defaultEntry.display;
+  }
   function quotaValuesFrom(container){
     const values={};
     container.querySelectorAll("[data-sponsored-feature]").forEach((input)=>{values[input.dataset.sponsoredFeature]=input.value});
     return values;
   }
-  function selectedLanguage(){return languageSelect.value==="__custom__"?normalizeLanguage(customLanguage.value):normalizeLanguage(languageSelect.value)}
+  function selectedLanguage(){return resolveLanguagePickerValue(languageSelect.value)}
   function inputPayload(){
-    const entitlements=buildEntitlements(quotaValuesFrom(form));
+    const entitlements=canManageEntitlements(operatorBody)?buildEntitlements(quotaValuesFrom(form)):[];
     return invitationPayload({
       first_name:document.getElementById("familyFirstName").value,
       last_name:document.getElementById("familyLastName").value,
@@ -364,7 +431,9 @@
       main.append(headline,stateCopy);row.append(main);
       if(item.kind==="managed"&&item.id){
         const actions=document.createElement("div");actions.className="family-owner-row-actions";
-        const manage=document.createElement("button");manage.type="button";manage.className="btn light";manage.textContent="Kontingente ansehen";manage.dataset.familyAction="manage";manage.dataset.familyIndex=String(index);actions.append(manage);
+        if(canManageEntitlements(operatorBody)){
+          const manage=document.createElement("button");manage.type="button";manage.className="btn light";manage.textContent="Kontingente & Nutzung";manage.dataset.familyAction="manage";manage.dataset.familyIndex=String(index);actions.append(manage);
+        }
         if(item.status==="ACTIVE"){const suspend=document.createElement("button");suspend.type="button";suspend.className="btn light";suspend.textContent="Pausieren";suspend.dataset.familyAction="suspend";suspend.dataset.familyIndex=String(index);actions.append(suspend)}
         if(item.status==="SUSPENDED"){const resume=document.createElement("button");resume.type="button";resume.className="btn light";resume.textContent="Fortsetzen";resume.dataset.familyAction="resume";resume.dataset.familyIndex=String(index);actions.append(resume)}
         if(item.status!=="REVOKED"){const revoke=document.createElement("button");revoke.type="button";revoke.className="btn light";revoke.textContent="Sponsored Access beenden";revoke.dataset.familyAction="revoke";revoke.dataset.familyIndex=String(index);actions.append(revoke)}
@@ -388,7 +457,7 @@
   function renderDetailEntitlements(entitlements){
     const map=new Map((Array.isArray(entitlements)?entitlements:[]).map((row)=>[String(row.feature_code),Number(row.included_quantity)||0]));
     detailQuota.innerHTML=FEATURE_DEFS.map((feature)=>'<label class="family-quota-field"><span>'+feature.label+'</span><input type="number" min="0" max="'+feature.max+'" step="1" value="'+(map.get(feature.code)??0)+'" data-sponsored-feature="'+feature.code+'"></label>').join("");
-    quotaSave.hidden=operatorBody?.operator?.can_manage_sponsored_entitlements!==true;
+    quotaSave.hidden=!canManageEntitlements(operatorBody);
   }
   function renderUsage(body){
     detailUsage.innerHTML=usageRows(body).map((row)=>'<div class="family-usage-row"><strong>'+row.label+'</strong><span>Festgelegt '+row.granted+' · Verbraucht '+row.used+' · Verbleibend '+row.remaining+'</span></div>').join("");
@@ -432,19 +501,25 @@
     operatorResolved=true;
     if(!result.ok||!operatorContextAllowed(result.data)){panel.hidden=true;return null}
     operatorBody=result.data;panel.hidden=false;
-    document.getElementById("familyQuotaSection").hidden=!canManageEntitlements(operatorBody);
-    ownerStatus.textContent=canManageEntitlements(operatorBody)?"OWNER bestätigt · Personen und Kontingente autorisiert":"OWNER bestätigt · Kontingentverwaltung nicht freigegeben";
+    const ownerAdmin=canManageEntitlements(operatorBody);
+    document.getElementById("familyQuotaSection").hidden=!ownerAdmin;
+    ownerStatus.textContent=ownerAdmin
+      ?"Family aktiv · OWNER-Administration verfügbar"
+      :"Family aktiv · Personenverwaltung verfügbar";
     await loadPeople();return operatorBody;
   }
 
-  languageSelect.addEventListener("change",()=>{customLanguageWrap.hidden=languageSelect.value!=="__custom__"});
+  languageSelect.addEventListener("change",()=>{
+    languageSelect.setCustomValidity(selectedLanguage()?"":"Bitte eine Sprache aus der Liste auswählen.");
+  });
+  languageSelect.addEventListener("input",()=>languageSelect.setCustomValidity(""));
   addButton.addEventListener("click",()=>setFormOpen(form.hidden));
   cancelButton.addEventListener("click",()=>{setFormOpen(false);setStatus("")});
   form.addEventListener("submit",async(event)=>{
     event.preventDefault();setStatus("");
     if(!form.reportValidity())return;
     const payload=inputPayload();
-    if(!payload){setStatus("Bitte prüfe Pflichtfelder, WhatsApp-Nummer, Sprache, Concierge, Anrede und Kontingente.",true);return}
+    if(!payload){setStatus("Bitte prüfe Pflichtfelder, WhatsApp-Nummer, Sprache, Concierge und Anrede.",true);return}
     const submit=document.getElementById("familyPersonSubmit");submit.disabled=true;
     const outcome=await createInvitation({base:FAMILY_GATEWAY_BASE,token:sessionToken(),input:payload,fetchImpl:globalThis.fetch,storage:globalThis.sessionStorage,cryptoImpl:globalThis.crypto});
     submit.disabled=false;
@@ -469,6 +544,7 @@
   });
   detailClose.addEventListener("click",()=>{detail.hidden=true;currentManagedId=null});
   accessTab.addEventListener("click",()=>{if(!operatorResolved)void probeOperator()});
+  populateLanguages();
   populateConcierges();
   void probeOperator();
 })();
