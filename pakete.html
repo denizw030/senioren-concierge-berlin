@@ -101,6 +101,62 @@
         color: #c8c4ba;
         line-height: 1.65;
       }
+
+      /* Axe closure: pricing page uses explicit dark surfaces and AA text contrast. */
+      body.pricing-page {
+        background: #070706 !important;
+        color: #fff !important;
+      }
+      body.pricing-page .odysx-info-bar,
+      body.pricing-page .odysx-info-bar span,
+      body.pricing-page .nw-capability-banner,
+      body.pricing-page .nw-capability-banner span {
+        color: #fff !important;
+        opacity: 1 !important;
+      }
+      body.pricing-page .package-card,
+      body.pricing-page .package-card.featured {
+        background: #151512 !important;
+        border-color: rgba(255,255,255,.18) !important;
+        color: #fff !important;
+      }
+      body.pricing-page .package-card h3,
+      body.pricing-page .package-price {
+        color: #fff !important;
+      }
+      body.pricing-page .package-price small,
+      body.pricing-page .package-card p,
+      body.pricing-page .package-card li,
+      body.pricing-page .package-card .whatsapp-label {
+        color: #d8d4cc !important;
+        opacity: 1 !important;
+      }
+      body.pricing-page .package-usage,
+      body.pricing-page .status-pill {
+        color: #f0d58d !important;
+        opacity: 1 !important;
+      }
+      body.pricing-page .btn.red {
+        background: #861f24 !important;
+        border-color: #861f24 !important;
+        color: #fff !important;
+      }
+      body.pricing-page .btn.light {
+        background: #f3eee4 !important;
+        border-color: #f3eee4 !important;
+        color: #17130d !important;
+      }
+      body.pricing-page .footer,
+      body.pricing-page .footer a,
+      body.pricing-page .footer p,
+      body.pricing-page .footer h3,
+      body.pricing-page .footbottom,
+      body.pricing-page .footbottom span,
+      body.pricing-page .footer .whatsapp-label {
+        color: #fff !important;
+        opacity: 1 !important;
+      }
+
       @media (max-width: 1120px) {
         .package-grid {
           grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -113,7 +169,7 @@
       }
     </style>
   <link rel="stylesheet" href="assets/acquisition-v1.css?v=1" /></head>
-  <body>
+  <body class="pricing-page">
     <header class="top"><div class="wrap nav"><a class="brand" href="index.html" aria-label="NAHWERK Concierge – Startseite"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Hauptnavigation"><a href="index.html">Übersicht</a><a href="prime-concierge.html">Persönlicher Concierge</a><a href="concierges.html">Concierges</a><a href="telefonannahme.html">Telefonannahme</a><a href="senioren-concierge.html">Senioren Concierge</a><a href="angehoerige.html">Für Angehörige</a><a class="active" href="leistungen.html">Leistungen</a><a href="kontakt.html">Kontakt</a><a class="auth-link login-link" href="anmelden.html">Anmelden</a><a class="auth-link register-link" href="registrieren.html">Registrieren</a></nav></div></header>
     <main>
       <section class="nw-capability-banner" aria-label="Verfügbarkeitsstatus">
@@ -140,6 +196,7 @@
       </section>
       <section class="section" id="paketvergleich">
         <div class="wrap">
+          <h2>Pakete vergleichen</h2>
           <div class="package-grid">
             <article class="package-card">
               <h3>FREE</h3>
@@ -302,7 +359,7 @@
             <p>Ihr persönlicher Concierge für Alltag, Organisation und verständliche Unterstützung.</p>
           </div>
           <div>
-            <h4>Angebot</h4>
+            <h3>Angebot</h3>
             <a href="prime-concierge.html">Persönlicher Concierge</a>
             <a href="telefonannahme.html">Telefonannahme</a>
             <a href="concierges.html">Concierges</a>
@@ -311,14 +368,14 @@
             <a href="pakete.html">Pakete</a>
           </div>
           <div>
-            <h4>Service</h4>
+            <h3>Service</h3>
             <a href="leistungen.html">Leistungen</a>
             <a href="ablauf.html">So funktioniert's</a>
             <a href="faq.html">FAQ</a>
             <a href="kontakt.html">Kontakt</a>
           </div>
           <div>
-            <h4>Rechtliches</h4>
+            <h3>Rechtliches</h3>
             <a href="impressum.html">Impressum</a>
             <a href="datenschutz.html">Datenschutz</a>
             <a href="agb.html">AGB</a>
