@@ -1,0 +1,29 @@
+name: Family Customer Access Finalization CI
+
+on:
+  push:
+    branches:
+      - feat/family-customer-access-finalization-20260909
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  family-customer-access:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax check
+        run: node --check assets/family-owner-sponsored-access.js
+      - name: Family and premium account tests
+        run: |
+          node --test tests/family-customer-access-finalization.test.mjs
+          node --test tests/family-owner-sponsored-access.test.mjs
+          node --test tests/account-premium-ui.test.mjs
+      - name: Pre-send boundary
+        run: |
+          node -e "const fs=require('fs'); const s=fs.readFileSync('assets/family-owner-sponsored-access.js','utf8'); if(!s.includes('provider_execution===false')) process.exit(1); console.log('WEBSITE_FAMILY_PRE_SEND_GREEN')"
