@@ -157,6 +157,57 @@
         opacity: 1 !important;
       }
 
+
+      /* Deterministic axe snapshot: disable transient reveal opacity on pricing. */
+      body.pricing-page main > section.reveal,
+      body.pricing-page .footer.reveal {
+        opacity:1!important;
+        transform:none!important;
+        transition:none!important;
+        filter:none!important;
+      }
+      body.pricing-page .odysx-info-bar,
+      body.pricing-page .odysx-info-bar *,
+      body.pricing-page .package-card,
+      body.pricing-page .package-card * {
+        opacity:1!important;
+        filter:none!important;
+        text-shadow:none!important;
+      }
+      body.pricing-page .odysx-info-bar,
+      body.pricing-page .odysx-info-bar * {
+        background:#0b0b09!important;
+        color:#fff!important;
+      }
+      body.pricing-page .package-card {
+        background:#11110f!important;
+      }
+      body.pricing-page .package-card h3,
+      body.pricing-page .package-card p,
+      body.pricing-page .package-card li,
+      body.pricing-page .package-card .package-price,
+      body.pricing-page .package-card .package-price small,
+      body.pricing-page .package-card .package-usage,
+      body.pricing-page .package-card .whatsapp-label,
+      body.pricing-page .package-card .status-pill {
+        color:#fff!important;
+      }
+      body.pricing-page .package-card .btn.light,
+      body.pricing-page #telefonannahme-modelle .btn.light {
+        background:#fff!important;
+        border-color:#fff!important;
+        color:#111!important;
+        opacity:1!important;
+        filter:none!important;
+      }
+      body.pricing-page .package-card .btn.red {
+        background:#651418!important;
+        border-color:#651418!important;
+        color:#fff!important;
+        opacity:1!important;
+        filter:none!important;
+      }
+
       @media (max-width: 1120px) {
         .package-grid {
           grid-template-columns: repeat(2, minmax(0, 1fr));
