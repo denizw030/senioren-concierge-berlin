@@ -59,6 +59,7 @@ test("responsive premium UI explicitly covers required viewport classes",()=>{
     assert.ok(css.includes("@media(max-width:"+width+")"),width);
   assert.match(css,/overflow-x:auto!important/);
   assert.match(css,/grid-column:1\/-1!important/);
+  assert.match(css,/top:auto!important/);
   assert.match(css,/:focus-visible/);
 });
 
