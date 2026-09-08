@@ -517,6 +517,7 @@
   cancelButton.addEventListener("click",()=>{setFormOpen(false);setStatus("")});
   form.addEventListener("submit",async(event)=>{
     event.preventDefault();setStatus("");
+    languageSelect.setCustomValidity(selectedLanguage()?"":"Bitte eine Sprache aus der Liste auswählen.");
     if(!form.reportValidity())return;
     const payload=inputPayload();
     if(!payload){setStatus("Bitte prüfe Pflichtfelder, WhatsApp-Nummer, Sprache, Concierge und Anrede.",true);return}
