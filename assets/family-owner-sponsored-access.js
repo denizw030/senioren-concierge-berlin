@@ -53,7 +53,7 @@
     MOTHER:"Mutter",FATHER:"Vater",GRANDMOTHER:"Großmutter",GRANDFATHER:"Großvater",
     PARTNER:"Partner/in",RELATIVE:"Angehörige/r",OTHER:"Andere"
   });
-  const LANGUAGE_LABELS=Object.freeze({de:"Deutsch",tr:"Türkçe",en:"English",fr:"Français",es:"Español"});
+  const LANGUAGE_LABELS=Object.freeze({de:"Deutsch",tr:"Türkisch",en:"Englisch",fr:"Französisch",es:"Spanisch"});
   const FEATURE_DEFS=Object.freeze([
     {code:"whatsapp_dialog",label:"WhatsApp-Dialoge",max:1000},
     {code:"app_dialog",label:"App-Dialoge",max:1000},
@@ -321,19 +321,50 @@
       entitlements
     });
   }
+  function visualStateDescription(state){
+    const value=String(state||"").toUpperCase();
+    const copy={
+      INVITE_CREATED:"Die Einladung ist vorbereitet.",
+      MESSAGE_PENDING:"Einladung wird für WhatsApp vorbereitet.",
+      MESSAGE_SENT:"Die Nachricht wurde versendet.",
+      AWAITING_ACCEPTANCE:"Die Einladung wartet auf Annahme.",
+      ACCEPTED:"Die Einladung wurde angenommen.",
+      ACTIVE:"Sponsored Access ist aktiv.",
+      SUSPENDED:"Sponsored Access ist pausiert.",
+      REVOKED:"Der Zugriff wurde widerrufen.",
+      DECLINED:"Die Einladung wurde abgelehnt.",
+      EXPIRED:"Die Einladung ist abgelaufen.",
+      SEND_UNCERTAIN:"Der Versandstatus wird serverseitig geprüft.",
+      SEND_FAILED:"Die Nachricht konnte nicht versendet werden."
+    };
+    return copy[value]||"Der Status wird serverseitig geprüft.";
+  }
+  function displayConcierge(value){
+    const raw=String(value||"").trim();
+    return raw?raw.charAt(0).toUpperCase()+raw.slice(1):"Concierge nicht gesetzt";
+  }
   function renderPeople(rows){
     currentPeople=rows;
     if(!rows.length){peopleList.innerHTML='<div class="family-owner-empty">Noch keine serverseitig bestätigten unterstützten Personen oder Einladungen.</div>';return}
     peopleList.innerHTML="";
     rows.forEach((item,index)=>{
-      const row=document.createElement("div");row.className="family-owner-person";
+      const row=document.createElement("div");row.className="family-owner-person";row.dataset.familyState=item.status||"UNKNOWN";
+      const main=document.createElement("div");main.className="family-owner-person-main";
+      const headline=document.createElement("div");headline.className="family-owner-person-headline";
       const copy=document.createElement("div");copy.className="family-owner-person-copy";
       const title=document.createElement("strong");title.textContent=item.name;
-      const meta=document.createElement("span");meta.textContent=[relationLabel(item.relationship),languageLabel(item.language),item.concierge||"Concierge nicht gesetzt",stateLabel(item.status)].join(" · ");
-      copy.append(title,meta);row.append(copy);
+      const meta=document.createElement("div");meta.className="family-owner-person-meta";
+      [relationLabel(item.relationship),languageLabel(item.language),displayConcierge(item.concierge)].forEach((value)=>{
+        const part=document.createElement("span");part.textContent=value;meta.append(part);
+      });
+      copy.append(title,meta);
+      const status=document.createElement("span");status.className="family-owner-person-status";status.textContent=stateLabel(item.status);
+      headline.append(copy,status);
+      const stateCopy=document.createElement("p");stateCopy.className="family-owner-person-state-copy";stateCopy.textContent=visualStateDescription(item.status);
+      main.append(headline,stateCopy);row.append(main);
       if(item.kind==="managed"&&item.id){
         const actions=document.createElement("div");actions.className="family-owner-row-actions";
-        const manage=document.createElement("button");manage.type="button";manage.className="btn light";manage.textContent="Kontingente & Nutzung";manage.dataset.familyAction="manage";manage.dataset.familyIndex=String(index);actions.append(manage);
+        const manage=document.createElement("button");manage.type="button";manage.className="btn light";manage.textContent="Kontingente ansehen";manage.dataset.familyAction="manage";manage.dataset.familyIndex=String(index);actions.append(manage);
         if(item.status==="ACTIVE"){const suspend=document.createElement("button");suspend.type="button";suspend.className="btn light";suspend.textContent="Pausieren";suspend.dataset.familyAction="suspend";suspend.dataset.familyIndex=String(index);actions.append(suspend)}
         if(item.status==="SUSPENDED"){const resume=document.createElement("button");resume.type="button";resume.className="btn light";resume.textContent="Fortsetzen";resume.dataset.familyAction="resume";resume.dataset.familyIndex=String(index);actions.append(resume)}
         if(item.status!=="REVOKED"){const revoke=document.createElement("button");revoke.type="button";revoke.className="btn light";revoke.textContent="Sponsored Access beenden";revoke.dataset.familyAction="revoke";revoke.dataset.familyIndex=String(index);actions.append(revoke)}
@@ -402,7 +433,7 @@
     if(!result.ok||!operatorContextAllowed(result.data)){panel.hidden=true;return null}
     operatorBody=result.data;panel.hidden=false;
     document.getElementById("familyQuotaSection").hidden=!canManageEntitlements(operatorBody);
-    ownerStatus.textContent=canManageEntitlements(operatorBody)?"OWNER bestätigt · Personen und Kontingente serverseitig autorisiert.":"OWNER bestätigt · Kontingentverwaltung serverseitig nicht freigegeben.";
+    ownerStatus.textContent=canManageEntitlements(operatorBody)?"OWNER bestätigt · Personen und Kontingente autorisiert":"OWNER bestätigt · Kontingentverwaltung nicht freigegeben";
     await loadPeople();return operatorBody;
   }
 

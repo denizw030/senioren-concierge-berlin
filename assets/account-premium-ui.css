@@ -1,0 +1,762 @@
+/* NAHWERK Account Premium UI 2026
+   Presentation only. No account, session, Family, quota or provider behavior lives here. */
+body.account-premium-ui{
+  --account-bg:#030405;
+  --account-surface:#090c10;
+  --account-surface-2:#0c1118;
+  --account-surface-3:#111722;
+  --account-line:rgba(173,190,214,.14);
+  --account-line-strong:rgba(202,215,234,.22);
+  --account-text:#f5f3ee;
+  --account-muted:#a4a9b2;
+  --account-gold:#d6b66b;
+  --account-gold-soft:#ead49d;
+  --account-danger:#d98989;
+  --account-radius:20px;
+  color:var(--account-text);
+  background:var(--account-bg);
+}
+body.account-premium-ui main,
+body.account-premium-ui .hero,
+body.account-premium-ui main>.section{
+  background:
+    radial-gradient(900px 520px at 92% 2%,rgba(31,51,88,.16),transparent 68%),
+    radial-gradient(720px 460px at 8% 58%,rgba(28,39,60,.10),transparent 72%),
+    linear-gradient(180deg,#030405 0%,#06090d 48%,#030405 100%)!important;
+}
+body.account-premium-ui .account-hero{
+  min-height:236px!important;
+  padding:54px 0 42px!important;
+  border-bottom:1px solid rgba(190,205,227,.08);
+}
+body.account-premium-ui .account-hero .wrap,
+body.account-premium-ui .account-section>.wrap{
+  width:min(1260px,calc(100% - 48px));
+}
+body.account-premium-ui .account-hero h1{
+  max-width:760px!important;
+  margin:9px 0 13px!important;
+  font-size:clamp(2.55rem,4.6vw,4.15rem)!important;
+  line-height:1!important;
+  letter-spacing:-.052em!important;
+}
+body.account-premium-ui .account-hero p{
+  max-width:680px!important;
+  margin:0!important;
+  color:#b6bac2!important;
+  font-size:15px!important;
+  line-height:1.65!important;
+}
+body.account-premium-ui .account-section{
+  padding:30px 0 92px!important;
+}
+body.account-premium-ui .eyebrow{
+  color:var(--account-gold-soft)!important;
+  letter-spacing:.105em!important;
+}
+
+/* Context bar */
+body.account-premium-ui .account-setup-by{
+  display:grid!important;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;
+  gap:12px 18px;
+  min-height:66px;
+  margin:0 0 14px!important;
+  padding:13px 17px!important;
+  border:1px solid var(--account-line)!important;
+  border-radius:16px!important;
+  background:linear-gradient(145deg,rgba(14,19,27,.92),rgba(8,11,16,.94))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 18px 48px rgba(0,0,0,.18)!important;
+}
+body.account-premium-ui .account-setup-by .eyebrow{
+  margin:0!important;
+  font-size:10px!important;
+}
+body.account-premium-ui .account-setup-name{
+  margin:0!important;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:15px!important;
+  letter-spacing:-.015em!important;
+}
+body.account-premium-ui .account-setup-context-label{
+  display:inline-flex;
+  align-items:center;
+  min-height:29px;
+  padding:0 10px;
+  border:1px solid rgba(214,182,107,.22);
+  border-radius:999px;
+  color:#c8c1b2;
+  background:rgba(214,182,107,.045);
+  font-size:11px;
+  font-weight:700;
+  white-space:nowrap;
+}
+
+/* Managed profile context */
+body.account-premium-ui .managed-person-context{
+  margin:0 0 14px!important;
+  padding:16px 17px!important;
+  border:1px solid var(--account-line)!important;
+  border-radius:16px!important;
+  background:rgba(10,14,20,.78)!important;
+}
+body.account-premium-ui .managed-context-notice{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:16px;
+  margin:0 0 14px!important;
+  padding:14px 16px!important;
+  border:1px solid var(--account-line)!important;
+  border-left:1px solid var(--account-line)!important;
+  border-radius:15px!important;
+  background:rgba(10,14,20,.74)!important;
+  color:#cacdd3!important;
+  box-shadow:none!important;
+  font-size:12.5px!important;
+  line-height:1.55!important;
+}
+body.account-premium-ui .managed-context-notice strong{
+  color:#f1eee8;
+}
+body.account-premium-ui .managed-context-notice .actions{
+  margin:0!important;
+}
+body.account-premium-ui .managed-context-notice .btn{
+  white-space:nowrap;
+}
+
+/* Tabs */
+body.account-premium-ui .account-tabs-shell{
+  position:relative;
+  margin:0 0 18px!important;
+  padding:4px!important;
+  overflow:hidden;
+  border:1px solid var(--account-line)!important;
+  border-radius:15px!important;
+  background:rgba(8,11,16,.82)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.018)!important;
+}
+body.account-premium-ui .account-tabs{
+  display:flex!important;
+  width:100%;
+  gap:3px!important;
+  padding:0!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  scrollbar-width:none;
+  overscroll-behavior-inline:contain;
+}
+body.account-premium-ui .account-tabs::-webkit-scrollbar{display:none}
+body.account-premium-ui .account-tab{
+  flex:1 0 auto!important;
+  min-width:max-content!important;
+  min-height:42px!important;
+  padding:0 13px!important;
+  border:0!important;
+  border-radius:11px!important;
+  background:transparent!important;
+  color:#999fa9!important;
+  font-size:12.5px!important;
+  font-weight:700!important;
+  letter-spacing:-.01em!important;
+  box-shadow:none!important;
+  transition:background .16s ease,color .16s ease,box-shadow .16s ease!important;
+}
+body.account-premium-ui .account-tab:hover:not(:disabled){
+  color:#e9e7e2!important;
+  background:rgba(255,255,255,.035)!important;
+}
+body.account-premium-ui .account-tab[aria-selected="true"]{
+  color:#f5f2ea!important;
+  background:linear-gradient(180deg,rgba(31,38,49,.95),rgba(18,23,31,.94))!important;
+  box-shadow:inset 0 0 0 1px rgba(217,226,239,.10),0 5px 15px rgba(0,0,0,.16)!important;
+}
+body.account-premium-ui .account-tab:focus-visible,
+body.account-premium-ui .account-overview-link:focus-visible,
+body.account-premium-ui .family-owner-panel button:focus-visible,
+body.account-premium-ui .family-owner-panel input:focus-visible,
+body.account-premium-ui .family-owner-panel select:focus-visible,
+body.account-premium-ui .family-owner-panel textarea:focus-visible{
+  outline:2px solid var(--account-gold-soft)!important;
+  outline-offset:3px!important;
+}
+
+/* Quiet connection note */
+body.account-premium-ui .account-session-note{
+  margin:0 0 18px!important;
+  padding:11px 14px!important;
+  border:1px solid rgba(169,187,211,.11)!important;
+  border-left:1px solid rgba(169,187,211,.11)!important;
+  border-radius:13px!important;
+  background:rgba(9,13,18,.62)!important;
+  color:#9097a2!important;
+  box-shadow:none!important;
+  font-size:11.5px!important;
+  line-height:1.5!important;
+}
+body.account-premium-ui .account-session-note strong{color:#cfd2d7}
+
+/* Shared cards */
+body.account-premium-ui .dash{
+  display:grid!important;
+  grid-template-columns:repeat(12,minmax(0,1fr))!important;
+  gap:14px!important;
+  align-items:start!important;
+}
+body.account-premium-ui .dash>.card,
+body.account-premium-ui .family-owner-panel,
+body.account-premium-ui .access-panel{
+  border:1px solid var(--account-line)!important;
+  border-radius:var(--account-radius)!important;
+  background:
+    radial-gradient(500px 230px at 100% 0%,rgba(43,64,99,.075),transparent 68%),
+    linear-gradient(145deg,rgba(13,18,25,.96),rgba(7,10,14,.98))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 20px 54px rgba(0,0,0,.20)!important;
+}
+body.account-premium-ui .dash>.card:hover{
+  border-color:rgba(198,211,230,.19)!important;
+}
+body.account-premium-ui .summary-card{
+  grid-column:span 4!important;
+  min-height:154px!important;
+  padding:19px 20px!important;
+}
+body.account-premium-ui .summary-card .value{
+  margin-top:8px!important;
+  color:#f5f3ee!important;
+  font-size:clamp(1.05rem,1.4vw,1.22rem)!important;
+  line-height:1.25!important;
+  letter-spacing:-.025em!important;
+}
+body.account-premium-ui .summary-card .muted{
+  margin:12px 0 0!important;
+  color:var(--account-muted)!important;
+  font-size:11.5px!important;
+  line-height:1.55!important;
+}
+body.account-premium-ui .person-summary{
+  grid-column:span 4!important;
+}
+body.account-premium-ui .statusdot{
+  width:7px!important;
+  height:7px!important;
+  margin-right:8px!important;
+  background:var(--account-gold)!important;
+  box-shadow:0 0 0 4px rgba(214,182,107,.07);
+}
+
+/* Overview quick cards */
+body.account-premium-ui .account-overview-highlights{
+  grid-column:1/-1!important;
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:14px!important;
+  margin:0!important;
+}
+body.account-premium-ui .account-overview-link{
+  min-width:0;
+  min-height:142px!important;
+  padding:18px 19px!important;
+  border:1px solid var(--account-line)!important;
+  border-radius:18px!important;
+  background:linear-gradient(145deg,rgba(12,17,23,.93),rgba(7,10,14,.96))!important;
+  color:inherit!important;
+  text-align:left!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.02)!important;
+  transition:border-color .16s ease,background .16s ease,transform .16s ease!important;
+}
+body.account-premium-ui .account-overview-link:hover:not(:disabled){
+  border-color:rgba(214,182,107,.22)!important;
+  background:linear-gradient(145deg,rgba(17,23,31,.96),rgba(8,11,16,.98))!important;
+  transform:translateY(-1px);
+}
+body.account-premium-ui .account-overview-link strong{
+  display:block;
+  margin:8px 0 7px!important;
+  color:#f3f1ec!important;
+  font-size:16px!important;
+  line-height:1.3!important;
+}
+body.account-premium-ui .account-overview-link>span:last-child{
+  display:block;
+  color:#999fa9!important;
+  font-size:11.5px!important;
+  line-height:1.55!important;
+}
+
+/* Section headings */
+body.account-premium-ui .account-panel-heading{
+  grid-column:1/-1!important;
+  padding:6px 2px 8px!important;
+}
+body.account-premium-ui .account-panel-heading h2{
+  max-width:760px;
+  margin:7px 0 7px!important;
+  font-size:clamp(1.75rem,2.7vw,2.35rem)!important;
+  letter-spacing:-.045em!important;
+  line-height:1.08!important;
+}
+body.account-premium-ui .account-panel-heading p{
+  max-width:720px;
+  margin:0!important;
+  color:#999fa9!important;
+  font-size:13px!important;
+  line-height:1.6!important;
+}
+
+/* Profile, concierge, usage and safety surfaces */
+body.account-premium-ui .profile-card,
+body.account-premium-ui .concierge-panel,
+body.account-premium-ui .safety-panel,
+body.account-premium-ui .usage-panel,
+body.account-premium-ui .reception-panel,
+body.account-premium-ui .email-account-card{
+  border-radius:20px!important;
+}
+body.account-premium-ui .profile-head,
+body.account-premium-ui .profile-form,
+body.account-premium-ui .concierge-panel,
+body.account-premium-ui .safety-panel,
+body.account-premium-ui .usage-panel,
+body.account-premium-ui .reception-panel{
+  padding-left:24px!important;
+  padding-right:24px!important;
+}
+body.account-premium-ui .profile-status,
+body.account-premium-ui .reception-status{
+  border:1px solid rgba(214,182,107,.18)!important;
+  background:rgba(214,182,107,.045)!important;
+  color:#d3c8ac!important;
+  box-shadow:none!important;
+}
+body.account-premium-ui .profile-status::before,
+body.account-premium-ui .reception-status::before{
+  background:var(--account-gold)!important;
+}
+body.account-premium-ui input,
+body.account-premium-ui select,
+body.account-premium-ui textarea{
+  border-color:rgba(172,190,216,.18)!important;
+  background:rgba(4,7,11,.58)!important;
+  color:#f1eee9!important;
+}
+body.account-premium-ui input::placeholder,
+body.account-premium-ui textarea::placeholder{color:#747b86!important}
+body.account-premium-ui .muted,
+body.account-premium-ui .privacy-note{color:var(--account-muted)!important}
+body.account-premium-ui .prefchip{
+  border:1px solid rgba(214,182,107,.14)!important;
+  background:rgba(214,182,107,.05)!important;
+  color:#d8c799!important;
+}
+
+/* Access section ordering: heading -> sponsored people -> reciprocal permissions */
+body.account-premium-ui .account-panel-heading[data-account-panel="access"]{order:-30}
+body.account-premium-ui #familyOwnerPanelSlot{
+  order:-20;
+  grid-column:1/-1!important;
+  min-width:0;
+}
+body.account-premium-ui #familyAccessCard{
+  order:-10;
+  grid-column:1/-1!important;
+  padding:22px!important;
+}
+body.account-premium-ui #familyOwnerPanelSlot[hidden]{display:none!important}
+body.account-premium-ui .family-owner-panel{
+  width:100%;
+  min-width:0;
+  box-sizing:border-box;
+  display:grid!important;
+  gap:18px!important;
+  padding:22px!important;
+}
+body.account-premium-ui .family-owner-panel[hidden]{display:none!important}
+body.account-premium-ui .family-owner-head{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:start!important;
+  gap:16px 24px!important;
+  padding-bottom:17px;
+  border-bottom:1px solid rgba(174,190,214,.10);
+}
+body.account-premium-ui .family-owner-head h3{
+  margin:6px 0 7px!important;
+  font-size:clamp(1.55rem,2.2vw,1.95rem)!important;
+  letter-spacing:-.04em!important;
+}
+body.account-premium-ui .family-owner-head .muted{
+  max-width:690px;
+  margin:0!important;
+  font-size:12px!important;
+  line-height:1.55!important;
+}
+body.account-premium-ui .family-owner-status{
+  display:inline-flex!important;
+  align-items:center;
+  max-width:360px!important;
+  min-height:31px;
+  padding:6px 10px!important;
+  border:1px solid rgba(214,182,107,.20)!important;
+  border-radius:999px!important;
+  background:rgba(214,182,107,.045)!important;
+  color:#d2c5a7!important;
+  font-size:10.5px!important;
+  font-weight:750!important;
+  line-height:1.3!important;
+  white-space:normal;
+}
+body.account-premium-ui .family-owner-status::before{
+  content:"";
+  width:6px;
+  height:6px;
+  flex:0 0 6px;
+  margin-right:7px;
+  border-radius:50%;
+  background:var(--account-gold);
+  box-shadow:0 0 0 3px rgba(214,182,107,.06);
+}
+body.account-premium-ui .family-owner-toolbar{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center!important;
+  gap:16px!important;
+  margin:0!important;
+  padding:15px 16px!important;
+  border:1px solid rgba(174,190,214,.10);
+  border-radius:15px;
+  background:rgba(255,255,255,.018);
+}
+body.account-premium-ui .family-owner-toolbar p{
+  max-width:760px;
+  margin:0!important;
+  font-size:11.5px!important;
+  line-height:1.55!important;
+}
+body.account-premium-ui #familyPersonAddButton{
+  min-height:40px!important;
+  padding:0 15px!important;
+  border:1px solid rgba(214,182,107,.30)!important;
+  border-radius:11px!important;
+  background:rgba(214,182,107,.08)!important;
+  color:#eadcb8!important;
+  box-shadow:none!important;
+  font-size:12px!important;
+  font-weight:750!important;
+  white-space:nowrap;
+}
+body.account-premium-ui #familyPersonAddButton:hover{
+  border-color:rgba(214,182,107,.50)!important;
+  background:rgba(214,182,107,.12)!important;
+}
+
+/* Add-person form */
+body.account-premium-ui .family-owner-form{
+  margin:0!important;
+  padding:18px!important;
+  border:1px solid var(--account-line)!important;
+  border-radius:17px!important;
+  background:rgba(6,9,13,.60)!important;
+  box-shadow:none!important;
+}
+body.account-premium-ui .family-owner-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:12px!important;
+}
+body.account-premium-ui .family-owner-field>span,
+body.account-premium-ui .family-quota-field>span{
+  color:#b2b6be!important;
+  font-size:10.5px!important;
+  letter-spacing:.025em;
+}
+body.account-premium-ui .family-owner-field input,
+body.account-premium-ui .family-owner-field select,
+body.account-premium-ui .family-owner-field textarea,
+body.account-premium-ui .family-quota-field input{
+  min-height:43px!important;
+  border-radius:10px!important;
+}
+body.account-premium-ui .family-quota-section{
+  border-top-color:rgba(174,190,214,.10)!important;
+}
+body.account-premium-ui .family-owner-note{
+  margin:0!important;
+  padding:12px 14px!important;
+  border:1px solid rgba(214,182,107,.10)!important;
+  border-radius:13px!important;
+  background:rgba(214,182,107,.035)!important;
+  color:#a9a79f!important;
+  font-size:11.5px!important;
+  line-height:1.55!important;
+}
+
+/* Supported people list */
+body.account-premium-ui .family-owner-list{
+  display:grid!important;
+  gap:10px!important;
+  margin-top:9px!important;
+}
+body.account-premium-ui .family-owner-person{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  grid-template-areas:"main actions";
+  align-items:center!important;
+  gap:16px 22px!important;
+  min-width:0;
+  padding:16px 17px!important;
+  border:1px solid rgba(174,190,214,.12)!important;
+  border-radius:16px!important;
+  background:
+    radial-gradient(360px 180px at 100% 0%,rgba(48,65,94,.07),transparent 72%),
+    rgba(255,255,255,.018)!important;
+  box-shadow:none!important;
+}
+body.account-premium-ui .family-owner-person-main{
+  grid-area:main;
+  display:grid;
+  min-width:0;
+  gap:8px;
+}
+body.account-premium-ui .family-owner-person-headline{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  min-width:0;
+}
+body.account-premium-ui .family-owner-person-copy{
+  min-width:0;
+}
+body.account-premium-ui .family-owner-person-copy strong{
+  display:block;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  color:#f4f1eb!important;
+  font-size:15px!important;
+  line-height:1.3!important;
+  letter-spacing:-.02em;
+  white-space:nowrap;
+}
+body.account-premium-ui .family-owner-person-meta{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:6px 11px;
+  color:#a2a7b0;
+  font-size:11.5px;
+  line-height:1.45;
+}
+body.account-premium-ui .family-owner-person-meta span{
+  position:relative;
+  white-space:nowrap;
+}
+body.account-premium-ui .family-owner-person-meta span+span::before{
+  content:"";
+  display:inline-block;
+  width:3px;
+  height:3px;
+  margin:0 9px 2px 0;
+  border-radius:50%;
+  background:#5c6470;
+}
+body.account-premium-ui .family-owner-person-status{
+  display:inline-flex;
+  align-items:center;
+  flex:0 0 auto;
+  min-height:25px;
+  padding:0 9px;
+  border:1px solid rgba(214,182,107,.20);
+  border-radius:999px;
+  background:rgba(214,182,107,.05);
+  color:#d7c89f;
+  font-size:10.5px;
+  font-weight:800;
+  white-space:nowrap;
+}
+body.account-premium-ui .family-owner-person[data-family-state="ACTIVE"] .family-owner-person-status,
+body.account-premium-ui .family-owner-person[data-family-state="ACCEPTED"] .family-owner-person-status{
+  border-color:rgba(120,180,144,.22);
+  background:rgba(120,180,144,.065);
+  color:#b5d4c0;
+}
+body.account-premium-ui .family-owner-person[data-family-state="REVOKED"] .family-owner-person-status,
+body.account-premium-ui .family-owner-person[data-family-state="DECLINED"] .family-owner-person-status,
+body.account-premium-ui .family-owner-person[data-family-state="SEND_FAILED"] .family-owner-person-status{
+  border-color:rgba(217,137,137,.20);
+  background:rgba(217,137,137,.055);
+  color:#dbabab;
+}
+body.account-premium-ui .family-owner-person-state-copy{
+  margin:0!important;
+  color:#8f96a1!important;
+  font-size:11.5px!important;
+  line-height:1.55!important;
+}
+body.account-premium-ui .family-owner-row-actions{
+  grid-area:actions;
+  display:flex!important;
+  flex-wrap:wrap!important;
+  justify-content:flex-end!important;
+  align-items:center;
+  gap:7px!important;
+}
+body.account-premium-ui .family-owner-row-actions .btn{
+  min-height:34px!important;
+  padding:0 10px!important;
+  border:1px solid rgba(174,190,214,.14)!important;
+  border-radius:10px!important;
+  background:rgba(255,255,255,.02)!important;
+  color:#c7cbd1!important;
+  box-shadow:none!important;
+  font-size:10.5px!important;
+}
+body.account-premium-ui .family-owner-row-actions .btn:hover{
+  border-color:rgba(210,221,235,.25)!important;
+  background:rgba(255,255,255,.04)!important;
+}
+body.account-premium-ui .family-owner-row-actions [data-family-action="invite-revoke"],
+body.account-premium-ui .family-owner-row-actions [data-family-action="revoke"]{
+  border-color:rgba(217,137,137,.16)!important;
+  color:#d4a1a1!important;
+  background:rgba(217,137,137,.025)!important;
+}
+body.account-premium-ui .family-owner-row-actions [data-family-action="invite-revoke"]:hover,
+body.account-premium-ui .family-owner-row-actions [data-family-action="revoke"]:hover{
+  border-color:rgba(217,137,137,.30)!important;
+  background:rgba(217,137,137,.055)!important;
+}
+body.account-premium-ui .family-owner-empty{
+  padding:15px!important;
+  border:1px dashed rgba(174,190,214,.17)!important;
+  border-radius:13px!important;
+  background:rgba(255,255,255,.012)!important;
+}
+
+/* Managed quotas detail */
+body.account-premium-ui .family-managed-detail{
+  padding:18px!important;
+  border:1px solid rgba(214,182,107,.14)!important;
+  border-radius:16px!important;
+  background:rgba(8,11,16,.68)!important;
+}
+body.account-premium-ui .family-usage-row{
+  border-bottom-color:rgba(174,190,214,.09)!important;
+}
+
+/* Reciprocal Family permissions as a secondary surface */
+body.account-premium-ui .access-panel-head{
+  align-items:center!important;
+}
+body.account-premium-ui .access-panel-head h3{
+  margin:5px 0 6px!important;
+  font-size:1.25rem!important;
+  letter-spacing:-.03em!important;
+}
+body.account-premium-ui .access-person{
+  border-color:rgba(174,190,214,.11)!important;
+  background:rgba(255,255,255,.015)!important;
+}
+body.account-premium-ui .access-right{
+  border-color:rgba(174,190,214,.10)!important;
+  background:rgba(255,255,255,.012)!important;
+}
+
+/* Buttons remain semantic; treatment is visual only */
+body.account-premium-ui .btn{
+  border-radius:10px!important;
+}
+body.account-premium-ui .btn.red{
+  border-color:rgba(214,182,107,.30)!important;
+  background:rgba(214,182,107,.09)!important;
+  color:#eadcb8!important;
+  box-shadow:none!important;
+}
+body.account-premium-ui .btn.light{
+  border-color:rgba(174,190,214,.15)!important;
+  background:rgba(255,255,255,.02)!important;
+  color:#d0d3d9!important;
+  box-shadow:none!important;
+}
+
+/* Breakpoints: 1440 default; 1280, 1024, 768, 390, 360 explicitly exercised by CI. */
+@media(max-width:1280px){
+  body.account-premium-ui .account-hero .wrap,
+  body.account-premium-ui .account-section>.wrap{width:min(1180px,calc(100% - 40px))}
+  body.account-premium-ui .account-tab{padding-inline:12px!important}
+}
+@media(max-width:1024px){
+  body.account-premium-ui .summary-card{grid-column:span 6!important}
+  body.account-premium-ui .account-overview-highlights{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  body.account-premium-ui .account-overview-link:last-child{grid-column:1/-1}
+  body.account-premium-ui .family-owner-person{grid-template-columns:1fr!important;grid-template-areas:"main" "actions"!important}
+  body.account-premium-ui .family-owner-row-actions{justify-content:flex-start!important}
+}
+@media(max-width:768px){
+  body.account-premium-ui .account-hero{min-height:205px!important;padding:42px 0 34px!important}
+  body.account-premium-ui .account-hero .wrap,
+  body.account-premium-ui .account-section>.wrap{width:calc(100% - 30px)}
+  body.account-premium-ui .account-section{padding-top:22px!important}
+  body.account-premium-ui .account-setup-by{grid-template-columns:1fr auto!important;gap:5px 12px!important}
+  body.account-premium-ui .account-setup-by .eyebrow{grid-column:1}
+  body.account-premium-ui .account-setup-name{grid-column:1}
+  body.account-premium-ui .account-setup-context-label{grid-column:2;grid-row:1/3}
+  body.account-premium-ui .managed-context-notice{grid-template-columns:1fr!important}
+  body.account-premium-ui .managed-context-notice .actions{justify-self:start}
+  body.account-premium-ui .account-tabs-shell{margin-inline:-2px!important}
+  body.account-premium-ui .account-tabs{padding-right:10px!important}
+  body.account-premium-ui .account-tab{flex:0 0 auto!important}
+  body.account-premium-ui .summary-card{grid-column:span 6!important;min-height:145px!important}
+  body.account-premium-ui .account-overview-highlights{grid-template-columns:1fr!important}
+  body.account-premium-ui .account-overview-link:last-child{grid-column:auto}
+  body.account-premium-ui .family-owner-head,
+  body.account-premium-ui .family-owner-toolbar{grid-template-columns:1fr!important}
+  body.account-premium-ui .family-owner-status{justify-self:start;max-width:100%!important}
+  body.account-premium-ui #familyPersonAddButton{justify-self:start}
+  body.account-premium-ui .family-owner-grid{grid-template-columns:1fr!important}
+  body.account-premium-ui .family-owner-field.is-wide{grid-column:auto!important}
+}
+@media(max-width:640px){
+  body.account-premium-ui .dash{grid-template-columns:1fr!important;gap:11px!important}
+  body.account-premium-ui .summary-card,
+  body.account-premium-ui .person-summary,
+  body.account-premium-ui .account-overview-highlights,
+  body.account-premium-ui .account-panel-heading,
+  body.account-premium-ui #familyOwnerPanelSlot,
+  body.account-premium-ui #familyAccessCard{grid-column:1!important}
+  body.account-premium-ui .summary-card{min-height:0!important;padding:17px!important}
+  body.account-premium-ui .profile-head,
+  body.account-premium-ui .profile-form,
+  body.account-premium-ui .concierge-panel,
+  body.account-premium-ui .safety-panel,
+  body.account-premium-ui .usage-panel,
+  body.account-premium-ui .reception-panel{padding-left:17px!important;padding-right:17px!important}
+  body.account-premium-ui .family-owner-panel{padding:17px!important;border-radius:17px!important}
+  body.account-premium-ui .family-owner-toolbar{padding:13px!important}
+  body.account-premium-ui .family-owner-person{padding:14px!important}
+  body.account-premium-ui .family-owner-person-headline{align-items:flex-start;flex-direction:column;gap:8px}
+  body.account-premium-ui .family-owner-row-actions{display:grid!important;grid-template-columns:1fr!important;width:100%}
+  body.account-premium-ui .family-owner-row-actions .btn{width:100%!important}
+}
+@media(max-width:390px){
+  body.account-premium-ui .account-hero .wrap,
+  body.account-premium-ui .account-section>.wrap{width:calc(100% - 24px)}
+  body.account-premium-ui .account-hero h1{font-size:2.35rem!important}
+  body.account-premium-ui .account-setup-by{padding:12px 13px!important}
+  body.account-premium-ui .account-setup-context-label{font-size:10px;padding-inline:8px}
+  body.account-premium-ui .account-tab{min-height:40px!important;padding-inline:11px!important;font-size:12px!important}
+  body.account-premium-ui .account-panel-heading h2{font-size:1.65rem!important}
+  body.account-premium-ui .family-owner-status{font-size:10px!important}
+}
+@media(max-width:360px){
+  body.account-premium-ui .account-hero .wrap,
+  body.account-premium-ui .account-section>.wrap{width:calc(100% - 20px)}
+  body.account-premium-ui .account-setup-by{grid-template-columns:1fr!important}
+  body.account-premium-ui .account-setup-context-label{grid-column:1;grid-row:auto;justify-self:start;margin-top:4px}
+  body.account-premium-ui .family-owner-panel,
+  body.account-premium-ui #familyAccessCard{padding:14px!important}
+}

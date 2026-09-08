@@ -5,6 +5,7 @@ on:
       - "growth/activation-system-v1-*"
       - "feat/family-runtime-activation-*"
       - "feat/family-runtime-pages-activation-*"
+      - "feat/account-premium-ui-*"
   pull_request:
     paths:
       - "index.html"
@@ -28,6 +29,7 @@ on:
       - "assets/email-account-integration.js"
       - "assets/family-owner-sponsored-access.css"
       - "assets/family-owner-sponsored-access.js"
+      - "assets/account-premium-ui.css"
       - "api/runtime-config.js"
       - "api/runtime-config.json"
       - "scripts/family-runtime-smoke.mjs"
@@ -36,6 +38,7 @@ on:
       - "tests/telephone-reception-product.test.mjs"
       - "tests/email-account-integration.test.mjs"
       - "tests/family-owner-sponsored-access.test.mjs"
+      - "tests/account-premium-ui.test.mjs"
       - "tests/acquisition-v1-acceptance.test.mjs"
       - ".github/workflows/acquisition-v1-ci.yml"
   workflow_dispatch:
@@ -234,6 +237,79 @@ jobs:
             sleep 1
           done
           curl -fsS "http://127.0.0.1:4173/index.html" >/dev/null
+      - name: Account premium visual browser E2E
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          src=Path("konto.html").read_text(encoding="utf-8")
+          links="\n".join(re.findall(r'<link[^>]+rel="stylesheet"[^>]*>',src,re.I))
+          styles="\n".join(re.findall(r'<style[^>]*>[\s\S]*?</style>',src,re.I))
+          tabs=re.search(r'<div class="account-tabs-shell">[\s\S]*?</nav>\s*</div>',src,re.I).group(0)
+          setup=re.search(r'<div class="account-setup-by"[\s\S]*?</div>',src,re.I).group(0)
+          summaries=[]
+          for klass in ["plan-summary","status-summary","customer-number-summary","person-summary"]:
+            summaries.append(re.search(r'<article class="card summary-card [^"]*'+klass+r'"[\s\S]*?</article>',src,re.I).group(0))
+          highlights=re.search(r'<div class="account-overview-highlights"[\s\S]*?</div>\s*<div class="account-panel-heading" data-account-panel="concierge"',src,re.I).group(0)
+          highlights=highlights.rsplit('<div class="account-panel-heading"',1)[0]
+          access_heading=re.search(r'<div class="account-panel-heading" data-account-panel="access"[\s\S]*?</div>\s*<article class="card wide access-panel"',src,re.I).group(0)
+          access_heading=access_heading.rsplit('<article',1)[0]
+          family_start=src.index('<div id="familyOwnerPanelSlot"')
+          family_end=src.index('<article class="card summary-card plan-summary"',family_start)
+          family=src[family_start:family_end]
+          family=re.sub(r'\s+hidden(?=[^>]*>)','',family)
+          family=family.replace('Berechtigung wird serverseitig geprüft.','OWNER bestätigt · Personen und Kontingente autorisiert')
+          family=family.replace('<div class="family-owner-empty">Personen werden ausschließlich serverseitig geladen.</div>',
+            '''<div class="family-owner-person" data-family-state="MESSAGE_PENDING">
+              <div class="family-owner-person-main">
+                <div class="family-owner-person-headline">
+                  <div class="family-owner-person-copy"><strong>Hülya Cimen</strong><div class="family-owner-person-meta"><span>Mutter</span><span>Türkisch</span><span>Leyla</span></div></div>
+                  <span class="family-owner-person-status">Versand wird vorbereitet</span>
+                </div>
+                <p class="family-owner-person-state-copy">Einladung wird für WhatsApp vorbereitet.</p>
+              </div>
+              <div class="family-owner-row-actions"><button class="btn light" type="button">Einladung widerrufen</button></div>
+            </div>''')
+          family=re.sub(r'<form class="family-owner-form"[\s\S]*?</form>','',family,count=1)
+          family=re.sub(r'<section class="family-managed-detail"[\s\S]*?</section>','',family,count=1)
+          family=re.sub(r'<article class="card wide access-panel"[\s\S]*?</article>','',family)
+          def shell(body,title):
+            return f'''<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title>{links}{styles}</head><body class="account-premium-ui" data-product="prime"><main><section class="section account-section"><div class="wrap">{body}</div></section></main><script>
+            addEventListener("load",()=>{{requestAnimationFrame(()=>{{
+              const bad=[...document.querySelectorAll("button,.card,.family-owner-person,.account-tabs-shell")].filter(el=>{{const r=el.getBoundingClientRect();return r.left<-1||r.right>innerWidth+1||r.width<1;}});
+              document.documentElement.dataset.overflow=(document.documentElement.scrollWidth<=innerWidth+1&&bad.length===0)?"none":"present";
+              document.documentElement.dataset.visualReady="true";
+            }})}});
+            </script></body></html>'''
+          overview=shell(setup+tabs+'<div class="dash">'+''.join(summaries)+highlights+'</div>',"Konto Übersicht")
+          access=shell(setup+tabs+'<div class="dash">'+access_heading+family+'</div>',"Konto Zugänge")
+          Path("__account-premium-overview.html").write_text(overview,encoding="utf-8")
+          Path("__account-premium-access.html").write_text(access,encoding="utf-8")
+          PY
+          mkdir -p /tmp/account-premium-visual
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          for width in 1440 1280 1024 768 390 360; do
+            for view in overview access; do
+              url="http://127.0.0.1:4173/__account-premium-$view.html"
+              "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --window-size="$width,1100" --virtual-time-budget=1200 --dump-dom "$url" > "/tmp/account-$view-$width.html"
+              grep -q 'data-visual-ready="true"' "/tmp/account-$view-$width.html"
+              grep -q 'data-overflow="none"' "/tmp/account-$view-$width.html"
+              "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --window-size="$width,1100" --virtual-time-budget=1200 --screenshot="/tmp/account-premium-visual/$view-$width.png" "$url" >/dev/null
+            done
+          done
+          grep -q "Hülya Cimen" /tmp/account-access-390.html
+          grep -q "Mutter" /tmp/account-access-390.html
+          grep -q "Türkisch" /tmp/account-access-390.html
+          grep -q "Leyla" /tmp/account-access-390.html
+          grep -q "Versand wird vorbereitet" /tmp/account-access-390.html
+          echo "ACCOUNT PREMIUM VISUAL E2E GREEN"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: account-premium-visual-${{ github.sha }}
+          path: /tmp/account-premium-visual
+          retention-days: 7
+
       - name: Accessibility smoke with axe
         run: |
           npx --yes @axe-core/cli@4.10.2 \

@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="assets/site.css?v=24" />
     <link rel="stylesheet" href="assets/email-account-integration.css?v=1" />
     <link rel="stylesheet" href="assets/family-owner-sponsored-access.css?v=1" />
+    <link rel="stylesheet" href="assets/account-premium-ui.css?v=1" />
     <style>
       .dash {
         display: grid;
@@ -1587,7 +1588,7 @@
       @media(max-width:720px){.access-rights{grid-template-columns:1fr}.access-person-head{flex-direction:column}.access-badges{justify-content:flex-start}}
 </style>    <link rel="stylesheet" href="assets/acquisition-v1.css?v=1" />
   </head>
-  <body>
+  <body class="account-premium-ui">
     <script>
       (() => {
         try {
@@ -1617,6 +1618,7 @@
           <div class="account-setup-by" aria-label="Eingerichtet von">
             <span class="eyebrow">Eingerichtet von</span>
             <strong class="value account-setup-name" id="ownerName">–</strong>
+            <span class="account-setup-context-label">Verwaltetes Profil</span>
           </div>
           <div class="managed-person-context" id="managedPersonContext" hidden>
             <div class="person-context-copy">
@@ -1688,9 +1690,9 @@
               </form>
             </article>
             <div class="account-panel-heading" data-account-panel="access" hidden>
-              <div class="eyebrow">Personen & Zugänge</div>
-              <h2>Wer darf was verwalten?</h2>
-              <p>Sie entscheiden selbst, welche verknüpfte Person bestimmte Einstellungen für Sie verwalten darf. Zahlung und Login bleiben davon unabhängig.</p>
+              <div class="eyebrow">Zugänge</div>
+              <h2>Verwalten Sie unterstützte Personen und Zugriffsrechte.</h2>
+              <p>Unterstützte Personen, Sponsored Access und persönliche Freigaben bleiben klar getrennt und serverseitig autorisiert.</p>
             </div>
             <article class="card wide access-panel" id="familyAccessCard" data-account-panel="access" role="tabpanel" aria-labelledby="accountTabAccess" hidden>
               <div class="access-panel-head">
@@ -1709,7 +1711,7 @@
             <div id="familyOwnerPanelSlot" data-account-panel="access" hidden>
               <article class="card wide family-owner-panel" id="familyOwnerPanel" hidden data-family-contract="family-owner-sponsored-access-v1" data-family-platform-sha="e63d09682c9a919a9ab347ff27d197f2a3c10a18" data-family-runtime="inert">
                 <div class="family-owner-head">
-                  <div><div class="eyebrow">Unterstützte Personen</div><h3>Personen verwalten</h3><p class="muted">Nur ein serverseitig bestätigter OWNER mit Freigabe für Sponsored People kann diesen Bereich sehen.</p></div>
+                  <div><div class="eyebrow">Unterstützte Personen</div><h3>Personen, die Sie über NAHWERK unterstützen.</h3><p class="muted">Personenverwaltung und Kontingente werden ausschließlich für serverseitig bestätigte OWNER freigeschaltet.</p></div>
                   <span class="family-owner-status" id="familyOwnerStatus">Berechtigung wird serverseitig geprüft.</span>
                 </div>
                 <div class="family-owner-toolbar"><p class="muted">Personen, Sprache, Concierge, Status, Kontingente und Nutzung – keine privaten Kommunikationsinhalte.</p><button class="btn red" type="button" id="familyPersonAddButton" aria-expanded="false" aria-controls="familyPersonForm">Person hinzufügen</button></div>
