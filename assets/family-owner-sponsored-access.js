@@ -4,7 +4,9 @@
   const PLATFORM_CONTRACT_SHA="e63d09682c9a919a9ab347ff27d197f2a3c10a18";
   const PREPARED_FAMILY_GATEWAY_BASE="https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-family-access";
   const RUNTIME_CONFIG_ENDPOINT="/api/runtime-config";
+  const PAGES_RUNTIME_CONFIG_ENDPOINT="/api/runtime-config.json";
   // Runtime safety boundary: deployment config is authoritative and defaults fail-closed.
+  // GitHub Pages may fall back only when the serverless path is positively absent (404/405).
   let FAMILY_GATEWAY_BASE=null;
   let runtimeConfigPromise=null;
   function normalizeRuntimeGateway(value){
@@ -16,15 +18,28 @@
     if(body?.ok!==true||body?.family_contract!==PLATFORM_CONTRACT||body?.platform_contract_sha!==PLATFORM_CONTRACT_SHA||body?.family_runtime_enabled!==true)return null;
     return normalizeRuntimeGateway(body.family_gateway_base);
   }
-  async function loadRuntimeGateway({fetchImpl=globalThis.fetch,configUrl=RUNTIME_CONFIG_ENDPOINT}={}){
-    if(typeof fetchImpl!=="function")return null;
+  function runtimeConfigFetchInit(){
+    return {method:"GET",headers:{Accept:"application/json"},cache:"no-store",credentials:"same-origin"};
+  }
+  async function readRuntimeConfig(fetchImpl,url){
     let response;
     try{
-      response=await fetchImpl(configUrl,{method:"GET",headers:{Accept:"application/json"},cache:"no-store",credentials:"same-origin"});
-    }catch{return null}
-    if(!response?.ok)return null;
-    const body=await response.json().catch(()=>null);
-    return runtimeConfigGateway(body);
+      response=await fetchImpl(url,runtimeConfigFetchInit());
+    }catch{return {kind:"network_error",gateway:null}}
+    if(response?.redirected===true)return {kind:"unsafe_response",gateway:null};
+    if(response?.ok===true){
+      const body=await response.json().catch(()=>null);
+      return {kind:"response",gateway:runtimeConfigGateway(body)};
+    }
+    return {kind:"http_error",status:Number(response?.status)||0,gateway:null};
+  }
+  async function loadRuntimeGateway({fetchImpl=globalThis.fetch,configUrl=RUNTIME_CONFIG_ENDPOINT}={}){
+    if(typeof fetchImpl!=="function")return null;
+    const primary=await readRuntimeConfig(fetchImpl,configUrl);
+    if(primary.kind==="response")return primary.gateway;
+    if(configUrl!==RUNTIME_CONFIG_ENDPOINT||primary.kind!=="http_error"||![404,405].includes(primary.status))return null;
+    const pages=await readRuntimeConfig(fetchImpl,PAGES_RUNTIME_CONFIG_ENDPOINT);
+    return pages.kind==="response"?pages.gateway:null;
   }
   async function ensureRuntimeGateway(){
     if(FAMILY_GATEWAY_BASE)return FAMILY_GATEWAY_BASE;
@@ -256,7 +271,7 @@
   }
 
   globalThis.NAHWERKFamilyOwnerTestHooks=Object.freeze({
-    PLATFORM_CONTRACT,PLATFORM_CONTRACT_SHA,PREPARED_FAMILY_GATEWAY_BASE,RUNTIME_CONFIG_ENDPOINT,runtimeGatewayBase:FAMILY_GATEWAY_BASE,
+    PLATFORM_CONTRACT,PLATFORM_CONTRACT_SHA,PREPARED_FAMILY_GATEWAY_BASE,RUNTIME_CONFIG_ENDPOINT,PAGES_RUNTIME_CONFIG_ENDPOINT,runtimeGatewayBase:FAMILY_GATEWAY_BASE,
     RELATIONSHIPS,LANGUAGE_LABELS,FEATURE_DEFS,FEATURE_CODES,INVITE_STATES,ACCESS_STATES,STATE_LABELS,
     FORBIDDEN_AUTHORITY_FIELDS,INVITE_FIELDS,INERT_MESSAGE,sessionToken,operatorContextAllowed,canManageEntitlements,
     normalizeLanguage,plausiblePhone,conciergeCatalogFrom,buildEntitlements,invitationPayload,containsAuthorityFields,

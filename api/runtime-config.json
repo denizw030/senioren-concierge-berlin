@@ -1,0 +1,7 @@
+{
+  "ok": true,
+  "family_contract": "family-owner-sponsored-access-v1",
+  "platform_contract_sha": "e63d09682c9a919a9ab347ff27d197f2a3c10a18",
+  "family_runtime_enabled": true,
+  "family_gateway_base": "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-family-access"
+}

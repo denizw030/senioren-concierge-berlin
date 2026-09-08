@@ -4,6 +4,7 @@ on:
     branches:
       - "growth/activation-system-v1-*"
       - "feat/family-runtime-activation-*"
+      - "feat/family-runtime-pages-activation-*"
   pull_request:
     paths:
       - "index.html"
@@ -28,6 +29,7 @@ on:
       - "assets/family-owner-sponsored-access.css"
       - "assets/family-owner-sponsored-access.js"
       - "api/runtime-config.js"
+      - "api/runtime-config.json"
       - "scripts/family-runtime-smoke.mjs"
       - "tests/family-runtime-activation.test.mjs"
       - "tests/acquisition-v1.test.mjs"
@@ -76,6 +78,111 @@ jobs:
           for page in index.html registrieren.html konto.html angehoerige.html pakete.html leistungen.html telefonannahme.html erster-schritt.html alltag-organisieren.html dokumente-verstehen.html technik-verstehen.html; do
             curl -fsS "http://127.0.0.1:4173/$page" >/dev/null
           done
+          curl -fsS "http://127.0.0.1:4173/api/runtime-config.json" > /tmp/family-pages-runtime.json
+          node - <<'NODE'
+          const fs=require("fs");
+          const body=JSON.parse(fs.readFileSync("/tmp/family-pages-runtime.json","utf8"));
+          const expected={
+            ok:true,
+            family_contract:"family-owner-sponsored-access-v1",
+            platform_contract_sha:"e63d09682c9a919a9ab347ff27d197f2a3c10a18",
+            family_runtime_enabled:true,
+            family_gateway_base:"https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-family-access"
+          };
+          if(JSON.stringify(body)!==JSON.stringify(expected))throw new Error("Pages runtime config mismatch");
+          console.log("PAGES STATIC RUNTIME CONFIG GREEN",body);
+          NODE
+
+      - name: GitHub Pages browser authorization smoke
+        run: |
+          python3 -m http.server 4173 >/tmp/nw-pages-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill $server_pid' EXIT
+          for attempt in 1 2 3 4 5; do
+            curl -fsS "http://127.0.0.1:4173/api/runtime-config.json" >/dev/null && break
+            sleep 1
+          done
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          src=Path("konto.html").read_text(encoding="utf-8")
+          tab=re.search(r'<button[^>]+id="accountTabAccess"[\s\S]*?</button>',src,re.I).group(0)
+          start=src.index('<div id="familyOwnerPanelSlot"')
+          end=src.index('<article class="card summary-card plan-summary"',start)
+          panel=src[start:end]
+          fixture='''<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Family Pages Smoke</title></head><body>'''
+          fixture+=tab+panel
+          fixture+='''<script>
+          (() => {
+            const mode=new URLSearchParams(location.search).get("mode")||"normal";
+            const gateway="https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-family-access";
+            const nativeFetch=window.fetch.bind(window);
+            const state=window.__familyPagesSmoke={primary404:false,staticConfig:false,context:false,providerWrite:false};
+            sessionStorage.setItem("scb_web_session",JSON.stringify({session_token:"r".repeat(40)}));
+            window.NAHWERK_CONCIERGES=[{key:"nilo",name:"Nilo"}];
+            window.fetch=async(input,init={})=>{
+              const raw=typeof input==="string"?input:input.url;
+              const url=new URL(raw,location.href);
+              const method=String(init.method||"GET").toUpperCase();
+              if(url.pathname==="/api/runtime-config"){
+                state.primary404=true;
+                return new Response("not found",{status:404,headers:{"Content-Type":"text/plain"}});
+              }
+              if(url.pathname==="/api/runtime-config.json"){
+                state.staticConfig=true;
+                return nativeFetch(input,init);
+              }
+              if(url.href.startsWith(gateway)){
+                if(method!=="GET"){
+                  state.providerWrite=true;
+                  return new Response(JSON.stringify({ok:false}),{status:500,headers:{"Content-Type":"application/json"}});
+                }
+                if(url.pathname.endsWith("/operator/context")){
+                  state.context=true;
+                  const operator=mode==="normal"
+                    ? {role:"CUSTOMER",can_manage_sponsored_people:false,can_manage_sponsored_entitlements:false}
+                    : {role:"OWNER",can_manage_sponsored_people:true,can_manage_sponsored_entitlements:mode==="owner-full"};
+                  return new Response(JSON.stringify({ok:true,operator,browser_actor_authority:false}),{status:200,headers:{"Content-Type":"application/json"}});
+                }
+                if(url.pathname.endsWith("/operator/managed-people"))
+                  return new Response(JSON.stringify({ok:true,people:[]}),{status:200,headers:{"Content-Type":"application/json"}});
+                if(url.pathname.endsWith("/family/invitations"))
+                  return new Response(JSON.stringify({ok:true,invitations:[]}),{status:200,headers:{"Content-Type":"application/json"}});
+                return new Response(JSON.stringify({ok:false}),{status:404,headers:{"Content-Type":"application/json"}});
+              }
+              return nativeFetch(input,init);
+            };
+            window.__familyPagesSmokeMode=mode;
+          })();
+          </script><script src="/assets/family-owner-sponsored-access.js?v=pages-smoke"></script><script>
+          (() => {
+            const timer=setInterval(()=>{
+              const mode=window.__familyPagesSmokeMode;
+              const state=window.__familyPagesSmoke||{};
+              const panel=document.getElementById("familyOwnerPanel");
+              const quota=document.getElementById("familyQuotaSection");
+              const add=document.getElementById("familyPersonAddButton");
+              const configured=panel?.dataset.familyRuntime==="configured";
+              let green=false;
+              if(mode==="normal")green=configured&&state.context&&panel?.hidden===true;
+              if(mode==="owner-no-quota")green=configured&&state.context&&panel?.hidden===false&&quota?.hidden===true;
+              if(mode==="owner-full")green=configured&&state.context&&panel?.hidden===false&&quota?.hidden===false&&add?.hidden!==true;
+              if(green&&state.primary404&&state.staticConfig&&!state.providerWrite){
+                document.documentElement.setAttribute("data-family-pages-smoke",mode+"-green");
+                clearInterval(timer);
+              }
+            },25);
+          })();
+          </script></body></html>'''
+          Path("__family-pages-browser-smoke.html").write_text(fixture,encoding="utf-8")
+          PY
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          for mode in normal owner-no-quota owner-full; do
+            "$CHROME" --headless --no-sandbox --disable-gpu --virtual-time-budget=3000 --dump-dom               "http://127.0.0.1:4173/__family-pages-browser-smoke.html?mode=$mode" > "/tmp/family-pages-$mode.html"
+            grep -q "data-family-pages-smoke=\"$mode-green\"" "/tmp/family-pages-$mode.html"
+          done
+          echo "PAGES BROWSER AUTHORIZATION SMOKE GREEN"
 
   ux-quality:
     runs-on: ubuntu-latest
