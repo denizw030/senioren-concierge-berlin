@@ -32,10 +32,11 @@ test("family list renderer is presentation-only enhanced with status pills and m
   assert.match(family,/family-owner-person-status/);
   assert.match(family,/family-owner-person-meta/);
   assert.match(family,/Einladung wird für WhatsApp vorbereitet\./);
-  assert.match(family,/manage\.textContent="Kontingente ansehen"/);
+  assert.match(family,/manage\.textContent="Kontingente & Nutzung"/);
   assert.match(family,/revokeInvite\.textContent="Einladung widerrufen"/);
   assert.match(family,/tr:"Türkisch"/);
-  assert.match(family,/OWNER bestätigt · Personen und Kontingente autorisiert/);
+  assert.match(family,/Family aktiv · OWNER-Administration verfügbar/);
+  assert.match(family,/Family aktiv · Personenverwaltung verfügbar/);
 });
 
 test("runtime, authorization and provider contracts remain wired to the same endpoints",()=>{
