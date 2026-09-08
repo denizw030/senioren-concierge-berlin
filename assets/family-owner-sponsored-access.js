@@ -300,7 +300,12 @@
   }
   function stateLabel(state){return STATE_LABELS[String(state||"").toUpperCase()]||"Status wird geprüft"}
   function relationLabel(value){return RELATIONSHIPS[String(value||"").toUpperCase()]||"Andere"}
-  function languageLabel(value){const normalized=normalizeLanguage(value);return normalized?(LANGUAGE_LABELS[normalized]||normalized):"–"}
+  function languageLabel(value){
+    const normalized=normalizeLanguage(value);
+    if(!normalized)return "–";
+    const entry=languagePickerEntries().find((item)=>item.code===normalized);
+    return entry?.label||LANGUAGE_LABELS[normalized]||normalized;
+  }
   function mergeServerPeople(managedBody,inviteBody){
     const managed=managedBody?.ok===true&&Array.isArray(managedBody.people)?managedBody.people:[];
     const invites=inviteBody?.ok===true&&Array.isArray(inviteBody.invitations)?inviteBody.invitations:[];
