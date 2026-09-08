@@ -951,6 +951,15 @@
         background: #000 !important;
         border-bottom-color: rgba(255, 255, 255, 0.08) !important;
         box-shadow: none !important;
+        -webkit-backdrop-filter: blur(24px) saturate(130%);
+        backdrop-filter: blur(24px) saturate(130%);
+        transition:
+          background-color 220ms ease,
+          border-color 220ms ease,
+          box-shadow 220ms ease;
+      }
+      body.overview-page.nw-header-scrolled .top {
+        background: rgba(7, 7, 6, 0.82) !important;
       }
       body.overview-page .odysx-info-bar {
         background: #d7d2c9 !important;
@@ -1521,6 +1530,6 @@
     <script src="assets/auth-nav.js?v=40"></script>
     <script src="assets/nahwerk-analytics.js?v=1"></script>
     <script src="assets/acquisition-v1.js?v=1"></script>
-    <script src="assets/site-ui.js?v=5"></script>
+    <script src="assets/site-ui.js?v=6"></script>
   </body>
 </html>

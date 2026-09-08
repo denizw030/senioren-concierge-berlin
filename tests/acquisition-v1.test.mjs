@@ -16,3 +16,15 @@ test("pricing matches canonical tariff set",()=>{const c=read("pakete.html")+rea
 test("growth assets stay small",()=>{assert.ok(Buffer.byteLength(read("assets/acquisition-v1.css"))<18000);assert.ok(Buffer.byteLength(read("assets/acquisition-v1.js"))<12000);for(const p of ["erster-schritt.html","alltag-organisieren.html","dokumente-verstehen.html","technik-verstehen.html","angehoerige.html"])assert.ok(Buffer.byteLength(read(p))<30000,p)});
 test("growth pages have basic accessibility metadata",()=>{for(const p of ["index.html","angehoerige.html","erster-schritt.html","alltag-organisieren.html","dokumente-verstehen.html","technik-verstehen.html"]){const c=read(p);assert.match(c,/<html lang="de">/i,p);assert.match(c,/name="viewport"/i,p);assert.match(c,/<h1[ >]/i,p)}});
 test("local href and src targets exist",()=>{const pages=fs.readdirSync(root).filter(x=>x.endsWith(".html"));const misses=[];for(const p of pages){const c=read(p);for(const m of c.matchAll(/(?:href|src)=["']([^"']+)["']/g)){let target=m[1];if(/^(https?:|mailto:|tel:|javascript:|data:|#)/i.test(target))continue;target=target.split("#")[0].split("?")[0];if(!target||target==="/")continue;if(!fs.existsSync(path.join(root,target)))misses.push(`${p} -> ${target}`)}}assert.deepEqual(misses,[])});
+
+
+test("homepage header is opaque at top and glass after scroll without layout changes", () => {
+  const home = fs.readFileSync("index.html", "utf8");
+  const siteUi = fs.readFileSync("assets/site-ui.js", "utf8");
+  assert.match(home, /body\.overview-page \.top\s*\{[\s\S]{0,700}background:\s*#000\s*!important/);
+  assert.match(home, /body\.overview-page\.nw-header-scrolled \.top\s*\{[\s\S]{0,180}rgba\(7,\s*7,\s*6,\s*0\.82\)/);
+  assert.match(home, /background-color\s+220ms\s+ease/);
+  assert.match(siteUi, /window\.scrollY\s*>\s*8/);
+  assert.match(siteUi, /classList\.toggle\('nw-header-scrolled'/);
+  assert.match(siteUi, /requestAnimationFrame\(syncHeaderScrollState\)/);
+});
