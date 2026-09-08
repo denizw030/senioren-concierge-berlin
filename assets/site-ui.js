@@ -64,6 +64,21 @@
       document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
     } else document.querySelectorAll('.reveal').forEach((el) => el.classList.add('is-visible'));
 
+    const topHeader = document.querySelector('.top');
+    if (topHeader && document.body.classList.contains('overview-page')) {
+      let headerScrollFrame = 0;
+      const syncHeaderScrollState = () => {
+        headerScrollFrame = 0;
+        document.body.classList.toggle('nw-header-scrolled', window.scrollY > 8);
+      };
+      const requestHeaderScrollSync = () => {
+        if (headerScrollFrame) return;
+        headerScrollFrame = requestAnimationFrame(syncHeaderScrollState);
+      };
+      syncHeaderScrollState();
+      window.addEventListener('scroll', requestHeaderScrollSync, { passive: true });
+    }
+
     const nav = document.querySelector('.links');
     const toggle = document.querySelector('.nav-toggle');
     if (!nav || !toggle) return;

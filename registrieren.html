@@ -666,13 +666,14 @@
         outline:1px solid rgba(212,175,55,.44);
         outline-offset:1px;
       }
-    </style></head>
+    </style>    <link rel="stylesheet" href="assets/acquisition-v1.css?v=1" />
+  </head>
   <body class="registration-page">
-    <header class="top"><div class="wrap nav"><a class="brand" href="index.html" aria-label="NAHWERK Concierge – Startseite"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Hauptnavigation"><a href="index.html">Übersicht</a><a href="prime-concierge.html">Persönlicher Concierge</a><a href="concierges.html">Concierges</a><a href="senioren-concierge.html">Senioren Concierge</a><a href="angehoerige.html">Für Angehörige</a><a href="leistungen.html">Leistungen</a><a href="kontakt.html">Kontakt</a><a class="auth-link login-link" href="anmelden.html">Anmelden</a><a class="active auth-link register-link" href="registrieren.html">Registrieren</a></nav></div></header>
+    <header class="top"><div class="wrap nav"><a class="brand" href="index.html" aria-label="NAHWERK Concierge – Startseite"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Hauptnavigation"><a href="index.html">Übersicht</a><a href="prime-concierge.html">Persönlicher Concierge</a><a href="concierges.html">Concierges</a><a href="telefonannahme.html">Telefonannahme</a><a href="senioren-concierge.html">Senioren Concierge</a><a href="angehoerige.html">Für Angehörige</a><a href="leistungen.html">Leistungen</a><a href="kontakt.html">Kontakt</a><a class="auth-link login-link" href="anmelden.html">Anmelden</a><a class="active auth-link register-link" href="registrieren.html">Registrieren</a></nav></div></header>
     <main>
       <section class="section">
         <div class="wrap signup">
-          <form class="formcard" id="signupForm">
+          <form class="formcard" id="signupForm" data-nw-registration="v1">
             <h1
               id="registrationTitle"
               style="
@@ -682,6 +683,17 @@
             >
               Zugang registrieren
             </h1>
+            <div class="nw-registration-progress" role="status" aria-live="polite">
+              <strong>1. Zugang anlegen</strong>
+              <span>2. WhatsApp bestätigen</span>
+              <span>3. Erste Aufgabe senden</span>
+            </div>
+            <p class="nw-registration-note">FREE ist vorausgewählt. Sicherheitsoptionen bleiben freiwillig; kostenpflichtige Tarife werden ohne freigegebenen Checkout nicht bestellt.</p>
+            <div class="progressive-panel" id="telephoneReceptionRegistrationPath">
+              <strong>Sie möchten die NAHWERK Telefonannahme einrichten?</strong>
+              <p class="tiny">Die Telefonannahme ist ein eigener Produkt- und Festnetz-Onboarding-Pfad. Eine normale Concierge-Registrierung bucht oder aktiviert sie nicht.</p>
+              <a href="telefonannahme.html#einrichtung" style="color:var(--gold);text-decoration:underline;font-weight:750">Zur Telefonannahme-Einrichtung</a>
+            </div>
             <section
               class="planbox"
               id="selectedPlanBox"
@@ -1030,7 +1042,7 @@
               >.
             </p>
           </form>
-          <aside class="preview">
+          <div class="preview" role="region" aria-label="Concierge-Vorschau">
             <div class="eyebrow">Persönlicher Zugang</div>
             <h3>Web-Konto + WhatsApp.</h3>
             <div class="msg" id="messagePreview">
@@ -1056,7 +1068,7 @@
                 geschützt.</span
               >
             </div>
-          </aside>
+          </div>
         </div>
       </section>
     </main>
@@ -1073,6 +1085,7 @@
           <div>
             <h4>Angebot</h4>
             <a href="prime-concierge.html">Persönlicher Concierge</a>
+            <a href="telefonannahme.html">Telefonannahme</a>
             <a href="concierges.html">Concierges</a>
             <a href="senioren-concierge.html">Für Senioren</a>
             <a href="angehoerige.html">Für Angehörige</a>
@@ -1105,7 +1118,8 @@
 <script src="assets/concierge-carousel.js?v=20"></script>
     <script src="assets/auth-nav.js?v=40"></script>
     <script src="assets/nahwerk-analytics.js?v=1"></script>
-    <script src="assets/onboarding.js?v=22"></script>
+    <script src="assets/acquisition-v1.js?v=1"></script>
+    <script src="assets/onboarding.js?v=23"></script>
     <script>
       const eye =
         '<svg class="eye-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.7"></circle></svg>';

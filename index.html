@@ -946,13 +946,29 @@
         }
       }
 
-      /* Overview ODYSX strip — near-black polish, logo untouched */
-      body.overview-page .odysx-info-bar {
-        background: #111214 !important;
-        color: #000 !important;
+      /* OVERVIEW HEADER / TRANSITION — deep black navigation, warmer light-grey strip */
+      body.overview-page .top {
+        background: #000 !important;
+        border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: blur(24px) saturate(130%);
+        backdrop-filter: blur(24px) saturate(130%);
+        transition:
+          background-color 220ms ease,
+          border-color 220ms ease,
+          box-shadow 220ms ease;
       }
-      body.overview-page .odysx-info-bar strong {
-        color: #000 !important;
+      body.overview-page.nw-header-scrolled .top {
+        background: rgba(7, 7, 6, 0.82) !important;
+      }
+      body.overview-page .odysx-info-bar {
+        background: #d7d2c9 !important;
+        color: #171512 !important;
+        border-color: #c4beb4 !important;
+      }
+      body.overview-page .odysx-info-bar strong,
+      body.overview-page .odysx-info-bar a {
+        color: #090908 !important;
       }
 
       /* OVERVIEW HERO — one continuous approved luxury artwork field */
@@ -960,8 +976,8 @@
         position: relative !important;
         overflow: hidden !important;
         isolation: isolate;
-        min-height: clamp(690px, calc(100svh - 150px), 900px) !important;
-        background: #08090a !important;
+        min-height: clamp(620px, 45vw, 780px) !important;
+        background: #000 !important;
       }
 
       body.overview-page .home-hero .overview-hero-artwork {
@@ -977,13 +993,13 @@
         border: 0;
         border-radius: 0;
         box-shadow: none;
-        transform: scale(1.045);
+        transform: none;
         transform-origin: 74% 46%;
       }
 
       @media (min-width: 1680px) {
         body.overview-page:not(.senior-product):not([data-product="senioren"]) .home-hero {
-          min-height: clamp(920px, 48vw, 1250px) !important;
+          min-height: clamp(760px, 48vw, 920px) !important;
         }
 
         body.overview-page .home-hero .overview-hero-artwork {
@@ -1014,6 +1030,27 @@
       body.overview-page .home-hero .hero-copy {
         position: relative;
         z-index: 3;
+        max-width: 690px;
+        padding: 2px 0;
+      }
+      body.overview-page .home-hero .hero-proof-line {
+        max-width: 620px;
+        margin: 20px 0 0;
+        padding-left: 15px;
+        border-left: 2px solid #d4af37;
+        color: #f5f2eb;
+        font-size: clamp(1rem, 1.3vw, 1.12rem);
+        line-height: 1.58;
+      }
+      body.overview-page .home-hero .hero-proof-line strong {
+        color: #fff;
+      }
+      body.overview-page .home-hero .hero-free-note {
+        margin: 14px 0 0;
+        color: #d7d2c9;
+        font-size: 0.9rem;
+        line-height: 1.45;
+        letter-spacing: 0.01em;
       }
 
       /* The person is already part of the approved 16:9 artwork. */
@@ -1026,8 +1063,8 @@
       @media (max-width: 760px) {
         body.overview-page:not(.senior-product):not([data-product="senioren"]) .home-hero {
           min-height: auto !important;
-          padding: 88px 0 370px !important;
-          background: #08090a !important;
+          padding: 72px 0 330px !important;
+          background: #000 !important;
         }
 
         body.overview-page .home-hero .hero-grid {
@@ -1036,8 +1073,8 @@
         }
 
         body.overview-page .home-hero .overview-hero-artwork {
-          inset: auto -2% 0 auto;
-          width: 168%;
+          inset: auto -5% 0 auto;
+          width: 154%;
           height: auto;
           max-width: none;
           object-fit: contain;
@@ -1062,23 +1099,24 @@
 
       @media (max-width: 480px) {
         body.overview-page:not(.senior-product):not([data-product="senioren"]) .home-hero {
-          padding-bottom: 350px !important;
+          padding-bottom: 305px !important;
         }
 
         body.overview-page .home-hero .overview-hero-artwork {
-          right: -3%;
-          width: 172%;
+          right: -7%;
+          width: 164%;
         }
       }
     </style>
+      <link rel="stylesheet" href="assets/acquisition-v1.css?v=1" />
   </head>
   <body class="overview-page">
-    <header class="top"><div class="wrap nav"><a class="brand" href="index.html" aria-label="NAHWERK Concierge – Startseite"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Hauptnavigation"><a class="active" href="index.html">Übersicht</a><a href="prime-concierge.html">Persönlicher Concierge</a><a href="concierges.html">Concierges</a><a href="senioren-concierge.html">Senioren Concierge</a><a href="angehoerige.html">Für Angehörige</a><a href="leistungen.html">Leistungen</a><a href="kontakt.html">Kontakt</a><a class="auth-link login-link" href="anmelden.html">Anmelden</a><a class="auth-link register-link" href="registrieren.html">Registrieren</a></nav></div></header>
+    <header class="top"><div class="wrap nav"><a class="brand" href="index.html" aria-label="NAHWERK Concierge – Startseite"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Hauptnavigation"><a class="active" href="index.html">Übersicht</a><a href="prime-concierge.html">Persönlicher Concierge</a><a href="concierges.html">Concierges</a><a href="telefonannahme.html">Telefonannahme</a><a href="senioren-concierge.html">Senioren Concierge</a><a href="angehoerige.html">Für Angehörige</a><a href="leistungen.html">Leistungen</a><a href="kontakt.html">Kontakt</a><a class="auth-link login-link" href="anmelden.html">Anmelden</a><a class="auth-link register-link" href="registrieren.html">Registrieren</a></nav></div></header>
     <main>
       <section class="home-hero">
         <img
           class="overview-hero-artwork"
-          src="assets/prime/prime-concierge-hero-luxury-monogram-v1.webp"
+          src="assets/prime/nahwerk-overview-hero-weboptimized-hq.webp"
           alt=""
           width="1672"
           height="941"
@@ -1088,19 +1126,27 @@
         <div class="wrap hero-grid">
           <div class="hero-copy">
             <div class="eyebrow">NAHWERK Concierge</div>
-            <h1>Ihr persönlicher Concierge für den Alltag.</h1>
+            <h1>Ein Concierge, der nicht nur antwortet. Sondern sich kümmert.</h1>
             <p>
-              Einfach schreiben oder sprechen. NAHWERK hilft beim Verstehen,
-              Organisieren, Recherchieren und Vorbereiten – persönlich über
-              WhatsApp, ohne dass Sie eine neue App lernen müssen.
+              NAHWERK recherchiert, organisiert, erinnert und kann für Sie telefonieren –
+              über WhatsApp, Telefon und Web.
+            </p>
+            <p class="hero-proof-line">
+              <strong>NAHWERK telefoniert für Sie.</strong>
+              Sie geben die Aufgabe ab; NAHWERK kümmert sich um Recherche, Organisation
+              und den nächsten freigegebenen Schritt.
             </p>
             <div class="actions">
               <a
                 class="btn red"
-                href="registrieren.html?produkt=prime&amp;paket=free"
-                >NAHWERK ausprobieren</a
-              ><a class="btn light" href="leistungen.html">Was NAHWERK kann</a>
+                href="registrieren.html?produkt=prime&amp;paket=free&amp;source=home_hero"
+                data-nw-cta="start_free"
+                data-nw-step="home_hero"
+                >KOSTENLOS AUSPROBIEREN</a
+              ><a class="btn light" href="#erste-aufgabe" data-nw-cta="see_first_value" data-nw-step="home_hero"
+                >So entsteht der erste Nutzen</a>
             </div>
+            <p class="hero-free-note">FREE · 0 € · Keine Zahlungsdaten · Kein automatisches Upgrade</p>
           </div>
         </div>
       </section>
@@ -1115,6 +1161,24 @@
           </ul>
         </div>
       </section>
+
+      <section class="nw-growth-section" id="erste-aufgabe" aria-labelledby="first-value-title">
+        <div class="wrap">
+          <div class="nw-growth-kicker">First Value Journey</div>
+          <h2 id="first-value-title">In drei Schritten zur ersten erfolgreichen Aufgabe.</h2>
+          <p class="nw-growth-lead">Kein Produkt-Rundgang, keine Funktionssuche. Starten Sie mit einem echten Anliegen – bis zur ersten erfolgreich erledigten Concierge-Aufgabe.</p>
+          <div class="nw-journey-grid">
+            <article class="nw-journey-card"><span>01</span><h3>Kostenlos registrieren</h3><p>FREE bleibt der Standard. Keine Zahlungsdaten, kein automatisches Upgrade.</p></article>
+            <article class="nw-journey-card"><span>02</span><h3>Aufgabe übergeben</h3><p>Zum Beispiel einen Hautarzt finden, passende Optionen vergleichen oder den nächsten Schritt organisieren lassen.</p></article>
+            <article class="nw-journey-card"><span>03</span><h3>NAHWERK bleibt dran</h3><p>NAHWERK recherchiert, organisiert, fragt bei nötigen Entscheidungen nach und meldet Ergebnis oder nächsten Schritt zurück.</p></article>
+          </div>
+          <div class="nw-intent-links" aria-label="Häufige erste Anliegen">
+            <a href="alltag-organisieren.html" data-nw-cta="intent_alltag" data-nw-step="first_value">Alltag organisieren</a>
+            <a href="dokumente-verstehen.html" data-nw-cta="intent_dokumente" data-nw-step="first_value">Dokument verstehen</a>
+            <a href="technik-verstehen.html" data-nw-cta="intent_technik" data-nw-step="first_value">Technik erklären lassen</a>
+          </div>
+        </div>
+      </section>
       <section class="home-section">
         <div class="wrap">
           <div class="section-head">
@@ -1124,8 +1188,8 @@
             </h2>
             <p>
               Sie müssen keine Funktionen kennen. Nennen Sie einfach Ihr
-              Anliegen. NAHWERK hilft, die Situation zu ordnen und den nächsten
-              sinnvollen Schritt klar zu machen.
+              Anliegen. NAHWERK recherchiert, organisiert den nächsten Schritt
+              und bleibt im freigegebenen Rahmen an der Aufgabe dran.
             </p>
           </div>
           <div class="situations">
@@ -1133,16 +1197,16 @@
               <span>Mobilität</span>
               <h3>„Kannst du mir einen Uber besorgen?“</h3>
               <p>
-                Fahrtmöglichkeiten finden und eine Buchung vorbereiten – Kosten
-                entstehen erst nach Ihrer Bestätigung.
+                Fahrtmöglichkeiten finden, Optionen vergleichen und eine Buchung
+                bis zur notwendigen Bestätigung vorbereiten.
               </p>
             </article>
             <article class="situation">
               <span>Freizeit & Reise</span>
               <h3>Restaurant, Ausflug oder Wochenende planen.</h3>
               <p>
-                Passende Orte, Ideen und Möglichkeiten nach Ihren Wünschen
-                verständlich vergleichen.
+                Passende Restaurants oder Ausflüge recherchieren, Optionen
+                vergleichen und den nächsten Schritt organisieren.
               </p>
             </article>
             <article class="situation">
@@ -1165,8 +1229,8 @@
               <span>Erinnerungen</span>
               <h3>Wichtige Dinge im Blick behalten.</h3>
               <p>
-                Aufgaben strukturieren und Erinnerungen im freigegebenen Rahmen
-                vorbereiten.
+                Offene Aufgaben weiterführen, an Fristen erinnern und den
+                nächsten Schritt später wieder aufnehmen.
               </p>
             </article>
             <article class="situation">
@@ -1287,21 +1351,52 @@
       <section class="nw-phone-section nw-phone-section--overview" aria-labelledby="nw-phone-overview-title">
         <div class="wrap nw-phone-shell">
           <div class="nw-phone-copy">
-            <span class="nw-phone-kicker">Zwei Telefonrollen</span>
-            <h2 id="nw-phone-overview-title">Ihr Concierge für Sie. Alexander für Telefonaufträge.</h2>
-            <p class="nw-phone-lead">Wenn Sie NAHWERK anrufen, sprechen Sie mit Ihrem ausgewählten persönlichen Concierge – zum Beispiel Mira oder Hartmut. Wenn NAHWERK in Ihrem Auftrag nach außen telefoniert oder Anrufassistenz übernimmt, ist Alexander der spezialisierte Telefon-Agent.</p>
+            <span class="nw-phone-kicker">Telefon-Aufträge</span>
+            <h2 id="nw-phone-overview-title">NAHWERK telefoniert für Sie.</h2>
+            <p class="nw-phone-lead">Sie nennen das Ziel. NAHWERK recherchiert passende Optionen und kann im freigegebenen Telefonpfad den externen Anruf übernehmen. Ihr persönlicher Concierge-Kontext bleibt dabei derselbe; für den eigentlichen Telefonauftrag kann eine spezialisierte Rolle und Stimme eingesetzt werden.</p>
             <ul class="nw-phone-benefits">
-              <li>Ihr gewählter Concierge spricht auch am Telefon mit seiner eigenen Stimme</li>
-              <li>Alexander übernimmt Anrufe an Restaurants, Behörden und Dienstleister</li>
-              <li>Alexander ist für spezialisierte Anrufassistenz vorgesehen</li>
-              <li>Persönlicher Concierge und Telefon-Agent bleiben klar getrennt</li>
+              <li>Hautarzt recherchieren und passende Praxis finden</li>
+              <li>Praxis anrufen und Warteschleife übernehmen</li>
+              <li>Verfügbaren Termin oder Ergebnis zurückmelden</li>
+              <li>Bei notwendiger Entscheidung oder Freigabe fragen und danach Follow-up oder Erinnerung organisieren</li>
             </ul>
+            <p class="nw-phone-lead">Für externe Telefonaufträge ist aktuell Alexander als spezialisierter Telefon-Agent vorgesehen – ohne getrennte Aufgaben-, Erinnerungs- oder Kundendatenwelt.</p>
           </div>
           <figure class="nw-phone-media">
             <img class="nw-phone-image" src="assets/voice/alexander-telefon-agent-v2.webp" width="960" height="1200" loading="lazy" decoding="async" alt="Alexander, spezialisierter NAHWERK Telefon-Agent in professionellem Anzug mit Headset" />
           </figure>
         </div>
       </section>
+      <section class="home-section" id="telefonannahme">
+        <div class="wrap">
+          <div class="section-head">
+            <div class="eyebrow">Eigenständiges Produkt</div>
+            <h2>NAHWERK geht für Sie ans Telefon.</h2>
+            <p>
+              Die NAHWERK Telefonannahme ist serverseitig als eigenständiges Produkt
+              vorbereitet – wahlweise als Abo oder Pay as you go. Sie kann ohne
+              persönlichen Concierge genutzt werden; die allgemeine Website-Buchung
+              und Provider-Einrichtung sind noch nicht produktiv freigegeben.
+            </p>
+          </div>
+          <div class="steps">
+            <article class="step-home">
+              <h3>Standalone</h3>
+              <p>Ein NAHWERK Telefonagent nimmt eingehende Anrufe an, erfasst das Anliegen, nimmt Nachrichten auf und kann Sie bei Bedarf zurückrufen oder nach Zustimmung verbinden.</p>
+            </article>
+            <article class="step-home">
+              <h3>Mit persönlichem Concierge</h3>
+              <p>Bei entsprechendem serverseitigem Entitlement kann wahlweise Ihr persönlicher Concierge oder ein Telefonagent die Anrufe übernehmen.</p>
+            </article>
+            <article class="step-home">
+              <h3>Kein Smartphone nötig</h3>
+              <p>Auch ein normales Festnetztelefon genügt: Bei einer Zuschaltung klingelt Ihr Telefon, NAHWERK bespricht den Anruf kurz privat mit Ihnen und verbindet nur nach Ihrer Entscheidung.</p>
+            </article>
+          </div>
+          <div class="actions">
+            <a class="btn light" href="telefonannahme.html" data-nw-cta="telephone_reception_learn" data-nw-step="home_product">Telefonannahme ansehen</a>
+          </div>
+        </div>
       <section class="home-section">
         <div class="wrap">
           <div class="section-head">
@@ -1359,6 +1454,20 @@
           </div>
         </div>
       </section>
+
+      <section class="nw-growth-section nw-capability-section" aria-labelledby="capability-truth-title">
+        <div class="wrap">
+          <div class="nw-growth-kicker">Capability Truth · Stand 8. September 2026</div>
+          <h2 id="capability-truth-title">Was Sie heute wirklich nutzen können.</h2>
+          <div class="nw-capability-grid">
+            <article><strong>WhatsApp</strong><span class="nw-status nw-status-live">Jetzt verfügbar</span><p>Text, Sprachnachrichten sowie Bild- und PDF-Verarbeitung sind im produktiven Concierge-Pfad freigegeben.</p></article>
+            <article><strong>Telefon</strong><span class="nw-status nw-status-limited">Begrenzt freigegeben</span><p>Reale Voice-Runtimes sowie der serverseitige Telefonannahme- und Festnetz-Onboarding-Vertrag sind PRE-PROD vorbereitet. Provider-, Routing- und Portierungsaktivierung sind noch nicht als allgemeiner Customer-Flow freigegeben.</p></article>
+            <article><strong>Web</strong><span class="nw-status nw-status-limited">Konto & Einstellungen</span><p>Login, Kundenbereich und Einstellungen sind verfügbar. Ein vollständiger Web-Concierge-Chat ist noch nicht freigegeben.</p></article>
+            <article><strong>App</strong><span class="nw-status nw-status-planned">Noch nicht veröffentlicht</span><p>Die App ist technisch vorbereitet, aber der Customer Release ist weiterhin deaktiviert.</p></article>
+          </div>
+          <p class="nw-proof-links"><a href="ki-transparenz.html">KI-Transparenz</a><a href="datenschutz.html">Datenschutz</a><a href="pakete.html">Tarife</a></p>
+        </div>
+      </section>
       <section class="wrap final-cta">
         <div class="eyebrow">Bereit für weniger Aufwand?</div>
         <h2>Lernen Sie NAHWERK als persönlichen Concierge kennen.</h2>
@@ -1368,8 +1477,7 @@
         <div class="actions">
           <a
             class="btn red"
-            href="registrieren.html?produkt=prime&amp;paket=free"
-            >NAHWERK ausprobieren</a
+            href="registrieren.html?produkt=prime&amp;paket=free&amp;source=home_final" data-nw-cta="start_free" data-nw-step="home_final">Kostenlos starten</a
           ><a class="btn light" href="kontakt.html">Frage stellen</a>
         </div>
       </section>
@@ -1385,22 +1493,23 @@
             <p>Ihr persönlicher Concierge für Alltag, Organisation und verständliche Unterstützung.</p>
           </div>
           <div>
-            <h4>Angebot</h4>
+            <h3>Angebot</h3>
             <a href="prime-concierge.html">Persönlicher Concierge</a>
+            <a href="telefonannahme.html">Telefonannahme</a>
             <a href="concierges.html">Concierges</a>
             <a href="senioren-concierge.html">Für Senioren</a>
             <a href="angehoerige.html">Für Angehörige</a>
             <a href="pakete.html">Pakete</a>
           </div>
           <div>
-            <h4>Service</h4>
+            <h3>Service</h3>
             <a href="leistungen.html">Leistungen</a>
             <a href="ablauf.html">So funktioniert's</a>
             <a href="faq.html">FAQ</a>
             <a href="kontakt.html">Kontakt</a>
           </div>
           <div>
-            <h4>Rechtliches</h4>
+            <h3>Rechtliches</h3>
             <a href="impressum.html">Impressum</a>
             <a href="datenschutz.html">Datenschutz</a>
             <a href="agb.html">AGB</a>
@@ -1419,6 +1528,8 @@
     <script src="assets/james-profile.js?v=1"></script>
 <script src="assets/concierge-carousel.js?v=20"></script>
     <script src="assets/auth-nav.js?v=40"></script>
-    <script src="assets/site-ui.js?v=5"></script>
+    <script src="assets/nahwerk-analytics.js?v=1"></script>
+    <script src="assets/acquisition-v1.js?v=1"></script>
+    <script src="assets/site-ui.js?v=6"></script>
   </body>
 </html>

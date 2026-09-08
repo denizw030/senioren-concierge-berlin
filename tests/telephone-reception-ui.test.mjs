@@ -10,7 +10,7 @@ const prime = read("prime-concierge.html");
 
 test("telephone reception lives inside Concierge without adding a main account tab", () => {
   assert.match(account, /id="telephoneReceptionCard"[\s\S]*data-account-panel="concierge"/);
-  assert.equal((account.match(/data-account-tab=/g) || []).length, 5);
+  assert.equal((account.match(/data-account-tab=/g) || []).length, 7);
   assert.match(account, /Persönliche Telefonannahme/);
   assert.match(account, /Telefonannahme mit erweitertem Schutz/);
 });
@@ -39,7 +39,7 @@ test("parallel account theme and usage work remains present", () => {
 
 test("public pages describe reception without fraud-prevention guarantees", () => {
   assert.match(senior, /Mehr Sicherheit bei unbekannten Anrufen/);
-  assert.match(senior, /Enkeltrick/);
+  assert.match(senior, /angebliche Familiennotfälle mit Geldforderung/);
   assert.match(senior, /keine Garantie, jeden Betrugsversuch zu erkennen/);
   assert.match(prime, /Persönliche Telefonannahme/);
   assert.match(prime, /Eltern oder Großeltern/);

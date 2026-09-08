@@ -164,8 +164,9 @@
     if (!header) return;
     const bar = document.createElement("div");
     bar.className = "odysx-info-bar";
-    bar.setAttribute("role", "note");
-    bar.innerHTML = '<img src="assets/logos/crown.png?v=1" alt="" aria-hidden="true" style="width:24px;height:24px;object-fit:contain;display:block;flex:0 0 auto"><span>Eine Marke von <strong>ODYSX</strong></span><img class="odysx-crown-logo" src="assets/logos/crown-white-96.png?v=1" alt="ODYSX Krone">';
+    bar.setAttribute("role", "region");
+    bar.setAttribute("aria-label", "Markenhinweis");
+    bar.innerHTML = '<img src="assets/logos/crown.png?v=1" alt="" aria-hidden="true" style="width:24px;height:24px;object-fit:contain;display:block;flex:0 0 auto"><span>Eine Marke von <strong>ODYSX</strong></span><img class="odysx-crown-logo" src="assets/logos/crown-white-96.png?v=1" alt="" aria-hidden="true">';
     header.insertAdjacentElement("afterend", bar);
   }
   function normalizeShell() {

@@ -1,0 +1,343 @@
+name: Acquisition Activation V1 CI
+on:
+  push:
+    branches:
+      - "growth/activation-system-v1-*"
+      - "feat/family-runtime-activation-*"
+      - "feat/family-runtime-pages-activation-*"
+  pull_request:
+    paths:
+      - "index.html"
+      - "registrieren.html"
+      - "konto.html"
+      - "angehoerige.html"
+      - "pakete.html"
+      - "senioren-concierge.html"
+      - "telefonannahme.html"
+      - "leistungen.html"
+      - "erster-schritt.html"
+      - "alltag-organisieren.html"
+      - "dokumente-verstehen.html"
+      - "technik-verstehen.html"
+      - "assets/acquisition-v1.css"
+      - "assets/acquisition-v1.js"
+      - "assets/onboarding.js"
+      - "assets/telephone-reception-product.css"
+      - "assets/telephone-reception-product.js"
+      - "assets/email-account-integration.css"
+      - "assets/email-account-integration.js"
+      - "assets/family-owner-sponsored-access.css"
+      - "assets/family-owner-sponsored-access.js"
+      - "api/runtime-config.js"
+      - "api/runtime-config.json"
+      - "scripts/family-runtime-smoke.mjs"
+      - "tests/family-runtime-activation.test.mjs"
+      - "tests/acquisition-v1.test.mjs"
+      - "tests/telephone-reception-product.test.mjs"
+      - "tests/email-account-integration.test.mjs"
+      - "tests/family-owner-sponsored-access.test.mjs"
+      - "tests/acquisition-v1-acceptance.test.mjs"
+      - ".github/workflows/acquisition-v1-ci.yml"
+  workflow_dispatch:
+concurrency:
+  group: acquisition-v1-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  implementation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Website and Family regression
+        run: node --test tests/*.test.mjs
+      - name: Telephone reception JS syntax
+        run: node --check assets/telephone-reception-product.js
+      - name: Email account integration JS syntax
+        run: node --check assets/email-account-integration.js
+      - name: Family owner sponsored access JS syntax
+        run: node --check assets/family-owner-sponsored-access.js
+      - name: Family runtime config syntax
+        run: node --check api/runtime-config.js
+      - name: Family runtime smoke harness syntax
+        run: node --check scripts/family-runtime-smoke.mjs
+      - name: Static HTTP smoke
+        run: |
+          python3 -m http.server 4173 >/tmp/nw-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill $server_pid' EXIT
+          for attempt in 1 2 3 4 5; do
+            curl -fsS "http://127.0.0.1:4173/index.html" >/dev/null && break
+            sleep 1
+          done
+          curl -fsS "http://127.0.0.1:4173/index.html" >/dev/null
+          for page in index.html registrieren.html konto.html angehoerige.html pakete.html leistungen.html telefonannahme.html erster-schritt.html alltag-organisieren.html dokumente-verstehen.html technik-verstehen.html; do
+            curl -fsS "http://127.0.0.1:4173/$page" >/dev/null
+          done
+          curl -fsS "http://127.0.0.1:4173/api/runtime-config.json" > /tmp/family-pages-runtime.json
+          node - <<'NODE'
+          const fs=require("fs");
+          const body=JSON.parse(fs.readFileSync("/tmp/family-pages-runtime.json","utf8"));
+          const expected={
+            ok:true,
+            family_contract:"family-owner-sponsored-access-v1",
+            platform_contract_sha:"e63d09682c9a919a9ab347ff27d197f2a3c10a18",
+            family_runtime_enabled:true,
+            family_gateway_base:"https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-family-access"
+          };
+          if(JSON.stringify(body)!==JSON.stringify(expected))throw new Error("Pages runtime config mismatch");
+          console.log("PAGES STATIC RUNTIME CONFIG GREEN",body);
+          NODE
+
+      - name: GitHub Pages browser authorization smoke
+        run: |
+          python3 -m http.server 4173 >/tmp/nw-pages-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill $server_pid' EXIT
+          for attempt in 1 2 3 4 5; do
+            curl -fsS "http://127.0.0.1:4173/api/runtime-config.json" >/dev/null && break
+            sleep 1
+          done
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          src=Path("konto.html").read_text(encoding="utf-8")
+          tab=re.search(r'<button[^>]+id="accountTabAccess"[\s\S]*?</button>',src,re.I).group(0)
+          start=src.index('<div id="familyOwnerPanelSlot"')
+          end=src.index('<article class="card summary-card plan-summary"',start)
+          panel=src[start:end]
+          fixture='''<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Family Pages Smoke</title></head><body>'''
+          fixture+=tab+panel
+          fixture+='''<script>
+          (() => {
+            const mode=new URLSearchParams(location.search).get("mode")||"normal";
+            const gateway="https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-family-access";
+            const nativeFetch=window.fetch.bind(window);
+            const state=window.__familyPagesSmoke={primary404:false,staticConfig:false,context:false,providerWrite:false};
+            sessionStorage.setItem("scb_web_session",JSON.stringify({session_token:"r".repeat(40)}));
+            window.NAHWERK_CONCIERGES=[{key:"nilo",name:"Nilo"}];
+            window.fetch=async(input,init={})=>{
+              const raw=typeof input==="string"?input:input.url;
+              const url=new URL(raw,location.href);
+              const method=String(init.method||"GET").toUpperCase();
+              if(url.pathname==="/api/runtime-config"){
+                state.primary404=true;
+                return new Response("not found",{status:404,headers:{"Content-Type":"text/plain"}});
+              }
+              if(url.pathname==="/api/runtime-config.json"){
+                state.staticConfig=true;
+                return nativeFetch(input,init);
+              }
+              if(url.href.startsWith(gateway)){
+                if(method!=="GET"){
+                  state.providerWrite=true;
+                  return new Response(JSON.stringify({ok:false}),{status:500,headers:{"Content-Type":"application/json"}});
+                }
+                if(url.pathname.endsWith("/operator/context")){
+                  state.context=true;
+                  const operator=mode==="normal"
+                    ? {role:"CUSTOMER",can_manage_sponsored_people:false,can_manage_sponsored_entitlements:false}
+                    : {role:"OWNER",can_manage_sponsored_people:true,can_manage_sponsored_entitlements:mode==="owner-full"};
+                  return new Response(JSON.stringify({ok:true,operator,browser_actor_authority:false}),{status:200,headers:{"Content-Type":"application/json"}});
+                }
+                if(url.pathname.endsWith("/operator/managed-people"))
+                  return new Response(JSON.stringify({ok:true,people:[]}),{status:200,headers:{"Content-Type":"application/json"}});
+                if(url.pathname.endsWith("/family/invitations"))
+                  return new Response(JSON.stringify({ok:true,invitations:[]}),{status:200,headers:{"Content-Type":"application/json"}});
+                return new Response(JSON.stringify({ok:false}),{status:404,headers:{"Content-Type":"application/json"}});
+              }
+              return nativeFetch(input,init);
+            };
+            window.__familyPagesSmokeMode=mode;
+          })();
+          </script><script src="/assets/family-owner-sponsored-access.js?v=pages-smoke"></script><script>
+          (() => {
+            const timer=setInterval(()=>{
+              const mode=window.__familyPagesSmokeMode;
+              const state=window.__familyPagesSmoke||{};
+              const panel=document.getElementById("familyOwnerPanel");
+              const quota=document.getElementById("familyQuotaSection");
+              const add=document.getElementById("familyPersonAddButton");
+              const configured=panel?.dataset.familyRuntime==="configured";
+              let green=false;
+              if(mode==="normal")green=configured&&state.context&&panel?.hidden===true;
+              if(mode==="owner-no-quota")green=configured&&state.context&&panel?.hidden===false&&quota?.hidden===true;
+              if(mode==="owner-full")green=configured&&state.context&&panel?.hidden===false&&quota?.hidden===false&&add?.hidden!==true;
+              if(green&&state.primary404&&state.staticConfig&&!state.providerWrite){
+                document.documentElement.setAttribute("data-family-pages-smoke",mode+"-green");
+                clearInterval(timer);
+              }
+            },25);
+          })();
+          </script></body></html>'''
+          Path("__family-pages-browser-smoke.html").write_text(fixture,encoding="utf-8")
+          PY
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          for mode in normal owner-no-quota owner-full; do
+            "$CHROME" --headless --no-sandbox --disable-gpu --virtual-time-budget=3000 --dump-dom               "http://127.0.0.1:4173/__family-pages-browser-smoke.html?mode=$mode" > "/tmp/family-pages-$mode.html"
+            grep -q "data-family-pages-smoke=\"$mode-green\"" "/tmp/family-pages-$mode.html"
+          done
+          echo "PAGES BROWSER AUTHORIZATION SMOKE GREEN"
+
+  ux-quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    needs: implementation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Build inert email account accessibility fixture
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          src=Path("konto.html").read_text(encoding="utf-8")
+          style=re.search(r"<style>[\s\S]*?</style>",src,re.I).group(0)
+          links="\n".join(re.findall(r'<link[^>]+rel="stylesheet"[^>]*>',src,re.I))
+          tab=re.search(r'<button[^>]+id="accountTabEmail"[\s\S]*?</button>',src,re.I).group(0)
+          tab=tab.replace('aria-selected="false"','aria-selected="true"')
+          panel_start=src.index('<div class="account-panel-heading" data-account-panel="email"')
+          panel_end=src.index('<div class="account-panel-heading" data-account-panel="usage"',panel_start)
+          panel=src[panel_start:panel_end].strip()
+          panel=re.sub(r'\s+hidden(?=[^>]*>)','',panel,count=2)
+          fixture=f'''<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>E-Mail-Konto | NAHWERK</title>{links}{style}</head><body><main><section class="section account-section"><div class="wrap"><h1>E-Mail-Konto</h1><nav class="account-tabs" role="tablist" aria-label="Kundenbereich E-Mail">{tab}</nav><div class="dash">{panel}</div></div></section></main></body></html>'''
+          Path("__email-account-a11y.html").write_text(fixture,encoding="utf-8")
+          PY
+      - name: Build inert family owner accessibility fixture
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          src=Path("konto.html").read_text(encoding="utf-8")
+          style=re.search(r"<style>[\s\S]*?</style>",src,re.I).group(0)
+          links="\n".join(re.findall(r'<link[^>]+rel="stylesheet"[^>]*>',src,re.I))
+          start=src.index('<div id="familyOwnerPanelSlot"')
+          end=src.index('<article class="card summary-card plan-summary"',start)
+          panel=src[start:end]
+          panel=re.sub(r'\s+hidden(?=[^>]*>)','',panel,count=4)
+          fixture=f'''<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Personen & Zugänge | NAHWERK</title>{links}{style}</head><body><main><section class="section account-section"><div class="wrap"><h1>Kundenbereich</h1><h2>Personen & Zugänge</h2><div class="dash">{panel}</div></div></section></main></body></html>'''
+          Path("__family-owner-a11y.html").write_text(fixture,encoding="utf-8")
+          PY
+      - name: Serve preview
+        run: |
+          nohup python3 -m http.server 4173 >/tmp/nw-http.log 2>&1 &
+          echo $! > /tmp/nw-http.pid
+          for attempt in 1 2 3 4 5; do
+            curl -fsS "http://127.0.0.1:4173/index.html" >/dev/null && break
+            sleep 1
+          done
+          curl -fsS "http://127.0.0.1:4173/index.html" >/dev/null
+      - name: Accessibility smoke with axe
+        run: |
+          npx --yes @axe-core/cli@4.10.2 \
+            http://127.0.0.1:4173/index.html \
+            http://127.0.0.1:4173/registrieren.html \
+            http://127.0.0.1:4173/angehoerige.html \
+            http://127.0.0.1:4173/leistungen.html \
+            http://127.0.0.1:4173/pakete.html \
+            http://127.0.0.1:4173/telefonannahme.html \
+            http://127.0.0.1:4173/__email-account-a11y.html \
+            http://127.0.0.1:4173/__family-owner-a11y.html \
+            --exit
+      - name: Lighthouse desktop
+        run: |
+          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/index.html \
+            --quiet --chrome-flags="--headless --no-sandbox" \
+            --preset=desktop --only-categories=performance,accessibility \
+            --output=json --output-path=/tmp/lh-desktop.json
+      - name: Lighthouse mobile
+        run: |
+          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/index.html \
+            --quiet --chrome-flags="--headless --no-sandbox" \
+            --only-categories=performance,accessibility \
+            --output=json --output-path=/tmp/lh-mobile.json
+      - name: Lighthouse telephone reception desktop
+        run: |
+          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/telefonannahme.html \
+            --quiet --chrome-flags="--headless --no-sandbox" \
+            --preset=desktop --only-categories=performance,accessibility \
+            --output=json --output-path=/tmp/lh-telephone-desktop.json
+      - name: Lighthouse telephone reception mobile
+        run: |
+          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/telefonannahme.html \
+            --quiet --chrome-flags="--headless --no-sandbox" \
+            --only-categories=performance,accessibility \
+            --output=json --output-path=/tmp/lh-telephone-mobile.json
+      - name: Lighthouse email account desktop
+        run: |
+          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/__email-account-a11y.html \
+            --quiet --chrome-flags="--headless --no-sandbox" \
+            --preset=desktop --only-categories=performance,accessibility \
+            --output=json --output-path=/tmp/lh-email-desktop.json
+      - name: Lighthouse email account mobile
+        run: |
+          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/__email-account-a11y.html \
+            --quiet --chrome-flags="--headless --no-sandbox" \
+            --only-categories=performance,accessibility \
+            --output=json --output-path=/tmp/lh-email-mobile.json
+      - name: Lighthouse family owner desktop
+        run: |
+          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/__family-owner-a11y.html \
+            --quiet --chrome-flags="--headless --no-sandbox" \
+            --preset=desktop --only-categories=performance,accessibility \
+            --output=json --output-path=/tmp/lh-family-desktop.json
+      - name: Lighthouse family owner mobile
+        run: |
+          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/__family-owner-a11y.html \
+            --quiet --chrome-flags="--headless --no-sandbox" \
+            --only-categories=performance,accessibility \
+            --output=json --output-path=/tmp/lh-family-mobile.json
+      - name: Enforce quality floors
+        run: |
+          node - <<'NODE'
+          const fs=require("fs");
+          for (const [name,file] of [["desktop","/tmp/lh-desktop.json"],["mobile","/tmp/lh-mobile.json"],["telephone-desktop","/tmp/lh-telephone-desktop.json"],["telephone-mobile","/tmp/lh-telephone-mobile.json"],["email-desktop","/tmp/lh-email-desktop.json"],["email-mobile","/tmp/lh-email-mobile.json"],["family-desktop","/tmp/lh-family-desktop.json"],["family-mobile","/tmp/lh-family-mobile.json"]]) {
+            const r=JSON.parse(fs.readFileSync(file,"utf8"));
+            const perf=r.categories.performance.score;
+            const a11y=r.categories.accessibility.score;
+            console.log(name,{performance:perf,accessibility:a11y});
+            if (perf < 0.75) throw new Error(name+" performance below 0.75");
+            if (a11y < 0.90) throw new Error(name+" accessibility below 0.90");
+          }
+          NODE
+
+  independent-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: implementation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Independent acquisition acceptance
+        run: node --test tests/acquisition-v1-acceptance.test.mjs
+
+  preview-artifact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [implementation, ux-quality, independent-acceptance]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build deployable Family runtime candidate
+        run: |
+          mkdir -p /tmp/nahwerk-preview
+          cp *.html /tmp/nahwerk-preview/
+          cp -R assets /tmp/nahwerk-preview/assets
+          cp -R api /tmp/nahwerk-preview/api
+          mkdir -p /tmp/nahwerk-preview/scripts
+          cp scripts/family-runtime-smoke.mjs /tmp/nahwerk-preview/scripts/family-runtime-smoke.mjs
+          printf "%s\n" "${GITHUB_SHA}" > /tmp/nahwerk-preview/PREVIEW_HEAD.txt
+          printf "%s\n" "e63d09682c9a919a9ab347ff27d197f2a3c10a18" > /tmp/nahwerk-preview/PLATFORM_CONTRACT_SHA.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: family-runtime-candidate-${{ github.sha }}
+          path: /tmp/nahwerk-preview
+          retention-days: 7

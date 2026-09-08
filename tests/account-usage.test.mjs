@@ -15,7 +15,7 @@ const matrix = [
   ["PLUS", "10,99 € / Monat", "180 App-Dialoge", "50 WhatsApp-Dialoge"],
   ["PREMIUM", "19,99 € / Monat", "400 App-Dialoge", "100 WhatsApp-Dialoge"],
   ["PREMIUM PLUS", "34,99 € / Monat", "750 App-Dialoge", "160 WhatsApp-Dialoge"],
-  ["FAMILIE", "59,99 € / Monat", "1.200 App-Dialoge", "300 WhatsApp-Dialoge"]
+  ["FAMILIE", "59,66 € / Monat", "1.200 App-Dialoge", "300 WhatsApp-Dialoge"]
 ];
 
 test("final six-plan matrix is used by registration and packages", () => {

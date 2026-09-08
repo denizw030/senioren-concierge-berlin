@@ -300,3 +300,22 @@ body[data-product="senioren"] .nw-carousel-status:not(:disabled):hover,body.seni
     transition:none!important;
   }
 }
+
+.nw-carousel-select>span{background:#131310!important;color:#f8f5ee!important}
+body[data-product="senioren"] .nw-carousel-select>span,
+body.senior-product .nw-carousel-select>span,
+.nw-carousel[data-variant="senior"] .nw-carousel-select>span{background:#fffdf9!important;color:#211b12!important}
+
+/* Accessibility: deterministic active-card contrast during initial carousel positioning. */
+.overview-page .nw-carousel-card.is-active{
+  opacity:1!important;
+  filter:none!important;
+  transition:none!important;
+}
+.overview-page .nw-carousel-card.is-active>.nw-carousel-select>span{
+  background:#000!important;
+  color:#fff!important;
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+}

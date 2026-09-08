@@ -65,7 +65,7 @@ test("current launch tariff matrix is consistent in packages and registration", 
     "34,99 € / Monat",
     "750 App-Dialoge",
     "160 WhatsApp-Dialoge",
-    "59,99 € / Monat",
+    "59,66 € / Monat",
     "1.200 App-Dialoge",
     "300 WhatsApp-Dialoge"
   ]) {

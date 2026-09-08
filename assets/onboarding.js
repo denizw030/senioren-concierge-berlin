@@ -96,8 +96,8 @@
     },
     familie: {
       code: "FAMILIE",
-      title: "FAMILIE · 59,99 € / MONAT",
-      price: "59,99 € / Monat",
+      title: "FAMILIE · 59,66 € / MONAT",
+      price: "59,66 € / Monat",
       usage: "1.200 App-Dialoge · 300 WhatsApp-Dialoge",
       state: "Checkout folgt",
       bookable: false,
@@ -388,11 +388,12 @@
 
       if (response.status === 201 && body.ok && body.status === "web_account_linked") {
         void window.NahwerkAnalytics?.track("registration_complete", { funnel_name: "registration", funnel_step: "complete" });
+        window.NahwerkActivation?.markRegistrationComplete?.();
         localStorage.setItem("scb_onboarding_sent", "1");
         localStorage.setItem("scb_onboarding_result", JSON.stringify(body));
         if (await login(request.email, password)) {
           show("<strong>Fertig.</strong><br>Die WhatsApp-Identität wurde bestätigt und der Web-Zugang wurde angelegt. Sie werden zum Kundenbereich weitergeleitet.");
-          return setTimeout(() => { location.href = "konto.html"; }, 500);
+          return setTimeout(() => { location.href = "erster-schritt.html"; }, 500);
         }
         show("<strong>Der Web-Zugang wurde angelegt.</strong><br>Bitte melden Sie sich jetzt mit Ihrer E-Mail-Adresse und Ihrem Passwort an.", true);
         return setTimeout(() => { location.href = "anmelden.html"; }, 1800);
@@ -541,11 +542,12 @@
       }
       if (response.status === 201 && body.ok) {
         void window.NahwerkAnalytics?.track("registration_complete", { funnel_name: "registration", funnel_step: "complete" });
+        window.NahwerkActivation?.markRegistrationComplete?.();
         localStorage.setItem("scb_onboarding_sent", "1");
         localStorage.setItem("scb_onboarding_result", JSON.stringify(body));
         if (await login(request.email, password)) {
           show("<strong>Fertig.</strong><br>Der Zugang wurde angelegt. Sie werden zum Kundenbereich weitergeleitet.");
-          return setTimeout(() => { location.href = "konto.html"; }, 500);
+          return setTimeout(() => { location.href = "erster-schritt.html"; }, 500);
         }
         show("<strong>Der Zugang wurde angelegt.</strong><br>Bitte melden Sie sich jetzt an.", true);
         return setTimeout(() => { location.href = "anmelden.html"; }, 1800);
