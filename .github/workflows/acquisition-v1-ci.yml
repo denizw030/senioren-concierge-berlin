@@ -219,14 +219,18 @@ jobs:
     needs: [implementation, ux-quality, independent-acceptance]
     steps:
       - uses: actions/checkout@v4
-      - name: Build provider-free preview bundle
+      - name: Build deployable Family runtime candidate
         run: |
           mkdir -p /tmp/nahwerk-preview
           cp *.html /tmp/nahwerk-preview/
           cp -R assets /tmp/nahwerk-preview/assets
+          cp -R api /tmp/nahwerk-preview/api
+          mkdir -p /tmp/nahwerk-preview/scripts
+          cp scripts/family-runtime-smoke.mjs /tmp/nahwerk-preview/scripts/family-runtime-smoke.mjs
           printf "%s\n" "${GITHUB_SHA}" > /tmp/nahwerk-preview/PREVIEW_HEAD.txt
+          printf "%s\n" "e63d09682c9a919a9ab347ff27d197f2a3c10a18" > /tmp/nahwerk-preview/PLATFORM_CONTRACT_SHA.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: acquisition-activation-v1-preview-${{ github.sha }}
+          name: family-runtime-candidate-${{ github.sha }}
           path: /tmp/nahwerk-preview
           retention-days: 7
