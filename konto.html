@@ -6,6 +6,7 @@
     <title>Kundenbereich | NAHWERK Concierge</title>
     <meta name="description" content="Persönlicher NAHWERK-Kundenbereich für Tarif, Nutzung, Concierge- und Sicherheitseinstellungen." />
     <link rel="stylesheet" href="assets/site.css?v=24" />
+    <link rel="stylesheet" href="assets/email-account-integration.css?v=1" />
     <style>
       .dash {
         display: grid;
@@ -1636,6 +1637,7 @@
             <nav class="account-tabs" role="tablist" aria-label="Kundenbereich">
               <button class="account-tab" type="button" role="tab" id="accountTabOverview" aria-controls="accountPanelOverview" aria-selected="true" data-account-tab="overview">Übersicht</button>
               <button class="account-tab" type="button" role="tab" id="accountTabConcierge" aria-controls="accountPanelConcierge" aria-selected="false" data-account-tab="concierge">Concierge</button>
+              <button class="account-tab" type="button" role="tab" id="accountTabEmail" aria-controls="accountEmailCard" aria-selected="false" data-account-tab="email">E-Mail</button>
               <button class="account-tab" type="button" role="tab" id="accountTabSafety" aria-controls="accountPanelSafety" aria-selected="false" data-account-tab="safety">Sicherheit</button>
               <button class="account-tab" type="button" role="tab" id="accountTabUsage" aria-controls="accountPanelUsage" aria-selected="false" data-account-tab="usage">Nutzung</button>
               <button class="account-tab" type="button" role="tab" id="accountTabPersonal" aria-controls="accountPanelPersonal" aria-selected="false" data-account-tab="personal">Persönliche Daten</button>
@@ -1840,6 +1842,17 @@
                 </div>
                 <span class="reception-save-status" id="receptionSaveStatus" aria-live="polite"></span>
               </form>
+            </article>
+            <div class="account-panel-heading" data-account-panel="email" hidden><div class="eyebrow">E-Mail</div><h2>E-Mail-Konto</h2><p>Verbinden Sie Ihr E-Mail-Konto mit Ihrem persönlichen NAHWERK Concierge.</p></div>
+            <article class="card wide email-account-panel" id="accountEmailCard" data-account-panel="email" role="tabpanel" aria-labelledby="accountTabEmail" hidden data-email-contract="WEBSITE_EMAIL_INTEGRATION_CONTRACT_V1" data-email-platform-sha="d9f91bb488f5895b27a0618e1a94188f1e9ee19b" data-email-runtime="inert">
+              <div class="email-account-head"><div><div class="eyebrow">E-Mail-Konto</div><h3>E-Mail-Konto</h3><p class="muted">Verbinden Sie Ihr E-Mail-Konto, damit Ihr NAHWERK Concierge E-Mails in Ihrem Auftrag lesen, vorbereiten und nach Ihrer Freigabe senden kann.</p></div><span class="email-status-badge" id="emailConnectionStatus">PRE-PROD</span></div>
+              <p class="email-runtime-note" id="emailRuntimeNote">Runtime inert · Der Platform-Gateway ist vorbereitet, aber noch nicht als Website-Runtime deployed. Es wird keine OAuth-Anmeldung und kein Provider-Login gestartet.</p>
+              <div><div class="eyebrow">Anbieter</div><div class="email-provider-grid" aria-label="E-Mail-Anbieter"><button class="email-provider-card" type="button" data-email-provider="GOOGLE" aria-pressed="false" disabled><strong>Google Gmail / Google Workspace</strong><span data-email-provider-status>Nicht serverseitig bestätigt</span></button><button class="email-provider-card" type="button" data-email-provider="MICROSOFT" aria-pressed="false" disabled><strong>Microsoft Outlook / Microsoft 365</strong><span data-email-provider-status>Nicht serverseitig bestätigt</span></button><button class="email-provider-card" type="button" data-email-provider="GENERIC" aria-pressed="false" disabled><strong>Anderer Anbieter</strong><span data-email-provider-status>Nicht serverseitig bestätigt</span></button></div><p class="email-provider-note">Die Verfügbarkeit wird ausschließlich serverseitig über den NAHWERK E-Mail-Gateway bestätigt. Die technische Verfügbarkeit hängt von den Einstellungen und Richtlinien Ihres E-Mail-Anbieters ab.</p></div>
+              <div><div class="eyebrow">Gewünschte Funktionen</div><div class="email-capabilities"><label class="email-capability"><input type="checkbox" value="EMAIL_READ" data-email-capability checked disabled /><span>E-Mails lesen</span></label><label class="email-capability"><input type="checkbox" value="EMAIL_SEARCH" data-email-capability checked disabled /><span>E-Mails suchen</span></label><label class="email-capability"><input type="checkbox" value="EMAIL_ATTACHMENTS" data-email-capability checked disabled /><span>Anhänge berücksichtigen</span></label><label class="email-capability"><input type="checkbox" value="EMAIL_DRAFT" data-email-capability checked disabled /><span>Entwürfe vorbereiten</span></label><label class="email-capability"><input type="checkbox" value="EMAIL_SEND" data-email-capability checked disabled /><span>Nach Freigabe senden</span></label></div></div>
+              <div class="email-state-card" aria-live="polite"><h4 id="emailStateTitle">Verbindung technisch vorbereitet, derzeit noch nicht verfügbar.</h4><p id="emailStateMeta">Der serverseitige Verbindungsstatus bleibt alleinige Authority.</p><span class="email-account-hint" id="emailAccountHint"></span></div>
+              <div class="email-actions"><button class="btn red" type="button" id="emailConnectButton" disabled>E-Mail-Konto verbinden</button><button class="btn red" type="button" id="emailReauthButton" hidden>Erneut verbinden</button><button class="btn light" type="button" id="emailDisconnectButton" hidden>Verbindung trennen</button><button class="btn light" type="button" id="emailRetryButton" hidden>Erneut versuchen</button></div>
+              <form class="email-generic-form" id="emailGenericForm" autocomplete="off" hidden><div class="eyebrow">Anderer Anbieter · APP_PASSWORD</div><h4>IMAP- und SMTP-Zugang</h4><p class="email-generic-help">OAuth2 wird für „Anderer Anbieter“ in Website V1 nicht angeboten. Das App-Passwort wird nur für den unmittelbaren Verbindungsrequest verwendet, niemals gespeichert und nach dem Submit sofort aus dem Eingabefeld gelöscht.</p><div class="email-generic-grid"><label class="email-field"><span>Anbieter</span><select id="emailGenericProviderKey"><option value="GMX">GMX</option><option value="WEBDE">WEB.DE</option><option value="YAHOO">Yahoo</option><option value="TELEKOM">Telekom</option><option value="IONOS">IONOS</option><option value="STRATO">STRATO</option><option value="FASTMAIL">Fastmail</option><option value="ICLOUD">iCloud</option><option value="ZOHO">Zoho</option><option value="CUSTOM">Eigener Anbieter</option></select></label><label class="email-field" id="emailGenericCustomWrap" hidden><span>Anbieterbezeichnung</span><input id="emailGenericCustomLabel" type="text" maxlength="80" /></label><label class="email-field"><span>IMAP-Host</span><input id="emailGenericImapHost" type="text" maxlength="253" autocomplete="off" /></label><label class="email-field"><span>IMAP-Port</span><input id="emailGenericImapPort" type="number" min="1" max="65535" value="993" /></label><label class="email-field"><span>SMTP-Host</span><input id="emailGenericSmtpHost" type="text" maxlength="253" autocomplete="off" /></label><label class="email-field"><span>SMTP-Port</span><input id="emailGenericSmtpPort" type="number" min="1" max="65535" value="465" /></label><label class="email-field"><span>Benutzername</span><input id="emailGenericUsername" type="text" maxlength="320" autocomplete="username" /></label><label class="email-field"><span>App-Passwort</span><input id="emailGenericAppPassword" type="password" maxlength="512" autocomplete="off" /></label></div><input type="hidden" id="emailGenericAuthMode" value="APP_PASSWORD" /><div class="email-tls-row"><label class="email-tls"><input id="emailGenericImapTls" type="checkbox" checked disabled /> IMAP TLS erforderlich</label><label class="email-tls"><input id="emailGenericSmtpTls" type="checkbox" checked disabled /> SMTP TLS erforderlich</label></div><p class="email-generic-help">Die technische Verfügbarkeit hängt von den Einstellungen und Richtlinien Ihres E-Mail-Anbieters ab.</p></form>
+              <p class="email-continuity-note"><strong>Ein NAHWERK.</strong> Die Verbindung gehört zu Ihrer Person – nicht zu diesem Browser oder einem einzelnen Kanal. Nach einer real bestätigten Verbindung nutzen Web, WhatsApp, Voice und App dieselbe person_id, denselben NAHWERK Core, dieselben Tasks, Memory und Approvals sowie dieselbe email_connections-Wahrheit über den CAO.</p>
             </article>
             <div class="account-panel-heading" data-account-panel="usage" hidden><div class="eyebrow">Nutzung</div><h2>Ihre aktuelle Nutzung.</h2><p>Nur tatsächlich verfügbare Verbrauchsdaten werden angezeigt.</p></div>
             <article class="card wide usage-panel" data-account-panel="usage" role="tabpanel" aria-labelledby="accountTabUsage" hidden>
@@ -2344,7 +2357,7 @@
         }
         function setManagedContextRestrictions(managed) {
           managedSafetyAuthorized = false;
-          const lockedTabs = new Set(["concierge", "safety", "personal", "access"]);
+          const lockedTabs = new Set(["concierge", "email", "safety", "personal", "access"]);
           const usageLocked = managed && activeAccountContext?.actor?.can_view_usage !== true;
           accountTabs.forEach((tab) => {
             const locked = managed && (
@@ -2406,7 +2419,7 @@
           }
         }
         function setAccountTab(name, focus = false) {
-          if (isManagedAccountContext() && ["concierge", "personal", "access"].includes(name)) name = "overview";
+          if (isManagedAccountContext() && ["concierge", "email", "personal", "access"].includes(name)) name = "overview";
           if (isManagedAccountContext() && name === "safety" && !managedSafetyAuthorized) name = "overview";
           if (isManagedAccountContext() && name === "usage" && activeAccountContext?.actor?.can_view_usage !== true) name = "overview";
           const validName = accountTabs.some((tab) => tab.dataset.accountTab === name) ? name : "overview";
@@ -2425,6 +2438,7 @@
             if (!isManagedAccountContext()) ensureMfaLoaded();
           }
           if (validName === "concierge") ensureReceptionLoaded();
+          if (validName === "email") window.NAHWERKEmailAccount?.activate?.();
           if (validName === "access") ensureFamilyPermissionsLoaded();
         }
         accountTabs.forEach((tab, index) => {
@@ -4833,6 +4847,7 @@
         } catch (e) {}
       })();
     </script>
+  <script src="assets/email-account-integration.js?v=1"></script>
   <script src="assets/web-core-shadow.js?v=1"></script>
   <script src="assets/web-concierge-chat.js?v=1"></script>
   <script src="assets/site-ui.js?v=5"></script></body>

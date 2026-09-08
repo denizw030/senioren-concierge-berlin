@@ -22,8 +22,11 @@ on:
       - "assets/onboarding.js"
       - "assets/telephone-reception-product.css"
       - "assets/telephone-reception-product.js"
+      - "assets/email-account-integration.css"
+      - "assets/email-account-integration.js"
       - "tests/acquisition-v1.test.mjs"
       - "tests/telephone-reception-product.test.mjs"
+      - "tests/email-account-integration.test.mjs"
       - "tests/acquisition-v1-acceptance.test.mjs"
       - ".github/workflows/acquisition-v1-ci.yml"
   workflow_dispatch:
@@ -42,9 +45,11 @@ jobs:
         with:
           node-version: "22"
       - name: Activation system regression
-        run: node --test tests/acquisition-v1.test.mjs tests/telephone-reception-product.test.mjs
+        run: node --test tests/acquisition-v1.test.mjs tests/telephone-reception-product.test.mjs tests/email-account-integration.test.mjs
       - name: Telephone reception JS syntax
         run: node --check assets/telephone-reception-product.js
+      - name: Email account integration JS syntax
+        run: node --check assets/email-account-integration.js
       - name: Static HTTP smoke
         run: |
           python3 -m http.server 4173 >/tmp/nw-http.log 2>&1 &
@@ -55,7 +60,7 @@ jobs:
             sleep 1
           done
           curl -fsS "http://127.0.0.1:4173/index.html" >/dev/null
-          for page in index.html registrieren.html angehoerige.html pakete.html leistungen.html telefonannahme.html erster-schritt.html alltag-organisieren.html dokumente-verstehen.html technik-verstehen.html; do
+          for page in index.html registrieren.html konto.html angehoerige.html pakete.html leistungen.html telefonannahme.html erster-schritt.html alltag-organisieren.html dokumente-verstehen.html technik-verstehen.html; do
             curl -fsS "http://127.0.0.1:4173/$page" >/dev/null
           done
 
@@ -68,6 +73,21 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - name: Build inert email account accessibility fixture
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          src=Path("konto.html").read_text(encoding="utf-8")
+          style=re.search(r"<style>[\s\S]*?</style>",src,re.I).group(0)
+          links="\n".join(re.findall(r'<link[^>]+rel="stylesheet"[^>]*>',src,re.I))
+          tab=re.search(r'<button[^>]+id="accountTabEmail"[\s\S]*?</button>',src,re.I).group(0)
+          tab=tab.replace('aria-selected="false"','aria-selected="true"')
+          panel=re.search(r'<article class="card wide email-account-panel"[\s\S]*?</article>',src,re.I).group(0)
+          panel=re.sub(r'\s+hidden(?=[^>]*>)','',panel,count=1)
+          fixture=f'''<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">{links}{style}</head><body><main><section class="section account-section"><div class="wrap"><nav class="account-tabs" role="tablist" aria-label="Kundenbereich E-Mail">{tab}</nav><div class="dash">{panel}</div></div></section></main></body></html>'''
+          Path("__email-account-a11y.html").write_text(fixture,encoding="utf-8")
+          PY
       - name: Serve preview
         run: |
           nohup python3 -m http.server 4173 >/tmp/nw-http.log 2>&1 &
@@ -86,6 +106,7 @@ jobs:
             http://127.0.0.1:4173/leistungen.html \
             http://127.0.0.1:4173/pakete.html \
             http://127.0.0.1:4173/telefonannahme.html \
+            http://127.0.0.1:4173/__email-account-a11y.html \
             --exit
       - name: Lighthouse desktop
         run: |
@@ -111,11 +132,23 @@ jobs:
             --quiet --chrome-flags="--headless --no-sandbox" \
             --only-categories=performance,accessibility \
             --output=json --output-path=/tmp/lh-telephone-mobile.json
+      - name: Lighthouse email account desktop
+        run: |
+          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/__email-account-a11y.html \
+            --quiet --chrome-flags="--headless --no-sandbox" \
+            --preset=desktop --only-categories=performance,accessibility \
+            --output=json --output-path=/tmp/lh-email-desktop.json
+      - name: Lighthouse email account mobile
+        run: |
+          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/__email-account-a11y.html \
+            --quiet --chrome-flags="--headless --no-sandbox" \
+            --only-categories=performance,accessibility \
+            --output=json --output-path=/tmp/lh-email-mobile.json
       - name: Enforce quality floors
         run: |
           node - <<'NODE'
           const fs=require("fs");
-          for (const [name,file] of [["desktop","/tmp/lh-desktop.json"],["mobile","/tmp/lh-mobile.json"],["telephone-desktop","/tmp/lh-telephone-desktop.json"],["telephone-mobile","/tmp/lh-telephone-mobile.json"]]) {
+          for (const [name,file] of [["desktop","/tmp/lh-desktop.json"],["mobile","/tmp/lh-mobile.json"],["telephone-desktop","/tmp/lh-telephone-desktop.json"],["telephone-mobile","/tmp/lh-telephone-mobile.json"],["email-desktop","/tmp/lh-email-desktop.json"],["email-mobile","/tmp/lh-email-mobile.json"]]) {
             const r=JSON.parse(fs.readFileSync(file,"utf8"));
             const perf=r.categories.performance.score;
             const a11y=r.categories.accessibility.score;
