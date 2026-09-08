@@ -109,3 +109,11 @@ test("password recovery is server-side and revokes sessions", () => {
   assert.match(reset, /signOut\(\{scope:'global'\}\)/);
   assert.equal(reset.includes("auth.updateUser({password:p})"), false);
 });
+
+
+test("hidden MFA recovery controls cannot block the primary login submit", () => {
+  assert.match(login, /id="mfaRecovery" hidden/);
+  assert.match(login, /id="mfaRecoveryPassword" type="password" autocomplete="current-password"/);
+  assert.equal(/id="mfaRecoveryPassword"[^>]*required/.test(login), false);
+  assert.match(login, /if\(!password\|\|!\/\^NWRC-/);
+});
