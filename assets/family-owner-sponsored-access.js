@@ -1,10 +1,37 @@
 (() => {
   const SESSION_KEY="scb_web_session";
   const PLATFORM_CONTRACT="family-owner-sponsored-access-v1";
-  const PLATFORM_CONTRACT_SHA="d7e62aeeaf63ef9e9c75bfa55512b69fea8f6372";
+  const PLATFORM_CONTRACT_SHA="e63d09682c9a919a9ab347ff27d197f2a3c10a18";
   const PREPARED_FAMILY_GATEWAY_BASE="https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-family-access";
-  // Runtime safety boundary: remains null until migration + function are separately approved and deployed.
-  const FAMILY_GATEWAY_BASE=null;
+  const RUNTIME_CONFIG_ENDPOINT="/api/runtime-config";
+  // Runtime safety boundary: deployment config is authoritative and defaults fail-closed.
+  let FAMILY_GATEWAY_BASE=null;
+  let runtimeConfigPromise=null;
+  function normalizeRuntimeGateway(value){
+    if(typeof value!=="string")return null;
+    const normalized=value.trim().replace(/\\/+$/,"");
+    return normalized===PREPARED_FAMILY_GATEWAY_BASE?normalized:null;
+  }
+  function runtimeConfigGateway(body){
+    if(body?.ok!==true||body?.family_contract!==PLATFORM_CONTRACT||body?.platform_contract_sha!==PLATFORM_CONTRACT_SHA||body?.family_runtime_enabled!==true)return null;
+    return normalizeRuntimeGateway(body.family_gateway_base);
+  }
+  async function loadRuntimeGateway({fetchImpl=globalThis.fetch,configUrl=RUNTIME_CONFIG_ENDPOINT}={}){
+    if(typeof fetchImpl!=="function")return null;
+    let response;
+    try{
+      response=await fetchImpl(configUrl,{method:"GET",headers:{Accept:"application/json"},cache:"no-store",credentials:"same-origin"});
+    }catch{return null}
+    if(!response?.ok)return null;
+    const body=await response.json().catch(()=>null);
+    return runtimeConfigGateway(body);
+  }
+  async function ensureRuntimeGateway(){
+    if(FAMILY_GATEWAY_BASE)return FAMILY_GATEWAY_BASE;
+    if(!runtimeConfigPromise)runtimeConfigPromise=loadRuntimeGateway();
+    FAMILY_GATEWAY_BASE=await runtimeConfigPromise;
+    return FAMILY_GATEWAY_BASE;
+  }
   const PENDING_INVITE_KEY="nw_family_owner_invite_pending_v1";
   const INERT_MESSAGE="Diese Funktion wird derzeit vorbereitet.";
   const RELATIONSHIPS=Object.freeze({
@@ -196,6 +223,11 @@
     const path=managedPath(id,"/"+op);
     return path?request({base,token,path,method:"POST",body:{},fetchImpl}):{ok:false,kind:"client_invalid",networkRequestMade:false};
   }
+  async function revokeInvitation({base,token,id,fetchImpl=globalThis.fetch}){
+    const safe=safeManagedId(id);
+    const path=safe?"/family/invitations/"+encodeURIComponent(safe)+"/revoke":null;
+    return path?request({base,token,path,method:"POST",body:{},fetchImpl}):{ok:false,kind:"client_invalid",networkRequestMade:false};
+  }
   function stateLabel(state){return STATE_LABELS[String(state||"").toUpperCase()]||"Status wird geprüft"}
   function relationLabel(value){return RELATIONSHIPS[String(value||"").toUpperCase()]||"Andere"}
   function languageLabel(value){const normalized=normalizeLanguage(value);return normalized?(LANGUAGE_LABELS[normalized]||normalized):"–"}
@@ -210,7 +242,7 @@
     });
     for(const invite of invites){
       if(invite?.id&&seen.has(String(invite.id)))continue;
-      rows.push({kind:"invitation",id:null,name:[invite?.first_name,invite?.last_name].filter(Boolean).join(" ").trim()||"Person",relationship:String(invite?.relationship||"OTHER"),language:String(invite?.preferred_language||""),concierge:String(invite?.concierge_choice||""),status:String(invite?.state||"").toUpperCase()});
+      rows.push({kind:"invitation",id:null,invitationId:safeManagedId(invite?.id),name:[invite?.first_name,invite?.last_name].filter(Boolean).join(" ").trim()||"Person",relationship:String(invite?.relationship||"OTHER"),language:String(invite?.preferred_language||""),concierge:String(invite?.concierge_choice||""),status:String(invite?.state||"").toUpperCase()});
     }
     return rows;
   }
@@ -224,12 +256,12 @@
   }
 
   globalThis.NAHWERKFamilyOwnerTestHooks=Object.freeze({
-    PLATFORM_CONTRACT,PLATFORM_CONTRACT_SHA,PREPARED_FAMILY_GATEWAY_BASE,runtimeGatewayBase:FAMILY_GATEWAY_BASE,
+    PLATFORM_CONTRACT,PLATFORM_CONTRACT_SHA,PREPARED_FAMILY_GATEWAY_BASE,RUNTIME_CONFIG_ENDPOINT,runtimeGatewayBase:FAMILY_GATEWAY_BASE,
     RELATIONSHIPS,LANGUAGE_LABELS,FEATURE_DEFS,FEATURE_CODES,INVITE_STATES,ACCESS_STATES,STATE_LABELS,
     FORBIDDEN_AUTHORITY_FIELDS,INVITE_FIELDS,INERT_MESSAGE,sessionToken,operatorContextAllowed,canManageEntitlements,
     normalizeLanguage,plausiblePhone,conciergeCatalogFrom,buildEntitlements,invitationPayload,containsAuthorityFields,
-    getOperatorContext,getManagedPeople,getInvitations,createInvitation,getEntitlements,getUsage,updateEntitlements,
-    transition,stateLabel,relationLabel,languageLabel,mergeServerPeople,usageRows,pendingIdempotency
+    runtimeConfigGateway,loadRuntimeGateway,getOperatorContext,getManagedPeople,getInvitations,createInvitation,getEntitlements,getUsage,updateEntitlements,
+    transition,revokeInvitation,stateLabel,relationLabel,languageLabel,mergeServerPeople,usageRows,pendingIdempotency
   });
 
   if(typeof document==="undefined")return;
@@ -291,6 +323,9 @@
         if(item.status==="SUSPENDED"){const resume=document.createElement("button");resume.type="button";resume.className="btn light";resume.textContent="Fortsetzen";resume.dataset.familyAction="resume";resume.dataset.familyIndex=String(index);actions.append(resume)}
         if(item.status!=="REVOKED"){const revoke=document.createElement("button");revoke.type="button";revoke.className="btn light";revoke.textContent="Sponsored Access beenden";revoke.dataset.familyAction="revoke";revoke.dataset.familyIndex=String(index);actions.append(revoke)}
         row.append(actions);
+      }else if(item.kind==="invitation"&&item.invitationId&&!["ACCEPTED","DECLINED","EXPIRED","REVOKED"].includes(item.status)){
+        const actions=document.createElement("div");actions.className="family-owner-row-actions";
+        const revokeInvite=document.createElement("button");revokeInvite.type="button";revokeInvite.className="btn light";revokeInvite.textContent="Einladung widerrufen";revokeInvite.dataset.familyAction="invite-revoke";revokeInvite.dataset.familyIndex=String(index);actions.append(revokeInvite);row.append(actions);
       }
       peopleList.append(row);
     });
@@ -334,9 +369,20 @@
     ownerStatus.textContent=operation==="revoke"?"Sponsored Access wurde serverseitig beendet. Person und Inhalte bleiben bestehen.":"Status serverseitig aktualisiert.";
     detail.hidden=true;currentManagedId=null;await loadPeople();
   }
+  async function doInvitationRevoke(item){
+    if(!item?.invitationId)return;
+    if(!globalThis.confirm("Einladung wirklich widerrufen? Ein bereits bestehender eigener Zugang der Person wird dadurch nicht gelöscht."))return;
+    ownerStatus.textContent="Widerruf wird serverseitig geprüft …";
+    const outcome=await revokeInvitation({base:FAMILY_GATEWAY_BASE,token:sessionToken(),id:item.invitationId,fetchImpl:globalThis.fetch});
+    if(!outcome.ok){ownerStatus.textContent=outcome.kind==="runtime_inert"?INERT_MESSAGE:"Die Einladung konnte nicht sicher widerrufen werden.";return}
+    ownerStatus.textContent="Einladung serverseitig widerrufen.";await loadPeople();
+  }
   async function probeOperator(){
     if(operatorResolved)return operatorBody;
-    const result=await getOperatorContext({base:FAMILY_GATEWAY_BASE,token:sessionToken(),fetchImpl:globalThis.fetch});
+    const runtimeBase=await ensureRuntimeGateway();
+    panel.dataset.familyRuntime=runtimeBase?"configured":"inert";
+    if(!runtimeBase){operatorResolved=true;panel.hidden=true;return null}
+    const result=await getOperatorContext({base:runtimeBase,token:sessionToken(),fetchImpl:globalThis.fetch});
     operatorResolved=true;
     if(!result.ok||!operatorContextAllowed(result.data)){panel.hidden=true;return null}
     operatorBody=result.data;panel.hidden=false;
@@ -363,7 +409,7 @@
   peopleList.addEventListener("click",async(event)=>{
     const button=event.target.closest("[data-family-action]");if(!button)return;
     const item=currentPeople[Number(button.dataset.familyIndex)];if(!item)return;
-    const action=button.dataset.familyAction;if(action==="manage")await openManaged(item);else await doTransition(item,action);
+    const action=button.dataset.familyAction;if(action==="manage")await openManaged(item);else if(action==="invite-revoke")await doInvitationRevoke(item);else await doTransition(item,action);
   });
   quotaSave.addEventListener("click",async()=>{
     if(!currentManagedId||!canManageEntitlements(operatorBody))return;
