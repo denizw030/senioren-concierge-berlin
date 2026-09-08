@@ -743,6 +743,28 @@ body.account-premium-ui .btn.light{
   body.account-premium-ui .family-owner-row-actions .btn{width:100%!important}
 }
 @media(max-width:390px){
+  body.account-premium-ui .account-section .dash>*,
+  body.account-premium-ui #familyOwnerPanelSlot,
+  body.account-premium-ui .family-owner-panel>*,
+  body.account-premium-ui .family-owner-head>*,
+  body.account-premium-ui .family-owner-toolbar>*,
+  body.account-premium-ui .family-owner-person-main,
+  body.account-premium-ui .family-owner-person-headline,
+  body.account-premium-ui .family-owner-person-copy{
+    min-width:0!important;
+    max-width:100%;
+  }
+  body.account-premium-ui .family-owner-status,
+  body.account-premium-ui .family-owner-person-status{
+    max-width:100%!important;
+    white-space:normal!important;
+    overflow-wrap:anywhere;
+  }
+  body.account-premium-ui .family-owner-toolbar p,
+  body.account-premium-ui .family-owner-note,
+  body.account-premium-ui .account-panel-heading p{
+    overflow-wrap:anywhere;
+  }
   body.account-premium-ui .account-hero .wrap,
   body.account-premium-ui .account-section>.wrap{width:calc(100% - 24px)}
   body.account-premium-ui .account-hero h1{font-size:2.35rem!important}
