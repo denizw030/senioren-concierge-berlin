@@ -7,6 +7,7 @@
     <meta name="description" content="Persönlicher NAHWERK-Kundenbereich für Tarif, Nutzung, Concierge- und Sicherheitseinstellungen." />
     <link rel="stylesheet" href="assets/site.css?v=24" />
     <link rel="stylesheet" href="assets/email-account-integration.css?v=1" />
+    <link rel="stylesheet" href="assets/family-owner-sponsored-access.css?v=1" />
     <style>
       .dash {
         display: grid;
@@ -1705,6 +1706,45 @@
               </div>
               <p class="access-state" id="familyAccessMeta" aria-live="polite"></p>
             </article>
+            <div id="familyOwnerPanelSlot" data-account-panel="access" hidden>
+              <article class="card wide family-owner-panel" id="familyOwnerPanel" hidden data-family-contract="family-owner-sponsored-access-v1" data-family-platform-sha="d7e62aeeaf63ef9e9c75bfa55512b69fea8f6372" data-family-runtime="inert">
+                <div class="family-owner-head">
+                  <div><div class="eyebrow">Unterstützte Personen</div><h3>Personen verwalten</h3><p class="muted">Nur ein serverseitig bestätigter OWNER mit Freigabe für Sponsored People kann diesen Bereich sehen.</p></div>
+                  <span class="family-owner-status" id="familyOwnerStatus">Berechtigung wird serverseitig geprüft.</span>
+                </div>
+                <div class="family-owner-toolbar"><p class="muted">Personen, Sprache, Concierge, Status, Kontingente und Nutzung – keine privaten Kommunikationsinhalte.</p><button class="btn red" type="button" id="familyPersonAddButton" aria-expanded="false" aria-controls="familyPersonForm">Person hinzufügen</button></div>
+                <form class="family-owner-form" id="familyPersonForm" hidden novalidate>
+                  <div class="family-owner-grid">
+                    <label class="family-owner-field"><span>Vorname</span><input id="familyFirstName" type="text" maxlength="120" autocomplete="off" required /></label>
+                    <label class="family-owner-field"><span>Nachname</span><input id="familyLastName" type="text" maxlength="120" autocomplete="off" required /></label>
+                    <label class="family-owner-field"><span>Beziehung</span><select id="familyRelationship" required><option value="">Auswählen</option><option value="MOTHER">Mutter</option><option value="FATHER">Vater</option><option value="GRANDMOTHER">Großmutter</option><option value="GRANDFATHER">Großvater</option><option value="PARTNER">Partner/in</option><option value="RELATIVE">Angehörige/r</option><option value="OTHER">Andere</option></select></label>
+                    <label class="family-owner-field"><span>WhatsApp-Nummer</span><input id="familyWhatsappNumber" type="tel" autocomplete="off" placeholder="+49 …" required /></label>
+                    <label class="family-owner-field"><span>Sprache</span><select id="familyPreferredLanguage" required><option value="de">Deutsch</option><option value="tr">Türkçe</option><option value="en">English</option><option value="fr">Français</option><option value="es">Español</option><option value="__custom__">Weitere Sprache …</option></select></label>
+                    <label class="family-owner-field" id="familyCustomLanguageWrap" hidden><span>Sprachcode (BCP 47)</span><input id="familyCustomLanguage" type="text" maxlength="35" placeholder="z. B. pl oder de-AT" /></label>
+                    <label class="family-owner-field"><span>Concierge auswählen</span><select id="familyConciergeChoice" required><option value="">Concierge auswählen</option></select></label>
+                    <label class="family-owner-field"><span>Anredeform</span><select id="familyFormOfAddress" required><option value="DU">Du</option><option value="SIE">Sie</option></select></label>
+                    <label class="family-owner-field is-wide"><span>Persönliche Nachricht</span><textarea id="familyPersonalMessage" maxlength="1200" placeholder="Eine persönliche Nachricht für die unterstützte Person."></textarea></label>
+                  </div>
+                  <section class="family-quota-section" id="familyQuotaSection">
+                    <div class="eyebrow">Owner-Kontingente</div><h4>Kontingente festlegen</h4>
+                    <div class="family-quota-grid"><label class="family-quota-field"><span>WhatsApp-Dialoge</span><input type="number" min="0" max="1000" step="1" value="0" data-sponsored-feature="whatsapp_dialog" /></label><label class="family-quota-field"><span>App-Dialoge</span><input type="number" min="0" max="1000" step="1" value="0" data-sponsored-feature="app_dialog" /></label><label class="family-quota-field"><span>Recherchen</span><input type="number" min="0" max="200" step="1" value="0" data-sponsored-feature="web_research" /></label><label class="family-quota-field"><span>Dokumente</span><input type="number" min="0" max="100" step="1" value="0" data-sponsored-feature="document_analysis" /></label><label class="family-quota-field"><span>Bildanalysen</span><input type="number" min="0" max="100" step="1" value="0" data-sponsored-feature="image_analysis" /></label><label class="family-quota-field"><span>Bildgenerierungen</span><input type="number" min="0" max="50" step="1" value="0" data-sponsored-feature="image_generation" /></label><label class="family-quota-field"><span>Erinnerungen</span><input type="number" min="0" max="200" step="1" value="0" data-sponsored-feature="reminders" /></label><label class="family-quota-field"><span>Concierge-Ausführungen</span><input type="number" min="0" max="100" step="1" value="0" data-sponsored-feature="concierge_execution" /></label><label class="family-quota-field"><span>Telefon-Minuten</span><input type="number" min="0" max="600" step="1" value="0" data-sponsored-feature="phone_concierge" /></label><label class="family-quota-field"><span>Sprachmemo-Minuten</span><input type="number" min="0" max="600" step="1" value="0" data-sponsored-feature="voice_input" /></label></div>
+                    <p class="family-owner-note">Diese Person muss dafür nichts buchen. Die Nutzung ist auf die von dir festgelegten Kontingente begrenzt.</p>
+                  </section>
+                  <label class="family-owner-consent"><input id="familyContactConsent" type="checkbox" required /><span>Ich bestätige, dass die Zustimmung zur Kontaktaufnahme über die angegebene WhatsApp-Nummer vorliegt.</span></label>
+                  <div class="family-owner-actions"><button class="btn red" type="submit" id="familyPersonSubmit">Einladung vorbereiten</button><button class="btn light" type="button" id="familyPersonCancelButton">Abbrechen</button></div>
+                  <span class="family-owner-form-status" id="familyPersonFormStatus" aria-live="polite"></span>
+                </form>
+                <div><div class="eyebrow">Meine Personen</div><div class="family-owner-list" id="familyManagedPeopleList"><div class="family-owner-empty">Personen werden ausschließlich serverseitig geladen.</div></div></div>
+                <section class="family-managed-detail" id="familyManagedDetail" hidden>
+                  <div class="family-managed-detail-head"><h4 id="familyManagedDetailTitle">Kontingente & Nutzung</h4><button class="btn light" type="button" id="familyManagedDetailClose">Schließen</button></div>
+                  <div class="family-managed-usage" id="familyManagedUsage"></div>
+                  <div class="family-quota-grid" id="familyManagedQuotaGrid"></div>
+                  <div class="family-owner-actions"><button class="btn red" type="button" id="familyManagedQuotaSave">Kontingente speichern</button></div>
+                </section>
+                <p class="family-owner-note">Sponsored Access ändert keine Eigentümerschaft an der Person und löscht bei einem Widerruf weder Person noch private Inhalte.</p>
+              </article>
+            </div>
+
             <article class="card summary-card plan-summary" data-account-panel="overview">
               <div class="eyebrow">Paket</div>
               <div class="value" id="planName">Tarif wird geladen …</div>
@@ -4847,6 +4887,8 @@
         } catch (e) {}
       })();
     </script>
+  <script src="assets/concierge-carousel.js?v=20"></script>
+  <script src="assets/family-owner-sponsored-access.js?v=1"></script>
   <script src="assets/email-account-integration.js?v=1"></script>
   <script src="assets/web-core-shadow.js?v=1"></script>
   <script src="assets/web-concierge-chat.js?v=1"></script>

@@ -24,9 +24,12 @@ on:
       - "assets/telephone-reception-product.js"
       - "assets/email-account-integration.css"
       - "assets/email-account-integration.js"
+      - "assets/family-owner-sponsored-access.css"
+      - "assets/family-owner-sponsored-access.js"
       - "tests/acquisition-v1.test.mjs"
       - "tests/telephone-reception-product.test.mjs"
       - "tests/email-account-integration.test.mjs"
+      - "tests/family-owner-sponsored-access.test.mjs"
       - "tests/acquisition-v1-acceptance.test.mjs"
       - ".github/workflows/acquisition-v1-ci.yml"
   workflow_dispatch:
@@ -45,11 +48,13 @@ jobs:
         with:
           node-version: "22"
       - name: Activation system regression
-        run: node --test tests/acquisition-v1.test.mjs tests/telephone-reception-product.test.mjs tests/email-account-integration.test.mjs
+        run: node --test tests/acquisition-v1.test.mjs tests/telephone-reception-product.test.mjs tests/email-account-integration.test.mjs tests/family-owner-sponsored-access.test.mjs
       - name: Telephone reception JS syntax
         run: node --check assets/telephone-reception-product.js
       - name: Email account integration JS syntax
         run: node --check assets/email-account-integration.js
+      - name: Family owner sponsored access JS syntax
+        run: node --check assets/family-owner-sponsored-access.js
       - name: Static HTTP smoke
         run: |
           python3 -m http.server 4173 >/tmp/nw-http.log 2>&1 &
@@ -90,6 +95,21 @@ jobs:
           fixture=f'''<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>E-Mail-Konto | NAHWERK</title>{links}{style}</head><body><main><section class="section account-section"><div class="wrap"><h1>E-Mail-Konto</h1><nav class="account-tabs" role="tablist" aria-label="Kundenbereich E-Mail">{tab}</nav><div class="dash">{panel}</div></div></section></main></body></html>'''
           Path("__email-account-a11y.html").write_text(fixture,encoding="utf-8")
           PY
+      - name: Build inert family owner accessibility fixture
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          src=Path("konto.html").read_text(encoding="utf-8")
+          style=re.search(r"<style>[\s\S]*?</style>",src,re.I).group(0)
+          links="\n".join(re.findall(r'<link[^>]+rel="stylesheet"[^>]*>',src,re.I))
+          start=src.index('<div id="familyOwnerPanelSlot"')
+          end=src.index('<article class="card summary-card plan-summary"',start)
+          panel=src[start:end]
+          panel=re.sub(r'\s+hidden(?=[^>]*>)','',panel,count=4)
+          fixture=f'''<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Personen & Zugänge | NAHWERK</title>{links}{style}</head><body><main><section class="section account-section"><div class="wrap"><h1>Personen & Zugänge</h1><div class="dash">{panel}</div></div></section></main></body></html>'''
+          Path("__family-owner-a11y.html").write_text(fixture,encoding="utf-8")
+          PY
       - name: Serve preview
         run: |
           nohup python3 -m http.server 4173 >/tmp/nw-http.log 2>&1 &
@@ -109,6 +129,7 @@ jobs:
             http://127.0.0.1:4173/pakete.html \
             http://127.0.0.1:4173/telefonannahme.html \
             http://127.0.0.1:4173/__email-account-a11y.html \
+            http://127.0.0.1:4173/__family-owner-a11y.html \
             --exit
       - name: Lighthouse desktop
         run: |
@@ -146,11 +167,23 @@ jobs:
             --quiet --chrome-flags="--headless --no-sandbox" \
             --only-categories=performance,accessibility \
             --output=json --output-path=/tmp/lh-email-mobile.json
+      - name: Lighthouse family owner desktop
+        run: |
+          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/__family-owner-a11y.html \
+            --quiet --chrome-flags="--headless --no-sandbox" \
+            --preset=desktop --only-categories=performance,accessibility \
+            --output=json --output-path=/tmp/lh-family-desktop.json
+      - name: Lighthouse family owner mobile
+        run: |
+          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/__family-owner-a11y.html \
+            --quiet --chrome-flags="--headless --no-sandbox" \
+            --only-categories=performance,accessibility \
+            --output=json --output-path=/tmp/lh-family-mobile.json
       - name: Enforce quality floors
         run: |
           node - <<'NODE'
           const fs=require("fs");
-          for (const [name,file] of [["desktop","/tmp/lh-desktop.json"],["mobile","/tmp/lh-mobile.json"],["telephone-desktop","/tmp/lh-telephone-desktop.json"],["telephone-mobile","/tmp/lh-telephone-mobile.json"],["email-desktop","/tmp/lh-email-desktop.json"],["email-mobile","/tmp/lh-email-mobile.json"]]) {
+          for (const [name,file] of [["desktop","/tmp/lh-desktop.json"],["mobile","/tmp/lh-mobile.json"],["telephone-desktop","/tmp/lh-telephone-desktop.json"],["telephone-mobile","/tmp/lh-telephone-mobile.json"],["email-desktop","/tmp/lh-email-desktop.json"],["email-mobile","/tmp/lh-email-mobile.json"],["family-desktop","/tmp/lh-family-desktop.json"],["family-mobile","/tmp/lh-family-mobile.json"]]) {
             const r=JSON.parse(fs.readFileSync(file,"utf8"));
             const perf=r.categories.performance.score;
             const a11y=r.categories.accessibility.score;
