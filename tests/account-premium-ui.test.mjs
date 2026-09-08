@@ -46,10 +46,10 @@ test("runtime, authorization and provider contracts remain wired to the same end
     '"/operator/managed-people/invitations"',
     '"/entitlements"',
     '"/usage"',
-    '"/suspend"',
-    '"/resume"',
-    '"/revoke"'
+    '"/family/invitations/"'
   ]) assert.ok(family.includes(route),route);
+  assert.match(family,/\["suspend","resume","revoke"\]\.includes\(op\)/);
+  assert.match(family,/managedPath\(id,"\/"+op\)/);
   assert.match(family,/browser_actor_authority===false/);
   assert.match(family,/data\?\.outbound\?\.provider_execution===false/);
 });
