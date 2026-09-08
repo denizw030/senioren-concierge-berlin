@@ -75,3 +75,12 @@ body.telephone-reception-page .btn.red{
   border-color:#861f24!important;
   color:#fff!important;
 }
+
+/* Deterministic accessibility snapshot: do not fade content while it is measured. */
+body.telephone-reception-page main > section.reveal,
+body.telephone-reception-page .footer.reveal{
+  opacity:1!important;
+  transform:none!important;
+  transition:none!important;
+  filter:none!important;
+}
