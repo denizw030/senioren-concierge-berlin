@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - "growth/activation-system-v1-*"
+      - "feat/family-runtime-activation-*"
   pull_request:
     paths:
       - "index.html"
@@ -26,6 +27,9 @@ on:
       - "assets/email-account-integration.js"
       - "assets/family-owner-sponsored-access.css"
       - "assets/family-owner-sponsored-access.js"
+      - "api/runtime-config.js"
+      - "scripts/family-runtime-smoke.mjs"
+      - "tests/family-runtime-activation.test.mjs"
       - "tests/acquisition-v1.test.mjs"
       - "tests/telephone-reception-product.test.mjs"
       - "tests/email-account-integration.test.mjs"
@@ -47,14 +51,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Activation system regression
-        run: node --test tests/acquisition-v1.test.mjs tests/telephone-reception-product.test.mjs tests/email-account-integration.test.mjs tests/family-owner-sponsored-access.test.mjs
+      - name: Website and Family regression
+        run: node --test tests/*.test.mjs
       - name: Telephone reception JS syntax
         run: node --check assets/telephone-reception-product.js
       - name: Email account integration JS syntax
         run: node --check assets/email-account-integration.js
       - name: Family owner sponsored access JS syntax
         run: node --check assets/family-owner-sponsored-access.js
+      - name: Family runtime config syntax
+        run: node --check api/runtime-config.js
+      - name: Family runtime smoke harness syntax
+        run: node --check scripts/family-runtime-smoke.mjs
       - name: Static HTTP smoke
         run: |
           python3 -m http.server 4173 >/tmp/nw-http.log 2>&1 &
