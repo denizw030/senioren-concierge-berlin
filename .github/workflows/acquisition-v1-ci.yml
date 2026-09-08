@@ -107,7 +107,7 @@ jobs:
           end=src.index('<article class="card summary-card plan-summary"',start)
           panel=src[start:end]
           panel=re.sub(r'\s+hidden(?=[^>]*>)','',panel,count=4)
-          fixture=f'''<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Personen & Zugänge | NAHWERK</title>{links}{style}</head><body><main><section class="section account-section"><div class="wrap"><h1>Personen & Zugänge</h1><div class="dash">{panel}</div></div></section></main></body></html>'''
+          fixture=f'''<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Personen & Zugänge | NAHWERK</title>{links}{style}</head><body><main><section class="section account-section"><div class="wrap"><h1>Kundenbereich</h1><h2>Personen & Zugänge</h2><div class="dash">{panel}</div></div></section></main></body></html>'''
           Path("__family-owner-a11y.html").write_text(fixture,encoding="utf-8")
           PY
       - name: Serve preview
