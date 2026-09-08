@@ -9,7 +9,7 @@
   let runtimeConfigPromise=null;
   function normalizeRuntimeGateway(value){
     if(typeof value!=="string")return null;
-    const normalized=value.trim().replace(/\\/+$/,"");
+    const normalized=value.trim().replace(/\/+$/,"");
     return normalized===PREPARED_FAMILY_GATEWAY_BASE?normalized:null;
   }
   function runtimeConfigGateway(body){
