@@ -132,7 +132,9 @@ body.account-premium-ui .managed-context-notice .btn{
 
 /* Tabs */
 body.account-premium-ui .account-tabs-shell{
-  position:relative;
+  position:relative!important;
+  top:auto!important;
+  z-index:4;
   margin:0 0 18px!important;
   padding:4px!important;
   overflow:hidden;
