@@ -282,7 +282,8 @@ jobs:
             }})}});
             </script></body></html>'''
           overview=shell(setup+tabs+'<div class="dash">'+''.join(summaries)+highlights+'</div>',"Konto Übersicht")
-          access=shell(setup+tabs+'<div class="dash">'+access_heading+family+'</div>',"Konto Zugänge")
+          access_tabs=tabs.replace('id="accountTabOverview" aria-controls="accountPanelOverview" aria-selected="true"','id="accountTabOverview" aria-controls="accountPanelOverview" aria-selected="false"').replace('id="accountTabAccess" aria-controls="accountPanelAccess" aria-selected="false"','id="accountTabAccess" aria-controls="accountPanelAccess" aria-selected="true"')
+          access=shell(setup+access_tabs+'<div class="dash">'+access_heading+family+'</div>',"Konto Zugänge")
           Path("__account-premium-overview.html").write_text(overview,encoding="utf-8")
           Path("__account-premium-access.html").write_text(access,encoding="utf-8")
           PY
