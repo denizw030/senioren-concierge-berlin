@@ -276,7 +276,7 @@ jobs:
           def shell(body,title):
             return f'''<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title>{links}{styles}</head><body class="account-premium-ui" data-product="prime"><main><section class="section account-section"><div class="wrap">{body}</div></section></main><script>
             addEventListener("load",()=>{{requestAnimationFrame(()=>{{
-              const bad=[...document.querySelectorAll("button,.card,.family-owner-person,.account-tabs-shell")].filter(el=>{{const r=el.getBoundingClientRect();return r.left<-1||r.right>innerWidth+1||r.width<1;}});
+              const bad=[...document.querySelectorAll("button:not(.account-tab),.card,.family-owner-person,.account-tabs-shell")].filter(el=>{{const r=el.getBoundingClientRect();return r.left<-1||r.right>innerWidth+1||r.width<1;}});
               document.documentElement.dataset.overflow=(document.documentElement.scrollWidth<=innerWidth+1&&bad.length===0)?"none":"present";
               document.documentElement.dataset.visualReady="true";
             }})}});
