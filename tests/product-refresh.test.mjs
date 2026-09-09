@@ -41,12 +41,13 @@ test("dark pages share the premium gold colour atmosphere while senior mode stay
   assert.match(colours, /\.senior-product \.request-card/);
 });
 
-test("senior and personal pages advertise useful real-world requests with approval boundaries", () => {
+test("senior page keeps real-world examples while personal page follows the frozen brand promise", () => {
   assert.match(visibleText(senior), /Kannst du mir einen Uber besorgen/);
   assert.match(visibleText(senior), /Bevor Kosten entstehen/);
   assert.match(visibleText(senior), /Ist diese Nachricht echt oder vielleicht Betrug/);
-  assert.match(visibleText(prime), /Plane mir ein entspanntes Wochenende in Lissabon/);
-  assert.match(visibleText(prime), /Buchungen, Käufe oder andere kostenpflichtige Schritte/);
+  assert.match(visibleText(prime), /Ein persönlicher Concierge, der erledigt/);
+  assert.match(visibleText(prime), /Google findet\. KI versteht\. NAHWERK erledigt/);
+  assert.match(visibleText(prime), /Welche Telefonfunktionen verfügbar sind, richtet sich nach dem eingerichteten Produkt und Zugang/);
 });
 
 test("current launch tariff matrix is consistent in packages and registration", () => {
