@@ -60,6 +60,7 @@ body.telephone-reception-page{background:#070706;color:#fff}
 .tr-agent-copy p{margin:0;color:#f1eee8;font-size:.96rem;font-weight:650}
 .tr-agent-copy small{display:block;margin-top:10px;color:#aaa69d;font-size:.88rem;line-height:1.55}
 .tr-agent-actions{display:flex;justify-content:center;margin-top:24px}
+.tr-agent-actions[hidden]{display:none!important}
 .tr-agent-actions .btn{min-width:190px}
 .tr-risk-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:30px}
 .tr-risk-card{padding:24px;border:1px solid rgba(255,255,255,.09);border-radius:20px;background:rgba(255,255,255,.025)}
