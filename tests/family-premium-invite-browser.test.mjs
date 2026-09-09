@@ -91,6 +91,7 @@ function page(mode){
     const set=(id,value)=>{const el=document.getElementById(id);if(el)el.value=value};
     set("familyFirstName","Hülya");
     set("familyLastName","Cimen");
+    set("familyRelationship","MOTHER");
     set("familyWhatsappNumber","+491700000777");
     set("familyPreferredLanguage","tr");
     set("familyConciergeChoice","leyla");
