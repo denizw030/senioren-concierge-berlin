@@ -41,6 +41,7 @@ on:
       - "tests/story-conversion-final.test.mjs"
       - "tests/product-refresh.test.mjs"
       - "tests/telephone-reception-ui.test.mjs"
+      - "tests/voice-preview.test.mjs"
       - "tests/telephone-reception-product.test.mjs"
       - "tests/email-account-integration.test.mjs"
       - "tests/family-owner-sponsored-access.test.mjs"
