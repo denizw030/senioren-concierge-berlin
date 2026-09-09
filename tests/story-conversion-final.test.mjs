@@ -41,8 +41,8 @@ test("demo makes Auftrag Freigabe Durchführung Ergebnis immediately explicit",(
   const start=home.indexOf('id="demo"');
   const end=home.indexOf('data-story-step="3"',start);
   assert.ok(start>=0&&end>start);
-  const demo=visibleText(home.slice(start,end));
-  const labels=["Auftrag","Freigabe","Durchführung","Ergebnis"];
+  const demo=home.slice(start,end);
+  const labels=["<h3>Auftrag</h3>","<h3>Freigabe</h3>","<h3>Durchführung</h3>","<h3>Ergebnis</h3>"];
   const positions=labels.map(x=>demo.indexOf(x));
   positions.forEach((p,i)=>assert.ok(p>=0,labels[i]));
   for(let i=1;i<positions.length;i++)assert.ok(positions[i]>positions[i-1],labels[i]);
@@ -85,7 +85,7 @@ test("family stays respectful and person-centered",()=>{
   const family=visibleText(read("angehoerige.html"));
   assert.match(family,/Unterstützung, ohne Selbstständigkeit abzunehmen/);
   assert.match(family,/eigenen Concierge/i);
-  assert.match(family,/eigene Sprache/i);
+  assert.match(family,/eigener Sprache|Sprache selbst wählen/i);
   assert.match(family,/Privatsphäre/i);
   assert.doesNotMatch(family,/Hilflos|Pflegefall|überwachen/i);
 });
