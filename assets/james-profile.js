@@ -48,7 +48,7 @@
           ${senior ? "" : `<p class="nw-james-dialog-background">${profile.background}</p>`}
           <ul class="nw-james-dialog-strengths">${profile.strengths.slice(0, senior ? 3 : 6).map(item => `<li>${item}</li>`).join("")}</ul>
           <blockquote class="nw-james-dialog-quote">„${profile.quote}“</blockquote>
-          <div class="nw-james-dialog-voice"><span>Stimme</span><div class="nw-james-dialog-voice-host"></div><small>Teststimme · feste Alexander-Zuordnung · noch nicht final freigegeben</small></div>
+          <div class="nw-james-dialog-voice"><span>Stimme</span><div class="nw-james-dialog-voice-host"></div><small>Stimmbeispiel von Alexander</small></div>
         </div>
       </div>`;
     document.body.appendChild(el);
