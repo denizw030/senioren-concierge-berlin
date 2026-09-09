@@ -668,6 +668,12 @@
       }
     </style>    <link rel="stylesheet" href="assets/acquisition-v1.css?v=1" />
     <style id="registration-whatsapp-step-premium">
+      /* Keep steps 1 and 3 on the same restrained corner geometry as step 2. */
+      body.registration-page .nw-registration-progress > strong,
+      body.registration-page .nw-registration-progress > span:not(.nw-registration-progress-whatsapp) {
+        border-radius: 11px;
+      }
+
       /* Step 2 only: one restrained Apple-like status chip, no nested WhatsApp decoration. */
       body.registration-page .nw-registration-progress > .nw-registration-progress-whatsapp {
         box-sizing: border-box;
