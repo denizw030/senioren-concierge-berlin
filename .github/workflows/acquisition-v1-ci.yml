@@ -277,9 +277,19 @@ jobs:
                   .filter(el=>{const r=el.getBoundingClientRect();return r.left<-4||r.right>viewport+4;});
                 const h1ok=doc.querySelectorAll("h1").length===1;
                 const controls=[...doc.querySelectorAll("a,button")].filter(visible);
+                const controlName=(el)=>{
+                  const text=String(el.textContent||"").trim();
+                  const aria=String(el.getAttribute("aria-label")||"").trim();
+                  const title=String(el.getAttribute("title")||"").trim();
+                  const labelledby=String(el.getAttribute("aria-labelledby")||"")
+                    .split(/\s+/).filter(Boolean)
+                    .map(id=>String(doc.getElementById(id)?.textContent||"").trim())
+                    .filter(Boolean).join(" ");
+                  return text||aria||title||labelledby;
+                };
                 const badControls=controls.filter(el=>{
-                  if(el.tagName==="A") return !el.getAttribute("href");
-                  return !String(el.textContent||"").trim();
+                  if(el.tagName==="A"&&!el.getAttribute("href")) return true;
+                  return !controlName(el);
                 });
                 let order=true;
                 if(page==="index.html"){
