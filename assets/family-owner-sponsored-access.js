@@ -53,7 +53,7 @@
     MOTHER:"Mutter",FATHER:"Vater",GRANDMOTHER:"Großmutter",GRANDFATHER:"Großvater",
     PARTNER:"Partner/in",RELATIVE:"Angehörige/r",OTHER:"Andere"
   });
-  const LANGUAGE_LABELS=Object.freeze({de:"Deutsch",tr:"Türkisch",en:"Englisch",fr:"Französisch",es:"Spanisch"});
+  const LANGUAGE_LABELS=Object.freeze({de:"Deutsch",tr:"Türkisch",en:"Englisch",pl:"Polnisch",ar:"Arabisch",fr:"Französisch",es:"Spanisch"});
   const FEATURE_DEFS=Object.freeze([
     {code:"whatsapp_dialog",label:"WhatsApp-Dialoge",max:1000},
     {code:"app_dialog",label:"App-Dialoge",max:1000},
@@ -221,7 +221,7 @@
     const canonical=(result.httpStatus===200||result.httpStatus===201)&&INVITE_STATES.includes(String(data?.state||""))&&data?.outbound?.provider_execution===false;
     if(!canonical)return {ok:false,kind:"invalid_server_confirmation",networkRequestMade:true,idempotencyKey:pending.key,retryUsesSameKey:true,message:"Die Einladung wurde nicht sicher bestätigt."};
     clearPending(storage,pending.fingerprint,pending.key);
-    return {...result,kind:"invitation_confirmed",idempotencyKey:pending.key,state:data.state,duplicate:data.duplicate===true};
+    return {...result,kind:"invitation_confirmed",idempotencyKey:pending.key,state:data.state,duplicate:data.duplicate===true,outbound:data.outbound??null};
   }
   function safeManagedId(id){const value=String(id||"");return UUID_RE.test(value)?value:null}
   function managedPath(id,suffix){const safe=safeManagedId(id);return safe?"/operator/managed-people/"+encodeURIComponent(safe)+suffix:null}
@@ -241,6 +241,11 @@
   async function revokeInvitation({base,token,id,fetchImpl=globalThis.fetch}){
     const safe=safeManagedId(id);
     const path=safe?"/family/invitations/"+encodeURIComponent(safe)+"/revoke":null;
+    return path?request({base,token,path,method:"POST",body:{},fetchImpl}):{ok:false,kind:"client_invalid",networkRequestMade:false};
+  }
+  async function getActivationLink({base,token,id,fetchImpl=globalThis.fetch}){
+    const safe=safeManagedId(id);
+    const path=safe?"/family/invitations/"+encodeURIComponent(safe)+"/activation-link":null;
     return path?request({base,token,path,method:"POST",body:{},fetchImpl}):{ok:false,kind:"client_invalid",networkRequestMade:false};
   }
   function stateLabel(state){return STATE_LABELS[String(state||"").toUpperCase()]||"Status wird geprüft"}
@@ -296,6 +301,31 @@
 
   function setFormOpen(open){form.hidden=!open;addButton.setAttribute("aria-expanded",String(open));if(open)document.getElementById("familyFirstName")?.focus();else form.reset()}
   function setStatus(message,isError=false){formStatus.textContent=message||"";formStatus.classList.toggle("is-error",isError)}
+  function renderInviteDelivery(outbound,container=formStatus){
+    const route=String(outbound?.route||"");
+    const activationLink=String(outbound?.activation_link||"");
+    container.textContent="";
+    container.classList.remove("is-error");
+    const text=document.createElement("span");
+    if(route==="DIRECT_PREMIUM"){
+      text.textContent="Einladung wird über WhatsApp zugestellt.";
+      container.append(text);return;
+    }
+    if(route!=="ACTIVATION_LINK"||!/^https:\/\/wa\.me\//i.test(activationLink)){
+      text.textContent="Die Einladung wurde vorbereitet.";
+      container.append(text);return;
+    }
+    text.textContent="Einladung über WhatsApp aktivieren. ";
+    const open=document.createElement("a");
+    open.href=activationLink;open.target="_blank";open.rel="noopener noreferrer";
+    open.textContent="In WhatsApp bestätigen";
+    const copy=document.createElement("button");
+    copy.type="button";copy.className="btn light";copy.textContent="Link kopieren";
+    copy.addEventListener("click",async()=>{
+      try{await navigator.clipboard.writeText(activationLink);copy.textContent="Kopiert"}catch{copy.textContent="Kopieren nicht möglich"}
+    });
+    container.append(text,open,document.createTextNode(" "),copy);
+  }
   function populateConcierges(){
     const catalog=conciergeCatalogFrom(globalThis.NAHWERK_CONCIERGES);
     conciergeSelect.innerHTML='<option value="">Concierge auswählen</option>'+catalog.map((item)=>'<option value="'+item.key+'">'+item.name+'</option>').join("");
@@ -371,6 +401,7 @@
         row.append(actions);
       }else if(item.kind==="invitation"&&item.invitationId&&!["ACCEPTED","DECLINED","EXPIRED","REVOKED"].includes(item.status)){
         const actions=document.createElement("div");actions.className="family-owner-row-actions";
+        const activate=document.createElement("button");activate.type="button";activate.className="btn light";activate.textContent="Einladung über WhatsApp aktivieren";activate.dataset.familyAction="invite-activation";activate.dataset.familyIndex=String(index);actions.append(activate);
         const revokeInvite=document.createElement("button");revokeInvite.type="button";revokeInvite.className="btn light";revokeInvite.textContent="Einladung widerrufen";revokeInvite.dataset.familyAction="invite-revoke";revokeInvite.dataset.familyIndex=String(index);actions.append(revokeInvite);row.append(actions);
       }
       peopleList.append(row);
@@ -423,6 +454,13 @@
     if(!outcome.ok){ownerStatus.textContent=outcome.kind==="runtime_inert"?INERT_MESSAGE:"Die Einladung konnte nicht sicher widerrufen werden.";return}
     ownerStatus.textContent="Einladung serverseitig widerrufen.";await loadPeople();
   }
+  async function doInvitationActivation(item){
+    if(!item?.invitationId)return;
+    ownerStatus.textContent="Einladungsweg wird vorbereitet …";
+    const outcome=await getActivationLink({base:FAMILY_GATEWAY_BASE,token:sessionToken(),id:item.invitationId,fetchImpl:globalThis.fetch});
+    if(!outcome.ok){ownerStatus.textContent=outcome.kind==="runtime_inert"?INERT_MESSAGE:"Der WhatsApp-Aktivierungslink konnte nicht sicher erstellt werden.";return}
+    renderInviteDelivery(outcome.data?.outbound,ownerStatus);
+  }
   async function probeOperator(){
     if(operatorResolved)return operatorBody;
     const runtimeBase=await ensureRuntimeGateway();
@@ -449,13 +487,13 @@
     const outcome=await createInvitation({base:FAMILY_GATEWAY_BASE,token:sessionToken(),input:payload,fetchImpl:globalThis.fetch,storage:globalThis.sessionStorage,cryptoImpl:globalThis.crypto});
     submit.disabled=false;
     if(!outcome.ok){setStatus(outcome.kind==="runtime_inert"?INERT_MESSAGE:"Die Einladung konnte nicht sicher bestätigt werden. Es wurde kein lokaler Erfolgsstatus erzeugt.",true);return}
-    setStatus("Einladung serverseitig bestätigt: "+stateLabel(outcome.state)+".");
+    renderInviteDelivery(outcome.outbound);
     setFormOpen(false);await loadPeople();
   });
   peopleList.addEventListener("click",async(event)=>{
     const button=event.target.closest("[data-family-action]");if(!button)return;
     const item=currentPeople[Number(button.dataset.familyIndex)];if(!item)return;
-    const action=button.dataset.familyAction;if(action==="manage")await openManaged(item);else if(action==="invite-revoke")await doInvitationRevoke(item);else await doTransition(item,action);
+    const action=button.dataset.familyAction;if(action==="manage")await openManaged(item);else if(action==="invite-revoke")await doInvitationRevoke(item);else if(action==="invite-activation")await doInvitationActivation(item);else await doTransition(item,action);
   });
   quotaSave.addEventListener("click",async()=>{
     if(!currentManagedId||!canManageEntitlements(operatorBody))return;
