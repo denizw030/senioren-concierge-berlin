@@ -239,6 +239,6 @@ test("product integration, pricing, hero and header regressions stay intact",()=
   assert.deepEqual([...home.matchAll(/data-story-step="([1-6])"/g)].map(m=>m[1]),["1","2","3","4","5","6"]);
   assert.match(home,/body\.overview-page\.nw-header-scrolled \.top/);
   assert.match(home,/rgba\(7,\s*7,\s*6,\s*0\.82\)/);
-  assert.match(pricing,/SUBSCRIPTION/);
-  assert.match(pricing,/PAYG/);
+  assert.match(pricing,/59,66 € \/ Monat/);
+  assert.match(pricing,/FREE/);
 });
