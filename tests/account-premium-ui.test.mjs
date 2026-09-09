@@ -51,7 +51,10 @@ test("runtime, authorization and provider contracts remain wired to the same end
   assert.match(family,/\["suspend","resume","revoke"\]\.includes\(op\)/);
   assert.ok(family.includes('managedPath(id,"/"+op)'));
   assert.match(family,/browser_actor_authority===false/);
-  assert.match(family,/data\?\.outbound\?\.provider_execution===false/);
+  assert.match(family,/route==="ACTIVATION_LINK"/);
+  assert.match(family,/route==="DIRECT_PREMIUM"/);
+  assert.match(family,/outbound\?\.provider_execution===false/);
+  assert.match(family,/outbound\?\.provider_execution===true/);
 });
 
 test("responsive premium UI explicitly covers required viewport classes",()=>{
