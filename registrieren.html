@@ -667,6 +667,62 @@
         outline-offset:1px;
       }
     </style>    <link rel="stylesheet" href="assets/acquisition-v1.css?v=1" />
+    <style id="registration-whatsapp-step-premium">
+      /* Registration progress step 2 only — compact Black Luxury WhatsApp confirmation. */
+      body.registration-page .nw-registration-progress > .nw-registration-progress-whatsapp {
+        box-sizing: border-box;
+        min-height: 48px;
+        padding: 0 13px 0 10px;
+        gap: 9px;
+        border: 1px solid rgba(255, 255, 255, 0.13);
+        border-radius: 13px;
+        background: rgba(255, 255, 255, 0.035);
+        color: #f5f5f3;
+        font-size: 0.82rem;
+        font-weight: 600;
+        line-height: 1;
+        letter-spacing: 0.005em;
+        white-space: nowrap;
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.045),
+          0 8px 22px rgba(0, 0, 0, 0.14);
+        -webkit-backdrop-filter: blur(10px) saturate(112%);
+        backdrop-filter: blur(10px) saturate(112%);
+      }
+      body.registration-page .nw-registration-progress > .nw-registration-progress-whatsapp .nw-registration-progress-index {
+        display: inline-flex;
+        width: 26px;
+        height: 26px;
+        flex: 0 0 26px;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.045);
+        color: rgba(255, 255, 255, 0.68);
+        font: 600 0.74rem/1 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+        letter-spacing: 0;
+      }
+      body.registration-page .nw-registration-progress > .nw-registration-progress-whatsapp .nw-registration-progress-whatsapp-icon {
+        display: block;
+        width: 17px;
+        height: 17px;
+        flex: 0 0 17px;
+        margin-left: 1px;
+        object-fit: contain;
+      }
+      @media (max-width: 720px) {
+        body.registration-page .nw-registration-progress > .nw-registration-progress-whatsapp {
+          width: 100%;
+          min-height: 48px;
+          padding-right: 14px;
+          white-space: normal;
+        }
+        body.registration-page .nw-registration-progress > .nw-registration-progress-whatsapp .nw-registration-progress-whatsapp-icon {
+          margin-left: auto;
+        }
+      }
+    </style>
   </head>
   <body class="registration-page">
     <header class="top"><div class="wrap nav"><a class="brand" href="index.html" aria-label="NAHWERK Concierge – Startseite"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Hauptnavigation"><a href="index.html">Übersicht</a><a href="prime-concierge.html">Persönlicher Concierge</a><a href="concierges.html">Concierges</a><a href="telefonannahme.html">Telefonannahme</a><a href="senioren-concierge.html">Senioren Concierge</a><a href="angehoerige.html">Für Angehörige</a><a href="leistungen.html">Leistungen</a><a href="kontakt.html">Kontakt</a><a class="auth-link login-link" href="anmelden.html">Anmelden</a><a class="active auth-link register-link" href="registrieren.html">Registrieren</a></nav></div></header>
@@ -685,7 +741,7 @@
             </h1>
             <div class="nw-registration-progress" role="status" aria-live="polite">
               <strong>1. Zugang anlegen</strong>
-              <span>2. WhatsApp bestätigen</span>
+              <span class="nw-registration-progress-whatsapp"><b class="nw-registration-progress-index">2.</b> WhatsApp bestätigen<img class="nw-registration-progress-whatsapp-icon" src="assets/icons/whatsapp-mark.svg" alt="" aria-hidden="true" /></span>
               <span>3. Erste Aufgabe senden</span>
             </div>
             <p class="nw-registration-note">FREE ist vorausgewählt. Sicherheitsoptionen bleiben freiwillig; kostenpflichtige Tarife werden ohne freigegebenen Checkout nicht bestellt.</p>
