@@ -9,6 +9,8 @@ on:
   pull_request:
     paths:
       - "index.html"
+      - "prime-concierge.html"
+      - "safety.html"
       - "registrieren.html"
       - "konto.html"
       - "angehoerige.html"
@@ -21,6 +23,7 @@ on:
       - "dokumente-verstehen.html"
       - "technik-verstehen.html"
       - "assets/acquisition-v1.css"
+      - "assets/story-conversion-final.css"
       - "assets/acquisition-v1.js"
       - "assets/onboarding.js"
       - "assets/telephone-reception-product.css"
@@ -35,6 +38,9 @@ on:
       - "scripts/family-runtime-smoke.mjs"
       - "tests/family-runtime-activation.test.mjs"
       - "tests/acquisition-v1.test.mjs"
+      - "tests/story-conversion-final.test.mjs"
+      - "tests/product-refresh.test.mjs"
+      - "tests/telephone-reception-ui.test.mjs"
       - "tests/telephone-reception-product.test.mjs"
       - "tests/email-account-integration.test.mjs"
       - "tests/family-owner-sponsored-access.test.mjs"
@@ -78,7 +84,7 @@ jobs:
             sleep 1
           done
           curl -fsS "http://127.0.0.1:4173/index.html" >/dev/null
-          for page in index.html registrieren.html konto.html angehoerige.html pakete.html leistungen.html telefonannahme.html erster-schritt.html alltag-organisieren.html dokumente-verstehen.html technik-verstehen.html; do
+          for page in index.html prime-concierge.html safety.html registrieren.html konto.html angehoerige.html pakete.html leistungen.html telefonannahme.html erster-schritt.html alltag-organisieren.html dokumente-verstehen.html technik-verstehen.html; do
             curl -fsS "http://127.0.0.1:4173/$page" >/dev/null
           done
           curl -fsS "http://127.0.0.1:4173/api/runtime-config.json" > /tmp/family-pages-runtime.json
@@ -237,6 +243,92 @@ jobs:
             sleep 1
           done
           curl -fsS "http://127.0.0.1:4173/index.html" >/dev/null
+      - name: Website story browser E2E
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          Path("__story-browser-e2e.html").write_text(r'''<!doctype html>
+          <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+          <title>NAHWERK Story Browser Gate</title>
+          <style>html,body{margin:0;width:100%;height:100%;overflow:hidden}iframe{display:block;width:100vw;height:100vh;border:0}</style>
+          </head><body><iframe id="target" title="Website preview"></iframe><script>
+          (() => {
+            const params=new URLSearchParams(location.search);
+            const page=params.get("page")||"index.html";
+            const frame=document.getElementById("target");
+            frame.src="/"+page;
+            frame.addEventListener("load",()=>{
+              const win=frame.contentWindow;
+              const doc=frame.contentDocument;
+              for(const img of doc.images) img.loading="eager";
+              win.scrollTo(0,doc.documentElement.scrollHeight);
+              setTimeout(()=>{
+                const visible=(el)=>{
+                  const cs=win.getComputedStyle(el);
+                  const r=el.getBoundingClientRect();
+                  return cs.display!=="none"&&cs.visibility!=="hidden"&&r.width>0&&r.height>0;
+                };
+                const broken=[...doc.images].filter(img=>visible(img)&&img.complete&&img.naturalWidth===0);
+                const viewport=doc.documentElement.clientWidth;
+                const overflow=doc.documentElement.scrollWidth>viewport+3;
+                const badBoxes=[...doc.querySelectorAll("main section, main article, main figure, main .story-actions")]
+                  .filter(visible)
+                  .filter(el=>{const r=el.getBoundingClientRect();return r.left<-4||r.right>viewport+4;});
+                const h1ok=doc.querySelectorAll("h1").length===1;
+                const controls=[...doc.querySelectorAll("a,button")].filter(visible);
+                const badControls=controls.filter(el=>{
+                  if(el.tagName==="A") return !el.getAttribute("href");
+                  return !String(el.textContent||"").trim();
+                });
+                let order=true;
+                if(page==="index.html"){
+                  const steps=[...doc.querySelectorAll("[data-story-step]")].map(el=>el.dataset.storyStep).join(",");
+                  order=steps==="1,2,3,4,5,6";
+                }
+                let telephoneReveal=true;
+                if(page==="telefonannahme.html"){
+                  const trigger=doc.querySelector("[data-tr-show-agents]");
+                  const extras=[...doc.querySelectorAll("[data-agent-extra]")];
+                  if(trigger&&extras.length){
+                    trigger.click();
+                    telephoneReveal=extras.every(el=>!el.hidden);
+                  }
+                }
+                const ok=!overflow&&!broken.length&&!badBoxes.length&&h1ok&&!badControls.length&&order&&telephoneReveal;
+                document.documentElement.dataset.storyE2e=ok?"green":"red";
+                document.documentElement.dataset.page=page;
+                document.documentElement.dataset.overflow=overflow?"yes":"no";
+                document.documentElement.dataset.brokenImages=String(broken.length);
+                document.documentElement.dataset.badBoxes=String(badBoxes.length);
+                document.documentElement.dataset.h1=String(doc.querySelectorAll("h1").length);
+                document.documentElement.dataset.badControls=String(badControls.length);
+                document.documentElement.dataset.storyOrder=order?"green":"red";
+                document.documentElement.dataset.telephoneReveal=telephoneReveal?"green":"red";
+              },1000);
+            },{once:true});
+          })();
+          </script></body></html>''',encoding="utf-8")
+          PY
+          mkdir -p /tmp/story-e2e-visual
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          for width in 1440 1024 768 390; do
+            for page in index.html prime-concierge.html safety.html angehoerige.html telefonannahme.html; do
+              key="$(printf '%s' "$page" | tr '.-' '__')-$width"
+              url="http://127.0.0.1:4173/__story-browser-e2e.html?page=$page"
+              "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --window-size="$width,1100" --virtual-time-budget=3500 --dump-dom "$url" > "/tmp/story-$key.html"
+              grep -q 'data-story-e2e="green"' "/tmp/story-$key.html" || { cat "/tmp/story-$key.html"; exit 1; }
+              "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --window-size="$width,1100" --virtual-time-budget=2200 --screenshot="/tmp/story-e2e-visual/$key.png" "http://127.0.0.1:4173/$page" >/dev/null
+            done
+          done
+          echo "WEBSITE STORY BROWSER E2E GREEN — 20/20 viewport/page combinations"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: website-story-visual-${{ github.sha }}
+          path: /tmp/story-e2e-visual
+          retention-days: 7
+
       - name: Account premium visual browser E2E
         run: |
           python3 - <<'PY'
@@ -315,6 +407,8 @@ jobs:
         run: |
           npx --yes @axe-core/cli@4.10.2 \
             http://127.0.0.1:4173/index.html \
+            http://127.0.0.1:4173/prime-concierge.html \
+            http://127.0.0.1:4173/safety.html \
             http://127.0.0.1:4173/registrieren.html \
             http://127.0.0.1:4173/angehoerige.html \
             http://127.0.0.1:4173/leistungen.html \
