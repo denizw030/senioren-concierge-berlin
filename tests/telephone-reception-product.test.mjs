@@ -27,7 +27,8 @@ function loadHooks() {
     crypto:webcrypto,
     TextEncoder,
     Uint8Array,
-    document:{getElementById:()=>null}
+    document:{getElementById:()=>null,querySelectorAll:()=>[],querySelector:()=>null},
+    matchMedia:()=>({matches:false})
   };
   vm.createContext(sandbox);
   vm.runInContext(js,sandbox,{filename:"telephone-reception-product.js"});
