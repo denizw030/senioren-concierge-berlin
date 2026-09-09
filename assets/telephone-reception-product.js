@@ -243,6 +243,27 @@
     submitNumber
   });
 
+  function initAgentGallery() {
+    const triggers = [...document.querySelectorAll("[data-tr-show-agents]")];
+    const extraCards = [...document.querySelectorAll("[data-agent-extra]")];
+    const section = document.getElementById("agenten");
+    if (!triggers.length || !extraCards.length) return;
+    const reveal = (trigger) => {
+      extraCards.forEach((card) => { card.hidden = false; });
+      triggers.forEach((item) => item.setAttribute("aria-expanded", "true"));
+      document.querySelector(".tr-agent-actions")?.setAttribute("hidden", "");
+      if (trigger?.tagName === "A") {
+        section?.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+      }
+    };
+    triggers.forEach((trigger) => trigger.addEventListener("click", (event) => {
+      if (trigger.tagName === "A") event.preventDefault();
+      reveal(trigger);
+    }));
+  }
+
+  initAgentGallery();
+
   const form = document.getElementById("telephoneReceptionSetupForm");
   if (!form) return;
   const $ = (id) => document.getElementById(id);
@@ -275,10 +296,10 @@
     if (standalone) handlerAgent.checked = true;
     agentField.hidden = !handlerAgent.checked;
     entitlementNote.textContent = standalone
-      ? "Standalone erlaubt serverseitig ausschließlich TELEPHONE_AGENT."
+      ? "Im Standalone-Modell übernimmt ein Telefonagent Ihre Anrufe."
       : allowPersonal
-        ? "Ihr serverseitiges Bundle-Entitlement erlaubt PERSONAL_CONCIERGE oder TELEPHONE_AGENT."
-        : "PERSONAL_CONCIERGE bleibt gesperrt, bis der Server ein entsprechendes Bundle-Entitlement bestätigt.";
+        ? "Sie können zwischen Telefonagent und persönlichem Concierge wählen."
+        : "Für diese Auswahl bleibt der Telefonagent voreingestellt.";
   }
   function extractPersonalConciergeAccess(body) {
     const candidates = [body?.product_access, body?.entitlement, body?.reception?.product_access, body?.reception?.entitlement];
@@ -287,13 +308,13 @@
   async function loadServerAuthority() {
     if (!NUMBER_ONBOARDING_ENDPOINT) {
       personalConciergeAllowed = false;
-      serverNote.textContent = "Der Platform-Endpunkt ist vorbereitet, aber noch nicht deployed. Dieser PRE-PROD-Stand führt deshalb keine Netzwerk- oder Provider-Aktion aus.";
+      serverNote.textContent = "";
       syncHandlerAuthority();
       return;
     }
     const token = sessionToken();
     if (!token) {
-      serverNote.textContent = "Noch nicht angemeldet. Die Formularangaben bleiben im Browser und werden nicht an einen Provider oder Routing-Dienst gesendet.";
+      serverNote.textContent = "";
       syncHandlerAuthority();
       return;
     }
@@ -302,10 +323,10 @@
       const body = await response.json().catch(() => ({}));
       if (!response.ok || body?.ok !== true) throw new Error("profile_unavailable");
       personalConciergeAllowed = extractPersonalConciergeAccess(body);
-      serverNote.textContent = "Kundenzugang bestätigt. Rollen bleiben serverseitig autorisiert; die Festnetz-Submit-Function muss separat deployed werden, bevor die Website senden darf.";
+      serverNote.textContent = "";
     } catch {
       personalConciergeAllowed = false;
-      serverNote.textContent = "Die serverseitige Berechtigung konnte nicht sicher bestätigt werden. Es wird fail-closed nichts aktiviert oder an einen Provider gesendet.";
+      serverNote.textContent = "";
     }
     syncHandlerAuthority();
   }
@@ -332,7 +353,7 @@
     event.preventDefault();
     if (!form.reportValidity()) return;
     if (!validPhone($("existingLandline").value) || !validPhone($("callbackNumber").value)) {
-      setResult("Bitte Telefonnummern prüfen", "Die clientseitige Prüfung dient nur der Eingabehilfe. Server-Normalisierung und Server-Validierung bleiben maßgeblich.", "error");
+      setResult("Bitte Telefonnummern prüfen", "Bitte prüfen Sie beide Telefonnummern und versuchen Sie es erneut.", "error");
       return;
     }
 
@@ -350,14 +371,14 @@
       handlerMode: payload.handlerMode,
       personalConciergeAllowed
     })) {
-      setResult("Berechtigung nicht bestätigt", "Die Rollenwahl wurde nicht serverseitig bestätigt. Es wird nichts gesendet.", "error");
+      setResult("Auswahl nicht verfügbar", "Bitte wählen Sie für diese Einrichtung den Telefonagenten.", "error");
       syncHandlerAuthority();
       return;
     }
 
     const token = sessionToken();
     if (!token) {
-      setResult("Noch nicht übermittelt", "Für die serverseitige Festnetz-Einrichtung ist ein verifizierter Kunden-Zugang erforderlich. Es wurde nichts gebucht, aktiviert, portiert oder an einen Provider gesendet.");
+      setResult("Bitte anmelden", "Melden Sie sich bitte mit Ihrem NAHWERK Zugang an, um mit der Einrichtung fortzufahren.");
       return;
     }
 
@@ -377,7 +398,7 @@
     }
 
     if (outcome.kind === "endpoint_not_deployed") {
-      setResult("Übermittlung noch nicht verfügbar", "Der Platform-Endpunkt ist vorbereitet, aber noch nicht deployed. Es wurde kein Request ausgeführt, keine Nummer gespeichert und kein Provider aufgerufen.");
+      setResult("Einrichtung abstimmen", "Bitte kontaktieren Sie NAHWERK, damit wir die Einrichtung Ihrer Telefonannahme gemeinsam mit Ihnen abstimmen.");
       return;
     }
     if (outcome.kind === "number_submitted") {
@@ -385,22 +406,22 @@
       return;
     }
     if (outcome.kind === "idempotency_conflict") {
-      setResult("Übermittlung gestoppt", "Der Idempotency-Key steht im Konflikt mit einem anderen Request. Es erfolgt keine automatische Neusendung mit einem neuen Schlüssel.", "error");
+      setResult("Einrichtung nicht abgeschlossen", "Der Vorgang konnte nicht sicher abgeschlossen werden. Bitte versuchen Sie es später erneut oder kontaktieren Sie NAHWERK.", "error");
       return;
     }
     if (outcome.kind === "number_already_submitted") {
-      setResult("Nummer bereits eingereicht", "Für diese Nummer existiert bereits ein sicherer Einreichungszustand. Es wird keine neue Submit- oder Provider-Schleife gestartet.");
+      setResult("Nummer bereits erfasst", "Für diese Rufnummer liegt bereits ein Einrichtungsstand vor. Bitte kontaktieren Sie NAHWERK, wenn Sie Unterstützung benötigen.");
       return;
     }
     if (outcome.kind === "uncertain_network_error") {
-      setResult("Übermittlung nicht sicher bestätigt", "Es wird nicht automatisch erneut gesendet. Bei einem bewussten Retry wird derselbe Idempotency-Key wiederverwendet.", "error");
+      setResult("Einrichtung nicht bestätigt", "Der Vorgang konnte nicht sicher bestätigt werden. Bitte versuchen Sie es später erneut oder kontaktieren Sie NAHWERK.", "error");
       return;
     }
     if (outcome.kind === "invalid_canonical_submit_response") {
-      setResult("Antwort nicht sicher bestätigt", "Die Antwort entsprach nicht vollständig dem NUMBER_SUBMITTED-Vertrag. Fail closed: Die Nummer wird nicht als eingereicht oder aktiv dargestellt.", "error");
+      setResult("Einrichtung nicht bestätigt", "Der Vorgang konnte nicht sicher bestätigt werden. Bitte kontaktieren Sie NAHWERK, bevor Sie fortfahren.", "error");
       return;
     }
-    setResult("Übermittlung nicht abgeschlossen", "Der Server hat den Vorgang nicht sicher bestätigt. Es gibt keine Fake-Aktivierung und keine automatische Neusendung.", "error");
+    setResult("Einrichtung nicht abgeschlossen", "Der Vorgang konnte nicht abgeschlossen werden. Bitte versuchen Sie es später erneut oder kontaktieren Sie NAHWERK.", "error");
   });
 
   window.NAHWERKTelephoneReceptionContract = Object.freeze({
