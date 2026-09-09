@@ -50,19 +50,19 @@ body.senior-product .top .brandtext strong:before { color:#D4AF37!important; }
 .links a:hover,.links a.active { color:var(--nw-gold-light); }
 .links .auth-link { padding:10px 17px; border-color:rgba(200,164,93,.55); }
 .links .auth-link.register-link { background:var(--nw-gold-light); color:#17130d; border-color:var(--nw-gold-light); box-shadow:none; }
-.odysx-info-bar { min-height:28px!important; background:#0b0b09!important; border-color:var(--nw-line-dark)!important; color:#a9a49a!important; font-size:11px!important; letter-spacing:.08em!important; }
+/* Canonical ODYSX strip: exact visual reference from the overview page. */
+.odysx-info-bar {
+  min-height:28px!important;
+  background:#d7d2c9!important;
+  border-color:#c4beb4!important;
+  color:#171512!important;
+  font-size:11px!important;
+  letter-spacing:.08em!important;
+}
+.odysx-info-bar strong,
+.odysx-info-bar a { color:#090908!important; }
 .odysx-info-bar img { width:18px!important; height:18px!important; opacity:.75; }
 .odysx-info-bar .odysx-crown-logo { width:18px!important; height:18px!important; border-radius:5px; opacity:1; object-fit:cover; }
-body[data-product="senioren"] .odysx-info-bar,
-body.senior-product .odysx-info-bar {
-  background:#eee8dc!important;
-  border-top-color:rgba(42,35,23,.08)!important;
-  border-bottom-color:rgba(42,35,23,.14)!important;
-  color:#6d665c!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.7)!important;
-}
-body[data-product="senioren"] .odysx-info-bar strong,
-body.senior-product .odysx-info-bar strong { color:#4d463d!important; }
 body[data-product="senioren"] .nav-toggle,
 body.senior-product .nav-toggle {
   background:#eee8dc!important;
@@ -469,7 +469,6 @@ body[data-product="senioren"] .top .brandtext span:before{
 body.senior-product .top,body[data-product="senioren"] .top{background:rgba(247,243,234,.96)!important;border-bottom:1px solid rgba(42,35,23,.13)!important;color:#181713!important;box-shadow:0 8px 30px rgba(50,39,20,.06)!important}
 body.senior-product .top .links a,body[data-product="senioren"] .top .links a{color:#353128!important}
 body.senior-product .top .links a:hover,body.senior-product .top .links a.active,body[data-product="senioren"] .top .links a:hover,body[data-product="senioren"] .top .links a.active{color:#8f6c24!important;border-color:#b38a34!important}
-body.senior-product .odysx-info-bar,body[data-product="senioren"] .odysx-info-bar{min-height:25px!important;background:#ece7dc!important;color:#766f64!important;border-top:1px solid rgba(42,35,23,.05)!important;border-bottom:1px solid rgba(42,35,23,.11)!important}
 .home-hero .concierge-stage{min-width:0;overflow:visible}.home-hero .concierge-stage>.nw-carousel{width:100%;max-width:650px;margin:0 auto}.home-hero .concierge-stage .nw-carousel-stage{height:clamp(390px,38vw,505px)}.home-hero .concierge-stage .nw-carousel-info{display:none}.home-hero .concierge-stage .nw-carousel-card.is-active{border-color:rgba(212,175,55,.78)!important;box-shadow:0 30px 78px rgba(0,0,0,.38),0 0 0 1px rgba(212,175,55,.42)!important}
 @media(max-width:760px){.home-hero .concierge-stage .nw-carousel-stage{height:min(108vw,440px)}}
 
