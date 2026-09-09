@@ -218,7 +218,13 @@
     const result=await request({base,token,path:"/operator/managed-people/invitations",method:"POST",body:payload,headers:{"Idempotency-Key":pending.key},fetchImpl});
     if(!result.ok)return {...result,idempotencyKey:pending.key,retryUsesSameKey:true};
     const data=result.data;
-    const canonical=(result.httpStatus===200||result.httpStatus===201)&&INVITE_STATES.includes(String(data?.state||""))&&data?.outbound?.provider_execution===false;
+    const outbound=data?.outbound??{};
+    const route=String(outbound?.route||"");
+    const activationReady=route==="ACTIVATION_LINK"&&outbound?.provider_execution===false&&/^https:\/\/wa\.me\//i.test(String(outbound?.activation_link||""));
+    const directConfirmed=route==="DIRECT_PREMIUM"&&outbound?.provider_execution===true&&String(outbound?.send_status||"")==="SENT";
+    const directPrepared=route==="DIRECT_PREMIUM"&&outbound?.provider_execution===false;
+    const legacySafe=!route&&outbound?.provider_execution===false;
+    const canonical=(result.httpStatus===200||result.httpStatus===201)&&INVITE_STATES.includes(String(data?.state||""))&&(activationReady||directConfirmed||directPrepared||legacySafe);
     if(!canonical)return {ok:false,kind:"invalid_server_confirmation",networkRequestMade:true,idempotencyKey:pending.key,retryUsesSameKey:true,message:"Die Einladung wurde nicht sicher bestätigt."};
     clearPending(storage,pending.fingerprint,pending.key);
     return {...result,kind:"invitation_confirmed",idempotencyKey:pending.key,state:data.state,duplicate:data.duplicate===true,outbound:data.outbound??null};
@@ -245,7 +251,7 @@
   }
   async function getActivationLink({base,token,id,fetchImpl=globalThis.fetch}){
     const safe=safeManagedId(id);
-    const path=safe?"/family/invitations/"+encodeURIComponent(safe)+"/activation-link":null;
+    const path=safe?"/family/invitations/"+encodeURIComponent(safe)+"/send":null;
     return path?request({base,token,path,method:"POST",body:{},fetchImpl}):{ok:false,kind:"client_invalid",networkRequestMade:false};
   }
   function stateLabel(state){return STATE_LABELS[String(state||"").toUpperCase()]||"Status wird geprüft"}
@@ -308,7 +314,13 @@
     container.classList.remove("is-error");
     const text=document.createElement("span");
     if(route==="DIRECT_PREMIUM"){
-      text.textContent="Einladung wird über WhatsApp zugestellt.";
+      if(outbound?.provider_execution===true){
+        text.textContent="Einladung wird über WhatsApp zugestellt.";
+      }else if(String(outbound?.send_status||"")==="RECONCILE_ONLY"){
+        text.textContent="Die WhatsApp-Zustellung wird geprüft.";
+      }else{
+        text.textContent="Die direkte WhatsApp-Einladung ist vorbereitet.";
+      }
       container.append(text);return;
     }
     if(route!=="ACTIVATION_LINK"||!/^https:\/\/wa\.me\//i.test(activationLink)){
