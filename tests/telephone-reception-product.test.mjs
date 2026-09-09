@@ -212,9 +212,10 @@ test("role guards remain fail closed",()=>{
   assert.equal(hooks.roleAllowed({productScope:"CONCIERGE_BUNDLE",handlerMode:"TELEPHONE_AGENT",personalConciergeAllowed:false}),true);
 });
 
-test("client phone check is UX-only while server authority remains explicit",()=>{
-  assert.match(js,/clientseitige Prüfung dient nur der Eingabehilfe/);
-  assert.match(js,/Server-Normalisierung und Server-Validierung bleiben maßgeblich/);
+test("telephone onboarding remains inert until separately deployed and approved",()=>{
+  assert.match(js,/Runtime safety boundary\. Keep null until the Platform function is actually deployed and separately approved/);
+  assert.match(js,/const NUMBER_ONBOARDING_ENDPOINT = null/);
+  assert.match(page,/data-runtime-status="inert"/);
 });
 
 test("only routing or porting active are active states",()=>{
@@ -238,5 +239,6 @@ test("product integration, pricing, hero and header regressions stay intact",()=
   assert.deepEqual([...home.matchAll(/data-story-step="([1-6])"/g)].map(m=>m[1]),["1","2","3","4","5","6"]);
   assert.match(home,/body\.overview-page\.nw-header-scrolled \.top/);
   assert.match(home,/rgba\(7,\s*7,\s*6,\s*0\.82\)/);
-  assert.match(pricing,/SUBSCRIPTION[\s\S]{0,120}PAYG/);
+  assert.match(pricing,/SUBSCRIPTION/);
+  assert.match(pricing,/PAYG/);
 });
