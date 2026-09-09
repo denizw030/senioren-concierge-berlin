@@ -416,7 +416,16 @@ jobs:
 
       - name: Accessibility smoke with axe
         run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          CHROME_MAJOR="$("$CHROME" --version | grep -oE '[0-9]+' | head -1)"
+          npx --yes browser-driver-manager@2.0.1 install "chrome@$CHROME_MAJOR"
+          set -a
+          source "$HOME/.browser-driver-manager/.env"
+          set +a
+          test -x "$CHROMEDRIVER_TEST_PATH"
           npx --yes @axe-core/cli@4.10.2 \
+            --chromedriver-path "$CHROMEDRIVER_TEST_PATH" \
             http://127.0.0.1:4173/index.html \
             http://127.0.0.1:4173/prime-concierge.html \
             http://127.0.0.1:4173/safety.html \
