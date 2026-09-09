@@ -3,9 +3,11 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 
 const js=fs.readFileSync("assets/family-owner-sponsored-access.js","utf8");
+const konto=fs.readFileSync("konto.html","utf8");
 
 test("premium family start languages include de tr en pl ar",()=>{
   for(const token of ['de:"Deutsch"','tr:"Türkisch"','en:"Englisch"','pl:"Polnisch"','ar:"Arabisch"']) assert.ok(js.includes(token));
+  for(const code of ["de","tr","en","pl","ar"]) assert.match(konto,new RegExp('value="'+code+'"'));
 });
 
 test("customer copy exposes premium direct or activation fallback without provider jargon",()=>{
