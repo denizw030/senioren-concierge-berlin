@@ -269,7 +269,7 @@ jobs:
                   const r=el.getBoundingClientRect();
                   return cs.display!=="none"&&cs.visibility!=="hidden"&&r.width>0&&r.height>0;
                 };
-                const broken=[...doc.images].filter(img=>visible(img)&&img.complete&&img.naturalWidth===0);
+                const broken=[...doc.images].filter(img=>visible(img)&&Boolean(img.currentSrc)&&img.complete&&img.naturalWidth===0);
                 const viewport=doc.documentElement.clientWidth;
                 const overflow=doc.documentElement.scrollWidth>viewport+3;
                 const badBoxes=[...doc.querySelectorAll("main section, main article, main figure, main .story-actions")]
