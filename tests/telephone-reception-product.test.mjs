@@ -222,18 +222,19 @@ test("only routing or porting active are active states",()=>{
   assert.match(page,/Nie automatisch aktiv/);
 });
 
-test("senior fixed-line and shared-context product regressions stay intact",()=>{
-  assert.match(page,/Kein Smartphone nötig/);
+test("prepared fixed-line markup stays inert while shared-context story is preserved",()=>{
+  assert.match(page,/class="tr-section story-hidden-unreleased" hidden aria-hidden="true"[\s\S]*Kein Smartphone nötig/);
   assert.match(page,/normales Festnetztelefon/);
   assert.match(page,/Keine App, kein QR-Code, keine Push-Nachricht/);
-  assert.match(page,/Kein Weitererzählen\. Kein Informationsverlust\. Ein NAHWERK/);
+  assert.match(page,/Ein Concierge\. Dasselbe Gespräch\. Egal über welchen Weg\./);
   assert.match(page,/Hausverwaltung/);
 });
 
 test("product integration, pricing, hero and header regressions stay intact",()=>{
   for(const body of [home,services,pricing,registration]) assert.match(body,/telefonannahme\.html/);
-  assert.match(home,/nahwerk-overview-hero-weboptimized-hq\.webp/);
-  assert.match(home,/Ein Concierge, der nicht nur antwortet\. Sondern sich kümmert\./);
+  assert.match(home,/nahwerk-hero-web-lossless\.webp/);
+  assert.match(home,/Ein persönlicher Concierge, der erledigt\./);
+  assert.deepEqual([...home.matchAll(/data-story-step="([1-6])"/g)].map(m=>m[1]),["1","2","3","4","5","6"]);
   assert.match(home,/body\.overview-page\.nw-header-scrolled \.top/);
   assert.match(home,/rgba\(7,\s*7,\s*6,\s*0\.82\)/);
   assert.match(pricing,/SUBSCRIPTION[\s\S]{0,120}PAYG/);
