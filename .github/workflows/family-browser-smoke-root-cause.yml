@@ -1,0 +1,55 @@
+name: Family Browser Smoke Root Cause Proof
+
+on:
+  push:
+    branches:
+      - diagnostic/family-browser-smoke-root-cause-20260910
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout diagnostic instrumentation
+        uses: actions/checkout@v4
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Checkout exact frozen website
+        uses: actions/checkout@v4
+        with:
+          repository: denizw030/senioren-concierge-berlin
+          ref: 9c76636a3c863e45d0d794d11fafa60f3e988a52
+          path: frozen-site
+
+      - name: Verify frozen website SHA
+        run: |
+          set -euo pipefail
+          test "$(git -C frozen-site rev-parse HEAD)" = "9c76636a3c863e45d0d794d11fafa60f3e988a52"
+          mkdir -p diagnostic-output
+          {
+            echo "runner_os=$RUNNER_OS"
+            echo "runner_arch=$RUNNER_ARCH"
+            echo "node=$(node --version)"
+            echo "kernel=$(uname -a)"
+            echo "frozen_sha=$(git -C frozen-site rev-parse HEAD)"
+          } > diagnostic-output/runner.txt
+
+      - name: Observe exact direct 1440 Chrome path
+        run: |
+          set -euo pipefail
+          node diagnostics/family-browser-smoke-root-cause.mjs frozen-site diagnostic-output 2>&1 | tee diagnostic-output/runner-console.log
+
+      - name: Upload diagnostic evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: family-browser-smoke-root-cause
+          path: diagnostic-output/
+          if-no-files-found: error
