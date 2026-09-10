@@ -1,0 +1,73 @@
+name: NAHWERK Website Du Ansprache Audit
+
+on:
+  push:
+    branches:
+      - fix/website-du-ansprache-final-20260910
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Audit visible formal address in root website HTML
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          import re, json
+
+          FORMAL = re.compile(r'\b(?:Sie|Ihnen|Ihr|Ihre|Ihren|Ihrem|Ihres|Ihrer|Ihrem|Ihren|Ihres)\b')
+          VISIBLE_ATTRS = {'placeholder','aria-label','title','alt','value'}
+          EXCLUDED_TAGS = {'script','style','template','svg','path'}
+
+          class P(HTMLParser):
+              def __init__(self, path):
+                  super().__init__(convert_charrefs=True)
+                  self.path=path; self.stack=[]; self.matches=[]
+              def handle_starttag(self, tag, attrs):
+                  self.stack.append(tag)
+                  if tag not in EXCLUDED_TAGS:
+                      for k,v in attrs:
+                          if k in VISIBLE_ATTRS and v and FORMAL.search(v):
+                              self.matches.append({'kind':'attr:'+k,'line':self.getpos()[0],'text':v.strip()})
+              def handle_startendtag(self, tag, attrs):
+                  if tag not in EXCLUDED_TAGS:
+                      for k,v in attrs:
+                          if k in VISIBLE_ATTRS and v and FORMAL.search(v):
+                              self.matches.append({'kind':'attr:'+k,'line':self.getpos()[0],'text':v.strip()})
+              def handle_endtag(self, tag):
+                  if self.stack:
+                      # tolerate imperfect HTML
+                      if self.stack[-1]==tag: self.stack.pop()
+                      elif tag in self.stack:
+                          self.stack=self.stack[:len(self.stack)-1-self.stack[::-1].index(tag)]
+              def handle_data(self, data):
+                  if any(t in EXCLUDED_TAGS for t in self.stack): return
+                  text=' '.join(data.split())
+                  if text and FORMAL.search(text):
+                      self.matches.append({'kind':'text','line':self.getpos()[0],'text':text})
+
+          report={}
+          for path in sorted(Path('.').glob('*.html')):
+              p=P(str(path))
+              try: p.feed(path.read_text(encoding='utf-8'))
+              except Exception as e: p.matches.append({'kind':'PARSER_ERROR','line':0,'text':str(e)})
+              if p.matches: report[str(path)]=p.matches
+
+          Path('website-du-audit.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps(report,ensure_ascii=False,indent=2))
+          print('FILES_WITH_FORMAL_ADDRESS', len(report))
+          print('TOTAL_MATCHES', sum(len(v) for v in report.values()))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: website-du-audit
+          path: website-du-audit.json
+          if-no-files-found: error
