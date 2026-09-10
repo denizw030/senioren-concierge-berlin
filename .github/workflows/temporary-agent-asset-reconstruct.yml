@@ -1,7 +1,9 @@
 name: Temporary telephone agent asset reconstruction
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - tmp/telephone-agent-assets-reconstruct-20260910
 
 permissions:
   contents: write
