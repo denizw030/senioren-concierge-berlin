@@ -46,10 +46,12 @@ class PendingChatStore(context: Context) {
         return rawCurrent()
     }
 
+    fun hasAnyPending(): Boolean = rawCurrent() != null
+
     fun hasPendingForOtherAccount(ownerAccountKey: String): Boolean {
         val raw = rawCurrent() ?: return false
         val owner = prefs.getString(OWNER_ACCOUNT_KEY, null).orEmpty()
-        return raw.sourceMessageId.isNotBlank() && owner.isNotBlank() && owner != ownerAccountKey
+        return raw.sourceMessageId.isNotBlank() && owner != ownerAccountKey
     }
 
     fun isOwnedBy(sourceMessageId: String, ownerAccountKey: String): Boolean {
