@@ -1,6 +1,12 @@
 name: Android Distribution Package
 
 on:
+  push:
+    branches:
+      - codex/nahwerk-android-finalization-20260910
+    paths:
+      - 'android-app/**'
+      - '.github/workflows/android-distribution-package.yml'
   pull_request:
     branches:
       - main
@@ -25,7 +31,7 @@ permissions:
 
 jobs:
   unsigned-candidate:
-    if: ${{ github.event_name == 'pull_request' || inputs.signed_package != true }}
+    if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' || inputs.signed_package != true }}
     runs-on: ubuntu-latest
     env:
       NAHWERK_RELEASE_AUTH_BASE_URL: ''
