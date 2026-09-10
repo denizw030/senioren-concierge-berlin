@@ -234,7 +234,7 @@ test("prepared fixed-line markup stays inert while shared-context story is prese
 
 test("product integration, pricing, hero and header regressions stay intact",()=>{
   for(const body of [home,services,pricing,registration]) assert.match(body,/telefonannahme\.html/);
-  assert.match(home,/nahwerk-hero-web-lossless\.webp/);
+  assert.match(home,/assets\/prime\/nahwerk-overview-hero-weboptimized-hq\.webp/);
   assert.match(home,/Ein persönlicher Concierge, der erledigt\./);
   assert.deepEqual([...home.matchAll(/data-story-step="([1-6])"/g)].map(m=>m[1]),["1","2","3","4","5","6"]);
   assert.match(home,/body\.overview-page\.nw-header-scrolled \.top/);
