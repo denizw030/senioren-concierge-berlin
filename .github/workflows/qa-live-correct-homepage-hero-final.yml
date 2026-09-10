@@ -51,7 +51,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat > /tmp/live-proof.mjs <<'JS'
+          cat > live-proof.mjs <<'JS'
           import { chromium } from 'playwright';
           import assert from 'node:assert/strict';
           import fs from 'node:fs';
@@ -130,6 +130,7 @@ jobs:
             assert.equal(state.primary, 'Kostenlos ausprobieren', `${cfg.name}: primary CTA unchanged`);
             assert.equal(state.secondary, 'Echte Demo ansehen', `${cfg.name}: secondary CTA unchanged`);
             assert.deepEqual(pageErrors, [], `${cfg.name}: page errors`);
+            assert.deepEqual(severe, [], `${cfg.name}: console errors`);
 
             await page.screenshot({ path: `live-${cfg.name}.png`, fullPage: false });
             results.push({ cfg, hero: data, state, consoleErrors: severe, pageErrors });
@@ -140,7 +141,7 @@ jobs:
           fs.writeFileSync('live-proof.json', JSON.stringify(results, null, 2));
           console.log(JSON.stringify(results, null, 2));
           JS
-          node /tmp/live-proof.mjs
+          node live-proof.mjs
 
       - name: Upload live browser proof
         uses: actions/upload-artifact@v4
