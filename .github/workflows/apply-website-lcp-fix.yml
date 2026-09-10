@@ -1,0 +1,62 @@
+name: Apply Website LCP Fix
+on:
+  push:
+    branches:
+      - feat/website-story-conversion-final-20260910
+permissions:
+  contents: write
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/website-story-conversion-final-20260910
+          fetch-depth: 0
+      - name: Apply smallest verified website fix
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          home=Path('index.html')
+          text=home.read_text(encoding='utf-8')
+          old='src="assets/prime/nahwerk-hero-web-lossless.webp"'
+          new='src="assets/prime/nahwerk-overview-hero-weboptimized-hq.webp"'
+          assert text.count(old)==1, f'expected exactly one homepage LCP source, got {text.count(old)}'
+          text=text.replace(old,new,1)
+          anchor='''          loading="eager"\n          decoding="async"'''
+          replacement='''          loading="eager"\n          fetchpriority="high"\n          decoding="async"'''
+          assert text.count(anchor)>=1, 'hero loading anchor missing'
+          hero_pos=text.index(new)
+          anchor_pos=text.index(anchor, hero_pos)
+          text=text[:anchor_pos]+text[anchor_pos:].replace(anchor,replacement,1)
+          assert [x for x in ['data-story-step="1"','data-story-step="2"','data-story-step="3"','data-story-step="4"','data-story-step="5"','data-story-step="6"'] if x not in text]==[], 'story freeze markers missing'
+          home.write_text(text,encoding='utf-8')
+
+          js=Path('assets/acquisition-v1.js').read_text(encoding='utf-8')
+          required=[
+            'chatten, Fragen stellen, Aufgaben vorbereiten und eine echte Concierge-Ausführung ausprobieren',
+            'Keine Zahlungsdaten erforderlich. Kein automatisches Upgrade.',
+            'Guthaben schon ab 5 € online aufladen',
+            'bis zu 50 App-Dialoge / Monat',
+            'bis zu 20 WhatsApp-Dialoge / Monat',
+            '1 echte Concierge-Ausführung',
+            'FUTURE COPY — erst nach produktiver Verfügbarkeit im UI aktivieren'
+          ]
+          assert all(x in js for x in required), 'FREE copy contract missing before patch'
+          PY
+          test -f assets/prime/nahwerk-overview-hero-weboptimized-hq.webp
+          echo "Original bytes: $(stat -c%s assets/prime/nahwerk-hero-web-lossless.webp)"
+          echo "Optimized HQ bytes: $(stat -c%s assets/prime/nahwerk-overview-hero-weboptimized-hq.webp)"
+          if command -v identify >/dev/null 2>&1; then
+            identify assets/prime/nahwerk-hero-web-lossless.webp assets/prime/nahwerk-overview-hero-weboptimized-hq.webp
+          fi
+      - name: Commit fix and remove one-shot workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/apply-website-lcp-fix.yml
+          git add index.html
+          git diff --cached --check
+          git commit -m "perf: optimize homepage LCP hero delivery"
+          git push origin HEAD:feat/website-story-conversion-final-20260910
