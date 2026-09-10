@@ -17,6 +17,12 @@ val releaseSigningComplete = releaseSigningValues.all { it.isNotBlank() }
 require(!releaseSigningAny || releaseSigningComplete) {
     "Android release signing requires all four NAHWERK_ANDROID_* signing environment variables."
 }
+require(releaseAuthBaseUrl.isBlank() || releaseAuthBaseUrl.startsWith("https://")) {
+    "Android release auth endpoint must use HTTPS."
+}
+require(releaseGatewayBaseUrl.isBlank() || releaseGatewayBaseUrl.startsWith("https://")) {
+    "Android release gateway endpoint must use HTTPS."
+}
 
 fun buildConfigString(value: String): String =
     "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
@@ -77,6 +83,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.navigation:navigation-compose:2.8.5")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
     compileOnly("com.google.errorprone:error_prone_annotations:2.36.0")
@@ -86,6 +93,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation(platform("androidx.compose:compose-bom:2024.12.01"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    androidTestImplementation("androidx.compose.ui:ui-test-manifest")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test:runner:1.6.2")
     androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
