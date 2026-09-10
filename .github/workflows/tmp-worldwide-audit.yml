@@ -1,0 +1,66 @@
+name: Temporary worldwide navigation audit
+on:
+  push:
+    branches:
+      - fix/nahwerk-weltweit-navigation-rename-final-20260910
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Audit worldwide links and labels
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from html.parser import HTMLParser
+          from urllib.parse import urlsplit, unquote
+
+          target = 'concierges.html'
+          accidental = 'NAHWERK weltweit.html'
+          findings = []
+          accidental_refs = []
+          html_files = sorted(Path('.').rglob('*.html'))
+
+          class Parser(HTMLParser):
+              def __init__(self, path):
+                  super().__init__(convert_charrefs=True)
+                  self.path = path
+                  self.anchor = None
+              def handle_starttag(self, tag, attrs):
+                  if tag.lower() != 'a': return
+                  d = dict(attrs)
+                  href = d.get('href')
+                  if href is not None:
+                      self.anchor = {'href': href, 'text': []}
+              def handle_data(self, data):
+                  if self.anchor is not None:
+                      self.anchor['text'].append(data)
+              def handle_endtag(self, tag):
+                  if tag.lower() == 'a' and self.anchor is not None:
+                      href = self.anchor['href']
+                      path = unquote(urlsplit(href).path)
+                      if path == target or path.endswith('/' + target):
+                          findings.append((str(self.path), href, ' '.join(''.join(self.anchor['text']).split())))
+                      if accidental in unquote(href):
+                          accidental_refs.append((str(self.path), href))
+                      self.anchor = None
+
+          for p in html_files:
+              text = p.read_text(encoding='utf-8')
+              parser = Parser(p)
+              parser.feed(text)
+              if accidental in text:
+                  for i, line in enumerate(text.splitlines(), 1):
+                      if accidental in line:
+                          accidental_refs.append((f'{p}:{i}', line.strip()[:300]))
+
+          print(f'HTML_FILES={len(html_files)}')
+          print(f'TARGET_EXISTS={Path(target).exists()}')
+          print(f'ACCIDENTAL_EXISTS={Path(accidental).exists()}')
+          print(f'TARGET_LINK_COUNT={len(findings)}')
+          for row in findings:
+              print('TARGET_LINK|' + '|'.join(row))
+          print(f'ACCIDENTAL_REF_COUNT={len(accidental_refs)}')
+          for row in accidental_refs:
+              print('ACCIDENTAL_REF|' + '|'.join(row))
+          PY
