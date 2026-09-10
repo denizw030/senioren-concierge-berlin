@@ -1,4 +1,4 @@
-name: Temporary telephone agent asset reconstruction
+name: Temporary telephone agent browser E2E
 
 on:
   push:
@@ -6,50 +6,143 @@ on:
       - tmp/telephone-agent-assets-reconstruct-20260910
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  reconstruct-and-commit:
+  browser-e2e:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          ref: 62ef3f841e383afda466546cf9576b52d81fc671
+          fetch-depth: 1
 
-      - name: Reconstruct and verify exact Q86 assets
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Chromium browser harness
         shell: bash
         run: |
           set -euo pipefail
-          cat .assetfix/luisa.{1,2,3}.b64 | base64 -d > /tmp/luisa.webp
-          cat .assetfix/konrad.1.b64 .assetfix/konrad.2.b64 .assetfix/konrad.3a.b64 .assetfix/konrad.3b.b64 | base64 -d > /tmp/konrad.webp
-          cat .assetfix/james.s{1,2,3,4,5,6}.b64 | base64 -d > /tmp/james.webp
+          cd /tmp
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright@1.55.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
 
-          test "$(wc -c < /tmp/luisa.webp)" -eq 26424
-          test "$(wc -c < /tmp/konrad.webp)" -eq 25336
-          test "$(wc -c < /tmp/james.webp)" -eq 25428
-
-          echo 'b3f9bfd0dca528dcc25bafb5ea733f30688509074c5c57d7ef1fd12834a4c6c3  /tmp/luisa.webp' | sha256sum -c -
-          echo '3a46411a78d789f03af5662b396bce11764cab139df009484a861d259b428046  /tmp/konrad.webp' | sha256sum -c -
-          echo '6b82b5a657468bc72501b679f76a9be4dfe812909e0b51bc4ad5e709a23410a3  /tmp/james.webp' | sha256sum -c -
-
-      - name: Commit exactly three verified assets to target branch
+      - name: Serve exact target commit
         shell: bash
         run: |
-          set -euo pipefail
-          target='feat/website-story-conversion-final-20260910'
-          expected='af9f2c0a67c3d9b9ee7d7f68fbeef402000b2c29'
-          git fetch origin "$target"
-          actual="$(git rev-parse "origin/$target")"
-          test "$actual" = "$expected"
-          git checkout -B "$target" "origin/$target"
-          cp /tmp/luisa.webp assets/voice/agents/luisa.webp
-          cp /tmp/konrad.webp assets/voice/agents/konrad.webp
-          cp /tmp/james.webp assets/voice/agents/james.webp
-          changed="$(git diff --name-only | sort)"
-          expected_changed=$'assets/voice/agents/james.webp\nassets/voice/agents/konrad.webp\nassets/voice/agents/luisa.webp'
-          test "$changed" = "$expected_changed"
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add assets/voice/agents/luisa.webp assets/voice/agents/konrad.webp assets/voice/agents/james.webp
-          git commit -m 'fix: restore telephone agent portrait quality'
-          git push origin "HEAD:$target"
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/nahwerk-http.log 2>&1 &
+          echo $! > /tmp/nahwerk-http.pid
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4173/telefonannahme.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/nahwerk-http.log
+          exit 1
+
+      - name: Browser E2E 1440 1024 768 390
+        shell: bash
+        run: |
+          cat >/tmp/agent-e2e.mjs <<'NODE'
+          import { chromium } from '/tmp/node_modules/playwright/index.mjs';
+          import fs from 'node:fs';
+
+          const widths = [1440, 1024, 768, 390];
+          const agents = ['Alexander', 'Luisa', 'Konrad', 'James'];
+          const expected = {
+            Alexander: { src: 'assets/voice/alexander-telefon-agent-v2.webp' },
+            Luisa: { src: 'assets/voice/agents/luisa.webp' },
+            Konrad: { src: 'assets/voice/agents/konrad.webp' },
+            James: { src: 'assets/voice/agents/james.webp' },
+          };
+
+          function assert(condition, message) {
+            if (!condition) throw new Error(message);
+          }
+
+          fs.mkdirSync('screenshots', { recursive: true });
+          const browser = await chromium.launch({ headless: true });
+          try {
+            for (const width of widths) {
+              const page = await browser.newPage({ viewport: { width, height: 1000 }, deviceScaleFactor: 1 });
+              const response = await page.goto('http://127.0.0.1:4173/telefonannahme.html', { waitUntil: 'networkidle' });
+              assert(response && response.status() === 200, `PAGE_HTTP width=${width} expected=200 actual=${response?.status()}`);
+
+              const card = (name) => page.locator('.tr-agent-card').filter({ has: page.getByRole('heading', { name, exact: true }) });
+              assert(await card('Alexander').isVisible(), `INITIAL Alexander not visible width=${width}`);
+              assert(await card('Luisa').isVisible(), `INITIAL Luisa not visible width=${width}`);
+              assert(!(await card('Konrad').isVisible()), `INITIAL Konrad unexpectedly visible width=${width}`);
+              assert(!(await card('James').isVisible()), `INITIAL James unexpectedly visible width=${width}`);
+
+              await page.screenshot({ path: `screenshots/${width}-initial.png`, fullPage: true });
+
+              const reveal = page.getByRole('button', { name: 'Alle Modelle ansehen', exact: true });
+              assert(await reveal.isVisible(), `Reveal button missing width=${width}`);
+              await reveal.click();
+
+              for (const name of agents) {
+                const c = card(name);
+                assert(await c.isVisible(), `REVEALED ${name} not visible width=${width}`);
+                const img = c.locator('img');
+                await img.scrollIntoViewIfNeeded();
+                await page.waitForFunction(el => el.complete && el.naturalWidth > 0 && el.naturalHeight > 0, await img.elementHandle());
+                const info = await img.evaluate(async (el) => {
+                  const u = new URL(el.currentSrc || el.src, location.href);
+                  const r = await fetch(u.href, { cache: 'no-store' });
+                  const canvas = document.createElement('canvas');
+                  canvas.width = 64;
+                  canvas.height = 80;
+                  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                  ctx.drawImage(el, 0, 0, canvas.width, canvas.height);
+                  const d = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+                  let sum = 0, sum2 = 0, dark = 0, count = 0;
+                  for (let i = 0; i < d.length; i += 4) {
+                    const lum = 0.2126*d[i] + 0.7152*d[i+1] + 0.0722*d[i+2];
+                    sum += lum; sum2 += lum*lum; if (lum < 5) dark++; count++;
+                  }
+                  const mean = sum / count;
+                  const std = Math.sqrt(Math.max(0, sum2 / count - mean*mean));
+                  const rect = el.getBoundingClientRect();
+                  return {
+                    http: r.status,
+                    complete: el.complete,
+                    naturalWidth: el.naturalWidth,
+                    naturalHeight: el.naturalHeight,
+                    renderedWidth: rect.width,
+                    renderedHeight: rect.height,
+                    src: u.pathname.replace(/^\//,''),
+                    mean: Number(mean.toFixed(2)),
+                    std: Number(std.toFixed(2)),
+                    darkFraction: Number((dark / count).toFixed(4)),
+                  };
+                });
+                assert(info.http === 200, `IMG_HTTP ${name} width=${width} expected=200 actual=${info.http}`);
+                assert(info.complete === true, `IMG_COMPLETE ${name} width=${width} false`);
+                assert(info.naturalWidth > 0 && info.naturalHeight > 0, `IMG_NATURAL ${name} width=${width} invalid`);
+                assert(info.renderedWidth > 0 && info.renderedHeight > 0, `IMG_RENDER ${name} width=${width} zero-area`);
+                assert(info.src === expected[name].src, `IMG_SRC ${name} width=${width} expected=${expected[name].src} actual=${info.src}`);
+                assert(info.mean > 10, `IMG_BLACK ${name} width=${width} mean=${info.mean}`);
+                assert(info.std > 10, `IMG_FLAT ${name} width=${width} std=${info.std}`);
+                assert(info.darkFraction < 0.95, `IMG_BLACK_FRACTION ${name} width=${width} fraction=${info.darkFraction}`);
+                console.log(`AGENT_BROWSER_GREEN width=${width} name=${name} http=${info.http} complete=${info.complete} natural=${info.naturalWidth}x${info.naturalHeight} rendered=${info.renderedWidth.toFixed(1)}x${info.renderedHeight.toFixed(1)} mean=${info.mean} std=${info.std} darkFraction=${info.darkFraction} src=${info.src}`);
+                await c.screenshot({ path: `screenshots/${width}-${name.toLowerCase()}.png` });
+              }
+              await page.screenshot({ path: `screenshots/${width}-revealed.png`, fullPage: true });
+              console.log(`VIEWPORT_BROWSER_GREEN width=${width}`);
+              await page.close();
+            }
+          } finally {
+            await browser.close();
+          }
+          console.log('TELEPHONE_AGENT_BROWSER_E2E_GREEN');
+          NODE
+          node /tmp/agent-e2e.mjs
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: telephone-agent-browser-screenshots
+          path: screenshots
+          if-no-files-found: error
