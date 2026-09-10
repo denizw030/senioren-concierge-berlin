@@ -48,14 +48,10 @@ internal class NahwerkAppViewModel(
     private var chatOwner: String? = api.accountKey()
     private val restoredChat = chatOwner?.let(chatUiStore::restore)
 
-    private val initialScreen = if (api.hasSession()) {
-        savedStateHandle.get<String>(SCREEN_KEY)
-            ?.let { runCatching { AppScreen.valueOf(it) }.getOrNull() }
-            ?.takeUnless { it == AppScreen.LOGIN }
-            ?: AppScreen.HOME
-    } else {
-        AppScreen.LOGIN
-    }
+    private val initialScreen = AppStatePolicy.restoredScreen(
+        hasSession = api.hasSession(),
+        savedScreen = savedStateHandle.get<String>(SCREEN_KEY)
+    )
 
     private val _uiState = MutableStateFlow(
         AppUiState(
