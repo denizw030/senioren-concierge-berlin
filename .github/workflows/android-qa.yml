@@ -80,18 +80,11 @@ jobs:
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-      - name: Run Android instrumentation regressions and export visual QA
+      - name: Run Android instrumentation regressions on emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
           arch: x86_64
           profile: pixel_2
           disable-animations: true
-          script: cd android-app && ./gradlew --no-daemon connectedDebugAndroidTest && APP_APK=$(find app/build/outputs/apk/debug -name '*.apk' -type f | head -n 1) && TEST_APK=$(find app/build/outputs/apk/androidTest/debug -name '*.apk' -type f | head -n 1) && test -n "$APP_APK" && test -n "$TEST_APK" && adb install -r "$APP_APK" && adb install -r "$TEST_APK" && adb shell am instrument -w -e class com.nahwerk.concierge.VisualQaInstrumentedTest com.nahwerk.concierge.test/androidx.test.runner.AndroidJUnitRunner && mkdir -p visual-qa && adb pull /sdcard/Android/data/com.nahwerk.concierge/files/visual-qa/. visual-qa/
-      - name: Upload visual QA screenshots
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: nahwerk-android-visual-qa
-          path: android-app/visual-qa/**/*.png
-          if-no-files-found: error
+          script: cd android-app && ./gradlew --no-daemon connectedDebugAndroidTest
