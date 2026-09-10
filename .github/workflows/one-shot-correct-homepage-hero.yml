@@ -43,8 +43,8 @@ jobs:
               assert out.size == (1916, 821), out.size
           assert dst.stat().st_size < 250_000, dst.stat().st_size
 
-          old = 'assets/prime/prime-concierge-hero-luxury-monogram-v2.webp'
-          new = 'assets/prime/nahwerk-hero-web-lossless-optimized-hq.webp'
+          old_name = 'prime-concierge-hero-luxury-monogram-v2'
+          new_name = 'nahwerk-hero-web-lossless-optimized-hq'
           paths = [
               Path('index.html'),
               Path('tests/email-account-integration.test.mjs'),
@@ -53,9 +53,9 @@ jobs:
           total = 0
           for path in paths:
               text = path.read_text(encoding='utf-8')
-              count = text.count(old)
+              count = text.count(old_name)
               assert count == 1, (str(path), count)
-              path.write_text(text.replace(old, new), encoding='utf-8')
+              path.write_text(text.replace(old_name, new_name), encoding='utf-8')
               total += count
           assert total == 3, total
           print(f'generated={dst} bytes={dst.stat().st_size} dims=1916x821')
