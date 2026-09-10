@@ -1,0 +1,53 @@
+name: Temporary telephone agent asset reconstruction
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  reconstruct-and-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reconstruct and verify exact Q86 assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .assetfix/luisa.{1,2,3}.b64 | base64 -d > /tmp/luisa.webp
+          cat .assetfix/konrad.1.b64 .assetfix/konrad.2.b64 .assetfix/konrad.3a.b64 .assetfix/konrad.3b.b64 | base64 -d > /tmp/konrad.webp
+          cat .assetfix/james.s{1,2,3,4,5,6}.b64 | base64 -d > /tmp/james.webp
+
+          test "$(wc -c < /tmp/luisa.webp)" -eq 26424
+          test "$(wc -c < /tmp/konrad.webp)" -eq 25336
+          test "$(wc -c < /tmp/james.webp)" -eq 25428
+
+          echo 'b3f9bfd0dca528dcc25bafb5ea733f30688509074c5c57d7ef1fd12834a4c6c3  /tmp/luisa.webp' | sha256sum -c -
+          echo '3a46411a78d789f03af5662b396bce11764cab139df009484a861d259b428046  /tmp/konrad.webp' | sha256sum -c -
+          echo '6b82b5a657468bc72501b679f76a9be4dfe812909e0b51bc4ad5e709a23410a3  /tmp/james.webp' | sha256sum -c -
+
+      - name: Commit exactly three verified assets to target branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          target='feat/website-story-conversion-final-20260910'
+          expected='af9f2c0a67c3d9b9ee7d7f68fbeef402000b2c29'
+          git fetch origin "$target"
+          actual="$(git rev-parse "origin/$target")"
+          test "$actual" = "$expected"
+          git checkout -B "$target" "origin/$target"
+          cp /tmp/luisa.webp assets/voice/agents/luisa.webp
+          cp /tmp/konrad.webp assets/voice/agents/konrad.webp
+          cp /tmp/james.webp assets/voice/agents/james.webp
+          changed="$(git diff --name-only | sort)"
+          expected_changed=$'assets/voice/agents/james.webp\nassets/voice/agents/konrad.webp\nassets/voice/agents/luisa.webp'
+          test "$changed" = "$expected_changed"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/voice/agents/luisa.webp assets/voice/agents/konrad.webp assets/voice/agents/james.webp
+          git commit -m 'fix: restore telephone agent portrait quality'
+          git push origin "HEAD:$target"
