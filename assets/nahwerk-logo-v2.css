@@ -81,11 +81,12 @@
     max-height:640px;
     border:1px solid rgba(212,175,55,.30);
     border-radius:28px;
+    overflow:hidden;
     background-color:#05070b;
     background-image:url("prime/nahwerk-red-blue-hero-web-lossless.webp");
     background-repeat:no-repeat;
-    background-position:center;
-    background-size:contain;
+    background-position:center 18%;
+    background-size:cover;
     box-shadow:0 30px 80px rgba(0,0,0,.40),inset 0 1px 0 rgba(255,255,255,.025);
   }
 
@@ -283,11 +284,12 @@
     margin:28px auto 0!important;
     border:1px solid rgba(212,175,55,.26)!important;
     border-radius:24px!important;
+    overflow:hidden!important;
     background-color:#05070b!important;
     background-image:url("prime/nahwerk-red-blue-hero-web-lossless.webp")!important;
     background-repeat:no-repeat!important;
-    background-position:center!important;
-    background-size:contain!important;
+    background-position:center 18%!important;
+    background-size:cover!important;
     box-shadow:0 24px 60px rgba(0,0,0,.34)!important;
     opacity:1!important;
   }
