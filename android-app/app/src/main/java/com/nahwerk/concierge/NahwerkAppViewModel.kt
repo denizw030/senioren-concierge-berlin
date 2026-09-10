@@ -9,13 +9,12 @@ import com.nahwerk.concierge.data.HomeContext
 import com.nahwerk.concierge.data.NahwerkApi
 import com.nahwerk.concierge.data.PendingChatRequest
 import com.nahwerk.concierge.data.PendingChatStore
+import com.nahwerk.concierge.data.SecureChatUiStore
 import com.nahwerk.concierge.data.SecureSessionStore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import org.json.JSONArray
-import org.json.JSONObject
 
 internal enum class AppScreen { LOGIN, HOME, CHAT, REMINDERS, SETTINGS }
 
@@ -39,14 +38,15 @@ internal class NahwerkAppViewModel(
 ) : AndroidViewModel(application) {
     companion object {
         private const val SCREEN_KEY = "app_screen"
-        private const val CHAT_MESSAGES_KEY = "chat_messages_json"
-        private const val CHAT_DRAFT_KEY = "chat_draft"
-        private const val CHAT_OWNER_KEY = "chat_owner"
     }
 
     private val sessions = SecureSessionStore(application.applicationContext)
     private val pendingChats = PendingChatStore(application.applicationContext)
+    private val chatUiStore = SecureChatUiStore(application.applicationContext)
     private val api = NahwerkApi(sessions, pendingChats)
+
+    private var chatOwner: String? = api.accountKey()
+    private val restoredChat = chatOwner?.let(chatUiStore::restore)
 
     private val initialScreen = if (api.hasSession()) {
         savedStateHandle.get<String>(SCREEN_KEY)
@@ -61,8 +61,8 @@ internal class NahwerkAppViewModel(
         AppUiState(
             screen = initialScreen,
             loading = api.hasSession(),
-            chatMessages = restoreMessages(),
-            chatDraft = savedStateHandle.get<String>(CHAT_DRAFT_KEY).orEmpty(),
+            chatMessages = restoredChat?.messages.orEmpty(),
+            chatDraft = restoredChat?.draft.orEmpty(),
             pendingRequest = api.pendingChatRequest()
         )
     )
@@ -106,8 +106,7 @@ internal class NahwerkAppViewModel(
             moveToLogin("Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.")
             return
         }
-        val current = _uiState.value
-        _uiState.value = current.copy(loading = true, error = null, notice = null)
+        _uiState.value = _uiState.value.copy(loading = true, error = null, notice = null)
         viewModelScope.launch {
             api.loadHome()
                 .onSuccess { home ->
@@ -153,7 +152,7 @@ internal class NahwerkAppViewModel(
     fun updateDraft(value: String) {
         if (value.length > 4000) return
         _uiState.value = _uiState.value.copy(chatDraft = value)
-        savedStateHandle[CHAT_DRAFT_KEY] = value
+        persistChatState()
     }
 
     fun sendChat() {
@@ -235,14 +234,14 @@ internal class NahwerkAppViewModel(
 
     private fun synchronizeChatOwner(clearOnMissing: Boolean) {
         val owner = api.accountKey()
-        val savedOwner = savedStateHandle.get<String>(CHAT_OWNER_KEY)
         if (owner.isNullOrBlank()) {
             if (clearOnMissing) clearChatState()
             return
         }
-        if (savedOwner != owner) {
-            clearChatState()
-            savedStateHandle[CHAT_OWNER_KEY] = owner
+        if (chatOwner != owner) {
+            chatUiStore.clear()
+            chatOwner = owner
+            _uiState.value = _uiState.value.copy(chatMessages = emptyList(), chatDraft = "", chatError = null)
         }
     }
 
@@ -257,9 +256,8 @@ internal class NahwerkAppViewModel(
     }
 
     private fun clearChatState() {
-        savedStateHandle.remove<String>(CHAT_MESSAGES_KEY)
-        savedStateHandle.remove<String>(CHAT_DRAFT_KEY)
-        savedStateHandle.remove<String>(CHAT_OWNER_KEY)
+        chatUiStore.clear()
+        chatOwner = null
     }
 
     private fun persistScreen(screen: AppScreen) {
@@ -267,34 +265,8 @@ internal class NahwerkAppViewModel(
     }
 
     private fun persistChatState() {
-        savedStateHandle[CHAT_DRAFT_KEY] = _uiState.value.chatDraft
-        val array = JSONArray()
-        _uiState.value.chatMessages.forEach { message ->
-            array.put(
-                JSONObject()
-                    .put("role", message.role)
-                    .put("text", message.text)
-                    .put("source_message_id", message.sourceMessageId ?: JSONObject.NULL)
-            )
-        }
-        savedStateHandle[CHAT_MESSAGES_KEY] = array.toString()
-    }
-
-    private fun restoreMessages(): List<ChatMessage> {
-        val encoded = savedStateHandle.get<String>(CHAT_MESSAGES_KEY).orEmpty()
-        if (encoded.isBlank()) return emptyList()
-        return runCatching {
-            val array = JSONArray(encoded)
-            buildList {
-                for (index in 0 until array.length()) {
-                    val item = array.optJSONObject(index) ?: continue
-                    val role = item.optString("role")
-                    val text = item.optString("text")
-                    if (role.isBlank() || text.isBlank()) continue
-                    val source = item.optString("source_message_id").takeIf { it.isNotBlank() && it != "null" }
-                    add(ChatMessage(role, text, source))
-                }
-            }
-        }.getOrDefault(emptyList())
+        val owner = api.accountKey() ?: return
+        if (chatOwner != owner) return
+        chatUiStore.save(owner, _uiState.value.chatMessages, _uiState.value.chatDraft)
     }
 }
