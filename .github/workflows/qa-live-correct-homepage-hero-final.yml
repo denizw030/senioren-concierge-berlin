@@ -1,0 +1,153 @@
+name: QA Live Correct Homepage Hero Final
+
+on:
+  push:
+    branches:
+      - qa/live-correct-homepage-hero-final-20260910
+
+permissions:
+  contents: read
+
+jobs:
+  live-proof:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Wait for production content and prove HTTP 200
+        shell: bash
+        run: |
+          set -euo pipefail
+          base='https://nahwerkconcierge.com'
+          asset='assets/prime/nahwerk-hero-web-lossless-optimized-hq.webp'
+          ok=0
+          for i in $(seq 1 30); do
+            html="$(curl -fsSL -H 'Cache-Control: no-cache' "$base/?hero-proof=${GITHUB_RUN_ID}-${i}" || true)"
+            if printf '%s' "$html" | grep -Fq "$asset"; then
+              ok=1
+              break
+            fi
+            sleep 5
+          done
+          test "$ok" -eq 1
+          code="$(curl -sS -o /tmp/live-hero.webp -w '%{http_code}' -H 'Cache-Control: no-cache' "$base/$asset?hero-proof=${GITHUB_RUN_ID}")"
+          test "$code" = '200'
+          test "$(stat -c%s /tmp/live-hero.webp)" = '133546'
+          sha="$(sha256sum /tmp/live-hero.webp | awk '{print $1}')"
+          test "$sha" = 'fe5df56d41eb5f50b99e1c40af99ea34f41911d57e0c4d62f969aff91a00d0bb'
+          echo "LIVE_ASSET_HTTP=$code"
+          echo "LIVE_ASSET_BYTES=$(stat -c%s /tmp/live-hero.webp)"
+          echo "LIVE_ASSET_SHA256=$sha"
+
+      - name: Install Playwright Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm --silent init -y >/dev/null 2>&1
+          npm --silent install playwright@1.55.0 >/dev/null
+          npx playwright install --with-deps chromium
+
+      - name: Real browser desktop and mobile proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/live-proof.mjs <<'JS'
+          import { chromium } from 'playwright';
+          import assert from 'node:assert/strict';
+          import fs from 'node:fs';
+
+          const base = 'https://nahwerkconcierge.com/';
+          const expected = 'nahwerk-hero-web-lossless-optimized-hq.webp';
+          const browser = await chromium.launch({ headless: true });
+          const results = [];
+
+          for (const cfg of [
+            { name: 'desktop-1440', width: 1440, height: 1000 },
+            { name: 'mobile-390', width: 390, height: 844 }
+          ]) {
+            const context = await browser.newContext({
+              viewport: { width: cfg.width, height: cfg.height },
+              deviceScaleFactor: 1,
+              ignoreHTTPSErrors: false
+            });
+            const page = await context.newPage();
+            const severe = [];
+            const pageErrors = [];
+            page.on('console', msg => {
+              if (msg.type() === 'error') severe.push(msg.text());
+            });
+            page.on('pageerror', err => pageErrors.push(String(err)));
+
+            const response = await page.goto(`${base}?hero-proof=${Date.now()}-${cfg.name}`, {
+              waitUntil: 'networkidle',
+              timeout: 60000
+            });
+            assert.equal(response?.status(), 200, `${cfg.name}: homepage HTTP`);
+
+            const hero = page.locator('.story-hero-art');
+            await hero.waitFor({ state: 'visible', timeout: 15000 });
+            await hero.evaluate(async img => {
+              if (!img.complete) await new Promise((resolve, reject) => {
+                img.addEventListener('load', resolve, { once: true });
+                img.addEventListener('error', reject, { once: true });
+              });
+              if (img.decode) await img.decode();
+            });
+
+            const data = await hero.evaluate(img => {
+              const r = img.getBoundingClientRect();
+              const s = getComputedStyle(img);
+              return {
+                src: img.currentSrc,
+                complete: img.complete,
+                naturalWidth: img.naturalWidth,
+                naturalHeight: img.naturalHeight,
+                rect: { x: r.x, y: r.y, width: r.width, height: r.height },
+                opacity: Number(s.opacity),
+                display: s.display,
+                visibility: s.visibility
+              };
+            });
+
+            assert.ok(data.src.includes(expected), `${cfg.name}: exact live hero asset`);
+            assert.equal(data.complete, true, `${cfg.name}: image complete`);
+            assert.equal(data.naturalWidth, 1916, `${cfg.name}: naturalWidth`);
+            assert.equal(data.naturalHeight, 821, `${cfg.name}: naturalHeight`);
+            assert.ok(data.rect.width > 0 && data.rect.height > 0, `${cfg.name}: rendered area`);
+            assert.ok(data.opacity > 0, `${cfg.name}: visible opacity`);
+            assert.notEqual(data.display, 'none', `${cfg.name}: display`);
+            assert.notEqual(data.visibility, 'hidden', `${cfg.name}: visibility`);
+
+            const state = await page.evaluate(() => ({
+              scrollWidth: document.documentElement.scrollWidth,
+              innerWidth: window.innerWidth,
+              h1: document.querySelector('.story-hero .story-title')?.textContent?.trim(),
+              primary: document.querySelector('.story-hero .story-btn--primary')?.textContent?.trim(),
+              secondary: document.querySelector('.story-hero .story-btn--secondary')?.textContent?.trim()
+            }));
+            assert.ok(state.scrollWidth <= state.innerWidth + 1, `${cfg.name}: no horizontal overflow`);
+            assert.equal(state.h1, 'Ein persönlicher Concierge, der erledigt.', `${cfg.name}: h1 unchanged`);
+            assert.equal(state.primary, 'Kostenlos ausprobieren', `${cfg.name}: primary CTA unchanged`);
+            assert.equal(state.secondary, 'Echte Demo ansehen', `${cfg.name}: secondary CTA unchanged`);
+            assert.deepEqual(pageErrors, [], `${cfg.name}: page errors`);
+
+            await page.screenshot({ path: `live-${cfg.name}.png`, fullPage: false });
+            results.push({ cfg, hero: data, state, consoleErrors: severe, pageErrors });
+            await context.close();
+          }
+
+          await browser.close();
+          fs.writeFileSync('live-proof.json', JSON.stringify(results, null, 2));
+          console.log(JSON.stringify(results, null, 2));
+          JS
+          node /tmp/live-proof.mjs
+
+      - name: Upload live browser proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-correct-homepage-hero-proof
+          path: |
+            live-desktop-1440.png
+            live-mobile-390.png
+            live-proof.json
+          if-no-files-found: error
