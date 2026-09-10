@@ -29,7 +29,6 @@ import com.nahwerk.concierge.data.HomeContext
 import com.nahwerk.concierge.data.PendingChatRequest
 import com.nahwerk.concierge.data.Reminder
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileOutputStream
 import org.junit.Rule
 import org.junit.Test
@@ -89,8 +88,7 @@ class VisualQaInstrumentedTest {
     }
 
     private fun saveNode(name: String) {
-        val bitmap = composeRule.onRoot().captureToImage().asAndroidBitmap()
-        saveBitmap(name, bitmap)
+        saveBitmap(name, composeRule.onRoot().captureToImage().asAndroidBitmap())
     }
 
     private fun saveDevice(name: String) {
@@ -100,45 +98,31 @@ class VisualQaInstrumentedTest {
     }
 
     private fun saveBitmap(name: String, bitmap: Bitmap) {
-        val instrumentation = InstrumentationRegistry.getInstrumentation()
-        val context = instrumentation.targetContext
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
         val directory = File(context.getExternalFilesDir(null), "visual-qa/before")
         check(directory.exists() || directory.mkdirs())
-        val localFile = File(directory, "$name.png")
-        FileOutputStream(localFile).use { stream ->
+        val output = File(directory, "$name.png")
+        FileOutputStream(output).use { stream ->
             check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream))
         }
-
-        val exportDirectory = "/sdcard/Download/nahwerk-visual-qa/before"
-        val exportedFile = "$exportDirectory/$name.png"
-        val command = "mkdir -p $exportDirectory && cp ${localFile.absolutePath} $exportedFile && ls $exportedFile"
-        val descriptor = instrumentation.uiAutomation.executeShellCommand(command)
-        val output = FileInputStream(descriptor.fileDescriptor).bufferedReader().use { it.readText() }
-        descriptor.close()
-        check(output.contains("$name.png")) { "Visual QA export failed for $name" }
+        check(output.isFile && output.length() > 0L) { "Visual QA PNG was not persisted for $name" }
     }
 
     @Test
     fun captureBeforeHome390() {
-        setFrame {
-            HomeScreen(home, false, null, {}, {}, {}, {})
-        }
+        setFrame { HomeScreen(home, false, null, {}, {}, {}, {}) }
         saveNode("home-390")
     }
 
     @Test
     fun captureBeforeHome360() {
-        setFrame(width = 360, height = 760) {
-            HomeScreen(home, false, null, {}, {}, {}, {})
-        }
+        setFrame(width = 360, height = 760) { HomeScreen(home, false, null, {}, {}, {}, {}) }
         saveNode("home-360")
     }
 
     @Test
     fun captureBeforeChatEmpty() {
-        setFrame {
-            ChatScreen(home, emptyList(), "", false, null, null, {}, {}, {}, {}, {})
-        }
+        setFrame { ChatScreen(home, emptyList(), "", false, null, null, {}, {}, {}, {}, {}) }
         saveNode("chat-empty")
     }
 
@@ -209,17 +193,13 @@ class VisualQaInstrumentedTest {
 
     @Test
     fun captureBeforeAccount() {
-        setFrame {
-            SettingsScreen(home, {}, {})
-        }
+        setFrame { SettingsScreen(home, {}, {}) }
         saveNode("account")
     }
 
     @Test
     fun captureBeforeRemindersAndEmptyState() {
-        setFrame {
-            ReminderScreen(emptyList(), {})
-        }
+        setFrame { ReminderScreen(emptyList(), {}) }
         saveNode("reminders-empty")
     }
 
