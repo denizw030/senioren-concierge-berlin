@@ -1,0 +1,44 @@
+name: NAHWERK Anmelden 1366 Nav Proof
+
+on:
+  push:
+    branches:
+      - fix/anmelden-header-1366-final-20260910
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  nav-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build local proof harness
+        shell: bash
+        run: |
+          cat > anmelden-nav-harness.html <<'EOF'
+          <!doctype html><html><body style="margin:0"><iframe id="f" style="position:fixed;inset:0;width:100vw;height:100vh;border:0"></iframe><pre id="r"></pre><script>
+          const f=document.getElementById('f'),r=document.getElementById('r');
+          f.onload=()=>setTimeout(()=>{try{const w=f.contentWindow,d=w.document,root=d.documentElement,t=d.querySelector('.nav-toggle'),links=d.querySelector('.top .links');const out={innerWidth:w.innerWidth,scrollWidth:root.scrollWidth,toggleDisplay:w.getComputedStyle(t).display,linksClosed:w.getComputedStyle(links).display};if(!t)throw Error('nav-toggle missing');if(w.getComputedStyle(t).display==='none')throw Error('nav-toggle hidden');if(w.getComputedStyle(links).display!=='none')throw Error('desktop links not collapsed');t.click();const lr=links.getBoundingClientRect();const open=w.getComputedStyle(links).display;if(open==='none')throw Error('menu did not open');if(lr.left<0||lr.right>w.innerWidth+1)throw Error('open menu outside viewport '+JSON.stringify({left:lr.left,right:lr.right,width:w.innerWidth}));if(root.scrollWidth>w.innerWidth+1)throw Error('horizontal overflow');r.textContent=JSON.stringify({...out,linksOpen:open,menuLeft:lr.left,menuRight:lr.right,result:'GREEN'});document.documentElement.dataset.result='green';f.style.display='none'}catch(e){r.textContent=String(e.stack||e);document.documentElement.dataset.result='red';f.style.display='none'}},1200);f.src='anmelden.html?produkt=prime';
+          </script></body></html>
+          EOF
+      - name: Serve branch
+        run: |
+          nohup python3 -m http.server 4173 >/tmp/http.log 2>&1 &
+          for i in 1 2 3 4 5; do curl -fsS http://127.0.0.1:4173/anmelden.html >/dev/null && break || sleep 1; done
+      - name: Prove 1366 navigation and screenshot
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          mkdir -p proof
+          "$CHROME" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --window-size=1366,768 --virtual-time-budget=5000 --dump-dom http://127.0.0.1:4173/anmelden-nav-harness.html > proof/nav-dom.html
+          grep -q 'data-result="green"' proof/nav-dom.html
+          "$CHROME" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --hide-scrollbars --window-size=1366,768 --virtual-time-budget=3500 --screenshot=proof/anmelden-1366-fixed.png 'http://127.0.0.1:4173/anmelden.html?produkt=prime'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: anmelden-1366-nav-proof
+          path: proof/
+          if-no-files-found: error
