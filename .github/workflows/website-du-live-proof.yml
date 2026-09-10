@@ -1,6 +1,9 @@
 name: NAHWERK Website Du Live Production Proof
 
 on:
+  push:
+    branches:
+      - verify/website-du-production-20260910
   workflow_dispatch:
 
 permissions:
