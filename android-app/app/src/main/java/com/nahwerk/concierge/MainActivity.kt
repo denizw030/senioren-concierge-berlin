@@ -367,7 +367,7 @@ internal fun HomeScreen(
 @Composable
 private fun ConciergeHero(home: HomeContext, onChat: () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth().aspectRatio(1.42f),
+        modifier = Modifier.fillMaxWidth().height(270.dp),
         shape = RoundedCornerShape(NahwerkRadii.Hero),
         colors = CardDefaults.cardColors(containerColor = NahwerkPalette.Surface),
         border = BorderStroke(1.dp, NahwerkPalette.Divider)
