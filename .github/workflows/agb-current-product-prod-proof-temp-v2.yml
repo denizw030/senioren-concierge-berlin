@@ -1,0 +1,73 @@
+name: AGB Current Product Production Proof V2
+
+on:
+  push:
+    branches:
+      - "qa/agb-current-product-prod-proof-20260910"
+
+permissions:
+  contents: read
+
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prove current AGB copy contract
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          src = re.sub(r'\s+', ' ', Path('agb.html').read_text(encoding='utf-8'))
+          required = [
+            'Allgemeine Geschäftsbedingungen für die Nutzung der NAHWERK Concierge-Dienste.',
+            'NAHWERK bietet KI-gestützte Concierge-Dienste und ergänzende Funktionen',
+            'NAHWERK Safety, Family',
+            'Telefonannahme',
+            '50 App-Dialoge und 20 WhatsApp-Dialoge',
+          ]
+          forbidden = ['Nilo oder Mira','digitalen Senioren-Concierge','ersten zwei Monaten jeweils 30 Dialoge','danach dauerhaft 15 Dialoge']
+          for needle in required: assert needle in src, f'missing: {needle}'
+          for needle in forbidden: assert needle not in src, f'old copy: {needle}'
+          print('AGB CURRENT PRODUCT COPY GREEN')
+          PY
+      - name: Install Chromium browser
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Browser QA production desktop mobile
+        run: |
+          node - <<'NODE'
+          const { chromium } = require('playwright');
+          const normalize = value => value.replace(/\s+/g, ' ').trim();
+          const required = [
+            'Diese Allgemeinen Geschäftsbedingungen regeln die Nutzung der NAHWERK Concierge-Dienste',
+            'NAHWERK bietet KI-gestützte Concierge-Dienste und ergänzende Funktionen',
+            'NAHWERK Safety, Family',
+            'Telefonannahme',
+            '50 App-Dialoge und 20 WhatsApp-Dialoge'
+          ];
+          const forbidden = ['Nilo oder Mira','digitalen Senioren-Concierge','ersten zwei Monaten jeweils 30 Dialoge','danach dauerhaft 15 Dialoge'];
+          const viewports = [['desktop',{width:1440,height:900}],['mobile',{width:390,height:844}]];
+          (async()=>{
+            const browser=await chromium.launch({headless:true});
+            try{
+              for(const [name,viewport] of viewports){
+                const page=await browser.newPage({viewport});
+                const response=await page.goto('https://nahwerkconcierge.com/agb.html',{waitUntil:'domcontentloaded',timeout:45000});
+                if(!response||!response.ok()) throw new Error(`${name}: HTTP ${response&&response.status()}`);
+                await page.waitForSelector('h1',{state:'visible',timeout:10000});
+                const text=normalize(await page.locator('body').innerText());
+                for(const needle of required) if(!text.includes(normalize(needle))) throw new Error(`${name}: missing ${needle}`);
+                for(const needle of forbidden) if(text.includes(normalize(needle))) throw new Error(`${name}: old copy visible ${needle}`);
+                const metrics=await page.evaluate(()=>({innerWidth:window.innerWidth,scrollWidth:document.documentElement.scrollWidth,h1:document.querySelector('h1')?.textContent?.trim(),title:document.title}));
+                if(metrics.scrollWidth>metrics.innerWidth+2) throw new Error(`${name}: horizontal overflow`);
+                if(metrics.h1!=='Allgemeine Geschäftsbedingungen') throw new Error(`${name}: H1 mismatch`);
+                if(metrics.title!=='AGB | NAHWERK Concierge') throw new Error(`${name}: title mismatch`);
+                console.log(`PRODUCTION ${name.toUpperCase()} GREEN`,JSON.stringify(metrics));
+                await page.close();
+              }
+            }finally{await browser.close();}
+          })().catch(err=>{console.error(err);process.exit(1);});
+          NODE
