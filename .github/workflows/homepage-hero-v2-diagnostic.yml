@@ -1,0 +1,48 @@
+name: Homepage Hero V2 Diagnostic
+on:
+  push:
+    branches:
+      - diagnostic/homepage-hero-v2-gates-20260910
+permissions:
+  contents: read
+jobs:
+  exact-node-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Run exact full Node regression and capture output
+        shell: bash
+        run: |
+          set +e
+          node --test tests/*.test.mjs > hero-v2-node-test-output.txt 2>&1
+          code=$?
+          echo "$code" > hero-v2-node-test-exit-code.txt
+          cat hero-v2-node-test-output.txt
+          exit 0
+      - name: Capture exact implementation syntax and static smoke
+        shell: bash
+        run: |
+          set +e
+          {
+            node --check assets/telephone-reception-product.js && \
+            node --check assets/email-account-integration.js && \
+            node --check assets/family-owner-sponsored-access.js && \
+            node --check api/runtime-config.js && \
+            node --check scripts/family-runtime-smoke.mjs
+          } > hero-v2-implementation-output.txt 2>&1
+          code=$?
+          echo "$code" > hero-v2-implementation-exit-code.txt
+          cat hero-v2-implementation-output.txt
+          exit 0
+      - uses: actions/upload-artifact@v4
+        with:
+          name: homepage-hero-v2-diagnostic
+          path: |
+            hero-v2-node-test-output.txt
+            hero-v2-node-test-exit-code.txt
+            hero-v2-implementation-output.txt
+            hero-v2-implementation-exit-code.txt
