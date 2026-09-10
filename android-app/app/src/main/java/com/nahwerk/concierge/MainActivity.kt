@@ -240,7 +240,7 @@ internal fun LoginScreen(
 }
 
 @Composable
-private fun HomeScreen(
+internal fun HomeScreen(
     home: HomeContext,
     refreshing: Boolean,
     error: String?,
@@ -408,7 +408,7 @@ private fun MessageBubble(message: ChatMessage) {
 }
 
 @Composable
-private fun ReminderScreen(reminders: List<Reminder>, onBack: () -> Unit) {
+internal fun ReminderScreen(reminders: List<Reminder>, onBack: () -> Unit) {
     Scaffold(
         containerColor = NahwerkBlack,
         topBar = { TextButton(onClick = onBack, modifier = Modifier.safeDrawingPadding().padding(10.dp).heightIn(min = 48.dp)) { Text("Zurück") } }
@@ -433,7 +433,7 @@ private fun ReminderScreen(reminders: List<Reminder>, onBack: () -> Unit) {
 }
 
 @Composable
-private fun SettingsScreen(home: HomeContext, onBack: () -> Unit, onLogout: () -> Unit) {
+internal fun SettingsScreen(home: HomeContext, onBack: () -> Unit, onLogout: () -> Unit) {
     Scaffold(
         containerColor = NahwerkBlack,
         topBar = { TextButton(onClick = onBack, modifier = Modifier.safeDrawingPadding().padding(10.dp).heightIn(min = 48.dp)) { Text("Zurück") } }
