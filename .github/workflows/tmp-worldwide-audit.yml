@@ -3,12 +3,61 @@ on:
   push:
     branches:
       - fix/nahwerk-weltweit-navigation-rename-final-20260910
+permissions:
+  contents: write
 jobs:
   audit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Audit worldwide links and labels
+        with:
+          ref: fix/nahwerk-weltweit-navigation-rename-final-20260910
+      - name: Apply exact navigation/footer label correction
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          anchor = re.compile(r'(<a\b[^>]*\bhref=["\u0027]concierges\.html["\u0027][^>]*>)(.*?)(</a>)', re.I | re.S)
+          changed_files = []
+          changed_links = 0
+
+          for path in sorted(Path('.').rglob('*.html')):
+              original = path.read_text(encoding='utf-8')
+              per_file = 0
+              def replace(match):
+                  nonlocal_holder[0] += 1
+                  return match.group(1) + 'NAHWERK weltweit' + match.group(3)
+
+              def scoped(match):
+                  nonlocal per_file
+                  inner = match.group(2)
+                  visible = re.sub(r'<[^>]+>', '', inner).strip()
+                  if visible != 'Concierges':
+                      return match.group(0)
+                  per_file += 1
+                  return match.group(1) + 'NAHWERK weltweit' + match.group(3)
+
+              updated = anchor.sub(scoped, original)
+              if updated != original:
+                  path.write_text(updated, encoding='utf-8')
+                  changed_files.append(str(path))
+                  changed_links += per_file
+
+          print(f'CHANGED_FILES={len(changed_files)}')
+          print(f'CHANGED_LINKS={changed_links}')
+          for path in changed_files:
+              print(f'CHANGED|{path}')
+          if changed_links != 42:
+              raise SystemExit(f'Expected exactly 42 scoped links, got {changed_links}')
+          PY
+          git config user.name 'denizw030'
+          git config user.email 'denizwnm@gmail.com'
+          git add -- '*.html'
+          git diff --cached --check
+          git commit -m 'Rename concierges navigation labels to NAHWERK weltweit'
+          git push origin HEAD:fix/nahwerk-weltweit-navigation-rename-final-20260910
+      - name: Verify scoped result
         run: |
           python - <<'PY' > worldwide-audit.txt
           from pathlib import Path
@@ -17,7 +66,8 @@ jobs:
 
           target = 'concierges.html'
           accidental = 'NAHWERK weltweit.html'
-          findings = []
+          target_links = []
+          wrong_target_labels = []
           accidental_refs = []
           html_files = sorted(Path('.').rglob('*.html'))
 
@@ -27,28 +77,25 @@ jobs:
                   self.path = path
                   self.anchor = None
               def handle_starttag(self, tag, attrs):
-                  if tag.lower() != 'a':
-                      return
+                  if tag.lower() != 'a': return
                   href = dict(attrs).get('href')
-                  if href is not None:
-                      self.anchor = {'href': href, 'text': []}
+                  if href is not None: self.anchor = {'href': href, 'text': []}
               def handle_data(self, data):
-                  if self.anchor is not None:
-                      self.anchor['text'].append(data)
+                  if self.anchor is not None: self.anchor['text'].append(data)
               def handle_endtag(self, tag):
                   if tag.lower() == 'a' and self.anchor is not None:
                       href = self.anchor['href']
                       path = unquote(urlsplit(href).path)
+                      text = ' '.join(''.join(self.anchor['text']).split())
                       if path == target or path.endswith('/' + target):
-                          findings.append((str(self.path), href, ' '.join(''.join(self.anchor['text']).split())))
-                      if accidental in unquote(href):
-                          accidental_refs.append((str(self.path), href))
+                          target_links.append((str(self.path), href, text))
+                          if text == 'Concierges': wrong_target_labels.append((str(self.path), href, text))
                       self.anchor = None
 
           for p in html_files:
               text = p.read_text(encoding='utf-8')
-              parser = Parser(p)
-              parser.feed(text)
+              ParserInstance = Parser(p)
+              ParserInstance.feed(text)
               for i, line in enumerate(text.splitlines(), 1):
                   if accidental in line:
                       accidental_refs.append((f'{p}:{i}', line.strip()[:300]))
@@ -56,15 +103,15 @@ jobs:
           print(f'HTML_FILES={len(html_files)}')
           print(f'TARGET_EXISTS={Path(target).exists()}')
           print(f'ACCIDENTAL_EXISTS={Path(accidental).exists()}')
-          print(f'TARGET_LINK_COUNT={len(findings)}')
-          for row in findings:
-              print('TARGET_LINK|' + '|'.join(row))
+          print(f'TARGET_LINK_COUNT={len(target_links)}')
+          print(f'OLD_EXACT_LABEL_COUNT={len(wrong_target_labels)}')
           print(f'ACCIDENTAL_REF_COUNT={len(accidental_refs)}')
-          for row in accidental_refs:
-              print('ACCIDENTAL_REF|' + '|'.join(row))
+          for row in target_links: print('TARGET_LINK|' + '|'.join(row))
+          if not Path(target).exists() or Path(accidental).exists() or wrong_target_labels or accidental_refs:
+              raise SystemExit('Scoped worldwide verification failed')
           PY
           cat worldwide-audit.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: worldwide-audit
+          name: worldwide-audit-final
           path: worldwide-audit.txt
