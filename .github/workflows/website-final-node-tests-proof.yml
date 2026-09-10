@@ -1,0 +1,20 @@
+name: Website Final Node Tests Proof
+on:
+  push:
+    branches:
+      - "diagnostic/website-final-node-tests-20260910"
+permissions:
+  contents: read
+jobs:
+  prove:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 9c76636a3c863e45d0d794d11fafa60f3e988a52
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Exact website and family regression
+        run: node --test tests/*.test.mjs
