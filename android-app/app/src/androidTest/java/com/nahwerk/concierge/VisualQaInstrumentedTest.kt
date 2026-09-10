@@ -6,11 +6,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.captureToImage
@@ -39,18 +36,6 @@ class VisualQaInstrumentedTest {
     @get:Rule
     val composeRule = createComposeRule()
 
-    private val colors = darkColorScheme(
-        primary = Color(0xFFD0AE68),
-        onPrimary = Color(0xFF221A0C),
-        background = Color(0xFF08090A),
-        onBackground = Color(0xFFF5F2EC),
-        surface = Color(0xFF121315),
-        onSurface = Color(0xFFF5F2EC),
-        surfaceVariant = Color(0xFF1A1B1E),
-        onSurfaceVariant = Color(0xFFB9B6AF),
-        error = Color(0xFFFFB4AB)
-    )
-
     private val home = HomeContext(
         greeting = "Was darf ich für dich tun?",
         concierge = ConciergeProfile(
@@ -76,9 +61,9 @@ class VisualQaInstrumentedTest {
         composeRule.setContent {
             val density = LocalDensity.current
             CompositionLocalProvider(LocalDensity provides Density(density.density, fontScale)) {
-                MaterialTheme(colorScheme = colors) {
+                NahwerkTheme {
                     Box(
-                        Modifier.width(width.dp).height(height.dp).background(Color(0xFF08090A))
+                        Modifier.width(width.dp).height(height.dp).background(NahwerkPalette.Background)
                     ) { content() }
                 }
             }
