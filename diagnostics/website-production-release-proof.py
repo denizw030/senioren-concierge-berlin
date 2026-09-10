@@ -258,7 +258,7 @@ for width, height, label in [(1440, 1000, "desktop"), (390, 844, "mobile")]:
         hero_stats = pixel_stats(driver, hero)
         assert hero_state["currentSrc"].split("?")[0].endswith("/assets/prime/nahwerk-overview-hero-weboptimized-hq.webp"), hero_state
         assert_rendered_image("Homepage hero", hero_state, hero_stats, hero=True)
-        cta_state = assert_visible_box(driver, ".home-hero .overview-hero-cta-primary", "Homepage primary CTA")
+        cta_state = assert_visible_box(driver, ".story-hero .story-btn--primary", "Homepage primary CTA")
         overflow = assert_no_horizontal_overflow(driver, "homepage")
         severe, runtime = js_runtime_errors(driver)
         assert not runtime, f"homepage JS runtime errors: {runtime}"
