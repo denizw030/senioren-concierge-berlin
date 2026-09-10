@@ -1,56 +1,36 @@
-name: Temporary Worldwide Registered Regression Diagnostic
+name: Update homepage accent color
 
 on:
   push:
-    branches:
-      - fix/nahwerk-weltweit-navigation-rename-final-20260910
+    branches: [main]
     paths:
       - '.github/workflows/darken-red.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  branch-regression:
+  update-color:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Exact branch Node regression
-        shell: bash
+      - name: Replace old red with dark garnet on homepage
         run: |
-          set +e
-          node --test tests/*.test.mjs > branch-node-regression.log 2>&1
-          code=$?
-          echo "EXIT_CODE=$code" >> branch-node-regression.log
-          cat branch-node-regression.log
-          exit 0
-      - uses: actions/upload-artifact@v4
-        with:
-          name: worldwide-node-regression-branch
-          path: branch-node-regression.log
-
-  fresh-main-regression:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: 5112c085938c0b892e7090442f03911a4b7f6131
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Exact fresh-main Node regression
-        shell: bash
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          text = p.read_text(encoding='utf-8')
+          text = text.replace('#b40d14', '#6f1018')
+          p.write_text(text, encoding='utf-8')
+          PY
+      - name: Commit change if needed
         run: |
-          set +e
-          node --test tests/*.test.mjs > fresh-main-node-regression.log 2>&1
-          code=$?
-          echo "EXIT_CODE=$code" >> fresh-main-node-regression.log
-          cat fresh-main-node-regression.log
-          exit 0
-      - uses: actions/upload-artifact@v4
-        with:
-          name: worldwide-node-regression-fresh-main
-          path: fresh-main-node-regression.log
+          if git diff --quiet; then
+            echo "No change needed"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Switch homepage red to dark garnet"
+          git push
