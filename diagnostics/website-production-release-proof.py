@@ -320,6 +320,7 @@ for width, height, label in [(1440, 1000, "desktop"), (390, 844, "mobile")]:
 
         after = {}
         for idx, name in enumerate(["Alexander", "Luisa", "Konrad", "James"]):
+            driver.execute_script("arguments[0].scrollIntoView({block:'center',behavior:'auto'})", cards[idx])
             img = cards[idx].find_element(By.TAG_NAME, "img")
             state = wait_image(driver, img)
             stats = pixel_stats(driver, img)
