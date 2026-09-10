@@ -2,9 +2,8 @@ package com.nahwerk.concierge
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,11 +15,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -32,36 +38,53 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.nahwerk.concierge.data.ChatMessage
 import com.nahwerk.concierge.data.HomeContext
-import com.nahwerk.concierge.data.NahwerkApi
 import com.nahwerk.concierge.data.PendingChatRequest
-import com.nahwerk.concierge.data.PendingChatStore
 import com.nahwerk.concierge.data.Reminder
-import com.nahwerk.concierge.data.SecureSessionStore
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
-private enum class Screen { LOGIN, HOME, CHAT, REMINDERS, SETTINGS }
+private val NahwerkBlack = Color(0xFF08090A)
+private val NahwerkSurface = Color(0xFF121315)
+private val NahwerkRaised = Color(0xFF1A1B1E)
+private val NahwerkGold = Color(0xFFD0AE68)
+private val NahwerkMuted = Color(0xFFB9B6AF)
+private val NahwerkError = Color(0xFFFFB4AB)
+
+private val NahwerkColors = darkColorScheme(
+    primary = NahwerkGold,
+    onPrimary = Color(0xFF221A0C),
+    background = NahwerkBlack,
+    onBackground = Color(0xFFF5F2EC),
+    surface = NahwerkSurface,
+    onSurface = Color(0xFFF5F2EC),
+    surfaceVariant = NahwerkRaised,
+    onSurfaceVariant = NahwerkMuted,
+    error = NahwerkError
+)
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,161 +94,144 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun NahwerkApp() {
-    val appContext = LocalContext.current.applicationContext
-    val sessions = remember { SecureSessionStore(appContext) }
-    val pendingChats = remember { PendingChatStore(appContext) }
-    val api = remember { NahwerkApi(sessions, pendingChats) }
-    val scope = rememberCoroutineScope()
+internal fun NahwerkApp(viewModel: NahwerkAppViewModel = viewModel()) {
+    val state by viewModel.uiState.collectAsState()
+    val childScreen = state.screen in setOf(AppScreen.CHAT, AppScreen.REMINDERS, AppScreen.SETTINGS)
+    BackHandler(enabled = childScreen) { viewModel.goHome() }
 
-    var screen by remember { mutableStateOf(if (api.hasSession()) Screen.HOME else Screen.LOGIN) }
-    var home by remember { mutableStateOf<HomeContext?>(null) }
-    var loading by remember { mutableStateOf(api.hasSession()) }
-    var loginBusy by remember { mutableStateOf(false) }
-    var error by remember { mutableStateOf<String?>(null) }
-
-    fun loadHome() {
-        scope.launch {
-            loading = true
-            error = null
-            api.loadHome()
-                .onSuccess {
-                    home = it
-                    screen = Screen.HOME
-                }
-                .onFailure {
-                    if (!api.hasSession()) screen = Screen.LOGIN
-                    error = it.message
-                }
-            loading = false
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        if (api.hasSession()) loadHome()
-    }
-
-    MaterialTheme {
+    MaterialTheme(colorScheme = NahwerkColors) {
         when {
-            loading && home == null && screen != Screen.LOGIN -> LoadingScreen()
-            screen == Screen.LOGIN -> LoginScreen(
-                busy = loginBusy,
-                error = error,
-                onLogin = { email, password ->
-                    scope.launch {
-                        loginBusy = true
-                        error = null
-                        val result = api.login(email, password)
-                        loginBusy = false
-                        if (result.ok) loadHome() else error = result.error
-                    }
-                },
-                onReset = { email ->
-                    scope.launch {
-                        val ok = api.requestPasswordReset(email)
-                        error = if (ok) "Wenn die Adresse registriert ist, wurde eine Rücksetz-E-Mail angefordert." else "Die Anfrage konnte nicht gesendet werden."
-                    }
-                }
+            state.screen == AppScreen.LOGIN -> LoginScreen(
+                busy = state.loginBusy,
+                error = state.error,
+                notice = state.notice,
+                onLogin = viewModel::login,
+                onReset = viewModel::requestPasswordReset
             )
-            home == null -> LoadingScreen()
-            screen == Screen.HOME -> HomeScreen(
-                home = home!!,
-                onChat = { screen = Screen.CHAT },
-                onReminders = { screen = Screen.REMINDERS },
-                onSettings = { screen = Screen.SETTINGS },
-                onRefresh = { loadHome() }
+            state.home == null && state.loading -> LoadingScreen()
+            state.home == null -> ContextLoadErrorScreen(
+                error = state.error ?: "Konto konnte nicht geladen werden.",
+                onRetry = { viewModel.refreshHome() },
+                onLogout = viewModel::logout
             )
-            screen == Screen.CHAT -> ChatScreen(home!!, api) {
-                loadHome()
-                screen = Screen.HOME
-            }
-            screen == Screen.REMINDERS -> ReminderScreen(home!!.reminders) { screen = Screen.HOME }
-            screen == Screen.SETTINGS -> SettingsScreen(
-                home = home!!,
-                onBack = { screen = Screen.HOME },
-                onLogout = {
-                    api.logout()
-                    home = null
-                    error = null
-                    screen = Screen.LOGIN
-                }
+            state.screen == AppScreen.HOME -> HomeScreen(
+                home = requireNotNull(state.home),
+                refreshing = state.loading,
+                error = state.error,
+                onChat = { viewModel.open(AppScreen.CHAT) },
+                onReminders = { viewModel.open(AppScreen.REMINDERS) },
+                onSettings = { viewModel.open(AppScreen.SETTINGS) },
+                onRefresh = { viewModel.refreshHome() }
             )
+            state.screen == AppScreen.CHAT -> ChatScreen(
+                home = requireNotNull(state.home),
+                messages = state.chatMessages,
+                draft = state.chatDraft,
+                sending = state.chatSending,
+                error = state.chatError,
+                pendingRequest = state.pendingRequest,
+                onDraftChange = viewModel::updateDraft,
+                onSend = viewModel::sendChat,
+                onRetry = viewModel::retryPending,
+                onDiscard = viewModel::discardPending,
+                onBack = viewModel::goHome
+            )
+            state.screen == AppScreen.REMINDERS -> ReminderScreen(requireNotNull(state.home).reminders, viewModel::goHome)
+            state.screen == AppScreen.SETTINGS -> SettingsScreen(requireNotNull(state.home), viewModel::goHome, viewModel::logout)
+            else -> LoadingScreen()
         }
     }
 }
 
 @Composable
 private fun LoadingScreen() {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator()
+    Box(Modifier.fillMaxSize().background(NahwerkBlack).testTag("loading_screen"), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator(color = NahwerkGold, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
     }
 }
 
 @Composable
-private fun LoginScreen(
+private fun ContextLoadErrorScreen(error: String, onRetry: () -> Unit, onLogout: () -> Unit) {
+    Column(
+        Modifier.fillMaxSize().background(NahwerkBlack).safeDrawingPadding().padding(24.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("NAHWERK", color = NahwerkGold, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.SemiBold)
+        Spacer(Modifier.height(18.dp))
+        ErrorText(error)
+        Spacer(Modifier.height(18.dp))
+        Button(onClick = onRetry, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text("Erneut versuchen") }
+        TextButton(onClick = onLogout) { Text("Abmelden") }
+    }
+}
+
+@Composable
+internal fun LoginScreen(
     busy: Boolean,
     error: String?,
+    notice: String?,
     onLogin: (String, String) -> Unit,
     onReset: (String) -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val canLogin = !busy && email.isNotBlank() && password.length >= 8
 
-    Box(
-        Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    listOf(Color(0xFFF8F6F1), Color(0xFFEDE8DD))
-                )
-            ),
-        contentAlignment = Alignment.Center
+    Column(
+        Modifier.fillMaxSize()
+            .background(Brush.verticalGradient(listOf(NahwerkBlack, Color(0xFF11100D))))
+            .safeDrawingPadding().imePadding().verticalScroll(rememberScrollState()).padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
         Card(
-            Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
+            Modifier.fillMaxWidth().widthIn(max = 560.dp),
             shape = RoundedCornerShape(28.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.94f))
+            colors = CardDefaults.cardColors(containerColor = NahwerkSurface)
         ) {
-            Column(
-                Modifier.padding(28.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Text("NAHWERK", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.SemiBold)
-                Text("PERSÖNLICHER CONCIERGE", style = MaterialTheme.typography.labelLarge)
-                Spacer(Modifier.height(4.dp))
+            Column(Modifier.padding(26.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                Text("NAHWERK", color = NahwerkGold, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.SemiBold)
+                Text("PERSÖNLICHER CONCIERGE", color = NahwerkMuted, style = MaterialTheme.typography.labelLarge)
                 Text("Anmelden", style = MaterialTheme.typography.headlineSmall)
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
                     label = { Text("E-Mail") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                    modifier = Modifier.fillMaxWidth().testTag("login_email"),
+                    singleLine = true,
+                    enabled = !busy,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next)
                 )
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
                     label = { Text("Passwort") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                    modifier = Modifier.fillMaxWidth().testTag("login_password"),
+                    singleLine = true,
+                    enabled = !busy,
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = { if (canLogin) onLogin(email, password) })
                 )
                 Button(
                     onClick = { onLogin(email, password) },
-                    enabled = !busy && email.isNotBlank() && password.length >= 8,
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp)
+                    enabled = canLogin,
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp).testTag("login_submit")
                 ) {
-                    if (busy) CircularProgressIndicator(modifier = Modifier.height(22.dp).width(22.dp))
+                    if (busy) CircularProgressIndicator(Modifier.height(22.dp).width(22.dp), strokeWidth = 2.dp)
                     else Text("Sicher anmelden")
                 }
-                TextButton(onClick = { if (email.isNotBlank()) onReset(email) }) {
-                    Text("Passwort zurücksetzen")
-                }
-                if (!error.isNullOrBlank()) {
-                    Text(error, style = MaterialTheme.typography.bodySmall)
-                }
+                TextButton(
+                    onClick = { onReset(email) },
+                    enabled = !busy && email.isNotBlank(),
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                ) { Text("Passwort zurücksetzen") }
+                if (!error.isNullOrBlank()) ErrorText(error)
+                if (!notice.isNullOrBlank()) StatusText(notice)
                 Text(
-                    "STAGING · Testversion · Zugangsdaten werden verschlüsselt auf dem Gerät gespeichert.",
+                    "STAGING · Testversion · Sitzungstoken werden verschlüsselt auf dem Gerät gespeichert.",
+                    color = NahwerkMuted,
                     style = MaterialTheme.typography.labelSmall
                 )
             }
@@ -236,49 +242,38 @@ private fun LoginScreen(
 @Composable
 private fun HomeScreen(
     home: HomeContext,
+    refreshing: Boolean,
+    error: String?,
     onChat: () -> Unit,
     onReminders: () -> Unit,
     onSettings: () -> Unit,
     onRefresh: () -> Unit
 ) {
-    Scaffold { padding ->
-        LazyColumn(
-            Modifier
-                .padding(padding)
-                .fillMaxSize()
-                .background(Color(0xFFF7F5F0)),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
+    Scaffold(containerColor = NahwerkBlack, modifier = Modifier.testTag("home_screen")) { padding ->
+        LazyColumn(Modifier.padding(padding).fillMaxSize().safeDrawingPadding(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             item {
                 Column(Modifier.padding(start = 18.dp, end = 18.dp, top = 18.dp)) {
-                    Text("NAHWERK", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-                    Text("Persönlicher Concierge", style = MaterialTheme.typography.bodyMedium)
+                    Text("NAHWERK", color = NahwerkGold, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+                    Text("Persönlicher Concierge", color = NahwerkMuted)
                 }
             }
+            item { ConciergePresence(home, Modifier.padding(horizontal = 18.dp)) }
             item {
-                ConciergePresence(home = home, modifier = Modifier.padding(horizontal = 18.dp))
-            }
-            item {
-                Column(
-                    Modifier.padding(horizontal = 18.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Button(onClick = onChat, modifier = Modifier.fillMaxWidth().heightIn(min = 58.dp)) {
+                Column(Modifier.padding(horizontal = 18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Button(onClick = onChat, modifier = Modifier.fillMaxWidth().heightIn(min = 58.dp).testTag("open_chat")) {
                         Text("${home.concierge.name} öffnen")
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        OutlinedButton(onClick = onReminders, modifier = Modifier.weight(1f)) {
-                            Text("Erinnerungen")
-                        }
-                        OutlinedButton(onClick = onSettings, modifier = Modifier.weight(1f)) {
-                            Text("Konto & Memory")
-                        }
+                        OutlinedButton(onClick = onReminders, modifier = Modifier.weight(1f).heightIn(min = 52.dp)) { Text("Erinnerungen") }
+                        OutlinedButton(onClick = onSettings, modifier = Modifier.weight(1f).heightIn(min = 52.dp)) { Text("Konto") }
                     }
-                    TextButton(onClick = onRefresh, modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                        Text("Kontext aktualisieren")
+                    TextButton(onClick = onRefresh, enabled = !refreshing, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                        Text(if (refreshing) "Aktualisiere …" else "Kontext aktualisieren")
                     }
+                    if (!error.isNullOrBlank()) ErrorText(error)
                     Text(
                         "${home.memoryCount} gemerkte Fakten · ${home.openLoopCount} offene Vorgänge · ${home.reminders.size} Erinnerungen",
+                        color = NahwerkMuted,
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
@@ -290,179 +285,110 @@ private fun HomeScreen(
 
 @Composable
 private fun ConciergePresence(home: HomeContext, modifier: Modifier = Modifier) {
-    var entered by remember(home.concierge.id) { mutableStateOf(false) }
-    LaunchedEffect(home.concierge.id) {
-        delay(180)
-        entered = true
-    }
-    val scale by animateFloatAsState(
-        targetValue = if (entered) 1f else 0.86f,
-        animationSpec = tween(durationMillis = 900),
-        label = "conciergeScale"
-    )
-    val offset by animateFloatAsState(
-        targetValue = if (entered) 0f else 48f,
-        animationSpec = tween(durationMillis = 900),
-        label = "conciergeOffset"
-    )
-
     Box(
-        modifier
-            .fillMaxWidth()
-            .height(520.dp)
-            .clip(RoundedCornerShape(32.dp))
-            .background(
-                Brush.verticalGradient(
-                    listOf(Color(0xFFEEE8DD), Color(0xFFD7D0C3), Color(0xFFB9B1A4))
-                )
-            )
+        modifier.fillMaxWidth().height(500.dp).clip(RoundedCornerShape(30.dp))
+            .background(Brush.verticalGradient(listOf(Color(0xFF29251D), Color(0xFF151515), NahwerkBlack)))
     ) {
         AsyncImage(
             model = home.concierge.imageUrl,
             contentDescription = "${home.concierge.name}, persönlicher NAHWERK Concierge",
             contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxHeight(0.86f)
-                .fillMaxWidth()
-                .graphicsLayer {
-                    scaleX = scale
-                    scaleY = scale
-                    translationY = offset
-                }
+            modifier = Modifier.align(Alignment.BottomCenter).fillMaxHeight(0.86f).fillMaxWidth()
         )
         Card(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding(16.dp),
             shape = RoundedCornerShape(22.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.92f))
+            colors = CardDefaults.cardColors(containerColor = NahwerkSurface.copy(alpha = 0.95f))
         ) {
             Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                Text(home.concierge.name, fontWeight = FontWeight.SemiBold)
+                Text(home.concierge.name, color = NahwerkGold, fontWeight = FontWeight.SemiBold)
                 Text(home.greeting, style = MaterialTheme.typography.titleMedium)
-                Text("Ich denke mit und behalte relevante offene Punkte im Blick.", style = MaterialTheme.typography.bodySmall)
+                Text("Ein Concierge. Dasselbe Gespräch. Derselbe zentrale Core.", color = NahwerkMuted, style = MaterialTheme.typography.bodySmall)
             }
         }
     }
 }
 
 @Composable
-private fun ChatScreen(home: HomeContext, api: NahwerkApi, onBack: () -> Unit) {
-    val scope = rememberCoroutineScope()
-    val messages = remember(home.concierge.id) {
-        mutableStateListOf(ChatMessage("assistant", home.greeting))
-    }
-    var draft by remember { mutableStateOf("") }
-    var sending by remember { mutableStateOf(false) }
-    var error by remember { mutableStateOf<String?>(null) }
-    var pendingRequest by remember { mutableStateOf(api.pendingChatRequest()) }
-
-    fun sendRequest(request: PendingChatRequest, ensureUserBubble: Boolean) {
-        if (sending) return
-        if (ensureUserBubble && messages.none { it.role == "user" && it.text == request.message }) {
-            messages.add(ChatMessage("user", request.message))
-        }
-        sending = true
-        error = null
-        scope.launch {
-            val result = api.sendText(request)
-            sending = false
-            if (result.ok && !result.text.isNullOrBlank()) {
-                pendingRequest = null
-                messages.add(ChatMessage("assistant", result.text))
-            } else {
-                pendingRequest = api.pendingChatRequest() ?: request
-                error = result.error ?: "Keine Antwort erhalten. Dieselbe Nachricht kann sicher erneut gesendet werden."
-            }
-        }
-    }
-
+internal fun ChatScreen(
+    home: HomeContext,
+    messages: List<ChatMessage>,
+    draft: String,
+    sending: Boolean,
+    error: String?,
+    pendingRequest: PendingChatRequest?,
+    onDraftChange: (String) -> Unit,
+    onSend: () -> Unit,
+    onRetry: () -> Unit,
+    onDiscard: () -> Unit,
+    onBack: () -> Unit
+) {
     Scaffold(
+        containerColor = NahwerkBlack,
+        modifier = Modifier.testTag("chat_screen"),
         topBar = {
             Row(
-                Modifier.fillMaxWidth().padding(12.dp),
+                Modifier.fillMaxWidth().background(NahwerkSurface).safeDrawingPadding().padding(10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TextButton(onClick = onBack) { Text("Zurück") }
+                TextButton(onClick = onBack, modifier = Modifier.heightIn(min = 48.dp)) { Text("Zurück") }
                 Spacer(Modifier.width(8.dp))
-                Text(home.concierge.name, fontWeight = FontWeight.SemiBold)
+                Column {
+                    Text(home.concierge.name, color = NahwerkGold, fontWeight = FontWeight.SemiBold)
+                    Text("Persönlicher Concierge", color = NahwerkMuted, style = MaterialTheme.typography.labelSmall)
+                }
             }
         }
     ) { padding ->
-        Column(
-            Modifier.padding(padding).fillMaxSize().padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            LazyColumn(
-                Modifier.weight(1f).fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(messages) { message ->
-                    MessageBubble(message)
-                }
+        Column(Modifier.padding(padding).fillMaxSize().imePadding().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            LazyColumn(Modifier.weight(1f).fillMaxWidth().testTag("chat_messages"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(messages, key = { it.sourceMessageId ?: "${it.role}:${it.text.hashCode()}" }) { MessageBubble(it) }
             }
-
             pendingRequest?.let { pending ->
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF4D8))
-                ) {
-                    Column(
-                        Modifier.padding(14.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text("Nicht bestätigte Nachricht", fontWeight = FontWeight.SemiBold)
+                Card(Modifier.fillMaxWidth().testTag("pending_request"), colors = CardDefaults.cardColors(containerColor = Color(0xFF282216))) {
+                    Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("Noch nicht bestätigt", color = NahwerkGold, fontWeight = FontWeight.SemiBold)
                         Text(pending.message, style = MaterialTheme.typography.bodySmall)
                         Text(
-                            "Ein Retry verwendet exakt dieselbe Nachrichten-ID und erzeugt keinen neuen Concierge-Turn.",
+                            "Retry verwendet exakt dieselbe Nachrichten-ID; es wird kein neuer Client-Request erzeugt.",
+                            color = NahwerkMuted,
                             style = MaterialTheme.typography.labelSmall
                         )
-                        OutlinedButton(
-                            onClick = { sendRequest(pending, ensureUserBubble = true) },
-                            enabled = !sending,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(if (sending) "Erneuter Versand läuft …" else "Sicher erneut senden")
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedButton(
+                                onClick = onRetry,
+                                enabled = !sending,
+                                modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("pending_retry")
+                            ) { Text(if (sending) "Retry läuft …" else "Sicher erneut") }
+                            TextButton(
+                                onClick = onDiscard,
+                                enabled = !sending,
+                                modifier = Modifier.heightIn(min = 48.dp).testTag("pending_discard")
+                            ) { Text("Verwerfen") }
                         }
                     }
                 }
             }
-
-            if (!error.isNullOrBlank()) Text(error!!, style = MaterialTheme.typography.bodySmall)
-
+            if (!error.isNullOrBlank()) ErrorText(error)
             OutlinedTextField(
                 value = draft,
-                onValueChange = { if (it.length <= 4000) draft = it },
-                modifier = Modifier.fillMaxWidth(),
+                onValueChange = onDraftChange,
+                modifier = Modifier.fillMaxWidth().testTag("chat_input"),
                 label = { Text("Nachricht an ${home.concierge.name}") },
                 minLines = 2,
                 maxLines = 5,
-                enabled = pendingRequest == null
+                enabled = pendingRequest == null && !sending,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+                keyboardActions = KeyboardActions(onSend = { if (draft.isNotBlank() && pendingRequest == null && !sending) onSend() })
             )
             Button(
-                onClick = {
-                    val text = draft.trim()
-                    if (text.isEmpty() || pendingRequest != null) return@Button
-                    val request = try {
-                        api.createChatRequest(text)
-                    } catch (e: Exception) {
-                        error = e.message ?: "Nachricht konnte nicht vorbereitet werden."
-                        return@Button
-                    }
-                    pendingRequest = request
-                    messages.add(ChatMessage("user", request.message))
-                    draft = ""
-                    sendRequest(request, ensureUserBubble = false)
-                },
+                onClick = onSend,
                 enabled = !sending && draft.isNotBlank() && pendingRequest == null,
-                modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp)
-            ) {
-                if (sending) Text("${home.concierge.name} denkt …") else Text("Senden")
-            }
+                modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp).testTag("chat_send")
+            ) { Text(if (sending) "${home.concierge.name} denkt …" else "Senden") }
             Text(
-                "Text ist mit dem echten NAHWERK-Staging-Concierge verbunden. Nicht bestätigte Sends bleiben verschlüsselt auf dem Gerät gespeichert und werden beim Retry mit derselben ID wiederverwendet.",
+                "Text läuft ausschließlich über den bestehenden NAHWERK-Backend/Core-Contract. Die App trifft keine eigene Intent-, Approval- oder Task-Entscheidung.",
+                color = NahwerkMuted,
                 style = MaterialTheme.typography.labelSmall
             )
         }
@@ -472,45 +398,33 @@ private fun ChatScreen(home: HomeContext, api: NahwerkApi, onBack: () -> Unit) {
 @Composable
 private fun MessageBubble(message: ChatMessage) {
     val isUser = message.role == "user"
-    Row(
-        Modifier.fillMaxWidth(),
-        horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start
-    ) {
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start) {
         Card(
             modifier = Modifier.fillMaxWidth(0.86f),
             shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = if (isUser) Color(0xFFE6E0D5) else Color(0xFFF4F2ED)
-            )
-        ) {
-            Text(message.text, modifier = Modifier.padding(14.dp))
-        }
+            colors = CardDefaults.cardColors(containerColor = if (isUser) Color(0xFF2A251B) else NahwerkRaised)
+        ) { Text(message.text, modifier = Modifier.padding(14.dp)) }
     }
 }
 
 @Composable
 private fun ReminderScreen(reminders: List<Reminder>, onBack: () -> Unit) {
     Scaffold(
-        topBar = { TextButton(onClick = onBack, modifier = Modifier.padding(12.dp)) { Text("Zurück") } }
+        containerColor = NahwerkBlack,
+        topBar = { TextButton(onClick = onBack, modifier = Modifier.safeDrawingPadding().padding(10.dp).heightIn(min = 48.dp)) { Text("Zurück") } }
     ) { padding ->
-        LazyColumn(
-            Modifier.padding(padding).fillMaxSize().padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
+        LazyColumn(Modifier.padding(padding).fillMaxSize().padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             item {
-                Text("Erinnerungen", style = MaterialTheme.typography.headlineMedium)
-                Text("Die App liest direkt aus der bestehenden NAHWERK-Reminder-Quelle.")
+                Text("Erinnerungen", color = NahwerkGold, style = MaterialTheme.typography.headlineMedium)
+                Text("Anzeige aus dem bestätigten bestehenden Mobile-Contract.", color = NahwerkMuted)
             }
-            if (reminders.isEmpty()) {
-                item { Text("Aktuell keine Erinnerungen.") }
-            } else {
-                items(reminders) { reminder ->
-                    Card(Modifier.fillMaxWidth()) {
-                        Column(Modifier.padding(14.dp)) {
-                            Text(reminder.title, fontWeight = FontWeight.Medium)
-                            if (!reminder.dueAt.isNullOrBlank()) Text(reminder.dueAt, style = MaterialTheme.typography.bodySmall)
-                            Text(reminder.status, style = MaterialTheme.typography.labelSmall)
-                        }
+            if (reminders.isEmpty()) item { Text("Aktuell keine Erinnerungen.") }
+            else items(reminders, key = { it.id }) { reminder ->
+                Card(Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = NahwerkSurface)) {
+                    Column(Modifier.padding(14.dp)) {
+                        Text(reminder.title, fontWeight = FontWeight.Medium)
+                        if (!reminder.dueAt.isNullOrBlank()) Text(reminder.dueAt, color = NahwerkMuted, style = MaterialTheme.typography.bodySmall)
+                        Text(reminder.status, color = NahwerkMuted, style = MaterialTheme.typography.labelSmall)
                     }
                 }
             }
@@ -521,24 +435,43 @@ private fun ReminderScreen(reminders: List<Reminder>, onBack: () -> Unit) {
 @Composable
 private fun SettingsScreen(home: HomeContext, onBack: () -> Unit, onLogout: () -> Unit) {
     Scaffold(
-        topBar = { TextButton(onClick = onBack, modifier = Modifier.padding(12.dp)) { Text("Zurück") } }
+        containerColor = NahwerkBlack,
+        topBar = { TextButton(onClick = onBack, modifier = Modifier.safeDrawingPadding().padding(10.dp).heightIn(min = 48.dp)) { Text("Zurück") } }
     ) { padding ->
         Column(
-            Modifier.padding(padding).fillMaxSize().padding(20.dp),
+            Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text("Konto & Memory", style = MaterialTheme.typography.headlineMedium)
+            Text("Konto", color = NahwerkGold, style = MaterialTheme.typography.headlineMedium)
             Text("Persönlicher Concierge: ${home.concierge.name}")
             Text("Stimme: ${home.concierge.voice}")
             HorizontalDivider()
             Text("${home.memoryCount} aktive Memory-Fakten")
             Text("${home.openLoopCount} offene Vorgänge")
-            Text("Der Server berücksichtigt Uhrzeit, offene Vorgänge, Erinnerungen und freigegebene Memory-Fakten für die Begrüßung.")
+            Text("Diese Werte werden nur dargestellt. Die Business-Wahrheit verbleibt im zentralen Concierge Core.", color = NahwerkMuted)
             HorizontalDivider()
-            OutlinedButton(onClick = onLogout, modifier = Modifier.fillMaxWidth()) {
-                Text("Sicher abmelden")
-            }
-            Text("STAGING · Keine Production-Datenbankänderung durch diese App.", style = MaterialTheme.typography.labelSmall)
+            OutlinedButton(onClick = onLogout, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text("Sicher abmelden") }
+            Text("STAGING · Keine Production-Aktion oder Provider-Aktion durch diese App-Finalisierung.", color = NahwerkMuted, style = MaterialTheme.typography.labelSmall)
         }
     }
+}
+
+@Composable
+private fun ErrorText(message: String) {
+    Text(
+        message,
+        color = NahwerkError,
+        style = MaterialTheme.typography.bodySmall,
+        modifier = Modifier.semantics { liveRegion = LiveRegionMode.Assertive }.testTag("error_message")
+    )
+}
+
+@Composable
+private fun StatusText(message: String) {
+    Text(
+        message,
+        color = NahwerkMuted,
+        style = MaterialTheme.typography.bodySmall,
+        modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }.testTag("status_message")
+    )
 }
