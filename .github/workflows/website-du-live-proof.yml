@@ -1,0 +1,92 @@
+name: NAHWERK Website Du Live Production Proof
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify public production resources
+        shell: bash
+        run: |
+          set -euo pipefail
+          CB="du-final-${GITHUB_RUN_ID}"
+          curl -fLsS --retry 6 --retry-delay 2 "https://nahwerkconcierge.com/index.html?cb=$CB" -o /tmp/index.html
+          curl -fLsS --retry 6 --retry-delay 2 "https://nahwerkconcierge.com/anmelden.html?produkt=prime&cb=$CB" -o /tmp/anmelden.html
+          curl -fLsS --retry 6 --retry-delay 2 "https://nahwerkconcierge.com/registrieren.html?cb=$CB" -o /tmp/registrieren.html
+          curl -fLsS --retry 6 --retry-delay 2 "https://nahwerkconcierge.com/senioren-concierge.html?cb=$CB" -o /tmp/senioren.html
+          grep -q 'Dein persönlicher Concierge' /tmp/index.html
+          grep -q 'Sag, was du brauchst' /tmp/index.html
+          grep -q 'Melde dich mit deiner E-Mail-Adresse' /tmp/anmelden.html
+          grep -q 'id="loginForm"' /tmp/anmelden.html
+          grep -q 'type="email"' /tmp/anmelden.html
+          grep -q 'type="password"' /tmp/anmelden.html
+          grep -Eq 'Für wen richtest du den Zugang ein\?|Wer darf dich begleiten\?' /tmp/registrieren.html
+          grep -q '<form' /tmp/registrieren.html
+          grep -q 'Sie müssen keine Befehle oder Fachbegriffe kennen.' /tmp/senioren.html
+          grep -q 'Finden Sie eine Persönlichkeit, die zu Ihnen passt.' /tmp/senioren.html
+          echo 'LIVE RESOURCE CONTRACT GREEN'
+
+      - name: Real Chromium production proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          mkdir -p live-proof
+          CB="du-final-${GITHUB_RUN_ID}"
+          case_run(){
+            name="$1"; width="$2"; height="$3"; path="$4"; kind="$5"
+            sep='?'; [[ "$path" == *'?'* ]] && sep='&'
+            url="https://nahwerkconcierge.com/${path}${sep}cb=${CB}-${name}"
+            "$CHROME" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --window-size="$width,$height" --virtual-time-budget=6000 --dump-dom "$url" > "live-proof/$name-dom.html"
+            grep -qi '<html' "live-proof/$name-dom.html"
+            grep -qi '<body' "live-proof/$name-dom.html"
+            case "$kind" in
+              index)
+                grep -q 'Dein persönlicher Concierge' "live-proof/$name-dom.html"
+                grep -q 'Sag, was du brauchst' "live-proof/$name-dom.html"
+                ;;
+              login)
+                grep -q 'id="loginForm"' "live-proof/$name-dom.html"
+                grep -q 'type="email"' "live-proof/$name-dom.html"
+                grep -q 'type="password"' "live-proof/$name-dom.html"
+                grep -q 'Melde dich mit deiner E-Mail-Adresse' "live-proof/$name-dom.html"
+                ;;
+              register)
+                grep -q '<form' "live-proof/$name-dom.html"
+                grep -Eq 'Für wen richtest du den Zugang ein\?|Wer darf dich begleiten\?' "live-proof/$name-dom.html"
+                ;;
+              senior)
+                grep -q 'Sie müssen keine Befehle oder Fachbegriffe kennen.' "live-proof/$name-dom.html"
+                grep -q 'Finden Sie eine Persönlichkeit, die zu Ihnen passt.' "live-proof/$name-dom.html"
+                ;;
+            esac
+            "$CHROME" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --hide-scrollbars --window-size="$width,$height" --virtual-time-budget=6000 --screenshot="live-proof/$name.png" "$url"
+            test -s "live-proof/$name.png"
+            echo "$name GREEN"
+          }
+          case_run index-1440x900 1440 900 index.html index
+          case_run index-1366x768 1366 768 index.html index
+          case_run index-1280x800 1280 800 index.html index
+          case_run index-390x844 390 844 index.html index
+          case_run index-360x800 360 800 index.html index
+          case_run anmelden-1440x900 1440 900 'anmelden.html?produkt=prime' login
+          case_run anmelden-390x844 390 844 'anmelden.html?produkt=prime' login
+          case_run registrieren-1440x900 1440 900 registrieren.html register
+          case_run registrieren-390x844 390 844 registrieren.html register
+          case_run senioren-1440x900 1440 900 senioren-concierge.html senior
+          case_run senioren-390x844 390 844 senioren-concierge.html senior
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: website-du-live-production-proof
+          path: live-proof/
+          if-no-files-found: error
