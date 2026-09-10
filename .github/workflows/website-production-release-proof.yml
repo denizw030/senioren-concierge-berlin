@@ -1,0 +1,36 @@
+name: Website Production Release Proof
+
+on:
+  push:
+    branches:
+      - diagnostic/website-production-release-proof-20260910
+
+permissions:
+  contents: read
+
+jobs:
+  production-browser-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout diagnostic proof
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Selenium
+        run: python -m pip install --disable-pip-version-check selenium
+
+      - name: Verify production with real Chrome
+        run: python diagnostics/website-production-release-proof.py
+
+      - name: Upload production proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: website-production-release-proof
+          path: production-proof/
+          if-no-files-found: warn
