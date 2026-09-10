@@ -79,8 +79,8 @@ jobs:
             page.on('pageerror', err => pageErrors.push(String(err)));
 
             const response = await page.goto(`${base}?hero-proof=${Date.now()}-${cfg.name}`, {
-              waitUntil: 'networkidle',
-              timeout: 60000
+              waitUntil: 'domcontentloaded',
+              timeout: 30000
             });
             assert.equal(response?.status(), 200, `${cfg.name}: homepage HTTP`);
 
@@ -93,6 +93,7 @@ jobs:
               });
               if (img.decode) await img.decode();
             });
+            await page.waitForTimeout(500);
 
             const data = await hero.evaluate(img => {
               const r = img.getBoundingClientRect();
