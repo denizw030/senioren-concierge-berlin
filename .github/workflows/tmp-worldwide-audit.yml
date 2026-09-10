@@ -24,25 +24,21 @@ jobs:
 
           for path in sorted(Path('.').rglob('*.html')):
               original = path.read_text(encoding='utf-8')
-              per_file = 0
-              def replace(match):
-                  nonlocal_holder[0] += 1
-                  return match.group(1) + 'NAHWERK weltweit' + match.group(3)
+              per_file = [0]
 
               def scoped(match):
-                  nonlocal per_file
                   inner = match.group(2)
                   visible = re.sub(r'<[^>]+>', '', inner).strip()
                   if visible != 'Concierges':
                       return match.group(0)
-                  per_file += 1
+                  per_file[0] += 1
                   return match.group(1) + 'NAHWERK weltweit' + match.group(3)
 
               updated = anchor.sub(scoped, original)
               if updated != original:
                   path.write_text(updated, encoding='utf-8')
                   changed_files.append(str(path))
-                  changed_links += per_file
+                  changed_links += per_file[0]
 
           print(f'CHANGED_FILES={len(changed_files)}')
           print(f'CHANGED_LINKS={changed_links}')
@@ -94,8 +90,8 @@ jobs:
 
           for p in html_files:
               text = p.read_text(encoding='utf-8')
-              ParserInstance = Parser(p)
-              ParserInstance.feed(text)
+              parser = Parser(p)
+              parser.feed(text)
               for i, line in enumerate(text.splitlines(), 1):
                   if accidental in line:
                       accidental_refs.append((f'{p}:{i}', line.strip()[:300]))
