@@ -41,6 +41,6 @@ test("public pages describe reception without fraud-prevention guarantees", () =
   assert.match(senior, /Mehr Sicherheit bei unbekannten Anrufen/);
   assert.match(senior, /angebliche Familiennotfälle mit Geldforderung/);
   assert.match(senior, /keine Garantie, jeden Betrugsversuch zu erkennen/);
-  assert.match(prime, /Persönliche Telefonannahme/);
-  assert.match(prime, /Eltern oder Großeltern/);
+  assert.match(prime, /Ein Concierge\. Dasselbe Gespräch\. Egal über welchen Weg\./);
+  assert.doesNotMatch(prime, /Eltern oder Großeltern/);
 });

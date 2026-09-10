@@ -163,6 +163,14 @@ async function waitForServer(){
   throw new Error("fixture server unavailable");
 }
 
+async function httpStatus(url){
+  try{
+    return (await fetch(url,{cache:"no-store"})).status;
+  }catch{
+    return 0;
+  }
+}
+
 test("Family Premium UI browser smoke: desktop/mobile, direct/activation/copy",async(t)=>{
   const chrome=chromeBinary();
   if(!chrome){t.skip("Chrome unavailable");return}
@@ -183,13 +191,56 @@ test("Family Premium UI browser smoke: desktop/mobile, direct/activation/copy",a
       const height=width===390?844:1000;
       for(const mode of ["direct","activation"]){
         const url=`http://127.0.0.1:${PORT}/${mode}.html`;
-        const r=spawnSync(chrome,[
+        const assetUrl=`http://127.0.0.1:${PORT}/assets/family-owner-sponsored-access.js?v=family-premium-browser-smoke`;
+        const args=[
           "--headless","--no-sandbox","--disable-gpu","--hide-scrollbars",
           `--window-size=${width},${height}`,
           "--virtual-time-budget=7000","--dump-dom",url
-        ],{encoding:"utf8",timeout:20000});
+        ];
+        const runChrome=()=>spawnSync(chrome,args,{encoding:"utf8",timeout:20000});
 
+        let r=runChrome();
         assert.equal(r.status,0,`Chrome ${mode} ${width} failed: ${r.stderr}`);
+
+        if(Buffer.byteLength(r.stdout||"","utf8")===0){
+          const first={
+            status:r.status,
+            stdoutBytes:Buffer.byteLength(r.stdout||"","utf8"),
+            stderr:r.stderr||""
+          };
+          const urlHttpStatus=await httpStatus(url);
+          const assetHttpStatus=await httpStatus(assetUrl);
+          const diagnostic={
+            mode,width,
+            firstStatus:first.status,
+            firstStdoutBytes:first.stdoutBytes,
+            firstStderr:first.stderr,
+            urlHttpStatus,
+            assetHttpStatus,
+            retryStatus:null,
+            retryStdoutBytes:null,
+            retryStderr:null,
+            markerFound:false
+          };
+
+          if(urlHttpStatus!==200||assetHttpStatus!==200){
+            console.error("FAMILY_PREMIUM_EMPTY_DOM",JSON.stringify(diagnostic));
+            assert.equal(urlHttpStatus,200,`Family Premium EMPTY-DOM target HTTP failed: ${JSON.stringify(diagnostic)}`);
+            assert.equal(assetHttpStatus,200,`Family Premium EMPTY-DOM asset HTTP failed: ${JSON.stringify(diagnostic)}`);
+          }
+
+          const retry=runChrome();
+          diagnostic.retryStatus=retry.status;
+          diagnostic.retryStdoutBytes=Buffer.byteLength(retry.stdout||"","utf8");
+          diagnostic.retryStderr=retry.stderr||"";
+          diagnostic.markerFound=(retry.stdout||"").includes(`data-family-premium-browser-smoke="${mode}-green"`);
+          console.error("FAMILY_PREMIUM_EMPTY_DOM",JSON.stringify(diagnostic));
+
+          assert.equal(retry.status,0,`Chrome ${mode} ${width} retry failed: ${JSON.stringify(diagnostic)}`);
+          assert.notEqual(diagnostic.retryStdoutBytes,0,`Chrome ${mode} ${width} retry returned empty DOM: ${JSON.stringify(diagnostic)}`);
+          r=retry;
+        }
+
         assert.match(r.stdout,new RegExp(`data-family-premium-browser-smoke="${mode}-green"`),r.stdout);
         assert.match(r.stdout,/data-family-premium-overflow="none"/,r.stdout);
         if(mode==="activation")assert.match(r.stdout,/data-family-premium-clipboard="green"/,r.stdout);

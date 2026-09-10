@@ -2,6 +2,9 @@
   const PENDING_KEY="nw_activation_pending_v1", COMPLETE_KEY="nw_activation_complete_v1";
   const PROFILE_URL="https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-profile";
   const SESSION_KEY="scb_web_session";
+  const FREE_ENTRY_COPY="Lernen Sie NAHWERK kostenlos kennen: chatten, Fragen stellen, Aufgaben vorbereiten und eine echte Concierge-Ausführung ausprobieren. Keine Zahlungsdaten erforderlich. Kein automatisches Upgrade. Danach können Sie Guthaben schon ab 5 € online aufladen.";
+  const FREE_LIMITS_COPY="FREE: bis zu 50 App-Dialoge / Monat · bis zu 20 WhatsApp-Dialoge / Monat · 1 echte Concierge-Ausführung.";
+  // FUTURE COPY — erst nach produktiver Verfügbarkeit im UI aktivieren: „Guthabenkarten ab 10 € im Handel erhältlich.“
   const safeToken=(v,max=64)=>String(v||"").toLowerCase().replace(/[^a-z0-9_:-]+/g,"_").slice(0,max).replace(/^_+|_+$/g,"");
   const track=(name,step)=>window.NahwerkAnalytics?.track?.(name,{funnel_name:"activation",funnel_step:safeToken(step)});
   const usageOf=(usage)=>({app:Math.max(0,Number(usage?.app_dialogues_used||0)||0),whatsapp:Math.max(0,Number(usage?.whatsapp_dialogues_used||0)||0)});
@@ -73,6 +76,30 @@
       return v;
     }catch(_){return"control"}
   }
+  function syncFreeEntryJourney(){
+    let grid=document.querySelector(".nw-journey-grid");
+    if(!grid){
+      const conversion=document.querySelector('.story-final[data-story-step="6"] .story-shell');
+      if(!conversion)return false;
+      grid=document.createElement("div");
+      grid.className="nw-journey-grid";
+      grid.setAttribute("aria-label","In drei Schritten zum kostenlosen Einstieg");
+      grid.innerHTML='<article class="nw-journey-card"><span>01</span><h3>Kostenlos registrieren</h3><p></p></article><article class="nw-journey-card"><span>02</span><h3>Aufgabe übergeben</h3><p>Zum Beispiel einen Hautarzt finden, passende Optionen vergleichen oder den nächsten Schritt organisieren lassen.</p></article><article class="nw-journey-card"><span>03</span><h3>NAHWERK bleibt dran</h3><p>NAHWERK recherchiert, organisiert, fragt bei nötigen Entscheidungen nach und meldet Ergebnis oder nächsten Schritt zurück.</p></article>';
+      const actions=conversion.querySelector(".story-actions");
+      conversion.insertBefore(grid,actions||null);
+    }
+    const card=grid.querySelector(".nw-journey-card");
+    if(!card)return false;
+    const heading=card.querySelector("h3");
+    if(heading)heading.textContent="Kostenlos registrieren";
+    let body=card.querySelector("p:not(.nw-free-limits)");
+    if(!body){body=document.createElement("p");card.append(body)}
+    body.textContent=FREE_ENTRY_COPY;
+    let limits=card.querySelector(".nw-free-limits");
+    if(!limits){limits=document.createElement("p");limits.className="nw-free-limits";card.append(limits)}
+    limits.textContent=FREE_LIMITS_COPY;
+    return true;
+  }
   document.addEventListener("click",(event)=>{
     const cta=event.target.closest?.("[data-nw-cta]");
     if(cta)void window.NahwerkAnalytics?.track?.("cta_click",{funnel_name:"activation",funnel_step:safeToken(cta.dataset.nwStep||cta.dataset.nwCta)});
@@ -94,6 +121,6 @@
     void seedBaselineFromProfile();
   }
   if(document.body.dataset.nwIntent)void track("funnel_step","intent_"+safeToken(document.body.dataset.nwIntent,40));
-  if(path==="index.html"||path==="")experiment();
+  if(path==="index.html"||path===""){syncFreeEntryJourney();experiment()}
   window.NahwerkActivation=Object.freeze({markRegistrationComplete,seedBaseline,seedBaselineFromProfile,observeUsage,isPending:pending,isComplete:complete});
 })();

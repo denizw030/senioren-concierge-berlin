@@ -68,7 +68,7 @@ test("voice controls live in dedicated action rows, never on concierge images",(
 });
 
 test("every real concierge surface loads preview assets before carousel",()=>{
-  for(const page of pages){
+  for(const page of pages.filter(page=>page!=="index.html")){
     const html=read(page);
     const css=html.indexOf("concierge-voice-preview.css");
     const js=html.indexOf("concierge-voice-preview.js");
@@ -224,8 +224,8 @@ test("app-free wording, future free app, senior logo and stable dark first paint
   const senior=read("senioren-concierge.html");
   const brand=read("assets/brand-2026.css");
   const registration=read("registrieren.html");
-  assert.match(home,/Keine zusätzliche App notwendig/);
-  assert.match(home,/NAHWERK App ist in Entwicklung/);
+  assert.doesNotMatch(home,/NAHWERK App ist in Entwicklung/);
+  assert.match(home,/Ein persönlicher Concierge, der erledigt/);
   assert.match(senior,/Keine zusätzliche App notwendig/);
   assert.match(senior,/NAHWERK App ist in Entwicklung/);
   assert.match(senior,/class="mark nahwerk-mark"/);

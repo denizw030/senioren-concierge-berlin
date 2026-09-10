@@ -27,7 +27,8 @@ function loadHooks() {
     crypto:webcrypto,
     TextEncoder,
     Uint8Array,
-    document:{getElementById:()=>null}
+    document:{getElementById:()=>null,querySelectorAll:()=>[],querySelector:()=>null},
+    matchMedia:()=>({matches:false})
   };
   vm.createContext(sandbox);
   vm.runInContext(js,sandbox,{filename:"telephone-reception-product.js"});
@@ -211,9 +212,10 @@ test("role guards remain fail closed",()=>{
   assert.equal(hooks.roleAllowed({productScope:"CONCIERGE_BUNDLE",handlerMode:"TELEPHONE_AGENT",personalConciergeAllowed:false}),true);
 });
 
-test("client phone check is UX-only while server authority remains explicit",()=>{
-  assert.match(js,/clientseitige Prüfung dient nur der Eingabehilfe/);
-  assert.match(js,/Server-Normalisierung und Server-Validierung bleiben maßgeblich/);
+test("telephone onboarding remains inert until separately deployed and approved",()=>{
+  assert.match(js,/Runtime safety boundary\. Keep null until the Platform function is actually deployed and separately approved/);
+  assert.match(js,/const NUMBER_ONBOARDING_ENDPOINT = null/);
+  assert.match(page,/data-runtime-status="inert"/);
 });
 
 test("only routing or porting active are active states",()=>{
@@ -222,19 +224,21 @@ test("only routing or porting active are active states",()=>{
   assert.match(page,/Nie automatisch aktiv/);
 });
 
-test("senior fixed-line and shared-context product regressions stay intact",()=>{
-  assert.match(page,/Kein Smartphone nötig/);
+test("prepared fixed-line markup stays inert while shared-context story is preserved",()=>{
+  assert.match(page,/class="tr-section story-hidden-unreleased" hidden aria-hidden="true"[\s\S]*Kein Smartphone nötig/);
   assert.match(page,/normales Festnetztelefon/);
   assert.match(page,/Keine App, kein QR-Code, keine Push-Nachricht/);
-  assert.match(page,/Kein Weitererzählen\. Kein Informationsverlust\. Ein NAHWERK/);
+  assert.match(page,/Ein Concierge\. Dasselbe Gespräch\. Egal über welchen Weg\./);
   assert.match(page,/Hausverwaltung/);
 });
 
 test("product integration, pricing, hero and header regressions stay intact",()=>{
   for(const body of [home,services,pricing,registration]) assert.match(body,/telefonannahme\.html/);
-  assert.match(home,/nahwerk-overview-hero-weboptimized-hq\.webp/);
-  assert.match(home,/Ein Concierge, der nicht nur antwortet\. Sondern sich kümmert\./);
+  assert.match(home,/assets\/prime\/nahwerk-overview-hero-weboptimized-hq\.webp/);
+  assert.match(home,/Ein persönlicher Concierge, der erledigt\./);
+  assert.deepEqual([...home.matchAll(/data-story-step="([1-6])"/g)].map(m=>m[1]),["1","2","3","4","5","6"]);
   assert.match(home,/body\.overview-page\.nw-header-scrolled \.top/);
   assert.match(home,/rgba\(7,\s*7,\s*6,\s*0\.82\)/);
-  assert.match(pricing,/SUBSCRIPTION[\s\S]{0,120}PAYG/);
+  assert.match(pricing,/59,66 €/);
+  assert.match(pricing,/FREE/);
 });
