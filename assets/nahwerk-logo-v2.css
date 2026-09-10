@@ -46,3 +46,303 @@
     height:46px!important;
   }
 }
+
+/*
+ * ANMELDEN PAGE HERO + FOLD FINAL
+ * Prime/default login only. Senior product styling and all auth semantics remain untouched.
+ */
+@media (min-width:901px){
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main{
+    position:relative;
+    isolation:isolate;
+    display:grid!important;
+    grid-template-columns:minmax(0,1.04fr) minmax(380px,.96fr);
+    grid-template-rows:auto auto;
+    column-gap:clamp(34px,4.8vw,72px);
+    row-gap:clamp(14px,2vh,22px);
+    align-content:center;
+    min-height:calc(100svh - 78px);
+    box-sizing:border-box;
+    padding:clamp(24px,3.6vh,40px) max(20px,calc((100vw - 1240px)/2));
+    overflow:hidden;
+    background:
+      radial-gradient(720px 520px at 88% 20%,rgba(38,76,155,.16),transparent 66%),
+      radial-gradient(620px 460px at 4% 78%,rgba(90,20,28,.06),transparent 72%),
+      linear-gradient(180deg,#05080d 0%,#08111c 52%,#05080c 100%)!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main::after{
+    content:"";
+    grid-column:2;
+    grid-row:1 / span 2;
+    align-self:stretch;
+    justify-self:stretch;
+    min-height:min(600px,calc(100svh - 126px));
+    max-height:640px;
+    border:1px solid rgba(212,175,55,.30);
+    border-radius:28px;
+    background-color:#05070b;
+    background-image:url("prime/nahwerk-red-blue-hero-web-lossless.webp");
+    background-repeat:no-repeat;
+    background-position:center;
+    background-size:contain;
+    box-shadow:0 30px 80px rgba(0,0,0,.40),inset 0 1px 0 rgba(255,255,255,.025);
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main > .hero{
+    grid-column:1;
+    grid-row:1;
+    min-height:0!important;
+    padding:0!important;
+    display:block!important;
+    align-self:end;
+    background:transparent!important;
+    border:0!important;
+    overflow:visible!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main > .hero::after{
+    display:none!important;
+    content:none!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main > .hero > .wrap,
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main > .section > .wrap{
+    width:100%!important;
+    max-width:590px!important;
+    margin:0!important;
+    padding:0!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main > .hero .eyebrow,
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main > .hero h1,
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main > .hero p{
+    width:auto!important;
+    max-width:590px!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main > .hero h1{
+    margin:8px 0 12px!important;
+    font-size:clamp(2.7rem,4vw,4.35rem)!important;
+    line-height:1.01!important;
+    letter-spacing:-.048em!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main > .hero p{
+    margin:0!important;
+    font-size:clamp(1rem,1.25vw,1.12rem)!important;
+    line-height:1.52!important;
+    color:#c9c9c5!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main > .section{
+    grid-column:1;
+    grid-row:2;
+    align-self:start;
+    padding:0!important;
+    background:transparent!important;
+    border:0!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) .loginwrap{
+    max-width:590px!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) .logincard{
+    padding:clamp(21px,2.2vw,27px)!important;
+    border-radius:20px!important;
+    border-color:rgba(212,175,55,.18)!important;
+    background:
+      radial-gradient(circle at 100% 0%,rgba(34,72,144,.12),transparent 42%),
+      radial-gradient(circle at 0% 100%,rgba(110,26,32,.035),transparent 52%),
+      linear-gradient(145deg,#0b1119,#080d14)!important;
+    box-shadow:0 22px 58px rgba(0,0,0,.33),inset 0 1px 0 rgba(255,255,255,.025)!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) .logincard > h2{
+    margin:0 0 16px!important;
+    font-size:27px!important;
+    line-height:1.08!important;
+    letter-spacing:-.025em!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) .logincard .field{
+    margin-bottom:13px!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) .logincard .field label{
+    display:block;
+    margin-bottom:6px;
+    font-size:13px;
+    line-height:1.35;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) .logincard .field input{
+    min-height:48px;
+    box-sizing:border-box;
+    padding-top:11px!important;
+    padding-bottom:11px!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) #loginSubmit{
+    width:100%;
+    min-height:48px;
+    margin-top:1px;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) .logincard .split{
+    margin-top:12px!important;
+    gap:8px 14px!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) .logincard .split .tiny,
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) .logincard .split a{
+    line-height:1.45!important;
+  }
+
+  @media (max-height:800px){
+    html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main{
+      padding-top:20px;
+      padding-bottom:20px;
+      row-gap:12px;
+    }
+
+    html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main::after{
+      min-height:calc(100svh - 118px);
+      max-height:610px;
+    }
+
+    html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main > .hero h1{
+      font-size:clamp(2.55rem,3.7vw,3.55rem)!important;
+      margin-top:6px!important;
+      margin-bottom:9px!important;
+    }
+
+    html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main > .hero p{
+      font-size:1rem!important;
+      line-height:1.45!important;
+    }
+
+    html body.login-image-page:not(.senior-product):not([data-product="senioren"]) .logincard{
+      padding:20px 22px!important;
+    }
+
+    html body.login-image-page:not(.senior-product):not([data-product="senioren"]) .logincard > h2{
+      margin-bottom:13px!important;
+      font-size:25px!important;
+    }
+
+    html body.login-image-page:not(.senior-product):not([data-product="senioren"]) .logincard .field{
+      margin-bottom:11px!important;
+    }
+  }
+}
+
+@media (max-width:900px){
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main{
+    overflow-x:hidden;
+    background:
+      radial-gradient(620px 440px at 90% 4%,rgba(38,76,155,.15),transparent 67%),
+      linear-gradient(180deg,#05080d 0%,#08111c 54%,#05080c 100%)!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main > .hero{
+    display:block!important;
+    min-height:0!important;
+    padding:42px 0 0!important;
+    background:transparent!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main > .hero > .wrap{
+    padding-right:0!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main > .hero h1{
+    margin:8px 0 12px!important;
+    font-size:clamp(2.45rem,11vw,3.35rem)!important;
+    line-height:1.02!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main > .hero p{
+    margin:0!important;
+    font-size:1rem!important;
+    line-height:1.5!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main > .hero::after{
+    content:""!important;
+    display:block!important;
+    position:relative!important;
+    inset:auto!important;
+    right:auto!important;
+    bottom:auto!important;
+    top:auto!important;
+    transform:none!important;
+    width:min(calc(100% - 40px),520px)!important;
+    aspect-ratio:1155 / 1362!important;
+    margin:28px auto 0!important;
+    border:1px solid rgba(212,175,55,.26)!important;
+    border-radius:24px!important;
+    background-color:#05070b!important;
+    background-image:url("prime/nahwerk-red-blue-hero-web-lossless.webp")!important;
+    background-repeat:no-repeat!important;
+    background-position:center!important;
+    background-size:contain!important;
+    box-shadow:0 24px 60px rgba(0,0,0,.34)!important;
+    opacity:1!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main > .section{
+    padding:24px 0 48px!important;
+    background:transparent!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) .logincard{
+    padding:22px!important;
+    border-radius:18px!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) .logincard > h2{
+    margin:0 0 16px!important;
+    font-size:26px!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) .logincard .field{
+    margin-bottom:14px!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) .logincard .field input,
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) .password-toggle,
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) #loginSubmit{
+    min-height:48px;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) #loginSubmit{
+    width:100%;
+  }
+}
+
+@media (max-width:390px){
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main > .hero{
+    padding-top:32px!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main > .hero::after{
+    width:calc(100% - 32px)!important;
+    margin-top:22px!important;
+    border-radius:20px!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main > .section{
+    padding-top:20px!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) .logincard{
+    padding:19px!important;
+  }
+
+  html body.login-image-page:not(.senior-product):not([data-product="senioren"]) .logincard .split{
+    align-items:flex-start!important;
+    flex-direction:column!important;
+  }
+}
