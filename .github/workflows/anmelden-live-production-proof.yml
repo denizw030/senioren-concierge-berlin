@@ -1,0 +1,78 @@
+name: NAHWERK Anmelden Live Production Proof
+
+on:
+  push:
+    branches:
+      - verify/anmelden-production-20260910
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify live production resources
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p live-proof
+          BASE="https://nahwerkconcierge.com"
+          CSS="$BASE/assets/nahwerk-logo-v2.css?v=live-proof-$(date +%s)"
+          PRIME="$BASE/anmelden.html?produkt=prime&liveproof=$(date +%s)"
+          SENIOR="$BASE/anmelden.html?produkt=senioren&liveproof=$(date +%s)"
+
+          ready=0
+          for attempt in $(seq 1 12); do
+            if curl -fsSL --retry 2 --max-time 20 "$CSS" -o live-proof/live.css && grep -q 'nahwerk-red-blue-hero-web-lossless.webp' live-proof/live.css; then
+              ready=1
+              break
+            fi
+            sleep 5
+          done
+          test "$ready" = 1
+
+          curl -fsSL --retry 2 --max-time 20 "$BASE/assets/prime/nahwerk-red-blue-hero-web-lossless.webp?liveproof=$(date +%s)" -o live-proof/live-hero.webp
+          test -s live-proof/live-hero.webp
+          curl -fsSL --retry 2 --max-time 20 "$PRIME" -o live-proof/prime-source.html
+          curl -fsSL --retry 2 --max-time 20 "$SENIOR" -o live-proof/senior-source.html
+          grep -q 'id="loginForm"' live-proof/prime-source.html
+          grep -q 'id="loginPassword"' live-proof/prime-source.html
+          grep -q 'id="loginSubmit"' live-proof/prime-source.html
+          grep -q 'id="forgotPassword"' live-proof/prime-source.html
+          grep -q 'registrieren.html' live-proof/prime-source.html
+          grep -q 'assets/auth-nav.js' live-proof/prime-source.html
+
+      - name: Capture real live Chromium screenshots
+        shell: bash
+        run: |
+          set -euo pipefail
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          BASE="https://nahwerkconcierge.com/anmelden.html"
+          stamp="$(date +%s)"
+          for spec in "1440x900 1440 900" "1366x768 1366 768" "1280x800 1280 800" "390x844 390 844" "360x800 360 800"; do
+            set -- $spec
+            name="$1"; width="$2"; height="$3"
+            "$CHROME" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --hide-scrollbars --window-size="$width,$height" --virtual-time-budget=5000 \
+              --screenshot="live-proof/live-prime-$name.png" "$BASE?produkt=prime&liveproof=$stamp"
+            test -s "live-proof/live-prime-$name.png"
+          done
+          "$CHROME" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --window-size=1440,900 --virtual-time-budget=5000 --dump-dom \
+            "$BASE?produkt=prime&liveproof=$stamp" > live-proof/live-prime-dom.html
+          "$CHROME" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --window-size=1440,900 --virtual-time-budget=5000 --dump-dom \
+            "$BASE?produkt=senioren&liveproof=$stamp" > live-proof/live-senior-dom.html
+          grep -q 'data-product="prime"' live-proof/live-prime-dom.html
+          grep -q 'data-product="senioren"' live-proof/live-senior-dom.html
+          grep -q 'senior-product' live-proof/live-senior-dom.html
+
+      - name: Upload live proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: anmelden-live-production-proof
+          path: live-proof/
+          if-no-files-found: error
