@@ -17,6 +17,7 @@ body.story-site .top{background:#000!important;border-bottom:1px solid rgba(255,
 body.story-site.nw-header-scrolled .top{background:rgba(3,3,4,.88)!important;backdrop-filter:blur(22px) saturate(130%)}
 body.story-site .links a{white-space:nowrap}
 body.story-site .links a.active{color:#fff}
+body.story-site main>section.reveal,body.story-site .footer.reveal{opacity:1!important;transform:none!important;transition:none!important}
 .story-shell{width:min(1180px,calc(100% - 48px));margin:0 auto}
 .story-section{position:relative;overflow:hidden;padding:clamp(88px,9vw,138px) 0;border-bottom:1px solid var(--story-line)}
 .story-section--soft{background:linear-gradient(180deg,#050506 0%,#080809 100%)}
