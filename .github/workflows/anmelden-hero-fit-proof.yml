@@ -1,0 +1,82 @@
+name: NAHWERK Anmelden Hero Fit Proof
+
+on:
+  push:
+    branches:
+      - fix/anmelden-hero-image-fit-final-20260910
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hero-fit-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Serve branch
+        shell: bash
+        run: |
+          nohup python3 -m http.server 4173 >/tmp/nw-hero-fit-http.log 2>&1 &
+          for attempt in 1 2 3 4 5; do
+            curl -fsS http://127.0.0.1:4173/anmelden.html >/dev/null && break
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:4173/anmelden.html >/dev/null
+
+      - name: Build DOM fit harness
+        shell: bash
+        run: |
+          cat > hero-fit-harness.html <<'EOF'
+          <!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+          <body><iframe id="p" style="width:100vw;height:100vh;border:0"></iframe><pre id="r"></pre><script>
+          const q=new URLSearchParams(location.search), product=q.get('product')||'prime';
+          const frame=document.getElementById('p'), out={product,errors:[],metrics:{}};
+          frame.onload=()=>setTimeout(()=>{try{
+            const w=frame.contentWindow,d=w.document,body=d.body,root=d.documentElement,main=d.querySelector('main'),hero=d.querySelector('main>.hero'),form=d.getElementById('loginForm');
+            const target=w.innerWidth>900?main:hero, ps=w.getComputedStyle(target,'::after'), fr=form.getBoundingClientRect();
+            out.metrics={viewport:[w.innerWidth,w.innerHeight],size:ps.backgroundSize,position:ps.backgroundPosition,radius:ps.borderRadius,overflow:ps.overflow,docWidth:root.scrollWidth,formBottom:fr.bottom};
+            const chk=(n,v)=>{if(!v)out.errors.push(n)};
+            chk('no-horizontal-overflow',root.scrollWidth<=w.innerWidth+1);
+            chk('asset',ps.backgroundImage.includes('nahwerk-red-blue-hero-web-lossless.webp'));
+            if(product==='prime'){
+              chk('cover',ps.backgroundSize==='cover');
+              chk('rounded',parseFloat(ps.borderRadius)>=20);
+              chk('clipped',ps.overflow==='hidden');
+              if(w.innerWidth>900) chk('fold',fr.bottom<=w.innerHeight+1);
+            } else {
+              chk('senior-context',body.dataset.product==='senioren'&&body.classList.contains('senior-product'));
+            }
+          }catch(e){out.errors.push(String(e))}
+          document.documentElement.dataset.result=out.errors.length?'red':'green';document.getElementById('r').textContent=JSON.stringify(out,null,2);frame.style.display='none';},1200);
+          frame.src='anmelden.html?produkt='+encodeURIComponent(product);
+          </script></body></html>
+          EOF
+
+      - name: Verify fit and capture screenshots
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          mkdir -p proof
+          case_run(){
+            name="$1"; width="$2"; height="$3"; product="$4"
+            "$CHROME" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --window-size="$width,$height" --virtual-time-budget=5000 --dump-dom "http://127.0.0.1:4173/hero-fit-harness.html?product=$product" > "proof/$name-dom.html"
+            grep -q 'data-result="green"' "proof/$name-dom.html" || { echo "CASE $name RED"; cat "proof/$name-dom.html"; exit 1; }
+            echo "CASE $name GREEN"
+            "$CHROME" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --hide-scrollbars --window-size="$width,$height" --virtual-time-budget=3500 --screenshot="proof/$name.png" "http://127.0.0.1:4173/anmelden.html?produkt=$product"
+          }
+          case_run prime-1440x900 1440 900 prime
+          case_run prime-1366x768 1366 768 prime
+          case_run prime-1280x800 1280 800 prime
+          case_run prime-390x844 390 844 prime
+          case_run prime-360x800 360 800 prime
+          case_run senior-1440x900 1440 900 senioren
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: anmelden-hero-fit-proof
+          path: proof/
+          if-no-files-found: error
