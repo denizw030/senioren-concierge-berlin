@@ -36,6 +36,20 @@ test("core marketing statements are preserved verbatim",()=>{
   ]) assert.ok(home.includes(statement),statement);
 });
 
+test("FREE entry copy explains trial, limits and online credit without live gift-card marketing",()=>{
+  const js=read("assets/acquisition-v1.js");
+  assert.match(js,/Kostenlos registrieren/);
+  assert.match(js,/chatten, Fragen stellen, Aufgaben vorbereiten und eine echte Concierge-Ausführung ausprobieren/);
+  assert.match(js,/Keine Zahlungsdaten erforderlich\. Kein automatisches Upgrade\./);
+  assert.match(js,/Guthaben schon ab 5 € online aufladen/);
+  assert.match(js,/bis zu 50 App-Dialoge \/ Monat/);
+  assert.match(js,/bis zu 20 WhatsApp-Dialoge \/ Monat/);
+  assert.match(js,/1 echte Concierge-Ausführung/);
+  assert.match(js,/FUTURE COPY — erst nach produktiver Verfügbarkeit im UI aktivieren/);
+  const renderedMarkup=read("index.html");
+  assert.doesNotMatch(renderedMarkup,/Guthabenkarten ab 10 €/);
+});
+
 test("demo makes Auftrag Freigabe Durchführung Ergebnis immediately explicit",()=>{
   const home=read("index.html");
   const start=home.indexOf('id="demo"');
