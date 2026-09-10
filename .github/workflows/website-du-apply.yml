@@ -1,0 +1,227 @@
+name: NAHWERK Website Du Copy Apply
+
+on:
+  push:
+    branches:
+      - fix/website-du-ansprache-final-20260910
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply curated grammar-aware Du copy
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          import re, subprocess, sys, os
+
+          FORMAL=re.compile(r'\b(?:Sie|Ihnen|Ihr|Ihre|Ihren|Ihrem|Ihres|Ihrer)\b')
+          EXCLUDED_TAGS={'script','style','template','svg','path'}
+          VISIBLE_ATTRS={'placeholder','aria-label','title','alt','value'}
+
+          class Audit(HTMLParser):
+              def __init__(self):
+                  super().__init__(convert_charrefs=True); self.stack=[]; self.matches=[]
+              def _attrs(self,tag,attrs):
+                  a=dict(attrs)
+                  for k,v in attrs:
+                      if k in VISIBLE_ATTRS and v and FORMAL.search(v): self.matches.append(v.strip())
+                  if tag=='meta' and (a.get('name','').lower() in {'description','twitter:description'} or a.get('property','').lower()=='og:description'):
+                      v=a.get('content','')
+                      if v and FORMAL.search(v): self.matches.append(v.strip())
+              def handle_starttag(self,tag,attrs):
+                  self.stack.append(tag)
+                  if tag not in EXCLUDED_TAGS:self._attrs(tag,attrs)
+              def handle_startendtag(self,tag,attrs):
+                  if tag not in EXCLUDED_TAGS:self._attrs(tag,attrs)
+              def handle_endtag(self,tag):
+                  if self.stack:
+                      if self.stack[-1]==tag:self.stack.pop()
+                      elif tag in self.stack:self.stack=self.stack[:len(self.stack)-1-self.stack[::-1].index(tag)]
+              def handle_data(self,data):
+                  if any(t in EXCLUDED_TAGS for t in self.stack): return
+                  t=' '.join(data.split())
+                  if t and FORMAL.search(t): self.matches.append(t)
+
+          protected_files={'senioren-concierge.html','zugang-uebertragen.html'}
+          keep={
+            ('angehoerige.html','Sie kann einfach in der Sprache schreiben oder sprechen, die für sie natürlich ist.'),
+            ('index.html','Sie kann einfach in der Sprache schreiben oder sprechen, die für sie natürlich ist.'),
+            ('ki-transparenz.html','Wird ein Zugang für eine andere Person eingerichtet, erhält die unterstützte Person eine Information darüber, wer den Zugang eingerichtet hat. Sie wird zugleich darüber informiert, dass Nilo oder Mira ein digitaler KI-Concierge ist.'),
+            ('ki-transparenz.html','Von Nilo oder Mira erzeugte Bilder oder andere synthetische Medien sind künstlich erzeugte Inhalte. Sie dürfen nicht als authentische Fotografie, Dokumentation realer Ereignisse oder verlässlicher Nachweis verstanden werden.'),
+            ('concierge-anpassen.html','Diese Einstellungen betreffen Kommunikationsstil und hilfreichen Kontext. Sie sind nicht dafür gedacht, eine Person heimlich zu überwachen oder Entscheidungen gegen ihren Willen festzulegen. Die unterstützte Person soll ihre eigenen Präferenzen jederzeit ändern können.'),
+            ('concierge-anpassen.html','Sie – mit Anrede und Nachnamen'),
+            ('registrieren.html','Sie – mit Anrede und Nachnamen'),
+            ('registrieren.html','Die tatsächliche Du-/Sie-Ansprache richtet sich nach der bei der Registrierung gewählten Einstellung.'),
+            ('konto.html','Ihre E-Mail-Adresse bleibt für die bestehende Passwort-Wiederherstellung verfügbar. Sie wird nicht als gleichwertiger zweiter Faktor dargestellt.')
+          }
+
+          exact={
+            'Der Link ist möglicherweise veraltet oder die Adresse wurde falsch eingegeben. Über die Startseite gelangen Sie direkt zurück zu allen Bereichen.':'Der Link ist möglicherweise veraltet oder die Adresse wurde falsch eingegeben. Über die Startseite gelangst du direkt zurück zu allen Bereichen.',
+            'So nutzen Sie NAHWERK: Anliegen nennen, Unterstützung erhalten und wichtige Schritte selbst bestätigen – einfach über WhatsApp.':'So nutzt du NAHWERK: Anliegen nennen, Unterstützung erhalten und wichtige Schritte selbst bestätigen – einfach über WhatsApp.',
+            'NAHWERK ist Ihr persönlicher Concierge für alltägliche Fragen, Organisation und verständliche Unterstützung. Sie schreiben oder sprechen ganz natürlich – ohne neue App und ohne interne Technikbegriffe kennen zu müssen.':'NAHWERK ist dein persönlicher Concierge für alltägliche Fragen, Organisation und verständliche Unterstützung. Du schreibst oder sprichst ganz natürlich – ohne neue App und ohne interne Technikbegriffe kennen zu müssen.',
+            'Schreiben Sie eine Nachricht, senden Sie eine Sprachnachricht oder – wenn es zum Anliegen passt – ein Foto oder Dokument. Formulieren Sie einfach so, wie Sie auch einem Menschen Ihr Anliegen erklären würden.':'Schreib eine Nachricht, sende eine Sprachnachricht oder – wenn es zum Anliegen passt – ein Foto oder Dokument. Formuliere einfach so, wie du auch einem Menschen dein Anliegen erklären würdest.',
+            'Du oder Sie, kurze Antworten oder mehr Erklärung: hilfreiche Präferenzen können berücksichtigt werden, damit die Unterstützung zu Ihnen passt.':'Du oder Sie, kurze Antworten oder mehr Erklärung: Hilfreiche Präferenzen können berücksichtigt werden, damit die Unterstützung zu dir passt.',
+            'Richten Sie NAHWERK für einen Menschen ein, der Ihnen wichtig ist. Die unterstützte Person nutzt ihren eigenen Concierge selbstständig – mit eigener Sprache, eigenem Kontext und klaren Berechtigungen.':'Richte NAHWERK für einen Menschen ein, der dir wichtig ist. Die unterstützte Person nutzt ihren eigenen Concierge selbstständig – mit eigener Sprache, eigenem Kontext und klaren Berechtigungen.',
+            'Melden Sie sich mit Ihrer E-Mail-Adresse und Ihrem Passwort an, um Ihren Zugang, die Nutzung und persönlichen Concierge- persönliche Einstellungen zu verwalten.':'Melde dich mit deiner E-Mail-Adresse und deinem Passwort an, um deinen Zugang, deine Nutzung und deine persönlichen Concierge-Einstellungen zu verwalten.',
+            'Wählen Sie, wie Sie diese Anmeldung bestätigen möchten.':'Wähle, wie du diese Anmeldung bestätigen möchtest.',
+            'Nur verwenden, wenn Sie keinen Zugriff mehr auf Ihre MFA-Methoden haben. Sie benötigen zusätzlich Ihr aktuelles Passwort.':'Nur verwenden, wenn du keinen Zugriff mehr auf deine MFA-Methoden hast. Du benötigst zusätzlich dein aktuelles Passwort.',
+            'Persönliche Unterstützung – dort, wo Sie sie brauchen.':'Persönliche Unterstützung – dort, wo du sie brauchst.',
+            'veröffentlichten Kontaktweg oder innerhalb des WhatsApp-Dialogs mitteilen, dass Sie die Löschung Ihrer bei NAHWERK Concierge gespeicherten personenbezogenen Daten wünschen. Eine eindeutige Formulierung wie „Ich möchte meine gespeicherten Daten löschen lassen“ genügt.':'veröffentlichten Kontaktweg oder innerhalb des WhatsApp-Dialogs mitteilen, dass du die Löschung deiner bei NAHWERK Concierge gespeicherten personenbezogenen Daten wünschst. Eine eindeutige Formulierung wie „Ich möchte meine gespeicherten Daten löschen lassen“ genügt.',
+            'Starten Sie nach der Registrierung direkt mit Ihrer ersten echten NAHWERK Concierge-Aufgabe.':'Starte nach der Registrierung direkt mit deiner ersten echten NAHWERK Concierge-Aufgabe.',
+            'Öffnen Sie WhatsApp und antworten Sie auf die NAHWERK-Begrüßung mit einem konkreten Anliegen. Erst eine real genutzte Concierge-Antwort schließt die Aktivierung ab.':'Öffne WhatsApp und antworte auf die NAHWERK-Begrüßung mit einem konkreten Anliegen. Erst eine real genutzte Concierge-Antwort schließt die Aktivierung ab.',
+            'Wählen Sie eine passende Aufgabe aus oder formulieren Sie Ihr eigenes Anliegen. Entscheidend ist nicht der Seitenaufruf, sondern dass NAHWERK tatsächlich etwas für Sie bearbeiten kann.':'Wähle eine passende Aufgabe aus oder formuliere dein eigenes Anliegen. Entscheidend ist nicht der Seitenaufruf, sondern dass NAHWERK tatsächlich etwas für dich bearbeiten kann.',
+            'Sagen Sie, was Sie brauchen. NAHWERK versteht das Anliegen, recherchiert, organisiert und führt den nächsten freigegebenen Schritt aus – ohne dass Sie sich durch Apps, Menüs oder Fachbegriffe arbeiten müssen.':'Sag, was du brauchst. NAHWERK versteht das Anliegen, recherchiert, organisiert und führt den nächsten freigegebenen Schritt aus – ohne dass du dich durch Apps, Menüs oder Fachbegriffe arbeiten musst.',
+            'Da sein, auch wenn Sie gerade verhindert sind.':'Da sein, auch wenn du gerade verhindert bist.',
+            'Kostenlos starten, ein echtes Anliegen nennen und messe NAHWERK daran, in wie weit es Ihnen Arbeit abnimmt.':'Starte kostenlos, nenne ein echtes Anliegen und miss NAHWERK daran, wie viel Arbeit es dir abnimmt.',
+            '1. Sie sprechen mit einem KI-System':'1. Du sprichst mit einem KI-System',
+            'Wenn Sie mit „Nilo oder Mira“ über WhatsApp kommunizieren, interagieren Sie mit einem digitalen, KI-gestützten System. Nilo und Mira sind keine menschlichen Mitarbeiter. Diese Information wird bereits beim Einstieg und in der Willkommenskommunikation kenntlich gemacht.':'Wenn du mit „Nilo oder Mira“ über WhatsApp kommunizierst, interagierst du mit einem digitalen, KI-gestützten System. Nilo und Mira sind keine menschlichen Mitarbeiter. Diese Information wird bereits beim Einstieg und in der Willkommenskommunikation kenntlich gemacht.',
+            'Fragen zu NAHWERK, Ihrem Concierge oder Ihrem Konto? Finden Sie direkt den passenden Kontaktweg.':'Fragen zu NAHWERK, deinem Concierge oder deinem Konto? Finde direkt den passenden Kontaktweg.',
+            'Concierge, Sicherheit, Nutzung und persönliche Kontodaten verwalten Sie am schnellsten direkt in Ihrem geschützten Kundenbereich.':'Concierge, Sicherheit, Nutzung und persönliche Kontodaten verwaltest du am schnellsten direkt in deinem geschützten Kundenbereich.',
+            'Wenn Sie NAHWERK für Eltern, Großeltern oder eine andere unterstützte Person einrichten möchten, führt Sie der Angehörigen-Bereich durch den passenden Einstieg.':'Wenn du NAHWERK für Eltern, Großeltern oder eine andere unterstützte Person einrichten möchtest, führt dich der Angehörigen-Bereich durch den passenden Einstieg.',
+            'Die Kontaktseite und der NAHWERK Concierge ersetzen keinen medizinischen Notruf oder Hausnotruf. Bei akuten medizinischen oder anderen Notfällen wenden Sie sich direkt an die zuständigen Notrufstellen. In Deutschland gilt':'Die Kontaktseite und der NAHWERK Concierge ersetzen keinen medizinischen Notruf oder Hausnotruf. Bei akuten medizinischen oder anderen Notfällen wende dich direkt an die zuständigen Notrufstellen. In Deutschland gilt',
+            'Wen möchten Sie verwalten?':'Wen möchtest du verwalten?',
+            'Personen, die Sie über NAHWERK unterstützen.':'Personen, die du über NAHWERK unterstützt.',
+            'Wählen Sie, wie Sie Ihre Anmeldung zusätzlich bestätigen möchten.':'Wähle, wie du deine Anmeldung zusätzlich bestätigen möchtest.',
+            'Scannen Sie den QR-Code mit einer Authenticator-App. Falls das Scannen nicht möglich ist, können Sie den Schlüssel manuell eingeben.':'Scanne den QR-Code mit einer Authenticator-App. Falls das Scannen nicht möglich ist, kannst du den Schlüssel manuell eingeben.',
+            'Zum Deaktivieren bestätigen Sie Ihr aktuelles Passwort und einen gültigen Code aus Ihrer Authenticator-App.':'Zum Deaktivieren bestätige dein aktuelles Passwort und einen gültigen Code aus deiner Authenticator-App.',
+            'Zum Deaktivieren der SMS-Bestätigung bestätigen Sie zuerst Ihr aktuelles Passwort. Danach senden wir einen Sicherheitscode an Ihre hinterlegte Mobilnummer.':'Zum Deaktivieren der SMS-Bestätigung bestätige zuerst dein aktuelles Passwort. Danach senden wir einen Sicherheitscode an deine hinterlegte Mobilnummer.',
+            'Wenn Sie den Zugriff auf eine Bestätigungsmethode verloren haben, können Sie sie mit Ihrem Passwort und der weiterhin verfügbaren zweiten Methode sicher zurücksetzen.':'Wenn du den Zugriff auf eine Bestätigungsmethode verloren hast, kannst du sie mit deinem Passwort und der weiterhin verfügbaren zweiten Methode sicher zurücksetzen.',
+            'Bestätigen Sie Ihr aktuelles Passwort und einen gültigen Code aus Ihrer Authenticator-App. Danach wird die verlorene SMS-Methode entfernt und Sie müssen sich neu anmelden.':'Bestätige dein aktuelles Passwort und einen gültigen Code aus deiner Authenticator-App. Danach wird die verlorene SMS-Methode entfernt und du musst dich neu anmelden.',
+            'Wiederherstellungscodes helfen, wenn Sie später keinen Zugriff mehr auf Ihre MFA-Methode haben. Neue Codes machen ältere, noch unbenutzte Codes ungültig.':'Wiederherstellungscodes helfen, wenn du später keinen Zugriff mehr auf deine MFA-Methode hast. Neue Codes machen ältere, noch unbenutzte Codes ungültig.',
+            'Ihre E-Mail-Adresse bleibt für die bestehende Passwort-Wiederherstellung verfügbar. Sie wird nicht als gleichwertiger zweiter Faktor dargestellt.':'Deine E-Mail-Adresse bleibt für die bestehende Passwort-Wiederherstellung verfügbar. Sie wird nicht als gleichwertiger zweiter Faktor dargestellt.',
+            'Automatische Abfragen und Eskalation nur, wenn Sie diese Funktion aktivieren.':'Automatische Abfragen und Eskalation nur, wenn du diese Funktion aktivierst.',
+            'Wenn keine WhatsApp-Bestätigung vorliegt, versucht Ihr KI-Concierge Sie bis zu zweimal telefonisch zu erreichen. Jeder Versuch klingelt höchstens 20 Sekunden. Erst nach dem zweiten erfolglosen Versuch beginnt die Wartezeit zum Sicherheitskontakt.':'Wenn keine WhatsApp-Bestätigung vorliegt, versucht dein KI-Concierge, dich bis zu zweimal telefonisch zu erreichen. Jeder Versuch klingelt höchstens 20 Sekunden. Erst nach dem zweiten erfolglosen Versuch beginnt die Wartezeit zum Sicherheitskontakt.',
+            'Ohne bestätigte Antwort versucht Ihr KI-Concierge Sie bis zu zweimal anzurufen – jeweils höchstens 20 Sekunden.':'Ohne bestätigte Antwort versucht dein KI-Concierge, dich bis zu zweimal anzurufen – jeweils höchstens 20 Sekunden.',
+            'Die NAHWERK Telefonannahme kann eigenständig oder zusammen mit Ihrem persönlichen Concierge genutzt werden. Bei der Einrichtung wählen Sie das Nutzungsmodell, das zu Ihrem Alltag passt.':'Die NAHWERK Telefonannahme kann eigenständig oder zusammen mit deinem persönlichen Concierge genutzt werden. Bei der Einrichtung wählst du das Nutzungsmodell, das zu deinem Alltag passt.',
+            'Öffnen Sie diese Seite über den Link aus Ihrer Passwort-Reset-E-Mail und wählen Sie anschließend ein neues Passwort.':'Öffne diese Seite über den Link aus deiner Passwort-Reset-E-Mail und wähle anschließend ein neues Passwort.',
+            'Sagen Sie in einem natürlichen Satz, was Sie brauchen. NAHWERK versteht das Anliegen, recherchiert, ordnet und führt den nächsten freigegebenen Schritt aus.':'Sag in einem natürlichen Satz, was du brauchst. NAHWERK versteht das Anliegen, recherchiert, ordnet und führt den nächsten freigegebenen Schritt aus.',
+            'Wer darf Sie begleiten?':'Wer darf dich begleiten?',
+            'Für wen richten Sie den Zugang ein?':'Für wen richtest du den Zugang ein?',
+            'Mindestens 15 Zeichen. Verwenden Sie eine lange, nicht vorhersehbare Passphrase; Sonderzeichen sind nicht vorgeschrieben.':'Mindestens 15 Zeichen. Verwende eine lange, nicht vorhersehbare Passphrase; Sonderzeichen sind nicht vorgeschrieben.',
+            'Nur nötig, wenn Sie Nilo selbst über WhatsApp nutzen.':'Nur nötig, wenn du Nilo selbst über WhatsApp nutzt.',
+            'Nur so viel Safety, wie Sie bewusst einrichten.':'Nur so viel Safety, wie du bewusst einrichtest.',
+            'Die Telefonannahme schafft einen klaren ersten Schritt: Name, Anliegen und Rückrufmöglichkeit werden aufgenommen, bevor Sie entscheiden, ob und wie Sie reagieren möchten.':'Die Telefonannahme schafft einen klaren ersten Schritt: Name, Anliegen und Rückrufmöglichkeit werden aufgenommen, bevor du entscheidest, ob und wie du reagieren möchtest.',
+            'Der Grund des Anrufs wird strukturiert festgehalten, statt Sie ungefiltert zu unterbrechen.':'Der Grund des Anrufs wird strukturiert festgehalten, statt dich ungefiltert zu unterbrechen.',
+            'Morgens sagen Sie: „Wenn die Hausverwaltung anruft, bin ich erst ab 17 Uhr erreichbar.“ Später nimmt Telefonagent Alexander den Anruf an und kann diese Information im erlaubten Kundenkontext berücksichtigen. Danach steht dem persönlichen Concierge die hinterlassene Nachricht im gemeinsamen NAHWERK-Kontext zur Verfügung.':'Morgens sagst du: „Wenn die Hausverwaltung anruft, bin ich erst ab 17 Uhr erreichbar.“ Später nimmt Telefonagent Alexander den Anruf an und kann diese Information im erlaubten Kundenkontext berücksichtigen. Danach steht dem persönlichen Concierge die hinterlassene Nachricht im gemeinsamen NAHWERK-Kontext zur Verfügung.',
+            '1. Jemand ruft Sie an':'1. Jemand ruft dich an',
+            '5. Sie entscheiden über die Verbindung':'5. Du entscheidest über die Verbindung',
+            'Wenn Sie nicht erreichbar sind:':'Wenn du nicht erreichbar bist:',
+            'Sie geben Ihre bestehende Festnetznummer an. Anschließend stimmen wir mit Ihnen den passenden Einrichtungsweg für Ihre Rufnummer ab.':'Du gibst deine bestehende Festnetznummer an. Anschließend stimmen wir mit dir den passenden Einrichtungsweg für deine Rufnummer ab.',
+            'Wir klären mit Ihnen, wie die Telefonannahme zu Ihrer bestehenden Rufnummer passen soll.':'Wir klären mit dir, wie die Telefonannahme zu deiner bestehenden Rufnummer passen soll.',
+            'Geben Sie die wichtigsten Angaben an. Anschließend kann NAHWERK mit Ihnen den passenden Einrichtungsweg für Ihre Rufnummer abstimmen.':'Gib die wichtigsten Angaben an. Anschließend kann NAHWERK mit dir den passenden Einrichtungsweg für deine Rufnummer abstimmen.',
+            'Sie bestimmen, welche Telefonfunktionen für Ihren Zugang eingerichtet werden. Funktionen mit Außenwirkung werden nicht allein durch eine Eingabe auf dieser Seite aktiviert.':'Du bestimmst, welche Telefonfunktionen für deinen Zugang eingerichtet werden. Funktionen mit Außenwirkung werden nicht allein durch eine Eingabe auf dieser Seite aktiviert.',
+            'Sie haben das Recht, binnen vierzehn Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen.':'Du hast das Recht, binnen vierzehn Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen.',
+            'Um Ihr Widerrufsrecht auszuüben, müssen Sie uns':'Um dein Widerrufsrecht auszuüben, musst du uns',
+            'mittels einer eindeutigen Erklärung – zum Beispiel per E-Mail, Brief oder über einen eindeutig zuordenbaren elektronischen Kontaktweg – über Ihren Entschluss, diesen Vertrag zu widerrufen, informieren. Sie können dafür das unten stehende Muster-Widerrufsformular verwenden; dies ist jedoch nicht vorgeschrieben.':'mittels einer eindeutigen Erklärung – zum Beispiel per E-Mail, Brief oder über einen eindeutig zuordenbaren elektronischen Kontaktweg – über deinen Entschluss, diesen Vertrag zu widerrufen, informieren. Du kannst dafür das unten stehende Muster-Widerrufsformular verwenden; dies ist jedoch nicht vorgeschrieben.',
+            'Zur Wahrung der Widerrufsfrist reicht es aus, dass Sie die Mitteilung über die Ausübung des Widerrufsrechts vor Ablauf der Widerrufsfrist absenden.':'Zur Wahrung der Widerrufsfrist reicht es aus, dass du die Mitteilung über die Ausübung des Widerrufsrechts vor Ablauf der Widerrufsfrist absendest.',
+            'Wenn Sie diesen Vertrag widerrufen, erstatten wir Ihnen alle Zahlungen, die wir von Ihnen erhalten haben, einschließlich gegebenenfalls berechneter Standard-Lieferkosten, unverzüglich und spätestens binnen vierzehn Tagen ab dem Tag, an dem die Mitteilung über Ihren Widerruf bei uns eingegangen ist. Für die Rückzahlung verwenden wir grundsätzlich dasselbe Zahlungsmittel, das Sie bei der ursprünglichen Transaktion eingesetzt haben, sofern nicht ausdrücklich etwas anderes vereinbart wurde.':'Wenn du diesen Vertrag widerrufst, erstatten wir dir alle Zahlungen, die wir von dir erhalten haben, einschließlich gegebenenfalls berechneter Standard-Lieferkosten, unverzüglich und spätestens binnen vierzehn Tagen ab dem Tag, an dem die Mitteilung über deinen Widerruf bei uns eingegangen ist. Für die Rückzahlung verwenden wir grundsätzlich dasselbe Zahlungsmittel, das du bei der ursprünglichen Transaktion eingesetzt hast, sofern nicht ausdrücklich etwas anderes vereinbart wurde.',
+            'Wenn Sie ausdrücklich verlangen, dass eine kostenpflichtige Dienstleistung bereits während der Widerrufsfrist beginnt, kann im Fall eines späteren Widerrufs für den bis zum Widerruf erbrachten Teil ein gesetzlich zulässiger anteiliger Betrag zu zahlen sein. Ein solcher vorzeitiger Beginn wird nur veranlasst, wenn die hierfür erforderlichen gesetzlichen Informationen und Erklärungen im Bestellprozess eingeholt wurden.':'Wenn du ausdrücklich verlangst, dass eine kostenpflichtige Dienstleistung bereits während der Widerrufsfrist beginnt, kann im Fall eines späteren Widerrufs für den bis zum Widerruf erbrachten Teil ein gesetzlich zulässiger anteiliger Betrag zu zahlen sein. Ein solcher vorzeitiger Beginn wird nur veranlasst, wenn die hierfür erforderlichen gesetzlichen Informationen und Erklärungen im Bestellprozess eingeholt wurden.',
+            'Wenn Sie den Vertrag widerrufen wollen, können Sie folgende Angaben übermitteln:':'Wenn du den Vertrag widerrufen willst, kannst du folgende Angaben übermitteln:',
+            'NAHWERK | Ihr persönlicher Concierge':'NAHWERK | Dein persönlicher Concierge'
+          }
+
+          phrases=[
+            ('Bitte übermitteln Sie','Bitte übermittle'),('Melden Sie sich','Melde dich'),('Wählen Sie','Wähle'),('Geben Sie','Gib'),('Sagen Sie','Sag'),('Nennen Sie','Nenne'),('Senden Sie','Sende'),('Beschreiben Sie','Beschreibe'),('Öffnen Sie','Öffne'),('Formulieren Sie','Formuliere'),('Nutzen Sie','Nutze'),('Prüfen und verwalten Sie','Prüfe und verwalte'),('Verwalten Sie','Verwalte'),('Passen Sie','Passe'),('Verbinden Sie','Verbinde'),('Bestätigen Sie','Bestätige'),('Scannen Sie','Scanne'),('Speichern Sie','Speichere'),
+            ('Sie können','Du kannst'),('Sie schreiben','Du schreibst'),('Sie behalten','Du behältst'),('Sie erhalten','Du erhältst'),('Sie bestimmen','Du bestimmst'),('Sie geben','Du gibst'),('Sie sind','Du bist'),('Sie müssen','Du musst'),('Sie benötigen','Du benötigst'),('Sie möchten','Du möchtest'),('Sie entscheiden','Du entscheidest'),('Sie haben','Du hast'),
+            ('können Sie','kannst du'),('möchten Sie','möchtest du'),('finden Sie','findest du'),('verwalten Sie','verwaltest du'),('öffnen Sie','öffnest du'),('gelangen Sie','gelangst du'),
+            ('Wenn Sie','Wenn du'),('wenn Sie','wenn du'),('bevor Sie','bevor du'),('dass Sie','dass du'),('falls Sie','falls du'),
+            ('für Sie selbst','für dich selbst'),('Für Sie selbst','Für dich selbst'),('für Sie','für dich'),('Für Sie','Für dich'),('bei Ihnen','bei dir'),('Bei Ihnen','Bei dir'),('mit Ihnen','mit dir'),('Mit Ihnen','Mit dir'),('zu Ihnen','zu dir'),('Zu Ihnen','Zu dir'),('von Ihnen','von dir'),('Von Ihnen','Von dir'),('Ihnen','dir')
+          ]
+
+          def rewrite(s):
+              if s in exact: return exact[s]
+              x=s
+              for a,b in phrases:x=x.replace(a,b)
+              for a,b in [('Ihres','deines'),('Ihrem','deinem'),('Ihren','deinen'),('Ihrer','deiner'),('Ihre','deine'),('Ihr','dein')]:x=x.replace(a,b)
+              x=re.sub(r'\bSie\b','du',x)
+              x=re.sub(r'(^|(?<=[.!?]\s))(du|dein|deine|deinen|deinem|deiner|deines)\b',lambda m:m.group(1)+m.group(2).capitalize(),x)
+              return x
+
+          changed=[]
+          before={}
+          for f in sorted(Path('.').glob('*.html')):
+              name=f.name
+              if name in protected_files:continue
+              p=Audit(); raw=f.read_text(encoding='utf-8'); p.feed(raw); oldraw=raw
+              seen=set()
+              for old in p.matches:
+                  if (name,old) in keep:continue
+                  new=rewrite(old)
+                  if old==new or (old,new) in seen:continue
+                  seen.add((old,new))
+                  if old not in raw:
+                      print('MISSING EXACT CUSTOMER TEXT',name,repr(old));sys.exit(3)
+                  raw=raw.replace(old,new)
+              if raw!=oldraw:
+                  before[name]=oldraw; f.write_text(raw,encoding='utf-8'); changed.append(name)
+
+          # Explicit third-person/literal corrections after the general rewrite pass.
+          corrections={
+            'ablauf.html': [('Du oder du, kurze Antworten oder mehr Erklärung','Du oder Sie, kurze Antworten oder mehr Erklärung')],
+            'angehoerige.html': [('du kann einfach in der Sprache schreiben oder sprechen, die für sie natürlich ist.','Sie kann einfach in der Sprache schreiben oder sprechen, die für sie natürlich ist.')],
+            'index.html': [('du kann einfach in der Sprache schreiben oder sprechen, die für sie natürlich ist.','Sie kann einfach in der Sprache schreiben oder sprechen, die für sie natürlich ist.')],
+            'ki-transparenz.html': [('du wird zugleich darüber informiert','Sie wird zugleich darüber informiert'),('du dürfen nicht als authentische Fotografie','Sie dürfen nicht als authentische Fotografie')],
+            'concierge-anpassen.html': [('du sind nicht dafür gedacht','Sie sind nicht dafür gedacht'),('du – mit Anrede und Nachnamen','Sie – mit Anrede und Nachnamen')],
+            'registrieren.html': [('du – mit Anrede und Nachnamen','Sie – mit Anrede und Nachnamen'),('Du-/du-Ansprache','Du-/Sie-Ansprache')],
+            'konto.html': [('Deine E-Mail-Adresse bleibt für die bestehende Passwort-Wiederherstellung verfügbar. du wird nicht als gleichwertiger zweiter Faktor dargestellt.','Deine E-Mail-Adresse bleibt für die bestehende Passwort-Wiederherstellung verfügbar. Sie wird nicht als gleichwertiger zweiter Faktor dargestellt.')]
+          }
+          for name,pairs in corrections.items():
+              p=Path(name)
+              if not p.exists():continue
+              raw=p.read_text(encoding='utf-8'); newer=raw
+              for a,b in pairs:newer=newer.replace(a,b)
+              if newer!=raw:
+                  if name not in before:before[name]=raw;changed.append(name)
+                  p.write_text(newer,encoding='utf-8')
+
+          # No structural, JS, CSS or navigation mutation is allowed.
+          attrs=re.compile(r'\b(?:id|class|href|src|data-[\w-]+|name|type|for|role|autocomplete|inputmode|pattern|maxlength|rel|property|aria-[\w-]+)\s*=\s*(?:"[^"]*"|\'[^\']*\')',re.I)
+          scripts=re.compile(r'<script\b[^>]*>.*?</script\s*>',re.I|re.S)
+          for name in set(changed):
+              a=before[name]; b=Path(name).read_text(encoding='utf-8')
+              if [m.group(0) for m in attrs.finditer(a)] != [m.group(0) for m in attrs.finditer(b)]:
+                  print('STRUCTURAL ATTRIBUTE CHANGED',name);sys.exit(4)
+              if scripts.findall(a)!=scripts.findall(b):
+                  print('JAVASCRIPT CHANGED',name);sys.exit(5)
+          if subprocess.run(['git','diff','--quiet','--','senioren-concierge.html','zugang-uebertragen.html']).returncode!=0:
+              print('SENIOR EXPERIENCE CHANGED');sys.exit(6)
+          bad=[n for n in subprocess.check_output(['git','diff','--name-only'],text=True).splitlines() if not n.endswith('.html')]
+          if bad:
+              print('NON HTML PRODUCT CHANGE',bad);sys.exit(7)
+          subprocess.run(['git','diff','--check'],check=True)
+
+          required={
+            'index.html':['NAHWERK | Dein persönlicher Concierge','Sag, was du brauchst.','miss NAHWERK daran, wie viel Arbeit es dir abnimmt.'],
+            'anmelden.html':['Melde dich mit deiner E-Mail-Adresse','Wähle, wie du diese Anmeldung bestätigen möchtest.'],
+            'registrieren.html':['Wer darf dich begleiten?','Für wen richtest du den Zugang ein?'],
+            'konto.html':['Dein persönlicher Bereich.','Zum Deaktivieren bestätige dein aktuelles Passwort'],
+            'safety.html':['Nur so viel Safety, wie du bewusst einrichtest.'],
+            'telefonannahme.html':['NAHWERK geht für dich ans Telefon.','Morgens sagst du:'],
+            'senioren-concierge.html':['Sie müssen keine Befehle oder Fachbegriffe kennen.']
+          }
+          for name,needles in required.items():
+              t=Path(name).read_text(encoding='utf-8')
+              for needle in needles:
+                  if needle not in t:
+                      print('REQUIRED COPY MISSING',name,needle);sys.exit(8)
+
+          print('PRODUCT HTML CHANGED',sorted(set(changed)))
+          if changed:
+              subprocess.run(['git','config','user.name','NAHWERK Website Copy'],check=True)
+              subprocess.run(['git','config','user.email','actions@users.noreply.github.com'],check=True)
+              subprocess.run(['git','add',*sorted(set(changed))],check=True)
+              subprocess.run(['git','commit','-m','Switch general website customer address to Du'],check=True)
+              subprocess.run(['git','push','origin',f'HEAD:{os.environ["GITHUB_REF_NAME"]}'],check=True)
+          else:
+              print('NO PRODUCT COPY CHANGES NEEDED')
+          PY
