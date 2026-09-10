@@ -29,6 +29,7 @@ import com.nahwerk.concierge.data.HomeContext
 import com.nahwerk.concierge.data.PendingChatRequest
 import com.nahwerk.concierge.data.Reminder
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import org.junit.Rule
 import org.junit.Test
@@ -67,7 +68,12 @@ class VisualQaInstrumentedTest {
         )
     )
 
-    private fun setFrame(width: Int = 390, height: Int = 820, fontScale: Float = 1f, content: @androidx.compose.runtime.Composable () -> Unit) {
+    private fun setFrame(
+        width: Int = 390,
+        height: Int = 820,
+        fontScale: Float = 1f,
+        content: @androidx.compose.runtime.Composable () -> Unit
+    ) {
         composeRule.setContent {
             val density = LocalDensity.current
             CompositionLocalProvider(LocalDensity provides Density(density.density, fontScale)) {
@@ -94,12 +100,22 @@ class VisualQaInstrumentedTest {
     }
 
     private fun saveBitmap(name: String, bitmap: Bitmap) {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val context = instrumentation.targetContext
         val directory = File(context.getExternalFilesDir(null), "visual-qa/before")
         check(directory.exists() || directory.mkdirs())
-        FileOutputStream(File(directory, "$name.png")).use { stream ->
+        val localFile = File(directory, "$name.png")
+        FileOutputStream(localFile).use { stream ->
             check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream))
         }
+
+        val exportDirectory = "/sdcard/Download/nahwerk-visual-qa/before"
+        val exportedFile = "$exportDirectory/$name.png"
+        val command = "mkdir -p $exportDirectory && cp ${localFile.absolutePath} $exportedFile && ls $exportedFile"
+        val descriptor = instrumentation.uiAutomation.executeShellCommand(command)
+        val output = FileInputStream(descriptor.fileDescriptor).bufferedReader().use { it.readText() }
+        descriptor.close()
+        check(output.contains("$name.png")) { "Visual QA export failed for $name" }
     }
 
     @Test
@@ -149,7 +165,12 @@ class VisualQaInstrumentedTest {
 
     @Test
     fun captureBeforePendingErrorRetry() {
-        val pending = PendingChatRequest("source-visual-2", "corr-visual-2", "Bitte prüfe, ob die Reservierung bestätigt ist.", 1234L)
+        val pending = PendingChatRequest(
+            "source-visual-2",
+            "corr-visual-2",
+            "Bitte prüfe, ob die Reservierung bestätigt ist.",
+            1234L
+        )
         setFrame {
             ChatScreen(
                 home,
@@ -166,7 +187,12 @@ class VisualQaInstrumentedTest {
 
     @Test
     fun captureBeforeSending() {
-        val pending = PendingChatRequest("source-visual-3", "corr-visual-3", "Bitte erinnere mich morgen daran.", 1234L)
+        val pending = PendingChatRequest(
+            "source-visual-3",
+            "corr-visual-3",
+            "Bitte erinnere mich morgen daran.",
+            1234L
+        )
         setFrame {
             ChatScreen(
                 home,
@@ -216,7 +242,15 @@ class VisualQaInstrumentedTest {
     @Test
     fun captureBeforeKeyboardOpen() {
         setFrame {
-            ChatScreen(home, listOf(ChatMessage("assistant", home.greeting)), "", false, null, null, {}, {}, {}, {}, {})
+            ChatScreen(
+                home,
+                listOf(ChatMessage("assistant", home.greeting)),
+                "",
+                false,
+                null,
+                null,
+                {}, {}, {}, {}, {}
+            )
         }
         composeRule.onNodeWithTag("chat_input").performClick().performTextInput("Tastatur-Test")
         saveDevice("chat-keyboard-open")
