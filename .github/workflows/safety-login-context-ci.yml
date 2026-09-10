@@ -1,0 +1,97 @@
+name: NAHWERK Safety Login Context CI
+
+on:
+  pull_request:
+    paths:
+      - "safety.html"
+      - "assets/auth-nav.js"
+      - "anmelden.html"
+      - "senioren-concierge.html"
+      - "prime-concierge.html"
+      - "tests/safety-login-context.test.mjs"
+      - "tests/safety-login-context-browser.html"
+      - ".github/workflows/safety-login-context-ci.yml"
+  push:
+    branches: [main]
+    paths:
+      - "safety.html"
+      - "assets/auth-nav.js"
+      - "anmelden.html"
+      - "senioren-concierge.html"
+      - "prime-concierge.html"
+      - "tests/safety-login-context.test.mjs"
+      - "tests/safety-login-context-browser.html"
+      - ".github/workflows/safety-login-context-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Full Node regression
+        run: node --test tests/*.test.mjs
+
+  browser-context:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: regression
+    steps:
+      - uses: actions/checkout@v4
+      - name: Serve repository
+        run: |
+          nohup python3 -m http.server 4173 >/tmp/nw-safety-context-http.log 2>&1 &
+          for attempt in 1 2 3 4 5; do
+            curl -fsS http://127.0.0.1:4173/safety.html >/dev/null && break
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:4173/safety.html >/dev/null
+      - name: Six required context cases in real browser desktop and mobile
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          for width in 1440 390; do
+            "$CHROME" --headless --no-sandbox --disable-gpu --window-size="$width,1100" --virtual-time-budget=10000 --dump-dom \
+              "http://127.0.0.1:4173/tests/safety-login-context-browser.html?width=$width" > "/tmp/safety-login-context-$width.html"
+            grep -q 'data-safety-login-context="green"' "/tmp/safety-login-context-$width.html" || { cat "/tmp/safety-login-context-$width.html"; exit 1; }
+          done
+          echo "SAFETY_LOGIN_CONTEXT_BROWSER_DESKTOP_MOBILE=GREEN"
+
+  production-proof:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [regression, browser-context]
+    steps:
+      - name: Wait for GitHub Pages production content
+        run: |
+          green=0
+          for attempt in $(seq 1 36); do
+            safety="$(curl -fsSL "https://nahwerkconcierge.com/safety.html?deploy=${GITHUB_SHA}-${attempt}" || true)"
+            fixture="$(curl -fsSL "https://nahwerkconcierge.com/tests/safety-login-context-browser.html?deploy=${GITHUB_SHA}-${attempt}" || true)"
+            count="$(printf '%s' "$safety" | grep -o 'href="anmelden.html?produkt=prime"[^>]*>Zum Kundenbereich</a>' | wc -l | tr -d ' ')"
+            if [ "$count" = "2" ] && printf '%s' "$fixture" | grep -q 'SAFETY_LOGIN_CONTEXT_BROWSER=GREEN'; then
+              green=1
+              break
+            fi
+            sleep 5
+          done
+          test "$green" = "1"
+          echo "SAFETY_LOGIN_CONTEXT_PRODUCTION_CONTENT=GREEN"
+      - name: Real production browser proof desktop and mobile
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          for width in 1440 390; do
+            "$CHROME" --headless --no-sandbox --disable-gpu --window-size="$width,1100" --virtual-time-budget=12000 --dump-dom \
+              "https://nahwerkconcierge.com/tests/safety-login-context-browser.html?deploy=${GITHUB_SHA}&width=$width" > "/tmp/safety-login-context-production-$width.html"
+            grep -q 'data-safety-login-context="green"' "/tmp/safety-login-context-production-$width.html" || { cat "/tmp/safety-login-context-production-$width.html"; exit 1; }
+          done
+          echo "SAFETY_LOGIN_CONTEXT_FINAL_PRODUCTION_BROWSER=GREEN"
