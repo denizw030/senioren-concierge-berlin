@@ -4,8 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,7 +40,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,7 +50,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.LiveRegionMode
@@ -70,11 +66,10 @@ import com.nahwerk.concierge.data.ChatMessage
 import com.nahwerk.concierge.data.HomeContext
 import com.nahwerk.concierge.data.PendingChatRequest
 import com.nahwerk.concierge.data.Reminder
-import kotlinx.coroutines.delay
 
 private val NahwerkBlack = Color(0xFF08090A)
 private val NahwerkSurface = Color(0xFF121315)
-private val NahwerkSurfaceRaised = Color(0xFF1A1B1E)
+private val NahwerkRaised = Color(0xFF1A1B1E)
 private val NahwerkGold = Color(0xFFD0AE68)
 private val NahwerkMuted = Color(0xFFB9B6AF)
 private val NahwerkError = Color(0xFFFFB4AB)
@@ -86,7 +81,7 @@ private val NahwerkColors = darkColorScheme(
     onBackground = Color(0xFFF5F2EC),
     surface = NahwerkSurface,
     onSurface = Color(0xFFF5F2EC),
-    surfaceVariant = NahwerkSurfaceRaised,
+    surfaceVariant = NahwerkRaised,
     onSurfaceVariant = NahwerkMuted,
     error = NahwerkError
 )
@@ -101,7 +96,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 internal fun NahwerkApp(viewModel: NahwerkAppViewModel = viewModel()) {
     val state by viewModel.uiState.collectAsState()
-    val childScreen = state.screen == AppScreen.CHAT || state.screen == AppScreen.REMINDERS || state.screen == AppScreen.SETTINGS
+    val childScreen = state.screen in setOf(AppScreen.CHAT, AppScreen.REMINDERS, AppScreen.SETTINGS)
     BackHandler(enabled = childScreen) { viewModel.goHome() }
 
     MaterialTheme(colorScheme = NahwerkColors) {
@@ -120,7 +115,7 @@ internal fun NahwerkApp(viewModel: NahwerkAppViewModel = viewModel()) {
                 onLogout = viewModel::logout
             )
             state.screen == AppScreen.HOME -> HomeScreen(
-                home = state.home,
+                home = requireNotNull(state.home),
                 refreshing = state.loading,
                 error = state.error,
                 onChat = { viewModel.open(AppScreen.CHAT) },
@@ -129,7 +124,7 @@ internal fun NahwerkApp(viewModel: NahwerkAppViewModel = viewModel()) {
                 onRefresh = { viewModel.refreshHome() }
             )
             state.screen == AppScreen.CHAT -> ChatScreen(
-                home = state.home,
+                home = requireNotNull(state.home),
                 messages = state.chatMessages,
                 draft = state.chatDraft,
                 sending = state.chatSending,
@@ -141,8 +136,8 @@ internal fun NahwerkApp(viewModel: NahwerkAppViewModel = viewModel()) {
                 onDiscard = viewModel::discardPending,
                 onBack = viewModel::goHome
             )
-            state.screen == AppScreen.REMINDERS -> ReminderScreen(state.home.reminders, viewModel::goHome)
-            state.screen == AppScreen.SETTINGS -> SettingsScreen(state.home, viewModel::goHome, viewModel::logout)
+            state.screen == AppScreen.REMINDERS -> ReminderScreen(requireNotNull(state.home).reminders, viewModel::goHome)
+            state.screen == AppScreen.SETTINGS -> SettingsScreen(requireNotNull(state.home), viewModel::goHome, viewModel::logout)
             else -> LoadingScreen()
         }
     }
@@ -150,10 +145,7 @@ internal fun NahwerkApp(viewModel: NahwerkAppViewModel = viewModel()) {
 
 @Composable
 private fun LoadingScreen() {
-    Box(
-        Modifier.fillMaxSize().background(NahwerkBlack).testTag("loading_screen"),
-        contentAlignment = Alignment.Center
-    ) {
+    Box(Modifier.fillMaxSize().background(NahwerkBlack).testTag("loading_screen"), contentAlignment = Alignment.Center) {
         CircularProgressIndicator(color = NahwerkGold, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
     }
 }
@@ -187,13 +179,9 @@ internal fun LoginScreen(
     val canLogin = !busy && email.isNotBlank() && password.length >= 8
 
     Column(
-        Modifier
-            .fillMaxSize()
+        Modifier.fillMaxSize()
             .background(Brush.verticalGradient(listOf(NahwerkBlack, Color(0xFF11100D))))
-            .safeDrawingPadding()
-            .imePadding()
-            .verticalScroll(rememberScrollState())
-            .padding(24.dp),
+            .safeDrawingPadding().imePadding().verticalScroll(rememberScrollState()).padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -231,15 +219,21 @@ internal fun LoginScreen(
                     enabled = canLogin,
                     modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp).testTag("login_submit")
                 ) {
-                    if (busy) CircularProgressIndicator(modifier = Modifier.height(22.dp).width(22.dp), strokeWidth = 2.dp)
+                    if (busy) CircularProgressIndicator(Modifier.height(22.dp).width(22.dp), strokeWidth = 2.dp)
                     else Text("Sicher anmelden")
                 }
-                TextButton(onClick = { onReset(email) }, enabled = !busy && email.isNotBlank(), modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                    Text("Passwort zurücksetzen")
-                }
+                TextButton(
+                    onClick = { onReset(email) },
+                    enabled = !busy && email.isNotBlank(),
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                ) { Text("Passwort zurücksetzen") }
                 if (!error.isNullOrBlank()) ErrorText(error)
                 if (!notice.isNullOrBlank()) StatusText(notice)
-                Text("STAGING · Testversion · Sitzungstoken werden verschlüsselt auf dem Gerät gespeichert.", color = NahwerkMuted, style = MaterialTheme.typography.labelSmall)
+                Text(
+                    "STAGING · Testversion · Sitzungstoken werden verschlüsselt auf dem Gerät gespeichert.",
+                    color = NahwerkMuted,
+                    style = MaterialTheme.typography.labelSmall
+                )
             }
         }
     }
@@ -256,10 +250,7 @@ private fun HomeScreen(
     onRefresh: () -> Unit
 ) {
     Scaffold(containerColor = NahwerkBlack, modifier = Modifier.testTag("home_screen")) { padding ->
-        LazyColumn(
-            Modifier.padding(padding).fillMaxSize().safeDrawingPadding(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
+        LazyColumn(Modifier.padding(padding).fillMaxSize().safeDrawingPadding(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             item {
                 Column(Modifier.padding(start = 18.dp, end = 18.dp, top = 18.dp)) {
                     Text("NAHWERK", color = NahwerkGold, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
@@ -280,7 +271,11 @@ private fun HomeScreen(
                         Text(if (refreshing) "Aktualisiere …" else "Kontext aktualisieren")
                     }
                     if (!error.isNullOrBlank()) ErrorText(error)
-                    Text("${home.memoryCount} gemerkte Fakten · ${home.openLoopCount} offene Vorgänge · ${home.reminders.size} Erinnerungen", color = NahwerkMuted, style = MaterialTheme.typography.bodySmall)
+                    Text(
+                        "${home.memoryCount} gemerkte Fakten · ${home.openLoopCount} offene Vorgänge · ${home.reminders.size} Erinnerungen",
+                        color = NahwerkMuted,
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
             }
             item { Spacer(Modifier.height(24.dp)) }
@@ -290,14 +285,6 @@ private fun HomeScreen(
 
 @Composable
 private fun ConciergePresence(home: HomeContext, modifier: Modifier = Modifier) {
-    var entered by remember(home.concierge.id) { mutableStateOf(false) }
-    LaunchedEffect(home.concierge.id) {
-        delay(120)
-        entered = true
-    }
-    val scale by animateFloatAsState(if (entered) 1f else 0.9f, tween(700), label = "conciergeScale")
-    val offset by animateFloatAsState(if (entered) 0f else 32f, tween(700), label = "conciergeOffset")
-
     Box(
         modifier.fillMaxWidth().height(500.dp).clip(RoundedCornerShape(30.dp))
             .background(Brush.verticalGradient(listOf(Color(0xFF29251D), Color(0xFF151515), NahwerkBlack)))
@@ -306,11 +293,7 @@ private fun ConciergePresence(home: HomeContext, modifier: Modifier = Modifier) 
             model = home.concierge.imageUrl,
             contentDescription = "${home.concierge.name}, persönlicher NAHWERK Concierge",
             contentScale = ContentScale.Fit,
-            modifier = Modifier.align(Alignment.BottomCenter).fillMaxHeight(0.86f).fillMaxWidth().graphicsLayer {
-                scaleX = scale
-                scaleY = scale
-                translationY = offset
-            }
+            modifier = Modifier.align(Alignment.BottomCenter).fillMaxHeight(0.86f).fillMaxWidth()
         )
         Card(
             modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding(16.dp),
@@ -344,7 +327,10 @@ internal fun ChatScreen(
         containerColor = NahwerkBlack,
         modifier = Modifier.testTag("chat_screen"),
         topBar = {
-            Row(Modifier.fillMaxWidth().background(NahwerkSurface).safeDrawingPadding().padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                Modifier.fillMaxWidth().background(NahwerkSurface).safeDrawingPadding().padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 TextButton(onClick = onBack, modifier = Modifier.heightIn(min = 48.dp)) { Text("Zurück") }
                 Spacer(Modifier.width(8.dp))
                 Column {
@@ -355,29 +341,34 @@ internal fun ChatScreen(
         }
     ) { padding ->
         Column(Modifier.padding(padding).fillMaxSize().imePadding().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            LazyColumn(
-                Modifier.weight(1f).fillMaxWidth().testTag("chat_messages"),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
+            LazyColumn(Modifier.weight(1f).fillMaxWidth().testTag("chat_messages"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(messages, key = { it.sourceMessageId ?: "${it.role}:${it.text.hashCode()}" }) { MessageBubble(it) }
             }
-
             pendingRequest?.let { pending ->
                 Card(Modifier.fillMaxWidth().testTag("pending_request"), colors = CardDefaults.cardColors(containerColor = Color(0xFF282216))) {
                     Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text("Noch nicht bestätigt", color = NahwerkGold, fontWeight = FontWeight.SemiBold)
                         Text(pending.message, style = MaterialTheme.typography.bodySmall)
-                        Text("Retry verwendet exakt dieselbe Nachrichten-ID; es wird kein neuer Client-Request erzeugt.", color = NahwerkMuted, style = MaterialTheme.typography.labelSmall)
+                        Text(
+                            "Retry verwendet exakt dieselbe Nachrichten-ID; es wird kein neuer Client-Request erzeugt.",
+                            color = NahwerkMuted,
+                            style = MaterialTheme.typography.labelSmall
+                        )
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            OutlinedButton(onClick = onRetry, enabled = !sending, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("pending_retry")) {
-                                Text(if (sending) "Retry läuft …" else "Sicher erneut")
-                            }
-                            TextButton(onClick = onDiscard, enabled = !sending, modifier = Modifier.heightIn(min = 48.dp).testTag("pending_discard")) { Text("Verwerfen") }
+                            OutlinedButton(
+                                onClick = onRetry,
+                                enabled = !sending,
+                                modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("pending_retry")
+                            ) { Text(if (sending) "Retry läuft …" else "Sicher erneut") }
+                            TextButton(
+                                onClick = onDiscard,
+                                enabled = !sending,
+                                modifier = Modifier.heightIn(min = 48.dp).testTag("pending_discard")
+                            ) { Text("Verwerfen") }
                         }
                     }
                 }
             }
-
             if (!error.isNullOrBlank()) ErrorText(error)
             OutlinedTextField(
                 value = draft,
@@ -395,7 +386,11 @@ internal fun ChatScreen(
                 enabled = !sending && draft.isNotBlank() && pendingRequest == null,
                 modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp).testTag("chat_send")
             ) { Text(if (sending) "${home.concierge.name} denkt …" else "Senden") }
-            Text("Text läuft ausschließlich über den bestehenden NAHWERK-Backend/Core-Contract. Die App trifft keine eigene Intent-, Approval- oder Task-Entscheidung.", color = NahwerkMuted, style = MaterialTheme.typography.labelSmall)
+            Text(
+                "Text läuft ausschließlich über den bestehenden NAHWERK-Backend/Core-Contract. Die App trifft keine eigene Intent-, Approval- oder Task-Entscheidung.",
+                color = NahwerkMuted,
+                style = MaterialTheme.typography.labelSmall
+            )
         }
     }
 }
@@ -407,7 +402,7 @@ private fun MessageBubble(message: ChatMessage) {
         Card(
             modifier = Modifier.fillMaxWidth(0.86f),
             shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = if (isUser) Color(0xFF2A251B) else NahwerkSurfaceRaised)
+            colors = CardDefaults.cardColors(containerColor = if (isUser) Color(0xFF2A251B) else NahwerkRaised)
         ) { Text(message.text, modifier = Modifier.padding(14.dp)) }
     }
 }
