@@ -312,8 +312,7 @@ for width, height, label in [(1440, 1000, "desktop"), (390, 844, "mobile")]:
             before[name] = {"image": state, "pixels": stats, "visible": cards[idx].is_displayed()}
         driver.save_screenshot(str(OUT / f"telephone-before-reveal-{label}.png"))
 
-        reveal = driver.find_element(By.CSS_SELECTOR, "button[data-tr-show-agents]")
-        driver.execute_script("arguments[0].scrollIntoView({block:'center'})", reveal)
+        reveal = driver.find_element(By.CSS_SELECTOR, "a[data-tr-show-agents]")
         assert reveal.is_displayed(), "agent reveal control not visible"
         reveal.click()
         WebDriverWait(driver, 10).until(lambda _d: cards[2].is_displayed() and cards[3].is_displayed())
