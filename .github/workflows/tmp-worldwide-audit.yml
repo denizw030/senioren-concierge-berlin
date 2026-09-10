@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Audit worldwide links and labels
         run: |
-          python - <<'PY'
+          python - <<'PY' > worldwide-audit.txt
           from pathlib import Path
           from html.parser import HTMLParser
           from urllib.parse import urlsplit, unquote
@@ -27,9 +27,9 @@ jobs:
                   self.path = path
                   self.anchor = None
               def handle_starttag(self, tag, attrs):
-                  if tag.lower() != 'a': return
-                  d = dict(attrs)
-                  href = d.get('href')
+                  if tag.lower() != 'a':
+                      return
+                  href = dict(attrs).get('href')
                   if href is not None:
                       self.anchor = {'href': href, 'text': []}
               def handle_data(self, data):
@@ -49,10 +49,9 @@ jobs:
               text = p.read_text(encoding='utf-8')
               parser = Parser(p)
               parser.feed(text)
-              if accidental in text:
-                  for i, line in enumerate(text.splitlines(), 1):
-                      if accidental in line:
-                          accidental_refs.append((f'{p}:{i}', line.strip()[:300]))
+              for i, line in enumerate(text.splitlines(), 1):
+                  if accidental in line:
+                      accidental_refs.append((f'{p}:{i}', line.strip()[:300]))
 
           print(f'HTML_FILES={len(html_files)}')
           print(f'TARGET_EXISTS={Path(target).exists()}')
@@ -64,3 +63,8 @@ jobs:
           for row in accidental_refs:
               print('ACCIDENTAL_REF|' + '|'.join(row))
           PY
+          cat worldwide-audit.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: worldwide-audit
+          path: worldwide-audit.txt
