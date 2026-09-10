@@ -30,7 +30,8 @@ body.story-site .links a.active{color:#fff}
 .story-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
 .story-btn{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 20px;border:1px solid var(--story-line-strong);border-radius:12px;text-decoration:none;font-weight:700;letter-spacing:.01em;transition:transform .2s ease,border-color .2s ease,background .2s ease}
 .story-btn:hover{transform:translateY(-1px)}
-.story-btn--primary{background:#f3f0e9;color:#111;border-color:#f3f0e9}\nbody.story-site a.story-btn--primary{background:#f3f0e9!important;color:#111!important;border-color:#f3f0e9!important}
+.story-btn--primary{background:#f3f0e9;color:#111;border-color:#f3f0e9}
+body.story-site a.story-btn.story-btn--primary{background:#f3f0e9!important;color:#111!important;border-color:#f3f0e9!important;opacity:1!important}
 .story-btn--primary:hover{background:#fff;border-color:#fff}
 .story-btn--secondary{background:rgba(255,255,255,.035);color:#fff}
 .story-btn--secondary:hover{background:rgba(255,255,255,.065);border-color:rgba(255,255,255,.28)}
