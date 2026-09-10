@@ -1,0 +1,138 @@
+name: NAHWERK Website Du Copy Safe Apply
+
+on:
+  push:
+    branches:
+      - fix/website-du-ansprache-final-20260910
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply-safe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply reviewed Du copy without touching scripts or structure
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64, gzip, json, re, html, subprocess, os, sys
+
+          DATA = '''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'''
+          mapping = json.loads(gzip.decompress(base64.b64decode(DATA)))
+          protected = {'senioren-concierge.html','zugang-uebertragen.html'}
+
+          block_re = re.compile(r'(?is)(<!--.*?-->|<script\b[^>]*>.*?</script\s*>|<style\b[^>]*>.*?</style\s*>|<template\b[^>]*>.*?</template\s*>|<[^>]+>)')
+          attr_re = re.compile(r'(?i)(\b(?:placeholder|aria-label|title|alt|value)\s*=\s*)(["\'])(.*?)(\2)', re.S)
+          meta_re = re.compile(r'(?is)^<meta\b')
+          name_re = re.compile(r'(?i)\b(?:name|property)\s*=\s*(["\'])(.*?)\1')
+          content_re = re.compile(r'(?i)(\bcontent\s*=\s*)(["\'])(.*?)(\2)', re.S)
+
+          def norm(s):
+              return ' '.join(html.unescape(s).split())
+
+          def preserve_ws(raw, new):
+              m1=re.match(r'^\s*',raw); m2=re.search(r'\s*$',raw)
+              return raw[:m1.end()] + new + raw[m2.start():]
+
+          changed=[]
+          originals={}
+          residual_candidates=[]
+
+          for fname, rows in mapping.items():
+              if fname in protected:
+                  continue
+              path=Path(fname)
+              if not path.exists():
+                  print('MISSING TARGET FILE',fname); sys.exit(2)
+              raw=path.read_text(encoding='utf-8')
+              originals[fname]=raw
+              text_map={norm(old):new for old,new,kind in rows if kind=='text'}
+              attr_map={norm(old):new for old,new,kind in rows if kind.startswith('attr:') or kind=='meta-description'}
+
+              parts=[]; pos=0
+              for m in block_re.finditer(raw):
+                  data=raw[pos:m.start()]
+                  key=norm(data)
+                  if key in text_map:
+                      data=preserve_ws(data,text_map[key])
+                  parts.append(data)
+                  token=m.group(0)
+                  low=token.lstrip().lower()
+                  if low.startswith('<script') or low.startswith('<style') or low.startswith('<template') or low.startswith('<!--'):
+                      parts.append(token)
+                  else:
+                      def repl_attr(am):
+                          val=am.group(3); key=norm(val)
+                          if key not in attr_map: return am.group(0)
+                          new=html.escape(attr_map[key],quote=True)
+                          return am.group(1)+am.group(2)+new+am.group(4)
+                      token=attr_re.sub(repl_attr,token)
+                      if meta_re.match(token):
+                          nm=name_re.search(token)
+                          if nm and nm.group(2).lower() in {'description','twitter:description','og:description'}:
+                              def repl_content(cm):
+                                  val=cm.group(3); key=norm(val)
+                                  if key not in attr_map:return cm.group(0)
+                                  new=html.escape(attr_map[key],quote=True)
+                                  return cm.group(1)+cm.group(2)+new+cm.group(4)
+                              token=content_re.sub(repl_content,token)
+                      parts.append(token)
+                  pos=m.end()
+              tail=raw[pos:]
+              key=norm(tail)
+              if key in text_map:
+                  tail=preserve_ws(tail,text_map[key])
+              parts.append(tail)
+              out=''.join(parts)
+              if out!=raw:
+                  path.write_text(out,encoding='utf-8')
+                  changed.append(fname)
+
+          # Hard invariants: scripts/styles/templates/comments and structural attributes stay unchanged.
+          structural_attrs={'id','class','href','src','data-product','data-target','data-step','data-action','name','type','for','role','autocomplete','inputmode','pattern','maxlength','rel','property'}
+          tag_re=re.compile(r'(?is)<[^>]+>')
+          any_attr_re=re.compile(r'(?is)\b([\w:-]+)\s*=\s*(["\'])(.*?)\2')
+          frozen_block_re=re.compile(r'(?is)(<!--.*?-->|<script\b[^>]*>.*?</script\s*>|<style\b[^>]*>.*?</style\s*>|<template\b[^>]*>.*?</template\s*>)')
+
+          for fname in changed:
+              before=originals[fname]; after=Path(fname).read_text(encoding='utf-8')
+              if frozen_block_re.findall(before)!=frozen_block_re.findall(after):
+                  print('FROZEN BLOCK CHANGED',fname); sys.exit(3)
+              def struct(doc):
+                  out=[]
+                  for tag in tag_re.findall(doc):
+                      vals=[]
+                      for a in any_attr_re.finditer(tag):
+                          k=a.group(1).lower()
+                          if k in structural_attrs or k.startswith('data-'):
+                              vals.append((k,a.group(3)))
+                      out.append((re.match(r'(?is)</?\s*([\w:-]+)',tag).group(1).lower() if re.match(r'(?is)</?\s*([\w:-]+)',tag) else '',tuple(vals)))
+                  return out
+              if struct(before)!=struct(after):
+                  print('STRUCTURE OR LINK CHANGED',fname); sys.exit(4)
+
+          for pf in protected:
+              subprocess.run(['git','diff','--quiet','--',pf],check=True)
+          subprocess.run(['git','diff','--check'],check=True)
+          bad=[p for p in subprocess.check_output(['git','diff','--name-only'],text=True).splitlines() if p and not p.endswith('.html')]
+          if bad:
+              print('NON HTML PRODUCT CHANGE',bad);sys.exit(5)
+
+          print('SAFE COPY FILES CHANGED',len(changed),sorted(changed))
+          if changed:
+              subprocess.run(['git','config','user.name','NAHWERK Website Copy'],check=True)
+              subprocess.run(['git','config','user.email','actions@users.noreply.github.com'],check=True)
+              subprocess.run(['git','add',*sorted(changed)],check=True)
+              subprocess.run(['git','commit','-m','Switch reviewed general website copy to Du'],check=True)
+              subprocess.run(['git','push','origin',f'HEAD:{os.environ["GITHUB_REF_NAME"]}'],check=True)
+          else:
+              print('NO SAFE COPY CHANGES')
+          PY
