@@ -298,7 +298,7 @@ for width, height, label in [(1440, 1000, "desktop"), (390, 844, "mobile")]:
 
         cards = driver.find_elements(By.CSS_SELECTOR, "#telephoneAgentGrid .tr-agent-card")
         assert len(cards) == 4, f"expected four agent cards, got {len(cards)}"
-        names = [c.find_element(By.TAG_NAME, "h3").text.strip() for c in cards]
+        names = [(c.find_element(By.TAG_NAME, "h3").get_attribute("textContent") or "").strip() for c in cards]
         assert names == ["Alexander", "Luisa", "Konrad", "James"], names
         assert cards[0].is_displayed() and cards[1].is_displayed(), "Alexander/Luisa must be initially visible"
         assert not cards[2].is_displayed() and not cards[3].is_displayed(), "Konrad/James must start hidden"
