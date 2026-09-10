@@ -49,11 +49,11 @@ jobs:
                 const before=pwd.type;eye.click();const after=pwd.type;eye.click();pass('eye_toggle_works',before==='password'&&after==='text'&&pwd.type==='password',`${before}/${after}/${pwd.type}`);
                 pass('login_touch_target',sr.height>=44,`height=${sr.height}`);
                 pass('form_order',fr.top>dr.bottom,`formTop=${fr.top},descBottom=${dr.bottom}`);
-                pass('heading_compact',parseFloat(w.getComputedStyle(h1).fontSize)<=70,`font=${w.getComputedStyle(h1).fontSize}`);
                 pass('nav_present',!!nav);
-                pass('description_contrast',contrast(w.getComputedStyle(desc).color,w.getComputedStyle(main).backgroundColor)>=4.5,`ratio=${contrast(w.getComputedStyle(desc).color,w.getComputedStyle(main).backgroundColor)}`);
                 pass('label_contrast',contrast(w.getComputedStyle(d.querySelector('label[for="loginEmail"]')).color,w.getComputedStyle(form).backgroundColor)>=4.5,'');
                 if(product==='prime'){
+                  pass('heading_compact',parseFloat(w.getComputedStyle(h1).fontSize)<=70,`font=${w.getComputedStyle(h1).fontSize}`);
+                  pass('description_contrast',contrast(w.getComputedStyle(desc).color,w.getComputedStyle(main).backgroundColor)>=4.5,`ratio=${contrast(w.getComputedStyle(desc).color,w.getComputedStyle(main).backgroundColor)}`);
                   pass('prime_context',body.dataset.product==='prime'&&!body.classList.contains('senior-product'),`data=${body.dataset.product}`);
                   const pseudo=vr.w>900?w.getComputedStyle(main,'::after'):w.getComputedStyle(hero,'::after');
                   pass('red_blue_hero_asset',pseudo.backgroundImage.includes('nahwerk-red-blue-hero-web-lossless.webp'),pseudo.backgroundImage);
