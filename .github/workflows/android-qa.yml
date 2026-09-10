@@ -87,7 +87,7 @@ jobs:
           arch: x86_64
           profile: pixel_2
           disable-animations: true
-          script: cd android-app && ./gradlew --no-daemon connectedDebugAndroidTest && mkdir -p visual-qa && adb pull /sdcard/Android/data/com.nahwerk.concierge/files/visual-qa/. visual-qa/
+          script: cd android-app && ./gradlew --no-daemon connectedDebugAndroidTest && mkdir -p visual-qa && adb pull /sdcard/Download/nahwerk-visual-qa/. visual-qa/
       - name: Upload visual QA screenshots
         if: always()
         uses: actions/upload-artifact@v4
