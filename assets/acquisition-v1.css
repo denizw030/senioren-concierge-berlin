@@ -11,6 +11,7 @@
 .nw-journey-card>span{display:inline-flex;margin-bottom:22px;color:#d4af37;font-size:.78rem;font-weight:800;letter-spacing:.12em}
 .nw-journey-card h3,.nw-capability-grid strong{display:block;margin:0 0 9px;font-size:1.08rem}
 .nw-journey-card p,.nw-capability-grid p,.nw-proof-card p,.nw-proof-card li{color:#aaa69e;line-height:1.65}
+.nw-journey-card .nw-free-limits{margin:.72rem 0 0;color:#d0cbc2;font-size:.82rem;line-height:1.55}
 .nw-intent-links,.nw-proof-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
 .nw-intent-links a,.nw-proof-links a{display:inline-flex;min-height:44px;align-items:center;padding:10px 14px;border:1px solid rgba(212,175,55,.32);border-radius:999px;color:inherit;text-decoration:none}
 .nw-capability-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
