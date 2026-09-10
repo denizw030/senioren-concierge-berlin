@@ -1,0 +1,67 @@
+name: NAHWERK Website Du Residual Audit
+
+on:
+  push:
+    branches:
+      - fix/website-du-ansprache-final-20260910
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Audit residual customer-facing formal address
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          import re, json
+
+          FORMAL=re.compile(r'\b(?:Sie|Ihnen|Ihr|Ihre|Ihren|Ihrem|Ihres|Ihrer)\b')
+          EXCLUDED={'script','style','template','svg','path'}
+          TEXT_ATTRS={'placeholder','aria-label','title','alt','value'}
+
+          class P(HTMLParser):
+              def __init__(self):
+                  super().__init__(convert_charrefs=True); self.stack=[]; self.matches=[]
+              def scan_attrs(self,tag,attrs):
+                  a=dict(attrs)
+                  for k,v in attrs:
+                      if k in TEXT_ATTRS and v and FORMAL.search(v):
+                          self.matches.append({'kind':'attr:'+k,'line':self.getpos()[0],'text':' '.join(v.split())})
+                  if tag=='meta' and (a.get('name','').lower() in {'description','twitter:description'} or a.get('property','').lower()=='og:description'):
+                      v=a.get('content','')
+                      if v and FORMAL.search(v): self.matches.append({'kind':'meta-description','line':self.getpos()[0],'text':' '.join(v.split())})
+              def handle_starttag(self,tag,attrs):
+                  self.stack.append(tag)
+                  if tag not in EXCLUDED:self.scan_attrs(tag,attrs)
+              def handle_startendtag(self,tag,attrs):
+                  if tag not in EXCLUDED:self.scan_attrs(tag,attrs)
+              def handle_endtag(self,tag):
+                  if self.stack:
+                      if self.stack[-1]==tag:self.stack.pop()
+                      elif tag in self.stack:self.stack=self.stack[:len(self.stack)-1-self.stack[::-1].index(tag)]
+              def handle_data(self,data):
+                  if any(t in EXCLUDED for t in self.stack):return
+                  t=' '.join(data.split())
+                  if t and FORMAL.search(t):self.matches.append({'kind':'text','line':self.getpos()[0],'text':t})
+
+          report={}
+          for f in sorted(Path('.').glob('*.html')):
+              p=P(); p.feed(f.read_text(encoding='utf-8'))
+              if p.matches:report[f.name]=p.matches
+          Path('website-du-residual.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps(report,ensure_ascii=False,indent=2))
+          print('FILES',len(report),'MATCHES',sum(map(len,report.values())))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: website-du-residual
+          path: website-du-residual.json
+          if-no-files-found: error
