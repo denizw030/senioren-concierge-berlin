@@ -1,0 +1,86 @@
+name: Homepage Hero V2 Production Proof
+
+on:
+  push:
+    branches:
+      - diagnostic/homepage-hero-v2-production-proof-20260910
+
+permissions:
+  contents: read
+
+jobs:
+  production-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Selenium
+        run: python -m pip install --disable-pip-version-check selenium
+      - name: Verify live Homepage Hero V2
+        run: |
+          cat > /tmp/proof.py <<'PY'
+          import json, time, urllib.request
+          from pathlib import Path
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.common.by import By
+          from selenium.webdriver.support.ui import WebDriverWait
+
+          BASE='https://nahwerkconcierge.com'
+          MERGE_SHA='6bf2703979bcc8984565b68469d4475826834129'
+          HERO='/assets/prime/prime-concierge-hero-luxury-monogram-v2.webp'
+          OUT=Path('production-proof'); OUT.mkdir(exist_ok=True)
+
+          def http(url):
+              req=urllib.request.Request(url,headers={'User-Agent':'NAHWERK-Hero-V2-production-proof/1.0'})
+              with urllib.request.urlopen(req,timeout=30) as r:
+                  body=r.read()
+                  return {'url':url,'status':r.status,'bytes':len(body),'contentType':r.headers.get('Content-Type'),'finalUrl':r.geturl()}
+
+          report={'mergeSha':MERGE_SHA,'base':BASE,'http':{},'viewports':[],'timestamp':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime())}
+          for name,url in {'homepage':f'{BASE}/?hero-v2-proof={MERGE_SHA}','hero':f'{BASE}{HERO}?hero-v2-proof={MERGE_SHA}'}.items():
+              p=http(url); assert p['status']==200,p; assert p['bytes']>1000,p; report['http'][name]=p
+
+          for width,height,label in [(1440,1000,'desktop'),(390,844,'mobile')]:
+              o=Options(); o.add_argument('--headless=new'); o.add_argument('--no-sandbox'); o.add_argument('--disable-gpu'); o.add_argument('--hide-scrollbars'); o.add_argument(f'--window-size={width},{height}'); o.add_argument('--force-device-scale-factor=1'); o.set_capability('goog:loggingPrefs',{'browser':'ALL'})
+              d=webdriver.Chrome(options=o); d.set_window_size(width,height); d.set_page_load_timeout(30)
+              try:
+                  d.get(f'{BASE}/?hero-v2-proof={MERGE_SHA}')
+                  WebDriverWait(d,20).until(lambda x:x.execute_script('return document.readyState')=='complete')
+                  h1=d.find_element(By.TAG_NAME,'h1').text.strip()
+                  assert 'Ein persönlicher Concierge, der erledigt.' in h1,h1
+                  hero=d.find_element(By.CSS_SELECTOR,'img.story-hero-art')
+                  WebDriverWait(d,20).until(lambda x:x.execute_script('return arguments[0].complete && arguments[0].naturalWidth>0',hero))
+                  state=d.execute_script('''const i=arguments[0],r=i.getBoundingClientRect(),s=getComputedStyle(i);return {src:i.currentSrc||i.src,naturalWidth:i.naturalWidth,naturalHeight:i.naturalHeight,displayed:r.width>20&&r.height>20&&s.display!=="none"&&s.visibility!=="hidden"&&Number(s.opacity)>0,rect:{x:r.x,y:r.y,width:r.width,height:r.height},objectFit:s.objectFit,objectPosition:s.objectPosition};''',hero)
+                  assert state['src'].split('?')[0].endswith(HERO),state
+                  assert state['naturalWidth']==1672 and state['naturalHeight']==941,state
+                  assert state['displayed'],state
+                  pixels=d.execute_script('''const i=arguments[0],c=document.createElement('canvas');c.width=32;c.height=40;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(i,0,0,32,40);const a=x.getImageData(0,0,32,40).data;let n=0,sum=0,sum2=0,max=0,nd=0;for(let k=0;k<a.length;k+=4){if(!a[k+3])continue;const l=.2126*a[k]+.7152*a[k+1]+.0722*a[k+2];n++;sum+=l;sum2+=l*l;max=Math.max(max,l);if(l>20)nd++;}const mean=n?sum/n:0;return {samples:n,maxLum:max,stdLum:Math.sqrt(Math.max(0,sum2/n-mean*mean)),nonDarkRatio:n?nd/n:0};''',hero)
+                  assert pixels['samples']>500 and pixels['maxLum']>20 and pixels['stdLum']>4 and pixels['nonDarkRatio']>.01,pixels
+                  cta=d.find_element(By.CSS_SELECTOR,'.story-hero .story-btn--primary')
+                  cr=d.execute_script('const e=arguments[0],r=e.getBoundingClientRect(),s=getComputedStyle(e);return {visible:r.width>0&&r.height>0&&s.display!=="none"&&s.visibility!=="hidden",rect:{x:r.x,y:r.y,width:r.width,height:r.height}}',cta)
+                  assert cr['visible'],cr
+                  layout=d.execute_script('return {scrollWidth:document.documentElement.scrollWidth,innerWidth:window.innerWidth}')
+                  assert layout['scrollWidth']<=layout['innerWidth']+4,layout
+                  severe=[e for e in d.get_log('browser') if e.get('level')=='SEVERE']
+                  runtime=[e for e in severe if any(t in e.get('message','') for t in ('Uncaught','TypeError','ReferenceError','SyntaxError','RangeError','EvalError'))]
+                  assert not runtime,runtime
+                  d.save_screenshot(str(OUT/f'homepage-{label}.png'))
+                  report['viewports'].append({'label':label,'width':width,'height':height,'h1':h1,'hero':state,'heroPixels':pixels,'cta':cr,'layout':layout,'severeConsole':severe,'runtimeErrors':runtime})
+              finally:
+                  d.quit()
+          (OUT/'report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps(report,ensure_ascii=False,indent=2))
+          print('HOMEPAGE HERO V2 PRODUCTION PROOF GREEN')
+          PY
+          python /tmp/proof.py
+      - name: Upload live proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: homepage-hero-v2-production-proof
+          path: production-proof/
+          if-no-files-found: warn
