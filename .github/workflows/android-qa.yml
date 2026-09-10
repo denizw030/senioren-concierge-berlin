@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - codex/nahwerk-android-foundation
+      - codex/nahwerk-android-finalization-20260910
       - staging/nw-android-real-concierge-memory-01
       - staging/nw-android-stable-source-message-id-01
     paths:
@@ -79,7 +80,7 @@ jobs:
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-      - name: Run encrypted pending-chat retry fixture on emulator
+      - name: Run Android instrumentation regressions on emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
