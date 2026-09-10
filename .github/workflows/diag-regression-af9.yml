@@ -1,0 +1,18 @@
+name: Diagnostic Regression AF9
+on:
+  push:
+    branches:
+      - "diag/website-regression-af9-20260910"
+permissions:
+  contents: read
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Reproduce Website and Family regression
+        run: node --test tests/*.test.mjs
