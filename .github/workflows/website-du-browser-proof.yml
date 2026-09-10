@@ -1,0 +1,172 @@
+name: NAHWERK Website Du Browser Proof
+
+on:
+  push:
+    branches:
+      - fix/website-du-ansprache-final-20260910
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prove text-only structural freeze
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=656aac95c3d88688c7642f4681abbb526e7ec118
+          git fetch origin "$BASE" --depth=1 || true
+          python3 - <<'PY'
+          from pathlib import Path
+          import subprocess,re,sys,json
+          BASE='656aac95c3d88688c7642f4681abbb526e7ec118'
+          changed=[x for x in subprocess.check_output(['git','diff','--name-only',BASE+'..HEAD'],text=True).splitlines() if x]
+          product=[x for x in changed if not x.startswith('.github/workflows/')]
+          bad=[x for x in product if not (x.endswith('.html') and '/' not in x)]
+          if bad: raise SystemExit('NON_TEXT_PRODUCT_FILES_CHANGED '+repr(bad))
+          if 'senioren-concierge.html' in product or 'zugang-uebertragen.html' in product:
+              raise SystemExit('SENIOR_EXPERIENCE_CHANGED')
+          expected={'404.html','ablauf.html','agb.html','alltag-organisieren.html','angehoerige.html','anmelden.html','concierge-anpassen.html','concierges.html','datenloeschung.html','datenschutz.html','dokumente-verstehen.html','erster-schritt.html','faq.html','impressum.html','index.html','ki-transparenz.html','kontakt.html','konto.html','leistungen.html','pakete.html','passwort-zuruecksetzen.html','prime-concierge.html','registrieren.html','safety.html','technik-verstehen.html','telefonannahme.html','ueber-mich.html','widerruf.html'}
+          if set(product)!=expected:
+              raise SystemExit('PRODUCT_FILE_SET_MISMATCH '+repr(product))
+
+          frozen_block=re.compile(r'(?is)(<!--.*?-->|<script\b[^>]*>.*?</script\s*>|<style\b[^>]*>.*?</style\s*>|<template\b[^>]*>.*?</template\s*>)')
+          tag_re=re.compile(r'(?is)<[^>]+>')
+          attr_re=re.compile(r'(?is)\b([\w:-]+)\s*=\s*(["\'])(.*?)\2')
+          structural={'id','class','href','src','data-product','data-target','data-step','data-action','name','type','for','role','autocomplete','inputmode','pattern','maxlength','rel','property'}
+          def structure(doc):
+              out=[]
+              for tag in tag_re.findall(doc):
+                  m=re.match(r'(?is)</?\s*([\w:-]+)',tag)
+                  name=m.group(1).lower() if m else ''
+                  vals=[]
+                  for a in attr_re.finditer(tag):
+                      k=a.group(1).lower()
+                      if k in structural or k.startswith('data-'): vals.append((k,a.group(3)))
+                  out.append((name,tuple(vals)))
+              return out
+          for f in product:
+              before=subprocess.check_output(['git','show',f'{BASE}:{f}'],text=True)
+              after=Path(f).read_text(encoding='utf-8')
+              if frozen_block.findall(before)!=frozen_block.findall(after):
+                  raise SystemExit('SCRIPT_STYLE_TEMPLATE_OR_COMMENT_CHANGED '+f)
+              if structure(before)!=structure(after):
+                  raise SystemExit('DOM_OR_NAV_STRUCTURE_CHANGED '+f)
+          subprocess.run(['git','diff','--check',BASE+'..HEAD','--',*product],check=True)
+          print('TEXT ONLY STRUCTURE FREEZE GREEN')
+          print(json.dumps(product,ensure_ascii=False))
+          PY
+
+      - name: Prove Du/Sie language contract
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          import re,sys
+          formal=re.compile(r'\b(?:Sie|Ihnen|Ihr|Ihre|Ihren|Ihrem|Ihres|Ihrer)\b')
+          excluded={'script','style','template','svg','path'}
+          attrs={'placeholder','aria-label','title','alt','value'}
+          allowed={
+            ('ablauf.html','Du oder Sie, kurze Antworten oder mehr Erklärung: Hilfreiche Präferenzen können berücksichtigt werden, damit die Unterstützung zu dir passt.'),
+            ('angehoerige.html','Sie kann einfach in der Sprache schreiben oder sprechen, die für sie natürlich ist.'),
+            ('concierge-anpassen.html','Diese Einstellungen betreffen Kommunikationsstil und hilfreichen Kontext. Sie sind nicht dafür gedacht, eine Person heimlich zu überwachen oder Entscheidungen gegen ihren Willen festzulegen. Die unterstützte Person soll ihre eigenen Präferenzen jederzeit ändern können.'),
+            ('concierge-anpassen.html','Sie – mit Anrede und Nachnamen'),
+            ('index.html','Sie kann einfach in der Sprache schreiben oder sprechen, die für sie natürlich ist.'),
+            ('ki-transparenz.html','Wird ein Zugang für eine andere Person eingerichtet, erhält die unterstützte Person eine Information darüber, wer den Zugang eingerichtet hat. Sie wird zugleich darüber informiert, dass Nilo oder Mira ein digitaler KI-Concierge ist.'),
+            ('ki-transparenz.html','Von Nilo oder Mira erzeugte Bilder oder andere synthetische Medien sind künstlich erzeugte Inhalte. Sie dürfen nicht als authentische Fotografie, Dokumentation realer Ereignisse oder verlässlicher Nachweis verstanden werden.'),
+            ('konto.html','Deine E-Mail-Adresse bleibt für die bestehende Passwort-Wiederherstellung verfügbar. Sie wird nicht als gleichwertiger zweiter Faktor dargestellt.'),
+            ('registrieren.html','Sie – mit Anrede und Nachnamen'),
+            ('registrieren.html','Die tatsächliche Du-/Sie-Ansprache richtet sich nach der bei der Registrierung gewählten Einstellung.')
+          }
+          protected={'senioren-concierge.html','zugang-uebertragen.html'}
+          class P(HTMLParser):
+              def __init__(self): super().__init__(convert_charrefs=True); self.stack=[]; self.hit=[]
+              def _attrs(self,tag,a):
+                  d=dict(a)
+                  for k,v in a:
+                      if k in attrs and v and formal.search(v):self.hit.append(' '.join(v.split()))
+                  if tag=='meta' and (d.get('name','').lower() in {'description','twitter:description'} or d.get('property','').lower()=='og:description'):
+                      v=d.get('content','')
+                      if v and formal.search(v):self.hit.append(' '.join(v.split()))
+              def handle_starttag(self,t,a): self.stack.append(t); self._attrs(t,a) if t not in excluded else None
+              def handle_startendtag(self,t,a): self._attrs(t,a) if t not in excluded else None
+              def handle_endtag(self,t):
+                  if self.stack:
+                      if self.stack[-1]==t:self.stack.pop()
+                      elif t in self.stack:self.stack=self.stack[:len(self.stack)-1-self.stack[::-1].index(t)]
+              def handle_data(self,d):
+                  if any(t in excluded for t in self.stack):return
+                  s=' '.join(d.split())
+                  if s and formal.search(s):self.hit.append(s)
+          unexpected=[]
+          for f in sorted(Path('.').glob('*.html')):
+              p=P();p.feed(f.read_text(encoding='utf-8'))
+              if f.name in protected:continue
+              for t in p.hit:
+                  if (f.name,t) not in allowed: unexpected.append((f.name,t))
+          if unexpected:
+              print('UNEXPECTED FORMAL ADDRESS',unexpected);sys.exit(1)
+          senior=Path('senioren-concierge.html').read_text(encoding='utf-8')
+          assert 'Sie müssen keine Befehle oder Fachbegriffe kennen.' in senior
+          assert 'Finden Sie eine Persönlichkeit, die zu Ihnen passt.' in senior
+          print('GENERAL DU / SENIOR SIE CONTRACT GREEN')
+          PY
+
+      - name: Serve website
+        shell: bash
+        run: |
+          nohup python3 -m http.server 4173 >/tmp/nw-du-http.log 2>&1 &
+          for i in 1 2 3 4 5; do curl -fsS http://127.0.0.1:4173/index.html >/dev/null && break; sleep 1; done
+          curl -fsS http://127.0.0.1:4173/index.html >/dev/null
+
+      - name: Browser responsive and auth surface proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          mkdir -p proof
+          cat > proof-harness.html <<'EOF'
+          <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><iframe id="f" style="width:100vw;height:100vh;border:0"></iframe><pre id="o"></pre><script>
+          const q=new URLSearchParams(location.search),page=q.get('page')||'index.html',kind=q.get('kind')||'index';
+          const f=document.getElementById('f'),out={errors:[],page,kind};
+          f.onload=()=>setTimeout(()=>{try{const w=f.contentWindow,d=w.document,r=d.documentElement,b=d.body,text=(d.body.innerText||'').replace(/\s+/g,' ');const chk=(n,v)=>{if(!v)out.errors.push(n)};
+          chk('no-overflow',r.scrollWidth<=w.innerWidth+1);chk('nav',!!d.querySelector('header,nav,.top'));
+          if(kind==='index'){chk('du-title',(d.title||'').includes('Dein persönlicher Concierge'));chk('du-copy',text.includes('Sag, was du brauchst.'));}
+          if(kind==='login'){chk('login-form',!!d.getElementById('loginForm'));chk('email',!!d.querySelector('input[type=email],#email'));chk('password',!!d.querySelector('input[type=password],#password'));chk('du-copy',text.includes('Melde dich mit deiner E-Mail-Adresse'));chk('forgot',!!d.querySelector('a[href*="passwort"],#forgotPassword'));}
+          if(kind==='register'){chk('form',!!d.querySelector('form'));chk('du-copy',text.includes('Für wen richtest du den Zugang ein?')||text.includes('Wer darf dich begleiten?'));}
+          if(kind==='senior'){chk('sie-copy',text.includes('Sie müssen keine Befehle oder Fachbegriffe kennen.'));chk('senior-title',text.includes('Senioren'));}
+          }catch(e){out.errors.push(String(e))}document.documentElement.dataset.result=out.errors.length?'red':'green';document.getElementById('o').textContent=JSON.stringify(out);f.style.display='none';},1400);f.src=page;</script></body></html>
+          EOF
+          case_run(){ name="$1"; width="$2"; height="$3"; page="$4"; kind="$5";
+            "$CHROME" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --window-size="$width,$height" --virtual-time-budget=5000 --dump-dom "http://127.0.0.1:4173/proof-harness.html?page=$page&kind=$kind" > "proof/$name-dom.html"
+            grep -q 'data-result="green"' "proof/$name-dom.html" || { cat "proof/$name-dom.html"; exit 1; }
+            "$CHROME" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --hide-scrollbars --window-size="$width,$height" --virtual-time-budget=4500 --screenshot="proof/$name.png" "http://127.0.0.1:4173/$page"
+            echo "$name GREEN";
+          }
+          case_run index-1440x900 1440 900 index.html index
+          case_run index-1366x768 1366 768 index.html index
+          case_run index-1280x800 1280 800 index.html index
+          case_run index-390x844 390 844 index.html index
+          case_run index-360x800 360 800 index.html index
+          case_run anmelden-1440x900 1440 900 'anmelden.html?produkt=prime' login
+          case_run anmelden-390x844 390 844 'anmelden.html?produkt=prime' login
+          case_run registrieren-1440x900 1440 900 registrieren.html register
+          case_run registrieren-390x844 390 844 registrieren.html register
+          case_run senioren-1440x900 1440 900 senioren-concierge.html senior
+          case_run senioren-390x844 390 844 senioren-concierge.html senior
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: website-du-browser-proof
+          path: proof/
+          if-no-files-found: error
