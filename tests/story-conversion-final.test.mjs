@@ -106,7 +106,7 @@ test("family stays respectful and person-centered",()=>{
 
 test("safety remains calm, deliberate and bounded",()=>{
   const safety=visibleText(read("safety.html"));
-  assert.match(safety,/Da sein, auch wenn Sie nicht da sein können/);
+  assert.match(safety,/Da sein, auch wenn Sie gerade verhindert sind/);
   assert.match(safety,/bewusst eingerichtet/i);
   assert.match(safety,/keinen medizinischen Notruf|ersetzt keinen medizinischen Notruf/i);
   assert.doesNotMatch(safety,/Sturz|Panik|Notfall deiner Eltern/i);
