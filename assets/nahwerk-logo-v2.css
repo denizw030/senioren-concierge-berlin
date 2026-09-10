@@ -247,6 +247,7 @@
   }
 
   html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main > .hero{
+    display:block!important;
     min-height:0!important;
     padding:42px 0 0!important;
     background:transparent!important;
@@ -277,8 +278,8 @@
     bottom:auto!important;
     top:auto!important;
     transform:none!important;
-    width:min(100% - 40px,520px)!important;
-    aspect-ratio:4 / 5!important;
+    width:min(calc(100% - 40px),520px)!important;
+    aspect-ratio:1155 / 1362!important;
     margin:28px auto 0!important;
     border:1px solid rgba(212,175,55,.26)!important;
     border-radius:24px!important;
