@@ -22,7 +22,7 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          import textwrap
+          import re, textwrap
 
           source=Path('.github/workflows/website-du-apply.yml').read_text(encoding='utf-8')
           marker="          python3 - <<'PY'\n"
@@ -30,21 +30,30 @@ jobs:
           end=source.rindex("\n          PY")
           code=textwrap.dedent(source[start:end])
 
-          # The first version normalized visible text for auditing but required literal
-          # source whitespace. Make matching tolerant of source line wrapping while
-          # preserving the curated sentence-by-sentence replacement map.
           old="""        if old not in raw:\n            print('MISSING EXACT CUSTOMER TEXT',name,repr(old));sys.exit(3)\n        raw=raw.replace(old,new)"""
           new="""        if old in raw:\n            raw=raw.replace(old,new)\n        else:\n            pat=re.compile(r'\\s+'.join(re.escape(part) for part in old.split()))\n            if not pat.search(raw):\n                print('MISSING CUSTOMER TEXT',name,repr(old));sys.exit(3)\n            raw=pat.sub(lambda _m:new,raw)"""
           if old not in code:
               raise SystemExit('application block not found')
           code=code.replace(old,new)
 
-          # In this account-security sentence only the first "Ihre" addresses the
-          # customer; the later "Sie" refers grammatically to the e-mail address.
-          keep_line="            ('konto.html','Ihre E-Mail-Adresse bleibt für die bestehende Passwort-Wiederherstellung verfügbar. Sie wird nicht als gleichwertiger zweiter Faktor dargestellt.')\n"
-          if keep_line not in code:
-              raise SystemExit('konto keep line not found')
-          code=code.replace(keep_line,'')
+          # In this sentence only the first formal possessive addresses the customer;
+          # the later "Sie" refers to the e-mail address and must stay grammatical.
+          account_sentence="Ihre E-Mail-Adresse bleibt für die bestehende Passwort-Wiederherstellung verfügbar. Sie wird nicht als gleichwertiger zweiter Faktor dargestellt."
+          code2=re.sub(r"^\s*\('konto\.html',"+re.escape(repr(account_sentence))+r"\),?\s*$",'',code,flags=re.M)
+          if code2==code:
+              # Match the literal source form independent of indentation/quote helper details.
+              lines=code.splitlines()
+              kept=[]; removed=False
+              for line in lines:
+                  if "('konto.html'" in line and account_sentence in line:
+                      removed=True
+                      continue
+                  kept.append(line)
+              if not removed:
+                  raise SystemExit('konto keep entry not found')
+              code='\n'.join(kept)
+          else:
+              code=code2
 
           exec(compile(code,'website-du-curated-map','exec'),{'__name__':'__main__'})
           PY
