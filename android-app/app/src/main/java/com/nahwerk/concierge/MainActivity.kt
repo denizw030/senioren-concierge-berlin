@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,7 +23,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -39,9 +39,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -58,7 +55,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -104,7 +100,7 @@ internal fun NahwerkApp(viewModel: NahwerkAppViewModel = viewModel()) {
             state.home == null && state.loading -> LoadingScreen()
             state.home == null -> ContextLoadErrorScreen(
                 error = state.error ?: "Konto konnte nicht geladen werden.",
-                onRetry = viewModel::refreshHome,
+                onRetry = { viewModel.refreshHome() },
                 onLogout = viewModel::logout
             )
             state.screen == AppScreen.HOME -> HomeScreen(
@@ -114,7 +110,7 @@ internal fun NahwerkApp(viewModel: NahwerkAppViewModel = viewModel()) {
                 onChat = { viewModel.open(AppScreen.CHAT) },
                 onReminders = { viewModel.open(AppScreen.REMINDERS) },
                 onSettings = { viewModel.open(AppScreen.SETTINGS) },
-                onRefresh = viewModel::refreshHome
+                onRefresh = { viewModel.refreshHome() }
             )
             state.screen == AppScreen.CHAT -> ChatScreen(
                 home = requireNotNull(state.home),
@@ -181,9 +177,10 @@ private fun ContextLoadErrorScreen(error: String, onRetry: () -> Unit, onLogout:
             )
             ErrorText(error)
             PrimaryButton("Erneut versuchen", onRetry, Modifier.fillMaxWidth())
-            TextButton(onClick = onLogout, modifier = Modifier.align(Alignment.CenterHorizontally).heightIn(min = NahwerkSizes.Touch)) {
-                Text("Abmelden")
-            }
+            TextButton(
+                onClick = onLogout,
+                modifier = Modifier.align(Alignment.CenterHorizontally).heightIn(min = NahwerkSizes.Touch)
+            ) { Text("Abmelden") }
         }
     }
 }
@@ -255,11 +252,8 @@ internal fun LoginScreen(
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
-                    if (busy) {
-                        CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
-                    } else {
-                        Text("Anmelden")
-                    }
+                    if (busy) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
+                    else Text("Anmelden")
                 }
                 TextButton(
                     onClick = { onReset(email) },
@@ -333,17 +327,17 @@ internal fun HomeScreen(
                             )
                             Text(
                                 if (home.openLoopCount == 0) "Im bestätigten Kontext ist aktuell kein offener Vorgang sichtbar."
-                                else "Details bleiben serverseitig autoritativ und werden erst mit bestätigtem Task-Vertrag angezeigt.",
+                                else "Details werden erst mit bestätigtem Task-Vertrag angezeigt.",
                                 color = NahwerkPalette.SecondaryText,
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
-                        Text("${home.openLoopCount}", color = NahwerkPalette.Gold, style = MaterialTheme.typography.headlineMedium)
+                        Text(home.openLoopCount.toString(), color = NahwerkPalette.Gold, style = MaterialTheme.typography.headlineMedium)
                     }
                 }
             }
             item {
-                SectionHeader("Schnellzugriff", "Die Funktionen, die bereits über bestätigte Verträge verfügen")
+                SectionHeader("Schnellzugriff", "Bereits bestätigte mobile Funktionen")
                 Spacer(Modifier.height(NahwerkSpacing.Md))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(NahwerkSpacing.Md)) {
                     QuickActionButton("Concierge", "✦", onChat, Modifier.weight(1f))
@@ -364,9 +358,7 @@ internal fun HomeScreen(
                     onClick = onRefresh,
                     enabled = !refreshing,
                     modifier = Modifier.fillMaxWidth().heightIn(min = NahwerkSizes.Touch)
-                ) {
-                    Text(if (refreshing) "Kontext wird aktualisiert …" else "Kontext aktualisieren")
-                }
+                ) { Text(if (refreshing) "Kontext wird aktualisiert …" else "Kontext aktualisieren") }
             }
         }
     }
@@ -394,14 +386,14 @@ private fun ConciergeHero(home: HomeContext, onChat: () -> Unit) {
                         listOf(
                             NahwerkPalette.Surface,
                             NahwerkPalette.Surface.copy(alpha = 0.96f),
-                            NahwerkPalette.Surface.copy(alpha = 0.68f),
+                            NahwerkPalette.Surface.copy(alpha = 0.70f),
                             Color.Transparent
                         )
                     )
                 )
             )
             Column(
-                Modifier.fillMaxHeight().fillMaxWidth(0.68f).padding(NahwerkSpacing.Xl),
+                Modifier.fillMaxHeight().fillMaxWidth(0.70f).padding(NahwerkSpacing.Xl),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 StatusChip("PERSÖNLICHER CONCIERGE", NahwerkPalette.Gold)
@@ -455,20 +447,14 @@ internal fun ChatScreen(
                 ),
                 verticalArrangement = Arrangement.spacedBy(NahwerkSpacing.Md)
             ) {
-                if (messages.isEmpty()) {
-                    item(key = "empty") { EmptyChatState(home.concierge.name) }
-                }
-                items(messages, key = { it.sourceMessageId ?: "${it.role}:${it.text.hashCode()}" }) { message ->
-                    MessageBubble(message)
-                }
+                if (messages.isEmpty()) item(key = "empty") { EmptyChatState(home.concierge.name) }
+                items(messages, key = { it.sourceMessageId ?: "${it.role}:${it.text.hashCode()}" }) { MessageBubble(it) }
                 pendingRequest?.let { pending ->
                     item(key = "pending:${pending.sourceMessageId}") {
-                        PendingRequestPanel(pending, sending, error, onRetry, onDiscard)
+                        PendingRequestPanel(sending, error, onRetry, onDiscard)
                     }
                 }
-                if (pendingRequest == null && !error.isNullOrBlank()) {
-                    item(key = "error") { ErrorText(error) }
-                }
+                if (pendingRequest == null && !error.isNullOrBlank()) item(key = "error") { ErrorText(error) }
             }
             ChatComposer(
                 conciergeName = home.concierge.name,
@@ -491,7 +477,7 @@ internal fun ChatScreen(
 
 @Composable
 private fun ChatTopBar(conciergeName: String, onBack: () -> Unit) {
-    Surface(color = NahwerkPalette.Surface, shadowElevation = 0.dp) {
+    Surface(color = NahwerkPalette.Surface) {
         Row(
             Modifier.fillMaxWidth().safeDrawingPadding().padding(horizontal = NahwerkSpacing.Md, vertical = NahwerkSpacing.Sm),
             verticalAlignment = Alignment.CenterVertically,
@@ -501,9 +487,7 @@ private fun ChatTopBar(conciergeName: String, onBack: () -> Unit) {
                 onClick = onBack,
                 modifier = Modifier.size(NahwerkSizes.Touch).semantics { contentDescription = "Zur Übersicht" },
                 contentPadding = PaddingValues(0.dp)
-            ) {
-                Text("‹", color = NahwerkPalette.Gold, style = MaterialTheme.typography.headlineMedium)
-            }
+            ) { Text("‹", color = NahwerkPalette.Gold, style = MaterialTheme.typography.headlineMedium) }
             Column(Modifier.weight(1f)) {
                 Text(conciergeName, style = MaterialTheme.typography.titleMedium)
                 Text("Persönlicher Concierge", color = NahwerkPalette.SecondaryText, style = MaterialTheme.typography.labelSmall)
@@ -516,18 +500,15 @@ private fun ChatTopBar(conciergeName: String, onBack: () -> Unit) {
 @Composable
 private fun EmptyChatState(conciergeName: String) {
     Column(
-        Modifier.fillMaxWidth().padding(top = 72.dp, bottom = NahwerkSpacing.Xxl),
+        Modifier.fillMaxWidth().padding(top = 64.dp, bottom = NahwerkSpacing.Xxl),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(NahwerkSpacing.Md)
     ) {
         Surface(
             shape = RoundedCornerShape(NahwerkRadii.Pill),
             color = NahwerkPalette.GoldSoft,
-            modifier = Modifier.size(52.dp),
-            contentColor = NahwerkPalette.Gold
-        ) {
-            Box(contentAlignment = Alignment.Center) { Text("✦", style = MaterialTheme.typography.titleLarge) }
-        }
+            modifier = Modifier.size(52.dp)
+        ) { Box(contentAlignment = Alignment.Center) { Text("✦", color = NahwerkPalette.Gold, style = MaterialTheme.typography.titleLarge) } }
         Text("Was darf ich für dich tun?", style = MaterialTheme.typography.headlineSmall)
         Text(
             "Schreib $conciergeName, was erledigt werden soll.",
@@ -549,12 +530,13 @@ private fun MessageBubble(message: ChatMessage) {
                 bottomStart = if (isUser) NahwerkRadii.Large else NahwerkRadii.Small,
                 bottomEnd = if (isUser) NahwerkRadii.Small else NahwerkRadii.Large
             ),
-            colors = CardDefaults.cardColors(
-                containerColor = if (isUser) NahwerkPalette.GoldSoft else NahwerkPalette.ElevatedSurface
-            ),
+            colors = CardDefaults.cardColors(containerColor = if (isUser) NahwerkPalette.GoldSoft else NahwerkPalette.ElevatedSurface),
             border = BorderStroke(1.dp, if (isUser) NahwerkPalette.Gold.copy(alpha = 0.26f) else NahwerkPalette.Divider)
         ) {
-            Column(Modifier.padding(horizontal = NahwerkSpacing.Lg, vertical = NahwerkSpacing.Md), verticalArrangement = Arrangement.spacedBy(NahwerkSpacing.Xs)) {
+            Column(
+                Modifier.padding(horizontal = NahwerkSpacing.Lg, vertical = NahwerkSpacing.Md),
+                verticalArrangement = Arrangement.spacedBy(NahwerkSpacing.Xs)
+            ) {
                 Text(
                     if (isUser) "DU" else "NAHWERK",
                     color = if (isUser) NahwerkPalette.Gold else NahwerkPalette.SecondaryText,
@@ -568,7 +550,6 @@ private fun MessageBubble(message: ChatMessage) {
 
 @Composable
 private fun PendingRequestPanel(
-    pending: PendingChatRequest,
     sending: Boolean,
     error: String?,
     onRetry: () -> Unit,
@@ -598,7 +579,7 @@ private fun PendingRequestPanel(
                     modifier = Modifier.weight(1f).heightIn(min = NahwerkSizes.Touch).testTag("pending_retry"),
                     shape = RoundedCornerShape(NahwerkRadii.Medium),
                     border = BorderStroke(1.dp, NahwerkPalette.Gold)
-                ) { Text(if (sending) "Wird erneut versucht …" else "Erneut versuchen") }
+                ) { Text(if (sending) "Wird versucht …" else "Erneut versuchen") }
                 TextButton(
                     onClick = onDiscard,
                     enabled = !sending,
@@ -648,16 +629,15 @@ private fun ChatComposer(
             Button(
                 onClick = onSend,
                 enabled = !sending && draft.isNotBlank() && !locked,
-                modifier = Modifier.size(NahwerkSizes.ComposerButton).testTag("chat_send").semantics { contentDescription = "Nachricht senden" },
+                modifier = Modifier.size(NahwerkSizes.ComposerButton).testTag("chat_send")
+                    .semantics { contentDescription = "Nachricht senden" },
                 shape = RoundedCornerShape(NahwerkRadii.Medium),
                 contentPadding = PaddingValues(0.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = NahwerkPalette.Gold,
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
-            ) {
-                Text("↑", style = MaterialTheme.typography.titleLarge)
-            }
+            ) { Text("↑", style = MaterialTheme.typography.titleLarge) }
         }
     }
 }
@@ -695,15 +675,9 @@ internal fun ReminderScreen(
                 )
             }
             if (reminders.isEmpty()) {
-                item {
-                    EmptyPanel(
-                        symbol = "✓",
-                        title = "Alles ruhig",
-                        body = "Aktuell sind keine Erinnerungen im bestätigten Kontext vorhanden."
-                    )
-                }
+                item { EmptyPanel("✓", "Alles ruhig", "Aktuell sind keine Erinnerungen im bestätigten Kontext vorhanden.") }
             } else {
-                items(reminders, key = { it.id }) { reminder -> ReminderCard(reminder) }
+                items(reminders, key = { it.id }) { ReminderCard(it) }
             }
         }
     }
@@ -806,40 +780,46 @@ private fun NahwerkBottomNavigation(
     onReminders: () -> Unit,
     onSettings: () -> Unit
 ) {
-    NavigationBar(containerColor = NahwerkPalette.Surface, tonalElevation = 0.dp) {
-        NavDestination("⌂", "Übersicht", current == AppScreen.HOME, onHome)
-        NavDestination("✦", "Concierge", current == AppScreen.CHAT, onChat)
-        NavDestination("✓", "Erinnerungen", current == AppScreen.REMINDERS, onReminders)
-        NavDestination("●", "Konto", current == AppScreen.SETTINGS, onSettings)
+    Surface(color = NahwerkPalette.Surface, border = BorderStroke(1.dp, NahwerkPalette.Divider)) {
+        Row(
+            Modifier.fillMaxWidth().safeDrawingPadding().padding(horizontal = NahwerkSpacing.Xs, vertical = NahwerkSpacing.Xs),
+            horizontalArrangement = Arrangement.spacedBy(NahwerkSpacing.Xs)
+        ) {
+            NavButton("⌂", "Übersicht", current == AppScreen.HOME, onHome, Modifier.weight(1f))
+            NavButton("✦", "Concierge", current == AppScreen.CHAT, onChat, Modifier.weight(1f))
+            NavButton("✓", "Erinnerungen", current == AppScreen.REMINDERS, onReminders, Modifier.weight(1f))
+            NavButton("●", "Konto", current == AppScreen.SETTINGS, onSettings, Modifier.weight(1f))
+        }
     }
 }
 
 @Composable
-private fun NavDestination(symbol: String, label: String, selected: Boolean, onClick: () -> Unit) {
-    NavigationBarItem(
-        selected = selected,
+private fun NavButton(
+    symbol: String,
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    TextButton(
         onClick = onClick,
-        icon = {
-            Text(
-                symbol,
-                modifier = Modifier.semantics { contentDescription = label },
-                style = MaterialTheme.typography.titleMedium
-            )
-        },
-        label = { Text(label, maxLines = 1, style = MaterialTheme.typography.labelSmall) },
-        alwaysShowLabel = true,
-        colors = NavigationBarItemDefaults.colors(
-            selectedIconColor = NahwerkPalette.Gold,
-            selectedTextColor = NahwerkPalette.PrimaryText,
-            indicatorColor = NahwerkPalette.GoldSoft,
-            unselectedIconColor = NahwerkPalette.SecondaryText,
-            unselectedTextColor = NahwerkPalette.SecondaryText
-        )
-    )
+        modifier = modifier.heightIn(min = 58.dp),
+        shape = RoundedCornerShape(NahwerkRadii.Medium),
+        colors = ButtonDefaults.textButtonColors(
+            containerColor = if (selected) NahwerkPalette.GoldSoft else Color.Transparent,
+            contentColor = if (selected) NahwerkPalette.Gold else NahwerkPalette.SecondaryText
+        ),
+        contentPadding = PaddingValues(horizontal = NahwerkSpacing.Xs, vertical = NahwerkSpacing.Sm)
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(symbol, modifier = Modifier.semantics { contentDescription = label }, style = MaterialTheme.typography.titleMedium)
+            Text(label, maxLines = 1, style = MaterialTheme.typography.labelSmall)
+        }
+    }
 }
 
 @Composable
-private fun PremiumCard(modifier: Modifier = Modifier, content: @Composable Column.() -> Unit) {
+private fun PremiumCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(NahwerkRadii.Large),
