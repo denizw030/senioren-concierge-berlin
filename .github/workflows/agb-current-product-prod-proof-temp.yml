@@ -49,6 +49,7 @@ jobs:
         run: |
           node - <<'NODE'
           const { chromium } = require('playwright');
+          const normalize = value => value.replace(/\s+/g, ' ').trim();
           const required = [
             'Diese Allgemeinen Geschäftsbedingungen regeln die Nutzung der NAHWERK Concierge-Dienste',
             'NAHWERK bietet KI-gestützte Concierge-Dienste und ergänzende Funktionen',
@@ -74,9 +75,9 @@ jobs:
                 const response = await page.goto('https://nahwerkconcierge.com/agb.html', { waitUntil: 'domcontentloaded', timeout: 45000 });
                 if (!response || !response.ok()) throw new Error(`${name}: HTTP ${response && response.status()}`);
                 await page.waitForSelector('h1', { state: 'visible', timeout: 10000 });
-                const text = await page.locator('body').innerText();
-                for (const needle of required) if (!text.includes(needle)) throw new Error(`${name}: missing ${needle}`);
-                for (const needle of forbidden) if (text.includes(needle)) throw new Error(`${name}: old copy visible ${needle}`);
+                const text = normalize(await page.locator('body').innerText());
+                for (const needle of required) if (!text.includes(normalize(needle))) throw new Error(`${name}: missing ${needle}`);
+                for (const needle of forbidden) if (text.includes(normalize(needle))) throw new Error(`${name}: old copy visible ${needle}`);
                 const metrics = await page.evaluate(() => ({
                   innerWidth: window.innerWidth,
                   scrollWidth: document.documentElement.scrollWidth,
