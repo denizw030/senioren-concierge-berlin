@@ -119,7 +119,6 @@ jobs:
                   overflow = page.evaluate('document.documentElement.scrollWidth > document.documentElement.clientWidth')
                   assert not overflow, f'{width}: horizontal overflow'
                   assert not page_errors, f'{width}: page errors {page_errors}'
-                  # Ignore external resource/network console noise; fail on JS runtime-style console errors only.
                   runtime_console = [e for e in console_errors if 'Failed to load resource' not in e]
                   assert not runtime_console, f'{width}: console errors {runtime_console}'
                   page.screenshot(path=f'qa-{width}.png', full_page=True)
