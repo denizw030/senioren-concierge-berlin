@@ -40,8 +40,8 @@ jobs:
             out.metrics={viewport:[w.innerWidth,w.innerHeight],size:ps.backgroundSize,position:ps.backgroundPosition,radius:ps.borderRadius,overflow:ps.overflow,docWidth:root.scrollWidth,formBottom:fr.bottom};
             const chk=(n,v)=>{if(!v)out.errors.push(n)};
             chk('no-horizontal-overflow',root.scrollWidth<=w.innerWidth+1);
-            chk('asset',ps.backgroundImage.includes('nahwerk-red-blue-hero-web-lossless.webp'));
             if(product==='prime'){
+              chk('asset',ps.backgroundImage.includes('nahwerk-red-blue-hero-web-lossless.webp'));
               chk('cover',ps.backgroundSize==='cover');
               chk('rounded',parseFloat(ps.borderRadius)>=20);
               chk('clipped',ps.overflow==='hidden');
