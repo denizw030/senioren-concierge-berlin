@@ -40,6 +40,9 @@ jobs:
       - name: Run existing website auth/security regression
         run: node --test tests/password-policy.test.mjs tests/auth-security.test.mjs
 
+      - name: Run existing website launch-readiness regression
+        run: node --test tests/website-launch-readiness-final.test.mjs
+
       - name: Enforce isolated public-chat scope
         shell: bash
         run: |
