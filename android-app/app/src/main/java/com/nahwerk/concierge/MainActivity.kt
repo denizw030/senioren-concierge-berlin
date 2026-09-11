@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -71,6 +70,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.nahwerk.concierge.data.ChatMessage
+import com.nahwerk.concierge.data.ClientCapabilityCatalog
+import com.nahwerk.concierge.data.ClientCapabilityDescriptor
 import com.nahwerk.concierge.data.HomeContext
 import com.nahwerk.concierge.data.PendingChatRequest
 import com.nahwerk.concierge.data.Reminder
@@ -195,7 +196,8 @@ internal fun LoginScreen(
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    val canLogin = !busy && email.isNotBlank() && password.length >= 8
+    val emailValid = LoginInputPolicy.isEmailStructurallyValid(email)
+    val canLogin = !busy && LoginInputPolicy.canSubmit(email, password)
 
     Box(
         Modifier.fillMaxSize()
@@ -225,10 +227,19 @@ internal fun LoginScreen(
                     modifier = Modifier.fillMaxWidth().testTag("login_email"),
                     singleLine = true,
                     enabled = !busy,
+                    isError = email.isNotBlank() && !emailValid,
                     shape = RoundedCornerShape(NahwerkRadii.Medium),
                     colors = premiumInputColors(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next)
                 )
+                if (email.isNotBlank() && !emailValid) {
+                    Text(
+                        "Bitte gib eine gültige E-Mail-Adresse ein.",
+                        color = NahwerkPalette.Error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.testTag("login_email_error")
+                    )
+                }
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
@@ -240,10 +251,10 @@ internal fun LoginScreen(
                     colors = premiumInputColors(),
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = { if (canLogin) onLogin(email, password) })
+                    keyboardActions = KeyboardActions(onDone = { if (canLogin) onLogin(LoginInputPolicy.normalizedEmail(email), password) })
                 )
                 Button(
-                    onClick = { onLogin(email, password) },
+                    onClick = { onLogin(LoginInputPolicy.normalizedEmail(email), password) },
                     enabled = canLogin,
                     modifier = Modifier.fillMaxWidth().heightIn(min = NahwerkSizes.PrimaryTouch).testTag("login_submit"),
                     shape = RoundedCornerShape(NahwerkRadii.Medium),
@@ -256,8 +267,8 @@ internal fun LoginScreen(
                     else Text("Anmelden")
                 }
                 TextButton(
-                    onClick = { onReset(email) },
-                    enabled = !busy && email.isNotBlank(),
+                    onClick = { onReset(LoginInputPolicy.normalizedEmail(email)) },
+                    enabled = !busy && emailValid,
                     modifier = Modifier.align(Alignment.CenterHorizontally).heightIn(min = NahwerkSizes.Touch)
                 ) { Text("Passwort zurücksetzen") }
                 if (!error.isNullOrBlank()) ErrorText(error)
@@ -739,15 +750,81 @@ internal fun SettingsScreen(
                     style = MaterialTheme.typography.bodySmall
                 )
             }
-            OutlinedButton(
-                onClick = onLogout,
-                modifier = Modifier.fillMaxWidth().heightIn(min = NahwerkSizes.PrimaryTouch),
-                shape = RoundedCornerShape(NahwerkRadii.Medium),
-                border = BorderStroke(1.dp, NahwerkPalette.Divider)
-            ) { Text("Sicher abmelden") }
+
+            CapabilityGroup(
+                title = "Konto & Produkte",
+                subtitle = "Oberflächen vorbereitet · Backend-Wahrheit bleibt gesperrt",
+                capabilities = ClientCapabilityCatalog.accountSurfaces
+            )
+            CapabilityGroup(
+                title = "Kanäle & Kontinuität",
+                subtitle = "Ein Core, eine Conversation, kein paralleler App-State",
+                capabilities = ClientCapabilityCatalog.channelSurfaces
+            )
+
+            PremiumCard {
+                SectionEyebrow("SITZUNG")
+                Text(
+                    "Beim Kontowechsel werden ausstehende lokale Chat-Zustände und Sitzungstoken sicher verworfen. Danach meldest du dich mit dem anderen Konto neu an.",
+                    color = NahwerkPalette.SecondaryText,
+                    style = MaterialTheme.typography.bodySmall
+                )
+                OutlinedButton(
+                    onClick = onLogout,
+                    modifier = Modifier.fillMaxWidth().heightIn(min = NahwerkSizes.PrimaryTouch).testTag("switch_account"),
+                    shape = RoundedCornerShape(NahwerkRadii.Medium),
+                    border = BorderStroke(1.dp, NahwerkPalette.Gold)
+                ) { Text("Anderes Konto verwenden") }
+                TextButton(
+                    onClick = onLogout,
+                    modifier = Modifier.fillMaxWidth().heightIn(min = NahwerkSizes.Touch).testTag("logout")
+                ) { Text("Abmelden") }
+            }
             Text(
                 "STAGING · Keine Production- oder Provider-Aktion durch diesen Test-Candidate.",
                 color = NahwerkPalette.SecondaryText,
+                style = MaterialTheme.typography.labelSmall
+            )
+        }
+    }
+}
+
+@Composable
+private fun CapabilityGroup(
+    title: String,
+    subtitle: String,
+    capabilities: List<ClientCapabilityDescriptor>
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(NahwerkSpacing.Md)) {
+        SectionHeader(title, subtitle)
+        capabilities.forEach { capability -> CapabilityCard(capability) }
+    }
+}
+
+@Composable
+private fun CapabilityCard(capability: ClientCapabilityDescriptor) {
+    Card(
+        modifier = Modifier.fillMaxWidth().testTag(capability.testTag),
+        shape = RoundedCornerShape(NahwerkRadii.Large),
+        colors = CardDefaults.cardColors(containerColor = NahwerkPalette.Surface),
+        border = BorderStroke(1.dp, NahwerkPalette.Divider)
+    ) {
+        Column(
+            Modifier.fillMaxWidth().padding(NahwerkSpacing.Lg),
+            verticalArrangement = Arrangement.spacedBy(NahwerkSpacing.Sm)
+        ) {
+            Row(
+                Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(NahwerkSpacing.Sm)
+            ) {
+                Text(capability.title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                StatusChip("NOCH NICHT VERBUNDEN", NahwerkPalette.Warning)
+            }
+            Text(capability.summary, color = NahwerkPalette.SecondaryText, style = MaterialTheme.typography.bodySmall)
+            Text(
+                "Keine Aktion wird ausgeführt und kein Erfolg angenommen, solange der bestätigte Shared-Contract fehlt.",
+                color = NahwerkPalette.Warning,
                 style = MaterialTheme.typography.labelSmall
             )
         }

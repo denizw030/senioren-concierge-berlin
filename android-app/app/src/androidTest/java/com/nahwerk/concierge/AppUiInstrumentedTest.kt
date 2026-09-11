@@ -11,6 +11,7 @@ import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nahwerk.concierge.data.ChatMessage
@@ -63,6 +64,28 @@ class AppUiInstrumentedTest {
         assertEquals(1, submitCount)
         assertEquals("test@example.com", submittedEmail)
         assertEquals("geheim123", submittedPassword)
+    }
+
+    @Test
+    fun malformedEmailStaysFailClosedBeforeAuthRequest() {
+        var submitCount = 0
+        composeRule.setContent {
+            MaterialTheme {
+                LoginScreen(
+                    busy = false,
+                    error = null,
+                    notice = null,
+                    onLogin = { _, _ -> submitCount += 1 },
+                    onReset = {}
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag("login_email").performTextInput("not-an-email")
+        composeRule.onNodeWithTag("login_password").performTextInput("geheim123")
+        composeRule.onNodeWithTag("login_email_error").assertIsDisplayed()
+        composeRule.onNodeWithTag("login_submit").assertIsNotEnabled()
+        assertEquals(0, submitCount)
     }
 
     @Test
@@ -122,5 +145,42 @@ class AppUiInstrumentedTest {
         composeRule.onNodeWithTag("chat_send").assertIsNotEnabled()
         composeRule.onNodeWithTag("pending_retry").assertIsEnabled()
         composeRule.onNodeWithTag("error_message").assertIsDisplayed()
+    }
+
+    @Test
+    fun blockedAccountCapabilitiesAreVisibleWithoutAuthorityActions() {
+        composeRule.setContent {
+            MaterialTheme {
+                SettingsScreen(
+                    home = home,
+                    onBack = {},
+                    onLogout = {}
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag("capability_usage_limits").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("capability_safety").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("capability_family").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("capability_billing").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("capability_voice").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("capability_whatsapp").performScrollTo().assertIsDisplayed()
+    }
+
+    @Test
+    fun accountSwitchUsesSafeLogoutBoundary() {
+        var logoutCount = 0
+        composeRule.setContent {
+            MaterialTheme {
+                SettingsScreen(
+                    home = home,
+                    onBack = {},
+                    onLogout = { logoutCount += 1 }
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag("switch_account").performScrollTo().performClick()
+        assertEquals(1, logoutCount)
     }
 }
