@@ -54,7 +54,7 @@ const success201={
 const replay200={...success201,duplicate:true};
 
 test("telephone reception remains a separate product without invented prices",()=>{
-  assert.match(page,/NAHWERK geht für Sie ans Telefon/);
+  assert.match(page,/NAHWERK geht für dich ans Telefon/);
   assert.match(page,/Telefonannahme Standalone/);
   assert.match(page,/Concierge \+ Telefonannahme/);
   assert.match(page,/Abo/);

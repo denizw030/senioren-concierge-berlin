@@ -23,8 +23,8 @@ test("all seven account tabs and functional ids remain intact",()=>{
 test("context bar and access hierarchy use compact premium copy",()=>{
   assert.match(konto,/account-setup-context-label">Verwaltetes Profil</);
   assert.match(konto,/>Zugänge<\/div>/);
-  assert.match(konto,/Verwalten Sie unterstützte Personen und Zugriffsrechte\./);
-  assert.match(konto,/Personen, die Sie über NAHWERK unterstützen\./);
+  assert.match(konto,/Verwalte unterstützte Personen und Zugriffsrechte\./);
+  assert.match(konto,/Personen, die du über NAHWERK unterstützt\./);
 });
 
 test("family list renderer is presentation-only enhanced with status pills and metadata",()=>{
