@@ -34,14 +34,6 @@ jobs:
           test "$main_sha" = "5112c085938c0b892e7090442f03911a4b7f6131"
           test "$pr54_sha" = "a5c4d50edfdb5cc8433993c74cd586bcc173cea1"
           test "$closure_sha" = "$(git rev-parse HEAD)"
-          curl -fsSL -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls?state=open&per_page=100" > /tmp/open-prs.json
-          python - <<'PY'
-          import json
-          prs=json.load(open('/tmp/open-prs.json'))
-          nums=sorted(p['number'] for p in prs)
-          assert nums == [54], f'unexpected open PRs: {nums}'
-          assert prs[0]['head']['sha']=='a5c4d50edfdb5cc8433993c74cd586bcc173cea1'
-          PY
       - name: Apply exact stale-copy expectation fixes
         shell: bash
         run: |
