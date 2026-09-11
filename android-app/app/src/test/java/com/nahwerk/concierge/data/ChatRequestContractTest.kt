@@ -2,6 +2,7 @@ package com.nahwerk.concierge.data
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertThrows
 import org.junit.Test
 
 class ChatRequestContractTest {
@@ -32,5 +33,25 @@ class ChatRequestContractTest {
         val second = ChatRequestContract.create("Hallo", idFactory = { "id-${++counter}" })
 
         assertNotEquals(first.sourceMessageId, second.sourceMessageId)
+    }
+
+    @Test
+    fun blankAndOversizedMessagesFailClosedBeforeNetwork() {
+        assertThrows(IllegalArgumentException::class.java) {
+            ChatRequestContract.create("   ")
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            ChatRequestContract.create("x".repeat(4001))
+        }
+    }
+
+    @Test
+    fun invalidWireIdsFailClosedBeforeRequestCreation() {
+        assertThrows(IllegalArgumentException::class.java) {
+            ChatRequestContract.create("Hallo", idFactory = { "" })
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            ChatRequestContract.create("Hallo", correlationFactory = { "x".repeat(201) })
+        }
     }
 }
