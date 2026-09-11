@@ -8,7 +8,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: read
 
 jobs:
   common-failure-closure:
@@ -26,24 +25,22 @@ jobs:
           node-version: '22'
       - name: Runtime drift guard
         shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          main_sha=$(git ls-remote origin refs/heads/main | awk '{print $1}')
-          pr54_sha=$(git ls-remote origin refs/heads/fix/nahwerk-weltweit-navigation-rename-final-20260910 | awk '{print $1}')
-          closure_sha=$(git ls-remote origin refs/heads/fix/website-main-ci-closure-20260911 | awk '{print $1}')
+          public_repo="https://github.com/${GITHUB_REPOSITORY}.git"
+          main_sha=$(git ls-remote "$public_repo" refs/heads/main | awk '{print $1}')
+          pr54_sha=$(git ls-remote "$public_repo" refs/heads/fix/nahwerk-weltweit-navigation-rename-final-20260910 | awk '{print $1}')
+          closure_sha=$(git ls-remote "$public_repo" refs/heads/fix/website-main-ci-closure-20260911 | awk '{print $1}')
           test "$main_sha" = "5112c085938c0b892e7090442f03911a4b7f6131"
           test "$pr54_sha" = "a5c4d50edfdb5cc8433993c74cd586bcc173cea1"
           test "$closure_sha" = "$(git rev-parse HEAD)"
-          curl -fsSL -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls?state=open&per_page=100" > /tmp/open-prs.json
+          curl -fsSL -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls?state=open&per_page=100" > /tmp/open-prs.json
           python - <<'PY'
           import json
           prs=json.load(open('/tmp/open-prs.json'))
           nums=sorted(p['number'] for p in prs)
           assert nums == [54], f'unexpected open PRs: {nums}'
-          pr=prs[0]
-          assert pr['head']['sha']=='a5c4d50edfdb5cc8433993c74cd586bcc173cea1'
+          assert prs[0]['head']['sha']=='a5c4d50edfdb5cc8433993c74cd586bcc173cea1'
           PY
       - name: Apply exact stale-copy expectation fixes
         shell: bash
