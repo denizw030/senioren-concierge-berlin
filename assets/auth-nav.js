@@ -9,7 +9,7 @@
   const LOGOUT_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-session-secure";
   const PROTECTED = new Set(["konto.html", "concierge-anpassen.html"]);
   const CONTEXT_PAGES = new Set(["pakete.html", "registrieren.html", "anmelden.html", "konto.html", "concierge-anpassen.html"]);
-  const NAV = [["index.html", "Übersicht"], ["prime-concierge.html", "Persönlicher Concierge"], ["concierges.html", "Concierges"], ["senioren-concierge.html", "Senioren Concierge"], ["senioren-concierge.html#angehoerige", "Für Angehörige"], ["leistungen.html", "Leistungen"], ["kontakt.html", "Kontakt"]];
+  const NAV = [["index.html", "Übersicht"], ["prime-concierge.html", "Persönlicher Concierge"], ["concierges.html", "NAHWERK weltweit"], ["senioren-concierge.html", "Senioren Concierge"], ["senioren-concierge.html#angehoerige", "Für Angehörige"], ["leistungen.html", "Leistungen"], ["kontakt.html", "Kontakt"]];
   let sessionValidated = false;
   let validatedSession = null;
   let validationPromise = null;
