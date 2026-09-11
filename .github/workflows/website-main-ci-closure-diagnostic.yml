@@ -6,6 +6,9 @@ on:
       - fix/website-main-ci-closure-20260911
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   node-tests:
     runs-on: ubuntu-latest
@@ -13,9 +16,35 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: fix/website-main-ci-closure-20260911
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Full Node regression
-        run: node --test tests/*.test.mjs
+      - name: Run and capture full Node regression
+        id: regression
+        shell: bash
+        run: |
+          set +e
+          mkdir -p diagnostics
+          node --test tests/*.test.mjs > diagnostics/website-main-ci-node-output.txt 2>&1
+          status=$?
+          echo "$status" > diagnostics/website-main-ci-node-status.txt
+          cat diagnostics/website-main-ci-node-output.txt
+          exit 0
+      - name: Commit diagnostic output
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add diagnostics/website-main-ci-node-output.txt diagnostics/website-main-ci-node-status.txt
+          if git diff --cached --quiet; then
+            echo "No diagnostic output change"
+          else
+            git commit -m "chore: capture website CI diagnostics [skip ci]"
+            git push origin HEAD:fix/website-main-ci-closure-20260911
+          fi
+      - name: Preserve regression result
+        shell: bash
+        run: exit "$(cat diagnostics/website-main-ci-node-status.txt)"
