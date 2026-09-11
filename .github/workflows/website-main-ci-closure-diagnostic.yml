@@ -22,14 +22,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Run and capture full Node regression
-        id: regression
+      - name: Run and compact full Node regression
         shell: bash
         run: |
           set +e
           mkdir -p diagnostics
-          node --test tests/*.test.mjs > diagnostics/website-main-ci-node-output.txt 2>&1
+          node --test --test-reporter=tap tests/*.test.mjs > /tmp/website-main-ci-full.txt 2>&1
           status=$?
+          {
+            grep -E '^[[:space:]]*not ok [0-9]+ - ' /tmp/website-main-ci-full.txt || true
+            grep -E '^# (tests|suites|pass|fail|cancelled|skipped|todo|duration_ms) ' /tmp/website-main-ci-full.txt || true
+          } > diagnostics/website-main-ci-node-output.txt
           echo "$status" > diagnostics/website-main-ci-node-status.txt
           cat diagnostics/website-main-ci-node-output.txt
           exit 0
@@ -42,7 +45,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No diagnostic output change"
           else
-            git commit -m "chore: capture website CI diagnostics [skip ci]"
+            git commit -m "chore: capture compact website CI diagnostics [skip ci]"
             git push origin HEAD:fix/website-main-ci-closure-20260911
           fi
       - name: Preserve regression result
