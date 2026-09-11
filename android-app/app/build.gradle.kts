@@ -41,7 +41,7 @@ android {
         minSdk = 26
         targetSdk = 35
         versionCode = 3
-        versionName = "0.2.1-staging"
+        versionName = "0.2.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures { compose = true; buildConfig = true }
@@ -58,6 +58,7 @@ android {
     }
     buildTypes {
         debug {
+            versionNameSuffix = "-staging"
             buildConfigField("String", "AUTH_BASE_URL", "\"https://btqklftjmwtqqqdmwlnk.supabase.co/functions/v1/nahwerk-mobile-auth-staging\"")
             buildConfigField("String", "GATEWAY_BASE_URL", "\"https://btqklftjmwtqqqdmwlnk.supabase.co/functions/v1/nahwerk-mobile-gateway-staging\"")
         }
