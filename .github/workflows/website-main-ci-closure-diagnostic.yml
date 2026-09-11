@@ -30,10 +30,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          git fetch origin main fix/nahwerk-weltweit-navigation-rename-final-20260910
-          test "$(git rev-parse origin/main)" = "5112c085938c0b892e7090442f03911a4b7f6131"
-          test "$(git rev-parse origin/fix/nahwerk-weltweit-navigation-rename-final-20260910)" = "a5c4d50edfdb5cc8433993c74cd586bcc173cea1"
-          test "$(git ls-remote origin refs/heads/fix/website-main-ci-closure-20260911 | awk '{print $1}')" = "$(git rev-parse HEAD)"
+          main_sha=$(git ls-remote origin refs/heads/main | awk '{print $1}')
+          pr54_sha=$(git ls-remote origin refs/heads/fix/nahwerk-weltweit-navigation-rename-final-20260910 | awk '{print $1}')
+          closure_sha=$(git ls-remote origin refs/heads/fix/website-main-ci-closure-20260911 | awk '{print $1}')
+          test "$main_sha" = "5112c085938c0b892e7090442f03911a4b7f6131"
+          test "$pr54_sha" = "a5c4d50edfdb5cc8433993c74cd586bcc173cea1"
+          test "$closure_sha" = "$(git rev-parse HEAD)"
           curl -fsSL -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls?state=open&per_page=100" > /tmp/open-prs.json
           python - <<'PY'
           import json
