@@ -16,10 +16,10 @@ test("homepage follows the frozen six-step story exactly",()=>{
   const positions=[
     "Ein persönlicher Concierge, der erledigt.",
     "Echte Demo",
-    "Da sein, auch wenn Sie nicht da sein können.",
+    "Da sein, auch wenn du gerade verhindert bist.",
     "Unterstützung, ohne Selbstständigkeit abzunehmen.",
     "Ein Concierge. Dasselbe Gespräch. Egal über welchen Weg.",
-    "Geben Sie die erste Aufgabe ab."
+    "Gib die erste Aufgabe ab."
   ].map(s=>home.indexOf(s));
   positions.forEach((p,i)=>assert.ok(p>=0,`story marker ${i+1} exists`));
   for(let i=1;i<positions.length;i++) assert.ok(positions[i]>positions[i-1],`story marker ${i+1} follows marker ${i}`);
@@ -30,7 +30,7 @@ test("core marketing statements are preserved verbatim",()=>{
   for(const statement of [
     "Ein persönlicher Concierge, der erledigt.",
     "Google findet. KI versteht. NAHWERK erledigt.",
-    "Da sein, auch wenn Sie nicht da sein können.",
+    "Da sein, auch wenn du gerade verhindert bist.",
     "Unterstützung, ohne Selbstständigkeit abzunehmen.",
     "Ein Concierge. Dasselbe Gespräch. Egal über welchen Weg."
   ]) assert.ok(home.includes(statement),statement);
@@ -106,7 +106,7 @@ test("family stays respectful and person-centered",()=>{
 
 test("safety remains calm, deliberate and bounded",()=>{
   const safety=visibleText(read("safety.html"));
-  assert.match(safety,/Da sein, auch wenn Sie gerade verhindert sind/);
+  assert.match(safety,/Da sein, auch wenn du gerade verhindert bist/);
   assert.match(safety,/bewusst eingerichtet/i);
   assert.match(safety,/keinen medizinischen Notruf|ersetzt keinen medizinischen Notruf/i);
   assert.doesNotMatch(safety,/Sturz|Panik|Notfall deiner Eltern/i);

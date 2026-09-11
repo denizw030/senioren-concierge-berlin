@@ -13,7 +13,7 @@ test("homepage follows frozen story and keeps conversion reachable",()=>{
   assert.match(c,/Ein persönlicher Concierge, der erledigt\./);
   assert.match(c,/Google findet\. KI versteht\. NAHWERK erledigt\./);
   assert.match(c,/id="demo"/);
-  assert.match(c,/Da sein, auch wenn Sie nicht da sein können\./);
+  assert.match(c,/Da sein, auch wenn du gerade verhindert bist\./);
   assert.match(c,/Unterstützung, ohne Selbstständigkeit abzunehmen\./);
   assert.match(c,/Ein Concierge\. Dasselbe Gespräch\. Egal über welchen Weg\./);
   assert.match(c,/Kostenlos starten/);
@@ -28,7 +28,7 @@ test("public capability truth stays fail-closed without internal release telemet
   assert.match(phone,/Platform-Endpunkt ist vorbereitet, aber noch nicht deployed/);
 });
 test("real activation requires post-registration usage delta",()=>{const js=read("assets/acquisition-v1.js");assert.match(js,/seedBaselineFromProfile/);assert.match(js,/seedBaseline\(body\.usage,"profile"\)/);assert.match(js,/current\.app>baseline\.app\|\|current\.whatsapp>baseline\.whatsapp/);assert.match(js,/seedBaseline\(current,"fallback"\)/);assert.match(js,/funnel_complete/);assert.match(js,/first_task_success/);assert.match(read("konto.html"),/NahwerkActivation\?\.observeUsage/);assert.match(read("assets/onboarding.js"),/markRegistrationComplete/)});
-test("first-party analytics is storage-minimal and disclosed",()=>{const analytics=read("assets/nahwerk-analytics.js");const privacy=read("datenschutz.html");assert.doesNotMatch(analytics,/sessionStorage|localStorage|VISIT_KEY/);assert.match(privacy,/First-Party-Produkt- und Funnel-Analyse/);assert.match(privacy,/keine eigenen Analyse-Cookies/);assert.doesNotMatch(privacy,/keine eigenen Analyse- oder Marketingtracker/)});
+test("first-party analytics is storage-minimal and disclosed",()=>{const analytics=read("assets/nahwerk-analytics.js");const privacy=read("datenschutz.html");assert.doesNotMatch(analytics,/sessionStorage|localStorage|VISIT_KEY/);assert.match(privacy,/eigene, datensparsame Nutzungsanalyse/);assert.match(privacy,/keine eigenen Analyse-Cookies/);assert.doesNotMatch(privacy,/keine eigenen Analyse- oder Marketingtracker/)});
 test("registration keeps secure endpoints and paid checkout closed",()=>{const c=read("assets/onboarding.js");assert.match(c,/web-registration-secure/);assert.match(c,/web-login-secure/);assert.match(c,/bookable: false/);assert.match(c,/erster-schritt\.html/);assert.doesNotMatch(c,/webhook\/senioren-concierge\/web\/login\/password/)});
 test("pricing matches canonical tariff set",()=>{const c=read("pakete.html")+read("assets/onboarding.js");for(const price of ["0 €","5,99 €","10,99 €","19,99 €","34,99 €","59,66 €"])assert.ok(c.includes(price),price);assert.doesNotMatch(c,/59,99 €/)});
 test("growth assets stay small",()=>{assert.ok(Buffer.byteLength(read("assets/acquisition-v1.css"))<18000);assert.ok(Buffer.byteLength(read("assets/acquisition-v1.js"))<12000);for(const p of ["erster-schritt.html","alltag-organisieren.html","dokumente-verstehen.html","technik-verstehen.html","angehoerige.html","safety.html"])assert.ok(Buffer.byteLength(read(p))<30000,p)});
