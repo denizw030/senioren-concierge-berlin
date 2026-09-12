@@ -150,6 +150,7 @@ private fun CustomerAccountScreen(
             }
 
             ProdCustomerHub()
+            PaygQuoteApprovalSurface()
             PaymentMethodProdSurface()
 
             OutlinedButton(
