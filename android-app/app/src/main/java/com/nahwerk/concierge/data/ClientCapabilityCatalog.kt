@@ -17,6 +17,8 @@ enum class ClientCapabilityKey {
 }
 
 enum class ClientSurfaceReadiness {
+    PROD_BOUND,
+    PROD_READ_ONLY,
     UI_READY_BACKEND_BLOCKED
 }
 
@@ -25,93 +27,102 @@ data class ClientCapabilityDescriptor(
     val title: String,
     val summary: String,
     val testTag: String,
-    val readiness: ClientSurfaceReadiness = ClientSurfaceReadiness.UI_READY_BACKEND_BLOCKED,
-    val backendAuthorityAvailable: Boolean = false,
-    val productionReady: Boolean = false,
-    val maySubmitAuthorityBearingAction: Boolean = false
+    val readiness: ClientSurfaceReadiness,
+    val backendAuthorityAvailable: Boolean,
+    val productionReady: Boolean,
+    val maySubmitAuthorityBearingAction: Boolean
 )
 
 object ClientCapabilityCatalog {
+    private fun liveWrite(key: ClientCapabilityKey, title: String, summary: String, tag: String) =
+        ClientCapabilityDescriptor(key, title, summary, tag, ClientSurfaceReadiness.PROD_BOUND, true, true, true)
+
+    private fun liveRead(key: ClientCapabilityKey, title: String, summary: String, tag: String) =
+        ClientCapabilityDescriptor(key, title, summary, tag, ClientSurfaceReadiness.PROD_READ_ONLY, true, true, false)
+
+    private fun blocked(key: ClientCapabilityKey, title: String, summary: String, tag: String) =
+        ClientCapabilityDescriptor(key, title, summary, tag, ClientSurfaceReadiness.UI_READY_BACKEND_BLOCKED, false, false, false)
+
     val accountSurfaces: List<ClientCapabilityDescriptor> = listOf(
-        ClientCapabilityDescriptor(
+        liveWrite(
             ClientCapabilityKey.REGISTRATION,
             "Registrierung",
-            "Die App startet keine Registrierung, bis der kanonische mobile PROD-Registrierungsvertrag bestätigt ist.",
+            "FREE-Selbstregistrierung, Verifizierung und Auth-Bootstrap laufen über den bestätigten PROD-Vertrag.",
             "capability_registration"
         ),
-        ClientCapabilityDescriptor(
+        liveWrite(
             ClientCapabilityKey.PERSONAL_DATA,
             "Persönliche Daten",
-            "Anzeigen und Änderungen bleiben gesperrt, bis ein bestätigter Account-Data- und Autorisierungsvertrag für die App vorliegt.",
+            "Profil, Tarif und Nutzung kommen aus PROD; die vorhandenen freigegebenen Profilfelder können sicher gespeichert werden.",
             "capability_personal_data"
         ),
-        ClientCapabilityDescriptor(
+        liveWrite(
             ClientCapabilityKey.PAYG,
             "PAYG",
-            "PAYG-Status, Aktivierung und kostenpflichtige Ausführungen werden ausschließlich über den finalen produktiven PAYG-Vertrag freigeschaltet.",
+            "Status, Wallet, Limits und Aktivierung werden ausschließlich über den autoritativen PAYG-PROD-Vertrag gesteuert.",
             "capability_payg"
         ),
-        ClientCapabilityDescriptor(
+        liveWrite(
             ClientCapabilityKey.PAYMENT_METHODS,
             "Zahlungsmethoden",
-            "Die App zeigt oder verändert keine Zahlungsmethode, bis der produktive Billing-Vertrag einen sicheren kundengebundenen Flow bereitstellt.",
+            "Vorhandene Methoden werden aus PROD geladen; neue Methoden werden über servergebundenes Stripe Checkout bestätigt.",
             "capability_payment_methods"
         ),
-        ClientCapabilityDescriptor(
+        liveRead(
             ClientCapabilityKey.USAGE_LIMITS,
             "Kosten & Nutzung",
-            "Verbindliche Kosten-, Verbrauchs- und Limitwerte werden nur aus dem bestätigten PROD-Billing-/Usage-Contract angezeigt.",
+            "Verbrauch, PAYG-Kosten, Quotes und Limits werden ohne Schätzwerte aus dem PROD-Ledger angezeigt.",
             "capability_usage_limits"
         ),
-        ClientCapabilityDescriptor(
+        liveWrite(
             ClientCapabilityKey.SAFETY,
             "Sicherheit",
-            "Die App trifft keine Safety-Entscheidung. Status und Aktionen werden erst aus einem bestätigten Backend-Contract freigeschaltet.",
+            "Safety-Status, Zeiten und Kontakte werden aus PROD geladen und über den bestehenden sicheren Vertrag gespeichert.",
             "capability_safety"
         ),
-        ClientCapabilityDescriptor(
+        liveWrite(
             ClientCapabilityKey.FAMILY,
             "Familie",
-            "Beziehungen, Rollen und Berechtigungen werden ausschließlich aus dem kanonischen Family-Contract geladen.",
+            "Rollen, Berechtigungen, verwaltete Personen und Einladungen nutzen die vorhandenen Family-PROD-Verträge.",
             "capability_family"
         ),
-        ClientCapabilityDescriptor(
+        blocked(
             ClientCapabilityKey.BILLING_SUBSCRIPTION,
-            "Tarif & Abrechnung",
-            "Keine Zahlung und keine Tarif- oder Abo-Änderung wird aus der App gestartet, solange der produktive Billing-Contract fehlt.",
+            "Tarif & Abo",
+            "Tarif- oder Abo-Wechsel gehören nicht zum aktuellen PAYG-Kundenflow und bleiben ohne separaten freigegebenen PROD-Vertrag gesperrt.",
             "capability_billing"
         ),
-        ClientCapabilityDescriptor(
+        blocked(
             ClientCapabilityKey.NOTIFICATIONS,
             "Benachrichtigungen",
-            "Geräte-Registrierung und Zustellung bleiben aus, bis der Notification-Contract bestätigt ist.",
+            "Geräte-Push bleibt aus, bis ein Notification-Contract bestätigt ist.",
             "capability_notifications"
         )
     )
 
     val channelSurfaces: List<ClientCapabilityDescriptor> = listOf(
-        ClientCapabilityDescriptor(
+        blocked(
             ClientCapabilityKey.VOICE_HANDOFF,
             "Telefon & Voice",
             "Voice bleibt ein anderer Kanal desselben zentralen Core. Die App aktiviert keinen eigenen Voice-Task-State.",
             "capability_voice"
         ),
-        ClientCapabilityDescriptor(
+        blocked(
             ClientCapabilityKey.WHATSAPP_CONTINUITY,
             "WhatsApp-Kontinuität",
             "Kanalwechsel dürfen nur dieselbe kanonische Conversation fortsetzen; lokale App-Historie wird nicht zur Backend-Wahrheit.",
             "capability_whatsapp"
         ),
-        ClientCapabilityDescriptor(
+        blocked(
             ClientCapabilityKey.CONVERSATION_HISTORY,
             "Gesprächsverlauf",
-            "Lokale UI-Persistenz bleibt nicht-kanonisch. Server-Verlauf wird erst nach bestätigtem Conversation-History-Contract geladen.",
+            "Lokale UI-Persistenz bleibt nicht-kanonisch. Server-Verlauf benötigt weiterhin einen bestätigten Conversation-History-Read-Contract.",
             "capability_history"
         ),
-        ClientCapabilityDescriptor(
+        blocked(
             ClientCapabilityKey.TASK_STATE,
             "Vorgänge & Ausführungen",
-            "Die App stellt Task-State erst dar, wenn der zentrale Core einen bestätigten, app-fähigen Read-Contract liefert.",
+            "Task-/Execution-Details benötigen weiterhin einen zentralen Core-Read-Contract.",
             "capability_task_state"
         )
     )

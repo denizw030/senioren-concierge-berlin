@@ -9,6 +9,7 @@ import com.nahwerk.concierge.data.HomeContext
 import com.nahwerk.concierge.data.NahwerkApi
 import com.nahwerk.concierge.data.PendingChatRequest
 import com.nahwerk.concierge.data.PendingChatStore
+import com.nahwerk.concierge.data.ProdCustomerApi
 import com.nahwerk.concierge.data.SecureChatUiStore
 import com.nahwerk.concierge.data.SecureSessionStore
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,6 +45,7 @@ internal class NahwerkAppViewModel(
     private val pendingChats = PendingChatStore(application.applicationContext)
     private val chatUiStore = SecureChatUiStore(application.applicationContext)
     private val api = NahwerkApi(sessions, pendingChats)
+    private val productApi = ProdCustomerApi(application.applicationContext)
 
     private var chatOwner: String? = api.accountKey()
     private val restoredChat = chatOwner?.let(chatUiStore::restore)
@@ -78,9 +80,29 @@ internal class NahwerkAppViewModel(
                 _uiState.value = _uiState.value.copy(loginBusy = false, error = result.error)
                 return@launch
             }
+
+            // Keep the already-established Concierge transport untouched. In parallel,
+            // bind the same customer credentials to the canonical PROD customer-product
+            // session used by profile/PAYG/Safety/Family. Failure here must never create
+            // a fake success; the Konto surface will request re-authentication explicitly.
+            val productAuth = productApi.authenticate(email, password)
+            val productNotice = when {
+                productAuth.authenticated && productAuth.enrollmentRequired ->
+                    "Konto verbunden. Für Änderungen richtest du im Konto einmalig die Sicherheitsbestätigung ein."
+                productAuth.authenticated -> null
+                productAuth.mfaRequired ->
+                    "Concierge ist angemeldet. Bestätige im Konto noch deine zusätzliche Sicherheitsstufe."
+                else ->
+                    "Concierge ist angemeldet. Konto-/PAYG-/Safety-/Family-Daten müssen im Konto noch sicher bestätigt werden."
+            }
+
             synchronizeChatOwner(clearOnMissing = true)
-            _uiState.value = _uiState.value.copy(loginBusy = false, pendingRequest = api.pendingChatRequest())
-            refreshHome(forceHome = true)
+            _uiState.value = _uiState.value.copy(
+                loginBusy = false,
+                notice = productNotice,
+                pendingRequest = api.pendingChatRequest()
+            )
+            refreshHome(forceHome = true, preserveNotice = true)
         }
     }
 
@@ -97,12 +119,16 @@ internal class NahwerkAppViewModel(
         }
     }
 
-    fun refreshHome(forceHome: Boolean = false) {
+    fun refreshHome(forceHome: Boolean = false, preserveNotice: Boolean = false) {
         if (!api.hasSession()) {
             moveToLogin("Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.")
             return
         }
-        _uiState.value = _uiState.value.copy(loading = true, error = null, notice = null)
+        _uiState.value = _uiState.value.copy(
+            loading = true,
+            error = null,
+            notice = if (preserveNotice) _uiState.value.notice else null
+        )
         viewModelScope.launch {
             api.loadHome()
                 .onSuccess { home ->
@@ -200,6 +226,7 @@ internal class NahwerkAppViewModel(
 
     fun logout() {
         api.logout()
+        productApi.clearLocalSession()
         clearChatState()
         _uiState.value = AppUiState(screen = AppScreen.LOGIN)
         persistScreen(AppScreen.LOGIN)
@@ -247,6 +274,7 @@ internal class NahwerkAppViewModel(
 
     private fun moveToLogin(message: String) {
         clearChatState()
+        productApi.clearLocalSession()
         _uiState.value = AppUiState(screen = AppScreen.LOGIN, error = message)
         persistScreen(AppScreen.LOGIN)
     }
