@@ -64,16 +64,20 @@ internal fun CustomerLaunchRoot(viewModel: NahwerkAppViewModel = viewModel()) {
                         ProdRegistrationSurface(onBack = { registration = false })
                     }
                 } else {
-                    Box(Modifier.fillMaxSize()) {
-                        LoginScreen(
-                            busy = state.loginBusy,
-                            error = state.error,
-                            notice = state.notice,
-                            onLogin = viewModel::login,
-                            onReset = viewModel::requestPasswordReset
-                        )
+                    Column(Modifier.fillMaxSize()) {
+                        Box(Modifier.weight(1f)) {
+                            LoginScreen(
+                                busy = state.loginBusy,
+                                error = state.error,
+                                notice = state.notice,
+                                onLogin = viewModel::login,
+                                onReset = viewModel::requestPasswordReset
+                            )
+                        }
                         Surface(
-                            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = NahwerkSpacing.Xl),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = NahwerkSpacing.Xl, vertical = NahwerkSpacing.Sm),
                             color = NahwerkPalette.Surface.copy(alpha = 0.96f),
                             shape = RoundedCornerShape(NahwerkRadii.Pill),
                             border = BorderStroke(1.dp, NahwerkPalette.Divider)
@@ -81,7 +85,7 @@ internal fun CustomerLaunchRoot(viewModel: NahwerkAppViewModel = viewModel()) {
                             TextButton(
                                 onClick = { registration = true },
                                 enabled = !state.loginBusy,
-                                modifier = Modifier.testTag("registration_open")
+                                modifier = Modifier.fillMaxWidth().testTag("registration_open")
                             ) { Text("Noch kein Konto? Kostenlos registrieren", color = NahwerkPalette.Gold) }
                         }
                     }
