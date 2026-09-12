@@ -14,6 +14,9 @@ val releaseSigningValues = listOf(
 val releaseSigningAny = releaseSigningValues.any { it.isNotBlank() }
 val releaseSigningComplete = releaseSigningValues.all { it.isNotBlank() }
 
+fun isStagingEndpoint(value: String): Boolean =
+    value.contains("staging", ignoreCase = true) || value.contains("-stg", ignoreCase = true)
+
 require(!releaseSigningAny || releaseSigningComplete) {
     "Android release signing requires all four NAHWERK_ANDROID_* signing environment variables."
 }
@@ -22,6 +25,12 @@ require(releaseAuthBaseUrl.isBlank() || releaseAuthBaseUrl.startsWith("https://"
 }
 require(releaseGatewayBaseUrl.isBlank() || releaseGatewayBaseUrl.startsWith("https://")) {
     "Android release gateway endpoint must use HTTPS."
+}
+require(releaseAuthBaseUrl.isBlank() || !isStagingEndpoint(releaseAuthBaseUrl)) {
+    "Android release auth endpoint must not target STAGING."
+}
+require(releaseGatewayBaseUrl.isBlank() || !isStagingEndpoint(releaseGatewayBaseUrl)) {
+    "Android release gateway endpoint must not target STAGING."
 }
 
 fun buildConfigString(value: String): String =
@@ -59,11 +68,13 @@ android {
     buildTypes {
         debug {
             versionNameSuffix = "-staging"
+            buildConfigField("String", "APP_ENVIRONMENT", "\"STAGING\"")
             buildConfigField("String", "AUTH_BASE_URL", "\"https://btqklftjmwtqqqdmwlnk.supabase.co/functions/v1/nahwerk-mobile-auth-staging\"")
             buildConfigField("String", "GATEWAY_BASE_URL", "\"https://btqklftjmwtqqqdmwlnk.supabase.co/functions/v1/nahwerk-mobile-gateway-staging\"")
         }
         release {
             isMinifyEnabled = true
+            buildConfigField("String", "APP_ENVIRONMENT", "\"PROD\"")
             buildConfigField("String", "AUTH_BASE_URL", buildConfigString(releaseAuthBaseUrl))
             buildConfigField("String", "GATEWAY_BASE_URL", buildConfigString(releaseGatewayBaseUrl))
             if (releaseSigningComplete) {
