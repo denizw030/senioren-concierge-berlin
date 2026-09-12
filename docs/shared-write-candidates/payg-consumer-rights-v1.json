@@ -1,0 +1,72 @@
+{
+  "contract_version": "payg-consumer-rights-v1",
+  "environment": "prod",
+  "payg_state_field": "consumer_rights",
+  "payg_state_required": {
+    "contract_version": "payg-consumer-rights-v1",
+    "authoritative": true,
+    "electronic_withdrawal_function": true,
+    "electronic_withdrawal_url": "https://nahwerkconcierge.com/vertrag-widerrufen.html",
+    "immediate_performance_consent_evidence": true,
+    "order_confirmation_durable_medium": true,
+    "legal_text_version": "non-empty immutable version",
+    "legal_text_sha256": "64 lowercase hex"
+  },
+  "quote_approval": {
+    "browser_action": "approve_quote",
+    "required_evidence": [
+      "quote_id",
+      "contract_version",
+      "legal_text_version",
+      "legal_text_sha256",
+      "immediate_performance_requested",
+      "withdrawal_expiry_acknowledged",
+      "accepted_at_client"
+    ],
+    "server_required": {
+      "immediate_performance_requested": true,
+      "withdrawal_expiry_acknowledged": true,
+      "server_received_at": "server timestamp",
+      "source_channel": "WEB",
+      "bind_to": ["person_id", "customer_account_id", "customer_member_id", "quote_id", "action_id", "approval_id", "evidence_hash"]
+    },
+    "atomic_rpc": "payg_approve_action_quote_with_consumer_rights_v1",
+    "rule": "For WEB paid service quotes, naked payg_approve_action_quote_v1 is not exposed through web-payg. Evidence persistence and quote approval are atomic and idempotent."
+  },
+  "evidence_table": {
+    "name": "payg_consumer_rights_evidence_v1",
+    "immutable_fields": ["customer_account_id", "customer_member_id", "person_id", "quote_id", "action_id", "approval_id", "contract_version", "legal_text_version", "legal_text_sha256", "immediate_performance_requested", "withdrawal_expiry_acknowledged", "client_accepted_at", "server_received_at", "evidence_hash"],
+    "unique": ["quote_id"],
+    "updates_allowed": false
+  },
+  "durable_order_confirmation": {
+    "table": "payg_order_confirmations_v1",
+    "required_fields": ["quote_id", "action_id", "customer_account_id", "amount_cents", "currency", "description", "approved_at", "legal_text_version", "confirmation_destination", "delivery_state", "sent_at"],
+    "required_delivery_state_before_execution": "SENT",
+    "rule": "cao_claim_canonical_action_v1 must fail closed for WEB PAYG when required durable confirmation is not SENT."
+  },
+  "electronic_withdrawal": {
+    "endpoint": "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-payg-consumer-rights",
+    "public_actions": ["readiness", "withdraw"],
+    "request_fields_only": ["consumer_name", "contract_reference", "confirmation_email", "statement"],
+    "statement": "WITHDRAW",
+    "prohibit_reason_requirement": true,
+    "rate_limit": true,
+    "anti_enumeration": true,
+    "request_table": "payg_withdrawal_requests_v1",
+    "required_confirmation": {
+      "durable_medium": true,
+      "include_statement_content": true,
+      "include_received_date_time": true,
+      "confirmation_delivery_state": "SENT"
+    },
+    "success_response": {
+      "ok": true,
+      "status": "withdrawal_received",
+      "contract_version": "payg-consumer-rights-v1",
+      "authoritative": true,
+      "confirmation_delivery_state": "SENT",
+      "received_at": "server ISO timestamp"
+    }
+  }
+}
