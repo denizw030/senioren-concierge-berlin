@@ -41,6 +41,8 @@ import androidx.compose.ui.unit.dp
 import com.nahwerk.concierge.data.PaygCheckoutApi
 import com.nahwerk.concierge.data.PaygSnapshot
 import com.nahwerk.concierge.data.PaymentMethodCheckout
+import com.nahwerk.concierge.data.PaymentReadinessApi
+import com.nahwerk.concierge.data.PaymentReadinessSnapshot
 import com.nahwerk.concierge.data.ProdCustomerApi
 import kotlinx.coroutines.launch
 
@@ -48,14 +50,19 @@ import kotlinx.coroutines.launch
  * Real PROD payment-method surface. Stripe owns all card entry in its hosted
  * Checkout page. NAHWERK only creates the server-bound setup session and syncs
  * its confirmed result; full card data never enters Compose state or app storage.
+ *
+ * Checkout stays fail-closed until the independent PROD readiness endpoint
+ * confirms Stripe live mode, webhook secret, endpoint and required events.
  */
 @Composable
 internal fun PaymentMethodProdSurface() {
     val context = LocalContext.current
     val productApi = remember { ProdCustomerApi(context) }
+    val readinessApi = remember { PaymentReadinessApi() }
     val checkoutApi = remember { PaygCheckoutApi(context) }
     val scope = rememberCoroutineScope()
     var state by remember { mutableStateOf<PaygSnapshot?>(null) }
+    var readiness by remember { mutableStateOf<PaymentReadinessSnapshot?>(null) }
     var loading by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
     var checkout by remember { mutableStateOf<PaymentMethodCheckout?>(null) }
@@ -64,9 +71,17 @@ internal fun PaymentMethodProdSurface() {
         loading = true
         error = null
         scope.launch {
-            productApi.loadPayg()
+            val paygResult = productApi.loadPayg()
+            val readinessResult = readinessApi.load()
+            paygResult
                 .onSuccess { state = it }
                 .onFailure { error = it.message ?: "Zahlungsmethoden konnten nicht geladen werden." }
+            readinessResult
+                .onSuccess { readiness = it }
+                .onFailure {
+                    readiness = null
+                    if (error == null) error = it.message ?: "Zahlungsbereitschaft konnte nicht bestätigt werden."
+                }
             loading = false
         }
     }
@@ -110,15 +125,30 @@ internal fun PaymentMethodProdSurface() {
                 Text(requireNotNull(error), color = NahwerkPalette.Error, style = MaterialTheme.typography.bodySmall)
             }
 
-            val ready = state?.enabled == true && state?.billingBlocked != true && state?.setupAvailable == true
+            val ready = state?.enabled == true &&
+                state?.billingBlocked != true &&
+                state?.setupAvailable == true &&
+                readiness?.paymentReady == true
             Button(
                 onClick = {
                     loading = true
                     error = null
                     scope.launch {
-                        checkoutApi.createPaymentMethodCheckout()
-                            .onSuccess { checkout = it }
-                            .onFailure { error = it.message ?: "Stripe konnte nicht vorbereitet werden." }
+                        readinessApi.load()
+                            .onFailure {
+                                readiness = null
+                                error = it.message ?: "Stripe Live konnte nicht bestätigt werden."
+                            }
+                            .onSuccess { fresh ->
+                                readiness = fresh
+                                if (!fresh.paymentReady) {
+                                    error = "Stripe Live ist noch nicht vollständig zahlungsbereit."
+                                } else {
+                                    checkoutApi.createPaymentMethodCheckout()
+                                        .onSuccess { checkout = it }
+                                        .onFailure { error = it.message ?: "Stripe konnte nicht vorbereitet werden." }
+                                }
+                            }
                         loading = false
                     }
                 },
@@ -133,12 +163,22 @@ internal fun PaymentMethodProdSurface() {
                     when {
                         state?.billingBlocked == true -> "PAYG ist serverseitig gesperrt."
                         state?.enabled != true -> "Aktiviere zuerst PAYG."
-                        state?.setupAvailable != true -> "Stripe Live ist serverseitig noch nicht als verfügbar bestätigt."
+                        state?.setupAvailable != true -> "Stripe-Setup ist serverseitig noch nicht verfügbar."
+                        readiness == null -> "Stripe Live konnte noch nicht eindeutig bestätigt werden."
+                        readiness?.liveConfirmed != true -> "Stripe läuft noch nicht bestätigt im Live-Modus."
+                        readiness?.webhookSecretConfigured != true ||
+                            readiness?.webhookEndpointConfigured != true ||
+                            readiness?.webhookEndpointEnabled != true ||
+                            readiness?.webhookRequiredEventsComplete != true -> "Stripe Live ist noch nicht vollständig für Zahlungen konfiguriert."
+                        readiness?.paymentReady != true -> "Zahlungen sind serverseitig noch nicht freigegeben."
                         else -> "Zahlungsmethode ist derzeit nicht verfügbar."
                     },
                     color = NahwerkPalette.Warning,
                     style = MaterialTheme.typography.bodySmall
                 )
+            }
+            if (readiness?.paymentReady == true) {
+                Text("Stripe Live · zahlungsbereit bestätigt", color = NahwerkPalette.Success, style = MaterialTheme.typography.bodySmall)
             }
             Text(
                 "Kartendaten werden ausschließlich auf der von Stripe gehosteten Seite eingegeben. NAHWERK speichert keine vollständigen Kartendaten.",
@@ -225,7 +265,7 @@ private fun StripeCheckoutDialog(
                     )
                 }
             }
-        }
+        )
     }
 }
 
