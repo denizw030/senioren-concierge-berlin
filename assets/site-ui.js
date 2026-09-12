@@ -1,4 +1,22 @@
 (() => {
+  const isCustomerAccount = /(?:^|\/)konto\.html$/.test(location.pathname);
+
+  // Customer-account PROD guard: never allow a known STAGING URL to become
+  // customer-visible product truth. This is deliberately website-only and
+  // does not alter any backend/runtime contract.
+  if (isCustomerAccount && typeof window.fetch === "function") {
+    const nativeFetch = window.fetch.bind(window);
+    window.fetch = (input, init) => {
+      const raw = input instanceof Request ? input.url : String(input || "");
+      let url = raw;
+      try { url = new URL(raw, location.href).href; } catch (_) {}
+      if (/staging/i.test(url)) {
+        return Promise.reject(new TypeError("NAHWERK PROD web guard blocked a non-PROD endpoint."));
+      }
+      return nativeFetch(input, init);
+    };
+  }
+
   const analytics = () => window.NahwerkAnalytics;
   const ensureAnalytics = () => new Promise((resolve) => {
     if (analytics()) return resolve(analytics());
@@ -16,7 +34,40 @@
     script.onerror = () => resolve(null);
     document.head.appendChild(script);
   });
+
+  const prepareCustomerAccount = () => {
+    if (!isCustomerAccount) return;
+
+    // The telephone-reception surface still points to an explicitly STAGING
+    // backend in the legacy account markup. Keep it out of the real customer
+    // product until a canonical PROD contract exists.
+    const reception = document.getElementById("telephoneReceptionCard");
+    if (reception) {
+      reception.hidden = true;
+      reception.setAttribute("aria-hidden", "true");
+      reception.querySelectorAll("button,input,select,textarea").forEach((control) => {
+        control.disabled = true;
+        control.tabIndex = -1;
+      });
+    }
+
+    // PAYG must be findable from the real account, while its current backend
+    // authority remains fail-closed. The dedicated page never invents status,
+    // payment methods, balances, costs or activation success.
+    const highlights = document.querySelector(".account-overview-highlights[data-account-panel='overview']");
+    if (highlights && !document.getElementById("accountPaygEntry")) {
+      const payg = document.createElement("a");
+      payg.id = "accountPaygEntry";
+      payg.className = "account-overview-link";
+      payg.href = "payg.html";
+      payg.setAttribute("aria-label", "PAYG – Bezahlen pro Auftrag öffnen");
+      payg.innerHTML = '<span class="eyebrow">PAYG</span><strong>Bezahlen pro Auftrag</strong><span>Status, Zahlungsmethode und Kosten transparent anzeigen.</span>';
+      highlights.appendChild(payg);
+    }
+  };
+
   const ready = async () => {
+    prepareCustomerAccount();
     const a = await ensureAnalytics();
     void a?.track("page_view");
     document.addEventListener("click", (event) => {
@@ -25,7 +76,7 @@
       const href = el.getAttribute("href") || "";
       const isPrimaryCta =
         el.classList.contains("btn") ||
-        /registrieren|anmelden|pakete|kontakt|prime-concierge|senioren-concierge/.test(href);
+        /registrieren|anmelden|pakete|kontakt|prime-concierge|senioren-concierge|payg/.test(href);
       if (!isPrimaryCta) return;
       void analytics()?.track("cta_click", {
         funnel_name: /registrieren/.test(href) ? "registration" : null,
