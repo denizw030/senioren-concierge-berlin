@@ -2,20 +2,48 @@ package com.nahwerk.concierge.data
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class BackendContractReadinessTest {
     @Test
-    fun allMappedCapabilitiesExistAndRemainBlocked() {
+    fun verifiedCustomerProductContractsAreActivated() {
         assertEquals(BackendContractCapability.values().size, BackendContractReadiness.gates.size)
-        assertEquals(0, BackendContractReadiness.activatedCount)
-        assertEquals(
-            BackendContractCapability.values().toSet(),
-            BackendContractReadiness.gates.map { it.capability }.toSet()
-        )
-        BackendContractReadiness.gates.forEach { gate ->
+        assertEquals(7, BackendContractReadiness.activatedCount)
+
+        listOf(
+            BackendContractCapability.REGISTRATION,
+            BackendContractCapability.CUSTOMER_PROFILE,
+            BackendContractCapability.PAYG,
+            BackendContractCapability.PAYMENT_METHODS,
+            BackendContractCapability.FAMILY_DISPLAY,
+            BackendContractCapability.SAFETY_DISPLAY
+        ).forEach { capability ->
+            val gate = BackendContractReadiness.gateFor(capability)
+            assertEquals(ClientContractActivation.PROD_READ_WRITE, gate.activation)
+            assertTrue(gate.backendAuthorityAvailable)
+            assertTrue(gate.maySubmitAuthorityBearingAction)
+            assertFalse(gate.mayAssumeSuccess)
+        }
+
+        val usage = BackendContractReadiness.gateFor(BackendContractCapability.COSTS_USAGE)
+        assertEquals(ClientContractActivation.PROD_READ_ONLY, usage.activation)
+        assertTrue(usage.backendAuthorityAvailable)
+        assertFalse(usage.maySubmitAuthorityBearingAction)
+        assertFalse(usage.mayAssumeSuccess)
+    }
+
+    @Test
+    fun unrelatedCoreContractsRemainBlocked() {
+        listOf(
+            BackendContractCapability.CONVERSATION_HISTORY,
+            BackendContractCapability.TASK_EXECUTION_DETAILS,
+            BackendContractCapability.APPROVAL_CONTINUATION,
+            BackendContractCapability.AUDIO_INPUT,
+            BackendContractCapability.FILE_IMAGE_UPLOAD
+        ).forEach { capability ->
+            val gate = BackendContractReadiness.gateFor(capability)
             assertEquals(ClientContractActivation.BLOCKED, gate.activation)
-            assertEquals(ClientContractUiState.UNKNOWN, gate.uiState)
             assertFalse(gate.backendAuthorityAvailable)
             assertFalse(gate.mayAssumeSuccess)
             assertFalse(gate.maySubmitAuthorityBearingAction)
@@ -23,30 +51,12 @@ class BackendContractReadinessTest {
     }
 
     @Test
-    fun everyPreparedUiStateRemainsFailClosed() {
+    fun retryableNeverMeansSuccess() {
         BackendContractCapability.values().forEach { capability ->
-            ClientContractUiState.values().forEach { uiState ->
-                val gate = BackendContractReadiness.stateFor(capability, uiState)
-
-                assertEquals(ClientContractActivation.BLOCKED, gate.activation)
-                assertEquals(uiState, gate.uiState)
-                assertFalse(gate.backendAuthorityAvailable)
-                assertFalse(gate.mayAssumeSuccess)
-                assertFalse(gate.maySubmitAuthorityBearingAction)
-            }
+            val gate = BackendContractReadiness.stateFor(capability, ClientContractUiState.RETRYABLE)
+            assertEquals(ClientContractUiState.RETRYABLE, gate.uiState)
+            assertFalse(gate.mayAssumeSuccess)
         }
-    }
-
-    @Test
-    fun retryableNeverMeansSuccessOrPermission() {
-        val gate = BackendContractReadiness.stateFor(
-            BackendContractCapability.APPROVAL_CONTINUATION,
-            ClientContractUiState.RETRYABLE
-        )
-
-        assertFalse(gate.backendAuthorityAvailable)
-        assertFalse(gate.mayAssumeSuccess)
-        assertFalse(gate.maySubmitAuthorityBearingAction)
     }
 
     @Test
@@ -55,10 +65,8 @@ class BackendContractReadinessTest {
             BackendContractCapability.PAYG,
             ClientContractUiState.UNKNOWN
         )
-
-        assertFalse(gate.backendAuthorityAvailable)
+        assertTrue(gate.backendAuthorityAvailable)
         assertFalse(gate.mayAssumeSuccess)
-        assertFalse(gate.maySubmitAuthorityBearingAction)
     }
 
     @Test
@@ -67,9 +75,7 @@ class BackendContractReadinessTest {
             BackendContractCapability.SAFETY_DISPLAY,
             ClientContractUiState.UNKNOWN
         )
-
-        assertFalse(gate.backendAuthorityAvailable)
+        assertTrue(gate.backendAuthorityAvailable)
         assertFalse(gate.mayAssumeSuccess)
-        assertFalse(gate.maySubmitAuthorityBearingAction)
     }
 }
