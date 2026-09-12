@@ -2,7 +2,7 @@
 
 ## Scope
 
-Client-side launch preparation only. Android does not activate or redefine backend/Core/CAO/Billing/WhatsApp/Voice contracts.
+Android is a thin client. It does not own or redefine Core, CAO, Billing, Wallet, Safety, Family, WhatsApp, Voice or shared database contracts.
 
 Architecture remains frozen:
 
@@ -10,54 +10,58 @@ Architecture remains frozen:
 
 `ONE PERSON -> ONE CONVERSATION -> ONE TASK STATE -> ONE CORE.`
 
-## Fresh customer-launch inventory
+## Verified PROD-bound customer surfaces
 
-Confirmed mobile client transports already implemented:
+Fresh read-only verification against the active PROD runtime confirms Android bindings for:
 
-- login
-- password reset
-- token refresh / logout boundary
-- authenticated account/home context read
-- Concierge text chat with stable idempotency/retry IDs
-- reminder read path
+- Registration: `web-registration-secure`
+- Product login/session: `web-login-secure` / `web-session-secure`
+- Customer profile/tariff/usage: `web-profile`
+- PAYG/wallet/costs/quotes/payment-method reads: `web-payg`
+- Payment-method setup/sync: `web-payg-checkout`
+- Safety: `web-managed-safety-context`
+- Family permissions: `web-family-permissions`
+- Family managed people/invitations: `nahwerk-family-access`
+- MFA enrollment/management: `web-mfa-manage`
 
-Customer-launch contracts still blocked because no exact confirmed mobile PROD transport/schema is present in the Android contract:
+The existing mobile gateway continues to own the already verified Home/Concierge/Reminders transport.
 
-1. Registration
-2. Customer profile / personal-data read-write
-3. PAYG status / activation / paid execution lifecycle
-4. Payment methods
-5. Costs / usage / limits
-6. Conversation History
-7. Task / Execution Details
-8. Approval Continuation
-9. Audio Input
-10. File / Image Upload
-11. Family Display / authorization
-12. Safety Display / continuation
+## Client authority model
 
-Backend contracts activated by this Android work: **0**.
+`PROD_BOUND` means Android may submit only the actions explicitly defined by the verified server contract. The server remains authoritative.
 
-## Fail-closed rule
+`PROD_READ_ONLY` means Android may present confirmed server values but does not mutate them.
 
-For every blocked contract the client may represent only non-authoritative states such as `LOADING`, `UNAVAILABLE`, `RETRYABLE` or `UNKNOWN`.
+The following optional/non-launch capabilities remain fail-closed until their own canonical contracts are activated:
 
-While blocked:
+- Billing/subscription changes
+- Notifications/device registration
+- Voice handoff
+- WhatsApp continuity UI
+- Canonical conversation history
+- Canonical task-state detail UI
 
-- backend authority is unavailable to Android;
-- success must not be inferred;
-- authority-bearing actions must not be submitted;
-- local state must not become canonical account, PAYG, billing, task, approval, family or safety truth;
-- no mock/staging value may be presented as PROD product truth.
+These are not required for the current Android customer launch path.
 
 ## PROD release boundary
 
-Release endpoint values remain environment-injected. Android now rejects any non-empty release Auth/Gateway URL that is non-HTTPS or visibly STAGING (`staging` / `-stg`). Empty release endpoints remain allowed only for production-inert unsigned packaging checks; they do not constitute a customer-ready release.
+Customer product functions use the canonical HTTPS PROD Functions base URL and reject visible STAGING targets.
 
-A real customer release therefore still requires confirmed non-STAGING PROD Auth/Gateway values plus the separately controlled signing/distribution gate.
+Concierge Auth/Gateway release endpoints remain environment-injected through:
 
-## Activation gate
+- `NAHWERK_RELEASE_AUTH_BASE_URL`
+- `NAHWERK_RELEASE_GATEWAY_BASE_URL`
 
-A blocked capability can become active only after the shared backend/product owner supplies a versioned contract with exact authentication/authorization, transport/schema, canonical identifiers, idempotency/retry behavior, error behavior and success acknowledgement.
+The Gradle release guard rejects non-HTTPS and visible STAGING values. Empty values are permitted only for the unsigned production-inert packaging job and never represent a customer-ready release.
 
-PAYG additionally requires the final PAYG product contract from its dedicated PROD workstream; Android must consume that contract and must not create a parallel billing/wallet model.
+Signing remains environment-only; credentials do not belong in source control.
+
+## Payment boundary
+
+Android never receives Stripe secret keys or full card data. `web-payg-checkout` creates the server-bound Checkout Session; Android accepts only an HTTPS `checkout.stripe.com` URL and synchronizes the resulting Checkout Session through the server contract.
+
+No real payment or provider side effect is part of CI.
+
+## Remaining launch proof
+
+The app-side contract work is complete for the currently approved customer path. Final launch proof still requires the final CI/emulator/release gates, merge to `main`, confirmed production release environment values, and an explicitly authorized real-customer PROD E2E.
