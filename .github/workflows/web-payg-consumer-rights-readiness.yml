@@ -1,0 +1,38 @@
+name: Web PAYG Consumer Rights Readiness
+on:
+  pull_request:
+    paths:
+      - "payg.html"
+      - "widerruf.html"
+      - "assets/payg-consumer-rights-guard.js"
+      - "tests/web-payg-consumer-rights-readiness.test.mjs"
+      - "docs/web-account-ready-for-shared-write.md"
+      - ".github/workflows/web-payg-consumer-rights-readiness.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  consumer-rights:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: PAYG consumer-rights regression
+        run: node --test tests/web-payg-consumer-rights-readiness.test.mjs
+      - name: Consumer-rights runtime syntax
+        run: node --check assets/payg-consumer-rights-guard.js
+      - name: Static legal and PAYG smoke
+        run: |
+          python3 -m http.server 4173 >/tmp/nw-consumer-rights-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill $server_pid' EXIT
+          for attempt in 1 2 3 4 5; do
+            curl -fsS "http://127.0.0.1:4173/payg.html" >/dev/null && break
+            sleep 1
+          done
+          curl -fsS "http://127.0.0.1:4173/payg.html" >/dev/null
+          curl -fsS "http://127.0.0.1:4173/widerruf.html" >/dev/null
+          curl -fsS "http://127.0.0.1:4173/assets/payg-consumer-rights-guard.js" >/dev/null
