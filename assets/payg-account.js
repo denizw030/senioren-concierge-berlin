@@ -32,7 +32,7 @@
   function setBusy(busy) {
     state.loading = busy;
     document.body.classList.toggle("payg-loading", busy);
-    ["paygActivate","paymentManage",...document.querySelectorAll("[data-topup-cents]")].forEach((el) => {
+    [$("paygActivate"), $("paymentManage"), ...document.querySelectorAll("[data-topup-cents]")].forEach((el) => {
       if (el) el.disabled = busy || el.dataset.forceDisabled === "1";
     });
   }
