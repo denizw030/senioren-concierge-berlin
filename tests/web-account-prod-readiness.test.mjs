@@ -30,6 +30,16 @@ test('customer account website blocks staging calls and suppresses staging telep
   assert.match(ui, /reception\.hidden = true/);
 });
 
+test('existing Web Concierge remains explicitly shadow-only and cannot be mistaken for PROD customer delivery', () => {
+  const shadow = read('assets/web-core-shadow.js');
+  const chat = read('assets/web-concierge-chat.js');
+  assert.match(shadow, /customer-portal-staging\/portal\/web-core-shadow/);
+  assert.match(shadow, /shadow_only: true/);
+  assert.match(shadow, /customer_delivery: false/);
+  assert.match(chat, /Shadow\/Test/);
+  assert.match(chat, /shadow-only/);
+});
+
 test('PAYG is findable but remains fail-closed until canonical PROD contract exists', () => {
   const ui = read('assets/site-ui.js');
   const payg = read('payg.html');
