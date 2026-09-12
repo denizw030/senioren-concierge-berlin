@@ -11,6 +11,8 @@ import java.net.URI
 import java.net.URL
 import java.util.UUID
 
+internal class AppGatewaySessionExpiredException : IllegalStateException("Deine sichere Sitzung ist abgelaufen. Bitte erneut anmelden.")
+
 internal data class AppHomeSnapshot(
     val personId: String,
     val customerAccountId: String,
@@ -112,8 +114,10 @@ internal class AppGatewayApi(context: Context) {
         parser: (JSONObject) -> T
     ): Result<T> = try {
         val response = request(path, method, payload)
-        if (response.code == 401) sessions.clear()
-        if (response.code !in 200..299 || response.body.optBoolean("ok") == false) {
+        if (response.code == 401) {
+            sessions.clear()
+            Result.failure(AppGatewaySessionExpiredException())
+        } else if (response.code !in 200..299 || response.body.optBoolean("ok") == false) {
             Result.failure(IllegalStateException(readableError(response.body, response.code)))
         } else if (response.body.optString("environment") != "PROD" || response.body.optBoolean("authoritative", true) == false) {
             Result.failure(IllegalStateException("PROD-Antwort konnte nicht autoritativ bestätigt werden."))
@@ -185,7 +189,6 @@ internal class AppGatewayApi(context: Context) {
     }
 
     private fun readableError(body: JSONObject, code: Int): String = when (body.optString("error", "REQUEST_FAILED")) {
-        "SESSION_REQUIRED", "SESSION_INVALID" -> "Deine sichere Sitzung ist abgelaufen. Bitte erneut anmelden."
         "APP_AUTHORITATIVE_ROUTE_DISABLED" -> "Der App-Concierge ist momentan nicht verfügbar. Bitte erneut versuchen."
         "CAO_APP_ROUTE_DISABLED" -> "Die Auftragsausführung ist momentan nicht verfügbar. Es wurde nichts ausgeführt."
         "NETWORK_UNAVAILABLE" -> "PROD ist gerade nicht erreichbar. Bitte erneut versuchen."
