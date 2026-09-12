@@ -52,7 +52,7 @@ test('PAYG customer surface uses only canonical PROD functions and no mocks or s
   assert.match(payg, /Zahlungen & Aufträge/);
   assert.match(runtime, /functions\/v1\/web-payg/);
   assert.match(runtime, /functions\/v1\/web-payg-checkout/);
-  assert.match(runtime, /action:"activate"/);
+  assert.match(runtime, /enabled \? "deactivate" : "activate"/);
   assert.match(runtime, /payment_method_checkout/);
   assert.match(runtime, /sync_payment_method_checkout/);
   assert.match(runtime, /topup_checkout/);
@@ -70,7 +70,7 @@ test('PAYG surface is mobile responsive, session-bound and explicit before real 
   assert.match(runtime, /validateSession/);
   assert.match(runtime, /location\.replace\("anmelden\.html"\)/);
   assert.match(runtime, /confirm\(`Du wirst zu Stripe weitergeleitet/);
-  assert.match(runtime, /requires_customer_confirmation/);
+  assert.match(runtime, /location\.assign\(result\.checkout_url\)/);
 });
 
 test('PAYG payment state remains fail-closed when Stripe Live is not configured', () => {
