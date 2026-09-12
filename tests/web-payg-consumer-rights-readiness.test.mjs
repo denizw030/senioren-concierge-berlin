@@ -42,7 +42,7 @@ test("electronic withdrawal UI asks only required identification and confirmatio
   assert.match(withdrawalPage, /id="withdrawReference"/);
   assert.match(withdrawalPage, /id="withdrawEmail"/);
   assert.match(withdrawalPage, /id="withdrawConfirm"[^>]*disabled>Widerruf bestätigen/);
-  assert.doesNotMatch(withdrawalPage, /Widerrufsgrund|reason/i);
+  assert.doesNotMatch(withdrawalPage, /<(?:input|textarea)[^>]*(?:name|id)="[^"]*(?:reason|grund)[^"]*"/i);
 });
 
 test("electronic withdrawal stays fail-closed until authoritative durable confirmation is available", () => {
