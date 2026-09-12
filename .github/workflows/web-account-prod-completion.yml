@@ -1,0 +1,53 @@
+name: Web Account PROD Completion
+on:
+  pull_request:
+    paths:
+      - "payg.html"
+      - "web-concierge.html"
+      - "assets/payg-account.js"
+      - "assets/payg-account.css"
+      - "assets/web-customer-concierge.js"
+      - "assets/web-customer-concierge.css"
+      - "assets/web-core-shadow.js"
+      - "assets/web-concierge-chat.js"
+      - "assets/site-ui.js"
+      - "tests/web-account-prod-completion.test.mjs"
+      - "tests/web-core-shadow-transport.test.mjs"
+      - "tests/web-concierge-chat-ui.test.mjs"
+      - ".github/workflows/web-account-prod-completion.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  customer-prod:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: PROD account contract tests
+        run: node --test tests/web-account-prod-completion.test.mjs tests/web-core-shadow-transport.test.mjs tests/web-concierge-chat-ui.test.mjs
+      - name: Runtime JavaScript syntax
+        run: |
+          node --check assets/payg-account.js
+          node --check assets/web-customer-concierge.js
+          node --check assets/web-core-shadow.js
+          node --check assets/web-concierge-chat.js
+          node --check assets/site-ui.js
+      - name: Static customer routes
+        run: |
+          python3 -m http.server 4173 >/tmp/nw-web-prod.log 2>&1 &
+          server_pid=$!
+          trap 'kill $server_pid' EXIT
+          for attempt in 1 2 3 4 5; do
+            curl -fsS "http://127.0.0.1:4173/konto.html" >/dev/null && break
+            sleep 1
+          done
+          for path in konto.html payg.html web-concierge.html assets/payg-account.js assets/web-customer-concierge.js; do
+            curl -fsS "http://127.0.0.1:4173/$path" >/dev/null
+          done
+      - name: No STAGING endpoint in new customer runtime
+        run: |
+          ! grep -Eiq 'customer-portal-staging|supabase\.co/functions/v1/[^"'"']*staging' payg.html web-concierge.html assets/payg-account.js assets/web-customer-concierge.js assets/web-core-shadow.js assets/web-concierge-chat.js
