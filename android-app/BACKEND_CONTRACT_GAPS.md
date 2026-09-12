@@ -1,132 +1,43 @@
-# NAHWERK Android – PROD Backend Blockers
+# NAHWERK Android – Remaining PROD Launch Gaps
 
-Fresh audit basis: current merged Android client on `main` plus current client transport implementation. This document records only contracts Android still needs; it does not define or activate shared backend behavior.
+This file records only remaining blockers for the currently approved Android customer launch path. It does not define or mutate shared backend behavior.
 
-## Already connected in the Android client
+## Customer contracts already available in PROD
 
-The existing client has concrete transport for:
+Android is bound to the active server contracts for:
 
-- authentication: login, password reset, token refresh
-- authenticated home/account-context read
-- Concierge text chat
-- reminder read/create transport already present in the API client
-- stable chat retry/idempotency identifiers
+- registration and verification
+- secure product login/session
+- customer profile, plan and usage read; approved name edits
+- PAYG activation/status, wallet, quotes, costs and usage
+- payment-method read plus server-owned Stripe Checkout setup/sync
+- Safety configuration/status
+- Family permissions, managed people and invitations
+- MFA enrollment/management
+- existing Home/Concierge/Reminders mobile transport
 
-These existing paths are not evidence that the remaining product contracts exist.
+No replacement billing, wallet, Safety, Family or Core truth is created locally.
 
-## Exact customer-launch blockers
+## Not launch blockers
 
-### 1. Registration — BLOCKED
-Required from shared PROD backend:
-- canonical mobile-safe registration transport
-- required customer fields and validation rules
-- duplicate-account / email-verification behavior
-- success acknowledgement and authenticated-session handoff
+The current approved customer scope does not require Android-owned UI for subscription changes, notifications, Voice handoff, WhatsApp continuity, canonical conversation history or detailed central task-state surfaces. These remain fail-closed until separate contracts are approved.
 
-Android must not reuse browser-specific registration behavior without this confirmation.
+E-mail and WhatsApp profile fields remain read-only because the published profile mutation contract does not authorize editing them. They are not part of the approved Android customer launch requirement.
 
-### 2. Customer profile / personal data — BLOCKED
-Required:
-- authoritative customer-profile read contract
-- allowed editable fields
-- update authorization and validation
-- canonical success/error response
-- concurrency/version behavior where relevant
+## Remaining launch proof
 
-### 3. PAYG — BLOCKED / OWNED BY PAYG PROD WORKSTREAM
-Required final shared contract:
-- current PAYG eligibility/status
-- activation state and activation acknowledgement
-- price/cost estimate before a paid execution
-- explicit customer approval representation
-- execution correlation/idempotency
-- exactly-once charge acknowledgement / receipt linkage
-- fail/retry semantics without duplicate charging
+The following are not backend-contract gaps; they are final release/E2E proof:
 
-Android will consume this contract only. It must not create its own wallet, price or billing truth.
+1. final Android CI and emulator/instrumentation gates must be GREEN on the exact merge head;
+2. the app-only PR must merge to `main` safely;
+3. a customer release must use confirmed non-STAGING `NAHWERK_RELEASE_AUTH_BASE_URL` and `NAHWERK_RELEASE_GATEWAY_BASE_URL` plus controlled signing;
+4. Stripe Live availability must be confirmed by the authoritative PROD PAYG runtime (`payment_provider.setup_available == true`) before a customer can start payment-method setup;
+5. the real-customer PROD E2E must be executed with explicit Owner authorization for any provider/payment side effect.
 
-### 4. Payment methods — BLOCKED
-Required:
-- safe customer-scoped payment-method read contract
-- provider-safe add/change/remove flow
-- no payment secret exposed to Android
-- confirmed result after provider/backend completion
+CI never performs a real charge, WhatsApp send, Family provider send or phone call.
 
-### 5. Costs / usage / limits — BLOCKED
-Required:
-- canonical current-period usage
-- remaining limits / allowance semantics
-- posted costs and pending/settled distinction where applicable
-- authoritative timestamp / period boundary
+## Gate
 
-No local counters may be shown as billing truth.
-
-### 6. Conversation History — BLOCKED
-Required:
-- canonical conversation/thread identifiers
-- server history pagination/order
-- reconciliation with local presentation cache
-- retry/error behavior
-
-### 7. Task / Execution Details — BLOCKED
-Required:
-- canonical task/execution identifiers
-- authoritative state vocabulary
-- read/retry behavior
-- verified-result representation
-
-### 8. Approval Continuation — BLOCKED
-Required:
-- canonical approval identifier and task binding
-- exact approved/rejected/expired states
-- idempotent continuation behavior
-- acknowledgement that continuation belongs to the same central task
-
-### 9. Audio Input — BLOCKED
-Required:
-- mobile audio upload/stream transport
-- accepted formats/limits
-- canonical message/task linkage
-- retry/idempotency and result acknowledgement
-
-Microphone permission stays absent until this contract is activated.
-
-### 10. File / Image Upload — BLOCKED
-Required:
-- upload transport and size/type limits
-- authenticated ownership/linkage
-- ingestion acknowledgement
-- retry/deduplication behavior
-
-### 11. Family — BLOCKED
-Required:
-- authoritative family membership / role / managed-person read contract
-- invitation and permission actions allowed to the signed-in customer
-- shared usage/pool semantics where applicable
-- authorization failures and acknowledgement
-
-Android must not infer Family authority locally.
-
-### 12. Safety — BLOCKED
-Required:
-- authoritative Safety configuration/status read contract
-- allowed customer mutations
-- escalation/contact semantics owned by the shared Safety runtime
-- acknowledgement/error/retry behavior
-
-Android must never infer that a customer is safe, checked-in or resolved from local state.
-
-## Release configuration blocker
-
-A real customer release additionally needs confirmed non-STAGING values for:
-
-- `NAHWERK_RELEASE_AUTH_BASE_URL`
-- `NAHWERK_RELEASE_GATEWAY_BASE_URL`
-
-The Android Gradle configuration rejects non-empty release URLs that are non-HTTPS or visibly STAGING. Empty values remain valid only for unsigned production-inert packaging and are **not** customer-ready.
-
-## Current launch verdict
+Until the real-customer PROD E2E succeeds:
 
 `READY_FOR_REAL_CUSTOMER_APP_E2E = NO`
-
-Reason: login/chat client groundwork exists, but the mandatory registration/profile/PAYG/payment/usage/Safety/Family contracts and confirmed real PROD release endpoints are not yet available to the Android client.
