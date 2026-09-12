@@ -265,7 +265,7 @@ private fun StripeCheckoutDialog(
                     )
                 }
             }
-        )
+        }
     }
 }
 
