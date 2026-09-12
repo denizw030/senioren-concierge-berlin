@@ -73,7 +73,7 @@ internal fun CustomerLaunchRoot(viewModel: NahwerkAppViewModel = viewModel()) {
                             onReset = viewModel::requestPasswordReset
                         )
                         Surface(
-                            modifier = Modifier.align(Alignment.BottomCenter).safeDrawingPadding().padding(bottom = 6.dp),
+                            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = NahwerkSpacing.Xl),
                             color = NahwerkPalette.Surface.copy(alpha = 0.96f),
                             shape = RoundedCornerShape(NahwerkRadii.Pill),
                             border = BorderStroke(1.dp, NahwerkPalette.Divider)
