@@ -135,6 +135,7 @@ jobs:
     steps:
       - name: Require explicit Core gate acknowledgement
         shell: bash
+        working-directory: ${{ github.workspace }}
         run: |
           set -euo pipefail
           if [ "$GITHUB_REF" != 'refs/heads/release/android-prod-v0.2.2' ]; then
@@ -236,4 +237,5 @@ jobs:
       - name: Remove materialized keystore
         if: always()
         shell: bash
+        working-directory: ${{ github.workspace }}
         run: rm -f "$RUNNER_TEMP/nahwerk-android-release.jks"
