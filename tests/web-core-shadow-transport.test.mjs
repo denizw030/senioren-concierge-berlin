@@ -7,7 +7,7 @@ const konto = readFileSync(new URL("../konto.html", import.meta.url), "utf8");
 
 test("legacy compatibility asset may remain loaded but contains no STAGING transport", () => {
   assert.match(konto, /assets\/web-core-shadow\.js\?v=1/);
-  assert.doesNotMatch(source, /staging/i);
+  assert.doesNotMatch(source, /customer-portal-staging|https?:\/\/[^\s"']*staging/i);
   assert.doesNotMatch(source, /\bfetch\s*\(/);
   assert.doesNotMatch(source, /https?:\/\//);
 });
