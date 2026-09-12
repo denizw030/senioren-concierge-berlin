@@ -6,6 +6,7 @@ on:
       - "anmelden.html"
       - "registrieren.html"
       - "payg.html"
+      - "assets/payg-account.js"
       - "assets/site-ui.js"
       - "assets/auth-nav.js"
       - "assets/onboarding.js"
@@ -26,7 +27,9 @@ jobs:
       - name: Web account PROD regression
         run: node --test tests/web-account-prod-readiness.test.mjs
       - name: Website runtime JS syntax
-        run: node --check assets/site-ui.js
+        run: |
+          node --check assets/site-ui.js
+          node --check assets/payg-account.js
       - name: Static PAYG route smoke
         run: |
           python3 -m http.server 4173 >/tmp/nw-web-account-http.log 2>&1 &
@@ -39,3 +42,4 @@ jobs:
           curl -fsS "http://127.0.0.1:4173/konto.html" >/dev/null
           curl -fsS "http://127.0.0.1:4173/payg.html" >/dev/null
           curl -fsS "http://127.0.0.1:4173/assets/site-ui.js" >/dev/null
+          curl -fsS "http://127.0.0.1:4173/assets/payg-account.js" >/dev/null
