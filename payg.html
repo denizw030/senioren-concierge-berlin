@@ -23,71 +23,26 @@
     </div>
 
     <div class="payg-grid" aria-live="polite">
-      <section class="payg-card" aria-labelledby="paygStatusTitle">
-        <div class="eyebrow">Status</div><h2 id="paygStatusTitle">PAYG</h2><div class="payg-state" id="paygStatus">Wird geladen</div>
-        <p id="paygStatusMeta">Der echte PROD-Status wird geladen.</p>
-        <button class="btn red" type="button" id="paygActivate">PAYG aktivieren</button>
-      </section>
-
-      <section class="payg-card" aria-labelledby="paymentTitle">
-        <div class="eyebrow">Zahlungsmethode</div><h2 id="paymentTitle">Zahlung verwalten</h2><div class="payg-state" id="paymentStatus">Wird geladen</div>
-        <p id="paymentMeta">Der autoritative Zahlungsstatus wird geladen.</p>
-        <div class="payg-payment-actions">
-          <button class="btn light" type="button" id="paymentManage">Zahlungsmethode hinterlegen</button>
-          <button class="btn light" type="button" id="paymentRemove" hidden disabled aria-disabled="true">Zahlungsmethode entfernen</button>
-        </div>
-        <p class="payg-payment-remove-hint" id="paymentRemoveHint" hidden>Entfernen bleibt gesperrt, bis der autoritative PAYG-PROD-Vertrag eine sichere Remove/Detach-Aktion veröffentlicht. Die Website entfernt keine Zahlungsmethode nur lokal.</p>
-      </section>
-
-      <section class="payg-card" aria-labelledby="walletTitle">
-        <div class="eyebrow">Wallet</div><h2 id="walletTitle">Verfügbares Guthaben</h2><div class="payg-state" id="walletStatus">Wird geladen</div>
-        <p id="walletMeta">Der echte Wallet-Stand wird geladen.</p>
-      </section>
-
-      <section class="payg-card" aria-labelledby="costTitle">
-        <div class="eyebrow">Kosten & Nutzung</div><h2 id="costTitle">PAYG-Verbrauch</h2><div class="payg-state" id="costStatus">Wird geladen</div>
-        <p id="costMeta">Es werden ausschließlich serverseitig verbuchte PAYG-Kosten angezeigt.</p>
-      </section>
-
-      <section class="payg-card" aria-labelledby="orderTitle">
-        <div class="eyebrow">Auftrag</div><h2 id="orderTitle">Letzter PAYG-Auftrag</h2><div class="payg-state" id="orderStatus">Wird geladen</div>
-        <p id="orderMeta">Preis und Freigabestatus werden aus dem PROD-Auftragsvertrag geladen.</p>
-      </section>
-
-      <section class="payg-card payg-topup" aria-labelledby="topupTitle">
-        <div class="eyebrow">Guthaben</div><h2 id="topupTitle">Wallet aufladen</h2>
-        <div class="payg-topup-grid">
-          <button type="button" data-topup-cents="500">5 €</button>
-          <button type="button" data-topup-cents="1000">10 €</button>
-          <button type="button" data-topup-cents="2000">20 €</button>
-          <button type="button" data-topup-cents="5000">50 €</button>
-        </div>
-        <p class="payg-topup-hint" id="topupHint">Zahlungsbereitschaft wird geprüft.</p>
-      </section>
-
-      <section class="payg-card payg-wide" aria-labelledby="quoteTitle">
-        <div class="eyebrow">Kostenfreigabe</div><h2 id="quoteTitle">Offene Preisfreigaben</h2>
-        <p>Nur Angebote mit dem serverseitigen Status <strong>QUOTED</strong> können hier freigegeben werden. Leistung und Gesamtbetrag stehen unmittelbar an der kostenpflichtigen Handlung.</p>
-        <div class="payg-quote-list" id="paygQuotes"><div class="payg-quote-empty">Wird geladen.</div></div>
-      </section>
-
-      <section class="payg-card payg-wide" aria-labelledby="activityTitle">
-        <div class="eyebrow">Verlauf</div><h2 id="activityTitle">Zahlungen & Aufträge</h2>
-        <p>Hier erscheinen nur tatsächlich serverseitig bekannte PAYG-Vorgänge.</p>
-        <ul class="payg-activity" id="paygActivity"><li class="payg-activity-empty">Wird geladen.</li></ul>
-      </section>
+      <section class="payg-card" aria-labelledby="paygStatusTitle"><div class="eyebrow">Status</div><h2 id="paygStatusTitle">PAYG</h2><div class="payg-state" id="paygStatus">Wird geladen</div><p id="paygStatusMeta">Der echte PROD-Status wird geladen.</p><button class="btn red" type="button" id="paygActivate">PAYG aktivieren</button></section>
+      <section class="payg-card" aria-labelledby="paymentTitle"><div class="eyebrow">Zahlungsmethode</div><h2 id="paymentTitle">Zahlung verwalten</h2><div class="payg-state" id="paymentStatus">Wird geladen</div><p id="paymentMeta">Der autoritative Zahlungsstatus wird geladen.</p><div class="payg-payment-actions"><button class="btn light" type="button" id="paymentManage">Zahlungsmethode hinterlegen</button><button class="btn light" type="button" id="paymentRemove" hidden disabled aria-disabled="true">Zahlungsmethode entfernen</button></div><p class="payg-payment-remove-hint" id="paymentRemoveHint" hidden>Entfernen bleibt gesperrt, bis der autoritative PAYG-PROD-Vertrag eine sichere Remove/Detach-Aktion veröffentlicht. Die Website entfernt keine Zahlungsmethode nur lokal.</p></section>
+      <section class="payg-card" aria-labelledby="walletTitle"><div class="eyebrow">Wallet</div><h2 id="walletTitle">Verfügbares Guthaben</h2><div class="payg-state" id="walletStatus">Wird geladen</div><p id="walletMeta">Der echte Wallet-Stand wird geladen.</p></section>
+      <section class="payg-card" aria-labelledby="costTitle"><div class="eyebrow">Kosten & Nutzung</div><h2 id="costTitle">PAYG-Verbrauch</h2><div class="payg-state" id="costStatus">Wird geladen</div><p id="costMeta">Es werden ausschließlich serverseitig verbuchte PAYG-Kosten angezeigt.</p></section>
+      <section class="payg-card" aria-labelledby="orderTitle"><div class="eyebrow">Auftrag</div><h2 id="orderTitle">Letzter PAYG-Auftrag</h2><div class="payg-state" id="orderStatus">Wird geladen</div><p id="orderMeta">Preis und Freigabestatus werden aus dem PROD-Auftragsvertrag geladen.</p></section>
+      <section class="payg-card payg-topup" aria-labelledby="topupTitle"><div class="eyebrow">Guthaben</div><h2 id="topupTitle">Wallet aufladen</h2><div class="payg-topup-grid"><button type="button" data-topup-cents="500">5 €</button><button type="button" data-topup-cents="1000">10 €</button><button type="button" data-topup-cents="2000">20 €</button><button type="button" data-topup-cents="5000">50 €</button></div><p class="payg-topup-hint" id="topupHint">Zahlungsbereitschaft wird geprüft.</p></section>
+      <section class="payg-card payg-wide" aria-labelledby="quoteTitle"><div class="eyebrow">Kostenfreigabe</div><h2 id="quoteTitle">Offene Preisfreigaben</h2><p>Nur Angebote mit dem serverseitigen Status <strong>QUOTED</strong> können hier freigegeben werden. Leistung und Gesamtbetrag stehen unmittelbar an der kostenpflichtigen Handlung.</p><div class="payg-quote-list" id="paygQuotes"><div class="payg-quote-empty">Wird geladen.</div></div></section>
+      <section class="payg-card payg-wide" aria-labelledby="activityTitle"><div class="eyebrow">Verlauf</div><h2 id="activityTitle">Zahlungen & Aufträge</h2><p>Hier erscheinen nur tatsächlich serverseitig bekannte PAYG-Vorgänge.</p><ul class="payg-activity" id="paygActivity"><li class="payg-activity-empty">Wird geladen.</li></ul></section>
     </div>
 
     <div class="payg-notice" id="paygContractNotice"><strong>PROD:</strong> Der PAYG-Status wird geladen.</div>
     <div class="payg-error" id="paygSessionError" hidden role="alert"></div>
   </main>
 
-  <footer class="footer"><div class="wrap"><div class="footline"><span>© 2026 NAHWERK Concierge</span><span><a href="datenschutz.html">Datenschutz</a> · <a href="impressum.html">Impressum</a> · <a href="widerruf.html">Widerruf</a></span></div></div></footer>
+  <footer class="footer"><div class="wrap"><div class="footline"><span>© 2026 NAHWERK Concierge</span><span><a href="datenschutz.html">Datenschutz</a> · <a href="impressum.html">Impressum</a> · <a href="widerruf.html">Widerruf</a> · <a href="vertrag-widerrufen.html">Vertrag widerrufen</a></span></div></div></footer>
   <script src="assets/auth-nav.js?v=41"></script>
   <script src="assets/nahwerk-analytics.js?v=1"></script>
   <script src="assets/site-ui.js?v=7"></script>
   <script src="assets/payg-account.js?v=2"></script>
-  <script src="assets/payg-consumer-rights-guard.js?v=1"></script>
-  <script src="assets/payg-payment-method-remove-guard.js?v=1"></script>
+  <script src="assets/payg-consumer-rights-guard.js?v=2"></script>
+  <script src="assets/payg-payment-method-remove-guard.js?v=2"></script>
 </body>
 </html>

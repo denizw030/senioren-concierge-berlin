@@ -1,0 +1,55 @@
+{
+  "contract_version": "payg-payment-method-detach-v1",
+  "environment": "prod",
+  "browser_endpoint": "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-payg-checkout",
+  "browser_action": "detach_payment_method",
+  "request": {
+    "required": ["payment_method_id", "idempotency_key"],
+    "identity": "Bearer scb_web_session only",
+    "browser_may_supply_customer_account_id": false
+  },
+  "authorization": {
+    "membership": "customer_members WHERE customer_account_id=session.account AND person_id=session.person",
+    "permission": "is_payer OR can_manage_plan",
+    "payment_method": "must belong to session account and status=ACTIVE"
+  },
+  "provider": {
+    "name": "stripe",
+    "operation": "POST /v1/payment_methods/{provider_payment_method_id}/detach",
+    "provider_customer_match_required": true
+  },
+  "preconditions": {
+    "block_topup_statuses_for_method": ["CREATED", "PROVIDER_PENDING"],
+    "terminal_topup_statuses": ["PAID", "FAILED", "CANCELLED"],
+    "existing_payment_method_statuses": ["ACTIVE", "DETACHED", "EXPIRED", "FAILED"]
+  },
+  "database": {
+    "canonical_final_status": "DETACHED",
+    "clear_is_default": true,
+    "fallback_default": "oldest ACTIVE method by created_at, then id, if any",
+    "operation_table": "payg_payment_method_detach_operations_v1",
+    "operation_states": ["PREPARED", "PROVIDER_DETACHED", "COMPLETED", "FAILED"],
+    "unique_idempotency": true,
+    "unique_active_operation_per_payment_method": true
+  },
+  "reconciliation": {
+    "rule": "Provider-detached but DB-finalize-failed must remain retryable and finalize without repeating customer-visible success.",
+    "browser_success_before_reconciliation": false
+  },
+  "response_success": {
+    "ok": true,
+    "status": "payment_method_detached",
+    "contract_version": "payg-payment-method-detach-v1",
+    "authoritative": true,
+    "payment_method_id": "same uuid as request"
+  },
+  "web_payg_get_capability": {
+    "field": "payment_method_capabilities",
+    "value": {
+      "contract_version": "payg-payment-method-detach-v1",
+      "authoritative": true,
+      "detach_supported": true
+    }
+  },
+  "website_verification": "After success response, GET web-payg and require the payment method to be absent from ACTIVE payment_methods before showing success."
+}

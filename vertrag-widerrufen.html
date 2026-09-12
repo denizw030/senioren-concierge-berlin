@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Vertrag widerrufen | NAHWERK Concierge</title>
+  <meta name="description" content="Elektronische Widerrufsfunktion für online geschlossene NAHWERK-Verträge." />
+  <meta name="robots" content="noindex,nofollow" />
+  <link rel="stylesheet" href="assets/site.css?v=24" />
+  <link rel="stylesheet" href="assets/brand-2026.css?v=23" />
+  <link rel="stylesheet" href="assets/nahwerk-logo-v2.css?v=9" />
+  <style>
+    .withdraw-shell{max-width:820px;margin:0 auto;padding:64px 24px 88px}.withdraw-shell h1{margin:8px 0 14px;font-size:clamp(2.2rem,6vw,4rem);letter-spacing:-.05em}.withdraw-lead{color:#aaa7a0;line-height:1.7}.withdraw-card{margin-top:28px;padding:26px;border:1px solid rgba(133,154,182,.16);border-radius:22px;background:#080e16}.withdraw-grid{display:grid;gap:16px}.withdraw-grid label{display:grid;gap:7px;font-weight:700}.withdraw-grid input{min-height:48px;padding:11px 13px;border:1px solid rgba(255,255,255,.13);border-radius:12px;background:#050a10;color:#f4f1e9;font:inherit}.withdraw-help{color:#92969d;font-size:.86rem;line-height:1.55}.withdraw-status{margin-top:18px;padding:14px 16px;border:1px solid rgba(205,168,78,.2);border-radius:14px;background:rgba(205,168,78,.055);line-height:1.55}.withdraw-status.is-error{border-color:rgba(191,91,91,.26);background:rgba(163,63,63,.08)}.withdraw-status[hidden]{display:none}.withdraw-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}.withdraw-actions .btn[disabled]{opacity:.48;cursor:not-allowed}@media(max-width:620px){.withdraw-shell{padding:42px 16px 70px}.withdraw-card{padding:20px}.withdraw-actions{display:grid}.withdraw-actions .btn{width:100%;justify-content:center}}
+  </style>
+</head>
+<body>
+  <header class="top"><div class="wrap nav"><a class="brand" href="index.html" aria-label="NAHWERK Concierge – Startseite"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Hauptnavigation"><a href="index.html">Übersicht</a><a href="kontakt.html">Kontakt</a><a href="widerruf.html">Widerrufsinformationen</a></nav></div></header>
+  <main id="main-content" class="withdraw-shell">
+    <div class="eyebrow">Elektronische Widerrufsfunktion</div>
+    <h1>Vertrag widerrufen</h1>
+    <p class="withdraw-lead">Hier kannst du eine Widerrufserklärung zu einem online geschlossenen NAHWERK-Vertrag übermitteln. Es werden nur die Angaben abgefragt, die zur Zuordnung und zur elektronischen Eingangsbestätigung erforderlich sind.</p>
+
+    <section class="withdraw-card" aria-labelledby="withdrawTitle">
+      <h2 id="withdrawTitle">Widerruf vorbereiten</h2>
+      <form id="withdrawForm" class="withdraw-grid" novalidate>
+        <label>Dein Name
+          <input id="withdrawName" name="consumer_name" autocomplete="name" maxlength="160" required />
+        </label>
+        <label>Auftrags-, Bestell- oder Vertragsnummer
+          <input id="withdrawReference" name="contract_reference" autocomplete="off" maxlength="160" required />
+        </label>
+        <label>E-Mail für die Eingangsbestätigung
+          <input id="withdrawEmail" name="confirmation_email" type="email" autocomplete="email" maxlength="254" required />
+        </label>
+        <p class="withdraw-help">Ein Widerrufsgrund wird nicht abgefragt. Mit dem nächsten Schritt übermittelst du deine eindeutige Widerrufserklärung.</p>
+        <div class="withdraw-actions">
+          <button class="btn red" id="withdrawConfirm" type="submit" disabled>Widerruf bestätigen</button>
+          <a class="btn light" href="widerruf.html">Widerrufsinformationen</a>
+        </div>
+      </form>
+      <div id="withdrawStatus" class="withdraw-status" role="status" aria-live="polite">Die PROD-Widerrufsfunktion wird geprüft.</div>
+    </section>
+  </main>
+  <footer class="footer"><div class="wrap"><div class="footline"><span>© 2026 NAHWERK Concierge</span><span><a href="impressum.html">Impressum</a> · <a href="datenschutz.html">Datenschutz</a> · <a href="widerruf.html">Widerruf</a></span></div></div></footer>
+  <script src="assets/electronic-withdrawal.js?v=1"></script>
+</body>
+</html>
