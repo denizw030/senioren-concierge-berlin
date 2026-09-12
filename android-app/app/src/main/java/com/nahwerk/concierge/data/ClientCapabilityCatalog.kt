@@ -1,8 +1,11 @@
 package com.nahwerk.concierge.data
 
 enum class ClientCapabilityKey {
+    REGISTRATION,
     USAGE_LIMITS,
     PERSONAL_DATA,
+    PAYG,
+    PAYMENT_METHODS,
     SAFETY,
     FAMILY,
     NOTIFICATIONS,
@@ -31,16 +34,34 @@ data class ClientCapabilityDescriptor(
 object ClientCapabilityCatalog {
     val accountSurfaces: List<ClientCapabilityDescriptor> = listOf(
         ClientCapabilityDescriptor(
-            ClientCapabilityKey.USAGE_LIMITS,
-            "Nutzung & Limits",
-            "Die App-Oberfläche ist vorbereitet. Verbindliche Verbrauchs- und Limitwerte werden erst nach bestätigtem Billing-/Usage-Contract angezeigt.",
-            "capability_usage_limits"
+            ClientCapabilityKey.REGISTRATION,
+            "Registrierung",
+            "Die App startet keine Registrierung, bis der kanonische mobile PROD-Registrierungsvertrag bestätigt ist.",
+            "capability_registration"
         ),
         ClientCapabilityDescriptor(
             ClientCapabilityKey.PERSONAL_DATA,
             "Persönliche Daten",
-            "Änderungen bleiben gesperrt, bis ein bestätigter Account-Data- und Autorisierungsvertrag für die App vorliegt.",
+            "Anzeigen und Änderungen bleiben gesperrt, bis ein bestätigter Account-Data- und Autorisierungsvertrag für die App vorliegt.",
             "capability_personal_data"
+        ),
+        ClientCapabilityDescriptor(
+            ClientCapabilityKey.PAYG,
+            "PAYG",
+            "PAYG-Status, Aktivierung und kostenpflichtige Ausführungen werden ausschließlich über den finalen produktiven PAYG-Vertrag freigeschaltet.",
+            "capability_payg"
+        ),
+        ClientCapabilityDescriptor(
+            ClientCapabilityKey.PAYMENT_METHODS,
+            "Zahlungsmethoden",
+            "Die App zeigt oder verändert keine Zahlungsmethode, bis der produktive Billing-Vertrag einen sicheren kundengebundenen Flow bereitstellt.",
+            "capability_payment_methods"
+        ),
+        ClientCapabilityDescriptor(
+            ClientCapabilityKey.USAGE_LIMITS,
+            "Kosten & Nutzung",
+            "Verbindliche Kosten-, Verbrauchs- und Limitwerte werden nur aus dem bestätigten PROD-Billing-/Usage-Contract angezeigt.",
+            "capability_usage_limits"
         ),
         ClientCapabilityDescriptor(
             ClientCapabilityKey.SAFETY,
@@ -55,16 +76,16 @@ object ClientCapabilityCatalog {
             "capability_family"
         ),
         ClientCapabilityDescriptor(
-            ClientCapabilityKey.NOTIFICATIONS,
-            "Benachrichtigungen",
-            "Die Oberfläche ist vorbereitet. Geräte-Registrierung und Zustellung bleiben aus, bis der Notification-Contract bestätigt ist.",
-            "capability_notifications"
+            ClientCapabilityKey.BILLING_SUBSCRIPTION,
+            "Tarif & Abrechnung",
+            "Keine Zahlung und keine Tarif- oder Abo-Änderung wird aus der App gestartet, solange der produktive Billing-Contract fehlt.",
+            "capability_billing"
         ),
         ClientCapabilityDescriptor(
-            ClientCapabilityKey.BILLING_SUBSCRIPTION,
-            "Abo & Abrechnung",
-            "Keine Zahlung und keine Abo-Änderung wird aus der App gestartet, solange der produktive Billing-Contract fehlt.",
-            "capability_billing"
+            ClientCapabilityKey.NOTIFICATIONS,
+            "Benachrichtigungen",
+            "Geräte-Registrierung und Zustellung bleiben aus, bis der Notification-Contract bestätigt ist.",
+            "capability_notifications"
         )
     )
 
