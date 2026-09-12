@@ -1,0 +1,73 @@
+name: Web Account Shared Contract Ready
+
+on:
+  pull_request:
+    paths:
+      - "web-concierge.html"
+      - "payg.html"
+      - "vertrag-widerrufen.html"
+      - "assets/web-customer-concierge.js"
+      - "assets/web-customer-concierge.css"
+      - "assets/payg-consumer-rights-guard.js"
+      - "assets/payg-payment-method-remove-guard.js"
+      - "assets/electronic-withdrawal.js"
+      - "docs/shared-write-candidates/**"
+      - "docs/web-account-shared-prod-change-set-v1.md"
+      - "tests/web-account-webconcierge-prod.test.mjs"
+      - "tests/web-account-prod-readiness.test.mjs"
+      - "tests/web-payg-consumer-rights-readiness.test.mjs"
+      - "tests/web-account-shared-contract-ready.test.mjs"
+      - ".github/workflows/web-account-shared-contract-ready.yml"
+  push:
+    branches: [main]
+    paths:
+      - "web-concierge.html"
+      - "payg.html"
+      - "vertrag-widerrufen.html"
+      - "assets/web-customer-concierge.js"
+      - "assets/web-customer-concierge.css"
+      - "assets/payg-consumer-rights-guard.js"
+      - "assets/payg-payment-method-remove-guard.js"
+      - "assets/electronic-withdrawal.js"
+      - "docs/shared-write-candidates/**"
+      - "docs/web-account-shared-prod-change-set-v1.md"
+      - "tests/web-account-shared-contract-ready.test.mjs"
+      - ".github/workflows/web-account-shared-contract-ready.yml"
+
+jobs:
+  shared-contract-ready:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Website and shared-contract regressions
+        run: |
+          node --test tests/web-account-webconcierge-prod.test.mjs
+          node --test tests/web-account-prod-readiness.test.mjs
+          node --test tests/web-payg-consumer-rights-readiness.test.mjs
+          node --test tests/web-account-shared-contract-ready.test.mjs
+      - name: Browser runtime syntax
+        run: |
+          node --check assets/web-customer-concierge.js
+          node --check assets/payg-consumer-rights-guard.js
+          node --check assets/payg-payment-method-remove-guard.js
+          node --check assets/electronic-withdrawal.js
+      - name: Contract JSON syntax
+        run: |
+          node -e 'for (const f of process.argv.slice(1)) JSON.parse(require("fs").readFileSync(f,"utf8"));' \
+            docs/shared-write-candidates/web-concierge-gateway-v1.json \
+            docs/shared-write-candidates/payg-payment-method-detach-v1.json \
+            docs/shared-write-candidates/payg-consumer-rights-v1.json
+      - name: Static customer route smoke
+        run: |
+          python3 -m http.server 4173 >/tmp/nw-web-shared-ready-http.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid"' EXIT
+          sleep 1
+          curl -fsS http://127.0.0.1:4173/web-concierge.html >/dev/null
+          curl -fsS http://127.0.0.1:4173/payg.html >/dev/null
+          curl -fsS http://127.0.0.1:4173/vertrag-widerrufen.html >/dev/null
+          curl -fsS http://127.0.0.1:4173/assets/web-customer-concierge.js >/dev/null
+          curl -fsS http://127.0.0.1:4173/assets/electronic-withdrawal.js >/dev/null
