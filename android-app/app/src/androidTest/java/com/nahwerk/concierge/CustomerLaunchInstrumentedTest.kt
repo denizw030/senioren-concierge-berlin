@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Rule
 import org.junit.Test
@@ -19,6 +20,6 @@ class CustomerLaunchInstrumentedTest {
     fun launcherExposesRegistrationWithoutCallingProd() {
         composeRule.onNodeWithTag("registration_open").assertIsDisplayed().performClick()
         composeRule.onNodeWithText("NAHWERK Konto erstellen").assertIsDisplayed()
-        composeRule.onNodeWithText("Kostenlos registrieren").assertIsDisplayed()
+        composeRule.onNodeWithText("Kostenlos registrieren").performScrollTo().assertIsDisplayed()
     }
 }
