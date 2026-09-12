@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="assets/site.css?v=24" />
   <link rel="stylesheet" href="assets/brand-2026.css?v=23" />
   <link rel="stylesheet" href="assets/nahwerk-logo-v2.css?v=9" />
-  <link rel="stylesheet" href="assets/web-customer-concierge.css?v=2" />
+  <link rel="stylesheet" href="assets/web-customer-concierge.css?v=3" />
   <link rel="icon" type="image/svg+xml" href="assets/logos/nahwerk-concierge-gold-transparent.svg?v=1" />
 </head>
 <body>
@@ -17,7 +17,7 @@
 
   <main id="main-content" class="web-concierge-shell">
     <div class="web-concierge-head">
-      <div><div class="eyebrow">Kundenkonto · Concierge</div><h1>Dein Web Concierge.</h1><p>Die Website ist auf die autoritative NAHWERK-Core-v1-Ausgabe vorbereitet. Nicht autoritative, Shadow- oder STAGING-Antworten werden nicht als Kundenergebnis angezeigt.</p></div>
+      <div><div class="eyebrow">Kundenkonto · Concierge</div><h1>Dein Web Concierge.</h1><p>Die Website spricht ausschließlich den final vorgesehenen PROD-Vertrag <strong>web-concierge-gateway-v1</strong>. Antworten erscheinen nur, wenn Core-v1 sie für <strong>WEB</strong> autoritativ zur Kundenausgabe freigibt.</p></div>
       <a class="btn light" href="konto.html">Zurück zum Konto</a>
     </div>
 
@@ -30,13 +30,13 @@
         <textarea id="webConciergeInput" rows="2" maxlength="4000" placeholder="Nachricht an deinen Concierge" disabled aria-disabled="true"></textarea>
         <button class="btn red" id="webConciergeSend" type="submit" disabled>Nachricht senden</button>
       </form>
-      <div class="web-concierge-note"><strong>Aktueller PROD-Gate:</strong> Der zentrale Core unterstützt den Kanal WEB im Core-v1-Vertrag, seine autoritative Auslieferungsentscheidung ist aktuell aber nur für den freigegebenen WhatsApp-Pfad aktiv. Zusätzlich fehlt der browserfähige Gateway, der die Web-Sitzung sicher serverseitig auf die kanonische Kundenidentität abbildet. Die Website erhält keine Service-Secrets und baut keinen Parallelvertrag.</div>
+      <div class="web-concierge-note"><strong>Fail-closed:</strong> Die Eingabe wird erst freigegeben, wenn der PROD-Gateway gleichzeitig `channel=WEB`, `core-v1`, autoritative Core-Ausgabe und autoritative CAO-Ausführung bestätigt. PAYG-Kostenfreigaben werden zum bestehenden geschützten PAYG-Freigabeflow geleitet.</div>
     </section>
   </main>
 
-  <footer class="footer"><div class="wrap"><div class="footline"><span>© 2026 NAHWERK Concierge</span><span><a href="datenschutz.html">Datenschutz</a> · <a href="impressum.html">Impressum</a> · <a href="widerruf.html">Widerruf</a></span></div></div></footer>
+  <footer class="footer"><div class="wrap"><div class="footline"><span>© 2026 NAHWERK Concierge</span><span><a href="datenschutz.html">Datenschutz</a> · <a href="impressum.html">Impressum</a> · <a href="widerruf.html">Widerruf</a> · <a href="vertrag-widerrufen.html">Vertrag widerrufen</a></span></div></div></footer>
   <script src="assets/auth-nav.js?v=40"></script>
   <script src="assets/site-ui.js?v=7"></script>
-  <script src="assets/web-customer-concierge.js?v=2"></script>
+  <script src="assets/web-customer-concierge.js?v=3"></script>
 </body>
 </html>
