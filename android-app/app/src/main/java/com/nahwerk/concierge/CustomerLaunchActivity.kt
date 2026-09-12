@@ -48,10 +48,9 @@ import kotlinx.coroutines.launch
 /**
  * Customer PROD launch shell.
  *
- * The launcher authenticates against the canonical PROD customer-account session.
- * It deliberately does not route a customer through the legacy mobile auth/gateway.
- * Home/Concierge/Reminders stay visibly unavailable until the shared APP/core-v1
- * contract is published and authoritative in PROD.
+ * Authentication uses the canonical PROD customer-account session. Home,
+ * Concierge and Reminders use the authoritative APP/core-v1 gateway. Account,
+ * PAYG, payment, Safety and Family continue to use their published PROD contracts.
  */
 class CustomerLaunchActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -114,7 +113,7 @@ private fun ProdLaunchLoginSurface(
         Text("NAHWERK", color = NahwerkPalette.Gold, style = MaterialTheme.typography.labelLarge)
         Text("Dein persönlicher Concierge", style = MaterialTheme.typography.headlineMedium)
         Text(
-            "Anmeldung direkt am echten NAHWERK-PROD-Konto. Unveröffentlichte Dienste bleiben gesperrt.",
+            "Sichere Anmeldung an deinem echten NAHWERK-PROD-Konto.",
             color = NahwerkPalette.SecondaryText,
             style = MaterialTheme.typography.bodyMedium
         )
@@ -265,30 +264,14 @@ private fun CustomerAccountScreen(onLogout: () -> Unit) {
                     Text("KUNDENKONTO", color = NahwerkPalette.Gold, style = MaterialTheme.typography.labelSmall)
                     Text("Nur bestätigte PROD-Zustände", style = MaterialTheme.typography.titleMedium)
                     Text(
-                        "Profil, Nutzung, PAYG, Zahlungsmethoden, Safety und Family werden direkt aus den veröffentlichten PROD-Verträgen geladen.",
+                        "Profil, Concierge, Erinnerungen, Nutzung, PAYG, Zahlungsmethoden, Safety und Family werden direkt aus veröffentlichten PROD-Verträgen geladen.",
                         color = NahwerkPalette.SecondaryText,
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
             }
 
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(NahwerkRadii.Large),
-                colors = CardDefaults.cardColors(containerColor = NahwerkPalette.Surface),
-                border = BorderStroke(1.dp, NahwerkPalette.Divider)
-            ) {
-                Column(Modifier.fillMaxWidth().padding(NahwerkSpacing.Lg), verticalArrangement = Arrangement.spacedBy(NahwerkSpacing.Sm)) {
-                    Text("STARTSEITE · CONCIERGE · ERINNERUNGEN", color = NahwerkPalette.Gold, style = MaterialTheme.typography.labelSmall)
-                    Text("Noch nicht für Kunden freigegeben", style = MaterialTheme.typography.titleMedium)
-                    Text(
-                        "Der APP/core-v1-Pfad ist in PROD noch nicht autoritativ aktiviert. Deshalb zeigt die App hier keinen Mock-Erfolg und sendet keine Aufträge oder Erinnerungen über einen Legacy-/STAGING-Pfad.",
-                        color = NahwerkPalette.Warning,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-            }
-
+            AppProdGatewaySurface(onSessionExpired = onLogout)
             ProdCustomerHub()
             PaygQuoteApprovalSurface()
             PaymentMethodProdSurface()
