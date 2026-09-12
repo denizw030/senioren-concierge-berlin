@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,7 +29,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -43,7 +41,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
  * Customer launch shell.
  *
  * It intentionally delegates the already-GREEN Home/Concierge/Reminder runtime
- * back to NahwerkApp and only takes ownership of the two missing customer entry
+ * back to NahwerkApp and only takes ownership of the missing customer entry
  * surfaces: registration before login and the real PROD account/product hub.
  */
 class CustomerLaunchActivity : ComponentActivity() {
@@ -144,7 +142,7 @@ private fun CustomerAccountScreen(
                     Text("ECHTES KUNDENKONTO", color = NahwerkPalette.Gold, style = MaterialTheme.typography.labelSmall)
                     Text("Nur bestätigte PROD-Zustände", style = MaterialTheme.typography.titleMedium)
                     Text(
-                        "Profil, Nutzung, PAYG, Safety und Family werden direkt aus den veröffentlichten PROD-Verträgen geladen. Unbekannte Zustände bleiben gesperrt.",
+                        "Profil, Nutzung, PAYG, Zahlungsmethode, Safety und Family werden direkt aus den veröffentlichten PROD-Verträgen geladen. Unbekannte Zustände bleiben gesperrt.",
                         color = NahwerkPalette.SecondaryText,
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -152,6 +150,7 @@ private fun CustomerAccountScreen(
             }
 
             ProdCustomerHub()
+            PaymentMethodProdSurface()
 
             OutlinedButton(
                 onClick = onLogout,
