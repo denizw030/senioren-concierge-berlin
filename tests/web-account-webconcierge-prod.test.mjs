@@ -9,25 +9,35 @@ const shadow = read("assets/web-core-shadow.js");
 const legacyUi = read("assets/web-concierge-chat.js");
 const siteUi = read("assets/site-ui.js");
 
-test("authenticated Web Concierge surface is present and fail closed", () => {
+test("authenticated Web Concierge surface is present and fail closed by default", () => {
   assert.match(page, /Dein Web Concierge/);
   assert.match(page, /id="webConciergeLog"/);
   assert.match(page, /id="webConciergeInput"[^>]*disabled/);
   assert.match(page, /id="webConciergeSend"[^>]*disabled/);
   assert.match(page, /assets\/auth-nav\.js/);
   assert.match(client, /SCBAuth\?\.validateSession/);
-  assert.doesNotMatch(client, /\bfetch\s*\(/);
+  assert.match(client, /setComposerReady\(false\)/);
 });
 
-test("Web Concierge accepts only a future exact PROD project endpoint and never STAGING", () => {
-  assert.match(client, /NAHWERK_WEB_CONCIERGE_PROD_ENDPOINT/);
-  assert.match(client, /djicahhmnnamtjuqedqd\.supabase\.co/);
-  assert.match(client, /\/functions\/v1\//);
+test("Web Concierge is pinned to one exact PROD gateway and never STAGING", () => {
+  assert.match(client, /GATEWAY_CONTRACT_VERSION = "web-concierge-gateway-v1"/);
+  assert.match(client, /https:\/\/djicahhmnnamtjuqedqd\.supabase\.co\/functions\/v1\/web-concierge-gateway/);
+  assert.match(client, /url\.pathname !== "\/functions\/v1\/web-concierge-gateway"/);
   assert.match(client, /staging\|shadow/i);
   assert.doesNotMatch(client, /customer-portal-staging/);
 });
 
-test("website renderer consumes exact Core v1 response semantics only", () => {
+test("gateway readiness must prove WEB Core and CAO authority before enabling composer", () => {
+  assert.match(client, /raw\.contract_version === GATEWAY_CONTRACT_VERSION/);
+  assert.match(client, /raw\.core_contract_version === CORE_CONTRACT_VERSION/);
+  assert.match(client, /toUpperCase\(\) === "WEB"/);
+  assert.match(client, /raw\.authoritative === true/);
+  assert.match(client, /raw\.cao_authoritative === true/);
+  assert.match(client, /raw\.shadow === false/);
+  assert.match(client, /gatewayReady = readiness\?\.ready === true/);
+});
+
+test("website renderer consumes exact Core v1 authoritative response semantics only", () => {
   assert.match(client, /CORE_CONTRACT_VERSION = "core-v1"/);
   for (const field of ["response_id","conversation_id","turn_id","active_task_id","response_state","messages","pending_approval","action_refs","error","state_version","correlation_id"]) {
     assert.ok(client.includes(field), `missing Core v1 response field ${field}`);
@@ -35,16 +45,20 @@ test("website renderer consumes exact Core v1 response semantics only", () => {
   assert.match(client, /delivery\.shadow === false/);
   assert.match(client, /delivery\.deliver === true/);
   assert.match(client, /delivery\.channel \|\| ""\)\.toUpperCase\(\) === "WEB"/);
-  assert.match(client, /if \(!response\.authoritative\) return false/);
+  assert.match(client, /!response\.authoritative/);
 });
 
-test("website does not own Approval or Action business logic", () => {
-  assert.match(client, /Freigabe bleibt an die vom Core gelieferte offene Aktion gebunden/);
-  assert.doesNotMatch(client, /approve_quote|cancel_quote|core_decide_action_approval|create_action_request/);
-  assert.doesNotMatch(client, /service_role|SUPABASE_SERVICE_ROLE|x-nahwerk-service/);
+test("browser sends content or bound approval only and never owns identity or Core business logic", () => {
+  assert.match(client, /gateway\("turn",\{ source_message_id:crypto\.randomUUID\(\), content \}\)/);
+  assert.match(client, /gateway\("approval",\{ source_message_id:crypto\.randomUUID\(\), approval_id:approvalId, decision \}\)/);
+  assert.doesNotMatch(client, /customer_account_id\s*:/);
+  assert.doesNotMatch(client, /customer_member_id\s*:/);
+  assert.doesNotMatch(client, /person_id\s*:/);
+  assert.doesNotMatch(client, /service_role|SUPABASE_SERVICE_ROLE|core_decide_action_approval|core_create_action_request/);
+  assert.match(client, /payg\.html/);
 });
 
-test("legacy Shadow transport and UI have no network path", () => {
+test("legacy Shadow transport and UI remain inert", () => {
   for (const source of [shadow, legacyUi]) {
     assert.doesNotMatch(source, /\bfetch\s*\(/);
     assert.doesNotMatch(source, /https?:\/\//);
@@ -62,10 +76,10 @@ test("customer PROD guard covers account PAYG and Web Concierge", () => {
   assert.match(siteUi, /web-concierge\.html/);
 });
 
-test("Web Concierge surface is responsive and does not claim customer success", () => {
+test("Web Concierge surface is responsive and does not claim execution success locally", () => {
   const css = read("assets/web-customer-concierge.css");
   assert.match(css, /@media\(max-width:700px\)/);
-  assert.match(css, /web-concierge-runtime-card/);
+  assert.match(css, /web-concierge-approval-actions/);
   assert.doesNotMatch(page, /erfolgreich gesendet|Auftrag ausgeführt|Nachricht gesendet/i);
   assert.match(page, /Keine Shadow-Antworten/);
 });
