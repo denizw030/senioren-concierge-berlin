@@ -1,0 +1,41 @@
+name: Web Account PROD Readiness
+on:
+  pull_request:
+    paths:
+      - "konto.html"
+      - "anmelden.html"
+      - "registrieren.html"
+      - "payg.html"
+      - "assets/site-ui.js"
+      - "assets/auth-nav.js"
+      - "assets/onboarding.js"
+      - "tests/web-account-prod-readiness.test.mjs"
+      - ".github/workflows/web-account-prod-readiness.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  web-account-prod:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Web account PROD regression
+        run: node --test tests/web-account-prod-readiness.test.mjs
+      - name: Website runtime JS syntax
+        run: node --check assets/site-ui.js
+      - name: Static PAYG route smoke
+        run: |
+          python3 -m http.server 4173 >/tmp/nw-web-account-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill $server_pid' EXIT
+          for attempt in 1 2 3 4 5; do
+            curl -fsS "http://127.0.0.1:4173/payg.html" >/dev/null && break
+            sleep 1
+          done
+          curl -fsS "http://127.0.0.1:4173/konto.html" >/dev/null
+          curl -fsS "http://127.0.0.1:4173/payg.html" >/dev/null
+          curl -fsS "http://127.0.0.1:4173/assets/site-ui.js" >/dev/null
