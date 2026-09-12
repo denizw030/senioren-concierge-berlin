@@ -21,6 +21,9 @@ fun isStagingEndpoint(value: String): Boolean =
 require(!releaseSigningAny || releaseSigningComplete) {
     "Android release signing requires all four NAHWERK_ANDROID_* signing environment variables."
 }
+require(releaseAuthBaseUrl.isBlank() == releaseGatewayBaseUrl.isBlank()) {
+    "Android release live transport must configure auth and gateway together or leave both disabled."
+}
 require(releaseAuthBaseUrl.isBlank() || releaseAuthBaseUrl.startsWith("https://")) {
     "Android release auth endpoint must use HTTPS."
 }
@@ -72,10 +75,10 @@ android {
     }
     buildTypes {
         debug {
-            versionNameSuffix = "-staging"
-            buildConfigField("String", "APP_ENVIRONMENT", "\"STAGING\"")
-            buildConfigField("String", "AUTH_BASE_URL", "\"https://btqklftjmwtqqqdmwlnk.supabase.co/functions/v1/nahwerk-mobile-auth-staging\"")
-            buildConfigField("String", "GATEWAY_BASE_URL", "\"https://btqklftjmwtqqqdmwlnk.supabase.co/functions/v1/nahwerk-mobile-gateway-staging\"")
+            versionNameSuffix = "-dev"
+            buildConfigField("String", "APP_ENVIRONMENT", "\"LOCAL\"")
+            buildConfigField("String", "AUTH_BASE_URL", "\"\"")
+            buildConfigField("String", "GATEWAY_BASE_URL", "\"\"")
         }
         release {
             isMinifyEnabled = true
