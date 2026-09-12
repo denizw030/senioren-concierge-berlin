@@ -101,3 +101,14 @@ test('PAYG lets customers decline a QUOTED job through the canonical PROD action
   assert.match(runtime, /reason:"customer_cancelled_in_web_account"/);
   assert.match(runtime, /quote_cancel_failed/);
 });
+
+test('payment method removal is prepared but cannot fake a missing PROD contract', () => {
+  const payg = read('payg.html');
+  const guard = read('assets/payg-payment-method-remove-guard.js');
+  assert.match(payg, /id="paymentRemove"[^>]*hidden[^>]*disabled/);
+  assert.match(payg, /autoritative PAYG-PROD-Vertrag/);
+  assert.match(guard, /supported: false/);
+  assert.match(guard, /PAYG_PROD_REMOVE_PAYMENT_METHOD_CONTRACT_MISSING/);
+  assert.doesNotMatch(guard, /\bfetch\s*\(/);
+  assert.doesNotMatch(guard, /staging/i);
+});
