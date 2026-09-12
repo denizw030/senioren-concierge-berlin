@@ -1,0 +1,76 @@
+{
+  "contract_version": "web-concierge-gateway-v1",
+  "environment": "prod",
+  "endpoint": "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-concierge-gateway",
+  "allowed_origins": [
+    "https://nahwerkconcierge.com",
+    "https://www.nahwerkconcierge.com"
+  ],
+  "auth": {
+    "scheme": "Bearer scb_web_session",
+    "validator": "web-session-secure",
+    "browser_may_supply_identity": false,
+    "server_identity": ["person_id", "customer_account_id", "customer_member_id"]
+  },
+  "server_identity_resolution": {
+    "customer_member_id": "customer_members.id WHERE customer_account_id=session.customer_account_id AND person_id=session.person_id",
+    "uniqueness_proof": "UNIQUE(customer_account_id, person_id)"
+  },
+  "readiness": {
+    "request": {"action": "readiness"},
+    "required_response": {
+      "ok": true,
+      "contract_version": "web-concierge-gateway-v1",
+      "core_contract_version": "core-v1",
+      "channel": "WEB",
+      "authoritative": true,
+      "cao_authoritative": true,
+      "shadow": false
+    }
+  },
+  "turn": {
+    "browser_request_fields": ["action", "source_message_id", "content"],
+    "browser_forbidden_authority_fields": ["person_id", "customer_account_id", "customer_member_id", "channel", "conversation_id", "task_id", "action_id", "execution_id", "correlation_id"],
+    "server_core_fields": {
+      "contract_version": "core-v1",
+      "channel": "WEB",
+      "input_kind": "TEXT",
+      "received_at": "server_now",
+      "channel_session_id": "web:<sha256(session_token)>",
+      "channel_subject_id": "web:<customer_account_id>:<person_id>",
+      "source_message_id": "browser UUID, validated and deduplicated",
+      "correlation_id": "stable derivative of source_message_id"
+    },
+    "content_max_chars": 4000
+  },
+  "approval": {
+    "browser_request_fields": ["action", "source_message_id", "approval_id", "decision"],
+    "decisions": ["APPROVE", "DENY"],
+    "binding": "approval_id must resolve server-side to the authenticated person/account/member and the current canonical Core action",
+    "payg_rule": "If pending approval contains a PAYG quote, browser routes customer to the existing protected PAYG quote approval; it does not duplicate PAYG consent logic."
+  },
+  "sync": {
+    "browser_request_fields": ["action", "conversation_id"],
+    "authorization": "conversation must belong to the authenticated person/account/member",
+    "source_of_truth": "Core-owned authoritative state/result only",
+    "local_business_logic": false
+  },
+  "core_response_passthrough": {
+    "required_contract_version": "core-v1",
+    "required_delivery_hints": {"channel": "WEB", "deliver": true, "shadow": false},
+    "required_identity_match": true,
+    "fields": ["response_id", "conversation_id", "turn_id", "active_task_id", "response_state", "messages", "pending_approval", "action_refs", "error", "delivery_hints", "state_version", "correlation_id"]
+  },
+  "authoritative_activation": {
+    "adapter_core_route_web": {"enabled": true, "rollout_percent": 100, "mode": "authoritative", "contract": "core-v1"},
+    "central_orchestrator_authoritative_WEB": true,
+    "prohibit_shadow_customer_delivery": true
+  },
+  "exactly_once": {
+    "turn": "source_message_id + canonical Core receipt",
+    "action": "existing concierge_actions_v1 idempotency_key",
+    "execution": "existing central_orchestrator_execution_claims + execution_id",
+    "provider": "existing central_orchestrator_provider_bindings",
+    "payg_capture": "only cao_transition_canonical_action_v1 -> COMPLETED"
+  }
+}
