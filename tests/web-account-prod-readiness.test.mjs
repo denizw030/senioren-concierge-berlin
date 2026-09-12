@@ -81,3 +81,23 @@ test('PAYG payment state remains fail-closed when Stripe Live is not configured'
   assert.match(runtime, /Stripe Live ist in der PROD-Runtime noch nicht verbunden/);
   assert.match(runtime, /button\.disabled = state\.loading \|\| !providerReady/);
 });
+
+test('PAYG exposes real QUOTED cost approvals with exact amount and explicit consent', () => {
+  const payg = read('payg.html');
+  const runtime = read('assets/payg-account.js');
+  assert.match(payg, /id="paygQuotes"/);
+  assert.match(payg, /Offene Preisfreigaben/);
+  assert.match(runtime, /String\(quote\?\.status \|\| ""\)\.toUpperCase\(\) !== "QUOTED"/);
+  assert.match(runtime, /Kostenpflichtig freigeben –/);
+  assert.match(runtime, /angezeigten Gesamtbetrag von \$\{amount\} kostenpflichtig frei/);
+  assert.match(runtime, /action:"approve_quote"/);
+  assert.match(runtime, /quote_id:String\(quote\.id\)/);
+});
+
+test('PAYG lets customers decline a QUOTED job through the canonical PROD action', () => {
+  const runtime = read('assets/payg-account.js');
+  assert.match(runtime, /Nicht beauftragen/);
+  assert.match(runtime, /action:"cancel_quote"/);
+  assert.match(runtime, /reason:"customer_cancelled_in_web_account"/);
+  assert.match(runtime, /quote_cancel_failed/);
+});
