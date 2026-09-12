@@ -6,8 +6,8 @@ import org.junit.Test
 
 class BackendContractReadinessTest {
     @Test
-    fun allSevenMappedCapabilitiesExistAndRemainBlocked() {
-        assertEquals(7, BackendContractReadiness.gates.size)
+    fun allMappedCapabilitiesExistAndRemainBlocked() {
+        assertEquals(BackendContractCapability.values().size, BackendContractReadiness.gates.size)
         assertEquals(0, BackendContractReadiness.activatedCount)
         assertEquals(
             BackendContractCapability.values().toSet(),
@@ -42,6 +42,18 @@ class BackendContractReadinessTest {
         val gate = BackendContractReadiness.stateFor(
             BackendContractCapability.APPROVAL_CONTINUATION,
             ClientContractUiState.RETRYABLE
+        )
+
+        assertFalse(gate.backendAuthorityAvailable)
+        assertFalse(gate.mayAssumeSuccess)
+        assertFalse(gate.maySubmitAuthorityBearingAction)
+    }
+
+    @Test
+    fun paygUnknownNeverMeansEnabledOrChargeable() {
+        val gate = BackendContractReadiness.stateFor(
+            BackendContractCapability.PAYG,
+            ClientContractUiState.UNKNOWN
         )
 
         assertFalse(gate.backendAuthorityAvailable)

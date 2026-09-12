@@ -275,7 +275,11 @@ internal fun LoginScreen(
                 if (!notice.isNullOrBlank()) StatusText(notice)
             }
             Text(
-                "STAGING · Testversion · Sitzungstoken werden verschlüsselt auf dem Gerät gespeichert.",
+                if (BuildConfig.DEBUG) {
+                    "STAGING · Testversion · Sitzungstoken werden verschlüsselt auf dem Gerät gespeichert."
+                } else {
+                    "PROD · Sitzungstoken werden verschlüsselt auf dem Gerät gespeichert."
+                },
                 color = NahwerkPalette.SecondaryText,
                 style = MaterialTheme.typography.labelSmall
             )
@@ -322,7 +326,10 @@ internal fun HomeScreen(
                         BrandWordmark()
                         Text("Persönlicher Concierge", color = NahwerkPalette.SecondaryText, style = MaterialTheme.typography.bodyMedium)
                     }
-                    StatusChip("STAGING", NahwerkPalette.Warning)
+                    StatusChip(
+                        BuildConfig.APP_ENVIRONMENT,
+                        if (BuildConfig.DEBUG) NahwerkPalette.Warning else NahwerkPalette.Success
+                    )
                 }
             }
             item { ConciergeHero(home, onChat) }
@@ -781,7 +788,11 @@ internal fun SettingsScreen(
                 ) { Text("Abmelden") }
             }
             Text(
-                "STAGING · Keine Production- oder Provider-Aktion durch diesen Test-Candidate.",
+                if (BuildConfig.DEBUG) {
+                    "STAGING · Keine Production- oder Provider-Aktion durch diesen Test-Candidate."
+                } else {
+                    "PROD · Nicht verfügbare Funktionen bleiben sicher gesperrt."
+                },
                 color = NahwerkPalette.SecondaryText,
                 style = MaterialTheme.typography.labelSmall
             )

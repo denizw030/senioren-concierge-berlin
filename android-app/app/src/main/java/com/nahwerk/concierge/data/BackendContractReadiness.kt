@@ -3,9 +3,14 @@ package com.nahwerk.concierge.data
 /**
  * Client-only readiness model for backend capabilities whose exact transport/schema contracts
  * are not activated yet. This file intentionally contains no endpoint, payload, identifier,
- * task, approval, safety or family business logic.
+ * task, approval, billing, safety or family business logic.
  */
 enum class BackendContractCapability {
+    REGISTRATION,
+    CUSTOMER_PROFILE,
+    PAYG,
+    PAYMENT_METHODS,
+    COSTS_USAGE,
     CONVERSATION_HISTORY,
     TASK_EXECUTION_DETAILS,
     APPROVAL_CONTINUATION,
