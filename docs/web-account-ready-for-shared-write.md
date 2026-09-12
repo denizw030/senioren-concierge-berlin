@@ -6,7 +6,7 @@ Stand: 2026-09-12
 
 `READY_FOR_REAL_CUSTOMER_WEB_ACCOUNT_E2E = NO`
 
-Die Website-eigenen Arbeiten sind bis an die aktuell veröffentlichten PROD-Verträge abgeschlossen. Die folgenden Punkte dürfen nicht in der Website erfunden werden und benötigen den Shared Platform/Core/CAO/Billing-Slot.
+Die Website-eigenen Arbeiten sind bis an die veröffentlichten PROD-Verträge abgeschlossen. Die folgenden Restpunkte benötigen den Shared Platform/Core/CAO/Billing-Slot und dürfen nicht im Browser erfunden werden.
 
 ## 1. Browserfähiger PROD Web Concierge Gateway
 
@@ -14,73 +14,95 @@ Fresh PROD-Befund:
 
 - `nahwerk-concierge-core` v43 ist ACTIVE.
 - Core v1 akzeptiert `channel = WEB` im generischen Turn-Vertrag.
-- Core v1 liefert bereits die kanonischen Felder `response_id`, `conversation_id`, `turn_id`, `active_task_id`, `response_state`, `messages`, `pending_approval`, `action_refs`, `error`, `state_version`, `correlation_id`.
-- Die aktuelle Core-Delivery-Entscheidung ist autoritativ jedoch ausschließlich für den freigegebenen WhatsApp-Pfad. Für alle anderen Kanäle fällt sie auf `CHANNEL_NOT_ENABLED_FOR_AUTHORITATIVE_DELIVERY` zurück.
-- Die Core-Route ist service-authentifiziert und darf nicht mit Service-Credentials aus einem Browser aufgerufen werden.
-- Es existiert aktuell keine aktive browserfähige PROD-Web-Concierge-Edge-Function.
+- `adapter_core_route_web` ist in PROD weiterhin `enabled=false`, `rollout_percent=0`, `mode=shadow_only`.
+- `central_orchestrator_authoritative` ist weiterhin deaktiviert.
+- Die Core-Route ist service-authentifiziert und darf nicht mit Service-Credentials aus dem Browser aufgerufen werden.
+- Es existiert weiterhin keine aktive browserfähige PROD-Web-Concierge-Edge-Function.
 
 Minimaler Shared-Vertrag:
 
-1. Ein PROD-Web-Gateway validiert ausschließlich die bestehende `scb_web_session` serverseitig.
-2. Es löst `person_id`, `customer_account_id` und `customer_member_id` ausschließlich serverseitig aus der Session/Kontobindung auf. Browser-übermittelte fremde IDs dürfen keine Autorität besitzen.
-3. Es erzeugt stabile `channel_session_id`, `channel_subject_id`, `source_message_id` und `correlation_id` bzw. akzeptiert nur den im Vertrag vorgesehenen ungefährlichen Clientanteil.
-4. Es ruft serverseitig den zentralen `nahwerk-concierge-core /v1/core/turn` mit `contract_version = core-v1` und `channel = WEB` unter Service-Authentisierung auf.
-5. Conversation, Task, Memory, Approval, Action und Ausführung bleiben vollständig Core/CAO-eigen. Der Gateway enthält keine parallele Business Logic.
-6. `adapter_core_route_web` und die Core-Delivery-Entscheidung werden für normale reale Webkunden autoritativ freigegeben: `shadow=false`, `deliver=true`, `authoritative=true`.
-7. Der Gateway gibt ausschließlich die autoritative, kundenfähige Core-v1-Ausgabe zurück. Shadow-/Testausgaben bleiben unzustellbar.
-8. Pending Approval muss an die vom Core gelieferten `approval_id`/Action-Bindings gekoppelt bleiben; keine lose Browser-Zustimmung.
-9. Wiederholte Browserrequests müssen über den kanonischen Source-Message-/Idempotenzvertrag genau einmal wirken.
-10. Der Browser muss nach Provider-/CAO-Ausführung den verifizierten Core-Zustand bzw. das verifizierte Ergebnis abrufen/erhalten können, ohne lokal einen Erfolg zu erfinden.
+1. PROD-Web-Gateway validiert ausschließlich die bestehende Web-Session serverseitig.
+2. `person_id`, `customer_account_id` und `customer_member_id` werden ausschließlich serverseitig aus Session/Kontobindung aufgelöst.
+3. Gateway erzeugt/bindet kanonische `channel_session_id`, `channel_subject_id`, `source_message_id` und `correlation_id`.
+4. Gateway ruft serverseitig `nahwerk-concierge-core /v1/core/turn` mit `contract_version=core-v1` und `channel=WEB` auf.
+5. Conversation, Task, Memory, Approval, Action, CAO und Verification bleiben vollständig Core/CAO-eigen.
+6. `adapter_core_route_web` wird für reale Webkunden autoritativ freigegeben: `shadow=false`, `deliver=true`, `authoritative=true`.
+7. Pending Approvals bleiben exakt an Core-Approval/Action gebunden; keine lose Browser-Zustimmung.
+8. Wiederholungen sind über Source-Message-/Idempotenzvertrag genau-einmal-sicher.
+9. Verifizierte Provider-/CAO-Ergebnisse werden wieder als autoritative Core-v1-Ausgabe an den Webkanal geliefert.
 
-Website-Stand dazu:
+Website-Stand:
 
 - `web-concierge.html` ist authentifiziert und fail-closed.
-- Der alte Shadow/STAGING-Pfad ist entfernt/inert.
-- `assets/web-customer-concierge.js` rendert bereits exakt die veröffentlichte `core-v1` Response-Struktur.
-- Eine Response wird nur dargestellt, wenn `delivery_hints.shadow === false`, `delivery_hints.deliver === true` und `delivery_hints.channel === WEB`.
-- Senden bleibt ohne den veröffentlichten Gateway-Request-Vertrag absichtlich deaktiviert.
+- Shadow/STAGING ist inert/gesperrt.
+- `assets/web-customer-concierge.js` rendert die veröffentlichte Core-v1-Struktur.
+- Ausgabe erscheint nur bei `delivery_hints.shadow === false`, `delivery_hints.deliver === true`, `channel === WEB`.
+- Keine Website-Business-Logic und keine Service-Secrets.
 
 ## 2. Zahlungsmethode entfernen
 
 Fresh PROD-Befund:
 
-- `web-payg` kann Zahlungsmethoden anlegen/synchronisieren und eine neue bestätigte Methode als Standard registrieren.
-- In den veröffentlichten DB-/Edge-Verträgen existiert keine `remove`, `detach`, `delete` oder `deactivate payment method` Aktion.
+- `web-payg` kann Zahlungsmethoden anlegen/synchronisieren.
+- Fresh DB-Inventar enthält weiterhin nur `payg_register_payment_method_v1`; keine Remove-/Detach-/Deactivate-Payment-Method-Funktion.
 
 Minimaler Shared-Vertrag:
 
-1. Session-/Account-autorisierte Aktion im bestehenden PAYG-PROD-Vertrag, nicht in der Website.
-2. Die Zahlungsmethode muss serverseitig dem echten Kundenkonto zugeordnet sein.
-3. Stripe-Detach/Deaktivierung und PAYG-Datenbankzustand müssen atomar bzw. sicher reconciliert werden.
-4. Regeln für letzte Zahlungsmethode, offene Wallet-Holds, laufende Aufträge oder sonstige Zahlungsabhängigkeiten werden ausschließlich serverseitig entschieden.
-5. Aktion ist idempotent und liefert danach den autoritativen Payment-Method-State bzw. einen stabilen kundenfähigen Ablehnungsgrund.
-
-Website-Stand dazu:
-
-- Die Entfernen-Oberfläche ist vorbereitet, bleibt aber sichtbar fail-closed und löst keinen lokalen Fake-Remove aus.
-
-## 3. Paid Legal / elektronischer Widerruf / sofortige Ausführung
+1. Session-/Account-autorisierte `remove_payment_method`/äquivalente Aktion im bestehenden PAYG-PROD-Vertrag.
+2. Zahlungsmethode muss serverseitig dem Konto gehören.
+3. Stripe-Detach und PAYG-Datenbankzustand werden sicher reconciliert.
+4. Letzte Zahlungsmethode, offene Holds und laufende Aufträge werden serverseitig geprüft.
+5. Aktion ist idempotent und liefert erst nach bestätigtem Detach den autoritativen neuen Payment-State.
 
 Website-Stand:
 
-- Der konkrete PAYG-Betrag steht unmittelbar an `Kostenpflichtig freigeben – <Betrag>`.
-- Die Freigabe verlangt eine weitere ausdrückliche Bestätigung und wird anschließend aus PROD neu geladen.
-- `widerruf.html`, Datenschutz und Impressum sind erreichbar.
-- Für reines auftragsbezogenes PAYG wird keine neue Abo-/Kündigungslogik erfunden. § 312k BGB betrifft entgeltliche Dauerschuldverhältnisse.
+- Remove-UI existiert, bleibt ohne Backend-Vertrag disabled und kann keinen Fake-Erfolg erzeugen.
 
-Shared-/Legal-Blocker:
+## 3. PAYG Verbraucherrecht / Consent
 
-1. Für online geschlossene Fernabsatzverträge braucht die Online-Oberfläche während der Widerrufsfrist eine echte elektronische Widerrufsfunktion (`Vertrag widerrufen` → Vertragsidentifikation/Kontaktweg → `Widerruf bestätigen`) mit sofortiger Eingangsbestätigung auf dauerhaftem Datenträger.
-2. Soll eine entgeltliche Dienstleistung vor Ablauf der Widerrufsfrist beginnen, muss der erforderliche ausdrückliche Wunsch/Zustimmung und die Kenntnis über das Erlöschen bei vollständiger Vertragserfüllung beweissicher an der Bestellung/Ausführung gebunden werden, soweit das konkrete Vertragsmodell dies erfordert.
-3. Die aktuelle `payg_approve_action_quote_v1` speichert nur Quote-Approval und Zeitpunkt; sie besitzt keinen Vertrag für diese separaten Verbraucherrechtserklärungen.
-4. Die Vertragsbestätigung/Bestellinformationen müssen im erforderlichen Umfang dauerhaft bereitgestellt bzw. übermittelt werden, bevor die Leistung ausgeführt wird.
-5. Die aktuelle Hauptseite `widerruf.html` enthält noch einen leeren Unternehmer-Kontaktplatzhalter. Der separate Legal-PR #25 besitzt dieselbe Legal-Datei, ist aber DRAFT/veraltet und darf nicht blind über aktuellen `main` gelegt werden.
-6. Vor dem Paid-Consumer-Launch muss außerdem die erforderliche Anbieter-Kontaktinformation final verifiziert werden; insbesondere ist aktuell keine verifizierte geschäftliche Telefonnummer auf der veröffentlichten Anbieterinformation vorhanden.
+Fresh Website-/Legal-Stand:
 
-## 4. Reales Kunden-E2E nach Shared-Freigabe
+- Betreiberangaben auf aktuellem `main` sind vorhanden: Anbieter/Inhaber, ladungsfähige Anschrift und geschäftliche E-Mail.
+- `widerruf.html` wurde auf diese realen Angaben und den aktuellen PAYG-Stand aktualisiert; keine Unternehmer-Platzhalter mehr.
+- Betrag und Leistung stehen unmittelbar an `Kostenpflichtig freigeben – <Betrag>`.
+- Für einzelne PAYG-Aufträge wird keine unnötige Abo-/Dauerschuldlogik eingebaut.
+- Website besitzt jetzt einen fail-closed Consumer-Rights-Gate.
 
-Erst nach Abschluss der Punkte 1–3:
+Erforderlicher Shared-Vertrag `payg-consumer-rights-v1`:
 
-Registrierung → Login → PAYG aktivieren → echte Zahlungsmethode → Web-Concierge-Auftrag → serverseitige Quote → konkreten Betrag sehen → ausdrücklich kostenpflichtig freigeben → Core/CAO führt genau eine Aktion aus → genau eine Belastung/Wallet-Buchung → verifiziertes Ergebnis im Web → Kosten/Nutzung im Konto.
+Der autoritative `web-payg` GET-State muss erst dann folgende Fähigkeiten als `true` melden, wenn sie real funktionieren:
 
-Der erste reale Test benötigt weiterhin eine separate Owner-Freigabe. Dieser Website-Strang löst keine echte Zahlung und keine externe kostenpflichtige Aktion aus.
+```json
+{
+  "consumer_rights": {
+    "contract_version": "payg-consumer-rights-v1",
+    "electronic_withdrawal_function": true,
+    "electronic_withdrawal_url": "https://nahwerkconcierge.com/<produktive-funktion>",
+    "immediate_performance_consent_evidence": true,
+    "order_confirmation_durable_medium": true
+  }
+}
+```
+
+Shared Umsetzung muss mindestens:
+
+1. eine echte elektronische Widerrufsfunktion mit Bestätigung und unverzüglicher Eingangsbestätigung auf dauerhaftem Datenträger bereitstellen;
+2. die beiden ausdrücklichen Sofortausführungs-Erklärungen beweissicher an Quote/Auftrag/Person binden;
+3. bei `approve_quote` das Website-Feld `consumer_rights_evidence` autoritativ validieren und speichern;
+4. Vertrags-/Bestellbestätigung im erforderlichen Umfang auf dauerhaftem Datenträger bereitstellen;
+5. niemals nur Client-Zeitstempel oder Client-Flags als alleinigen Beweis behandeln.
+
+Website-Stand:
+
+- Solange dieser Vertrag fehlt, werden `approve_quote`-Requests zusätzlich browserseitig fail-closed blockiert.
+- Ablehnen einer Quote bleibt möglich.
+- Sobald der Vertrag autoritativ bereitsteht, zeigt die Website vor der Kostenfreigabe die beiden ausdrücklichen Erklärungen und übermittelt die Evidence an den bestehenden PAYG-Endpunkt.
+- Der Link `Vertrag widerrufen` wird nur aus einer autoritativ bestätigten NAHWERK-HTTPS-URL dargestellt.
+
+## 4. Reales Kunden-E2E
+
+Erst nach Abschluss der Shared-Punkte 1–3 und separater Owner-Freigabe:
+
+Login → PAYG aktiv → echte Zahlungsmethode → Web-Concierge-Auftrag → serverseitige Quote → Betrag sehen → Sofortausführungs-Erklärungen → ausdrücklich kostenpflichtig freigeben → Core/CAO führt genau eine Aktion aus → genau eine Belastung/Wallet-Buchung → verifiziertes Ergebnis im Web → Kosten/Nutzung im Konto.
+
+Dieser Website-Strang löst keine echte Zahlung und keine externe kostenpflichtige Aktion aus.
