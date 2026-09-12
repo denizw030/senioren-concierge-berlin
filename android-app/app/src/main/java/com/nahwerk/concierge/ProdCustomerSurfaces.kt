@@ -347,7 +347,7 @@ private fun PaygCard(snapshot: PaygSnapshot, api: ProdCustomerApi, onUpdated: (P
         }
         if (snapshot.paymentMethods.isEmpty()) {
             Text(
-                if (snapshot.setupAvailable) "Stripe-Setup ist serverseitig bereit. Für die native Bestätigung fehlt der App noch der veröffentlichte Stripe-Publishable-Key/Client-Contract."
+                if (snapshot.setupAvailable) "Sichere Stripe-Verwaltung ist serverseitig bereit und direkt unter dem PAYG-Bereich verfügbar."
                 else "Der Zahlungsanbieter meldet Setup derzeit nicht als verfügbar.",
                 color = NahwerkPalette.Warning,
                 style = MaterialTheme.typography.bodySmall
