@@ -23,41 +23,61 @@ test('customer account fails closed when plan or usage truth is unavailable', ()
 
 test('customer account website blocks staging calls and suppresses staging telephone surface', () => {
   const ui = read('assets/site-ui.js');
-  assert.match(ui, /konto\\\.html/);
+  assert.match(ui, /konto\|payg\|web-concierge/);
   assert.match(ui, /\/staging\/i/);
   assert.match(ui, /PROD web guard blocked a non-PROD endpoint/);
   assert.match(ui, /telephoneReceptionCard/);
   assert.match(ui, /reception\.hidden = true/);
 });
 
-test('existing Web Concierge remains explicitly shadow-only and cannot be mistaken for PROD customer delivery', () => {
+test('legacy Web Concierge Shadow path is removed and cannot be mistaken for PROD delivery', () => {
   const shadow = read('assets/web-core-shadow.js');
   const chat = read('assets/web-concierge-chat.js');
-  assert.match(shadow, /customer-portal-staging\/portal\/web-core-shadow/);
-  assert.match(shadow, /shadow_only: true/);
+  assert.doesNotMatch(shadow, /customer-portal-staging\/portal\/web-core-shadow/);
+  assert.doesNotMatch(shadow, /\bfetch\s*\(/);
+  assert.match(shadow, /shadow_only: false/);
   assert.match(shadow, /customer_delivery: false/);
-  assert.match(chat, /Web-Concierge-Testtransport/);
-  assert.match(chat, /keine Kundenausgabe/);
-  assert.match(chat, /shadow-only/);
+  assert.match(shadow, /web_prod_gateway_required/);
+  assert.doesNotMatch(chat, /\bfetch\s*\(/);
+  assert.match(chat, /isEnabled: \(\) => false/);
+  assert.match(chat, /mount: \(\) => null/);
 });
 
-test('PAYG is findable but remains fail-closed until canonical PROD contract exists', () => {
-  const ui = read('assets/site-ui.js');
+test('PAYG customer surface uses only canonical PROD functions and no mocks or staging', () => {
   const payg = read('payg.html');
-  assert.match(ui, /accountPaygEntry/);
-  assert.match(ui, /payg\.html/);
+  const runtime = read('assets/payg-account.js');
   assert.match(payg, /Kundenkonto · PAYG/);
-  assert.match(payg, /id="paygActivate" disabled/);
-  assert.match(payg, /id="paymentManage" disabled/);
-  assert.match(payg, /Es werden keine Kosten, Guthaben, Belastungen oder Auftragszahlen geschätzt/);
-  assert.match(payg, /PAYG-Arbeitsstrang seinen kanonischen PROD-Webvertrag veröffentlicht hat/);
-  assert.doesNotMatch(payg, /customer-portal-staging|functions\/v1\/.*payg/i);
+  assert.match(payg, /assets\/payg-account\.js/);
+  assert.match(payg, /id="paygActivate"/);
+  assert.match(payg, /id="paymentManage"/);
+  assert.match(payg, /data-topup-cents="500"/);
+  assert.match(payg, /Zahlungen & Aufträge/);
+  assert.match(runtime, /functions\/v1\/web-payg/);
+  assert.match(runtime, /functions\/v1\/web-payg-checkout/);
+  assert.match(runtime, /enabled \? "deactivate" : "activate"/);
+  assert.match(runtime, /payment_method_checkout/);
+  assert.match(runtime, /sync_payment_method_checkout/);
+  assert.match(runtime, /topup_checkout/);
+  assert.match(runtime, /sync_topup_checkout/);
+  assert.match(runtime, /serverseitigen Usage-Ledger/);
+  assert.doesNotMatch(payg, /customer-portal-staging|mock/i);
+  assert.doesNotMatch(runtime, /customer-portal-staging|mock/i);
 });
 
-test('PAYG surface is mobile responsive and validates the real session', () => {
+test('PAYG surface is mobile responsive, session-bound and explicit before real top-up', () => {
   const payg = read('payg.html');
+  const runtime = read('assets/payg-account.js');
   assert.match(payg, /@media\(max-width:820px\)/);
-  assert.match(payg, /SCBAuth/);
-  assert.match(payg, /validateSession/);
-  assert.match(payg, /location\.replace\("anmelden\.html"\)/);
+  assert.match(runtime, /SCBAuth/);
+  assert.match(runtime, /validateSession/);
+  assert.match(runtime, /location\.replace\("anmelden\.html"\)/);
+  assert.match(runtime, /confirm\(`Du wirst zu Stripe weitergeleitet/);
+  assert.match(runtime, /location\.assign\(result\.checkout_url\)/);
+});
+
+test('PAYG payment state remains fail-closed when Stripe Live is not configured', () => {
+  const runtime = read('assets/payg-account.js');
+  assert.match(runtime, /provider\.setup_available === true/);
+  assert.match(runtime, /Stripe Live ist in der PROD-Runtime noch nicht verbunden/);
+  assert.match(runtime, /button\.disabled = state\.loading \|\| !providerReady/);
 });
