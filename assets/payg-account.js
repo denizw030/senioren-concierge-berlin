@@ -20,6 +20,12 @@
     return new Intl.NumberFormat("de-DE", { style: "currency", currency }).format(value / 100);
   }
 
+  function moneyMajor(amount, currency = "EUR") {
+    const value = Number(amount);
+    if (!Number.isFinite(value)) return "–";
+    return new Intl.NumberFormat("de-DE", { style: "currency", currency }).format(value);
+  }
+
   function dateTime(value) {
     if (!value) return "–";
     const date = new Date(value);
@@ -42,7 +48,9 @@
   function setBusy(value, label = "") {
     state.busy = Boolean(value);
     document.body.classList.toggle("payg-loading", state.busy);
-    document.querySelectorAll("[data-payg-action]").forEach((node) => { node.disabled = state.busy || node.dataset.contractBlocked === "true"; });
+    document.querySelectorAll("[data-payg-action]").forEach((node) => {
+      node.disabled = state.busy || node.dataset.contractBlocked === "true";
+    });
     const live = el("paygLiveStatus");
     if (live) live.textContent = state.busy ? (label || "Wird geladen …") : "";
   }
@@ -54,6 +62,7 @@
     if (/stripe|provider_configuration|configuration_missing/i.test(String(code) + String(raw))) return "Die Zahlungsanbindung ist serverseitig noch nicht vollständig verfügbar.";
     if (/billing_blocked/i.test(String(code) + String(raw))) return "PAYG ist für dieses Konto derzeit gesperrt.";
     if (/payment_method/i.test(String(code) + String(raw))) return "Für diese Aktion wird eine gültige Zahlungsmethode benötigt.";
+    if (/quote.*expired|expired.*quote/i.test(String(code) + String(raw))) return "Diese Preisfreigabe ist abgelaufen. Bitte fordere einen neuen Preis an.";
     return raw ? String(raw).slice(0, 220) : "Die Anfrage konnte gerade nicht verarbeitet werden.";
   }
 
@@ -121,22 +130,29 @@
     if (data?.payg?.enabled !== true) note.textContent = "Aktiviere zuerst PAYG.";
     else if (provider.setup_available !== true) note.textContent = "Die Stripe-PROD-Anbindung ist serverseitig noch nicht für die Einrichtung freigegeben.";
     else if (!key) note.textContent = "Der öffentliche Stripe-Browser-Key ist noch nicht im Website-PROD-Client veröffentlicht. Es wird keine Ersatz- oder STAGING-Konfiguration verwendet.";
-    else note.textContent = methods.length ? "Du kannst eine neue Methode hinterlegen; sie wird nach erfolgreicher Bestätigung als Standard registriert." : "Zahlungsmethode sicher über Stripe hinzufügen.";
+    else note.textContent = methods.length
+      ? "Du kannst eine neue Standard-Zahlungsmethode hinterlegen. Entfernen ist erst verfügbar, sobald der PAYG-PROD-Vertrag dafür eine autoritative Aktion bereitstellt."
+      : "Zahlungsmethode sicher über Stripe hinzufügen.";
   }
 
   function renderTopups(data) {
     const packages = Array.isArray(data?.topup_packages_cents) ? data.topup_packages_cents.filter((n) => ALLOWED_TOPUPS.has(Number(n))) : [];
     const methods = Array.isArray(data?.payment_methods) ? data.payment_methods : [];
     const defaultMethod = methods.find((item) => item.is_default) || methods[0] || null;
+    const provider = data?.payment_provider || {};
     const key = stripePublishableKey();
+    const topupReady = Boolean(defaultMethod && key && data?.payg?.enabled === true && provider.webhook_configured === true);
     const host = el("topupPackages");
-    host.innerHTML = packages.length ? packages.map((amount) => `<button class="payg-package" type="button" data-payg-action="topup" data-amount-cents="${Number(amount)}" ${(!defaultMethod || !key || data?.payg?.enabled !== true) ? "disabled" : ""}>${money(amount)}</button>`).join("") : empty("Keine serverseitig bestätigten Aufladebeträge verfügbar.");
+    host.innerHTML = packages.length ? packages.map((amount) => `<button class="payg-package" type="button" data-payg-action="topup" data-amount-cents="${Number(amount)}" ${topupReady ? "" : "disabled"}>${money(amount)} kostenpflichtig aufladen</button>`).join("") : empty("Keine serverseitig bestätigten Aufladebeträge verfügbar.");
     el("topupConsent").checked = false;
-    el("topupMeta").textContent = !defaultMethod ? "Für eine Aufladung wird zuerst eine aktive Zahlungsmethode benötigt." : !key ? "Aufladung bleibt gesperrt, bis der Stripe-Browser-Key in PROD veröffentlicht ist." : `Belastung über ${defaultMethod.brand || defaultMethod.method_type || "Standard-Zahlungsmethode"}${defaultMethod.last4 ? ` •••• ${defaultMethod.last4}` : ""}.`;
+    if (!defaultMethod) el("topupMeta").textContent = "Für eine Aufladung wird zuerst eine aktive Zahlungsmethode benötigt.";
+    else if (!key) el("topupMeta").textContent = "Aufladung bleibt gesperrt, bis der Stripe-Browser-Key in PROD veröffentlicht ist.";
+    else if (provider.webhook_configured !== true) el("topupMeta").textContent = "Aufladung bleibt gesperrt, bis die serverseitige Stripe-Zahlungsbestätigung in PROD autoritativ bestätigt ist.";
+    else el("topupMeta").textContent = `Belastung über ${defaultMethod.brand || defaultMethod.method_type || "Standard-Zahlungsmethode"}${defaultMethod.last4 ? ` •••• ${defaultMethod.last4}` : ""}.`;
   }
 
   function quoteCanApprove(status) {
-    return !["APPROVED", "RESERVED", "CAPTURED", "CANCELLED", "EXPIRED", "FAILED"].includes(String(status || "").toUpperCase());
+    return String(status || "").toUpperCase() === "QUOTED";
   }
 
   function renderQuotes(data) {
@@ -152,7 +168,7 @@
 
   function renderUsage(data) {
     const usage = Array.isArray(data?.usage) ? data.usage : [];
-    el("usageList").innerHTML = usage.length ? usage.map((item) => `<div class="payg-row"><div class="payg-row-main"><strong>${escapeHtml(item.rate_code || "Concierge-Ausführung")}</strong><div class="payg-row-meta">${escapeHtml(item.quantity ?? "–")} ${escapeHtml(item.unit || "")} · ${dateTime(item.occurred_at)}</div></div><div class="payg-amount">${money(Math.round(Number(item.actual_cost || 0) * 100), item.currency || "EUR")}</div></div>`).join("") : empty("Noch keine PAYG-Nutzung verbucht.");
+    el("usageList").innerHTML = usage.length ? usage.map((item) => `<div class="payg-row"><div class="payg-row-main"><strong>${escapeHtml(item.rate_code || "Concierge-Ausführung")}</strong><div class="payg-row-meta">${escapeHtml(item.quantity ?? "–")} ${escapeHtml(item.unit || "")} · ${dateTime(item.occurred_at)}</div></div><div class="payg-amount">${moneyMajor(item.actual_cost, item.currency || "EUR")}</div></div>`).join("") : empty("Noch keine PAYG-Nutzung verbucht.");
   }
 
   function renderTransactions(data) {
@@ -223,7 +239,7 @@
 
   async function loadStripe() {
     const key = stripePublishableKey();
-    if (!/^pk_(live|test)_/.test(key)) throw new Error("Der Stripe-Browser-Key ist in PROD noch nicht veröffentlicht.");
+    if (!/^pk_live_/.test(key)) throw new Error("Der Stripe-Live-Browser-Key ist in PROD noch nicht veröffentlicht.");
     if (!window.Stripe) {
       await new Promise((resolve, reject) => {
         const script = document.createElement("script");
@@ -278,6 +294,7 @@
     if (!el("topupConsent").checked) return setAlert("Bitte bestätige zuerst den angezeigten Aufladebetrag.", "error");
     const method = state.data?.payment_methods?.find((item) => item.is_default) || state.data?.payment_methods?.[0];
     if (!method) return setAlert("Es ist keine aktive Zahlungsmethode hinterlegt.", "error");
+    if (state.data?.payment_provider?.webhook_configured !== true) return setAlert("Die serverseitige Zahlungsbestätigung ist noch nicht autoritativ verfügbar.", "error");
     if (String(method.method_type || "card").toLowerCase() !== "card") return setAlert("Diese Zahlungsmethode benötigt einen serverseitig freigegebenen Bestätigungsweg. Es wird keine Ersatzlogik verwendet.", "error");
     setBusy(true, `Aufladung über ${money(amountCents)} wird vorbereitet …`);
     try {
@@ -286,7 +303,7 @@
       if (!result?.client_secret) throw new Error("Der Zahlungsanbieter hat keine sichere Zahlungsfreigabe geliefert.");
       const confirmation = await stripe.confirmCardPayment(result.client_secret);
       if (confirmation.error) throw new Error(confirmation.error.message || "Die Zahlung wurde nicht bestätigt.");
-      setAlert("Zahlung bestätigt. Der Kontostand wird nach serverseitiger Zahlungsbestätigung aktualisiert.", "success");
+      setAlert("Zahlung bestätigt. Der Kontostand wird erst nach serverseitiger Zahlungsbestätigung aktualisiert.", "success");
       await reload("Zahlungsstatus wird aktualisiert …");
     } catch (error) { setAlert(error.message, "error"); }
     finally { setBusy(false); }
@@ -330,7 +347,7 @@
     });
   }
 
-  window.NAHWERKPaygAccountTestHooks = Object.freeze({ PROD_PAYG_ENDPOINT, money, euroToCents, errorMessage, stripePublishableKey, quoteCanApprove });
+  window.NAHWERKPaygAccountTestHooks = Object.freeze({ PROD_PAYG_ENDPOINT, money, moneyMajor, euroToCents, errorMessage, stripePublishableKey, quoteCanApprove });
 
   async function boot() {
     bind();
