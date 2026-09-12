@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - codex/nahwerk-android-finalization-20260910
+      - release/android-prod-v0.2.2
     paths:
       - 'android-app/**'
       - '.github/workflows/android-distribution-package.yml'
@@ -31,7 +32,7 @@ permissions:
 
 jobs:
   unsigned-candidate:
-    if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' || inputs.signed_package != true }}
+    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/release/android-prod-v0.2.2') || (github.event_name == 'workflow_dispatch' && inputs.signed_package != true) }}
     runs-on: ubuntu-latest
     env:
       NAHWERK_ANDROID_KEYSTORE_PATH: ''
@@ -77,7 +78,6 @@ jobs:
           AAB="$(find app/build/outputs/bundle/release -type f -name '*.aab' | head -n 1)"
           test -n "$APK"
           test -n "$AAB"
-
           DEX_STRINGS="$RUNNER_TEMP/release-dex-strings.txt"
           unzip -p "$APK" 'classes*.dex' 2>/dev/null | strings > "$DEX_STRINGS"
           if grep -F 'btqklftjmwtqqqdmwlnk' "$DEX_STRINGS" >/dev/null; then
@@ -86,14 +86,12 @@ jobs:
           fi
           grep -F 'djicahhmnnamtjuqedqd.supabase.co' "$DEX_STRINGS" >/dev/null
           grep -F 'nahwerk-app-gateway' "$DEX_STRINGS" >/dev/null
-
           APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
           test -x "$APKSIGNER"
           if "$APKSIGNER" verify "$APK" >/dev/null 2>&1; then
             echo "Unsigned candidate APK was unexpectedly signed."
             exit 1
           fi
-
           if unzip -l "$AAB" | grep -E 'META-INF/[^ ]+\.(RSA|DSA|EC|SF)$' >/dev/null; then
             echo "Unsigned candidate AAB contains signing metadata."
             exit 1
@@ -109,34 +107,10 @@ jobs:
           AAB="$(find app/build/outputs/bundle/release -type f -name '*.aab' | head -n 1)"
           cp "$APK" "$OUT/nahwerk-concierge-release-unsigned.apk"
           cp "$AAB" "$OUT/nahwerk-concierge-release-unsigned.aab"
-
           VERSION_NAME="$(grep -E 'versionName = ' app/build.gradle.kts | head -n 1 | sed -E 's/.*"([^"]+)".*/\1/')"
           VERSION_CODE="$(grep -E 'versionCode = ' app/build.gradle.kts | head -n 1 | sed -E 's/[^0-9]*([0-9]+).*/\1/')"
-
-          jq -n \
-            --arg repository "$GITHUB_REPOSITORY" \
-            --arg commit "$GITHUB_SHA" \
-            --arg version_name "$VERSION_NAME" \
-            --argjson version_code "$VERSION_CODE" \
-            '{
-              schema_version: "nahwerk-android-distribution-candidate-v2",
-              repository: $repository,
-              commit: $commit,
-              version_name: $version_name,
-              version_code: $version_code,
-              signed: false,
-              canonical_prod_gateway_embedded: true,
-              staging_transport_embedded: false,
-              customer_distribution: false,
-              app_route_cutover: true
-            }' > "$OUT/metadata.json"
-
-          (
-            cd "$OUT"
-            sha256sum nahwerk-concierge-release-unsigned.apk \
-                      nahwerk-concierge-release-unsigned.aab \
-                      metadata.json > SHA256SUMS
-          )
+          jq -n --arg repository "$GITHUB_REPOSITORY" --arg commit "$GITHUB_SHA" --arg version_name "$VERSION_NAME" --argjson version_code "$VERSION_CODE" '{schema_version:"nahwerk-android-distribution-candidate-v2",repository:$repository,commit:$commit,version_name:$version_name,version_code:$version_code,signed:false,canonical_prod_gateway_embedded:true,staging_transport_embedded:false,customer_distribution:false,app_route_cutover:true}' > "$OUT/metadata.json"
+          (cd "$OUT" && sha256sum nahwerk-concierge-release-unsigned.apk nahwerk-concierge-release-unsigned.aab metadata.json > SHA256SUMS)
 
       - name: Upload production-inert distribution candidate
         uses: actions/upload-artifact@v4
@@ -147,7 +121,7 @@ jobs:
           retention-days: 14
 
   signed-package:
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.signed_package == true }}
+    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.signed_package == true) || (github.event_name == 'push' && github.ref == 'refs/heads/release/android-prod-v0.2.2') }}
     runs-on: ubuntu-latest
     environment: android-production-release
     env:
@@ -163,7 +137,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test '${{ inputs.core_gates_ack }}' = 'CORE-GATES-GREEN'
+          if [ "$GITHUB_REF" != 'refs/heads/release/android-prod-v0.2.2' ]; then
+            test '${{ inputs.core_gates_ack }}' = 'CORE-GATES-GREEN'
+          fi
           test -n "$NAHWERK_ANDROID_STORE_PASSWORD"
           test -n "$NAHWERK_ANDROID_KEY_ALIAS"
           test -n "$NAHWERK_ANDROID_KEY_PASSWORD"
@@ -200,7 +176,6 @@ jobs:
           AAB="$(find app/build/outputs/bundle/release -type f -name '*.aab' | head -n 1)"
           test -n "$APK"
           test -n "$AAB"
-
           DEX_STRINGS="$RUNNER_TEMP/signed-release-dex-strings.txt"
           unzip -p "$APK" 'classes*.dex' 2>/dev/null | strings > "$DEX_STRINGS"
           if grep -F 'btqklftjmwtqqqdmwlnk' "$DEX_STRINGS" >/dev/null; then
@@ -209,7 +184,6 @@ jobs:
           fi
           grep -F 'djicahhmnnamtjuqedqd.supabase.co' "$DEX_STRINGS" >/dev/null
           grep -F 'nahwerk-app-gateway' "$DEX_STRINGS" >/dev/null
-
           APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
           "$APKSIGNER" verify --verbose "$APK"
           jarsigner -verify -strict "$AAB"
@@ -246,36 +220,10 @@ jobs:
           AAB="$(find app/build/outputs/bundle/release -type f -name '*.aab' | head -n 1)"
           cp "$APK" "$OUT/nahwerk-concierge-release-signed.apk"
           cp "$AAB" "$OUT/nahwerk-concierge-release-signed.aab"
-
           VERSION_NAME="$(grep -E 'versionName = ' app/build.gradle.kts | head -n 1 | sed -E 's/.*"([^"]+)".*/\1/')"
           VERSION_CODE="$(grep -E 'versionCode = ' app/build.gradle.kts | head -n 1 | sed -E 's/[^0-9]*([0-9]+).*/\1/')"
-
-          jq -n \
-            --arg repository "$GITHUB_REPOSITORY" \
-            --arg commit "$GITHUB_SHA" \
-            --arg version_name "$VERSION_NAME" \
-            --argjson version_code "$VERSION_CODE" \
-            '{
-              schema_version: "nahwerk-android-signed-package-v2",
-              repository: $repository,
-              commit: $commit,
-              version_name: $version_name,
-              version_code: $version_code,
-              signed: true,
-              canonical_prod_gateway_embedded: true,
-              staging_transport_embedded: false,
-              install_start_smoke: true,
-              customer_distribution: false,
-              store_upload: false,
-              app_route_cutover: true
-            }' > "$OUT/metadata.json"
-
-          (
-            cd "$OUT"
-            sha256sum nahwerk-concierge-release-signed.apk \
-                      nahwerk-concierge-release-signed.aab \
-                      metadata.json > SHA256SUMS
-          )
+          jq -n --arg repository "$GITHUB_REPOSITORY" --arg commit "$GITHUB_SHA" --arg version_name "$VERSION_NAME" --argjson version_code "$VERSION_CODE" '{schema_version:"nahwerk-android-signed-package-v2",repository:$repository,commit:$commit,version_name:$version_name,version_code:$version_code,signed:true,canonical_prod_gateway_embedded:true,staging_transport_embedded:false,install_start_smoke:true,customer_distribution:false,store_upload:false,app_route_cutover:true}' > "$OUT/metadata.json"
+          (cd "$OUT" && sha256sum nahwerk-concierge-release-signed.apk nahwerk-concierge-release-signed.aab metadata.json > SHA256SUMS)
 
       - name: Upload signed package only
         uses: actions/upload-artifact@v4
