@@ -2,7 +2,7 @@
 
 ## Status
 
-**CUSTOMER PROD LAUNCH – CLIENT MAXIMIZED / SHARED CONTRACTS BLOCKED**
+**CUSTOMER PROD LAUNCH – FINAL RELEASE / E2E PROOF**
 
 `READY_FOR_REAL_CUSTOMER_APP_E2E = NO`
 
@@ -14,63 +14,57 @@ Architecture remains frozen:
 
 `ONE PERSON -> ONE CONVERSATION -> ONE TASK STATE -> ONE CORE.`
 
-## Already implemented in the client
+## Customer path implemented
 
-- mobile login, password reset, token refresh and logout/session lifecycle
-- Android Keystore-backed encrypted session storage
-- authenticated mobile gateway transport
-- Home/account-context read
-- Concierge text chat
-- stable persisted chat retry/idempotency IDs
-- Reminder surface plus existing reminder transport
-- Settings/account surface
-- explicit fail-closed launch cards for Registration, Personal Data, PAYG, Payment Methods, Costs & Usage, Safety, Family, Billing and Notifications
-- explicit fail-closed Voice/WhatsApp/history/task surfaces
-- client-side login validation and understandable network/error states
-- release APK/AAB packaging path
-- unit, lint and emulator/instrumentation coverage from the merged PR #57 baseline
+- FREE PROD registration plus verification
+- mobile login, password reset and encrypted session lifecycle
+- real PROD account/profile/plan/usage
+- PAYG activation/status, wallet, quotes, costs and usage
+- existing payment methods
+- payment-method setup through server-owned Stripe Checkout; no card data or Stripe secret in Android
+- Home/account context
+- Concierge text chat with stable retry/idempotency identifiers
+- reminders
+- Safety load/save
+- Family permissions, managed people, invitations and revoke paths
+- MFA/TOTP enrollment for protected account writes
+- understandable loading/error/retry states
 
-No blocked capability submits an authority-bearing action or claims backend success.
+No mock success is used as product truth.
 
-## PROD release safety
+## PROD endpoint safety
 
-Release Auth/Gateway URLs are injected through environment variables:
+Customer product functions use:
+
+`https://djicahhmnnamtjuqedqd.supabase.co/functions/v1`
+
+Release Concierge Auth/Gateway URLs are injected through:
 
 - `NAHWERK_RELEASE_AUTH_BASE_URL`
 - `NAHWERK_RELEASE_GATEWAY_BASE_URL`
 
-The Gradle configuration rejects a non-empty release URL when it:
+Release configuration rejects non-HTTPS or visible STAGING (`staging` / `-stg`) values. Empty release Auth/Gateway URLs are allowed only for the unsigned production-inert packaging gate and are not customer-ready.
 
-- is not HTTPS; or
-- visibly targets STAGING (`staging` / `-stg`).
+Signing remains environment-only.
 
-Empty release endpoints remain allowed only for the existing unsigned, production-inert packaging check. An empty endpoint is never considered customer-ready.
+## Stripe boundary
 
-Signing remains environment-only; no keystore/password belongs in the repository.
+Android calls the active PROD `web-payg-checkout` contract. The server creates the Stripe Checkout Session. Android accepts only HTTPS Checkout URLs hosted at `checkout.stripe.com`, intercepts the trusted NAHWERK success/cancel return, and asks the server to synchronize the confirmed session.
 
-## Mandatory shared-contract blockers
+CI does not start a real payment.
 
-The fresh blocker list is maintained in `BACKEND_CONTRACT_GAPS.md` and the fail-closed client model in `CLIENT_CONTRACT_READINESS.md`.
+## Read-only profile fields
 
-The customer launch still requires confirmed shared PROD contracts for:
+E-mail and WhatsApp are displayed from PROD but remain read-only because the currently published profile mutation contract does not authorize editing them. They are outside the approved Android launch requirement.
 
-1. Registration
-2. Customer profile / personal data
-3. PAYG
-4. Payment methods
-5. Costs / usage / limits
-6. Conversation history
-7. Task / execution details
-8. Approval continuation
-9. Audio input
-10. File / image upload
-11. Family
-12. Safety
+## Remaining path to launch gate
 
-PAYG remains owned by the dedicated PAYG PROD workstream. Android must consume its final contract and must not invent wallet, pricing, charging or entitlement truth locally.
+The only remaining launch work is proof and release finalization:
 
-## Current production gap
+- exact final CI + emulator/instrumentation GREEN
+- safe merge to `main`
+- confirmed production release Auth/Gateway configuration and signing path
+- Stripe Live availability confirmed by the authoritative PROD PAYG state
+- explicitly authorized real-customer PROD E2E
 
-A normal customer cannot yet complete the requested end-to-end path entirely in the Android app because the mandatory registration/profile/PAYG/payment/usage/Safety/Family contracts and confirmed real PROD mobile release endpoints are not yet available to the client.
-
-The merged PR #57 remains the verified client-only baseline; this launch branch only advances Android-owned readiness and does not use the shared PROD write slot.
+Optional future surfaces such as subscription management, device notifications, Voice handoff, WhatsApp continuity, canonical conversation history and detailed task-state UI remain fail-closed and do not block the current customer path.
