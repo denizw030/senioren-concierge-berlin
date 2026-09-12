@@ -102,13 +102,17 @@ test('PAYG lets customers decline a QUOTED job through the canonical PROD action
   assert.match(runtime, /quote_cancel_failed/);
 });
 
-test('payment method removal is prepared but cannot fake a missing PROD contract', () => {
+test('payment method removal binds to exact PROD detach capability and verifies authoritative state', () => {
   const payg = read('payg.html');
   const guard = read('assets/payg-payment-method-remove-guard.js');
   assert.match(payg, /id="paymentRemove"[^>]*hidden[^>]*disabled/);
-  assert.match(payg, /autoritative PAYG-PROD-Vertrag/);
-  assert.match(guard, /supported: false/);
-  assert.match(guard, /PAYG_PROD_REMOVE_PAYMENT_METHOD_CONTRACT_MISSING/);
-  assert.doesNotMatch(guard, /\bfetch\s*\(/);
-  assert.doesNotMatch(guard, /staging/i);
+  assert.match(guard, /CONTRACT_VERSION = "payg-payment-method-detach-v1"/);
+  assert.match(guard, /source\.authoritative === true/);
+  assert.match(guard, /source\.detach_supported === true/);
+  assert.match(guard, /action:"detach_payment_method"/);
+  assert.match(guard, /payment_method_id:methodId/);
+  assert.match(guard, /body\?\.status !== "payment_method_detached"/);
+  assert.match(guard, /stillActive/);
+  assert.match(guard, /location\.reload\(\)/);
+  assert.doesNotMatch(guard, /staging|shadow/i);
 });
