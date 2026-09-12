@@ -20,6 +20,12 @@ Für die vollständige Kundenstrecke muss der PAYG-Arbeitsstrang den kanonischen
 
 Die Website erfindet dafür keine parallelen Endpunkte oder Response-Schemas.
 
+## Web Concierge — externer Blocker
+
+Der aktuell eingebundene Web-Chat ist ausdrücklich nur eine Shadow-/Testoberfläche. `assets/web-core-shadow.js` verweist auf `nahwerk-customer-portal-staging/portal/web-core-shadow`; erfolgreiche Shadow-Verarbeitung setzt `shadow_only: true` und `customer_delivery: false`. `assets/web-concierge-chat.js` bezeichnet die Oberfläche ebenfalls als Shadow/Test und ist standardmäßig deaktiviert.
+
+Damit existiert aktuell kein veröffentlichter echter PROD-Web-Concierge-Transport für einen normalen eingeloggten Kunden. Der Website-PROD-Guard blockiert den STAGING-Transport zusätzlich. Für die vollständige Kundenstrecke muss ein kanonischer PROD-Web-Transport des zentralen Concierge Core bereitgestellt und danach gegen einen realen Kundenkontext E2E verifiziert werden. Die Website erfindet keinen Ersatztransport.
+
 ## Telefonannahme — PROD-Schutz
 
 `konto.html` enthält im Legacy-Markup noch einen ausdrücklich als STAGING bezeichneten Endpoint für Telefonannahme. Die Website blockiert deshalb auf der Kundenkonto-Seite jeden STAGING-Fetch und blendet die Telefonannahme-Oberfläche aus. Eine Wiederfreigabe darf erst erfolgen, wenn ein kanonischer PROD-Vertrag existiert.
@@ -30,4 +36,4 @@ Die bestehende Website-Launch-Readiness-Arbeit bleibt für kostenpflichtige Vert
 
 ## Gate
 
-`READY_FOR_REAL_CUSTOMER_WEB_ACCOUNT_E2E` bleibt `NO`, solange PAYG-Aktivierung, Zahlungsmethode und PAYG-Kosten nicht über einen kanonischen PROD-Webvertrag real verfügbar sind und die vollständige Kundenstrecke nicht gegen PROD end-to-end verifiziert wurde.
+`READY_FOR_REAL_CUSTOMER_WEB_ACCOUNT_E2E` bleibt `NO`, solange PAYG-Aktivierung, Zahlungsmethode und PAYG-Kosten nicht über einen kanonischen PROD-Webvertrag real verfügbar sind, der Web Concierge keinen echten PROD-Kundentransport besitzt und die vollständige Kundenstrecke nicht gegen PROD end-to-end verifiziert wurde.
