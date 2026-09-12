@@ -4,6 +4,7 @@ val releaseKeystorePath = System.getenv("NAHWERK_ANDROID_KEYSTORE_PATH")?.trim()
 val releaseStorePassword = System.getenv("NAHWERK_ANDROID_STORE_PASSWORD")?.trim().orEmpty()
 val releaseKeyAlias = System.getenv("NAHWERK_ANDROID_KEY_ALIAS")?.trim().orEmpty()
 val releaseKeyPassword = System.getenv("NAHWERK_ANDROID_KEY_PASSWORD")?.trim().orEmpty()
+val customerProductBaseUrl = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1"
 
 val releaseSigningValues = listOf(
     releaseKeystorePath,
@@ -32,6 +33,9 @@ require(releaseAuthBaseUrl.isBlank() || !isStagingEndpoint(releaseAuthBaseUrl)) 
 require(releaseGatewayBaseUrl.isBlank() || !isStagingEndpoint(releaseGatewayBaseUrl)) {
     "Android release gateway endpoint must not target STAGING."
 }
+require(customerProductBaseUrl.startsWith("https://") && !isStagingEndpoint(customerProductBaseUrl)) {
+    "Android customer product API must target canonical HTTPS PROD only."
+}
 
 fun buildConfigString(value: String): String =
     "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
@@ -52,6 +56,7 @@ android {
         versionCode = 3
         versionName = "0.2.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "CUSTOMER_PRODUCT_BASE_URL", buildConfigString(customerProductBaseUrl))
     }
     buildFeatures { compose = true; buildConfig = true }
 
