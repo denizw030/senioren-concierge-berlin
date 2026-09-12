@@ -41,23 +41,41 @@ test('existing Web Concierge remains explicitly shadow-only and cannot be mistak
   assert.match(chat, /shadow-only/);
 });
 
-test('PAYG is findable but remains fail-closed until canonical PROD contract exists', () => {
-  const ui = read('assets/site-ui.js');
+test('PAYG customer surface uses only canonical PROD functions and no mocks or staging', () => {
   const payg = read('payg.html');
-  assert.match(ui, /accountPaygEntry/);
-  assert.match(ui, /payg\.html/);
+  const runtime = read('assets/payg-account.js');
   assert.match(payg, /Kundenkonto · PAYG/);
-  assert.match(payg, /id="paygActivate" disabled/);
-  assert.match(payg, /id="paymentManage" disabled/);
-  assert.match(payg, /Es werden keine Kosten, Guthaben, Belastungen oder Auftragszahlen geschätzt/);
-  assert.match(payg, /PAYG-Arbeitsstrang seinen kanonischen PROD-Webvertrag veröffentlicht hat/);
-  assert.doesNotMatch(payg, /customer-portal-staging|functions\/v1\/.*payg/i);
+  assert.match(payg, /assets\/payg-account\.js/);
+  assert.match(payg, /id="paygActivate"/);
+  assert.match(payg, /id="paymentManage"/);
+  assert.match(payg, /data-topup-cents="500"/);
+  assert.match(payg, /Zahlungen & Aufträge/);
+  assert.match(runtime, /functions\/v1\/web-payg/);
+  assert.match(runtime, /functions\/v1\/web-payg-checkout/);
+  assert.match(runtime, /action:"activate"/);
+  assert.match(runtime, /payment_method_checkout/);
+  assert.match(runtime, /sync_payment_method_checkout/);
+  assert.match(runtime, /topup_checkout/);
+  assert.match(runtime, /sync_topup_checkout/);
+  assert.match(runtime, /serverseitigen Usage-Ledger/);
+  assert.doesNotMatch(payg, /customer-portal-staging|mock/i);
+  assert.doesNotMatch(runtime, /customer-portal-staging|mock/i);
 });
 
-test('PAYG surface is mobile responsive and validates the real session', () => {
+test('PAYG surface is mobile responsive, session-bound and explicit before real top-up', () => {
   const payg = read('payg.html');
+  const runtime = read('assets/payg-account.js');
   assert.match(payg, /@media\(max-width:820px\)/);
-  assert.match(payg, /SCBAuth/);
-  assert.match(payg, /validateSession/);
-  assert.match(payg, /location\.replace\("anmelden\.html"\)/);
+  assert.match(runtime, /SCBAuth/);
+  assert.match(runtime, /validateSession/);
+  assert.match(runtime, /location\.replace\("anmelden\.html"\)/);
+  assert.match(runtime, /confirm\(`Du wirst zu Stripe weitergeleitet/);
+  assert.match(runtime, /requires_customer_confirmation/);
+});
+
+test('PAYG payment state remains fail-closed when Stripe Live is not configured', () => {
+  const runtime = read('assets/payg-account.js');
+  assert.match(runtime, /provider\.setup_available === true/);
+  assert.match(runtime, /Stripe Live ist in der PROD-Runtime noch nicht verbunden/);
+  assert.match(runtime, /button\.disabled = state\.loading \|\| !providerReady/);
 });
