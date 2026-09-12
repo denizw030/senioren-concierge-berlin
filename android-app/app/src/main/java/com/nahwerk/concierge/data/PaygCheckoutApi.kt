@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.net.HttpURLConnection
+import java.net.URI
 import java.net.URL
 import java.util.UUID
 
@@ -39,7 +40,7 @@ internal class PaygCheckoutApi(context: Context) {
         }
         val url = response.second.optString("checkout_url")
         val sessionId = response.second.optString("checkout_session_id")
-        if (!url.startsWith("https://") || !sessionId.startsWith("cs_")) {
+        if (!isTrustedStripeCheckoutUrl(url) || !sessionId.startsWith("cs_")) {
             return@withContext Result.failure(IllegalStateException("Stripe-Checkout wurde nicht eindeutig bestätigt."))
         }
         Result.success(PaymentMethodCheckout(url, sessionId))
@@ -65,6 +66,13 @@ internal class PaygCheckoutApi(context: Context) {
         }
         Result.success(Unit)
     }
+
+    private fun isTrustedStripeCheckoutUrl(value: String): Boolean = runCatching {
+        val uri = URI(value)
+        uri.scheme.equals("https", ignoreCase = true) &&
+            uri.host.equals("checkout.stripe.com", ignoreCase = true) &&
+            uri.userInfo == null
+    }.getOrDefault(false)
 
     private fun post(token: String, payload: JSONObject): Pair<Int, JSONObject> {
         if (!endpoint.startsWith("https://") || endpoint.contains("staging", ignoreCase = true)) {
