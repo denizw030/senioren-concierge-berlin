@@ -15,6 +15,13 @@
     return new Intl.NumberFormat("de-DE", { style:"currency", currency }).format(amount);
   }
 
+  function formatDateTime(value) {
+    if (!value) return "";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+    return new Intl.DateTimeFormat("de-DE", { dateStyle:"medium", timeStyle:"short" }).format(date);
+  }
+
   function showError(message) {
     const box = $("paygSessionError");
     if (!box) return;
@@ -32,7 +39,12 @@
   function setBusy(busy) {
     state.loading = busy;
     document.body.classList.toggle("payg-loading", busy);
-    [$("paygActivate"), $("paymentManage"), ...document.querySelectorAll("[data-topup-cents]")].forEach((el) => {
+    [
+      $("paygActivate"),
+      $("paymentManage"),
+      ...document.querySelectorAll("[data-topup-cents]"),
+      ...document.querySelectorAll("[data-quote-action]")
+    ].forEach((el) => {
       if (el) el.disabled = busy || el.dataset.forceDisabled === "1";
     });
   }
@@ -74,7 +86,10 @@
       invalid_session:"Deine Sitzung ist nicht mehr gültig.",
       checkout_failed:"Die sichere Zahlungsseite konnte nicht vorbereitet werden.",
       payment_method_register_failed:"Die Zahlungsmethode konnte nicht übernommen werden.",
-      topup_finalize_failed:"Die Zahlung wurde noch nicht vollständig verbucht. Bitte den Status erneut laden."
+      topup_finalize_failed:"Die Zahlung wurde noch nicht vollständig verbucht. Bitte den Status erneut laden.",
+      quote_id_required:"Die Preisfreigabe ist nicht mehr gültig. Bitte den Status neu laden.",
+      quote_approval_failed:"Der Auftrag konnte nicht kostenpflichtig freigegeben werden. Bitte den aktuellen Status neu laden.",
+      quote_cancel_failed:"Der Auftrag konnte nicht abgelehnt werden. Bitte den aktuellen Status neu laden."
     };
     return map[code] || "Der Vorgang konnte gerade nicht abgeschlossen werden. Es wurde nichts doppelt ausgelöst.";
   }
@@ -106,6 +121,75 @@
     button.dataset.forceDisabled = providerReady ? "0" : "1";
     button.disabled = state.loading || !providerReady;
     return Boolean(active);
+  }
+
+  function quoteActionable(quote) {
+    if (String(quote?.status || "").toUpperCase() !== "QUOTED") return false;
+    if (!quote?.expires_at) return true;
+    const expiresAt = new Date(quote.expires_at).getTime();
+    return Number.isFinite(expiresAt) && expiresAt > Date.now();
+  }
+
+  function renderQuotes(data) {
+    const host = $("paygQuotes");
+    if (!host) return;
+    const quotes = (Array.isArray(data?.quotes) ? data.quotes : []).filter((quote) => String(quote?.status || "").toUpperCase() === "QUOTED");
+    host.innerHTML = "";
+    if (!quotes.length) {
+      const empty = document.createElement("div");
+      empty.className = "payg-quote-empty";
+      empty.textContent = "Keine offenen Preisfreigaben.";
+      host.appendChild(empty);
+      return;
+    }
+
+    const paygReady = data?.payg?.enabled === true && data?.payg?.billing_blocked !== true;
+    quotes.forEach((quote) => {
+      const row = document.createElement("article");
+      row.className = "payg-quote";
+
+      const head = document.createElement("div");
+      head.className = "payg-quote-head";
+      const titleWrap = document.createElement("div");
+      titleWrap.className = "payg-quote-title";
+      const title = document.createElement("strong");
+      title.textContent = String(quote.description || quote.rate_code || "PAYG-Auftrag");
+      const meta = document.createElement("span");
+      const expiry = formatDateTime(quote.expires_at);
+      meta.textContent = quoteActionable(quote)
+        ? `Status QUOTED${expiry ? ` · gültig bis ${expiry}` : ""}`
+        : `Status QUOTED · Freigabefrist abgelaufen${expiry ? ` (${expiry})` : ""}`;
+      titleWrap.append(title,meta);
+
+      const amount = document.createElement("strong");
+      amount.className = "payg-quote-amount";
+      amount.textContent = moneyFromCents(quote.amount_cents,quote.currency || "EUR");
+      head.append(titleWrap,amount);
+      row.appendChild(head);
+
+      const actionable = paygReady && quoteActionable(quote);
+      if (actionable) {
+        const actions = document.createElement("div");
+        actions.className = "payg-quote-actions";
+        const approve = document.createElement("button");
+        approve.className = "btn red";
+        approve.type = "button";
+        approve.dataset.quoteAction = "approve";
+        approve.dataset.quoteId = String(quote.id || "");
+        approve.dataset.forceDisabled = "0";
+        approve.textContent = `Kostenpflichtig freigeben – ${moneyFromCents(quote.amount_cents,quote.currency || "EUR")}`;
+        const cancel = document.createElement("button");
+        cancel.className = "btn light";
+        cancel.type = "button";
+        cancel.dataset.quoteAction = "cancel";
+        cancel.dataset.quoteId = String(quote.id || "");
+        cancel.dataset.forceDisabled = "0";
+        cancel.textContent = "Nicht beauftragen";
+        actions.append(approve,cancel);
+        row.appendChild(actions);
+      }
+      host.appendChild(row);
+    });
   }
 
   function renderActivity(data) {
@@ -217,6 +301,7 @@
       ? "<strong>PROD aktiv:</strong> PAYG-Status, Wallet, Zahlungsmethode, Preise und Kosten werden ausschließlich aus dem autoritativen PROD-Vertrag geladen."
       : "<strong>PAYG-Backend aktiv:</strong> Status, Wallet, Preise und Kosten kommen aus PROD. Für echte Zahlungen fehlt aktuell noch die Stripe-Live-Konfiguration der Server-Runtime.";
 
+    renderQuotes(data);
     renderActivity(data);
   }
 
@@ -288,6 +373,45 @@
     }
   }
 
+  function findQuote(quoteId) {
+    return (Array.isArray(state.account?.quotes) ? state.account.quotes : []).find((quote) => String(quote?.id || "") === String(quoteId || "")) || null;
+  }
+
+  async function approveQuote(quoteId) {
+    if (state.loading) return;
+    const quote = findQuote(quoteId);
+    if (!quote || !quoteActionable(quote)) return showError("Diese Preisfreigabe ist nicht mehr aktiv. Bitte den Status neu laden.");
+    const title = String(quote.description || quote.rate_code || "PAYG-Auftrag");
+    const amount = moneyFromCents(quote.amount_cents,quote.currency || "EUR");
+    if (!confirm(`Du gibst „${title}“ zum angezeigten Gesamtbetrag von ${amount} kostenpflichtig frei. Ohne diese Freigabe wird der Auftrag nicht als genehmigt markiert. Kostenpflichtig freigeben?`)) return;
+    clearError();
+    setBusy(true);
+    try {
+      await api(PAYG_URL,"POST",{ action:"approve_quote", quote_id:String(quote.id) });
+      await load();
+    } catch (error) {
+      showError(friendlyStatus(error.message));
+      setBusy(false);
+    }
+  }
+
+  async function cancelQuote(quoteId) {
+    if (state.loading) return;
+    const quote = findQuote(quoteId);
+    if (!quote || String(quote.status || "").toUpperCase() !== "QUOTED") return showError("Diese Preisfreigabe ist nicht mehr offen. Bitte den Status neu laden.");
+    const title = String(quote.description || quote.rate_code || "PAYG-Auftrag");
+    if (!confirm(`„${title}“ nicht beauftragen und diese Preisfreigabe ablehnen?`)) return;
+    clearError();
+    setBusy(true);
+    try {
+      await api(PAYG_URL,"POST",{ action:"cancel_quote", quote_id:String(quote.id), reason:"customer_cancelled_in_web_account" });
+      await load();
+    } catch (error) {
+      showError(friendlyStatus(error.message));
+      setBusy(false);
+    }
+  }
+
   async function syncReturnState() {
     const params = new URLSearchParams(location.search);
     const checkoutSessionId = params.get("session_id") || "";
@@ -321,9 +445,17 @@
     document.querySelectorAll("[data-topup-cents]").forEach((button) => {
       button.addEventListener("click", () => startTopup(Number(button.dataset.topupCents)));
     });
+    $("paygQuotes")?.addEventListener("click", (event) => {
+      const button = event.target instanceof Element ? event.target.closest("button[data-quote-action]") : null;
+      if (!button || button.disabled) return;
+      if (button.dataset.quoteAction === "approve") approveQuote(button.dataset.quoteId);
+      if (button.dataset.quoteAction === "cancel") cancelQuote(button.dataset.quoteId);
+    });
     await syncReturnState();
     await load();
   }
+
+  window.NAHWERKPaygAccountTestHooks = Object.freeze({ quoteActionable, moneyFromCents, friendlyStatus });
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once:true });
   else init();
