@@ -1,10 +1,9 @@
 (() => {
   const isCustomerAccount = /(?:^|\/)konto\.html$/.test(location.pathname);
+  const isProdCustomerSurface = /(?:^|\/)(?:konto|payg|web-concierge)\.html$/.test(location.pathname);
 
-  // Customer-account PROD guard: never allow a known STAGING URL to become
-  // customer-visible product truth. This is deliberately website-only and
-  // does not alter any backend/runtime contract.
-  if (isCustomerAccount && typeof window.fetch === "function") {
+  // Customer PROD surfaces must never call a known STAGING endpoint.
+  if (isProdCustomerSurface && typeof window.fetch === "function") {
     const nativeFetch = window.fetch.bind(window);
     window.fetch = (input, init) => {
       const raw = input instanceof Request ? input.url : String(input || "");
@@ -38,9 +37,6 @@
   const prepareCustomerAccount = () => {
     if (!isCustomerAccount) return;
 
-    // The telephone-reception surface still points to an explicitly STAGING
-    // backend in the legacy account markup. Keep it out of the real customer
-    // product until a canonical PROD contract exists.
     const reception = document.getElementById("telephoneReceptionCard");
     if (reception) {
       reception.hidden = true;
@@ -51,9 +47,6 @@
       });
     }
 
-    // PAYG must be findable from the real account, while its current backend
-    // authority remains fail-closed. The dedicated page never invents status,
-    // payment methods, balances, costs or activation success.
     const highlights = document.querySelector(".account-overview-highlights[data-account-panel='overview']");
     if (highlights && !document.getElementById("accountPaygEntry")) {
       const payg = document.createElement("a");
@@ -63,6 +56,16 @@
       payg.setAttribute("aria-label", "PAYG – Bezahlen pro Auftrag öffnen");
       payg.innerHTML = '<span class="eyebrow">PAYG</span><strong>Bezahlen pro Auftrag</strong><span>Status, Zahlungsmethode und Kosten transparent anzeigen.</span>';
       highlights.appendChild(payg);
+    }
+
+    if (highlights && !document.getElementById("accountWebConciergeEntry")) {
+      const concierge = document.createElement("a");
+      concierge.id = "accountWebConciergeEntry";
+      concierge.className = "account-overview-link";
+      concierge.href = "web-concierge.html";
+      concierge.setAttribute("aria-label", "Web Concierge öffnen");
+      concierge.innerHTML = '<span class="eyebrow">Web Concierge</span><strong>Concierge im Kundenkonto</strong><span>Aktuelle PROD-Verfügbarkeit des persönlichen Webkanals ansehen.</span>';
+      highlights.appendChild(concierge);
     }
   };
 
@@ -76,7 +79,7 @@
       const href = el.getAttribute("href") || "";
       const isPrimaryCta =
         el.classList.contains("btn") ||
-        /registrieren|anmelden|pakete|kontakt|prime-concierge|senioren-concierge|payg/.test(href);
+        /registrieren|anmelden|pakete|kontakt|prime-concierge|senioren-concierge|payg|web-concierge/.test(href);
       if (!isPrimaryCta) return;
       void analytics()?.track("cta_click", {
         funnel_name: /registrieren/.test(href) ? "registration" : null,

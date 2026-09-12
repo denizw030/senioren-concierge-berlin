@@ -23,22 +23,24 @@ test('customer account fails closed when plan or usage truth is unavailable', ()
 
 test('customer account website blocks staging calls and suppresses staging telephone surface', () => {
   const ui = read('assets/site-ui.js');
-  assert.match(ui, /konto\\\.html/);
+  assert.match(ui, /konto\|payg\|web-concierge/);
   assert.match(ui, /\/staging\/i/);
   assert.match(ui, /PROD web guard blocked a non-PROD endpoint/);
   assert.match(ui, /telephoneReceptionCard/);
   assert.match(ui, /reception\.hidden = true/);
 });
 
-test('existing Web Concierge remains explicitly shadow-only and cannot be mistaken for PROD customer delivery', () => {
+test('legacy Web Concierge Shadow path is removed and cannot be mistaken for PROD delivery', () => {
   const shadow = read('assets/web-core-shadow.js');
   const chat = read('assets/web-concierge-chat.js');
-  assert.match(shadow, /customer-portal-staging\/portal\/web-core-shadow/);
-  assert.match(shadow, /shadow_only: true/);
+  assert.doesNotMatch(shadow, /customer-portal-staging\/portal\/web-core-shadow/);
+  assert.doesNotMatch(shadow, /\bfetch\s*\(/);
+  assert.match(shadow, /shadow_only: false/);
   assert.match(shadow, /customer_delivery: false/);
-  assert.match(chat, /Web-Concierge-Testtransport/);
-  assert.match(chat, /keine Kundenausgabe/);
-  assert.match(chat, /shadow-only/);
+  assert.match(shadow, /web_prod_gateway_required/);
+  assert.doesNotMatch(chat, /\bfetch\s*\(/);
+  assert.match(chat, /isEnabled: \(\) => false/);
+  assert.match(chat, /mount: \(\) => null/);
 });
 
 test('PAYG customer surface uses only canonical PROD functions and no mocks or staging', () => {

@@ -1,0 +1,46 @@
+name: Web Account Web Concierge PROD
+on:
+  pull_request:
+    paths:
+      - "web-concierge.html"
+      - "assets/web-customer-concierge.js"
+      - "assets/web-customer-concierge.css"
+      - "assets/web-core-shadow.js"
+      - "assets/web-concierge-chat.js"
+      - "assets/site-ui.js"
+      - "tests/web-account-webconcierge-prod.test.mjs"
+      - "tests/web-core-shadow-transport.test.mjs"
+      - "tests/web-concierge-chat-ui.test.mjs"
+      - ".github/workflows/web-account-webconcierge-prod.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  web-concierge-prod:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Web Concierge PROD boundary tests
+        run: node --test tests/web-account-webconcierge-prod.test.mjs tests/web-core-shadow-transport.test.mjs tests/web-concierge-chat-ui.test.mjs
+      - name: Runtime JavaScript syntax
+        run: |
+          node --check assets/web-customer-concierge.js
+          node --check assets/web-core-shadow.js
+          node --check assets/web-concierge-chat.js
+          node --check assets/site-ui.js
+      - name: Static customer route smoke
+        run: |
+          python3 -m http.server 4173 >/tmp/nw-web-concierge.log 2>&1 &
+          server_pid=$!
+          trap 'kill $server_pid' EXIT
+          for attempt in 1 2 3 4 5; do
+            curl -fsS "http://127.0.0.1:4173/web-concierge.html" >/dev/null && break
+            sleep 1
+          done
+          curl -fsS "http://127.0.0.1:4173/konto.html" >/dev/null
+          curl -fsS "http://127.0.0.1:4173/web-concierge.html" >/dev/null
+          curl -fsS "http://127.0.0.1:4173/assets/web-customer-concierge.js" >/dev/null
