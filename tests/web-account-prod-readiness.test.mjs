@@ -36,7 +36,8 @@ test('existing Web Concierge remains explicitly shadow-only and cannot be mistak
   assert.match(shadow, /customer-portal-staging\/portal\/web-core-shadow/);
   assert.match(shadow, /shadow_only: true/);
   assert.match(shadow, /customer_delivery: false/);
-  assert.match(chat, /Shadow\/Test/);
+  assert.match(chat, /Web-Concierge-Testtransport/);
+  assert.match(chat, /keine Kundenausgabe/);
   assert.match(chat, /shadow-only/);
 });
 
