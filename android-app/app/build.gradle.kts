@@ -1,5 +1,3 @@
-val releaseAuthBaseUrl = System.getenv("NAHWERK_RELEASE_AUTH_BASE_URL")?.trim().orEmpty()
-val releaseGatewayBaseUrl = System.getenv("NAHWERK_RELEASE_GATEWAY_BASE_URL")?.trim().orEmpty()
 val releaseKeystorePath = System.getenv("NAHWERK_ANDROID_KEYSTORE_PATH")?.trim().orEmpty()
 val releaseStorePassword = System.getenv("NAHWERK_ANDROID_STORE_PASSWORD")?.trim().orEmpty()
 val releaseKeyAlias = System.getenv("NAHWERK_ANDROID_KEY_ALIAS")?.trim().orEmpty()
@@ -21,23 +19,11 @@ fun isStagingEndpoint(value: String): Boolean =
 require(!releaseSigningAny || releaseSigningComplete) {
     "Android release signing requires all four NAHWERK_ANDROID_* signing environment variables."
 }
-require(releaseAuthBaseUrl.isBlank() == releaseGatewayBaseUrl.isBlank()) {
-    "Android release live transport must configure auth and gateway together or leave both disabled."
-}
-require(releaseAuthBaseUrl.isBlank() || releaseAuthBaseUrl.startsWith("https://")) {
-    "Android release auth endpoint must use HTTPS."
-}
-require(releaseGatewayBaseUrl.isBlank() || releaseGatewayBaseUrl.startsWith("https://")) {
-    "Android release gateway endpoint must use HTTPS."
-}
-require(releaseAuthBaseUrl.isBlank() || !isStagingEndpoint(releaseAuthBaseUrl)) {
-    "Android release auth endpoint must not target STAGING."
-}
-require(releaseGatewayBaseUrl.isBlank() || !isStagingEndpoint(releaseGatewayBaseUrl)) {
-    "Android release gateway endpoint must not target STAGING."
-}
 require(customerProductBaseUrl.startsWith("https://") && !isStagingEndpoint(customerProductBaseUrl)) {
     "Android customer product API must target canonical HTTPS PROD only."
+}
+require(customerProductBaseUrl.contains("djicahhmnnamtjuqedqd.supabase.co")) {
+    "Android customer product API must target the canonical NAHWERK PROD project."
 }
 
 fun buildConfigString(value: String): String =
@@ -56,8 +42,8 @@ android {
         applicationId = "com.nahwerk.concierge"
         minSdk = 26
         targetSdk = 35
-        versionCode = 3
-        versionName = "0.2.1"
+        versionCode = 4
+        versionName = "0.2.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "CUSTOMER_PRODUCT_BASE_URL", buildConfigString(customerProductBaseUrl))
     }
@@ -83,8 +69,10 @@ android {
         release {
             isMinifyEnabled = true
             buildConfigField("String", "APP_ENVIRONMENT", "\"PROD\"")
-            buildConfigField("String", "AUTH_BASE_URL", buildConfigString(releaseAuthBaseUrl))
-            buildConfigField("String", "GATEWAY_BASE_URL", buildConfigString(releaseGatewayBaseUrl))
+            // Legacy mobile transport is intentionally inert. Customer PROD traffic
+            // uses CUSTOMER_PRODUCT_BASE_URL + /nahwerk-app-gateway.
+            buildConfigField("String", "AUTH_BASE_URL", "\"\"")
+            buildConfigField("String", "GATEWAY_BASE_URL", "\"\"")
             if (releaseSigningComplete) {
                 signingConfig = signingConfigs.getByName("releaseFromEnvironment")
             }
