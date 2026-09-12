@@ -11,60 +11,71 @@
   <link rel="stylesheet" href="assets/nahwerk-logo-v2.css?v=9" />
   <link rel="icon" type="image/svg+xml" href="assets/logos/nahwerk-concierge-gold-transparent.svg?v=1" />
   <style>
-    body{background:#05090e;color:#f2efe8}.payg-shell{max-width:1100px;margin:0 auto;padding:56px 24px 80px}.payg-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:28px}.payg-head h1{margin:6px 0 8px;font-size:clamp(2rem,5vw,3.4rem);letter-spacing:-.045em}.payg-head p{max-width:700px;margin:0;color:#a6a39d;line-height:1.65}.payg-back{white-space:nowrap}.payg-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.payg-card{min-width:0;padding:24px;border:1px solid rgba(133,154,182,.14);border-radius:20px;background:radial-gradient(340px 180px at 100% 0%,rgba(39,80,155,.10),transparent 66%),#080e16;box-shadow:inset 0 1px 0 rgba(255,255,255,.02)}.payg-card h2{margin:7px 0 12px;font-size:1.25rem}.payg-state{display:inline-flex;align-items:center;gap:8px;margin:3px 0 14px;padding:7px 10px;border:1px solid rgba(205,168,78,.25);border-radius:999px;color:#e6c66f;font-size:12px;font-weight:800}.payg-card p{margin:0 0 18px;color:#aaa7a1;line-height:1.6}.payg-card .btn{width:100%;justify-content:center}.payg-card .btn[disabled]{opacity:.48;cursor:not-allowed}.payg-notice{margin-top:18px;padding:18px 20px;border:1px solid rgba(205,168,78,.20);border-radius:16px;background:rgba(205,168,78,.055);color:#d9d4c8;line-height:1.6}.payg-notice strong{color:#f2efe8}.payg-error{margin-top:18px;padding:14px 16px;border-radius:12px;background:rgba(163,63,63,.10);border:1px solid rgba(191,91,91,.24);color:#e8caca}.payg-error[hidden]{display:none}.payg-loading{opacity:.72}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}@media(max-width:820px){.payg-head{align-items:flex-start;flex-direction:column}.payg-grid{grid-template-columns:1fr}.payg-shell{padding-top:34px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+    body{background:#05090e;color:#f2efe8}.payg-shell{max-width:1120px;margin:0 auto;padding:56px 24px 80px}.payg-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:28px}.payg-head h1{margin:6px 0 8px;font-size:clamp(2rem,5vw,3.4rem);letter-spacing:-.045em}.payg-head p{max-width:720px;margin:0;color:#a6a39d;line-height:1.65}.payg-back{white-space:nowrap}.payg-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.payg-card{min-width:0;padding:24px;border:1px solid rgba(133,154,182,.14);border-radius:20px;background:radial-gradient(340px 180px at 100% 0%,rgba(39,80,155,.10),transparent 66%),#080e16;box-shadow:inset 0 1px 0 rgba(255,255,255,.02)}.payg-card h2{margin:7px 0 12px;font-size:1.25rem}.payg-state{display:inline-flex;align-items:center;gap:8px;margin:3px 0 14px;padding:7px 10px;border:1px solid rgba(205,168,78,.25);border-radius:999px;color:#e6c66f;font-size:12px;font-weight:800}.payg-card p{margin:0 0 18px;color:#aaa7a1;line-height:1.6}.payg-card .btn{width:100%;justify-content:center}.payg-card .btn[disabled],.payg-topup button[disabled]{opacity:.48;cursor:not-allowed}.payg-wide{grid-column:1/-1}.payg-topup-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}.payg-topup button{min-height:44px;border:1px solid rgba(205,168,78,.28);border-radius:12px;background:rgba(205,168,78,.07);color:#f1dfad;font:inherit;font-weight:800;cursor:pointer}.payg-topup-hint{margin-top:11px!important;font-size:12px}.payg-activity{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:9px}.payg-activity-row{display:flex;justify-content:space-between;gap:18px;padding:13px 14px;border:1px solid rgba(133,154,182,.12);border-radius:12px;background:rgba(255,255,255,.018)}.payg-activity-row div{display:grid;gap:3px}.payg-activity-row span{color:#8e9299;font-size:12px}.payg-activity-empty{padding:16px;border:1px dashed rgba(133,154,182,.18);border-radius:12px;color:#90949a}.payg-notice{margin-top:18px;padding:18px 20px;border:1px solid rgba(205,168,78,.20);border-radius:16px;background:rgba(205,168,78,.055);color:#d9d4c8;line-height:1.6}.payg-notice strong{color:#f2efe8}.payg-error{margin-top:18px;padding:14px 16px;border-radius:12px;background:rgba(163,63,63,.10);border:1px solid rgba(191,91,91,.24);color:#e8caca}.payg-error[hidden]{display:none}.payg-loading{cursor:progress}.payg-loading .payg-card{opacity:.82}@media(max-width:820px){.payg-head{align-items:flex-start;flex-direction:column}.payg-grid{grid-template-columns:1fr}.payg-wide{grid-column:auto}.payg-shell{padding-top:34px}.payg-topup-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
   </style>
 </head>
 <body>
   <header class="top"><div class="wrap nav"><a class="brand" href="index.html" aria-label="NAHWERK Concierge – Startseite"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Hauptnavigation"><a href="index.html">Übersicht</a><a href="prime-concierge.html">Persönlicher Concierge</a><a href="concierges.html">NAHWERK weltweit</a><a href="senioren-concierge.html">Senioren Concierge</a><a href="leistungen.html">Leistungen</a><a href="kontakt.html">Kontakt</a></nav></div></header>
   <main id="main-content" class="payg-shell">
     <div class="payg-head">
-      <div><div class="eyebrow">Kundenkonto · PAYG</div><h1>Bezahlen pro Auftrag.</h1><p>Hier werden nur serverseitig bestätigte PAYG-Zustände angezeigt. Solange der PROD-Vertrag noch nicht veröffentlicht ist, wird nichts aktiviert, gespeichert oder berechnet.</p></div>
+      <div><div class="eyebrow">Kundenkonto · PAYG</div><h1>Bezahlen nur bei Nutzung.</h1><p>PAYG läuft ausschließlich über den echten NAHWERK-PROD-Vertrag. Preise, Wallet, Zahlungen und Nutzung werden nicht geschätzt und nicht aus STAGING geladen.</p></div>
       <a class="btn light payg-back" href="konto.html">Zurück zum Konto</a>
     </div>
 
     <div class="payg-grid" aria-live="polite">
       <section class="payg-card" aria-labelledby="paygStatusTitle">
-        <div class="eyebrow">Status</div><h2 id="paygStatusTitle">PAYG</h2><div class="payg-state" id="paygStatus">Nicht verfügbar</div>
-        <p id="paygStatusMeta">Der echte PAYG-PROD-Status kann derzeit noch nicht aus dem veröffentlichten Web-Vertrag geladen werden.</p>
-        <button class="btn red" type="button" id="paygActivate" disabled>PAYG aktivieren</button>
+        <div class="eyebrow">Status</div><h2 id="paygStatusTitle">PAYG</h2><div class="payg-state" id="paygStatus">Wird geladen</div>
+        <p id="paygStatusMeta">Der echte PROD-Status wird geladen.</p>
+        <button class="btn red" type="button" id="paygActivate">PAYG aktivieren</button>
       </section>
+
       <section class="payg-card" aria-labelledby="paymentTitle">
-        <div class="eyebrow">Zahlungsmethode</div><h2 id="paymentTitle">Zahlung verwalten</h2><div class="payg-state" id="paymentStatus">Keine Live-Daten</div>
-        <p id="paymentMeta">Es wird keine Zahlungsmethode angenommen oder behauptet, solange der autoritative PROD-Status nicht verfügbar ist.</p>
-        <button class="btn light" type="button" id="paymentManage" disabled>Zahlungsmethode verwalten</button>
+        <div class="eyebrow">Zahlungsmethode</div><h2 id="paymentTitle">Zahlung verwalten</h2><div class="payg-state" id="paymentStatus">Wird geladen</div>
+        <p id="paymentMeta">Der autoritative Zahlungsstatus wird geladen.</p>
+        <button class="btn light" type="button" id="paymentManage">Zahlungsmethode hinterlegen</button>
       </section>
+
+      <section class="payg-card" aria-labelledby="walletTitle">
+        <div class="eyebrow">Wallet</div><h2 id="walletTitle">Verfügbares Guthaben</h2><div class="payg-state" id="walletStatus">Wird geladen</div>
+        <p id="walletMeta">Der echte Wallet-Stand wird geladen.</p>
+      </section>
+
       <section class="payg-card" aria-labelledby="costTitle">
-        <div class="eyebrow">Kosten & Nutzung</div><h2 id="costTitle">PAYG-Verbrauch</h2><div class="payg-state" id="costStatus">Keine Live-Daten</div>
-        <p id="costMeta">Es werden keine Kosten, Guthaben, Belastungen oder Auftragszahlen geschätzt.</p>
-        <a class="btn light" href="konto.html">Tarifnutzung im Konto ansehen</a>
+        <div class="eyebrow">Kosten & Nutzung</div><h2 id="costTitle">PAYG-Verbrauch</h2><div class="payg-state" id="costStatus">Wird geladen</div>
+        <p id="costMeta">Es werden ausschließlich serverseitig verbuchte PAYG-Kosten angezeigt.</p>
+      </section>
+
+      <section class="payg-card" aria-labelledby="orderTitle">
+        <div class="eyebrow">Auftrag</div><h2 id="orderTitle">Letzter PAYG-Auftrag</h2><div class="payg-state" id="orderStatus">Wird geladen</div>
+        <p id="orderMeta">Preis und Freigabestatus werden aus dem PROD-Auftragsvertrag geladen.</p>
+      </section>
+
+      <section class="payg-card payg-topup" aria-labelledby="topupTitle">
+        <div class="eyebrow">Guthaben</div><h2 id="topupTitle">Wallet aufladen</h2>
+        <div class="payg-topup-grid">
+          <button type="button" data-topup-cents="500">5 €</button>
+          <button type="button" data-topup-cents="1000">10 €</button>
+          <button type="button" data-topup-cents="2000">20 €</button>
+          <button type="button" data-topup-cents="5000">50 €</button>
+        </div>
+        <p class="payg-topup-hint" id="topupHint">Zahlungsbereitschaft wird geprüft.</p>
+      </section>
+
+      <section class="payg-card payg-wide" aria-labelledby="activityTitle">
+        <div class="eyebrow">Verlauf</div><h2 id="activityTitle">Zahlungen & Aufträge</h2>
+        <p>Hier erscheinen nur tatsächlich serverseitig bekannte PAYG-Vorgänge.</p>
+        <ul class="payg-activity" id="paygActivity"><li class="payg-activity-empty">Wird geladen.</li></ul>
       </section>
     </div>
 
-    <div class="payg-notice" id="paygContractNotice"><strong>Aktueller Stand:</strong> Die Oberfläche ist PROD-fail-closed vorbereitet. Aktivierung, Zahlungsmethode und PAYG-Kosten bleiben gesperrt, bis der PAYG-Arbeitsstrang seinen kanonischen PROD-Webvertrag veröffentlicht hat.</div>
+    <div class="payg-notice" id="paygContractNotice"><strong>PROD:</strong> Der PAYG-Status wird geladen.</div>
     <div class="payg-error" id="paygSessionError" hidden role="alert"></div>
   </main>
 
   <footer class="footer"><div class="wrap"><div class="footline"><span>© 2026 NAHWERK Concierge</span><span><a href="datenschutz.html">Datenschutz</a> · <a href="impressum.html">Impressum</a> · <a href="widerruf.html">Widerruf</a></span></div></div></footer>
-  <script src="assets/auth-nav.js?v=40"></script>
+  <script src="assets/auth-nav.js?v=41"></script>
   <script src="assets/nahwerk-analytics.js?v=1"></script>
   <script src="assets/site-ui.js?v=6"></script>
-  <script>
-    (() => {
-      const error = document.getElementById("paygSessionError");
-      const failToLogin = () => {
-        error.hidden = false;
-        error.textContent = "Deine Sitzung ist nicht gültig. Du wirst zur Anmeldung weitergeleitet.";
-        setTimeout(() => location.replace("anmelden.html"), 250);
-      };
-      const verify = async () => {
-        const auth = window.SCBAuth;
-        if (!auth?.validateSession) return failToLogin();
-        const valid = await auth.validateSession().catch(() => false);
-        if (!valid) failToLogin();
-      };
-      if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", verify, { once:true });
-      else verify();
-    })();
-  </script>
+  <script src="assets/payg-account.js?v=1"></script>
 </body>
 </html>
