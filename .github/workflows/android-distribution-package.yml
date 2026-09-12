@@ -34,8 +34,6 @@ jobs:
     if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' || inputs.signed_package != true }}
     runs-on: ubuntu-latest
     env:
-      NAHWERK_RELEASE_AUTH_BASE_URL: ''
-      NAHWERK_RELEASE_GATEWAY_BASE_URL: ''
       NAHWERK_ANDROID_KEYSTORE_PATH: ''
       NAHWERK_ANDROID_STORE_PASSWORD: ''
       NAHWERK_ANDROID_KEY_ALIAS: ''
@@ -57,8 +55,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test -z "$NAHWERK_RELEASE_AUTH_BASE_URL"
-          test -z "$NAHWERK_RELEASE_GATEWAY_BASE_URL"
           test -z "$NAHWERK_ANDROID_KEYSTORE_PATH"
           test -z "$NAHWERK_ANDROID_STORE_PASSWORD"
           test -z "$NAHWERK_ANDROID_KEY_ALIAS"
@@ -73,7 +69,7 @@ jobs:
           chmod +x ./gradlew
           ./gradlew --no-daemon clean testDebugUnitTest lintRelease assembleRelease bundleRelease
 
-      - name: Verify candidate is inert and unsigned
+      - name: Verify candidate is PROD-only and unsigned
         shell: bash
         run: |
           set -euo pipefail
@@ -82,10 +78,14 @@ jobs:
           test -n "$APK"
           test -n "$AAB"
 
-          if unzip -p "$APK" classes.dex 2>/dev/null | strings | grep -F 'btqklftjmwtqqqdmwlnk' >/dev/null; then
+          DEX_STRINGS="$RUNNER_TEMP/release-dex-strings.txt"
+          unzip -p "$APK" 'classes*.dex' 2>/dev/null | strings > "$DEX_STRINGS"
+          if grep -F 'btqklftjmwtqqqdmwlnk' "$DEX_STRINGS" >/dev/null; then
             echo "STAGING endpoint leaked into release candidate APK."
             exit 1
           fi
+          grep -F 'djicahhmnnamtjuqedqd.supabase.co' "$DEX_STRINGS" >/dev/null
+          grep -F 'nahwerk-app-gateway' "$DEX_STRINGS" >/dev/null
 
           APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
           test -x "$APKSIGNER"
@@ -119,15 +119,16 @@ jobs:
             --arg version_name "$VERSION_NAME" \
             --argjson version_code "$VERSION_CODE" \
             '{
-              schema_version: "nahwerk-android-distribution-candidate-v1",
+              schema_version: "nahwerk-android-distribution-candidate-v2",
               repository: $repository,
               commit: $commit,
               version_name: $version_name,
               version_code: $version_code,
               signed: false,
-              release_endpoints_configured: false,
+              canonical_prod_gateway_embedded: true,
+              staging_transport_embedded: false,
               customer_distribution: false,
-              app_route_cutover: false
+              app_route_cutover: true
             }' > "$OUT/metadata.json"
 
           (
@@ -150,8 +151,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: android-production-release
     env:
-      NAHWERK_RELEASE_AUTH_BASE_URL: ${{ vars.NAHWERK_RELEASE_AUTH_BASE_URL }}
-      NAHWERK_RELEASE_GATEWAY_BASE_URL: ${{ vars.NAHWERK_RELEASE_GATEWAY_BASE_URL }}
       NAHWERK_ANDROID_STORE_PASSWORD: ${{ secrets.NAHWERK_ANDROID_STORE_PASSWORD }}
       NAHWERK_ANDROID_KEY_ALIAS: ${{ secrets.NAHWERK_ANDROID_KEY_ALIAS }}
       NAHWERK_ANDROID_KEY_PASSWORD: ${{ secrets.NAHWERK_ANDROID_KEY_PASSWORD }}
@@ -165,8 +164,6 @@ jobs:
         run: |
           set -euo pipefail
           test '${{ inputs.core_gates_ack }}' = 'CORE-GATES-GREEN'
-          test -n "$NAHWERK_RELEASE_AUTH_BASE_URL"
-          test -n "$NAHWERK_RELEASE_GATEWAY_BASE_URL"
           test -n "$NAHWERK_ANDROID_STORE_PASSWORD"
           test -n "$NAHWERK_ANDROID_KEY_ALIAS"
           test -n "$NAHWERK_ANDROID_KEY_PASSWORD"
@@ -195,7 +192,7 @@ jobs:
           chmod +x ./gradlew
           ./gradlew --no-daemon clean testDebugUnitTest lintRelease assembleRelease bundleRelease
 
-      - name: Verify signed release package
+      - name: Verify signed PROD-only release package
         shell: bash
         run: |
           set -euo pipefail
@@ -204,9 +201,40 @@ jobs:
           test -n "$APK"
           test -n "$AAB"
 
+          DEX_STRINGS="$RUNNER_TEMP/signed-release-dex-strings.txt"
+          unzip -p "$APK" 'classes*.dex' 2>/dev/null | strings > "$DEX_STRINGS"
+          if grep -F 'btqklftjmwtqqqdmwlnk' "$DEX_STRINGS" >/dev/null; then
+            echo "STAGING endpoint leaked into signed release APK."
+            exit 1
+          fi
+          grep -F 'djicahhmnnamtjuqedqd.supabase.co' "$DEX_STRINGS" >/dev/null
+          grep -F 'nahwerk-app-gateway' "$DEX_STRINGS" >/dev/null
+
           APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
           "$APKSIGNER" verify --verbose "$APK"
           jarsigner -verify -strict "$AAB"
+
+      - name: Enable KVM for signed install smoke
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Install and start signed customer APK
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          script: |
+            APK="$(find android-app/app/build/outputs/apk/release -type f -name '*.apk' | head -n 1)"
+            test -n "$APK"
+            adb install -r "$APK"
+            adb shell am start -W -n com.nahwerk.concierge/.CustomerLaunchActivity
+            adb shell dumpsys activity activities | grep -F 'com.nahwerk.concierge/.CustomerLaunchActivity'
 
       - name: Package signed artifacts without publishing
         shell: bash
@@ -228,15 +256,18 @@ jobs:
             --arg version_name "$VERSION_NAME" \
             --argjson version_code "$VERSION_CODE" \
             '{
-              schema_version: "nahwerk-android-signed-package-v1",
+              schema_version: "nahwerk-android-signed-package-v2",
               repository: $repository,
               commit: $commit,
               version_name: $version_name,
               version_code: $version_code,
               signed: true,
-              release_endpoints_configured: true,
+              canonical_prod_gateway_embedded: true,
+              staging_transport_embedded: false,
+              install_start_smoke: true,
               customer_distribution: false,
-              store_upload: false
+              store_upload: false,
+              app_route_cutover: true
             }' > "$OUT/metadata.json"
 
           (
