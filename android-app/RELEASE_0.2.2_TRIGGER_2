@@ -1,0 +1,5 @@
+NAHWERK Android PROD signed release trigger
+version=0.2.2
+versionCode=4
+main_head=a684fb3edce3c73f9e0a4c454c117133f608a80c
+runtime_change=false
