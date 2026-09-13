@@ -95,6 +95,7 @@ jobs:
               text = re.sub(r'href=(["\'])([^"\']+)\1', lambda m: rewrite_href(m, lang), text, flags=re.I)
               text = re.sub(r'(data-register-url|action)=(["\'])([^"\']+\.html[^"\']*)\2', lambda m: f'{m.group(1)}={m.group(2)}/{m.group(3)}{m.group(2)}' if not m.group(3).startswith('/') else m.group(0), text, flags=re.I)
               text = text.replace('/assets/language-switcher.js?v=1', '/assets/language-switcher.js?v=5')
+              text = '\n'.join(line.rstrip() for line in text.splitlines()) + ('\n' if text.endswith('\n') else '')
               (ROOT / lang / page).write_text(text, encoding='utf-8')
 
           for page in PAGES:
