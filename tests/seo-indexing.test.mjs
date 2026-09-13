@@ -49,8 +49,8 @@ test('sitemap contains only existing canonical public pages', () => {
 
 test('homepage publishes Open Graph and structured-data runtime', () => {
   const home = read('index.html');
-  assert.match(home, /<meta property="og:url" content="https:\/\/nahwerkconcierge\.com\/"\s*\/>/);
-  assert.match(home, /<meta property="og:image"/);
+  assert.match(home, /property=["']og:url["'][^>]*content=["']https:\/\/nahwerkconcierge\.com\/["']/s);
+  assert.match(home, /property=["']og:image["']/s);
   const runtime = read('assets/site-ui.js');
   assert.match(runtime, /data-nw-structured-data/);
   assert.match(runtime, /https:\/\/schema\.org/);
