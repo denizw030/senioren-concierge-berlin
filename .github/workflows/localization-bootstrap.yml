@@ -4,7 +4,11 @@ on:
   push:
     branches: [main]
     paths:
+      - '*.html'
+      - 'locales/*.json'
       - 'scripts/localization-bootstrap.py'
+      - 'scripts/i18n-mirror.py'
+      - 'assets/language-switcher.js'
       - '.github/workflows/localization-bootstrap.yml'
 
 permissions:
@@ -23,91 +27,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Generate DE EN TR SEO metadata
+      - name: Generate localized SEO seed and hreflang
         run: python scripts/localization-bootstrap.py
-      - name: Mirror exact PROD design into EN and TR
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          import re
-
-          ROOT = Path('.')
-          DOMAIN = 'https://nahwerkconcierge.com'
-          PAGES = [
-              'index.html','prime-concierge.html','safety.html','angehoerige.html',
-              'telefonannahme.html','pakete.html','leistungen.html','ablauf.html',
-              'faq.html','kontakt.html','concierges.html','senioren-concierge.html',
-              'alltag-organisieren.html','dokumente-verstehen.html',
-              'technik-verstehen.html','ueber-mich.html'
-          ]
-
-          def locale_url(lang, page):
-              return f'{DOMAIN}/{lang}/' if page == 'index.html' else f'{DOMAIN}/{lang}/{page}'
-
-          def title_of(text):
-              m = re.search(r'<title>(.*?)</title>', text, re.I | re.S)
-              return m.group(1) if m else None
-
-          def description_of(text):
-              m = re.search(r'<meta\b(?=[^>]*\bname=["\']description["\'])(?=[^>]*\bcontent=(["\']))[^>]*\bcontent=(["\'])(.*?)\2[^>]*>', text, re.I | re.S)
-              if m:
-                  return m.group(3)
-              m = re.search(r'<meta\b[^>]*\bname=["\']description["\'][^>]*\bcontent=(["\'])(.*?)\1[^>]*>', text, re.I | re.S)
-              return m.group(2) if m else None
-
-          def replace_meta(text, name, value):
-              pattern = re.compile(r'(<meta\b[^>]*\bname=["\']' + re.escape(name) + r'["\'][^>]*\bcontent=)(["\'])(.*?)(\2[^>]*>)', re.I | re.S)
-              return pattern.sub(lambda m: m.group(1) + m.group(2) + value + m.group(4), text, count=1)
-
-          def rewrite_href(match, lang):
-              quote, target = match.group(1), match.group(2)
-              if target.startswith(('#','/','http://','https://','mailto:','tel:','javascript:')):
-                  return match.group(0)
-              base = re.split(r'[?#]', target, maxsplit=1)[0]
-              suffix = target[len(base):]
-              if base == 'index.html':
-                  return f'href={quote}/{lang}/{suffix}{quote}'
-              if base in PAGES:
-                  return f'href={quote}/{lang}/{base}{suffix}{quote}'
-              if base.endswith('.html'):
-                  return f'href={quote}/{target}{quote}'
-              return match.group(0)
-
-          def mirror(lang, page):
-              generated = (ROOT / lang / page).read_text(encoding='utf-8')
-              translated_title = title_of(generated)
-              translated_desc = description_of(generated)
-              text = (ROOT / page).read_text(encoding='utf-8')
-
-              text = re.sub(r'(<html\b[^>]*\blang=)["\'][^"\']+["\']', rf'\1"{lang}"', text, count=1, flags=re.I)
-              if translated_title:
-                  text = re.sub(r'<title>.*?</title>', f'<title>{translated_title}</title>', text, count=1, flags=re.I | re.S)
-              if translated_desc:
-                  text = replace_meta(text, 'description', translated_desc)
-
-              canonical = locale_url(lang, page)
-              text = re.sub(r'(<link\b[^>]*\brel=["\']canonical["\'][^>]*\bhref=)(["\'])(.*?)(\2[^>]*>)', lambda m: m.group(1) + m.group(2) + canonical + m.group(4), text, count=1, flags=re.I | re.S)
-
-              text = text.replace('href="assets/', 'href="/assets/').replace("href='assets/", "href='/assets/")
-              text = text.replace('src="assets/', 'src="/assets/').replace("src='assets/", "src='/assets/")
-              text = text.replace('srcset="assets/', 'srcset="/assets/').replace("srcset='assets/", "srcset='/assets/")
-              text = re.sub(r'url\((["\']?)assets/', r'url(\1/assets/', text)
-              text = re.sub(r'href=(["\'])([^"\']+)\1', lambda m: rewrite_href(m, lang), text, flags=re.I)
-              text = re.sub(r'(data-register-url|action)=(["\'])([^"\']+\.html[^"\']*)\2', lambda m: f'{m.group(1)}={m.group(2)}/{m.group(3)}{m.group(2)}' if not m.group(3).startswith('/') else m.group(0), text, flags=re.I)
-              text = text.replace('/assets/language-switcher.js?v=1', '/assets/language-switcher.js?v=5')
-              text = '\n'.join(line.rstrip() for line in text.splitlines()) + ('\n' if text.endswith('\n') else '')
-              (ROOT / lang / page).write_text(text, encoding='utf-8')
-
-          for page in PAGES:
-              root = ROOT / page
-              text = root.read_text(encoding='utf-8')
-              text = text.replace('/assets/language-switcher.js?v=1', '/assets/language-switcher.js?v=5')
-              root.write_text(text, encoding='utf-8')
-
-          for lang in ('en','tr'):
-              for page in PAGES:
-                  mirror(lang, page)
-          PY
+      - name: Mirror exact PROD design and apply translations
+        run: python scripts/i18n-mirror.py
       - name: Make SEO guard directory-index aware
         run: |
           python - <<'PY'
@@ -133,5 +56,5 @@ jobs:
           git config user.name 'nahwerk-prod-bot'
           git config user.email 'actions@users.noreply.github.com'
           git add en tr sitemap.xml tests/seo-indexing.test.mjs *.html
-          git commit -m 'i18n: mirror exact PROD design for EN and TR'
+          git commit -m 'i18n: publish exact-design EN and TR pages'
           git push origin HEAD:main
