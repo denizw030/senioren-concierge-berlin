@@ -1,0 +1,35 @@
+name: SEO indexing guard
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '*.html'
+      - 'robots.txt'
+      - 'sitemap.xml'
+      - 'assets/site-ui.js'
+      - 'tests/seo-indexing.test.mjs'
+      - '.github/workflows/seo-indexing.yml'
+  pull_request:
+    paths:
+      - '*.html'
+      - 'robots.txt'
+      - 'sitemap.xml'
+      - 'assets/site-ui.js'
+      - 'tests/seo-indexing.test.mjs'
+      - '.github/workflows/seo-indexing.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  seo-indexing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate search-engine index surface
+        run: node --test tests/seo-indexing.test.mjs
