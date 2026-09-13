@@ -124,6 +124,13 @@
   syncUi();
   new MutationObserver(syncUi).observe(status,{ childList:true,characterData:true,subtree:true });
 
+  if (!document.querySelector('script[data-payg-portal-feedback="v1"]')) {
+    const feedbackScript = document.createElement("script");
+    feedbackScript.src = "assets/payg-portal-feedback-v1.js?v=1";
+    feedbackScript.dataset.paygPortalFeedback = "v1";
+    document.head.appendChild(feedbackScript);
+  }
+
   window.NAHWERKPaymentMethodRemovalGuard = Object.freeze({
     contractVersion:CONTRACT_VERSION,
     normalizeCapability,
