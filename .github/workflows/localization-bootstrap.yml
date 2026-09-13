@@ -1,0 +1,54 @@
+name: Localization bootstrap PROD
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/localization-bootstrap.py'
+      - '.github/workflows/localization-bootstrap.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  localize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Generate DE EN TR public website
+        run: python scripts/localization-bootstrap.py
+      - name: Make SEO guard directory-index aware
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('tests/seo-indexing.test.mjs')
+          text = p.read_text(encoding='utf-8')
+          old = "const file = pathname === '/' ? 'index.html' : pathname.slice(1);"
+          new = "const file = pathname === '/' ? 'index.html' : pathname.endsWith('/') ? `${pathname.slice(1)}index.html` : pathname.slice(1);"
+          if old in text:
+              text = text.replace(old, new, 1)
+              p.write_text(text, encoding='utf-8')
+          PY
+      - name: Validate generated SEO surface
+        run: node --test tests/seo-indexing.test.mjs
+      - name: Validate clean diff
+        run: git diff --check
+      - name: Commit localization to PROD
+        run: |
+          if git diff --quiet; then
+            echo 'No localization changes required.'
+            exit 0
+          fi
+          git config user.name 'nahwerk-prod-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add en tr sitemap.xml tests/seo-indexing.test.mjs *.html
+          git commit -m 'i18n: publish DE EN TR website and hreflang'
+          git push origin HEAD:main
