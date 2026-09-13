@@ -162,3 +162,48 @@
   };
   document.addEventListener('DOMContentLoaded', () => setTimeout(ready, 0));
 })();
+
+// Public homepage structured data. Isolated from customer/product runtime.
+(() => {
+  const path = location.pathname.replace(/\/+$/, '') || '/';
+  if (path !== '/' && !/\/index\.html$/.test(path)) return;
+  if (document.querySelector('script[data-nw-structured-data="v1"]')) return;
+
+  const schema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': 'https://nahwerkconcierge.com/#organization',
+        name: 'NAHWERK Concierge',
+        url: 'https://nahwerkconcierge.com/',
+        logo: {
+          '@type': 'ImageObject',
+          url: 'https://nahwerkconcierge.com/assets/logos/nahwerk-concierge.png'
+        }
+      },
+      {
+        '@type': 'WebSite',
+        '@id': 'https://nahwerkconcierge.com/#website',
+        url: 'https://nahwerkconcierge.com/',
+        name: 'NAHWERK Concierge',
+        inLanguage: 'de-DE',
+        publisher: { '@id': 'https://nahwerkconcierge.com/#organization' }
+      },
+      {
+        '@type': 'Service',
+        '@id': 'https://nahwerkconcierge.com/#personal-concierge',
+        name: 'Persönlicher NAHWERK Concierge',
+        serviceType: 'Persönlicher Concierge',
+        url: 'https://nahwerkconcierge.com/prime-concierge.html',
+        provider: { '@id': 'https://nahwerkconcierge.com/#organization' }
+      }
+    ]
+  };
+
+  const script = document.createElement('script');
+  script.type = 'application/ld+json';
+  script.dataset.nwStructuredData = 'v1';
+  script.textContent = JSON.stringify(schema);
+  document.head.appendChild(script);
+})();
