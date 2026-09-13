@@ -58,10 +58,16 @@
       .nw-language-option[aria-current="page"]{background:rgba(215,169,52,.1)!important;color:#f2c45b!important}
       .nw-language-option small{margin-left:auto;color:#8d8a82;font-size:11px;letter-spacing:.08em}
       @media (max-width:1180px){
+        .top .nav>.nw-language,.home-reference .top .nav>.nw-language{display:inline-flex;margin-left:auto;z-index:130}
+        .top .nav>.nw-language+.nav-toggle,.home-reference .top .nav>.nw-language+.nav-toggle{margin-left:0}
+        .top .nav>.nw-language .nw-language-menu,.home-reference .top .nav>.nw-language .nw-language-menu{top:calc(100% + 12px);right:0}
         .links .nw-language{width:100%;display:block;padding:4px 8px}
         .links .nw-language-button{width:100%;justify-content:flex-start;border-radius:10px;min-height:48px;padding:12px 14px}
         .links .nw-language-chevron{margin-left:auto}
         .links .nw-language-menu{position:static;width:100%;margin-top:6px;box-shadow:none}
+      }
+      @media (max-width:620px){
+        .top .nav>.nw-language .nw-language-button,.home-reference .top .nav>.nw-language .nw-language-button{min-height:42px;padding:8px 10px;gap:6px}
       }
     `;
     document.head.appendChild(style);
@@ -80,7 +86,7 @@
     const current = SUPPORTED[lang] || SUPPORTED.de;
     const wrapper = document.createElement('div');
     wrapper.className = 'nw-language';
-    wrapper.dataset.nwLanguageSwitcher = 'v1';
+    wrapper.dataset.nwLanguageSwitcher = 'v2';
 
     const button = document.createElement('button');
     button.type = 'button';
@@ -133,9 +139,25 @@
     });
 
     wrapper.append(button, menu);
+
+    const headerNav = nav.closest('.nav') || document.querySelector('.top .nav') || document.querySelector('header .nav');
+    const toggle = headerNav?.querySelector('.nav-toggle');
     const auth = nav.querySelector('.auth-link');
-    if (auth) nav.insertBefore(wrapper, auth);
-    else nav.appendChild(wrapper);
+    const compact = window.matchMedia('(max-width: 1180px)');
+
+    const place = () => {
+      close();
+      if (compact.matches && headerNav && toggle) {
+        headerNav.insertBefore(wrapper, toggle);
+        return;
+      }
+      if (auth && auth.parentNode === nav) nav.insertBefore(wrapper, auth);
+      else nav.appendChild(wrapper);
+    };
+
+    place();
+    if (typeof compact.addEventListener === 'function') compact.addEventListener('change', place);
+    else if (typeof compact.addListener === 'function') compact.addListener(place);
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount, { once: true });
