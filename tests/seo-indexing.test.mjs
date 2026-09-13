@@ -36,7 +36,7 @@ test('sitemap contains only existing canonical public pages', () => {
   for (const url of urls) {
     assert.ok(url.startsWith(`${DOMAIN}/`), `wrong sitemap host: ${url}`);
     const { pathname } = new URL(url);
-    const file = pathname === '/' ? 'index.html' : pathname.slice(1);
+    const file = pathname === '/' ? 'index.html' : pathname.endsWith('/') ? `${pathname.slice(1)}index.html` : pathname.slice(1);
     assert.ok(existsSync(resolve(root, file)), `missing sitemap target: ${file}`);
     const html = read(file);
     assert.match(html, /<title>[^<]+<\/title>/i, `${file}: missing title`);
