@@ -8,22 +8,10 @@
   };
 
   const LOCALIZED_PAGES = new Set([
-    'index.html',
-    'prime-concierge.html',
-    'safety.html',
-    'angehoerige.html',
-    'telefonannahme.html',
-    'pakete.html',
-    'leistungen.html',
-    'ablauf.html',
-    'faq.html',
-    'kontakt.html',
-    'concierges.html',
-    'senioren-concierge.html',
-    'alltag-organisieren.html',
-    'dokumente-verstehen.html',
-    'technik-verstehen.html',
-    'ueber-mich.html'
+    'index.html','prime-concierge.html','safety.html','angehoerige.html',
+    'telefonannahme.html','pakete.html','leistungen.html','ablauf.html','faq.html',
+    'kontakt.html','concierges.html','senioren-concierge.html','alltag-organisieren.html',
+    'dokumente-verstehen.html','technik-verstehen.html','ueber-mich.html'
   ]);
 
   const normalizePath = (pathname) => {
@@ -77,7 +65,7 @@
     const current = SUPPORTED[lang] || SUPPORTED.de;
     const wrapper = document.createElement('div');
     wrapper.className = 'nw-language';
-    wrapper.dataset.nwLanguageSwitcher = 'v3';
+    wrapper.dataset.nwLanguageSwitcher = 'v5';
 
     const button = document.createElement('button');
     button.type = 'button';
@@ -110,7 +98,6 @@
       wrapper.classList.remove('is-open');
       button.setAttribute('aria-expanded', 'false');
     };
-
     button.addEventListener('click', (event) => {
       event.preventDefault();
       event.stopPropagation();
@@ -118,16 +105,13 @@
       wrapper.classList.toggle('is-open', open);
       button.setAttribute('aria-expanded', String(open));
     });
-    document.addEventListener('click', (event) => {
-      if (!wrapper.contains(event.target)) close();
-    });
+    document.addEventListener('click', (event) => { if (!wrapper.contains(event.target)) close(); });
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && wrapper.classList.contains('is-open')) {
         close();
         button.focus();
       }
     });
-
     wrapper.append(button, menu);
     return wrapper;
   };
@@ -135,24 +119,18 @@
   const placeSwitcher = () => {
     const { lang, page } = normalizePath(location.pathname);
     if (!LOCALIZED_PAGES.has(page)) return;
-
     const nav = document.querySelector('nav.links') || document.querySelector('.links') || document.querySelector('nav[aria-label]') || document.querySelector('header nav');
     if (!nav) return;
-
     injectStyles();
-
     let wrapper = document.querySelector('[data-nw-language-switcher]');
     if (!wrapper) wrapper = createSwitcher(lang, page);
-
     const headerNav = nav.closest('.nav') || document.querySelector('.top .nav') || document.querySelector('header .nav');
     const toggle = headerNav?.querySelector(':scope > .nav-toggle') || headerNav?.querySelector('.nav-toggle');
     const compact = window.matchMedia('(max-width: 1280px)').matches;
-
     if (compact && headerNav && toggle) {
       if (wrapper.parentNode !== headerNav || wrapper.nextElementSibling !== toggle) headerNav.insertBefore(wrapper, toggle);
       return;
     }
-
     const auth = nav.querySelector('.auth-link');
     const account = nav.querySelector('.nw-account-cluster-desktop');
     const anchor = auth || account;
@@ -162,6 +140,89 @@
     }
   };
 
+  const clean = (value) => String(value || '').replace(/\s+/g, ' ').trim();
+  let catalog = null;
+  let localizationBusy = false;
+
+  const translateTextNode = (node) => {
+    if (!catalog || !node?.nodeValue) return;
+    const key = clean(node.nodeValue);
+    const translated = catalog[key];
+    if (!translated || translated === key) return;
+    const lead = node.nodeValue.match(/^\s*/)?.[0] || '';
+    const tail = node.nodeValue.match(/\s*$/)?.[0] || '';
+    node.nodeValue = `${lead}${translated}${tail}`;
+  };
+
+  const translateElement = (root) => {
+    if (!catalog || !root) return;
+    const skip = new Set(['SCRIPT','STYLE','NOSCRIPT','TEMPLATE','SVG']);
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        return node.parentElement && !skip.has(node.parentElement.tagName) && !node.parentElement.closest('[data-nw-language-switcher]')
+          ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+      }
+    });
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(translateTextNode);
+
+    const elements = root.nodeType === 1 ? [root, ...root.querySelectorAll('*')] : [...document.querySelectorAll('*')];
+    elements.forEach((el) => {
+      if (!el?.getAttribute || el.closest?.('[data-nw-language-switcher]')) return;
+      ['aria-label','title','placeholder','alt'].forEach((attr) => {
+        const raw = el.getAttribute(attr);
+        const key = clean(raw);
+        if (key && catalog[key]) el.setAttribute(attr, catalog[key]);
+      });
+    });
+  };
+
+  const rewriteLocaleLinks = () => {
+    const { lang } = normalizePath(location.pathname);
+    if (lang === 'de') return;
+    document.querySelectorAll('a[href]').forEach((link) => {
+      if (link.closest('[data-nw-language-switcher]')) return;
+      const raw = link.getAttribute('href') || '';
+      if (!raw || raw.startsWith('#') || /^(https?:|mailto:|tel:|javascript:)/i.test(raw)) return;
+      let path = raw;
+      if (path.startsWith('/en/') || path.startsWith('/tr/')) return;
+      path = path.replace(/^\//, '');
+      const base = path.split(/[?#]/)[0];
+      const suffix = path.slice(base.length);
+      if (base === '' || base === 'index.html') {
+        link.setAttribute('href', localeHref(lang, 'index.html') + suffix);
+      } else if (LOCALIZED_PAGES.has(base)) {
+        link.setAttribute('href', localeHref(lang, base) + suffix);
+      } else if (base.endsWith('.html')) {
+        link.setAttribute('href', `/${path}`);
+      }
+    });
+  };
+
+  const applyLocalization = () => {
+    if (localizationBusy || !catalog) return;
+    localizationBusy = true;
+    try {
+      translateElement(document.body);
+      rewriteLocaleLinks();
+      document.documentElement.lang = normalizePath(location.pathname).lang;
+    } finally {
+      localizationBusy = false;
+    }
+  };
+
+  const loadCatalog = async () => {
+    const { lang } = normalizePath(location.pathname);
+    if (lang === 'de') return;
+    try {
+      const response = await fetch(`/locales/${lang}.json?v=1`, { cache: 'no-cache' });
+      if (!response.ok) return;
+      catalog = await response.json();
+      applyLocalization();
+    } catch (_) {}
+  };
+
   let scheduled = false;
   const schedulePlacement = () => {
     if (scheduled) return;
@@ -169,15 +230,15 @@
     requestAnimationFrame(() => {
       scheduled = false;
       placeSwitcher();
+      applyLocalization();
     });
   };
 
   const start = () => {
     placeSwitcher();
+    loadCatalog();
     const root = document.querySelector('header.top') || document.body;
-    if (root) {
-      new MutationObserver(() => schedulePlacement()).observe(root, { childList: true, subtree: true });
-    }
+    if (root) new MutationObserver(schedulePlacement).observe(root, { childList: true, subtree: true });
     window.addEventListener('resize', schedulePlacement, { passive: true });
     window.addEventListener('pageshow', schedulePlacement, { passive: true });
     setTimeout(schedulePlacement, 0);
