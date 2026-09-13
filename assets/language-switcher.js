@@ -57,9 +57,8 @@
       .nw-language-option:hover,.nw-language-option:focus-visible{background:rgba(255,255,255,.07)!important;color:#f2c45b!important;outline:none}
       .nw-language-option[aria-current="page"]{background:rgba(215,169,52,.1)!important;color:#f2c45b!important}
       .nw-language-option small{margin-left:auto;color:#8d8a82;font-size:11px;letter-spacing:.08em}
-      @media (max-width:1180px){
-        .top .nav>.nw-language,.home-reference .top .nav>.nw-language{display:inline-flex;margin-left:auto;z-index:130}
-        .top .nav>.nw-language+.nav-toggle,.home-reference .top .nav>.nw-language+.nav-toggle{margin-left:0}
+      @media (max-width:1280px){
+        .top .nav>.nw-language,.home-reference .top .nav>.nw-language{display:inline-flex;margin-left:auto;margin-right:58px;z-index:130;align-self:center}
         .top .nav>.nw-language .nw-language-menu,.home-reference .top .nav>.nw-language .nw-language-menu{top:calc(100% + 12px);right:0}
         .links .nw-language{width:100%;display:block;padding:4px 8px}
         .links .nw-language-button{width:100%;justify-content:flex-start;border-radius:10px;min-height:48px;padding:12px 14px}
@@ -67,26 +66,18 @@
         .links .nw-language-menu{position:static;width:100%;margin-top:6px;box-shadow:none}
       }
       @media (max-width:620px){
+        .top .nav>.nw-language,.home-reference .top .nav>.nw-language{margin-right:54px}
         .top .nav>.nw-language .nw-language-button,.home-reference .top .nav>.nw-language .nw-language-button{min-height:42px;padding:8px 10px;gap:6px}
       }
     `;
     document.head.appendChild(style);
   };
 
-  const mount = () => {
-    const { lang, page } = normalizePath(location.pathname);
-    if (!LOCALIZED_PAGES.has(page)) return;
-    if (document.querySelector('[data-nw-language-switcher]')) return;
-
-    const nav = document.querySelector('.links') || document.querySelector('nav[aria-label]') || document.querySelector('header nav');
-    if (!nav) return;
-
-    injectStyles();
-
+  const createSwitcher = (lang, page) => {
     const current = SUPPORTED[lang] || SUPPORTED.de;
     const wrapper = document.createElement('div');
     wrapper.className = 'nw-language';
-    wrapper.dataset.nwLanguageSwitcher = 'v2';
+    wrapper.dataset.nwLanguageSwitcher = 'v3';
 
     const button = document.createElement('button');
     button.type = 'button';
@@ -119,14 +110,13 @@
       wrapper.classList.remove('is-open');
       button.setAttribute('aria-expanded', 'false');
     };
-    const open = () => {
-      wrapper.classList.add('is-open');
-      button.setAttribute('aria-expanded', 'true');
-    };
 
     button.addEventListener('click', (event) => {
+      event.preventDefault();
       event.stopPropagation();
-      wrapper.classList.contains('is-open') ? close() : open();
+      const open = !wrapper.classList.contains('is-open');
+      wrapper.classList.toggle('is-open', open);
+      button.setAttribute('aria-expanded', String(open));
     });
     document.addEventListener('click', (event) => {
       if (!wrapper.contains(event.target)) close();
@@ -139,27 +129,62 @@
     });
 
     wrapper.append(button, menu);
-
-    const headerNav = nav.closest('.nav') || document.querySelector('.top .nav') || document.querySelector('header .nav');
-    const toggle = headerNav?.querySelector('.nav-toggle');
-    const auth = nav.querySelector('.auth-link');
-    const compact = window.matchMedia('(max-width: 1180px)');
-
-    const place = () => {
-      close();
-      if (compact.matches && headerNav && toggle) {
-        headerNav.insertBefore(wrapper, toggle);
-        return;
-      }
-      if (auth && auth.parentNode === nav) nav.insertBefore(wrapper, auth);
-      else nav.appendChild(wrapper);
-    };
-
-    place();
-    if (typeof compact.addEventListener === 'function') compact.addEventListener('change', place);
-    else if (typeof compact.addListener === 'function') compact.addListener(place);
+    return wrapper;
   };
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount, { once: true });
-  else mount();
+  const placeSwitcher = () => {
+    const { lang, page } = normalizePath(location.pathname);
+    if (!LOCALIZED_PAGES.has(page)) return;
+
+    const nav = document.querySelector('nav.links') || document.querySelector('.links') || document.querySelector('nav[aria-label]') || document.querySelector('header nav');
+    if (!nav) return;
+
+    injectStyles();
+
+    let wrapper = document.querySelector('[data-nw-language-switcher]');
+    if (!wrapper) wrapper = createSwitcher(lang, page);
+
+    const headerNav = nav.closest('.nav') || document.querySelector('.top .nav') || document.querySelector('header .nav');
+    const toggle = headerNav?.querySelector(':scope > .nav-toggle') || headerNav?.querySelector('.nav-toggle');
+    const compact = window.matchMedia('(max-width: 1280px)').matches;
+
+    if (compact && headerNav && toggle) {
+      if (wrapper.parentNode !== headerNav || wrapper.nextElementSibling !== toggle) headerNav.insertBefore(wrapper, toggle);
+      return;
+    }
+
+    const auth = nav.querySelector('.auth-link');
+    const account = nav.querySelector('.nw-account-cluster-desktop');
+    const anchor = auth || account;
+    if (wrapper.parentNode !== nav || (anchor && wrapper.nextElementSibling !== anchor)) {
+      if (anchor) nav.insertBefore(wrapper, anchor);
+      else nav.appendChild(wrapper);
+    }
+  };
+
+  let scheduled = false;
+  const schedulePlacement = () => {
+    if (scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(() => {
+      scheduled = false;
+      placeSwitcher();
+    });
+  };
+
+  const start = () => {
+    placeSwitcher();
+    const root = document.querySelector('header.top') || document.body;
+    if (root) {
+      new MutationObserver(() => schedulePlacement()).observe(root, { childList: true, subtree: true });
+    }
+    window.addEventListener('resize', schedulePlacement, { passive: true });
+    window.addEventListener('pageshow', schedulePlacement, { passive: true });
+    setTimeout(schedulePlacement, 0);
+    setTimeout(schedulePlacement, 250);
+    setTimeout(schedulePlacement, 1000);
+  };
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
+  else start();
 })();
