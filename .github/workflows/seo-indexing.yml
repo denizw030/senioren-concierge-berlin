@@ -5,18 +5,28 @@ on:
     branches: [main]
     paths:
       - '*.html'
+      - 'en/**/*.html'
+      - 'tr/**/*.html'
       - 'robots.txt'
       - 'sitemap.xml'
       - 'assets/site-ui.js'
+      - 'assets/language-switcher.js'
+      - 'assets/international.css'
       - 'tests/seo-indexing.test.mjs'
+      - 'scripts/localization-bootstrap.py'
       - '.github/workflows/seo-indexing.yml'
   pull_request:
     paths:
       - '*.html'
+      - 'en/**/*.html'
+      - 'tr/**/*.html'
       - 'robots.txt'
       - 'sitemap.xml'
       - 'assets/site-ui.js'
+      - 'assets/language-switcher.js'
+      - 'assets/international.css'
       - 'tests/seo-indexing.test.mjs'
+      - 'scripts/localization-bootstrap.py'
       - '.github/workflows/seo-indexing.yml'
 
 permissions:
