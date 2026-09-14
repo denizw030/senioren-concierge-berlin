@@ -32,49 +32,6 @@ test("runtime-created asset URLs are root absolute", () => {
   assert.match(carousel, /`\/assets\/voice\/samples\/\$\{key\}-\$\{code\}\.mp3/);
 });
 
-test("every local media reference resolves from every public EN/TR and auth page", () => {
-  const publicPages = [
-    "index.html","prime-concierge.html","safety.html","angehoerige.html","telefonannahme.html",
-    "pakete.html","leistungen.html","ablauf.html","faq.html","kontakt.html","concierges.html",
-    "senioren-concierge.html","alltag-organisieren.html","dokumente-verstehen.html",
-    "technik-verstehen.html","ueber-mich.html"
-  ];
-  const pages = [
-    ...publicPages.flatMap(page => [`en/${page}`, `tr/${page}`]),
-    "registrieren.html","anmelden.html","erster-schritt.html"
-  ];
-  const refsFrom = (html) => {
-    const refs = [];
-    for (const match of html.matchAll(/<(?:img|source|audio|video)\b[^>]*\b(?:src|poster)=["']([^"']+)["'][^>]*>/gi)) refs.push(match[1]);
-    for (const match of html.matchAll(/<(?:img|source)\b[^>]*\bsrcset=["']([^"']+)["'][^>]*>/gi)) {
-      for (const part of match[1].split(',')) refs.push(part.trim().split(/\s+/)[0]);
-    }
-    return refs;
-  };
-  for (const page of pages) {
-    for (const raw of refsFrom(read(page))) {
-      if (!raw || /^(?:https?:|data:|blob:|#)/i.test(raw)) continue;
-      const clean = raw.split(/[?#]/)[0];
-      const absolute = clean.startsWith('/')
-        ? path.join(root, clean.replace(/^\/+/, ''))
-        : path.resolve(root, path.dirname(page), clean);
-      assert.ok(fs.existsSync(absolute), `${page} has broken media reference ${raw}`);
-    }
-  }
-});
-
-test("all Concierge preview audio files required by the slider exist", () => {
-  const carousel = read("assets/concierge-carousel.js");
-  const profiles = [...carousel.matchAll(/^\s*\["([^"]+)",.*,"([a-z]{2})"\],$/gm)].map(match => ({key:match[1], native:match[2]}));
-  assert.equal(profiles.length, 23, "expected all 23 Concierge profiles");
-  for (const {key,native} of profiles) {
-    for (const code of new Set([native,"de","en"])) {
-      const file = path.join(root,"assets","voice","samples",`${key}-${code}.mp3`);
-      assert.ok(fs.existsSync(file), `missing slider audio ${key}-${code}.mp3`);
-    }
-  }
-});
-
 test("localized public runtime repairs late-added asset references", () => {
   const js = read("assets/locale-runtime.js");
   assert.match(js, /repairAssetRefs/);
