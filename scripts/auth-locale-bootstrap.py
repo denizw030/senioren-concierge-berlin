@@ -14,17 +14,20 @@ PUBLIC_PAGES = [
     "alltag-organisieren.html", "dokumente-verstehen.html", "technik-verstehen.html", "ueber-mich.html",
 ]
 AUTH_PAGES = ("registrieren.html", "anmelden.html", "erster-schritt.html")
-AUTH_SCRIPT = '<script src="assets/auth-i18n.js?v=2"></script>'
+AUTH_SCRIPT = '<script src="assets/auth-i18n.js?v=3"></script>'
+APP_LANGUAGE_SCRIPT = '<script src="assets/app-language-switcher.js?v=1"></script>'
 
 
 def inject_auth_runtime(path: Path) -> None:
     text = path.read_text(encoding="utf-8")
     text = re.sub(r'\s*<script\s+src=["\']/?assets/auth-i18n\.js\?v=\d+["\']></script>', "", text, flags=re.I)
+    text = re.sub(r'\s*<script\s+src=["\']/?assets/app-language-switcher\.js\?v=\d+["\']></script>', "", text, flags=re.I)
     marker = "</body>"
     if marker not in text.lower():
         raise SystemExit(f"Missing </body> in {path.name}")
     idx = text.lower().rfind(marker)
-    text = text[:idx] + "    " + AUTH_SCRIPT + "\n  " + text[idx:]
+    scripts = "    " + AUTH_SCRIPT + "\n    " + APP_LANGUAGE_SCRIPT + "\n  "
+    text = text[:idx] + scripts + text[idx:]
     path.write_text(text, encoding="utf-8")
 
 
@@ -85,7 +88,7 @@ def main() -> None:
             if path.exists():
                 rewrite_generated_auth_links(path, lang)
 
-    print("Auth locale continuity prepared for EN/TR public → registration/login flow.")
+    print("Auth locale continuity and persistent DE/EN/TR selector prepared for translated auth flow.")
 
 
 if __name__ == "__main__":
