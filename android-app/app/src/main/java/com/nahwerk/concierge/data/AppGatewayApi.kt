@@ -20,8 +20,17 @@ internal data class AppHomeSnapshot(
     val activeTaskId: String?,
     val activeTaskStatus: String?,
     val pendingApproval: Boolean,
+    val intelligenceMode: String,
     val reminderCountActive: Int,
     val reminders: List<AppReminder>
+)
+
+internal data class AppIntelligenceMode(
+    val mode: String,
+    val pricingStatus: String,
+    val exactCustomerPriceFinalized: Boolean,
+    val smartNotice: String,
+    val economyNotice: String
 )
 
 internal data class AppReminder(
@@ -43,17 +52,22 @@ internal class AppGatewayApi(context: Context) {
     companion object {
         private const val PROD_HOST = "djicahhmnnamtjuqedqd.supabase.co"
         private const val GATEWAY_SLUG = "nahwerk-app-gateway"
+        private const val INTELLIGENCE_MODE_SLUG = "nahwerk-app-intelligence-mode"
     }
 
     private val sessions = SecureProductSessionStore(context.applicationContext)
-    private val gatewayBaseUrl = "${BuildConfig.CUSTOMER_PRODUCT_BASE_URL.trimEnd('/')}/$GATEWAY_SLUG"
+    private val functionsBaseUrl = BuildConfig.CUSTOMER_PRODUCT_BASE_URL.trimEnd('/')
+    private val gatewayBaseUrl = "$functionsBaseUrl/$GATEWAY_SLUG"
+    private val intelligenceModeBaseUrl = "$functionsBaseUrl/$INTELLIGENCE_MODE_SLUG"
 
     private data class HttpJson(val code: Int, val body: JSONObject)
 
     init {
-        val uri = runCatching { URI(gatewayBaseUrl) }.getOrNull()
-        require(uri?.scheme == "https" && uri.host == PROD_HOST && !gatewayBaseUrl.contains("staging", ignoreCase = true)) {
-            "prod_app_gateway_required"
+        listOf(gatewayBaseUrl, intelligenceModeBaseUrl).forEach { baseUrl ->
+            val uri = runCatching { URI(baseUrl) }.getOrNull()
+            require(uri?.scheme == "https" && uri.host == PROD_HOST && !baseUrl.contains("staging", ignoreCase = true)) {
+                "prod_app_gateway_required"
+            }
         }
     }
 
@@ -62,6 +76,8 @@ internal class AppGatewayApi(context: Context) {
             val identity = body.optJSONObject("identity") ?: error("identity_missing")
             val conversation = body.optJSONObject("conversation")
             val reminders = parseReminders(body.optJSONArray("reminders"))
+            val mode = body.optJSONObject("intelligence_mode")?.optString("mode", "ECONOMY")
+                ?.uppercase()?.takeIf { it == "ECONOMY" || it == "SMART" } ?: "ECONOMY"
             AppHomeSnapshot(
                 personId = identity.optString("person_id"),
                 customerAccountId = identity.optString("customer_account_id"),
@@ -69,10 +85,34 @@ internal class AppGatewayApi(context: Context) {
                 activeTaskId = conversation?.optString("active_task_id")?.takeIf(String::isNotBlank),
                 activeTaskStatus = conversation?.optString("active_task_status")?.takeIf(String::isNotBlank),
                 pendingApproval = body.has("pending_approval") && !body.isNull("pending_approval"),
+                intelligenceMode = mode,
                 reminderCountActive = body.optInt("reminder_count_active", reminders.count { it.status == "active" }),
                 reminders = reminders
             )
         }
+    }
+
+    suspend fun loadIntelligenceMode(): Result<AppIntelligenceMode> = withContext(Dispatchers.IO) {
+        modeResultRequest("GET") { body ->
+            parseIntelligenceMode(body.optJSONObject("intelligence_mode"))
+        }
+    }
+
+    suspend fun setIntelligenceMode(mode: String, acknowledgeHigherConsumption: Boolean): Result<AppIntelligenceMode> = withContext(Dispatchers.IO) {
+        val normalized = mode.trim().uppercase()
+        if (normalized != "ECONOMY" && normalized != "SMART") {
+            return@withContext Result.failure(IllegalArgumentException("Unbekannter Concierge-Modus."))
+        }
+        if (normalized == "SMART" && !acknowledgeHigherConsumption) {
+            return@withContext Result.failure(IllegalArgumentException("Bitte bestätige zuerst den höheren KI-Verbrauch."))
+        }
+        modeResultRequest(
+            "POST",
+            JSONObject()
+                .put("mode", normalized)
+                .put("acknowledge_higher_consumption", acknowledgeHigherConsumption)
+                .put("source_message_id", UUID.randomUUID().toString())
+        ) { body -> parseIntelligenceMode(body.optJSONObject("intelligence_mode")) }
     }
 
     suspend fun loadReminders(): Result<List<AppReminder>> = withContext(Dispatchers.IO) {
@@ -112,8 +152,18 @@ internal class AppGatewayApi(context: Context) {
         method: String,
         payload: JSONObject? = null,
         parser: (JSONObject) -> T
+    ): Result<T> = parseResponse(request(path, method, payload), parser)
+
+    private inline fun <T> modeResultRequest(
+        method: String,
+        payload: JSONObject? = null,
+        parser: (JSONObject) -> T
+    ): Result<T> = parseResponse(requestUrl(intelligenceModeBaseUrl, method, payload), parser)
+
+    private inline fun <T> parseResponse(
+        response: HttpJson,
+        parser: (JSONObject) -> T
     ): Result<T> = try {
-        val response = request(path, method, payload)
         if (response.code == 401) {
             sessions.clear()
             Result.failure(AppGatewaySessionExpiredException())
@@ -127,11 +177,15 @@ internal class AppGatewayApi(context: Context) {
     }
 
     private fun request(path: String, method: String, payload: JSONObject? = null): HttpJson {
+        return requestUrl("$gatewayBaseUrl/${path.trimStart('/')}", method, payload)
+    }
+
+    private fun requestUrl(urlString: String, method: String, payload: JSONObject? = null): HttpJson {
         val token = sessions.sessionToken()
             ?: return HttpJson(401, JSONObject().put("error", "SESSION_REQUIRED"))
         if (!sessions.hasValidSession()) return HttpJson(401, JSONObject().put("error", "SESSION_INVALID"))
 
-        val url = URL("$gatewayBaseUrl/${path.trimStart('/')}")
+        val url = URL(urlString)
         require(url.protocol == "https" && url.host == PROD_HOST) { "prod_app_gateway_required" }
         val connection = (url.openConnection() as HttpURLConnection).apply {
             requestMethod = method
@@ -155,6 +209,24 @@ internal class AppGatewayApi(context: Context) {
         } finally {
             connection.disconnect()
         }
+    }
+
+    private fun parseIntelligenceMode(raw: JSONObject?): AppIntelligenceMode {
+        val body = raw ?: error("intelligence_mode_missing")
+        val mode = body.optString("mode", "ECONOMY").uppercase().takeIf { it == "ECONOMY" || it == "SMART" } ?: "ECONOMY"
+        return AppIntelligenceMode(
+            mode = mode,
+            pricingStatus = body.optString("pricing_status", "CALIBRATION_PENDING"),
+            exactCustomerPriceFinalized = body.optBoolean("exact_customer_price_finalized", false),
+            smartNotice = body.optString(
+                "smart_notice",
+                "Der intelligente Modus nutzt mehr KI und kann dein Guthaben deutlich schneller verbrauchen."
+            ),
+            economyNotice = body.optString(
+                "economy_notice",
+                "Der günstige Modus vermeidet KI für normale Navigation und klare Auftragserfassung."
+            )
+        )
     }
 
     private fun parseCoreReply(body: JSONObject): AppCoreReply {
@@ -191,6 +263,8 @@ internal class AppGatewayApi(context: Context) {
     private fun readableError(body: JSONObject, code: Int): String = when (body.optString("error", "REQUEST_FAILED")) {
         "APP_AUTHORITATIVE_ROUTE_DISABLED" -> "Der App-Concierge ist momentan nicht verfügbar. Bitte erneut versuchen."
         "CAO_APP_ROUTE_DISABLED" -> "Die Auftragsausführung ist momentan nicht verfügbar. Es wurde nichts ausgeführt."
+        "SMART_HIGHER_CONSUMPTION_ACK_REQUIRED" -> "Bitte bestätige zuerst, dass der intelligente Modus mehr KI nutzt und dein Guthaben schneller verbrauchen kann."
+        "INVALID_INTELLIGENCE_MODE" -> "Dieser Concierge-Modus ist nicht verfügbar."
         "NETWORK_UNAVAILABLE" -> "PROD ist gerade nicht erreichbar. Bitte erneut versuchen."
         else -> "PROD-Anfrage fehlgeschlagen (${body.optString("error", "REQUEST_FAILED")}, HTTP $code)."
     }
