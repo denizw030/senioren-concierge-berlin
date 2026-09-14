@@ -11,9 +11,11 @@ on:
       - 'sitemap.xml'
       - 'assets/site-ui.js'
       - 'assets/language-switcher.js'
-      - 'assets/international.css'
+      - 'locales/*.json'
       - 'tests/seo-indexing.test.mjs'
+      - 'tests/i18n-design-parity.test.mjs'
       - 'scripts/localization-bootstrap.py'
+      - 'scripts/i18n-mirror.py'
       - '.github/workflows/seo-indexing.yml'
   pull_request:
     paths:
@@ -24,9 +26,11 @@ on:
       - 'sitemap.xml'
       - 'assets/site-ui.js'
       - 'assets/language-switcher.js'
-      - 'assets/international.css'
+      - 'locales/*.json'
       - 'tests/seo-indexing.test.mjs'
+      - 'tests/i18n-design-parity.test.mjs'
       - 'scripts/localization-bootstrap.py'
+      - 'scripts/i18n-mirror.py'
       - '.github/workflows/seo-indexing.yml'
 
 permissions:
@@ -41,5 +45,5 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Validate search-engine index surface
-        run: node --test tests/seo-indexing.test.mjs
+      - name: Validate search-engine index surface and locale design parity
+        run: node --test tests/seo-indexing.test.mjs tests/i18n-design-parity.test.mjs
