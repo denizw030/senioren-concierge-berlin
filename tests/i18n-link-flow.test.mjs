@@ -1,0 +1,55 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const root = process.cwd();
+const pages = [
+  'index.html','prime-concierge.html','safety.html','angehoerige.html','telefonannahme.html',
+  'pakete.html','leistungen.html','ablauf.html','faq.html','kontakt.html','concierges.html',
+  'senioren-concierge.html','alltag-organisieren.html','dokumente-verstehen.html',
+  'technik-verstehen.html','ueber-mich.html'
+];
+const localized = new Set(pages);
+const authTargets = new Set(['registrieren.html','anmelden.html']);
+
+function read(file) {
+  return fs.readFileSync(path.join(root, file), 'utf8');
+}
+
+function hrefs(html) {
+  return [...html.matchAll(/<a\b[^>]*href=["']([^"']+)["'][^>]*>/gi)].map((m) => m[1]);
+}
+
+for (const lang of ['en', 'tr']) {
+  test(`${lang}: every localized public page keeps the selected language`, () => {
+    for (const page of pages) {
+      const html = read(`${lang}/${page}`);
+      for (const href of hrefs(html)) {
+        if (!href || href.startsWith('#') || /^(?:https?:|mailto:|tel:|javascript:)/i.test(href)) continue;
+        const url = new URL(href, 'https://nahwerkconcierge.com/');
+        const base = url.pathname.split('/').filter(Boolean).pop() || 'index.html';
+        if (localized.has(base)) {
+          const expectedPrefix = base === 'index.html' ? `/${lang}/` : `/${lang}/`;
+          assert.ok(url.pathname.startsWith(expectedPrefix), `${lang}/${page} leaks localized link ${href} back to DE`);
+        }
+        if (authTargets.has(base)) {
+          assert.equal(url.searchParams.get('lang'), lang, `${lang}/${page} auth link ${href} loses lang=${lang}`);
+        }
+      }
+    }
+  });
+}
+
+test('auth entry pages load the shared locale runtime', () => {
+  for (const page of ['registrieren.html','anmelden.html','erster-schritt.html']) {
+    const html = read(page);
+    assert.match(html, /assets\/auth-i18n\.js\?v=1/, `${page} must load auth-i18n runtime`);
+  }
+});
+
+test('registration redirects preserve the active locale', () => {
+  const onboarding = read('assets/onboarding.js');
+  assert.match(onboarding, /NAHWERKLocale\?\.href\("erster-schritt\.html"\)/);
+  assert.match(onboarding, /NAHWERKLocale\?\.href\("anmelden\.html"\)/);
+});
