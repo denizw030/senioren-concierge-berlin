@@ -176,7 +176,7 @@ internal fun AppProdGatewaySurface(onSessionExpired: () -> Unit) {
                         color = NahwerkPalette.SecondaryText
                     )
                     Text(
-                        "Concierge-Modus: ${if (snapshot.intelligenceMode == "SMART") "Intelligent" else "Günstig"}",
+                        "Concierge-Modus: ${if ((intelligenceMode?.mode ?: snapshot.intelligenceMode) == "SMART") "Intelligent" else "Günstig"}",
                         color = NahwerkPalette.SecondaryText
                     )
                     Text("Aktive Erinnerungen: ${snapshot.reminderCountActive}", color = NahwerkPalette.SecondaryText)
