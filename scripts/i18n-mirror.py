@@ -178,7 +178,8 @@ def mirror_page(lang: str, page: str, catalog: dict[str, str]) -> None:
     html = rewrite_assets(html)
     html = rewrite_links(html, lang)
     html = translate_visible_html(html, catalog)
-    html = re.sub(r"/assets/language-switcher\.js\?v=\d+", "/assets/language-switcher.js?v=10", html)
+    html = re.sub(r"/assets/language-switcher\.js\?v=\d+", "/assets/language-switcher.js?v=11", html)
+    html = re.sub(r"assets/story-conversion-final\.css\?v=\d+", "assets/story-conversion-final.css?v=2", html)
     html = "\n".join(line.rstrip() for line in html.splitlines()) + ("\n" if html.endswith("\n") else "")
     generated_path.write_text(html, encoding="utf-8")
 
@@ -186,7 +187,9 @@ def mirror_page(lang: str, page: str, catalog: dict[str, str]) -> None:
 def update_root_switcher_version() -> None:
     for page in PAGES:
         path = ROOT / page
-        text = re.sub(r"/assets/language-switcher\.js\?v=\d+", "/assets/language-switcher.js?v=10", path.read_text(encoding="utf-8"))
+        text = path.read_text(encoding="utf-8")
+        text = re.sub(r"/assets/language-switcher\.js\?v=\d+", "/assets/language-switcher.js?v=11", text)
+        text = re.sub(r"assets/story-conversion-final\.css\?v=\d+", "assets/story-conversion-final.css?v=2", text)
         path.write_text(text, encoding="utf-8")
 
 
