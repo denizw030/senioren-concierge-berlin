@@ -247,24 +247,60 @@ body.senior-product .senior-image-hero .senior-benefit-chip{
   }
 }
 
-/* Desktop mirror: keep the senior visible on the left and place the content cleanly on the right. */
+/* Desktop/tablet mirror: reserve the left half for the senior and keep copy fully on the right. */
 @media(min-width:701px){
   body.senior-product .senior-image-hero{
     background-image:
-      linear-gradient(270deg,rgba(2,2,2,.95) 0%,rgba(2,2,2,.87) 27%,rgba(2,2,2,.64) 47%,rgba(2,2,2,.24) 69%,rgba(2,2,2,.06) 100%),
+      linear-gradient(270deg,rgba(2,2,2,.97) 0%,rgba(2,2,2,.92) 29%,rgba(2,2,2,.76) 46%,rgba(2,2,2,.30) 63%,rgba(2,2,2,.05) 80%,rgba(2,2,2,.02) 100%),
       linear-gradient(180deg,rgba(0,0,0,.10) 0%,rgba(0,0,0,.06) 56%,rgba(0,0,0,.34) 100%),
       url("lifestyle/nahwerk-senior-web-q88.webp")!important;
+    background-position:44% center!important;
   }
   body.senior-product .senior-image-hero .senior-hero-layout{
-    display:flex!important;
-    justify-content:flex-end!important;
-    align-items:center!important;
+    display:block!important;
+    box-sizing:border-box!important;
+    padding-left:54%!important;
   }
   body.senior-product .senior-image-hero .senior-hero-copy{
-    width:min(100%,660px)!important;
-    max-width:660px!important;
-    margin-left:auto!important;
-    margin-right:0!important;
+    width:100%!important;
+    max-width:560px!important;
+    margin:0!important;
     text-align:left!important;
+  }
+  body.senior-product .senior-image-hero h1{
+    max-width:9.8ch!important;
+    margin:10px 0 20px!important;
+    font-size:clamp(44px,4.5vw,70px)!important;
+    line-height:.96!important;
+    letter-spacing:-.052em!important;
+  }
+  body.senior-product .senior-image-hero .senior-hero-lead,
+  body.senior-product .senior-image-hero .senior-app-note{
+    max-width:540px!important;
+  }
+  body.senior-product .senior-image-hero .senior-benefit-chips{
+    max-width:550px!important;
+  }
+}
+
+@media(min-width:701px) and (max-width:1100px){
+  body.senior-product .senior-image-hero{
+    padding-top:64px!important;
+    padding-bottom:64px!important;
+  }
+  body.senior-product .senior-image-hero .senior-hero-layout{
+    padding-left:56%!important;
+  }
+  body.senior-product .senior-image-hero .senior-hero-copy{
+    max-width:430px!important;
+  }
+  body.senior-product .senior-image-hero h1{
+    max-width:10ch!important;
+    font-size:clamp(42px,4.8vw,54px)!important;
+  }
+  body.senior-product .senior-image-hero .senior-hero-lead,
+  body.senior-product .senior-image-hero .senior-app-note{
+    font-size:15px!important;
+    line-height:1.5!important;
   }
 }
