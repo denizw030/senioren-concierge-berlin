@@ -66,6 +66,6 @@ test('legal pages expose DE EN TR switcher coverage', () => {
 test('localized legal links stay in the selected language', () => {
   const js = read('assets/legal-i18n.js');
   assert.match(js, /url\.searchParams\.set\('lang', lang\)/);
-  assert.match(js, /`\/${lang}\/\$\{target\}`/);
+  assert.ok(js.includes("`/${lang}/${target}`"));
   assert.ok(js.includes("'datenschutz.html','agb.html','widerruf.html','ki-transparenz.html'"));
 });
