@@ -126,7 +126,11 @@ body.story-site .footer h3,body.story-site .footer h4{color:#fff!important}
   .story-shell{width:min(100% - 30px,1180px)}
   .story-section{padding:76px 0}
   .story-hero{min-height:auto;padding:76px 0 320px;align-items:flex-start}
-  .story-hero-art{height:100%;object-fit:cover;object-position:66% 100%}
+  .story-hero-art{
+  height:100%;
+  object-fit:cover;
+  object-position:50% 50%;
+}
   .story-hero::after{background:linear-gradient(180deg,#000 0%,rgba(0,0,0,.90) 38%,rgba(0,0,0,.42) 66%,rgba(0,0,0,.08) 100%)}
   .story-title{font-size:clamp(2.55rem,13vw,4.2rem)}
   .story-title--section{font-size:clamp(2.2rem,10.5vw,3.45rem)}
