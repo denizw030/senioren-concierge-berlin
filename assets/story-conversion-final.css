@@ -82,14 +82,14 @@ body.story-site a.story-btn.story-btn--primary{background:#f3f0e9!important;colo
 .story-channel-label span{color:var(--story-gold);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase}
 .story-channel p{max-width:52ch;margin:0;color:var(--story-muted);line-height:1.68}
 .story-channel-proof{margin-top:20px;padding:18px 0;border-top:1px solid var(--story-line);color:#e0dcd4;font-size:.94rem;line-height:1.55}
-.story-channel-media{margin-top:34px;display:grid;grid-template-columns:minmax(0,1fr) 180px;gap:24px;align-items:end}
+.story-channel-media{margin-top:34px;display:grid;grid-template-columns:minmax(0,1fr) 132px;gap:24px;align-items:start}
 .story-chat-proof{padding:22px;border:1px solid var(--story-line);border-radius:22px;background:rgba(255,255,255,.025)}
 .story-chat-row{margin-bottom:12px;padding:13px 15px;border-radius:16px;line-height:1.45}
 .story-chat-row--user{margin-left:10%;background:#f2efe8;color:#171717}
 .story-chat-row--nw{margin-right:10%;border:1px solid var(--story-line);color:#eeeae2;background:#0b0b0d}
-.story-agent-mini{margin:0;border:1px solid var(--story-line);border-radius:22px;overflow:hidden;background:#09090a}
-.story-agent-mini img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover}
-.story-agent-mini figcaption{padding:10px 12px;color:#c4c0b7;font-size:.76rem}
+.story-agent-mini{width:132px;max-width:132px;margin:0;justify-self:end;align-self:start;border:1px solid var(--story-line);border-radius:18px;overflow:hidden;background:#09090a}
+.story-agent-mini img{display:block;width:132px!important;height:165px!important;max-width:132px!important;aspect-ratio:auto!important;object-fit:cover!important;object-position:center top!important}
+.story-agent-mini figcaption{padding:8px 10px;color:#c4c0b7;font-size:.72rem;line-height:1.35}
 .story-final{padding:clamp(100px,11vw,160px) 0;background:
   radial-gradient(720px 430px at 86% 14%,rgba(212,175,55,.09),transparent 68%),
   linear-gradient(180deg,#080809,#030304)}
@@ -138,7 +138,7 @@ body.story-site .footer h3,body.story-site .footer h4{color:#fff!important}
   .story-demo-step::before{margin-bottom:10px}
   .story-channels{grid-template-columns:1fr;gap:38px}
   .story-channel-media{grid-template-columns:1fr}
-  .story-agent-mini{width:min(62%,220px);justify-self:end}
+  .story-agent-mini{width:132px;max-width:132px;justify-self:end}
   .story-family-media,.story-family-media img{min-height:360px}
   .story-safety-preview{padding:22px;border-radius:24px}
   .story-subhero{padding:78px 0 70px}
