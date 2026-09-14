@@ -1210,16 +1210,22 @@
     <main>
       <!-- 1 · Concierge als Begeisterung -->
       <section class="story-hero" id="concierge" data-story-step="1">
-        <img
-          class="story-hero-art"
-          src="/assets/prime/nahwerk-hero-blue-red-goldmann.webp?v=2"
-          width="1916"
-          height="821"
-          alt=""
-          loading="eager"
-          fetchpriority="high"
-          decoding="async"
-        />
+<picture>
+  <source
+    media="(max-width: 760px)"
+    srcset="/assets/prime/nahwerk-mobile-hero-web-lossless.webp?v=1"
+  />
+  <img
+    class="story-hero-art"
+    src="/assets/prime/nahwerk-hero-blue-red-goldmann.webp?v=2"
+    width="1916"
+    height="821"
+    alt=""
+    loading="eager"
+    fetchpriority="high"
+    decoding="async"
+  />
+</picture>
         <div class="story-shell">
           <div class="story-hero-copy">
             <div class="story-kicker">NAHWERK Concierge</div>
