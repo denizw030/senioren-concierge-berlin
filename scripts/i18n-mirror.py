@@ -178,7 +178,7 @@ def mirror_page(lang: str, page: str, catalog: dict[str, str]) -> None:
     html = rewrite_assets(html)
     html = rewrite_links(html, lang)
     html = translate_visible_html(html, catalog)
-    html = re.sub(r"/assets/language-switcher\.js\?v=\d+", "/assets/language-switcher.js?v=7", html)
+    html = re.sub(r"/assets/language-switcher\.js\?v=\d+", "/assets/language-switcher.js?v=8", html)
     html = "\n".join(line.rstrip() for line in html.splitlines()) + ("\n" if html.endswith("\n") else "")
     generated_path.write_text(html, encoding="utf-8")
 
@@ -186,7 +186,7 @@ def mirror_page(lang: str, page: str, catalog: dict[str, str]) -> None:
 def update_root_switcher_version() -> None:
     for page in PAGES:
         path = ROOT / page
-        text = re.sub(r"/assets/language-switcher\.js\?v=\d+", "/assets/language-switcher.js?v=7", path.read_text(encoding="utf-8"))
+        text = re.sub(r"/assets/language-switcher\.js\?v=\d+", "/assets/language-switcher.js?v=8", path.read_text(encoding="utf-8"))
         path.write_text(text, encoding="utf-8")
 
 
