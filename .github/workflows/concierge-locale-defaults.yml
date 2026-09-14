@@ -1,0 +1,67 @@
+name: concierge locale defaults
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "assets/concierge-locale-defaults.js"
+      - "scripts/concierge-locale-defaults.py"
+      - "tests/concierge-locale-defaults.test.mjs"
+      - ".github/workflows/concierge-locale-defaults.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: concierge-locale-defaults-main
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Apply locale defaults
+        run: python scripts/concierge-locale-defaults.py
+
+      - name: Verify locale defaults and existing i18n guards
+        run: >-
+          node --test
+          tests/concierge-locale-defaults.test.mjs
+          tests/i18n-runtime-hardening.test.mjs
+          tests/i18n-media-audit.test.mjs
+          tests/i18n-completeness.test.mjs
+          tests/i18n-design-parity.test.mjs
+          tests/i18n-link-flow.test.mjs
+          tests/seo-indexing.test.mjs
+
+      - name: Validate diff
+        run: git diff --check
+
+      - name: Publish generated pages
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "No generated changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "i18n: pin EN Lukas and TR Leyla defaults"
+          git push origin HEAD:main
