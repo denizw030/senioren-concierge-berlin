@@ -29,7 +29,7 @@
     const preload = document.createElement('link');
     preload.rel = 'preload';
     preload.as = 'image';
-    preload.href = '/assets/lifestyle/senior-woman-overview.webp?v=3';
+    preload.href = '/assets/lifestyle/senior-woman-overview.webp?v=4';
     preload.fetchPriority = 'high';
     document.head.appendChild(preload);
   }
@@ -67,8 +67,9 @@
     }
     body.login-image-page.senior-product.nw-senior-login-composed .hero,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero {
-      min-height:720px !important;
-      padding:58px 0 64px !important;
+      position:relative !important;
+      min-height:760px !important;
+      padding:52px 0 58px !important;
       background:
         radial-gradient(760px 520px at 85% 28%,rgba(200,164,93,.18),transparent 66%),
         radial-gradient(640px 440px at 7% 18%,rgba(255,255,255,.72),transparent 64%),
@@ -83,54 +84,74 @@
     }
     body.login-image-page.senior-product.nw-senior-login-composed .hero .wrap,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero .wrap {
-      display:grid !important;
-      grid-template-columns:minmax(0,1.12fr) minmax(340px,430px) !important;
-      gap:clamp(42px,6vw,88px) !important;
-      align-items:center !important;
-      width:min(100% - 48px,1240px) !important;
-      padding-right:0 !important;
+      position:relative !important;
+      display:block !important;
+      width:min(calc(100% - 48px),1240px) !important;
+      max-width:1240px !important;
+      margin:0 auto !important;
+      padding:0 clamp(355px,34vw,445px) 0 0 !important;
+      box-sizing:border-box !important;
     }
     .nw-senior-login-copy {
-      min-width:0;
-      max-width:680px;
+      position:relative !important;
+      z-index:3 !important;
+      display:block !important;
+      width:100% !important;
+      max-width:650px !important;
+      min-width:0 !important;
+      box-sizing:border-box !important;
     }
     body.login-image-page.senior-product.nw-senior-login-composed .hero h1,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero h1 {
-      max-width:680px !important;
-      margin:12px 0 18px !important;
+      width:auto !important;
+      max-width:620px !important;
+      margin:10px 0 14px !important;
       color:#181713 !important;
-      font-size:clamp(3rem,5vw,4.8rem) !important;
-      line-height:.97 !important;
+      font-size:clamp(2.7rem,4.4vw,4.45rem) !important;
+      line-height:.98 !important;
       letter-spacing:-.055em !important;
       text-shadow:none !important;
+      word-break:normal !important;
+      overflow-wrap:normal !important;
+      text-wrap:balance !important;
     }
     body.login-image-page.senior-product.nw-senior-login-composed .hero p,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero p {
-      max-width:630px !important;
+      width:auto !important;
+      max-width:600px !important;
       margin:0 !important;
       color:#655f55 !important;
-      font-size:clamp(1rem,1.25vw,1.16rem) !important;
-      line-height:1.62 !important;
+      font-size:clamp(.98rem,1.15vw,1.1rem) !important;
+      line-height:1.55 !important;
+      word-break:normal !important;
+      overflow-wrap:normal !important;
     }
     body.login-image-page.senior-product.nw-senior-login-composed .logincard,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed .logincard {
+      display:block !important;
       width:min(100%,560px) !important;
-      margin:28px 0 0 !important;
-      padding:28px 30px !important;
+      max-width:560px !important;
+      margin:22px 0 0 !important;
+      padding:24px 26px !important;
+      box-sizing:border-box !important;
       border:1px solid rgba(112,87,39,.16) !important;
       border-left:1px solid rgba(112,87,39,.16) !important;
-      border-radius:24px !important;
-      background:rgba(255,255,255,.82) !important;
+      border-radius:22px !important;
+      background:rgba(255,255,255,.84) !important;
       box-shadow:0 22px 64px rgba(65,49,22,.10),inset 0 1px 0 rgba(255,255,255,.9) !important;
       backdrop-filter:blur(18px) saturate(115%) !important;
       -webkit-backdrop-filter:blur(18px) saturate(115%) !important;
     }
     body.login-image-page.senior-product.nw-senior-login-composed .logincard h2,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed .logincard h2 {
-      margin:0 0 20px !important;
+      margin:0 0 18px !important;
       color:#181713 !important;
-      font-size:1.9rem !important;
+      font-size:1.75rem !important;
       letter-spacing:-.035em !important;
+    }
+    body.login-image-page.senior-product.nw-senior-login-composed .field,
+    body.login-image-page[data-product="senioren"].nw-senior-login-composed .field {
+      margin-bottom:14px !important;
     }
     body.login-image-page.senior-product.nw-senior-login-composed .field label,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed .field label {
@@ -138,55 +159,116 @@
     }
     body.login-image-page.senior-product.nw-senior-login-composed .field input,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed .field input {
-      min-height:54px !important;
+      width:100% !important;
+      min-height:50px !important;
       border-color:rgba(90,72,40,.2) !important;
       background:#fff !important;
       color:#1f1c17 !important;
+      box-sizing:border-box !important;
     }
     .nw-senior-login-portrait {
-      position:relative;
-      z-index:2;
-      width:100%;
-      margin:0;
-      aspect-ratio:4/5;
-      overflow:hidden;
-      border:1px solid rgba(151,115,43,.2);
-      border-radius:30px;
-      background:#e8dfd2;
-      box-shadow:0 30px 80px rgba(69,50,20,.16);
+      position:absolute !important;
+      z-index:2 !important;
+      top:50% !important;
+      right:0 !important;
+      width:clamp(315px,31vw,410px) !important;
+      max-width:410px !important;
+      margin:0 !important;
+      aspect-ratio:4/5 !important;
+      transform:translateY(-50%) !important;
+      overflow:hidden !important;
+      box-sizing:border-box !important;
+      border:1px solid rgba(151,115,43,.2) !important;
+      border-radius:30px !important;
+      background:#e8dfd2 !important;
+      box-shadow:0 30px 80px rgba(69,50,20,.16) !important;
     }
     .nw-senior-login-portrait img {
-      display:block;
-      width:100%;
-      height:100%;
-      max-width:none;
-      object-fit:cover;
-      object-position:58% 50%;
-      transform:scale(1.06) translateX(-2.5%);
-      transform-origin:center;
+      display:block !important;
+      width:100% !important;
+      height:100% !important;
+      max-width:none !important;
+      object-fit:cover !important;
+      object-position:58% 50% !important;
+      transform:scale(1.06) translateX(-2.5%) !important;
+      transform-origin:center !important;
     }
     body.login-image-page.senior-product.nw-senior-login-composed .nw-senior-login-source-section,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed .nw-senior-login-source-section {
       display:none !important;
     }
-    @media(max-width:900px) {
+
+    @media(max-width:1050px) and (min-width:721px) {
       body.login-image-page.senior-product.nw-senior-login-composed .hero,
       body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero {
-        min-height:0 !important;
-        padding:52px 0 70px !important;
+        min-height:720px !important;
+        padding:44px 0 50px !important;
       }
       body.login-image-page.senior-product.nw-senior-login-composed .hero .wrap,
       body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero .wrap {
-        grid-template-columns:1fr !important;
-        gap:38px !important;
-        width:min(100% - 36px,720px) !important;
+        width:min(calc(100% - 36px),980px) !important;
+        padding-right:310px !important;
       }
-      .nw-senior-login-copy { max-width:none; }
+      .nw-senior-login-copy {
+        max-width:560px !important;
+      }
       .nw-senior-login-portrait {
-        width:min(100%,520px);
-        justify-self:center;
-        aspect-ratio:4/3;
-        border-radius:26px;
+        width:280px !important;
+        max-width:280px !important;
+        border-radius:26px !important;
+      }
+      body.login-image-page.senior-product.nw-senior-login-composed .hero h1,
+      body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero h1 {
+        font-size:clamp(2.55rem,5.2vw,3.6rem) !important;
+      }
+    }
+
+    @media(max-width:720px) {
+      body.login-image-page.senior-product.nw-senior-login-composed .hero,
+      body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero {
+        min-height:0 !important;
+        padding:42px 0 54px !important;
+        overflow:visible !important;
+      }
+      body.login-image-page.senior-product.nw-senior-login-composed .hero .wrap,
+      body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero .wrap {
+        display:flex !important;
+        flex-direction:column !important;
+        gap:30px !important;
+        width:min(calc(100% - 32px),620px) !important;
+        padding:0 !important;
+      }
+      .nw-senior-login-copy {
+        width:100% !important;
+        max-width:none !important;
+      }
+      .nw-senior-login-portrait {
+        position:relative !important;
+        top:auto !important;
+        right:auto !important;
+        width:min(100%,460px) !important;
+        max-width:460px !important;
+        aspect-ratio:4/3 !important;
+        margin:0 auto !important;
+        transform:none !important;
+        border-radius:24px !important;
+        order:2 !important;
+      }
+      body.login-image-page.senior-product.nw-senior-login-composed .hero h1,
+      body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero h1 {
+        max-width:none !important;
+        font-size:clamp(2.5rem,11vw,3.5rem) !important;
+      }
+      body.login-image-page.senior-product.nw-senior-login-composed .hero p,
+      body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero p {
+        max-width:none !important;
+      }
+      body.login-image-page.senior-product.nw-senior-login-composed .logincard,
+      body.login-image-page[data-product="senioren"].nw-senior-login-composed .logincard {
+        width:100% !important;
+        max-width:none !important;
+        margin-top:20px !important;
+        padding:22px 20px !important;
       }
     }
   `;
@@ -224,7 +306,7 @@
     const figure = document.createElement('figure');
     figure.className = 'nw-senior-login-portrait';
     const image = document.createElement('img');
-    image.src = '/assets/lifestyle/senior-woman-overview.webp?v=3';
+    image.src = '/assets/lifestyle/senior-woman-overview.webp?v=4';
     image.alt = 'Ältere Frau nutzt zu Hause zufrieden ihr Smartphone';
     image.width = 960;
     image.height = 1200;
