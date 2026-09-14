@@ -181,3 +181,145 @@ body.login-image-page[data-product="senioren"] .password-toggle{
   body.login-image-page.senior-product .split,
   body.login-image-page[data-product="senioren"] .split{align-items:flex-start!important;flex-direction:column!important;gap:10px!important}
 }
+
+/* Senior surfaces: language control always matches the menu control beside it. */
+body.senior-product .nw-language-button,
+body[data-product="senioren"] .nw-language-button{
+  background:#eee8dc!important;
+  border-color:rgba(42,35,23,.18)!important;
+  color:#4d463d!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.75)!important;
+}
+body.senior-product .nw-language-button:hover,
+body.senior-product .nw-language-button:focus-visible,
+body[data-product="senioren"] .nw-language-button:hover,
+body[data-product="senioren"] .nw-language-button:focus-visible{
+  background:#eee8dc!important;
+  border-color:rgba(42,35,23,.28)!important;
+  color:#2f2a24!important;
+}
+
+/* Senioren login: use the same dark premium language as the normal login while keeping the senior portrait. */
+body.login-image-page.senior-product,
+body.login-image-page[data-product="senioren"]{
+  background:#05080d!important;
+  color:#f3f3ef!important;
+}
+body.login-image-page.senior-product .top,
+body.login-image-page[data-product="senioren"] .top{
+  background:rgba(2,2,2,.96)!important;
+  border-color:#242424!important;
+  box-shadow:0 1px 0 rgba(255,255,255,.02),0 18px 48px rgba(0,0,0,.22)!important;
+}
+body.login-image-page.senior-product .top .brandtext span:before,
+body.login-image-page[data-product="senioren"] .top .brandtext span:before{
+  color:#fff!important;
+}
+body.login-image-page.senior-product .top .links,
+body.login-image-page[data-product="senioren"] .top .links{
+  color:#e8e8e6!important;
+}
+body.login-image-page.senior-product .nav-toggle,
+body.login-image-page[data-product="senioren"] .nav-toggle,
+body.login-image-page.senior-product .nw-language-button,
+body.login-image-page[data-product="senioren"] .nw-language-button{
+  background:#0b0b0c!important;
+  border-color:#8d6a20!important;
+  color:#fff!important;
+  box-shadow:none!important;
+}
+body.login-image-page.senior-product .nw-language-button:hover,
+body.login-image-page.senior-product .nw-language-button:focus-visible,
+body.login-image-page[data-product="senioren"] .nw-language-button:hover,
+body.login-image-page[data-product="senioren"] .nw-language-button:focus-visible{
+  background:#11110f!important;
+  border-color:rgba(239,188,63,.8)!important;
+  color:#fff!important;
+}
+body.login-image-page.senior-product .hero,
+body.login-image-page[data-product="senioren"] .hero{
+  background:
+    radial-gradient(700px 500px at 78% 28%,rgba(34,72,144,.13),transparent 64%),
+    radial-gradient(600px 430px at 12% 82%,rgba(44,58,104,.035),transparent 68%),
+    radial-gradient(520px 380px at 88% 70%,rgba(20,91,110,.025),transparent 67%),
+    linear-gradient(145deg,#070b11,#0b131d 58%,#06090d)!important;
+  border-bottom:1px solid rgba(126,148,178,.12)!important;
+}
+body.login-image-page.senior-product .hero h1,
+body.login-image-page[data-product="senioren"] .hero h1{
+  color:#fff!important;
+}
+body.login-image-page.senior-product .hero p,
+body.login-image-page[data-product="senioren"] .hero p{
+  color:#c9c9c5!important;
+}
+body.login-image-page.senior-product .hero .eyebrow,
+body.login-image-page[data-product="senioren"] .hero .eyebrow{
+  color:var(--gold)!important;
+}
+body.login-image-page.senior-product .hero:after,
+body.login-image-page[data-product="senioren"] .hero:after{
+  border-color:rgba(215,169,52,.32)!important;
+  background:
+    linear-gradient(180deg,transparent 68%,rgba(0,0,0,.20) 100%),
+    url("lifestyle/senior-woman-overview.webp") 78% 28%/cover no-repeat!important;
+  box-shadow:0 30px 80px rgba(0,0,0,.42)!important;
+}
+body.login-image-page.senior-product main>.section,
+body.login-image-page[data-product="senioren"] main>.section{
+  background:
+    radial-gradient(760px 480px at 92% 10%,rgba(32,72,150,.15),transparent 67%),
+    radial-gradient(680px 430px at 8% 86%,rgba(44,58,104,.035),transparent 72%),
+    rgba(5,9,14,.99)!important;
+}
+body.login-image-page.senior-product .logincard,
+body.login-image-page[data-product="senioren"] .logincard{
+  border:1px solid rgba(126,148,178,.14)!important;
+  border-left:1px solid rgba(126,148,178,.14)!important;
+  background:
+    radial-gradient(circle at 100% 0%,rgba(34,72,144,.13),transparent 42%),
+    radial-gradient(circle at 0% 100%,rgba(21,89,108,.025),transparent 52%),
+    linear-gradient(145deg,#0b1119,#080d14)!important;
+  box-shadow:inset 0 1px 0 rgba(174,195,222,.03),0 24px 64px rgba(0,0,0,.40)!important;
+}
+body.login-image-page.senior-product .logincard h2,
+body.login-image-page[data-product="senioren"] .logincard h2,
+body.login-image-page.senior-product .field label,
+body.login-image-page[data-product="senioren"] .field label{
+  color:#f3f3ef!important;
+}
+body.login-image-page.senior-product .field input,
+body.login-image-page[data-product="senioren"] .field input{
+  border-color:rgba(124,146,174,.14)!important;
+  background:#080d14!important;
+  color:#f3f3ef!important;
+  caret-color:#f3f3ef!important;
+  box-shadow:inset 0 1px 0 rgba(174,195,222,.018)!important;
+}
+body.login-image-page.senior-product .field input:focus,
+body.login-image-page[data-product="senioren"] .field input:focus{
+  border-color:rgba(215,169,52,.55)!important;
+  background:#0a1018!important;
+  box-shadow:0 0 0 4px rgba(215,169,52,.10)!important;
+}
+body.login-image-page.senior-product .password-toggle,
+body.login-image-page[data-product="senioren"] .password-toggle{
+  color:#d8d5cd!important;
+}
+body.login-image-page.senior-product .split,
+body.login-image-page[data-product="senioren"] .split{
+  border-top-color:rgba(124,146,174,.13)!important;
+  color:#bcb8af!important;
+}
+body.login-image-page.senior-product .status,
+body.login-image-page[data-product="senioren"] .status{
+  border-color:rgba(124,146,174,.14)!important;
+  background:linear-gradient(145deg,#0b1119,#080d14)!important;
+  color:#f3f3ef!important;
+}
+@media(max-width:900px){
+  body.login-image-page.senior-product .hero:after,
+  body.login-image-page[data-product="senioren"] .hero:after{
+    background-position:76% 28%!important;
+  }
+}
