@@ -29,7 +29,7 @@
     const preload = document.createElement('link');
     preload.rel = 'preload';
     preload.as = 'image';
-    preload.href = '/assets/lifestyle/senior-woman-overview.webp?v=5';
+    preload.href = '/assets/lifestyle/senior-woman-overview.webp?v=6';
     preload.fetchPriority = 'high';
     document.head.appendChild(preload);
   }
@@ -66,8 +66,10 @@
     body.login-image-page.senior-product.nw-senior-login-composed .hero,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero {
       position:relative !important;
-      min-height:700px !important;
-      padding:48px 0 54px !important;
+      display:flex !important;
+      align-items:flex-start !important;
+      min-height:590px !important;
+      padding:88px 0 88px !important;
       overflow:hidden !important;
       background:
         radial-gradient(760px 520px at 86% 26%,rgba(200,164,93,.17),transparent 66%),
@@ -91,7 +93,7 @@
     .nw-senior-login-copy {
       min-width:0 !important;
       width:100% !important;
-      max-width:640px !important;
+      max-width:560px !important;
       box-sizing:border-box !important;
       position:relative !important;
       z-index:3 !important;
@@ -99,10 +101,10 @@
     body.login-image-page.senior-product.nw-senior-login-composed .hero h1,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero h1 {
       width:auto !important;
-      max-width:620px !important;
+      max-width:560px !important;
       margin:10px 0 14px !important;
       color:#181713 !important;
-      font-size:clamp(2.55rem,4.5vw,4.4rem) !important;
+      font-size:clamp(2.55rem,4.4vw,4.15rem) !important;
       line-height:.98 !important;
       letter-spacing:-.055em !important;
       text-shadow:none !important;
@@ -113,7 +115,7 @@
     body.login-image-page.senior-product.nw-senior-login-composed .hero p,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero p {
       width:auto !important;
-      max-width:600px !important;
+      max-width:560px !important;
       margin:0 !important;
       color:#655f55 !important;
       font-size:clamp(.98rem,1.15vw,1.1rem) !important;
@@ -126,7 +128,7 @@
       display:block !important;
       width:100% !important;
       max-width:560px !important;
-      margin:20px 0 0 !important;
+      margin:18px 0 0 !important;
       padding:24px 26px !important;
       box-sizing:border-box !important;
       border:1px solid rgba(112,87,39,.16) !important;
@@ -165,7 +167,7 @@
       position:relative !important;
       z-index:2 !important;
       min-width:0 !important;
-      margin:0 !important;
+      margin:-26px 0 0 !important;
       overflow:hidden !important;
       box-sizing:border-box !important;
       border:1px solid rgba(151,115,43,.2) !important;
@@ -204,6 +206,9 @@
       body.login-image-page[data-product="senioren"].nw-senior-login-composed .logincard {
         padding:22px 20px !important;
       }
+      .nw-senior-login-portrait {
+        margin:0 auto !important;
+      }
     }
   `;
   document.head.appendChild(style);
@@ -238,6 +243,10 @@
     important(copy, 'width', '100%');
 
     if (stacked) {
+      important(hero, 'display', 'flex');
+      important(hero, 'align-items', 'flex-start');
+      important(hero, 'min-height', '0');
+      important(hero, 'padding', '40px 0 52px');
       important(wrap, 'display', 'flex');
       important(wrap, 'flex-direction', 'column');
       important(wrap, 'gap', '28px');
@@ -253,21 +262,25 @@
       return;
     }
 
-    const portraitWidth = Math.max(240, Math.min(360, Math.round(width * 0.31)));
-    const gap = Math.max(24, Math.min(48, Math.round(width * 0.045)));
-    const copyWidth = Math.max(360, width - portraitWidth - gap);
+    const portraitWidth = Math.max(330, Math.min(410, Math.round(width * 0.42)));
+    const gap = Math.max(30, Math.min(48, Math.round(width * 0.045)));
+    const copyWidth = Math.max(390, width - portraitWidth - gap);
 
+    important(hero, 'display', 'flex');
+    important(hero, 'align-items', 'flex-start');
+    important(hero, 'min-height', '590px');
+    important(hero, 'padding', '88px 0 88px');
     important(wrap, 'display', 'grid');
     important(wrap, 'grid-template-columns', `minmax(0, 1fr) ${portraitWidth}px`);
     important(wrap, 'gap', `${gap}px`);
-    important(wrap, 'align-items', 'center');
-    important(copy, 'max-width', `${copyWidth}px`);
+    important(wrap, 'align-items', 'start');
+    important(copy, 'max-width', `${Math.min(560, copyWidth)}px`);
     important(portrait, 'position', 'relative');
     important(portrait, 'top', 'auto');
     important(portrait, 'right', 'auto');
     important(portrait, 'width', `${portraitWidth}px`);
     important(portrait, 'max-width', `${portraitWidth}px`);
-    important(portrait, 'margin', '0');
+    important(portrait, 'margin', '-26px 0 0');
     important(portrait, 'transform', 'none');
     important(portrait, 'justify-self', 'end');
     important(portrait, 'aspect-ratio', '4 / 5');
@@ -293,7 +306,7 @@
       const figure = document.createElement('figure');
       figure.className = 'nw-senior-login-portrait';
       const image = document.createElement('img');
-      image.src = '/assets/lifestyle/senior-woman-overview.webp?v=5';
+      image.src = '/assets/lifestyle/senior-woman-overview.webp?v=6';
       image.alt = 'Ältere Frau nutzt zu Hause zufrieden ihr Smartphone';
       image.width = 960;
       image.height = 1200;
