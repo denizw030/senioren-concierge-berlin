@@ -1,0 +1,64 @@
+name: overview lifestyle integration
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/overview-lifestyle.py'
+      - 'assets/overview-lifestyle.css'
+      - 'tests/overview-lifestyle.test.mjs'
+      - '.github/workflows/overview-lifestyle.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: overview-lifestyle-main
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Integrate overview lifestyle stories
+        run: python scripts/overview-lifestyle.py
+
+      - name: Verify overview integration and existing locale guards
+        run: >-
+          node --test
+          tests/overview-lifestyle.test.mjs
+          tests/i18n-media-audit.test.mjs
+          tests/i18n-design-parity.test.mjs
+          tests/seo-indexing.test.mjs
+
+      - name: Validate diff
+        run: git diff --check
+
+      - name: Publish generated overview pages
+        run: |
+          if git diff --quiet; then
+            echo "No generated changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html en/index.html tr/index.html
+          git commit -m "overview: add lifestyle story moments in DE EN TR"
+          git push origin HEAD:main
