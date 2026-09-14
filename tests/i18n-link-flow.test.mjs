@@ -60,7 +60,7 @@ for (const lang of ['en', 'tr']) {
 test('auth entry pages load the shared locale runtime', () => {
   for (const page of ['registrieren.html','anmelden.html','erster-schritt.html']) {
     const html = read(page);
-    assert.match(html, /assets\/auth-i18n\.js\?v=1/, `${page} must load auth-i18n runtime`);
+    assert.match(html, /assets\/auth-i18n\.js\?v=[12]/, `${page} must load auth-i18n runtime`);
   }
 });
 
