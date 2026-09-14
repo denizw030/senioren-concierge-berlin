@@ -5,6 +5,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = '<script src="/assets/concierge-locale-defaults.js?v=1"></script>'
 CAROUSEL_RE = re.compile(r'(<script\s+src=["\']/?assets/concierge-carousel\.js[^>]*></script>)', re.I)
 SELECTED_RE = re.compile(r'data-selected=["\'][^"\']*["\']', re.I)
+SENIOR_PHONE_AGENT_IMAGE = '/assets/voice/telephone-concierge-agent.jpg'
+SENIOR_PHONE_PERSONAL_IMAGE = '/assets/concierges/large/hartmut.webp?v=1'
 
 
 def update(path: Path) -> bool:
@@ -18,6 +20,12 @@ def update(path: Path) -> bool:
         fixed = SELECTED_RE.sub('data-selected="lukas"', fixed)
     elif rel.startswith('tr/'):
         fixed = SELECTED_RE.sub('data-selected="leyla"', fixed)
+
+    # Localized senior pages must keep the same PROD visual asset structure as DE.
+    # The phone section illustrates the customer's personal senior concierge (Hartmut),
+    # while Alexander remains a specialized phone-agent role in the copy/runtime.
+    if rel in {'en/senioren-concierge.html', 'tr/senioren-concierge.html'}:
+        fixed = fixed.replace(SENIOR_PHONE_AGENT_IMAGE, SENIOR_PHONE_PERSONAL_IMAGE)
 
     if '/assets/concierge-locale-defaults.js' not in fixed:
         fixed, count = CAROUSEL_RE.subn(SCRIPT + '\n    ' + r'\1', fixed, count=1)
