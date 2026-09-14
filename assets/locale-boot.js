@@ -215,8 +215,8 @@
       height:100% !important;
       max-width:none !important;
       object-fit:cover !important;
-      object-position:50% 50% !important;
-      transform:scale(1.04) translateX(-2%) !important;
+      object-position:42% 50% !important;
+      transform:scale(1.04) translateX(-4%) !important;
       transform-origin:center !important;
     }
     body.login-image-page.senior-product.nw-senior-login-composed .nw-senior-login-source-section,
