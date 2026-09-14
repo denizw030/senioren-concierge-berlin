@@ -6,6 +6,7 @@ on:
     paths:
       - "scripts/i18n-runtime-hardening.py"
       - "tests/i18n-runtime-hardening.test.mjs"
+      - "tests/i18n-media-audit.test.mjs"
       - "tests/i18n-link-flow.test.mjs"
       - ".github/workflows/i18n-runtime-hardening.yml"
 
@@ -39,10 +40,11 @@ jobs:
       - name: Apply runtime hardening
         run: python scripts/i18n-runtime-hardening.py
 
-      - name: Run localization and SEO guards
+      - name: Run localization media and SEO guards
         run: >-
           node --test
           tests/i18n-runtime-hardening.test.mjs
+          tests/i18n-media-audit.test.mjs
           tests/i18n-completeness.test.mjs
           tests/i18n-design-parity.test.mjs
           tests/i18n-link-flow.test.mjs
