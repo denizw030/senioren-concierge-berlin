@@ -176,8 +176,14 @@
   const loadCatalog = async () => {
     if (lang === 'de') return;
     try {
-      const response = await fetch(`/locales/${lang}-auth.json?v=1`, { cache: 'no-cache' });
-      if (response.ok) catalog = await response.json();
+      const urls = [1,2,3,4].map((index) => `/locales/${lang}-auth${index}.json?v=1`);
+      const parts = await Promise.all(urls.map(async (url) => {
+        try {
+          const response = await fetch(url, { cache: 'no-cache' });
+          return response.ok ? await response.json() : {};
+        } catch (_) { return {}; }
+      }));
+      catalog = Object.assign({}, ...parts);
     } catch (_) {}
     apply();
   };
