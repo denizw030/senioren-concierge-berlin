@@ -15,8 +15,8 @@ PUBLIC_PAGES = [
 ]
 AUTH_PAGES = ("registrieren.html", "anmelden.html", "erster-schritt.html")
 AUTH_SCRIPT = '<script src="assets/auth-i18n.js?v=3"></script>'
-SLIDER_SCRIPT = '<script src="assets/auth-slider-i18n.js?v=1"></script>'
-APP_LANGUAGE_SCRIPT = '<script src="assets/app-language-switcher.js?v=1"></script>'
+SLIDER_SCRIPT = '<script src="assets/auth-slider-i18n.js?v=2"></script>'
+APP_LANGUAGE_SCRIPT = '<script src="assets/app-language-switcher.js?v=2"></script>'
 
 
 def inject_auth_runtime(path: Path) -> None:
@@ -27,7 +27,10 @@ def inject_auth_runtime(path: Path) -> None:
     if marker not in text.lower():
         raise SystemExit(f"Missing </body> in {path.name}")
     idx = text.lower().rfind(marker)
-    scripts = "    " + AUTH_SCRIPT + "\n    " + SLIDER_SCRIPT + "\n    " + APP_LANGUAGE_SCRIPT + "\n  "
+    scripts = "    " + AUTH_SCRIPT + "\n"
+    if path.name == "registrieren.html":
+        scripts += "    " + SLIDER_SCRIPT + "\n"
+    scripts += "    " + APP_LANGUAGE_SCRIPT + "\n  "
     text = text[:idx] + scripts + text[idx:]
     path.write_text(text, encoding="utf-8")
 
