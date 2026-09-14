@@ -49,6 +49,17 @@
     html.nw-locale-pending body {
       visibility:hidden !important;
     }
+    html.nw-product-senior-first-paint body.login-image-page .hero:after,
+    body.login-image-page.senior-product .hero:after,
+    body.login-image-page[data-product="senioren"] .hero:after {
+      content:"" !important;
+      display:block !important;
+      visibility:visible !important;
+      opacity:1 !important;
+      background:#e9e1d5 center 38%/cover no-repeat url("/assets/lifestyle/senior-man-phone.webp?v=1") !important;
+      border-color:rgba(112,87,39,.22) !important;
+      box-shadow:0 30px 80px rgba(73,52,18,.18) !important;
+    }
   `;
   document.head.appendChild(style);
 
