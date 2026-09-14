@@ -173,3 +173,76 @@
   .nw-phone-section .nw-phone-image{border-radius:22px}
   .nw-phone-section--senior .nw-phone-image{border-radius:20px}
 }
+
+/* Senior overview hero — full-bleed image with a dark readability fade, no rounded image card. */
+body.senior-product .senior-image-hero{
+  position:relative!important;
+  min-height:calc(100svh - 100px)!important;
+  display:grid!important;
+  align-items:center!important;
+  overflow:hidden!important;
+  padding:clamp(82px,9vw,126px) 0!important;
+  color:#fff!important;
+  background-image:
+    linear-gradient(90deg,rgba(2,2,2,.94) 0%,rgba(2,2,2,.86) 28%,rgba(2,2,2,.62) 47%,rgba(2,2,2,.24) 68%,rgba(2,2,2,.08) 100%),
+    linear-gradient(180deg,rgba(0,0,0,.12) 0%,rgba(0,0,0,.08) 58%,rgba(0,0,0,.38) 100%),
+    url("lifestyle/nahwerk-senior-web-q88.webp")!important;
+  background-position:center center!important;
+  background-size:cover!important;
+  background-repeat:no-repeat!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+body.senior-product .senior-image-hero .senior-hero-layout{
+  display:block!important;
+  grid-template-columns:1fr!important;
+  position:relative!important;
+  z-index:2!important;
+}
+body.senior-product .senior-image-hero .senior-hero-copy{
+  position:relative!important;
+  z-index:2!important;
+  max-width:700px!important;
+  margin:0!important;
+}
+body.senior-product .senior-image-hero .senior-hero-photo{
+  display:none!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+body.senior-product .senior-image-hero .eyebrow{
+  color:#d4af37!important;
+}
+body.senior-product .senior-image-hero h1{
+  color:#fff!important;
+  text-shadow:0 3px 28px rgba(0,0,0,.34)!important;
+}
+body.senior-product .senior-image-hero .senior-hero-lead,
+body.senior-product .senior-image-hero .senior-app-note{
+  color:#ece9e1!important;
+  text-shadow:0 2px 18px rgba(0,0,0,.32)!important;
+}
+body.senior-product .senior-image-hero .senior-benefit-chip{
+  color:#f7f3ea!important;
+  border-color:rgba(212,175,55,.38)!important;
+  background:rgba(5,5,5,.48)!important;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+@media(max-width:700px){
+  body.senior-product .senior-image-hero{
+    min-height:760px!important;
+    padding:60px 0 68px!important;
+    background-image:
+      linear-gradient(180deg,rgba(2,2,2,.34) 0%,rgba(2,2,2,.58) 34%,rgba(2,2,2,.90) 76%,rgba(2,2,2,.96) 100%),
+      linear-gradient(90deg,rgba(2,2,2,.70) 0%,rgba(2,2,2,.28) 100%),
+      url("lifestyle/nahwerk-senior-web-q88.webp")!important;
+    background-position:center center!important;
+  }
+  body.senior-product .senior-image-hero .senior-hero-copy{
+    max-width:620px!important;
+  }
+  body.senior-product .senior-image-hero .senior-benefit-chips{
+    justify-content:flex-start!important;
+  }
+}
