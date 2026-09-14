@@ -58,14 +58,7 @@ def rewrite_generated_auth_links(path: Path, lang: str) -> None:
         localized = with_lang_query(root_target, lang)
         return f'href={quote}{escape(localized, quote=True)}{quote}'
 
-    def register_repl(match: re.Match[str]) -> str:
-        quote, raw_target = match.group(1), match.group(2)
-        target = unescape(raw_target)
-        localized = with_lang_query("/" + target.lstrip("/"), lang)
-        return f'data-register-url={quote}{escape(localized, quote=True)}{quote}'
-
     text = re.sub(r'href=(["\'])([^"\']+)\1', href_repl, text, flags=re.I)
-    text = re.sub(r'data-register-url=(["\'])([^"\']+)\1', register_repl, text, flags=re.I)
     path.write_text(text, encoding="utf-8")
 
 
