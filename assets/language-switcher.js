@@ -46,46 +46,6 @@
       .nw-language-option[aria-current="page"]{background:rgba(215,169,52,.1)!important;color:#f2c45b!important}
       .nw-language-option small{margin-left:auto;color:#8d8a82;font-size:11px;letter-spacing:.08em}
 
-      /* PROD visual parity lock: the approved homepage artwork must keep the
-         same crop in DE/EN/TR even when translated copy changes section height. */
-      @media (min-width:761px){
-        body.story-site.overview-page .story-hero-art{
-          top:0!important;
-          right:0!important;
-          bottom:auto!important;
-          left:0!important;
-          width:100%!important;
-          height:clamp(690px,48vw,880px)!important;
-          object-fit:cover!important;
-          object-position:center center!important;
-        }
-      }
-      @media (max-width:760px){
-        body.story-site.overview-page .story-hero{
-          min-height:0!important;
-          height:auto!important;
-          padding:76px 0 320px!important;
-          align-items:flex-start!important;
-        }
-        body.story-site.overview-page .story-hero-art{
-          top:auto!important;
-          right:0!important;
-          bottom:0!important;
-          left:0!important;
-          width:100%!important;
-          height:320px!important;
-          object-fit:cover!important;
-          object-position:66% 100%!important;
-        }
-      }
-      @media (max-width:480px){
-        body.story-site.overview-page .story-hero{padding-bottom:275px!important}
-        body.story-site.overview-page .story-hero-art{
-          height:275px!important;
-          object-position:69% 100%!important;
-        }
-      }
-
       @media (max-width:1280px){
         .top .nav>.nw-language,.home-reference .top .nav>.nw-language{display:inline-flex;margin-left:auto;margin-right:58px;z-index:130;align-self:center}
         .top .nav>.nw-language .nw-language-menu,.home-reference .top .nav>.nw-language .nw-language-menu{top:calc(100% + 12px);right:0}
@@ -106,7 +66,7 @@
     const current = SUPPORTED[lang] || SUPPORTED.de;
     const wrapper = document.createElement('div');
     wrapper.className = 'nw-language';
-    wrapper.dataset.nwLanguageSwitcher = 'v8';
+    wrapper.dataset.nwLanguageSwitcher = 'v10';
 
     const button = document.createElement('button');
     button.type = 'button';
