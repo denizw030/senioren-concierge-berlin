@@ -98,6 +98,27 @@
 
   const localizedProduct = (value) => productNames[clean(value)]?.[lang] || clean(value);
 
+  const normalizeAssetRef = (value) => {
+    if (!value) return value;
+    const raw = String(value);
+    return raw
+      .replace(/^\/(?:en|tr)\/assets\//i, '/assets/')
+      .replace(/^assets\//i, '/assets/')
+      .replace(/(^|,\s*)\/(?:en|tr)\/assets\//gi, '$1/assets/')
+      .replace(/(^|,\s*)assets\//gi, '$1/assets/');
+  };
+
+  const repairAssetRefs = () => {
+    document.querySelectorAll('img,source,audio,video').forEach((el) => {
+      ['src','data-src','srcset','data-srcset','poster'].forEach((attr) => {
+        const raw = el.getAttribute?.(attr);
+        if (!raw) return;
+        const fixed = normalizeAssetRef(raw);
+        if (fixed !== raw) el.setAttribute(attr, fixed);
+      });
+    });
+  };
+
   const translateDynamic = (value) => {
     const key = clean(value);
     if (!key) return value;
@@ -108,6 +129,9 @@
     if ((match = key.match(/^Willkommen bei (.+)\.$/))) {
       const product = localizedProduct(match[1]);
       return lang === 'tr' ? `${product}'e hoş geldiniz.` : `Welcome to ${product}.`;
+    }
+    if ((match = key.match(/^Welcome to (.+)\.$/)) && lang === 'en') {
+      return `Welcome to ${localizedProduct(match[1])}.`;
     }
     if ((match = key.match(/^(.+)'e hoş geldiniz\.$/)) && lang === 'tr') {
       const product = localizedProduct(match[1]);
@@ -194,6 +218,7 @@
     busy = true;
     try {
       document.documentElement.lang = lang;
+      repairAssetRefs();
       repairOdysxBar();
       translateTree(document.body);
     } finally { busy = false; }
@@ -232,7 +257,7 @@
   const start = () => {
     apply();
     loadCatalog();
-    if (document.body) new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true, characterData: true });
+    if (document.body) new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['src','srcset','data-src','data-srcset','poster'] });
     addEventListener('pageshow', schedule, { passive: true });
     setTimeout(schedule, 0);
     setTimeout(schedule, 250);

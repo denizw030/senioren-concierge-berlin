@@ -23,10 +23,10 @@
     nativeLanguage: "de",
     nativeLanguageLabel: "Deutsch",
     sampleText: "Guten Tag. Alexander. Ihr NAHWERK Telefon-Concierge. Sagen Sie mir einfach, worum es geht. Ich höre zu, ordne die Situation und wir entscheiden anschließend in Ruhe über den nächsten Schritt.",
-    sampleAudio: "assets/voice/samples/james-de.mp3?v=james-20260831-1",
-    sampleAudioByLanguage: { de: "assets/voice/samples/james-de.mp3?v=james-20260831-1" },
+    sampleAudio: "/assets/voice/samples/james-de.mp3?v=james-20260831-1",
+    sampleAudioByLanguage: { de: "/assets/voice/samples/james-de.mp3?v=james-20260831-1" },
     previewLanguages: [{ code: "de", label: "Deutsch" }],
-    image: "assets/voice/telephone-concierge-agent.jpg"
+    image: "/assets/voice/telephone-concierge-agent.jpg"
   });
   window.NAHWERK_JAMES_PROFILE = profile;
   let dialog = null, lastTrigger = null;

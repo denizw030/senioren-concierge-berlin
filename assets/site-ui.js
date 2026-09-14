@@ -26,7 +26,7 @@
       return;
     }
     const script = document.createElement('script');
-    script.src = 'assets/nahwerk-analytics.js?v=1';
+    script.src = '/assets/nahwerk-analytics.js?v=1';
     script.async = true;
     script.dataset.nwAnalyticsClient = 'true';
     script.onload = () => resolve(analytics());
@@ -89,7 +89,7 @@
     if (!document.querySelector('link[data-nw-premium-preview]')) {
       const premium = document.createElement('link');
       premium.rel = 'stylesheet';
-      premium.href = 'assets/premium-preview.css?v=1';
+      premium.href = '/assets/premium-preview.css?v=1';
       premium.dataset.nwPremiumPreview = 'true';
       document.head.append(premium);
     }

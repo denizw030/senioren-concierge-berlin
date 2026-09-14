@@ -37,6 +37,30 @@
 
   const lang = detectLang();
   const clean = (value) => String(value || '').replace(/\s+/g, ' ').trim();
+  const productNames = {
+    'Persönlicher Concierge': { en:'Personal Concierge', tr:'Kişisel Concierge' },
+    'Senioren Concierge': { en:'Senior Concierge', tr:'İleri yaş Concierge' },
+    'Prime Concierge': { en:'Personal Concierge', tr:'Kişisel Concierge' }
+  };
+  const localizedProduct = (value) => productNames[clean(value)]?.[lang] || clean(value);
+  const hardFragments = {
+    en: {
+      'Deine':'Your',
+      'WhatsApp-Telefonnummer':'WhatsApp phone number',
+      'Deine Telefonnummer wird als':'Your phone number is used for',
+      'WhatsApp-Zugang verwendet.':'WhatsApp access.',
+      'Web-Konto +':'Web account +',
+      'Persönlicher Concierge':'Personal Concierge'
+    },
+    tr: {
+      'Deine':'Size ait',
+      'WhatsApp-Telefonnummer':'WhatsApp telefon numarası',
+      'Deine Telefonnummer wird als':'Telefon numaranız',
+      'WhatsApp-Zugang verwendet.':'WhatsApp erişimi için kullanılır.',
+      'Web-Konto +':'Web hesabı +',
+      'Persönlicher Concierge':'Kişisel Concierge'
+    }
+  };
   let catalog = {};
   let busy = false;
   let scheduled = false;
@@ -73,6 +97,7 @@
     const key = clean(value);
     if (!key) return value;
     if (catalog[key]) return catalog[key];
+    if (hardFragments[lang]?.[key]) return hardFragments[lang][key];
     let m;
     if ((m = key.match(/^Nur nötig, wenn Sie (.+) selbst über WhatsApp nutzen\.$/))) {
       return lang === 'tr' ? `Yalnızca ${m[1]} adlı Concierge'i WhatsApp üzerinden kendiniz kullanacaksanız gereklidir.` : `Only required if you use ${m[1]} yourself via WhatsApp.`;
@@ -90,7 +115,14 @@
       return lang === 'tr' ? `Varsayılan olarak kapalıdır. ${m[1]} belirlenen zamanlarda her şeyin yolunda olup olmadığını sorabilir.` : `Off by default. ${m[1]} can check at agreed times whether everything is all right.`;
     }
     if ((m = key.match(/^Hallo (.+) 👋$/))) return lang === 'tr' ? `Merhaba ${m[1]} 👋` : `Hello ${m[1]} 👋`;
-    if ((m = key.match(/^Willkommen bei (.+)\.$/))) return lang === 'tr' ? `${m[1]}'e hoş geldiniz.` : `Welcome to ${m[1]}.`;
+    if ((m = key.match(/^Willkommen bei (.+)\.$/))) {
+      const product = localizedProduct(m[1]);
+      return lang === 'tr' ? `${product}'e hoş geldiniz.` : `Welcome to ${product}.`;
+    }
+    if ((m = key.match(/^Welcome to (.+)\.$/)) && lang === 'en') return `Welcome to ${localizedProduct(m[1])}.`;
+    if ((m = key.match(/^(.+)'e hoş geldiniz\.$/)) && lang === 'tr') return `${localizedProduct(m[1])}'e hoş geldiniz.`;
+    if ((m = key.match(/^Nur nötig, wenn (?:Sie|du) (.+) selbst über$/))) return lang === 'tr' ? `Yalnızca ${m[1]}'yu` : `Only required if you use ${m[1]} yourself via`;
+    if (key === 'WhatsApp nutzen.') return lang === 'tr' ? 'WhatsApp üzerinden kendiniz kullanacaksanız gereklidir.' : 'WhatsApp.';
     if ((m = key.match(/^Ich bin (.+), (?:dein|Ihr) persönlicher KI-Concierge\.$/))) return lang === 'tr' ? `Ben ${m[1]}, kişisel yapay zekâ Concierge'inizim.` : `I am ${m[1]}, your personal AI Concierge.`;
     if ((m = key.match(/^(.+) hat diesen Zugang für (?:dich|Sie) eingerichtet\.$/))) return lang === 'tr' ? `${m[1]} bu erişimi sizin için kurdu.` : `${m[1]} set up this access for you.`;
     if ((m = key.match(/^Persönliche Nachricht von (.+):$/))) return lang === 'tr' ? `${m[1]} tarafından kişisel mesaj:` : `Personal message from ${m[1]}:`;
@@ -136,6 +168,55 @@
     if (translatedTitle !== document.title) document.title = clean(translatedTitle);
   };
 
+  const whatsappIcon = () => {
+    const img = document.createElement('img');
+    img.src = '/assets/icons/whatsapp-mark.svg?v=1';
+    img.alt = '';
+    img.setAttribute('aria-hidden', 'true');
+    img.style.cssText = 'width:16px;height:16px;object-fit:contain;display:inline-block;vertical-align:-2px;margin:0 4px';
+    return img;
+  };
+
+  const repairRegistrationSurface = () => {
+    if (basename() !== 'registrieren.html' || lang === 'de') return;
+    const copy = lang === 'tr' ? {
+      phoneBefore:'', phoneAfter:'WhatsApp telefon numaranız',
+      hint:'Yalnızca seçtiğiniz Concierge’i WhatsApp üzerinden kendiniz kullanacaksanız gereklidir.',
+      selfStrong:'Kendiniz için:', selfBefore:'Telefon numaranız', selfAfter:'WhatsApp erişimi için kullanılır.',
+      previewBefore:'Web hesabı +', previewAfter:'WhatsApp.'
+    } : {
+      phoneBefore:'Your', phoneAfter:'WhatsApp phone number',
+      hint:'Only required if you use your selected Concierge yourself via WhatsApp.',
+      selfStrong:'For yourself:', selfBefore:'Your phone number is used for', selfAfter:'WhatsApp access.',
+      previewBefore:'Web account +', previewAfter:'WhatsApp.'
+    };
+
+    const label = document.querySelector('#ownerPhoneField label[for="ownerPhone"]');
+    const expectedLabel = clean(`${copy.phoneBefore} ${copy.phoneAfter}`);
+    if (label && clean(label.textContent) !== expectedLabel) {
+      label.replaceChildren();
+      if (copy.phoneBefore) label.append(document.createTextNode(copy.phoneBefore + ' '));
+      label.append(whatsappIcon(), document.createTextNode(' ' + copy.phoneAfter));
+    }
+
+    const hint = document.getElementById('ownerPhoneHint');
+    if (hint && clean(hint.textContent) !== copy.hint) hint.textContent = copy.hint;
+
+    const self = document.getElementById('selfHint');
+    const expectedSelf = clean(`${copy.selfStrong} ${copy.selfBefore} ${copy.selfAfter}`);
+    if (self && clean(self.textContent) !== expectedSelf) {
+      const strong = document.createElement('strong');
+      strong.textContent = copy.selfStrong;
+      self.replaceChildren(strong, document.createTextNode(' ' + copy.selfBefore + ' '), whatsappIcon(), document.createTextNode(' ' + copy.selfAfter));
+    }
+
+    const preview = document.querySelector('.preview h3');
+    const expectedPreview = clean(`${copy.previewBefore} ${copy.previewAfter}`);
+    if (preview && clean(preview.textContent) !== expectedPreview) {
+      preview.replaceChildren(document.createTextNode(copy.previewBefore + ' '), whatsappIcon(), document.createTextNode(' ' + copy.previewAfter));
+    }
+  };
+
   const rewriteLinks = () => {
     if (lang === 'de') return;
     document.querySelectorAll('a[href]').forEach((link) => {
@@ -162,6 +243,7 @@
       normalizeCurrentUrl();
       document.documentElement.lang = lang;
       translateTree(document.body);
+      repairRegistrationSurface();
       rewriteLinks();
     } finally { busy = false; }
   };
@@ -174,6 +256,8 @@
       apply();
     });
   };
+
+  const revealLocalizedPage = () => document.documentElement.classList.remove('nw-locale-pending');
 
   const loadCatalog = async () => {
     if (lang === 'de') return;
@@ -188,6 +272,7 @@
       catalog = Object.assign({}, ...parts);
     } catch (_) {}
     apply();
+    revealLocalizedPage();
   };
 
   try { localStorage.setItem('nw_language', lang); } catch (_) {}
@@ -212,6 +297,7 @@
     setTimeout(schedule, 0);
     setTimeout(schedule, 250);
     setTimeout(schedule, 1000);
+    setTimeout(revealLocalizedPage, 2500);
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once:true });

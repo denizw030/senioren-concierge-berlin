@@ -31,14 +31,14 @@
   ].map(([key,name,description,voice,voiceStatus,sampleText,nativeLanguage]) => {
     const previewLanguageCodes=[...new Set([nativeLanguage,"de","en"])];
     const sampleAudioByLanguage=Object.fromEntries(previewLanguageCodes.map(code=>[
-      code,`assets/voice/samples/${key}-${code}.mp3?v=multilingual-20260829-1`
+      code,`/assets/voice/samples/${key}-${code}.mp3?v=multilingual-20260829-1`
     ]));
     return {
       key,name,description,voice,voiceStatus,sampleText,nativeLanguage,
       nativeLanguageLabel:languageCatalog[nativeLanguage]||nativeLanguage,
-      image:`assets/concierges/large/${key}.webp`,
-      cardImage:`assets/concierges/card/${key}.webp`,
-      largeImage:`assets/concierges/large/${key}.webp`,
+      image:`/assets/concierges/large/${key}.webp`,
+      cardImage:`/assets/concierges/card/${key}.webp`,
+      largeImage:`/assets/concierges/large/${key}.webp`,
       sampleAudio:sampleAudioByLanguage[nativeLanguage],
       sampleAudioByLanguage,
       previewLanguages:previewLanguageCodes.map(code=>({code,label:languageCatalog[code]||code}))

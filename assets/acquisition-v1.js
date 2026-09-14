@@ -2,8 +2,47 @@
   const PENDING_KEY="nw_activation_pending_v1", COMPLETE_KEY="nw_activation_complete_v1";
   const PROFILE_URL="https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-profile";
   const SESSION_KEY="scb_web_session";
-  const FREE_ENTRY_COPY="Lernen Sie NAHWERK kostenlos kennen: chatten, Fragen stellen, Aufgaben vorbereiten und eine echte Concierge-Ausführung ausprobieren. Keine Zahlungsdaten erforderlich. Kein automatisches Upgrade. Danach können Sie Guthaben schon ab 5 € online aufladen.";
-  const FREE_LIMITS_COPY="FREE: bis zu 50 App-Dialoge / Monat · bis zu 20 WhatsApp-Dialoge / Monat · 1 echte Concierge-Ausführung.";
+  const locale=(()=>{
+    const first=location.pathname.split("/").filter(Boolean)[0];
+    if(first==="en"||first==="tr")return first;
+    const query=new URLSearchParams(location.search).get("lang");
+    if(query==="en"||query==="tr")return query;
+    try{const stored=localStorage.getItem("nw_language");if(stored==="en"||stored==="tr")return stored}catch(_){}
+    return "de";
+  })();
+  const JOURNEY_COPY={
+    de:{
+      aria:"In drei Schritten zum kostenlosen Einstieg",
+      oneTitle:"Kostenlos registrieren",
+      oneBody:"Lernen Sie NAHWERK kostenlos kennen: chatten, Fragen stellen, Aufgaben vorbereiten und eine echte Concierge-Ausführung ausprobieren. Keine Zahlungsdaten erforderlich. Kein automatisches Upgrade. Danach können Sie Guthaben schon ab 5 € online aufladen.",
+      limits:"FREE: bis zu 50 App-Dialoge / Monat · bis zu 20 WhatsApp-Dialoge / Monat · 1 echte Concierge-Ausführung.",
+      twoTitle:"Aufgabe übergeben",
+      twoBody:"Zum Beispiel einen Hautarzt finden, passende Optionen vergleichen oder den nächsten Schritt organisieren lassen.",
+      threeTitle:"NAHWERK bleibt dran",
+      threeBody:"NAHWERK recherchiert, organisiert, fragt bei nötigen Entscheidungen nach und meldet Ergebnis oder nächsten Schritt zurück."
+    },
+    en:{
+      aria:"Three steps to get started for free",
+      oneTitle:"Register for free",
+      oneBody:"Get to know NAHWERK for free: chat, ask questions, prepare tasks and try one real Concierge execution. No payment details required. No automatic upgrade. Afterwards, you can top up credit online from €5.",
+      limits:"FREE: up to 50 app conversations / month · up to 20 WhatsApp conversations / month · 1 real Concierge execution.",
+      twoTitle:"Hand over a task",
+      twoBody:"For example, find a dermatologist, compare suitable options or have the next step organised.",
+      threeTitle:"NAHWERK stays on it",
+      threeBody:"NAHWERK researches, organises, asks for approval when a decision is needed and reports back with the result or next step."
+    },
+    tr:{
+      aria:"Ücretsiz başlangıç için üç adım",
+      oneTitle:"Ücretsiz kayıt ol",
+      oneBody:"NAHWERK'i ücretsiz deneyin: sohbet edin, sorular sorun, görevleri hazırlayın ve gerçek bir Concierge işlemini deneyin. Ödeme bilgisi gerekmez. Otomatik yükseltme yoktur. Sonrasında çevrim içi olarak 5 €'dan başlayan bakiye yükleyebilirsiniz.",
+      limits:"FREE: ayda en fazla 50 uygulama görüşmesi · ayda en fazla 20 WhatsApp görüşmesi · 1 gerçek Concierge işlemi.",
+      twoTitle:"Bir görev verin",
+      twoBody:"Örneğin bir dermatolog bulun, uygun seçenekleri karşılaştırın veya sonraki adımı organize ettirin.",
+      threeTitle:"NAHWERK takipte kalır",
+      threeBody:"NAHWERK araştırır, organize eder, gerekli kararlarda onay ister ve sonucu ya da sonraki adımı size bildirir."
+    }
+  };
+  const journeyCopy=JOURNEY_COPY[locale]||JOURNEY_COPY.de;
   // FUTURE COPY — erst nach produktiver Verfügbarkeit im UI aktivieren: „Guthabenkarten ab 10 € im Handel erhältlich.“
   const safeToken=(v,max=64)=>String(v||"").toLowerCase().replace(/[^a-z0-9_:-]+/g,"_").slice(0,max).replace(/^_+|_+$/g,"");
   const track=(name,step)=>window.NahwerkAnalytics?.track?.(name,{funnel_name:"activation",funnel_step:safeToken(step)});
@@ -83,21 +122,11 @@
       if(!conversion)return false;
       grid=document.createElement("div");
       grid.className="nw-journey-grid";
-      grid.setAttribute("aria-label","In drei Schritten zum kostenlosen Einstieg");
-      grid.innerHTML='<article class="nw-journey-card"><span>01</span><h3>Kostenlos registrieren</h3><p></p></article><article class="nw-journey-card"><span>02</span><h3>Aufgabe übergeben</h3><p>Zum Beispiel einen Hautarzt finden, passende Optionen vergleichen oder den nächsten Schritt organisieren lassen.</p></article><article class="nw-journey-card"><span>03</span><h3>NAHWERK bleibt dran</h3><p>NAHWERK recherchiert, organisiert, fragt bei nötigen Entscheidungen nach und meldet Ergebnis oder nächsten Schritt zurück.</p></article>';
       const actions=conversion.querySelector(".story-actions");
       conversion.insertBefore(grid,actions||null);
     }
-    const card=grid.querySelector(".nw-journey-card");
-    if(!card)return false;
-    const heading=card.querySelector("h3");
-    if(heading)heading.textContent="Kostenlos registrieren";
-    let body=card.querySelector("p:not(.nw-free-limits)");
-    if(!body){body=document.createElement("p");card.append(body)}
-    body.textContent=FREE_ENTRY_COPY;
-    let limits=card.querySelector(".nw-free-limits");
-    if(!limits){limits=document.createElement("p");limits.className="nw-free-limits";card.append(limits)}
-    limits.textContent=FREE_LIMITS_COPY;
+    grid.setAttribute("aria-label",journeyCopy.aria);
+    grid.innerHTML=`<article class="nw-journey-card"><span>01</span><h3>${journeyCopy.oneTitle}</h3><p>${journeyCopy.oneBody}</p><p class="nw-free-limits">${journeyCopy.limits}</p></article><article class="nw-journey-card"><span>02</span><h3>${journeyCopy.twoTitle}</h3><p>${journeyCopy.twoBody}</p></article><article class="nw-journey-card"><span>03</span><h3>${journeyCopy.threeTitle}</h3><p>${journeyCopy.threeBody}</p></article>`;
     return true;
   }
   document.addEventListener("click",(event)=>{

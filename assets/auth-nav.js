@@ -166,7 +166,7 @@
     bar.className = "odysx-info-bar";
     bar.setAttribute("role", "region");
     bar.setAttribute("aria-label", "Markenhinweis");
-    bar.innerHTML = '<img src="assets/logos/crown.png?v=1" alt="" aria-hidden="true" style="width:24px;height:24px;object-fit:contain;display:block;flex:0 0 auto"><span>Eine Marke von <strong>ODYSX</strong></span><img class="odysx-crown-logo" src="assets/logos/crown-white-96.png?v=1" alt="" aria-hidden="true">';
+    bar.innerHTML = '<img src="/assets/logos/crown.png?v=1" alt="" aria-hidden="true" style="width:24px;height:24px;object-fit:contain;display:block;flex:0 0 auto"><span>Eine Marke von <strong>ODYSX</strong></span><img class="odysx-crown-logo" src="/assets/logos/crown-white-96.png?v=1" alt="" aria-hidden="true">';
     header.insertAdjacentElement("afterend", bar);
   }
   function normalizeShell() {
@@ -395,7 +395,7 @@
         if (index) {
           const label = document.createElement("span");
           label.className = "whatsapp-label";
-          label.innerHTML = '<img class="whatsapp-mark" src="assets/icons/whatsapp-mark.svg?v=1" alt="" aria-hidden="true">WhatsApp';
+          label.innerHTML = '<img class="whatsapp-mark" src="/assets/icons/whatsapp-mark.svg?v=1" alt="" aria-hidden="true">WhatsApp';
           fragment.appendChild(label);
         }
         if (part) fragment.appendChild(document.createTextNode(part));
