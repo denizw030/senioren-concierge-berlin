@@ -1,0 +1,129 @@
+name: Web Intelligence Mode PROD V1
+
+on:
+  push:
+    branches:
+      - web-intelligence-mode-prod-v1
+    paths:
+      - '.github/workflows/web-intelligence-mode-prod-v1.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nahwerk-web-intelligence-mode-prod-v1
+  cancel-in-progress: false
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: web-intelligence-mode-prod-v1
+
+      - name: Patch web preferences transport and intelligence mode
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path('concierge-anpassen.html')
+          s = p.read_text()
+          old_api = 'const API_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-concierge-preferences";'
+          new_api = '''const API_URL = "https://djicahhmnnamtjuqedqd.supabase.co/rest/v1/rpc/web_concierge_preferences_v2";
+          const API_KEY = "sb_publishable_Zr4L9Lk-zOnjTc5bE_ChNA_SybjXxZx";
+          async function sessionHash(token) {
+            const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(token));
+            return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, "0")).join("");
+          }
+          async function prefsRpc(token, accountId, operation, preferences = null) {
+            const response = await fetch(API_URL, {
+              method: "POST",
+              headers: { "apikey": API_KEY, "Content-Type": "application/json" },
+              body: JSON.stringify({
+                p_token_hash: await sessionHash(token),
+                p_customer_account_id: accountId,
+                p_operation: operation,
+                p_preferences: preferences
+              })
+            });
+            return { response, body: await response.json().catch(() => ({})) };
+          }'''
+          if old_api not in s:
+              raise SystemExit('preferences API anchor missing')
+          s = s.replace(old_api, new_api, 1)
+
+          old_get = '''const response = await fetch(API_URL + "?customer_account_id=" + encodeURIComponent(activeAccountId), {
+                method: "GET",
+                headers: { Authorization: "Bearer " + s.session_token }
+              });
+              const body = await response.json().catch(() => ({}));'''
+          new_get = '''const rpc = await prefsRpc(s.session_token, activeAccountId, "GET");
+              const response = rpc.response;
+              const body = rpc.body;'''
+          if old_get not in s:
+              raise SystemExit('preferences GET anchor missing')
+          s = s.replace(old_get, new_get, 1)
+
+          old_put = '''const response = await fetch(API_URL, {
+                method: "PUT",
+                headers: {
+                  "Authorization": "Bearer " + s.session_token,
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                  customer_account_id: activeAccountId,
+                  preferences: read()
+                })
+              });
+              const body = await response.json().catch(() => ({}));'''
+          new_put = '''const rpc = await prefsRpc(s.session_token, activeAccountId, "PUT", read());
+              const response = rpc.response;
+              const body = rpc.body;'''
+          if old_put not in s:
+              raise SystemExit('preferences PUT anchor missing')
+          s = s.replace(old_put, new_put, 1)
+          p.write_text(s)
+
+          k = Path('konto.html')
+          x = k.read_text()
+          section = '<section id="accountConcierge" class="account-panel" role="tabpanel" aria-labelledby="accountTabConcierge">'
+          if section not in x:
+              raise SystemExit('konto concierge section anchor missing')
+
+          card = '''<article class="card wide" id="intelligenceModeCard" style="margin-bottom:18px"><div class="eyebrow">CONCIERGE-MODUS</div><h3 id="intelligenceModeTitle">Günstiger Modus</h3><p id="intelligenceModeText">Klare Abläufe werden möglichst sparsam verarbeitet. KI wird nur genutzt, wenn die Leistung selbst sie benötigt.</p><p class="small">Der genaue Aufpreis für den intelligenten Modus wird erst nach realer Kostenkalibrierung festgelegt.</p><div class="actions"><button class="btn primary" type="button" id="modeEconomyBtn">Günstig</button><button class="btn secondary" type="button" id="modeSmartBtn">Intelligent</button></div><p class="small" id="intelligenceModeStatus" aria-live="polite"></p></article>'''
+          x = x.replace(section, section + card, 1)
+
+          body_end = '</body>'
+          if body_end not in x:
+              raise SystemExit('konto body anchor missing')
+          mode_js = '''<script id="nahwerk-intelligence-mode-v1">(()=>{const API="https://djicahhmnnamtjuqedqd.supabase.co/rest/v1/rpc/web_intelligence_mode_v1",KEY="sb_publishable_Zr4L9Lk-zOnjTc5bE_ChNA_SybjXxZx";const q=id=>document.getElementById(id);async function hash(v){const d=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(v));return Array.from(new Uint8Array(d)).map(b=>b.toString(16).padStart(2,"0")).join("")}function sess(){try{return JSON.parse(sessionStorage.getItem("scb_web_session")||"null")}catch{return null}}function ctx(){const s=sess();try{const a=JSON.parse(sessionStorage.getItem("nw_selected_account_context_v1")||"null");return a&&String(a.actor_person_id||"")===String(s?.person_id||"")?a:null}catch{return null}}async function call(mode=null,ack=false){const s=sess(),c=ctx(),account=String(c?.customer_account_id||s?.customer_account_id||"");if(!s?.session_token||!account)throw new Error("session_missing");const r=await fetch(API,{method:"POST",headers:{apikey:KEY,"Content-Type":"application/json"},body:JSON.stringify({p_token_hash:await hash(s.session_token),p_customer_account_id:account,p_mode:mode,p_acknowledge_higher_consumption:ack,p_source_message_id:crypto.randomUUID()})});const b=await r.json().catch(()=>({}));if(!r.ok||b?.ok!==true)throw new Error(String(b?.status||"mode_failed"));return b}function value(b){const m=b?.intelligence_mode;return String((m&&typeof m==="object"?(m.mode??m.intelligence_mode):m)||"ECONOMY").toUpperCase()==="SMART"?"SMART":"ECONOMY"}function render(m){const smart=m==="SMART";q("intelligenceModeTitle").textContent=smart?"Intelligenter Modus":"Günstiger Modus";q("intelligenceModeText").textContent=smart?"Freie Formulierungen und Kontext werden intelligent verstanden. Dafür wird mehr KI verwendet und das Guthaben kann schneller verbraucht werden.":"Klare Abläufe werden möglichst sparsam verarbeitet. KI wird nur genutzt, wenn die Leistung selbst sie benötigt.";q("modeEconomyBtn").disabled=!smart;q("modeSmartBtn").disabled=smart}async function load(){try{const b=await call();render(value(b))}catch{q("intelligenceModeStatus").textContent="Der Concierge-Modus konnte nicht sicher geladen werden."}}q("modeEconomyBtn")?.addEventListener("click",async()=>{q("intelligenceModeStatus").textContent="Wird gespeichert …";try{render(value(await call("ECONOMY",false)));q("intelligenceModeStatus").textContent="Günstiger Modus aktiv."}catch{q("intelligenceModeStatus").textContent="Änderung nicht gespeichert."}});q("modeSmartBtn")?.addEventListener("click",async()=>{if(!confirm("Der intelligente Modus nutzt deutlich mehr KI und kann dein Guthaben schneller aufbrauchen. Der genaue Aufpreis wird erst nach realer Kostenkalibrierung festgelegt. Möchtest du ihn aktivieren?"))return;q("intelligenceModeStatus").textContent="Wird gespeichert …";try{render(value(await call("SMART",true)));q("intelligenceModeStatus").textContent="Intelligenter Modus aktiv."}catch{q("intelligenceModeStatus").textContent="Änderung nicht gespeichert."}});load()})();</script>'''
+          x = x.replace(body_end, mode_js + body_end, 1)
+          k.write_text(x)
+          print('WEB_INTELLIGENCE_MODE_PATCH=GREEN')
+          PY
+
+      - name: Static provider-free proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'web_concierge_preferences_v2' concierge-anpassen.html
+          grep -q 'web_intelligence_mode_v1' konto.html
+          grep -q 'p_acknowledge_higher_consumption:ack' konto.html
+          grep -q 'Der intelligente Modus nutzt deutlich mehr KI' konto.html
+          echo WEB_PROVIDER_FREE_PROOF=GREEN
+          echo REAL_WHATSAPP_SENDS=0
+          echo TTS_CALLS=0
+          echo PHONE_CALLS=0
+          echo PAYMENTS=0
+
+      - name: Commit isolated web patch
+        shell: bash
+        run: |
+          if git diff --quiet; then exit 0; fi
+          git config user.name 'NAHWERK PROD Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add concierge-anpassen.html konto.html
+          git commit -m 'web: add PROD economy smart mode and restore preferences transport'
+          git push origin HEAD:web-intelligence-mode-prod-v1
