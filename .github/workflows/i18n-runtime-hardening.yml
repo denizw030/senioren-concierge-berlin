@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - "scripts/i18n-runtime-hardening.py"
+      - "tests/i18n-runtime-hardening.test.mjs"
       - "tests/i18n-link-flow.test.mjs"
       - ".github/workflows/i18n-runtime-hardening.yml"
 
