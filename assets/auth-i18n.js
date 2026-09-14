@@ -48,6 +48,8 @@
 
   const appHref = (targetLang, raw) => {
     const url = new URL(raw, location.origin + '/');
+    const page = basename(url.pathname);
+    url.pathname = `/${page}`;
     if (targetLang === 'de') url.searchParams.delete('lang');
     else url.searchParams.set('lang', targetLang);
     return `${url.pathname}${url.search}${url.hash}`;
