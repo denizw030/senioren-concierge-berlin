@@ -19,6 +19,7 @@ COMMENT_RE = re.compile(r"<!--.*?-->", re.S)
 HEAD_RE = re.compile(r"<head\b.*?</head\s*>", re.I | re.S)
 TEXT_RE = re.compile(r">([^<>]+)<", re.S)
 ATTR_RE = re.compile(r"\b(aria-label|title|placeholder|alt)=([\"'])(.*?)\2", re.I | re.S)
+LOCALE_RUNTIME = '<script src="/assets/locale-runtime.js?v=1" defer></script>'
 
 
 def clean(value: str) -> str:
@@ -170,6 +171,16 @@ def update_metadata(html: str, lang: str, page: str, translated_title: str | Non
     return html
 
 
+def ensure_locale_runtime(html: str) -> str:
+    html = re.sub(r'\s*<script\s+src=["\']/?assets/locale-runtime\.js\?v=\d+["\'](?:\s+defer)?\s*></script>', "", html, flags=re.I)
+    lower = html.lower()
+    marker = "</head>"
+    idx = lower.rfind(marker)
+    if idx < 0:
+        raise SystemExit("Missing </head> while injecting locale runtime")
+    return html[:idx] + "  " + LOCALE_RUNTIME + "\n" + html[idx:]
+
+
 def mirror_page(lang: str, page: str, catalog: dict[str, str]) -> None:
     generated_path = ROOT / lang / page
     translated_seed = generated_path.read_text(encoding="utf-8")
@@ -180,6 +191,7 @@ def mirror_page(lang: str, page: str, catalog: dict[str, str]) -> None:
     html = translate_visible_html(html, catalog)
     html = re.sub(r"/assets/language-switcher\.js\?v=\d+", "/assets/language-switcher.js?v=12", html)
     html = re.sub(r"assets/story-conversion-final\.css\?v=\d+", "assets/story-conversion-final.css?v=2", html)
+    html = ensure_locale_runtime(html)
     html = "\n".join(line.rstrip() for line in html.splitlines()) + ("\n" if html.endswith("\n") else "")
     generated_path.write_text(html, encoding="utf-8")
 
@@ -228,7 +240,7 @@ def main() -> None:
     audit_catalogs(catalogs)
     for lang in LANGS:
         for page in PAGES: mirror_page(lang, page, catalogs[lang])
-    print(f"Mirrored exact PROD design and localized {len(PAGES) * len(LANGS)} public pages with shared assets.")
+    print(f"Mirrored exact PROD design and localized {len(PAGES) * len(LANGS)} public pages with shared assets and runtime locale repair.")
 
 
 if __name__ == "__main__":
