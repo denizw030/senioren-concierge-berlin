@@ -4,10 +4,12 @@ on:
   push:
     branches: [main]
     paths:
+      - '*.html'
       - 'locales/*.json'
       - 'scripts/localization-bootstrap.py'
       - 'scripts/i18n-mirror.py'
       - 'assets/language-switcher.js'
+      - 'assets/story-conversion-final.css'
       - 'tests/i18n-design-parity.test.mjs'
       - '.github/workflows/localization-bootstrap.yml'
 
