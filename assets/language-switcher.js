@@ -66,7 +66,7 @@
     const current = SUPPORTED[lang] || SUPPORTED.de;
     const wrapper = document.createElement('div');
     wrapper.className = 'nw-language';
-    wrapper.dataset.nwLanguageSwitcher = 'v10';
+    wrapper.dataset.nwLanguageSwitcher = 'v11';
 
     const button = document.createElement('button');
     button.type = 'button';
@@ -201,12 +201,50 @@
     });
   };
 
+  const normalizeAssetRef = (value) => {
+    if (!value) return value;
+    return String(value)
+      .replace(new RegExp(`^${location.origin.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/(?:en|tr)/assets/`, 'i'), '/assets/')
+      .replace(/^\/(?:en|tr)\/assets\//i, '/assets/')
+      .replace(/^assets\//i, '/assets/')
+      .replace(/(^|,\s*)assets\//gi, '$1/assets/')
+      .replace(/(^|,\s*)\/(?:en|tr)\/assets\//gi, '$1/assets/');
+  };
+
+  const repairLocalizedRuntime = () => {
+    const { lang } = normalizePath(location.pathname);
+    if (lang === 'de') return;
+
+    document.querySelectorAll('[data-concierge-carousel] img, .nw-carousel img').forEach((img) => {
+      ['src','data-src','srcset','data-srcset'].forEach((attr) => {
+        const raw = img.getAttribute(attr);
+        if (!raw) return;
+        const fixed = normalizeAssetRef(raw);
+        if (fixed !== raw) img.setAttribute(attr, fixed);
+      });
+    });
+
+    document.querySelectorAll('audio[src], source[src]').forEach((media) => {
+      const raw = media.getAttribute('src');
+      const fixed = normalizeAssetRef(raw);
+      if (fixed && fixed !== raw) media.setAttribute('src', fixed);
+    });
+
+    document.querySelectorAll('[data-concierge-carousel]').forEach((root) => {
+      const raw = root.getAttribute('data-register-url');
+      if (raw && !raw.startsWith('/') && !/^(https?:)/i.test(raw)) root.setAttribute('data-register-url', `/${raw.replace(/^\.\//, '')}`);
+    });
+
+    rewriteLocaleLinks();
+  };
+
   const applyLocalization = () => {
     if (localizationBusy || !catalog) return;
     localizationBusy = true;
     try {
       translateElement(document.body);
       rewriteLocaleLinks();
+      repairLocalizedRuntime();
       document.documentElement.lang = normalizePath(location.pathname).lang;
     } finally {
       localizationBusy = false;
@@ -243,15 +281,38 @@
     requestAnimationFrame(() => {
       scheduled = false;
       placeSwitcher();
+      repairLocalizedRuntime();
       applyLocalization();
     });
   };
 
+  const interceptLocalizedRegistration = (event) => {
+    const { lang } = normalizePath(location.pathname);
+    if (lang === 'de') return;
+    const status = event.target.closest?.('.nw-carousel-status');
+    if (status) {
+      const root = status.closest('[data-concierge-carousel]');
+      const active = root?.querySelector('.nw-carousel-card.is-active .nw-carousel-select[href]');
+      if (active) {
+        const target = new URL(active.getAttribute('href'), location.href);
+        if (/^\/(?:en|tr)\/registrieren\.html$/i.test(target.pathname)) target.pathname = '/registrieren.html';
+        if (target.pathname === '/registrieren.html') {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          location.href = `${target.pathname}${target.search}${target.hash}`;
+        }
+      }
+    }
+  };
+
   const start = () => {
     placeSwitcher();
+    repairLocalizedRuntime();
     loadCatalog();
     const root = document.querySelector('header.top') || document.body;
     if (root) new MutationObserver(schedulePlacement).observe(root, { childList: true, subtree: true });
+    if (document.body) new MutationObserver(schedulePlacement).observe(document.body, { childList: true, subtree: true });
+    document.addEventListener('click', interceptLocalizedRegistration, true);
     window.addEventListener('resize', schedulePlacement, { passive: true });
     window.addEventListener('pageshow', schedulePlacement, { passive: true });
     setTimeout(schedulePlacement, 0);
