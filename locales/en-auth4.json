@@ -22,6 +22,7 @@
   "Melde dich mit deiner E-Mail-Adresse und deinem Passwort an, um deinen Zugang, deine Nutzung und deine persönlichen Concierge-Einstellungen zu verwalten.": "Sign in with your email address and password to manage your access, usage and personal Concierge settings.",
   "E-Mail-Adresse": "Email address",
   "Passwort": "Password",
+  "Aktuelles Passwort": "Current password",
   "Passwort anzeigen": "Show password",
   "Passwort ausblenden": "Hide password",
   "Passwort vergessen?": "Forgot password?",
@@ -95,6 +96,6 @@
   "Zurück": "Back",
   "„Erkläre mir einen Brief in einfachen Worten.“": "“Explain a letter to me in simple words.”",
   "„Sortiere meine nächsten drei Aufgaben.“": "“Organise my next three tasks.”",
-  "„Erkläre mir eine Smartphone-Funktion.“": "“Explain a smartphone feature to me.”",
+  "„Erkläre mir eine Smartphone-Funktion.“": "“Explain a smartphone feature.”",
   "„Vergleiche passende Möglichkeiten.“": "“Compare suitable options.”"
 }
