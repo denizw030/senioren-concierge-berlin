@@ -20,8 +20,17 @@ internal data class AppHomeSnapshot(
     val activeTaskId: String?,
     val activeTaskStatus: String?,
     val pendingApproval: Boolean,
+    val intelligenceMode: String,
     val reminderCountActive: Int,
     val reminders: List<AppReminder>
+)
+
+internal data class AppIntelligenceMode(
+    val mode: String,
+    val pricingStatus: String,
+    val exactCustomerPriceFinalized: Boolean,
+    val smartNotice: String,
+    val economyNotice: String
 )
 
 internal data class AppReminder(
@@ -62,6 +71,8 @@ internal class AppGatewayApi(context: Context) {
             val identity = body.optJSONObject("identity") ?: error("identity_missing")
             val conversation = body.optJSONObject("conversation")
             val reminders = parseReminders(body.optJSONArray("reminders"))
+            val mode = body.optJSONObject("intelligence_mode")?.optString("mode", "ECONOMY")
+                ?.uppercase()?.takeIf { it == "ECONOMY" || it == "SMART" } ?: "ECONOMY"
             AppHomeSnapshot(
                 personId = identity.optString("person_id"),
                 customerAccountId = identity.optString("customer_account_id"),
@@ -69,10 +80,35 @@ internal class AppGatewayApi(context: Context) {
                 activeTaskId = conversation?.optString("active_task_id")?.takeIf(String::isNotBlank),
                 activeTaskStatus = conversation?.optString("active_task_status")?.takeIf(String::isNotBlank),
                 pendingApproval = body.has("pending_approval") && !body.isNull("pending_approval"),
+                intelligenceMode = mode,
                 reminderCountActive = body.optInt("reminder_count_active", reminders.count { it.status == "active" }),
                 reminders = reminders
             )
         }
+    }
+
+    suspend fun loadIntelligenceMode(): Result<AppIntelligenceMode> = withContext(Dispatchers.IO) {
+        resultRequest("mobile/intelligence-mode", "GET") { body ->
+            parseIntelligenceMode(body.optJSONObject("intelligence_mode"))
+        }
+    }
+
+    suspend fun setIntelligenceMode(mode: String, acknowledgeHigherConsumption: Boolean): Result<AppIntelligenceMode> = withContext(Dispatchers.IO) {
+        val normalized = mode.trim().uppercase()
+        if (normalized != "ECONOMY" && normalized != "SMART") {
+            return@withContext Result.failure(IllegalArgumentException("Unbekannter Concierge-Modus."))
+        }
+        if (normalized == "SMART" && !acknowledgeHigherConsumption) {
+            return@withContext Result.failure(IllegalArgumentException("Bitte bestätige zuerst den höheren KI-Verbrauch."))
+        }
+        resultRequest(
+            "mobile/intelligence-mode",
+            "POST",
+            JSONObject()
+                .put("mode", normalized)
+                .put("acknowledge_higher_consumption", acknowledgeHigherConsumption)
+                .put("source_message_id", UUID.randomUUID().toString())
+        ) { body -> parseIntelligenceMode(body.optJSONObject("intelligence_mode")) }
     }
 
     suspend fun loadReminders(): Result<List<AppReminder>> = withContext(Dispatchers.IO) {
@@ -157,6 +193,24 @@ internal class AppGatewayApi(context: Context) {
         }
     }
 
+    private fun parseIntelligenceMode(raw: JSONObject?): AppIntelligenceMode {
+        val body = raw ?: error("intelligence_mode_missing")
+        val mode = body.optString("mode", "ECONOMY").uppercase().takeIf { it == "ECONOMY" || it == "SMART" } ?: "ECONOMY"
+        return AppIntelligenceMode(
+            mode = mode,
+            pricingStatus = body.optString("pricing_status", "CALIBRATION_PENDING"),
+            exactCustomerPriceFinalized = body.optBoolean("exact_customer_price_finalized", false),
+            smartNotice = body.optString(
+                "smart_notice",
+                "Der intelligente Modus nutzt mehr KI und kann dein Guthaben deutlich schneller verbrauchen."
+            ),
+            economyNotice = body.optString(
+                "economy_notice",
+                "Der günstige Modus vermeidet KI für normale Navigation und klare Auftragserfassung."
+            )
+        )
+    }
+
     private fun parseCoreReply(body: JSONObject): AppCoreReply {
         val core = body.optJSONObject("core") ?: error("core_response_missing")
         val messages = core.optJSONArray("messages")
@@ -191,6 +245,8 @@ internal class AppGatewayApi(context: Context) {
     private fun readableError(body: JSONObject, code: Int): String = when (body.optString("error", "REQUEST_FAILED")) {
         "APP_AUTHORITATIVE_ROUTE_DISABLED" -> "Der App-Concierge ist momentan nicht verfügbar. Bitte erneut versuchen."
         "CAO_APP_ROUTE_DISABLED" -> "Die Auftragsausführung ist momentan nicht verfügbar. Es wurde nichts ausgeführt."
+        "SMART_HIGHER_CONSUMPTION_ACK_REQUIRED" -> "Bitte bestätige zuerst, dass der intelligente Modus mehr KI nutzt und dein Guthaben schneller verbrauchen kann."
+        "INVALID_INTELLIGENCE_MODE" -> "Dieser Concierge-Modus ist nicht verfügbar."
         "NETWORK_UNAVAILABLE" -> "PROD ist gerade nicht erreichbar. Bitte erneut versuchen."
         else -> "PROD-Anfrage fehlgeschlagen (${body.optString("error", "REQUEST_FAILED")}, HTTP $code)."
     }
