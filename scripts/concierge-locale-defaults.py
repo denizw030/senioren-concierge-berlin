@@ -3,13 +3,13 @@ import re
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = '<script src="/assets/concierge-locale-defaults.js?v=1"></script>'
-CAROUSEL_RE = re.compile(r'(<script\s+src=["\']/assets/concierge-carousel\.js[^>]*></script>)', re.I)
+CAROUSEL_RE = re.compile(r'(<script\s+src=["\']/?assets/concierge-carousel\.js[^>]*></script>)', re.I)
 SELECTED_RE = re.compile(r'data-selected=["\'][^"\']*["\']', re.I)
 
 
 def update(path: Path) -> bool:
     text = path.read_text(encoding='utf-8')
-    if 'data-concierge-carousel' not in text or '/assets/concierge-carousel.js' not in text:
+    if 'data-concierge-carousel' not in text or 'concierge-carousel.js' not in text:
         return False
 
     fixed = text
