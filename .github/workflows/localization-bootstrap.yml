@@ -4,7 +4,6 @@ on:
   push:
     branches: [main]
     paths:
-      - '*.html'
       - 'locales/*.json'
       - 'scripts/localization-bootstrap.py'
       - 'scripts/i18n-mirror.py'
