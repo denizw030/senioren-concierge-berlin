@@ -215,7 +215,7 @@
       height:100% !important;
       max-width:none !important;
       object-fit:cover !important;
-      object-position:68% 50% !important;
+      object-position:50% 50% !important;
       transform:scale(1.04) translateX(-2%) !important;
       transform-origin:center !important;
     }
