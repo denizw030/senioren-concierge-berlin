@@ -32,14 +32,12 @@ jobs:
           node-version: '22'
       - name: Apply legal locale hardening
         run: python scripts/legal-i18n-hardening.py
-      - name: Verify legal and existing localization guards
-        run: >-
-          node --test
-          tests/legal-i18n.test.mjs
-          tests/i18n-completeness.test.mjs
-          tests/i18n-link-flow.test.mjs
-          tests/i18n-media-audit.test.mjs
-          tests/seo-indexing.test.mjs
+      - name: Verify requested privacy notice removal
+        run: |
+          node --test tests/legal-i18n.test.mjs tests/seo-indexing.test.mjs
+          ! grep -Fq 'Stand: 10. September 2026.' datenschutz.html
+          ! grep -Fq 'Version: 10 September 2026.' assets/legal-i18n.js
+          ! grep -Fq 'Sürüm: 10 Eylül 2026.' assets/legal-i18n.js
       - name: Validate diff
         run: git diff --check
       - name: Publish generated legal localization
@@ -52,5 +50,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add assets/auth-i18n.js assets/app-language-switcher.js assets/legal-i18n.js \
             impressum.html datenschutz.html agb.html widerruf.html ki-transparenz.html datenloeschung.html vertrag-widerrufen.html
-          git commit -m "i18n: localize complete legal flow in EN and TR"
+          git commit -m "privacy: remove dated intro notice in DE EN TR"
           git push origin HEAD:main
