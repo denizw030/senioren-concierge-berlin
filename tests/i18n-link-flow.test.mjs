@@ -68,7 +68,7 @@ test('auth entry pages load locale and persistent language selector runtimes', (
 
 test('auth language selector switches directly without auth link rewriting', () => {
   const appSwitcher = read('assets/app-language-switcher.js');
-  assert.match(appSwitcher, /data\.nwLanguageTarget/);
+  assert.match(appSwitcher, /dataset\.nwLanguageTarget/);
   assert.match(appSwitcher, /location\.assign\(hrefFor\(key\)\)/);
   assert.doesNotMatch(appSwitcher, /document\.createElement\('a'\)/);
 });
