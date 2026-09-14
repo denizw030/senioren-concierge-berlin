@@ -27,6 +27,7 @@
   const hard = {
     en: {
       'Eine Marke von': 'A brand of',
+      'Eine Marke von ODYSX': 'An ODYSX brand',
       'Markenhinweis': 'Brand notice',
       'Menü öffnen': 'Open menu',
       'Menü schließen': 'Close menu',
@@ -49,11 +50,13 @@
       'Strukturierte Rückfragen': 'Structured follow-up questions',
       'Anrufassistenz': 'Call assistance',
       'Alexander bleibt auch dann ruhig, wenn die Situation es gerade nicht ist.': 'Alexander stays calm even when the situation is not.',
+      'Ideal für Menschen, die Unterstützung möchten, aber gut und gerne lesen, schreiben und sich mit NAHWERK über Text, WhatsApp, E-Mails und den direkten Austausch verständigen können.': 'Ideal for people who want support but can comfortably read and write and communicate with NAHWERK via text, WhatsApp, email and direct interaction.',
       'Persönlicher Concierge\'e hoş geldiniz.': 'Welcome to Personal Concierge.',
       'Senioren Concierge\'e hoş geldiniz.': 'Welcome to Senior Concierge.'
     },
     tr: {
       'Eine Marke von': 'ODYSX markası:',
+      'Eine Marke von ODYSX': 'Bir ODYSX markası',
       'Markenhinweis': 'Marka bilgisi',
       'Menü öffnen': 'Menüyü aç',
       'Menü schließen': 'Menüyü kapat',
@@ -76,6 +79,7 @@
       'Strukturierte Rückfragen': 'Yapılandırılmış takip soruları',
       'Anrufassistenz': 'Arama desteği',
       'Alexander bleibt auch dann ruhig, wenn die Situation es gerade nicht ist.': 'Durum sakin olmasa bile Alexander sakin kalır.',
+      'Ideal für Menschen, die Unterstützung möchten, aber gut und gerne lesen, schreiben und sich mit NAHWERK über Text, WhatsApp, E-Mails und den direkten Austausch verständigen können.': 'Desteğe ihtiyaç duyan ancak rahatça okuyup yazabilen ve NAHWERK ile metin, WhatsApp, e-posta ve doğrudan iletişim üzerinden anlaşabilen kişiler için idealdir.',
       'Persönlicher Concierge\'e hoş geldiniz.': "Kişisel Concierge'e hoş geldiniz.",
       'Senioren Concierge\'e hoş geldiniz.': "İleri yaş Concierge'e hoş geldiniz."
     }
