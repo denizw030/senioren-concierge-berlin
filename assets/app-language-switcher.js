@@ -6,7 +6,7 @@
     en: { code: 'EN', label: 'English', flag: '🇬🇧' },
     tr: { code: 'TR', label: 'Türkçe', flag: '🇹🇷' }
   };
-  const PAGES = new Set(['registrieren.html','anmelden.html','erster-schritt.html']);
+  const PAGES = new Set(['registrieren.html','anmelden.html','erster-schritt.html','passwort-zuruecksetzen.html','impressum.html','datenschutz.html','agb.html','widerruf.html','ki-transparenz.html','datenloeschung.html','vertrag-widerrufen.html']);
 
   const page = location.pathname.split('/').filter(Boolean).pop() || 'index.html';
   if (!PAGES.has(page)) return;

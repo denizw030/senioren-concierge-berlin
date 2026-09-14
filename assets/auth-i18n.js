@@ -9,7 +9,9 @@
   ]);
   const APP_PAGES = new Set([
     'registrieren.html','anmelden.html','passwort-zuruecksetzen.html','erster-schritt.html',
-    'konto.html','payg.html','web-concierge.html','concierge-anpassen.html'
+    'konto.html','payg.html','web-concierge.html','concierge-anpassen.html','zugang-uebertragen.html',
+    'impressum.html','datenschutz.html','agb.html','widerruf.html','ki-transparenz.html',
+    'datenloeschung.html','vertrag-widerrufen.html'
   ]);
   const SUPPORTED = new Set(['de','en','tr']);
 
