@@ -63,19 +63,24 @@
       background:#f7f3ea !important;
       color:#181713 !important;
     }
+    body.login-image-page.senior-product.nw-senior-login-composed main,
+    body.login-image-page[data-product="senioren"].nw-senior-login-composed main {
+      padding:0 !important;
+      margin:0 !important;
+      background:#f7f3ea !important;
+    }
     body.login-image-page.senior-product.nw-senior-login-composed .hero,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero {
       position:relative !important;
       display:flex !important;
-      align-items:flex-start !important;
-      min-height:590px !important;
-      padding:88px 0 88px !important;
+      align-items:stretch !important;
+      width:100% !important;
+      min-height:700px !important;
+      margin:0 !important;
+      padding:0 !important;
       overflow:hidden !important;
-      background:
-        radial-gradient(760px 520px at 86% 26%,rgba(200,164,93,.17),transparent 66%),
-        radial-gradient(640px 440px at 7% 18%,rgba(255,255,255,.72),transparent 64%),
-        linear-gradient(145deg,#fbf8f1 0%,#f3eddf 58%,#e9deca 100%) !important;
-      border-bottom:1px solid rgba(112,87,39,.14) !important;
+      background:#f7f3ea !important;
+      border-bottom:0 !important;
     }
     body.login-image-page.senior-product.nw-senior-login-composed .hero:after,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero:after {
@@ -84,19 +89,25 @@
     }
     body.login-image-page.senior-product.nw-senior-login-composed .hero .wrap,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero .wrap {
-      width:min(calc(100% - 40px),1240px) !important;
-      max-width:1240px !important;
-      margin:0 auto !important;
+      width:100% !important;
+      max-width:none !important;
+      min-height:inherit !important;
+      margin:0 !important;
       padding:0 !important;
       box-sizing:border-box !important;
     }
     .nw-senior-login-copy {
-      min-width:0 !important;
-      width:100% !important;
-      max-width:560px !important;
-      box-sizing:border-box !important;
       position:relative !important;
       z-index:3 !important;
+      min-width:0 !important;
+      width:100% !important;
+      max-width:none !important;
+      box-sizing:border-box !important;
+      padding:clamp(42px,5.2vw,78px) clamp(34px,5.6vw,86px) 48px !important;
+      background:
+        radial-gradient(700px 520px at 88% 24%,rgba(200,164,93,.17),transparent 66%),
+        radial-gradient(560px 420px at 8% 12%,rgba(255,255,255,.8),transparent 66%),
+        linear-gradient(145deg,#fbf8f1 0%,#f3eddf 62%,#eadfca 100%) !important;
     }
     body.login-image-page.senior-product.nw-senior-login-composed .hero h1,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero h1 {
@@ -128,7 +139,7 @@
       display:block !important;
       width:100% !important;
       max-width:560px !important;
-      margin:8px 0 0 !important;
+      margin:28px 0 0 !important;
       padding:24px 26px !important;
       box-sizing:border-box !important;
       border:1px solid rgba(112,87,39,.16) !important;
@@ -203,10 +214,10 @@
       margin:0 !important;
       overflow:hidden !important;
       box-sizing:border-box !important;
-      border:1px solid rgba(151,115,43,.2) !important;
-      border-radius:28px !important;
+      border:0 !important;
+      border-radius:0 !important;
       background:#e8dfd2 !important;
-      box-shadow:0 30px 80px rgba(69,50,20,.16) !important;
+      box-shadow:none !important;
       aspect-ratio:auto !important;
     }
     .nw-senior-login-portrait img {
@@ -215,20 +226,28 @@
       height:100% !important;
       max-width:none !important;
       object-fit:cover !important;
-      object-position:82% 52% !important;
-      transform:scale(1.05) translateX(-8%) !important;
+      object-position:68% 50% !important;
+      transform:none !important;
       transform-origin:center !important;
     }
     body.login-image-page.senior-product.nw-senior-login-composed .nw-senior-login-source-section,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed .nw-senior-login-source-section {
       display:none !important;
     }
-    @media(max-width:720px) {
+    @media(max-width:820px) {
       body.login-image-page.senior-product.nw-senior-login-composed .hero,
       body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero {
         min-height:0 !important;
-        padding:40px 0 52px !important;
+        padding:0 !important;
         overflow:visible !important;
+      }
+      body.login-image-page.senior-product.nw-senior-login-composed .hero .wrap,
+      body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero .wrap {
+        width:100% !important;
+        max-width:none !important;
+      }
+      .nw-senior-login-copy {
+        padding:38px 20px 32px !important;
       }
       body.login-image-page.senior-product.nw-senior-login-composed .hero h1,
       body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero h1 {
@@ -238,9 +257,13 @@
       body.login-image-page.senior-product.nw-senior-login-composed .logincard,
       body.login-image-page[data-product="senioren"].nw-senior-login-composed .logincard {
         padding:22px 20px !important;
+        margin-top:24px !important;
       }
       .nw-senior-login-portrait {
-        margin:0 auto !important;
+        width:100% !important;
+        max-width:none !important;
+        margin:0 !important;
+        border-radius:0 !important;
       }
     }
   `;
@@ -282,9 +305,8 @@
     const portrait = wrap?.querySelector('.nw-senior-login-portrait');
     if (!hero || !wrap || !copy || !portrait) return;
 
-    const measured = Math.max(0, Math.round(wrap.getBoundingClientRect().width));
-    const width = measured || Math.max(320, window.innerWidth - 40);
-    const stacked = width < 720;
+    const width = Math.max(320, Math.round(window.innerWidth || document.documentElement.clientWidth || 320));
+    const stacked = width < 820;
 
     important(wrap, 'padding', '0');
     important(wrap, 'box-sizing', 'border-box');
@@ -293,49 +315,54 @@
 
     if (stacked) {
       important(hero, 'display', 'flex');
-      important(hero, 'align-items', 'flex-start');
+      important(hero, 'align-items', 'stretch');
       important(hero, 'min-height', '0');
-      important(hero, 'padding', '40px 0 52px');
+      important(hero, 'padding', '0');
       important(wrap, 'display', 'flex');
       important(wrap, 'flex-direction', 'column');
-      important(wrap, 'gap', '28px');
+      important(wrap, 'width', '100%');
+      important(wrap, 'max-width', 'none');
+      important(wrap, 'gap', '0');
       important(copy, 'max-width', 'none');
       important(portrait, 'position', 'relative');
       important(portrait, 'top', 'auto');
       important(portrait, 'right', 'auto');
-      important(portrait, 'width', 'min(100%, 440px)');
-      important(portrait, 'max-width', '440px');
-      important(portrait, 'height', 'auto');
-      important(portrait, 'margin', '0 auto');
+      important(portrait, 'width', '100%');
+      important(portrait, 'max-width', 'none');
+      important(portrait, 'height', 'clamp(360px,72vw,560px)');
+      important(portrait, 'margin', '0');
       important(portrait, 'transform', 'none');
-      important(portrait, 'aspect-ratio', '4 / 3');
+      important(portrait, 'aspect-ratio', 'auto');
       return;
     }
 
-    const portraitWidth = Math.max(330, Math.min(410, Math.round(width * 0.42)));
-    const gap = Math.max(30, Math.min(48, Math.round(width * 0.045)));
-    const copyWidth = Math.max(390, width - portraitWidth - gap);
+    const heroTop = Math.max(0, Math.round(hero.getBoundingClientRect().top + window.scrollY));
+    const fillHeight = Math.max(700, Math.round(window.innerHeight - heroTop));
 
     important(hero, 'display', 'flex');
-    important(hero, 'align-items', 'flex-start');
-    important(hero, 'min-height', '590px');
-    important(hero, 'padding', '88px 0 88px');
+    important(hero, 'align-items', 'stretch');
+    important(hero, 'min-height', `${fillHeight}px`);
+    important(hero, 'padding', '0');
     important(wrap, 'display', 'grid');
-    important(wrap, 'grid-template-columns', `minmax(0, 1fr) ${portraitWidth}px`);
-    important(wrap, 'gap', `${gap}px`);
-    important(wrap, 'align-items', 'start');
-    important(copy, 'max-width', `${Math.min(560, copyWidth)}px`);
+    important(wrap, 'grid-template-columns', 'minmax(0, 1fr) minmax(0, 1fr)');
+    important(wrap, 'width', '100%');
+    important(wrap, 'max-width', 'none');
+    important(wrap, 'gap', '0');
+    important(wrap, 'align-items', 'stretch');
+    important(copy, 'max-width', 'none');
+    important(copy, 'align-self', 'stretch');
 
-    const copyHeight = Math.max(560, Math.round(copy.getBoundingClientRect().height));
     important(portrait, 'position', 'relative');
     important(portrait, 'top', 'auto');
     important(portrait, 'right', 'auto');
-    important(portrait, 'width', `${portraitWidth}px`);
-    important(portrait, 'max-width', `${portraitWidth}px`);
-    important(portrait, 'height', `${copyHeight}px`);
+    important(portrait, 'width', '100%');
+    important(portrait, 'max-width', 'none');
+    important(portrait, 'height', '100%');
+    important(portrait, 'min-height', `${fillHeight}px`);
     important(portrait, 'margin', '0');
     important(portrait, 'transform', 'none');
-    important(portrait, 'justify-self', 'end');
+    important(portrait, 'justify-self', 'stretch');
+    important(portrait, 'align-self', 'stretch');
     important(portrait, 'aspect-ratio', 'auto');
   };
 
