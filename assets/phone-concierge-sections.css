@@ -246,3 +246,25 @@ body.senior-product .senior-image-hero .senior-benefit-chip{
     justify-content:flex-start!important;
   }
 }
+
+/* Desktop mirror: keep the senior visible on the left and place the content cleanly on the right. */
+@media(min-width:701px){
+  body.senior-product .senior-image-hero{
+    background-image:
+      linear-gradient(270deg,rgba(2,2,2,.95) 0%,rgba(2,2,2,.87) 27%,rgba(2,2,2,.64) 47%,rgba(2,2,2,.24) 69%,rgba(2,2,2,.06) 100%),
+      linear-gradient(180deg,rgba(0,0,0,.10) 0%,rgba(0,0,0,.06) 56%,rgba(0,0,0,.34) 100%),
+      url("lifestyle/nahwerk-senior-web-q88.webp")!important;
+  }
+  body.senior-product .senior-image-hero .senior-hero-layout{
+    display:flex!important;
+    justify-content:flex-end!important;
+    align-items:center!important;
+  }
+  body.senior-product .senior-image-hero .senior-hero-copy{
+    width:min(100%,660px)!important;
+    max-width:660px!important;
+    margin-left:auto!important;
+    margin-right:0!important;
+    text-align:left!important;
+  }
+}
