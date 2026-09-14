@@ -17,12 +17,13 @@ AUTH_PAGES = ("registrieren.html", "anmelden.html", "erster-schritt.html")
 AUTH_SCRIPT = '<script src="assets/auth-i18n.js?v=3"></script>'
 SLIDER_SCRIPT = '<script src="assets/auth-slider-i18n.js?v=2"></script>'
 APP_LANGUAGE_SCRIPT = '<script src="assets/app-language-switcher.js?v=2"></script>'
+LOCALE_RUNTIME_SCRIPT = '<script src="assets/locale-runtime.js?v=1"></script>'
 
 
 def inject_auth_runtime(path: Path) -> None:
     text = path.read_text(encoding="utf-8")
-    for asset in ("auth-i18n", "auth-slider-i18n", "app-language-switcher"):
-        text = re.sub(rf'\s*<script\s+src=["\']/?assets/{asset}\.js\?v=\d+["\']></script>', "", text, flags=re.I)
+    for asset in ("auth-i18n", "auth-slider-i18n", "app-language-switcher", "locale-runtime"):
+        text = re.sub(rf'\s*<script\s+src=["\']/?assets/{asset}\.js\?v=\d+["\'](?:\s+defer)?\s*></script>', "", text, flags=re.I)
     marker = "</body>"
     if marker not in text.lower():
         raise SystemExit(f"Missing </body> in {path.name}")
@@ -30,6 +31,7 @@ def inject_auth_runtime(path: Path) -> None:
     scripts = "    " + AUTH_SCRIPT + "\n"
     if path.name == "registrieren.html":
         scripts += "    " + SLIDER_SCRIPT + "\n"
+    scripts += "    " + LOCALE_RUNTIME_SCRIPT + "\n"
     scripts += "    " + APP_LANGUAGE_SCRIPT + "\n  "
     text = text[:idx] + scripts + text[idx:]
     path.write_text(text, encoding="utf-8")
@@ -92,7 +94,7 @@ def main() -> None:
             if path.exists():
                 rewrite_generated_auth_links(path, lang)
 
-    print("Auth locale continuity, persistent DE/EN/TR selector and slider localization prepared.")
+    print("Auth locale continuity, persistent DE/EN/TR selector, slider localization and runtime locale repair prepared.")
 
 
 if __name__ == "__main__":
