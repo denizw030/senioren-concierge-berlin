@@ -202,6 +202,7 @@ def update_root_switcher_version() -> None:
         text = path.read_text(encoding="utf-8")
         text = re.sub(r"/assets/language-switcher\.js\?v=\d+", "/assets/language-switcher.js?v=12", text)
         text = re.sub(r"assets/story-conversion-final\.css\?v=\d+", "assets/story-conversion-final.css?v=2", text)
+        text = ensure_locale_runtime(text)
         path.write_text(text, encoding="utf-8")
 
 
