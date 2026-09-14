@@ -57,10 +57,25 @@ for (const lang of ['en', 'tr']) {
   });
 }
 
-test('auth entry pages load the shared locale runtime', () => {
+test('auth entry pages load locale, slider and persistent language selector runtimes', () => {
   for (const page of ['registrieren.html','anmelden.html','erster-schritt.html']) {
     const html = read(page);
-    assert.match(html, /assets\/auth-i18n\.js\?v=[12]/, `${page} must load auth-i18n runtime`);
+    assert.match(html, /assets\/auth-i18n\.js\?v=\d+/, `${page} must load auth-i18n runtime`);
+    assert.match(html, /assets\/auth-slider-i18n\.js\?v=\d+/, `${page} must load auth slider locale runtime`);
+    assert.match(html, /assets\/app-language-switcher\.js\?v=\d+/, `${page} must keep the language selector visible`);
+  }
+});
+
+test('auth slider locale runtime covers the visible German carousel copy', () => {
+  const sliderI18n = read('assets/auth-slider-i18n.js');
+  for (const copy of [
+    'Warm, ruhig, modern und strukturiert.',
+    'Die Hörprobe startet in der Herkunftssprache. Die Sprache können Sie direkt darunter wechseln.',
+    'Stimme anhören',
+    'Sprache',
+    'Ausgewählt'
+  ]) {
+    assert.ok(sliderI18n.includes(copy), `missing slider localization source: ${copy}`);
   }
 });
 
