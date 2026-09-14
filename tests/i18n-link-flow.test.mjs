@@ -60,7 +60,7 @@ for (const lang of ['en', 'tr']) {
 test('auth entry pages load locale and persistent language selector runtimes', () => {
   for (const page of ['registrieren.html','anmelden.html','erster-schritt.html']) {
     const html = read(page);
-    assert.match(html, /assets\/auth-i18n\.js\?v=3/, `${page} must load current auth-i18n runtime`);
+    assert.match(html, /assets\/auth-i18n\.js\?v=4/, `${page} must load current auth-i18n runtime`);
     assert.match(html, /assets\/app-language-switcher\.js\?v=2/, `${page} must keep the current language selector visible`);
   }
   assert.match(read('registrieren.html'), /assets\/auth-slider-i18n\.js\?v=2/, 'registration must load current slider locale runtime');
