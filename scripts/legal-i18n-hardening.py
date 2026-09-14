@@ -75,10 +75,34 @@ def patch_runtime_typo() -> bool:
     return write_if_changed(path, text)
 
 
+def remove_privacy_intro_notice() -> int:
+    snippets = {
+        ROOT / 'datenschutz.html': [
+            '<div class="notice"><strong>Stand: 10. September 2026.</strong> Diese Datenschutzerklärung informiert darüber, wie personenbezogene Daten bei der Nutzung unserer Website und unserer Concierge-Dienste verarbeitet werden.</div>'
+        ],
+        ROOT / 'assets/legal-i18n.js': [
+            '<div class="notice"><strong>Version: 10 September 2026.</strong> This Privacy Policy explains how personal data is processed when using our website and Concierge services.</div>',
+            '<div class="notice"><strong>Sürüm: 10 Eylül 2026.</strong> Bu Gizlilik Politikası, web sitemizi ve Concierge hizmetlerimizi kullanırken kişisel verilerin nasıl işlendiğini açıklar.</div>',
+        ],
+    }
+    changed = 0
+    for path, removals in snippets.items():
+        text = path.read_text(encoding='utf-8')
+        original = text
+        for snippet in removals:
+            text = text.replace(snippet, '')
+        if text != original:
+            path.write_text(text, encoding='utf-8')
+            print(f'updated {path.relative_to(ROOT)}')
+            changed += 1
+    return changed
+
+
 changed = 0
 changed += int(patch_auth_i18n())
 changed += int(patch_app_switcher())
 changed += int(patch_runtime_typo())
+changed += remove_privacy_intro_notice()
 for page in LEGAL:
     changed += int(patch_legal_page(page))
 print(f'changed={changed}')
