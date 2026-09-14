@@ -13,10 +13,12 @@ on:
       - 'assets/app-language-switcher.js'
       - 'assets/auth-i18n.js'
       - 'assets/auth-slider-i18n.js'
+      - 'assets/locale-runtime.js'
       - 'assets/onboarding.js'
       - 'assets/story-conversion-final.css'
       - 'tests/i18n-design-parity.test.mjs'
       - 'tests/i18n-link-flow.test.mjs'
+      - 'tests/i18n-completeness.test.mjs'
       - '.github/workflows/localization-bootstrap.yml'
 
 permissions:
@@ -53,8 +55,8 @@ jobs:
               text = text.replace(old, new, 1)
               p.write_text(text, encoding='utf-8')
           PY
-      - name: Validate SEO, visual parity and complete EN/TR link flow
-        run: node --test tests/seo-indexing.test.mjs tests/i18n-design-parity.test.mjs tests/i18n-link-flow.test.mjs
+      - name: Validate SEO, visual parity, link flow and complete EN/TR localization
+        run: node --test tests/seo-indexing.test.mjs tests/i18n-design-parity.test.mjs tests/i18n-link-flow.test.mjs tests/i18n-completeness.test.mjs
       - name: Validate clean diff
         run: git diff --check
       - name: Commit localization to PROD
