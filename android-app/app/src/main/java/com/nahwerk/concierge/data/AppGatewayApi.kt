@@ -52,17 +52,22 @@ internal class AppGatewayApi(context: Context) {
     companion object {
         private const val PROD_HOST = "djicahhmnnamtjuqedqd.supabase.co"
         private const val GATEWAY_SLUG = "nahwerk-app-gateway"
+        private const val INTELLIGENCE_MODE_SLUG = "nahwerk-app-intelligence-mode"
     }
 
     private val sessions = SecureProductSessionStore(context.applicationContext)
-    private val gatewayBaseUrl = "${BuildConfig.CUSTOMER_PRODUCT_BASE_URL.trimEnd('/')}/$GATEWAY_SLUG"
+    private val functionsBaseUrl = BuildConfig.CUSTOMER_PRODUCT_BASE_URL.trimEnd('/')
+    private val gatewayBaseUrl = "$functionsBaseUrl/$GATEWAY_SLUG"
+    private val intelligenceModeBaseUrl = "$functionsBaseUrl/$INTELLIGENCE_MODE_SLUG"
 
     private data class HttpJson(val code: Int, val body: JSONObject)
 
     init {
-        val uri = runCatching { URI(gatewayBaseUrl) }.getOrNull()
-        require(uri?.scheme == "https" && uri.host == PROD_HOST && !gatewayBaseUrl.contains("staging", ignoreCase = true)) {
-            "prod_app_gateway_required"
+        listOf(gatewayBaseUrl, intelligenceModeBaseUrl).forEach { baseUrl ->
+            val uri = runCatching { URI(baseUrl) }.getOrNull()
+            require(uri?.scheme == "https" && uri.host == PROD_HOST && !baseUrl.contains("staging", ignoreCase = true)) {
+                "prod_app_gateway_required"
+            }
         }
     }
 
@@ -88,7 +93,7 @@ internal class AppGatewayApi(context: Context) {
     }
 
     suspend fun loadIntelligenceMode(): Result<AppIntelligenceMode> = withContext(Dispatchers.IO) {
-        resultRequest("mobile/intelligence-mode", "GET") { body ->
+        modeResultRequest("GET") { body ->
             parseIntelligenceMode(body.optJSONObject("intelligence_mode"))
         }
     }
@@ -101,8 +106,7 @@ internal class AppGatewayApi(context: Context) {
         if (normalized == "SMART" && !acknowledgeHigherConsumption) {
             return@withContext Result.failure(IllegalArgumentException("Bitte bestätige zuerst den höheren KI-Verbrauch."))
         }
-        resultRequest(
-            "mobile/intelligence-mode",
+        modeResultRequest(
             "POST",
             JSONObject()
                 .put("mode", normalized)
@@ -148,8 +152,18 @@ internal class AppGatewayApi(context: Context) {
         method: String,
         payload: JSONObject? = null,
         parser: (JSONObject) -> T
+    ): Result<T> = parseResponse(request(path, method, payload), parser)
+
+    private inline fun <T> modeResultRequest(
+        method: String,
+        payload: JSONObject? = null,
+        parser: (JSONObject) -> T
+    ): Result<T> = parseResponse(requestUrl(intelligenceModeBaseUrl, method, payload), parser)
+
+    private inline fun <T> parseResponse(
+        response: HttpJson,
+        parser: (JSONObject) -> T
     ): Result<T> = try {
-        val response = request(path, method, payload)
         if (response.code == 401) {
             sessions.clear()
             Result.failure(AppGatewaySessionExpiredException())
@@ -163,11 +177,15 @@ internal class AppGatewayApi(context: Context) {
     }
 
     private fun request(path: String, method: String, payload: JSONObject? = null): HttpJson {
+        return requestUrl("$gatewayBaseUrl/${path.trimStart('/')}", method, payload)
+    }
+
+    private fun requestUrl(urlString: String, method: String, payload: JSONObject? = null): HttpJson {
         val token = sessions.sessionToken()
             ?: return HttpJson(401, JSONObject().put("error", "SESSION_REQUIRED"))
         if (!sessions.hasValidSession()) return HttpJson(401, JSONObject().put("error", "SESSION_INVALID"))
 
-        val url = URL("$gatewayBaseUrl/${path.trimStart('/')}")
+        val url = URL(urlString)
         require(url.protocol == "https" && url.host == PROD_HOST) { "prod_app_gateway_required" }
         val connection = (url.openConnection() as HttpURLConnection).apply {
             requestMethod = method
