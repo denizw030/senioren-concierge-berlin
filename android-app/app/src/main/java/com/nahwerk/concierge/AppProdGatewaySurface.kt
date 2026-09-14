@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -15,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,6 +32,7 @@ import com.nahwerk.concierge.data.AppCoreReply
 import com.nahwerk.concierge.data.AppGatewayApi
 import com.nahwerk.concierge.data.AppGatewaySessionExpiredException
 import com.nahwerk.concierge.data.AppHomeSnapshot
+import com.nahwerk.concierge.data.AppIntelligenceMode
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -52,6 +55,10 @@ internal fun AppProdGatewaySurface(onSessionExpired: () -> Unit) {
     var home by remember { mutableStateOf<AppHomeSnapshot?>(null) }
     var loadingHome by remember { mutableStateOf(true) }
     var homeError by remember { mutableStateOf<String?>(null) }
+    var intelligenceMode by remember { mutableStateOf<AppIntelligenceMode?>(null) }
+    var modeBusy by remember { mutableStateOf(false) }
+    var modeError by remember { mutableStateOf<String?>(null) }
+    var showSmartConfirm by remember { mutableStateOf(false) }
     var message by rememberSaveable { mutableStateOf("") }
     var conciergeBusy by remember { mutableStateOf(false) }
     var conciergeReply by remember { mutableStateOf<AppCoreReply?>(null) }
@@ -70,22 +77,76 @@ internal fun AppProdGatewaySurface(onSessionExpired: () -> Unit) {
         }
     }
 
+    fun refreshIntelligenceMode() {
+        modeError = null
+        scope.launch {
+            api.loadIntelligenceMode()
+                .onSuccess { intelligenceMode = it }
+                .onFailure { handleFailure(it) { text -> modeError = text } }
+        }
+    }
+
     fun refreshHome() {
         loadingHome = true
         homeError = null
         scope.launch {
             val result = api.loadHome()
             loadingHome = false
-            result.onSuccess { home = it }
-                .onFailure { handleFailure(it) { text -> homeError = text } }
+            result.onSuccess {
+                home = it
+                refreshIntelligenceMode()
+            }.onFailure { handleFailure(it) { text -> homeError = text } }
+        }
+    }
+
+    fun setMode(mode: String, acknowledgeHigherConsumption: Boolean) {
+        if (modeBusy) return
+        modeBusy = true
+        modeError = null
+        scope.launch {
+            val result = api.setIntelligenceMode(mode, acknowledgeHigherConsumption)
+            modeBusy = false
+            result.onSuccess {
+                intelligenceMode = it
+                home = home?.copy(intelligenceMode = it.mode)
+            }.onFailure { handleFailure(it) { text -> modeError = text } }
         }
     }
 
     LaunchedEffect(Unit) {
         val result = api.loadHome()
         loadingHome = false
-        result.onSuccess { home = it }
-            .onFailure { handleFailure(it) { text -> homeError = text } }
+        result.onSuccess {
+            home = it
+            api.loadIntelligenceMode()
+                .onSuccess { mode -> intelligenceMode = mode }
+                .onFailure { failure -> handleFailure(failure) { text -> modeError = text } }
+        }.onFailure { handleFailure(it) { text -> homeError = text } }
+    }
+
+    if (showSmartConfirm) {
+        AlertDialog(
+            onDismissRequest = { if (!modeBusy) showSmartConfirm = false },
+            title = { Text("Intelligenten Modus aktivieren?") },
+            text = {
+                Text(
+                    intelligenceMode?.smartNotice
+                        ?: "Der intelligente Modus versteht freie Formulierungen und Kontext, nutzt dafür mehr KI und kann dein Guthaben deutlich schneller verbrauchen. Der genaue Preisaufschlag wird erst nach realer Kostenkalibrierung festgelegt."
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showSmartConfirm = false
+                        setMode("SMART", acknowledgeHigherConsumption = true)
+                    },
+                    enabled = !modeBusy
+                ) { Text("Ja, intelligent aktivieren") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showSmartConfirm = false }, enabled = !modeBusy) { Text("Abbrechen") }
+            }
+        )
     }
 
     Card(
@@ -114,6 +175,10 @@ internal fun AppProdGatewaySurface(onSessionExpired: () -> Unit) {
                         if (snapshot.activeTaskId == null) "Kein aktiver Auftrag." else "Aktiver Auftrag: ${snapshot.activeTaskStatus ?: "offen"}",
                         color = NahwerkPalette.SecondaryText
                     )
+                    Text(
+                        "Concierge-Modus: ${if (snapshot.intelligenceMode == "SMART") "Intelligent" else "Günstig"}",
+                        color = NahwerkPalette.SecondaryText
+                    )
                     Text("Aktive Erinnerungen: ${snapshot.reminderCountActive}", color = NahwerkPalette.SecondaryText)
                     if (snapshot.pendingApproval) Text("Eine Freigabe wartet auf deine Antwort.", color = NahwerkPalette.Warning)
                     snapshot.reminders.take(3).forEach { item ->
@@ -122,6 +187,57 @@ internal fun AppProdGatewaySurface(onSessionExpired: () -> Unit) {
                     OutlinedButton(onClick = ::refreshHome) { Text("Aktualisieren") }
                 }
             }
+        }
+    }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = NahwerkPalette.Surface),
+        border = BorderStroke(1.dp, NahwerkPalette.Divider)
+    ) {
+        Column(
+            Modifier.fillMaxWidth().padding(NahwerkSpacing.Lg),
+            verticalArrangement = Arrangement.spacedBy(NahwerkSpacing.Md)
+        ) {
+            Text("CONCIERGE-MODUS", color = NahwerkPalette.Gold, style = MaterialTheme.typography.labelSmall)
+            val effectiveMode = intelligenceMode?.mode ?: home?.intelligenceMode ?: "ECONOMY"
+            Text(
+                if (effectiveMode == "SMART") "Intelligenter Modus" else "Günstiger Modus",
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                if (effectiveMode == "SMART") {
+                    intelligenceMode?.smartNotice
+                        ?: "Freie Formulierungen und Kontext werden intelligent verstanden. Dafür wird mehr KI verwendet."
+                } else {
+                    intelligenceMode?.economyNotice
+                        ?: "Klare Abläufe und Befehle werden möglichst ohne laufende KI-Interpretation verarbeitet. KI wird nur genutzt, wenn die Leistung selbst sie benötigt."
+                },
+                color = NahwerkPalette.SecondaryText,
+                style = MaterialTheme.typography.bodySmall
+            )
+            if (intelligenceMode?.pricingStatus == "CALIBRATION_PENDING" || intelligenceMode == null) {
+                Text(
+                    "Der genaue Aufpreis für den intelligenten Modus wird erst nach realer Kostenkalibrierung festgelegt.",
+                    color = NahwerkPalette.SecondaryText,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(NahwerkSpacing.Sm)) {
+                Button(
+                    onClick = { setMode("ECONOMY", acknowledgeHigherConsumption = false) },
+                    enabled = !modeBusy && effectiveMode != "ECONOMY"
+                ) { Text("Günstig") }
+                OutlinedButton(
+                    onClick = { showSmartConfirm = true },
+                    enabled = !modeBusy && effectiveMode != "SMART"
+                ) { Text("Intelligent") }
+            }
+            if (modeBusy) Row(horizontalArrangement = Arrangement.spacedBy(NahwerkSpacing.Sm)) {
+                CircularProgressIndicator(strokeWidth = 2.dp)
+                Text("Modus wird sicher gespeichert.", color = NahwerkPalette.SecondaryText)
+            }
+            modeError?.let { Text(it, color = NahwerkPalette.Error, style = MaterialTheme.typography.bodySmall) }
         }
     }
 
