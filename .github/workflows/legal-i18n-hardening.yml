@@ -35,9 +35,9 @@ jobs:
       - name: Verify requested privacy notice removal
         run: |
           node --test tests/legal-i18n.test.mjs tests/seo-indexing.test.mjs
-          ! grep -Fq 'Stand: 10. September 2026.' datenschutz.html
-          ! grep -Fq 'Version: 10 September 2026.' assets/legal-i18n.js
-          ! grep -Fq 'Sürüm: 10 Eylül 2026.' assets/legal-i18n.js
+          ! grep -Fq 'Diese Datenschutzerklärung informiert darüber, wie personenbezogene Daten bei der Nutzung unserer Website und unserer Concierge-Dienste verarbeitet werden.' datenschutz.html
+          ! grep -Fq 'This Privacy Policy explains how personal data is processed when using our website and Concierge services.' assets/legal-i18n.js
+          ! grep -Fq 'Bu Gizlilik Politikası, web sitemizi ve Concierge hizmetlerimizi kullanırken kişisel verilerin nasıl işlendiğini açıklar.' assets/legal-i18n.js
       - name: Validate diff
         run: git diff --check
       - name: Publish generated legal localization
