@@ -14,7 +14,7 @@ PUBLIC_PAGES = [
     "alltag-organisieren.html", "dokumente-verstehen.html", "technik-verstehen.html", "ueber-mich.html",
 ]
 AUTH_PAGES = ("registrieren.html", "anmelden.html", "erster-schritt.html")
-AUTH_SCRIPT = '<script src="assets/auth-i18n.js?v=1"></script>'
+AUTH_SCRIPT = '<script src="assets/auth-i18n.js?v=2"></script>'
 
 
 def inject_auth_runtime(path: Path) -> None:
