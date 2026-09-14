@@ -163,11 +163,44 @@
       background:#fff !important;
       color:#1f1c17 !important;
     }
+    body.login-image-page.senior-product.nw-senior-login-composed .mfa-step,
+    body.login-image-page[data-product="senioren"].nw-senior-login-composed .mfa-step {
+      border-top:1px solid rgba(112,87,39,.16) !important;
+      color:#2b2720 !important;
+    }
+    body.login-image-page.senior-product.nw-senior-login-composed .mfa-step .tiny,
+    body.login-image-page[data-product="senioren"].nw-senior-login-composed .mfa-step .tiny,
+    body.login-image-page.senior-product.nw-senior-login-composed #mfaHint,
+    body.login-image-page[data-product="senioren"].nw-senior-login-composed #mfaHint {
+      color:#6b645a !important;
+    }
+    body.login-image-page.senior-product.nw-senior-login-composed .mfa-step .btn.light,
+    body.login-image-page[data-product="senioren"].nw-senior-login-composed .mfa-step .btn.light {
+      background:#f5efe4 !important;
+      color:#29251f !important;
+      border:1px solid rgba(120,91,39,.22) !important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.78),0 8px 20px rgba(74,55,23,.06) !important;
+    }
+    body.login-image-page.senior-product.nw-senior-login-composed .mfa-step .btn.light:hover,
+    body.login-image-page.senior-product.nw-senior-login-composed .mfa-step .btn.light:focus-visible,
+    body.login-image-page[data-product="senioren"].nw-senior-login-composed .mfa-step .btn.light:hover,
+    body.login-image-page[data-product="senioren"].nw-senior-login-composed .mfa-step .btn.light:focus-visible {
+      background:#eee5d5 !important;
+      color:#1f1b15 !important;
+      border-color:rgba(155,112,37,.42) !important;
+    }
+    body.login-image-page.senior-product.nw-senior-login-composed .mfa-step .btn.red,
+    body.login-image-page[data-product="senioren"].nw-senior-login-composed .mfa-step .btn.red {
+      background:linear-gradient(135deg,#e2c071,#c99d43) !important;
+      color:#1d1810 !important;
+      border:1px solid rgba(132,96,30,.25) !important;
+      box-shadow:0 10px 24px rgba(157,116,38,.14) !important;
+    }
     .nw-senior-login-portrait {
       position:relative !important;
       z-index:2 !important;
       min-width:0 !important;
-      margin:-26px 0 0 !important;
+      margin:10px 0 0 !important;
       overflow:hidden !important;
       box-sizing:border-box !important;
       border:1px solid rgba(151,115,43,.2) !important;
@@ -182,8 +215,8 @@
       height:100% !important;
       max-width:none !important;
       object-fit:cover !important;
-      object-position:55% 50% !important;
-      transform:scale(1.04) translateX(-1.5%) !important;
+      object-position:68% 50% !important;
+      transform:scale(1.04) translateX(-2%) !important;
       transform-origin:center !important;
     }
     body.login-image-page.senior-product.nw-senior-login-composed .nw-senior-login-source-section,
@@ -280,7 +313,7 @@
     important(portrait, 'right', 'auto');
     important(portrait, 'width', `${portraitWidth}px`);
     important(portrait, 'max-width', `${portraitWidth}px`);
-    important(portrait, 'margin', '-26px 0 0');
+    important(portrait, 'margin', '10px 0 0');
     important(portrait, 'transform', 'none');
     important(portrait, 'justify-self', 'end');
     important(portrait, 'aspect-ratio', '4 / 5');
