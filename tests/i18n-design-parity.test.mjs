@@ -33,6 +33,13 @@ function normalizeAsset(value) {
   return '/' + value.replace(/^\.\//, '').replace(/^\//, '');
 }
 
+function normalizeInlineCss(css) {
+  return css
+    .replace(/url\((["']?)\/?assets\//gi, 'url($1/assets/')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function stylesheetRefs(html) {
   return [...html.matchAll(/<link\b[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["'][^>]*>/gi)]
     .map((m) => normalizeAsset(m[1]));
@@ -49,7 +56,8 @@ function imageRefs(html) {
 }
 
 function styleBlocks(html) {
-  return [...html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/gi)].map((m) => m[1]);
+  return [...html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/gi)]
+    .map((m) => normalizeInlineCss(m[1]));
 }
 
 function bodyClass(html) {
