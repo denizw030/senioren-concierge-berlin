@@ -178,7 +178,7 @@
   const loadCatalog = async () => {
     if (lang === 'de') return;
     try {
-      const urls = [1,2,3,4].map((index) => `/locales/${lang}-auth${index}.json?v=1`);
+      const urls = [1,2,3,4].map((index) => `/locales/${lang}-auth${index}.json?v=2`);
       const parts = await Promise.all(urls.map(async (url) => {
         try {
           const response = await fetch(url, { cache: 'no-cache' });
