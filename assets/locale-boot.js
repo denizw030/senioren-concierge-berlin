@@ -128,7 +128,7 @@
       display:block !important;
       width:100% !important;
       max-width:560px !important;
-      margin:18px 0 0 !important;
+      margin:8px 0 0 !important;
       padding:24px 26px !important;
       box-sizing:border-box !important;
       border:1px solid rgba(112,87,39,.16) !important;
@@ -200,14 +200,14 @@
       position:relative !important;
       z-index:2 !important;
       min-width:0 !important;
-      margin:10px 0 0 !important;
+      margin:0 !important;
       overflow:hidden !important;
       box-sizing:border-box !important;
       border:1px solid rgba(151,115,43,.2) !important;
       border-radius:28px !important;
       background:#e8dfd2 !important;
       box-shadow:0 30px 80px rgba(69,50,20,.16) !important;
-      aspect-ratio:4/5 !important;
+      aspect-ratio:auto !important;
     }
     .nw-senior-login-portrait img {
       display:block !important;
@@ -215,8 +215,8 @@
       height:100% !important;
       max-width:none !important;
       object-fit:cover !important;
-      object-position:35% 60% !important;
-      transform:scale(1.04) translateX(-6%) !important;
+      object-position:72% 52% !important;
+      transform:scale(1.05) translateX(-5%) !important;
       transform-origin:center !important;
     }
     body.login-image-page.senior-product.nw-senior-login-composed .nw-senior-login-source-section,
@@ -247,6 +247,22 @@
   document.head.appendChild(style);
 
   const important = (el, name, value) => el?.style?.setProperty(name, value, 'important');
+
+  const removeStrayHeadMarker = () => {
+    if (!document.body) return;
+    const marker = /^<\s*\/\s*head\s*>$/i;
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    const remove = [];
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      if (marker.test(String(node.nodeValue || '').trim())) remove.push(node);
+    }
+    remove.forEach((node) => node.remove());
+    document.body.querySelectorAll('*').forEach((el) => {
+      if (el.children.length) return;
+      if (marker.test(String(el.textContent || '').trim())) el.remove();
+    });
+  };
 
   const applyProduct = () => {
     const body = document.body;
@@ -289,6 +305,7 @@
       important(portrait, 'right', 'auto');
       important(portrait, 'width', 'min(100%, 440px)');
       important(portrait, 'max-width', '440px');
+      important(portrait, 'height', 'auto');
       important(portrait, 'margin', '0 auto');
       important(portrait, 'transform', 'none');
       important(portrait, 'aspect-ratio', '4 / 3');
@@ -308,15 +325,18 @@
     important(wrap, 'gap', `${gap}px`);
     important(wrap, 'align-items', 'start');
     important(copy, 'max-width', `${Math.min(560, copyWidth)}px`);
+
+    const copyHeight = Math.max(560, Math.round(copy.getBoundingClientRect().height));
     important(portrait, 'position', 'relative');
     important(portrait, 'top', 'auto');
     important(portrait, 'right', 'auto');
     important(portrait, 'width', `${portraitWidth}px`);
     important(portrait, 'max-width', `${portraitWidth}px`);
-    important(portrait, 'margin', '10px 0 0');
+    important(portrait, 'height', `${copyHeight}px`);
+    important(portrait, 'margin', '0');
     important(portrait, 'transform', 'none');
     important(portrait, 'justify-self', 'end');
-    important(portrait, 'aspect-ratio', '4 / 5');
+    important(portrait, 'aspect-ratio', 'auto');
   };
 
   const composeSeniorLogin = () => {
@@ -367,10 +387,16 @@
     observer.observe(root, { childList: true });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', composeSeniorLogin, { once:true });
-  } else {
+  const onReady = () => {
+    removeStrayHeadMarker();
     composeSeniorLogin();
+    [0, 120, 500, 1500].forEach((delay) => setTimeout(removeStrayHeadMarker, delay));
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', onReady, { once:true });
+  } else {
+    onReady();
   }
 
   if (product === 'senioren' && isLoginPage) {
