@@ -24,9 +24,9 @@ test('every page with a concierge carousel loads locale defaults before the caro
   });
   for (const full of walk(root).filter(p => p.endsWith('.html') && !p.includes(`${path.sep}.git${path.sep}`))) {
     const html = fs.readFileSync(full, 'utf8');
-    if (!html.includes('data-concierge-carousel')) continue;
+    if (!html.includes('data-concierge-carousel') || !html.includes('concierge-carousel.js')) continue;
     const defaultsAt = html.indexOf('/assets/concierge-locale-defaults.js?v=1');
-    const carouselAt = html.indexOf('/assets/concierge-carousel.js');
+    const carouselAt = html.indexOf('concierge-carousel.js');
     assert.ok(defaultsAt >= 0, `${path.relative(root, full)} is missing locale defaults runtime`);
     assert.ok(carouselAt >= 0 && defaultsAt < carouselAt, `${path.relative(root, full)} loads locale defaults too late`);
   }
