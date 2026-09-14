@@ -57,17 +57,36 @@ for (const lang of ['en', 'tr']) {
   });
 }
 
-test('auth entry pages load locale, slider and persistent language selector runtimes', () => {
+test('auth entry pages load locale and persistent language selector runtimes', () => {
   for (const page of ['registrieren.html','anmelden.html','erster-schritt.html']) {
     const html = read(page);
-    assert.match(html, /assets\/auth-i18n\.js\?v=\d+/, `${page} must load auth-i18n runtime`);
-    assert.match(html, /assets\/auth-slider-i18n\.js\?v=\d+/, `${page} must load auth slider locale runtime`);
-    assert.match(html, /assets\/app-language-switcher\.js\?v=\d+/, `${page} must keep the language selector visible`);
+    assert.match(html, /assets\/auth-i18n\.js\?v=3/, `${page} must load current auth-i18n runtime`);
+    assert.match(html, /assets\/app-language-switcher\.js\?v=2/, `${page} must keep the current language selector visible`);
+  }
+  assert.match(read('registrieren.html'), /assets\/auth-slider-i18n\.js\?v=2/, 'registration must load current slider locale runtime');
+});
+
+test('auth language selector switches directly without auth link rewriting', () => {
+  const appSwitcher = read('assets/app-language-switcher.js');
+  assert.match(appSwitcher, /data\.nwLanguageTarget/);
+  assert.match(appSwitcher, /location\.assign\(hrefFor\(key\)\)/);
+  assert.doesNotMatch(appSwitcher, /document\.createElement\('a'\)/);
+});
+
+test('public and auth mobile language controls pin to the menu button geometry', () => {
+  for (const file of ['assets/language-switcher.js','assets/app-language-switcher.js']) {
+    const source = read(file);
+    assert.match(source, /const pinToToggle/);
+    assert.match(source, /toggle\.getBoundingClientRect\(\)/);
+    assert.match(source, /button\.style\.height = height/);
+    assert.match(source, /const gap = 10/);
   }
 });
 
-test('auth slider locale runtime covers the visible German carousel copy', () => {
+test('auth slider locale runtime and catalogs cover visible carousel copy', () => {
   const sliderI18n = read('assets/auth-slider-i18n.js');
+  const trAuth = read('locales/tr-auth4.json');
+  const enAuth = read('locales/en-auth4.json');
   for (const copy of [
     'Warm, ruhig, modern und strukturiert.',
     'Die Hörprobe startet in der Herkunftssprache. Die Sprache können Sie direkt darunter wechseln.',
@@ -75,7 +94,9 @@ test('auth slider locale runtime covers the visible German carousel copy', () =>
     'Sprache',
     'Ausgewählt'
   ]) {
-    assert.ok(sliderI18n.includes(copy), `missing slider localization source: ${copy}`);
+    assert.ok(sliderI18n.includes(copy), `missing slider runtime localization source: ${copy}`);
+    assert.ok(trAuth.includes(copy), `missing Turkish auth catalog slider copy: ${copy}`);
+    assert.ok(enAuth.includes(copy), `missing English auth catalog slider copy: ${copy}`);
   }
 });
 
