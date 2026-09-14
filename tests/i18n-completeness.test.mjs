@@ -10,7 +10,10 @@ const publicPages = [
   'senioren-concierge.html','alltag-organisieren.html','dokumente-verstehen.html',
   'technik-verstehen.html','ueber-mich.html'
 ];
-const authPages = ['registrieren.html','anmelden.html','erster-schritt.html'];
+const authPages = [
+  'registrieren.html','anmelden.html','passwort-zuruecksetzen.html','erster-schritt.html',
+  'konto.html','payg.html','web-concierge.html','concierge-anpassen.html','zugang-uebertragen.html'
+];
 
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const clean = (value) => String(value || '').replace(/&amp;/g, '&').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
@@ -36,14 +39,14 @@ function visibleValues(html) {
   return values;
 }
 
-const germanWord = /\b(?:eine|einer|einem|einen|der|die|das|den|dem|des|und|oder|aber|für|mit|von|ohne|über|unter|bei|wenn|dass|damit|wird|werden|ist|sind|kann|können|soll|sollen|muss|müssen|nicht|noch|auch|dein|deine|deiner|du|Sie|Ihr|Ihre|ihnen|ihre|Menschen|Unterstützung|Registrieren|Anmelden|Leistungen|Datenschutz|Impressum|Pakete|Zugang|auswählen|Hörprobe|Sprache|Stimme|erklärt|einrichten|persönlich|Persönlicher|Senioren|Angehörige|Kundenkonto|Abmelden|Menü)\b/i;
+const germanWord = /\b(?:eine|einer|einem|einen|der|die|das|den|dem|des|und|oder|aber|für|mit|von|ohne|über|unter|bei|wenn|dass|damit|wird|werden|ist|sind|kann|können|soll|sollen|muss|müssen|nicht|noch|auch|dein|deine|deiner|du|Sie|Ihr|Ihre|ihnen|ihre|Menschen|Unterstützung|Registrieren|Anmelden|Leistungen|Datenschutz|Impressum|Pakete|Zugang|auswählen|Hörprobe|Sprache|Stimme|erklärt|einrichten|persönlich|Persönlicher|Senioren|Angehörige|Kundenkonto|Abmelden|Menü|Passwort|zurücksetzen|Speichern|Ändern|Aufladen|Guthaben|Nutzung|Einstellungen|Nachricht|Senden|Aufgabe|Concierge wechseln|Telefonnummer|E-Mail|Bestätigen|Weiter|Zurück)\b/i;
 const germanish = (value) => /[äöüßÄÖÜ]/.test(value) || germanWord.test(value);
 
 const allowedShared = new Set([
   'NAHWERK','NAHWERK Concierge','NAHWERK Safety','NAHWERK Safety Check','NAHWERK Family',
   'WhatsApp','Family','Safety','FREE','STANDARD','PLUS','PREMIUM','PREMIUM PLUS','FAMILY','FAQ','ODYSX',
   'Lena','James','Konrad','Alexander','Luisa','Leyla','Martin','Nilo','Mira','Hartmut','Sarah','Camila',
-  'Eleni','Zofia','Mei','Yuna','Amara','Emily','David','Arthur','Kenji','Sofia','Isabella','Fatima','Ana','Giulia','Malik',
+  'Eleni','Zofia','Mei','Yuna','Amara','Emily','David','Arthur','Kenji','Sofia','Isabella','Fatima','Ana','Giulia','Malik','Lukas',
   'PayPal','Visa','Mastercard','Stripe','Uber','Berlin','Europe/Berlin','DE','EN','TR','EUR','GPT','AI','112'
 ]);
 
@@ -69,7 +72,7 @@ for (const lang of ['en','tr']) {
     assert.deepEqual(leaks, [], `${lang.toUpperCase()} unchanged German copy:\n${leaks.join('\n')}`);
   });
 
-  test(`${lang}: auth entry pages have catalog coverage for visible German copy`, () => {
+  test(`${lang}: every customer-facing app page has catalog coverage for visible German copy`, () => {
     const catalog = loadAuthCatalog(lang);
     const missing = [];
     for (const page of authPages) {
@@ -80,7 +83,7 @@ for (const lang of ['en','tr']) {
         missing.push(`${page}: ${value}`);
       }
     }
-    assert.deepEqual(missing, [], `${lang.toUpperCase()} auth catalog gaps:\n${missing.join('\n')}`);
+    assert.deepEqual(missing, [], `${lang.toUpperCase()} app catalog gaps:\n${missing.join('\n')}`);
   });
 }
 
@@ -92,8 +95,12 @@ test('every localized public page loads the shared runtime locale repair', () =>
   }
 });
 
-test('auth entry pages load the shared runtime locale repair', () => {
-  for (const page of authPages) assert.match(read(page), /assets\/locale-runtime\.js\?v=\d+/, `${page} missing locale-runtime.js`);
+test('every customer-facing app page loads localization runtime and locale boot', () => {
+  for (const page of authPages) {
+    const html = read(page);
+    assert.match(html, /assets\/auth-i18n\.js\?v=\d+/, `${page} missing auth-i18n.js`);
+    assert.match(html, /assets\/locale-boot\.js\?v=\d+/, `${page} missing locale-boot.js`);
+  }
 });
 
 test('runtime repair covers dynamic ODYSX, menu and hybrid Concierge welcome copy', () => {
