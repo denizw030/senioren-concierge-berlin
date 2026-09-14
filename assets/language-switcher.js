@@ -65,7 +65,7 @@
     const current = SUPPORTED[lang] || SUPPORTED.de;
     const wrapper = document.createElement('div');
     wrapper.className = 'nw-language';
-    wrapper.dataset.nwLanguageSwitcher = 'v5';
+    wrapper.dataset.nwLanguageSwitcher = 'v6';
 
     const button = document.createElement('button');
     button.type = 'button';
@@ -216,9 +216,21 @@
     const { lang } = normalizePath(location.pathname);
     if (lang === 'de') return;
     try {
-      const response = await fetch(`/locales/${lang}.json?v=1`, { cache: 'no-cache' });
-      if (!response.ok) return;
-      catalog = await response.json();
+      const urls = [
+        `/locales/${lang}.json?v=2`,
+        `/locales/${lang}-extra1.json?v=2`,
+        `/locales/${lang}-extra2.json?v=2`,
+        `/locales/${lang}-extra3.json?v=2`
+      ];
+      const parts = await Promise.all(urls.map(async (url) => {
+        try {
+          const response = await fetch(url, { cache: 'no-cache' });
+          return response.ok ? await response.json() : {};
+        } catch (_) {
+          return {};
+        }
+      }));
+      catalog = Object.assign({}, ...parts);
       applyLocalization();
     } catch (_) {}
   };
