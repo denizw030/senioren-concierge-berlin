@@ -9,6 +9,7 @@ on:
       - 'scripts/localization-bootstrap.py'
       - 'scripts/i18n-mirror.py'
       - 'assets/language-switcher.js'
+      - 'tests/i18n-design-parity.test.mjs'
       - '.github/workflows/localization-bootstrap.yml'
 
 permissions:
@@ -43,8 +44,8 @@ jobs:
               text = text.replace(old, new, 1)
               p.write_text(text, encoding='utf-8')
           PY
-      - name: Validate generated SEO surface
-        run: node --test tests/seo-indexing.test.mjs
+      - name: Validate generated SEO surface and visual parity
+        run: node --test tests/seo-indexing.test.mjs tests/i18n-design-parity.test.mjs
       - name: Validate clean diff
         run: git diff --check
       - name: Commit localization to PROD
