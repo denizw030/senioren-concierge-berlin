@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from urllib.parse import parse_qsl, urlencode
+from html import escape, unescape
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -28,6 +29,7 @@ def inject_auth_runtime(path: Path) -> None:
 
 
 def with_lang_query(target: str, lang: str) -> str:
+    target = unescape(target)
     hash_part = ""
     if "#" in target:
         target, hash_part = target.split("#", 1)
@@ -45,16 +47,25 @@ def with_lang_query(target: str, lang: str) -> str:
 def rewrite_generated_auth_links(path: Path, lang: str) -> None:
     text = path.read_text(encoding="utf-8")
 
-    def repl(match: re.Match[str]) -> str:
-        quote, target = match.group(1), match.group(2)
+    def href_repl(match: re.Match[str]) -> str:
+        quote, raw_target = match.group(1), match.group(2)
+        target = unescape(raw_target)
         plain = target.lstrip("/")
         base = plain.split("?", 1)[0].split("#", 1)[0]
         if base not in {"registrieren.html", "anmelden.html"}:
             return match.group(0)
         root_target = "/" + plain
-        return f'href={quote}{with_lang_query(root_target, lang)}{quote}'
+        localized = with_lang_query(root_target, lang)
+        return f'href={quote}{escape(localized, quote=True)}{quote}'
 
-    text = re.sub(r'href=(["\'])([^"\']+)\1', repl, text, flags=re.I)
+    def register_repl(match: re.Match[str]) -> str:
+        quote, raw_target = match.group(1), match.group(2)
+        target = unescape(raw_target)
+        localized = with_lang_query("/" + target.lstrip("/"), lang)
+        return f'data-register-url={quote}{escape(localized, quote=True)}{quote}'
+
+    text = re.sub(r'href=(["\'])([^"\']+)\1', href_repl, text, flags=re.I)
+    text = re.sub(r'data-register-url=(["\'])([^"\']+)\1', register_repl, text, flags=re.I)
     path.write_text(text, encoding="utf-8")
 
 
