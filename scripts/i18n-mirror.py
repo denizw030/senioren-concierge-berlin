@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from html import escape
+from html import escape, unescape
 import json
 import re
 
@@ -49,7 +49,7 @@ def page_url(lang: str, page: str) -> str:
 
 def get_title(html: str) -> str | None:
     match = re.search(r"<title>(.*?)</title>", html, re.I | re.S)
-    return clean(match.group(1)) if match else None
+    return unescape(clean(match.group(1))) if match else None
 
 
 def get_description(html: str) -> str | None:
@@ -57,7 +57,7 @@ def get_description(html: str) -> str | None:
     if not tag_match:
         return None
     content_match = re.search(r"\bcontent=([\"'])(.*?)\1", tag_match.group(0), re.I | re.S)
-    return clean(content_match.group(2)) if content_match else None
+    return unescape(clean(content_match.group(2))) if content_match else None
 
 
 def replace_meta_content(html: str, key_attr: str, key_value: str, value: str) -> str:
@@ -110,7 +110,6 @@ def rewrite_links(html: str, lang: str) -> str:
 
 def translate_visible_html(html: str, catalog: dict[str, str]) -> str:
     head_match = HEAD_RE.search(html)
-    head = head_match.group(0) if head_match else ""
     body_start = head_match.end() if head_match else 0
     prefix = html[:body_start]
     body = html[body_start:]
@@ -179,7 +178,7 @@ def mirror_page(lang: str, page: str, catalog: dict[str, str]) -> None:
     html = rewrite_assets(html)
     html = rewrite_links(html, lang)
     html = translate_visible_html(html, catalog)
-    html = re.sub(r"/assets/language-switcher\.js\?v=\d+", "/assets/language-switcher.js?v=6", html)
+    html = re.sub(r"/assets/language-switcher\.js\?v=\d+", "/assets/language-switcher.js?v=7", html)
     html = "\n".join(line.rstrip() for line in html.splitlines()) + ("\n" if html.endswith("\n") else "")
     generated_path.write_text(html, encoding="utf-8")
 
@@ -187,7 +186,7 @@ def mirror_page(lang: str, page: str, catalog: dict[str, str]) -> None:
 def update_root_switcher_version() -> None:
     for page in PAGES:
         path = ROOT / page
-        text = re.sub(r"/assets/language-switcher\.js\?v=\d+", "/assets/language-switcher.js?v=6", path.read_text(encoding="utf-8"))
+        text = re.sub(r"/assets/language-switcher\.js\?v=\d+", "/assets/language-switcher.js?v=7", path.read_text(encoding="utf-8"))
         path.write_text(text, encoding="utf-8")
 
 
