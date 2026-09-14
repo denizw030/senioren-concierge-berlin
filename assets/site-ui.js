@@ -207,3 +207,84 @@
   script.textContent = JSON.stringify(schema);
   document.head.appendChild(script);
 })();
+
+// Shared header stability + account overview cleanup.
+(() => {
+  const STYLE_ID = 'nw-shell-stability-v1';
+  const installStyles = () => {
+    if (document.getElementById(STYLE_ID)) return;
+    const style = document.createElement('style');
+    style.id = STYLE_ID;
+    style.textContent = `
+      .top .nav,.home-reference .top .nav{position:relative!important}
+      .top .nav-toggle{width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important;border-radius:10px!important}
+      .nw-language-button{height:48px!important;min-height:48px!important;min-width:76px!important;padding:0 12px!important;border-radius:10px!important}
+      .nw-account-link,.top .links .nw-account-link{height:48px!important;min-height:48px!important;padding:0 12px 0 7px!important;border-radius:10px!important}
+      .nw-account-logout{width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important;border-radius:10px!important}
+      .nw-account-cluster,.top .links .nw-account-cluster-desktop{gap:8px!important}
+      body.account-premium-ui .person-summary[data-account-panel="overview"]{display:none!important}
+      body.account-premium-ui #managedPersonContext.nw-managed-stabilizing:not(.nw-managed-ready){display:none!important}
+      @media(min-width:1281px){
+        .top .links,.home-reference .top .links{flex:1 1 auto!important}
+        .top .links>.nw-language,.home-reference .top .links>.nw-language{margin-left:auto!important;margin-right:0!important}
+        .top .links .nw-account-cluster-desktop{margin-left:8px!important}
+      }
+      @media(max-width:1280px){
+        .top .nav-toggle{top:16px!important;right:clamp(10px,3vw,28px)!important}
+        .top .nav>.nw-language,.home-reference .top .nav>.nw-language{top:16px!important;right:calc(clamp(10px,3vw,28px) + 58px)!important;margin:0!important}
+        .top .nav>.nw-language .nw-language-button,.home-reference .top .nav>.nw-language .nw-language-button{height:48px!important;min-height:48px!important;padding:0 12px!important}
+        .nw-account-cluster-mobile{top:16px!important;right:calc(clamp(10px,3vw,28px) + 144px)!important;transform:none!important;height:48px!important}
+        .nw-account-mobile{height:48px!important;min-height:48px!important}
+        .nw-account-cluster-mobile .nw-account-logout{width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important}
+      }
+      @media(max-width:620px){
+        .nw-account-cluster-mobile{right:calc(clamp(10px,3vw,28px) + 144px)!important}
+        .nw-account-mobile{width:48px!important;min-width:48px!important;max-width:48px!important;padding:0!important;justify-content:center!important}
+        .nw-account-mobile .nw-account-name{display:none!important}
+        .nw-account-cluster-mobile .nw-account-logout{display:none!important}
+      }
+    `;
+    document.head.appendChild(style);
+  };
+
+  const stabilizeAccount = () => {
+    if (!/(?:^|\/)konto\.html$/.test(location.pathname)) return;
+
+    document.querySelectorAll('.person-summary[data-account-panel="overview"]').forEach((element) => element.remove());
+
+    const context = document.getElementById('managedPersonContext');
+    if (!context || context.dataset.nwStabilityBound === '1') return;
+    context.dataset.nwStabilityBound = '1';
+    context.classList.add('nw-managed-stabilizing');
+
+    const sync = () => {
+      const select = context.querySelector('#personContextSelect');
+      const values = new Set(
+        select
+          ? Array.from(select.options)
+              .map((option) => String(option.value || '').trim())
+              .filter(Boolean)
+          : []
+      );
+      const ready = context.hidden === false && values.size > 1;
+      context.classList.toggle('nw-managed-ready', ready);
+    };
+
+    sync();
+    new MutationObserver(sync).observe(context, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ['hidden']
+    });
+    [0,100,300,800].forEach((delay) => setTimeout(sync, delay));
+  };
+
+  installStyles();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', stabilizeAccount, { once:true });
+  } else {
+    stabilizeAccount();
+  }
+  addEventListener('pageshow', stabilizeAccount, { once:true });
+})();
