@@ -393,10 +393,10 @@
         localStorage.setItem("scb_onboarding_result", JSON.stringify(body));
         if (await login(request.email, password)) {
           show("<strong>Fertig.</strong><br>Die WhatsApp-Identität wurde bestätigt und der Web-Zugang wurde angelegt. Sie werden zum Kundenbereich weitergeleitet.");
-          return setTimeout(() => { location.href = "erster-schritt.html"; }, 500);
+          return setTimeout(() => { location.href = window.NAHWERKLocale?.href("erster-schritt.html") || "erster-schritt.html"; }, 500);
         }
         show("<strong>Der Web-Zugang wurde angelegt.</strong><br>Bitte melden Sie sich jetzt mit Ihrer E-Mail-Adresse und Ihrem Passwort an.", true);
-        return setTimeout(() => { location.href = "anmelden.html"; }, 1800);
+        return setTimeout(() => { location.href = window.NAHWERKLocale?.href("anmelden.html") || "anmelden.html"; }, 1800);
       }
 
       if (response.status === 401 && body.status === "verification_failed") {
@@ -547,10 +547,10 @@
         localStorage.setItem("scb_onboarding_result", JSON.stringify(body));
         if (await login(request.email, password)) {
           show("<strong>Fertig.</strong><br>Der Zugang wurde angelegt. Sie werden zum Kundenbereich weitergeleitet.");
-          return setTimeout(() => { location.href = "erster-schritt.html"; }, 500);
+          return setTimeout(() => { location.href = window.NAHWERKLocale?.href("erster-schritt.html") || "erster-schritt.html"; }, 500);
         }
         show("<strong>Der Zugang wurde angelegt.</strong><br>Bitte melden Sie sich jetzt an.", true);
-        return setTimeout(() => { location.href = "anmelden.html"; }, 1800);
+        return setTimeout(() => { location.href = window.NAHWERKLocale?.href("anmelden.html") || "anmelden.html"; }, 1800);
       }
       if (response.status === 409 && body.status === "email_in_use") return show('<strong>Für diese E-Mail-Adresse besteht bereits ein Konto.</strong><br><a href="anmelden.html">Zur Anmeldung</a>', true);
       if (response.status === 400 || body.status === "validation_error") return show("<strong>Bitte prüfen Sie Ihre Angaben.</strong>", true);
