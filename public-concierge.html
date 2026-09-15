@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#030303" />
+    <meta name="color-scheme" content="dark" />
+    <title>NAHWERK Concierge | Öffentlicher Chat</title>
+    <meta name="description" content="Öffentliche NAHWERK Concierge Chat-Vorschau für Besucher ohne Kundenkonto." />
+    <link rel="stylesheet" href="assets/site.css?v=24" />
+    <link rel="stylesheet" href="assets/public-concierge.css?v=1" />
+  </head>
+  <body class="public-concierge-page">
+    <a class="pc-skip" href="#publicChatInput">Direkt zum Chat</a>
+
+    <header class="top pc-top">
+      <div class="wrap nav pc-nav" aria-label="Public Concierge Navigation">
+        <a class="brand" href="index.html" aria-label="NAHWERK Concierge Startseite">
+          <span class="mark nahwerk-mark" aria-hidden="true"></span>
+          <span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span>
+        </a>
+        <nav class="pc-nav-actions" aria-label="Schnellzugriff">
+          <a href="datenschutz.html">Datenschutz</a>
+          <a href="anmelden.html">Anmelden</a>
+          <a class="pc-register-top" href="registrieren.html?paket=free&amp;source=public-concierge">Kostenlos registrieren</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="pc-shell wrap">
+      <section class="pc-intro" aria-labelledby="pcTitle">
+        <p class="pc-eyebrow">NAHWERK CONCIERGE · VISITOR MODE</p>
+        <h1 id="pcTitle">Erst erleben.<br /><span>Dann entscheiden.</span></h1>
+        <p class="pc-lead">Sprich direkt mit NAHWERK, noch bevor du ein Konto anlegst. Formuliere dein Anliegen, kläre Fragen und bereite einen Auftrag vor.</p>
+
+        <div class="pc-trust-grid" aria-label="Besucher-Modus Eigenschaften">
+          <article>
+            <strong>Ohne Login</strong>
+            <span>Eine temporäre Besucher-Sitzung reicht für den Einstieg.</span>
+          </article>
+          <article>
+            <strong>Keine externe Ausführung</strong>
+            <span>Anrufe, Nachrichten, Käufe, Buchungen und Provider-Tools bleiben gesperrt.</span>
+          </article>
+          <article>
+            <strong>Kontrollierter Übergang</strong>
+            <span>Dein Gespräch wird für einen späteren, authentifizierten Handover vorbereitet.</span>
+          </article>
+        </div>
+
+        <p class="pc-privacy-note">
+          Diese Preview speichert den Gesprächskontext nur in dieser Browser-Sitzung und führt keine externen Aktionen aus.
+          <a href="datenschutz.html">Datenschutzhinweise ansehen</a>.
+        </p>
+      </section>
+
+      <section class="pc-chat-card" aria-labelledby="publicChatHeading">
+        <div class="pc-chat-head">
+          <div class="pc-avatar" aria-hidden="true">N</div>
+          <div>
+            <p class="pc-chat-kicker">Öffentlicher Concierge</p>
+            <h2 id="publicChatHeading">NAHWERK</h2>
+            <p class="pc-online"><span aria-hidden="true"></span> Visitor Mode · providerfreie Preview</p>
+          </div>
+          <div class="pc-session-meta" aria-label="Sitzungsstatus">
+            <span id="publicChatSessionLabel">Session</span>
+            <strong id="publicChatCounter">0 / 12</strong>
+          </div>
+        </div>
+
+        <div
+          id="publicChatLog"
+          class="pc-chat-log"
+          role="log"
+          aria-live="polite"
+          aria-relevant="additions text"
+          aria-label="Chatverlauf"
+        ></div>
+
+        <div id="publicChatTyping" class="pc-typing" hidden role="status" aria-live="polite" aria-label="NAHWERK schreibt">
+          <span></span><span></span><span></span>
+          <b>NAHWERK formuliert …</b>
+        </div>
+
+        <div id="publicChatStatus" class="pc-status" role="status" aria-live="polite" hidden></div>
+
+        <div id="publicChatLimit" class="pc-limit" tabindex="-1" hidden>
+          <p class="pc-limit-kicker">Besucher-Sitzung beendet</p>
+          <h3 id="publicChatLimitTitle">Die 12 Nachrichten sind erreicht.</h3>
+          <p id="publicChatLimitCopy">Es wird kein teureres Modell gestartet. Erstelle kostenlos ein Konto und mache anschließend kontrolliert weiter.</p>
+          <a id="publicChatRegister" class="pc-primary" href="registrieren.html?paket=free&amp;source=public-concierge">Konto kostenlos erstellen und weitermachen</a>
+          <button id="publicChatNewSession" class="pc-secondary" type="button">Neue Besucher-Sitzung starten</button>
+        </div>
+
+        <form id="publicChatForm" class="pc-composer" novalidate>
+          <label class="pc-sr-only" for="publicChatInput">Nachricht an NAHWERK</label>
+          <textarea
+            id="publicChatInput"
+            name="message"
+            rows="1"
+            maxlength="2400"
+            autocomplete="off"
+            placeholder="Was kann ich für dich erledigen?"
+            aria-describedby="publicChatComposerHint"
+            required
+          ></textarea>
+          <button id="publicChatSend" type="submit" aria-label="Nachricht senden">
+            <span>Senden</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M14 6l6 6-6 6" /></svg>
+          </button>
+          <p id="publicChatComposerHint" class="pc-composer-hint">Enter sendet · Shift + Enter erzeugt eine neue Zeile</p>
+        </form>
+
+        <footer class="pc-chat-foot">
+          <span>Visitor Contract v1</span>
+          <span>GPT-5.6 Luna only</span>
+          <span>Keine Tools · keine Actions</span>
+        </footer>
+      </section>
+    </main>
+
+    <script src="assets/public-concierge-policy.js?v=1"></script>
+    <script src="assets/public-concierge.js?v=1"></script>
+  </body>
+</html>
