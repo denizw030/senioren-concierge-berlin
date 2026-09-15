@@ -91,6 +91,26 @@
     html.nw-product-senior-first-paint body.login-image-page .top,
     body.login-image-page.senior-product .top,
     body.login-image-page[data-product="senioren"] .top{background:#f7f3ea!important;border-color:rgba(65,51,26,.13)!important;box-shadow:0 1px 0 rgba(65,51,26,.06)!important}
+    .senior-login-visual{display:none}
+    html.nw-product-senior-first-paint body.login-image-page main::after,
+    body.login-image-page.senior-product main::after,
+    body.login-image-page[data-product="senioren"] main::after{content:none!important;display:none!important}
+    html.nw-product-senior-first-paint body.login-image-page main>.senior-login-visual,
+    body.login-image-page.senior-product main>.senior-login-visual,
+    body.login-image-page[data-product="senioren"] main>.senior-login-visual{
+      display:block!important;position:absolute!important;inset:0 0 0 45%!important;z-index:1!important;
+      width:auto!important;max-width:none!important;height:auto!important;min-height:0!important;margin:0!important;padding:0!important;
+      border:0!important;border-radius:0!important;box-shadow:none!important;pointer-events:none!important;
+      background:#ddd4c8 url("/assets/lifestyle/senior-woman-overview.webp?v=6") 68% 50%/cover no-repeat!important
+    }
+    @media(max-width:899px){
+      html.nw-product-senior-first-paint body.login-image-page main>.senior-login-visual,
+      body.login-image-page.senior-product main>.senior-login-visual,
+      body.login-image-page[data-product="senioren"] main>.senior-login-visual{
+        position:relative!important;inset:auto!important;display:block!important;width:100%!important;max-width:100%!important;
+        height:clamp(360px,72vw,540px)!important;min-height:360px!important;margin:28px 0 0!important;background-position:68% 50%!important
+      }
+    }
   `;
   document.head.appendChild(style);
 
@@ -119,6 +139,19 @@
     return true;
   };
 
+  const ensureSeniorVisualPanel = () => {
+    if (!isSeniorLogin || !document.body) return;
+    const main = document.querySelector('main');
+    if (!main) return;
+    let visual = main.querySelector(':scope > .senior-login-visual');
+    if (!visual) {
+      visual = document.createElement('div');
+      visual.className = 'senior-login-visual';
+      visual.setAttribute('aria-hidden', 'true');
+      main.appendChild(visual);
+    }
+  };
+
   if (product && !applyProduct()) {
     const observer = new MutationObserver(() => {
       if (!applyProduct()) return;
@@ -129,6 +162,7 @@
 
   const onReady = () => {
     if (product) applyProduct();
+    ensureSeniorVisualPanel();
     removeStrayHeadMarker();
     [120, 500, 1500].forEach((delay) => setTimeout(removeStrayHeadMarker, delay));
   };
