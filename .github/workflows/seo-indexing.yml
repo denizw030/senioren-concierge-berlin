@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - '*.html'
+      - 'de/**/*.html'
       - 'en/**/*.html'
       - 'tr/**/*.html'
       - 'robots.txt'
@@ -16,10 +17,12 @@ on:
       - 'tests/i18n-design-parity.test.mjs'
       - 'scripts/localization-bootstrap.py'
       - 'scripts/i18n-mirror.py'
+      - 'scripts/i18n-home-routing.py'
       - '.github/workflows/seo-indexing.yml'
   pull_request:
     paths:
       - '*.html'
+      - 'de/**/*.html'
       - 'en/**/*.html'
       - 'tr/**/*.html'
       - 'robots.txt'
@@ -31,6 +34,7 @@ on:
       - 'tests/i18n-design-parity.test.mjs'
       - 'scripts/localization-bootstrap.py'
       - 'scripts/i18n-mirror.py'
+      - 'scripts/i18n-home-routing.py'
       - '.github/workflows/seo-indexing.yml'
 
 permissions:
