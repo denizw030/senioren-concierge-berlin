@@ -32,14 +32,18 @@ test('every page with a concierge carousel loads locale defaults before the caro
   }
 });
 
-test('localized source markup is pinned to the requested concierge', () => {
-  for (const [dir, key] of [['en', 'lukas'], ['tr', 'leyla']]) {
+test('localized source markup uses a valid fallback while locale runtime owns the final default', () => {
+  const catalog = read('assets/concierge-carousel.js');
+  for (const dir of ['en', 'tr']) {
     for (const file of fs.readdirSync(path.join(root, dir)).filter(name => name.endsWith('.html'))) {
       const html = read(`${dir}/${file}`);
       if (!html.includes('data-concierge-carousel')) continue;
       const selections = [...html.matchAll(/data-selected=["']([^"']+)["']/g)].map(match => match[1]);
       assert.ok(selections.length > 0, `${dir}/${file} has no selected concierge`);
-      assert.ok(selections.every(value => value === key), `${dir}/${file} is not pinned to ${key}`);
+      for (const value of selections) assert.ok(catalog.includes(`["${value}",`), `${dir}/${file} has unknown concierge ${value}`);
+      const defaultsAt = html.indexOf('/assets/concierge-locale-defaults.js?v=1');
+      const carouselAt = html.indexOf('concierge-carousel.js');
+      assert.ok(defaultsAt >= 0 && defaultsAt < carouselAt, `${dir}/${file} must let locale defaults run before carousel hydration`);
     }
   }
 });
