@@ -1,0 +1,76 @@
+name: Senior Login remove inline legacy once
+
+on:
+  push:
+    branches:
+      - fix/senior-login-canonical-reset-20260915
+
+permissions:
+  contents: write
+
+concurrency:
+  group: senior-login-remove-inline-legacy-20260915
+  cancel-in-progress: false
+
+jobs:
+  remove-legacy-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout isolated branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/senior-login-canonical-reset-20260915
+          fetch-depth: 0
+
+      - name: Remove legacy Senioren login DOM/CSS mutation block
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('assets/app-language-switcher.js')
+          text = path.read_text(encoding='utf-8')
+          marker = '// Senioren login: preserve the light Senioren identity, but use the compact two-column auth layout of the normal login.'
+          if marker not in text:
+              raise SystemExit('Legacy Senioren inline auth marker not found; refusing blind rewrite')
+          prefix, _ = text.split(marker, 1)
+          cleaned = prefix.rstrip() + '\n'
+          path.write_text(cleaned, encoding='utf-8')
+          PY
+
+      - name: Validate generic language switcher preserved and legacy login runtime gone
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          text = Path('assets/app-language-switcher.js').read_text(encoding='utf-8')
+          required = [
+              "const SUPPORTED = {",
+              "const createSwitcher = () => {",
+              "data.nwAppLanguageSwitcher",
+              "const place = () => {",
+          ]
+          for token in required:
+              if token not in text:
+                  raise SystemExit(f'Generic language-switcher contract missing: {token}')
+          forbidden = [
+              'senior-inline-auth',
+              'nw-senior-inline-auth-v1',
+              'senior-auth-inline',
+              'data-senior-auth-empty',
+          ]
+          for token in forbidden:
+              if token in text:
+                  raise SystemExit(f'Legacy Senioren login runtime still present: {token}')
+          print('GENERIC_LANGUAGE_SWITCHER_PRESERVED=GREEN')
+          print('LEGACY_SENIOR_INLINE_AUTH_RUNTIME=REMOVED')
+          PY
+
+      - name: Commit isolated runtime cleanup
+        shell: bash
+        run: |
+          git config user.name "nahwerk-prod-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add assets/app-language-switcher.js
+          git commit -m "[skip ci] senior login: remove legacy inline auth layout mutation"
+          git push origin HEAD:fix/senior-login-canonical-reset-20260915
