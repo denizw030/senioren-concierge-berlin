@@ -17,24 +17,27 @@ html body.account-premium-ui .account-section,html body.account-premium-ui .acco
 html body.account-premium-ui .account-setup-by{box-sizing:border-box!important;min-height:66px!important}
 html body.account-premium-ui .account-tabs-shell:not(:has(+ #nwPortalThemeSetting)){margin-bottom:112px!important}
 html body.account-premium-ui #managedContextNotice:not([hidden]){display:none!important}
-html body.account-premium-ui #managedPersonContext.nw-managed-ready + #managedContextNotice:not([hidden]){display:block!important}
+html body.account-premium-ui #managedPersonContext.nw-managed-ready:not([hidden]) + #managedContextNotice:not([hidden]){display:block!important}
+html body.account-premium-ui #managedPersonContext[hidden] + #managedContextNotice:not([hidden]){display:none!important}
 @media(max-width:720px){html body.account-premium-ui .account-tabs-shell:not(:has(+ #nwPortalThemeSetting)){margin-bottom:132px!important}}
 
-/* Light account shell must stay fully light when the portal is in the light/senior presentation. */
-html body.account-premium-ui.senior-product,
-html body.account-premium-ui[data-product="senioren"]{
-  background:#f2ede2!important;
-  color:#1f1c17!important;
+/* Persisted portal light mode must override the premium dark account shell. */
+html[data-nw-portal-theme="light"] body.account-premium-ui,
+html body.account-premium-ui.nw-portal-light{
+  background:#f7f3ea!important;
+  color:#1c1a16!important;
+  color-scheme:light!important;
 }
-html body.account-premium-ui.senior-product main,
-html body.account-premium-ui.senior-product .hero,
-html body.account-premium-ui.senior-product main>.section,
-html body.account-premium-ui.senior-product .account-section,
-html body.account-premium-ui[data-product="senioren"] main,
-html body.account-premium-ui[data-product="senioren"] .hero,
-html body.account-premium-ui[data-product="senioren"] main>.section,
-html body.account-premium-ui[data-product="senioren"] .account-section{
+html[data-nw-portal-theme="light"] body.account-premium-ui main,
+html[data-nw-portal-theme="light"] body.account-premium-ui .hero,
+html[data-nw-portal-theme="light"] body.account-premium-ui main>.section,
+html[data-nw-portal-theme="light"] body.account-premium-ui .account-section,
+html body.account-premium-ui.nw-portal-light main,
+html body.account-premium-ui.nw-portal-light .hero,
+html body.account-premium-ui.nw-portal-light main>.section,
+html body.account-premium-ui.nw-portal-light .account-section{
   background:
-    radial-gradient(820px 420px at 90% 8%,rgba(212,175,55,.10),transparent 66%),
-    linear-gradient(180deg,#f7f3ea 0%,#f1ece1 52%,#eee8dc 100%)!important;
+    radial-gradient(900px 520px at 92% 2%,rgba(196,157,79,.12),transparent 68%),
+    linear-gradient(180deg,#fbf8f1 0%,#f7f3ea 54%,#f2ebdf 100%)!important;
+  color:#1c1a16!important;
 }
