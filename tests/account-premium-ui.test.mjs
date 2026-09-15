@@ -7,7 +7,7 @@ const css=fs.readFileSync("assets/account-premium-ui.css","utf8");
 const family=fs.readFileSync("assets/family-owner-sponsored-access.js","utf8");
 
 test("premium account stylesheet is page-scoped and loaded last in account head",()=>{
-  assert.match(konto,/assets\/account-premium-ui\.css\?v=1/);
+  assert.match(konto,/assets\/account-premium-ui\.css\?v=2/);
   assert.match(konto,/<body class="account-premium-ui">/);
   assert.match(css,/body\.account-premium-ui/);
   assert.doesNotMatch(css,/@import|fonts\.googleapis|font-face/i);
