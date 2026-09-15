@@ -1,0 +1,65 @@
+name: senior login locale cache bust once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/senior-login-locale-cache-bust-once.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: senior-login-locale-cache-bust-once
+  cancel-in-progress: false
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Cache-bust locale boot only
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('anmelden.html')
+          s = p.read_text(encoding='utf-8')
+          old = '/assets/locale-boot.js?v=6'
+          new = '/assets/locale-boot.js?v=7'
+          count = s.count(old)
+          if count != 1:
+              raise SystemExit(f'expected exactly one {old!r}, found {count}')
+          p.write_text(s.replace(old, new), encoding='utf-8')
+          PY
+          rm -f .github/workflows/senior-login-locale-cache-bust-once.yml
+
+      - name: Validate isolated diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff -- anmelden.html .github/workflows/senior-login-locale-cache-bust-once.yml
+          changed="$(git status --short | awk '{print $2}' | sort)"
+          expected="$(printf '%s\n' '.github/workflows/senior-login-locale-cache-bust-once.yml' 'anmelden.html' | sort)"
+          test "$changed" = "$expected"
+          grep -q '/assets/locale-boot.js?v=7' anmelden.html
+
+      - name: Commit and publish without overwriting concurrent work
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          base="$(git rev-parse HEAD)"
+          git add anmelden.html .github/workflows/senior-login-locale-cache-bust-once.yml
+          git commit -m 'Cache-bust stable senior login boot'
+          git fetch origin main
+          if [ "$(git rev-parse origin/main)" != "$base" ]; then
+            git rebase origin/main
+          fi
+          git push origin HEAD:main
