@@ -1,0 +1,60 @@
+name: Google Limited Use hardening once
+
+on:
+  push:
+    branches:
+      - fix/google-limited-use-hardening-20260915
+    paths:
+      - '.github/workflows/google-limited-use-hardening-once.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: google-limited-use-hardening-branch
+  cancel-in-progress: false
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout isolated branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Harden Google Workspace Limited Use disclosure
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('datenschutz/index.html')
+          s = p.read_text(encoding='utf-8')
+          old = '<p>Google- und Gmail-Daten werden nicht verkauft, nicht für personalisierte Werbung verwendet und nicht zur Erstellung von Werbeprofilen genutzt. Eine Übermittlung an technisch erforderliche Dienstleister erfolgt nur, soweit dies zur Ausführung einer von dir angeforderten Funktion notwendig ist. Dazu können insbesondere Infrastruktur-, Sicherheits- und KI-Dienstleister gehören, wenn deren Verarbeitung für die konkrete Concierge-Aufgabe erforderlich ist. Ein menschlicher Zugriff erfolgt nur, soweit dies für Sicherheit, Missbrauchsprävention, Support auf deine ausdrückliche Anfrage oder zur Erfüllung gesetzlicher Pflichten erforderlich ist.</p>'
+          new = ('<p>Google- und Gmail-Daten werden nicht verkauft, nicht für Werbung oder Retargeting verwendet, nicht zur Erstellung von Werbeprofilen oder zur Bewertung der Kreditwürdigkeit genutzt und nicht zum Erstellen, Trainieren oder Verbessern allgemeiner Machine-Learning- oder KI-Modelle verwendet. Eine Verarbeitung durch einen KI-Dienst erfolgt nur, soweit sie für eine von dir konkret angeforderte, sichtbare Concierge-Funktion erforderlich ist; die dabei übermittelten Google-Workspace-Daten dürfen nicht zum Training oder zur Verbesserung allgemeiner Modelle verwendet werden.</p>'
+                 '<p>Eine Übermittlung von Google-Workspace-Daten an technisch erforderliche Dienstleister erfolgt nur, soweit dies zur Bereitstellung oder Verbesserung der von dir angeforderten, nutzerseitig sichtbaren Funktion erforderlich ist und du dieser Verarbeitung zugestimmt hast. Dazu können insbesondere Infrastruktur-, Sicherheits- und KI-Dienstleister als technische Auftragsverarbeiter gehören. Ein menschlicher Zugriff auf Google-Workspace-Daten erfolgt nur, wenn du ausdrücklich und nachweisbar dem Zugriff auf konkret benannte Nachrichten oder Daten zugestimmt hast, wenn Daten für interne Abläufe ausschließlich aggregiert und anonymisiert verarbeitet werden, wenn der Zugriff aus Sicherheits- oder Missbrauchsschutzgründen erforderlich ist oder wenn eine gesetzliche Verpflichtung besteht.</p>')
+          if new in s:
+              raise SystemExit(0)
+          if old not in s:
+              raise SystemExit('Expected Google disclosure paragraph not found')
+          s = s.replace(old, new, 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Validate exact scope
+        shell: bash
+        run: |
+          git diff --check
+          grep -F 'nicht zum Erstellen, Trainieren oder Verbessern allgemeiner Machine-Learning- oder KI-Modelle' datenschutz/index.html
+          grep -F 'ausdrücklich und nachweisbar dem Zugriff auf konkret benannte Nachrichten oder Daten zugestimmt' datenschutz/index.html
+          test "$(git diff --name-only | wc -l)" -eq 1
+          test "$(git diff --name-only)" = "datenschutz/index.html"
+
+      - name: Commit privacy-policy hardening only
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add datenschutz/index.html
+          git commit -m 'Harden Google Workspace Limited Use disclosure'
+          git push origin HEAD:fix/google-limited-use-hardening-20260915
