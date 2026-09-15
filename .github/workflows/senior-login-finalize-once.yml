@@ -1,0 +1,83 @@
+name: senior login finalize once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/senior-login-finalize-once.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: senior-login-finalize-main
+  cancel-in-progress: false
+
+jobs:
+  finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Patch only the senior login delivery path
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          html_path = Path('anmelden.html')
+          html = html_path.read_text(encoding='utf-8')
+          old_boot = '<script src="/assets/locale-boot.js?v=5"></script>'
+          new_boot = '<link rel="stylesheet" href="/assets/senior-login-final-v1.css?v=3"><script src="/assets/locale-boot.js?v=6"></script>'
+          if old_boot in html:
+              html = html.replace(old_boot, new_boot, 1)
+          elif new_boot not in html:
+              raise SystemExit('Expected locale boot marker not found; refusing to rewrite anmelden.html')
+
+          old_site = '<script src="assets/site-ui.js?v=5"></script>'
+          new_site = '<script src="assets/site-ui.js?v=6"></script>'
+          if old_site in html:
+              html = html.replace(old_site, new_site, 1)
+          elif new_site not in html:
+              raise SystemExit('Expected site-ui marker not found; refusing to rewrite anmelden.html')
+          html_path.write_text(html, encoding='utf-8')
+
+          site_path = Path('assets/site-ui.js')
+          site = site_path.read_text(encoding='utf-8')
+          old = "    if (!document.querySelector('link[data-nw-premium-preview]')) {"
+          new = "    const skipPremiumPreview = /(?:^|\\/)anmelden\\.html$/.test(location.pathname) && new URLSearchParams(location.search).get('produkt') === 'senioren';\n    if (!skipPremiumPreview && !document.querySelector('link[data-nw-premium-preview]')) {"
+          if old in site:
+              site = site.replace(old, new, 1)
+          elif 'const skipPremiumPreview =' not in site:
+              raise SystemExit('Expected premium-preview loader not found; refusing to rewrite site-ui.js')
+          site_path.write_text(site, encoding='utf-8')
+          PY
+
+      - name: Validate isolated result
+        shell: bash
+        run: |
+          git diff --check
+          grep -F 'senior-login-final-v1.css?v=3' anmelden.html
+          grep -F 'locale-boot.js?v=6' anmelden.html
+          grep -F 'site-ui.js?v=6' anmelden.html
+          grep -F 'const skipPremiumPreview =' assets/site-ui.js
+          git diff -- anmelden.html assets/site-ui.js
+
+      - name: Commit and collision-safe publish
+        shell: bash
+        run: |
+          if git diff --quiet -- anmelden.html assets/site-ui.js; then
+            echo 'No changes required.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add anmelden.html assets/site-ui.js
+          git commit -m 'Finalize stable senior login delivery'
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
