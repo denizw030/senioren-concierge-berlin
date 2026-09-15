@@ -1,0 +1,48 @@
+name: account overview tab scope once
+
+on:
+  push:
+    branches:
+      - fix/account-overview-tab-scope-20260915
+    paths:
+      - .github/workflows/account-overview-tab-scope-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/account-overview-tab-scope-20260915
+      - name: Scope overview cards to overview tab only
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('assets/account-premium-ui.css')
+          text = path.read_text()
+          rule = '''\n/* Account overview cards belong only to the overview tab. */\nbody.account-premium-ui .account-overview-highlights[hidden]{\n  display:none!important;\n}\n'''
+          if 'body.account-premium-ui .account-overview-highlights[hidden]' not in text:
+              text = text.rstrip() + '\n' + rule
+              path.write_text(text)
+
+          updated = path.read_text()
+          assert 'body.account-premium-ui .account-overview-highlights[hidden]' in updated
+          assert 'display:none!important' in updated
+          PY
+      - name: Remove one-shot workflow
+        run: rm .github/workflows/account-overview-tab-scope-once.yml
+      - name: Commit isolated CSS fix
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/account-premium-ui.css .github/workflows/account-overview-tab-scope-once.yml
+          git diff --cached --check
+          git commit -m "Keep account overview cards on overview tab only"
+          git push origin HEAD:fix/account-overview-tab-scope-20260915
