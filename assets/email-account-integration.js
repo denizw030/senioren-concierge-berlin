@@ -1,7 +1,10 @@
 (() => {
   const SESSION_KEY = "scb_web_session";
+  const PLATFORM_CONTRACT = "WEBSITE_EMAIL_INTEGRATION_CONTRACT_V1";
+  const PLATFORM_CONTRACT_SHA = "d9f91bb488f5895b27a0618e1a94188f1e9ee19b";
   const BASE = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-email-runtime";
   const CAPABILITIES = ["EMAIL_READ", "EMAIL_SEARCH", "EMAIL_ATTACHMENTS", "EMAIL_DRAFT", "EMAIL_SEND"];
+  const STATES = ["DISCONNECTED", "CONNECTING", "CONNECTED", "REAUTH_REQUIRED", "SCOPE_REQUIRED", "ERROR"];
   const ERROR_COPY = {
     UNAUTHENTICATED: "Deine Sitzung ist nicht mehr gültig. Bitte melde dich erneut an.",
     EMAIL_IDENTITY_BINDING_FAILED: "Die E-Mail-Verbindung konnte deinem Konto nicht sicher zugeordnet werden.",
@@ -11,6 +14,90 @@
     EMAIL_REQUEST_INVALID: "Die E-Mail-Anfrage konnte nicht sicher verarbeitet werden."
   };
 
+  function safeGoogleRedirect(value) {
+    try {
+      const url = new URL(String(value || ""));
+      return url.protocol === "https:" && url.hostname === "accounts.google.com" ? url.toString() : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function normalizeProviderList(body) {
+    if (body?.ok !== true || !Array.isArray(body.providers)) return [];
+    return body.providers.flatMap((row) => {
+      const provider = String(row?.provider || "").toUpperCase();
+      const availability = String(row?.availability || "").toUpperCase();
+      if (!["GOOGLE", "MICROSOFT", "GENERIC"].includes(provider)) return [];
+      if (!["AVAILABLE", "CONFIGURATION_REQUIRED", "UNAVAILABLE"].includes(availability)) return [];
+      return [{
+        provider,
+        availability,
+        label: String(row?.label || "").slice(0, 100),
+        capabilities: Array.isArray(row?.capabilities) ? row.capabilities.map(String).filter((v) => CAPABILITIES.includes(v)) : []
+      }];
+    });
+  }
+
+  function normalizeConnection(body) {
+    if (body?.ok !== true) return null;
+    const state = String(body?.state || "").toUpperCase();
+    if (!STATES.includes(state)) return null;
+    const provider = body?.provider == null ? null : String(body.provider).toUpperCase();
+    if (provider !== null && provider !== "GOOGLE") return null;
+    const hint = String(body?.account_display_hint || "").trim();
+    return {
+      provider,
+      state,
+      capabilities: Array.isArray(body?.capabilities) ? body.capabilities.map(String).filter((v) => CAPABILITIES.includes(v)) : [],
+      account_display_hint: hint && /[•*]/.test(hint) ? hint.slice(0, 180) : null,
+      reauth_required: body?.reauth_required === true,
+      scope_required: body?.scope_required === true
+    };
+  }
+
+  async function gatewayRequest({ base = BASE, token, method = "GET", path, body = null, fetchImpl = globalThis.fetch }) {
+    if (!token) return { ok: false, error: "UNAUTHENTICATED", networkRequestMade: false };
+    const headers = { Authorization: "Bearer " + token };
+    const init = { method, headers };
+    if (body !== null) {
+      headers["Content-Type"] = "application/json";
+      init.body = JSON.stringify(body);
+    }
+    let response;
+    try {
+      response = await fetchImpl(String(base).replace(/\/$/, "") + path, init);
+    } catch {
+      return { ok: false, error: "EMAIL_PROVIDER_UNAVAILABLE", networkRequestMade: true };
+    }
+    const data = await response.json().catch(() => null);
+    if (!response.ok || data?.ok !== true) {
+      return { ok: false, error: String(data?.error?.code || data?.error || "EMAIL_REQUEST_INVALID"), networkRequestMade: true, httpStatus: response.status };
+    }
+    return { ok: true, data, networkRequestMade: true, httpStatus: response.status };
+  }
+
+  function connectPayload(provider = "GOOGLE", requestedCapabilities = CAPABILITIES) {
+    const p = String(provider || "").toUpperCase();
+    const caps = Array.isArray(requestedCapabilities) ? [...new Set(requestedCapabilities.map(String))].filter((v) => CAPABILITIES.includes(v)) : [];
+    if (p !== "GOOGLE" || !caps.length) return null;
+    return { provider: "GOOGLE", requested_capabilities: caps };
+  }
+
+  globalThis.NAHWERKEmailIntegrationTestHooks = Object.freeze({
+    PLATFORM_CONTRACT,
+    PLATFORM_CONTRACT_SHA,
+    runtimeGatewayBase: BASE,
+    CAPABILITIES: CAPABILITIES.slice(),
+    STATES: STATES.slice(),
+    safeGoogleRedirect,
+    normalizeProviderList,
+    normalizeConnection,
+    gatewayRequest,
+    connectPayload
+  });
+
+  if (typeof document === "undefined") return;
   const root = document.getElementById("accountEmailCard");
   if (!root) return;
 
@@ -59,28 +146,10 @@
     return selected.length ? selected : CAPABILITIES.slice();
   }
 
-  function errorCode(body, fallback = "EMAIL_REQUEST_INVALID") {
-    return String(body?.error?.code || body?.error || fallback);
-  }
-
   async function request(path, { method = "GET", body = null } = {}) {
-    const token = sessionToken();
-    if (!token) throw new Error("UNAUTHENTICATED");
-    const headers = { Authorization: "Bearer " + token };
-    const init = { method, headers };
-    if (body !== null) {
-      headers["Content-Type"] = "application/json";
-      init.body = JSON.stringify(body);
-    }
-    let response;
-    try {
-      response = await fetch(BASE + path, init);
-    } catch {
-      throw new Error("EMAIL_PROVIDER_UNAVAILABLE");
-    }
-    const data = await response.json().catch(() => null);
-    if (!response.ok || data?.ok !== true) throw new Error(errorCode(data));
-    return data;
+    const outcome = await gatewayRequest({ base: BASE, token: sessionToken(), method, path, body, fetchImpl: globalThis.fetch });
+    if (!outcome.ok) throw new Error(outcome.error);
+    return outcome.data;
   }
 
   function providerRow(key) {
@@ -195,8 +264,8 @@
         request("/email/providers"),
         request("/email/connection")
       ]);
-      providers = Array.isArray(providerData.providers) ? providerData.providers : [];
-      connection = connectionData;
+      providers = normalizeProviderList(providerData);
+      connection = normalizeConnection(connectionData) || { state: "ERROR", provider: "GOOGLE", capabilities: [], account_display_hint: null };
       renderProviders();
       renderConnection();
       loaded = true;
@@ -208,23 +277,13 @@
     }
   }
 
-  function safeGoogleRedirect(value) {
-    try {
-      const url = new URL(String(value || ""));
-      return url.protocol === "https:" && url.hostname === "accounts.google.com" ? url.toString() : null;
-    } catch {
-      return null;
-    }
-  }
-
   async function begin(path) {
     if (!googleAvailable()) return;
+    const body = connectPayload("GOOGLE", selectedCapabilities());
+    if (!body) return;
     setBusy(true);
     try {
-      const data = await request(path, {
-        method: "POST",
-        body: { provider: "GOOGLE", requested_capabilities: selectedCapabilities() }
-      });
+      const data = await request(path, { method: "POST", body });
       const redirect = safeGoogleRedirect(data.authorization_redirect_url);
       if (!redirect) throw new Error("EMAIL_OAUTH_FAILED");
       location.assign(redirect);
