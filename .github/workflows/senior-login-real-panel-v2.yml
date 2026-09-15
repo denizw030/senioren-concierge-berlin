@@ -126,3 +126,6 @@ html body.login-image-page[data-product="senioren"] .senior-login-visual{
           git add anmelden.html assets/senior-login-canonical-reset-20260915.css
           git commit -m "senior login: replace pseudo image with real full-height panel"
           git push origin HEAD:fix/senior-login-canonical-reset-20260915
+
+      - name: Mark repair runner revision
+        run: echo "SENIOR_LOGIN_REAL_PANEL_RUNNER=v2.1"
