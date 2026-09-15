@@ -19,6 +19,8 @@
           ? 'prime'
           : null;
 
+  const isSeniorLogin = product === 'senioren' && isLoginPage;
+
   const supported = new Set(['en', 'tr']);
   const languageQuery = params.get('lang');
   let storedLanguage = null;
@@ -40,7 +42,7 @@
     setTimeout(() => root.classList.remove('nw-locale-pending'), 3000);
   }
 
-  if (product === 'senioren' && isLoginPage) {
+  if (isSeniorLogin) {
     const preload = document.createElement('link');
     preload.rel = 'preload';
     preload.as = 'image';
@@ -58,6 +60,9 @@
     html.nw-product-prime-first-paint body{background:#070706!important;color-scheme:dark!important}
     html.nw-product-booting body,
     html.nw-locale-pending body{visibility:hidden!important}
+
+    html.nw-product-senior-first-paint body.login-image-page{background:#f7f3ea!important;color:#181713!important;color-scheme:light!important}
+    html.nw-product-senior-first-paint body.login-image-page .top{background:#f7f3ea!important;border-color:rgba(65,51,26,.13)!important;box-shadow:0 1px 0 rgba(65,51,26,.06)!important}
 
     body.login-image-page.senior-product,
     body.login-image-page[data-product="senioren"]{background:#f7f3ea!important;color:#181713!important;color-scheme:light!important}
@@ -195,9 +200,31 @@
     });
   };
 
+  const clearSeniorLoginRuntimeMarkers = () => {
+    if (!isSeniorLogin || !document.body) return;
+    document.body.classList.remove('senior-product');
+    if (document.body.dataset.product === 'senioren') delete document.body.dataset.product;
+  };
+
+  let seniorLoginGuardBound = false;
+  const bindSeniorLoginGuard = () => {
+    if (!isSeniorLogin || !document.body || seniorLoginGuardBound) return;
+    seniorLoginGuardBound = true;
+    clearSeniorLoginRuntimeMarkers();
+    new MutationObserver(clearSeniorLoginRuntimeMarkers).observe(document.body, {
+      attributes: true,
+      attributeFilter: ['class', 'data-product']
+    });
+  };
+
   const applyProduct = () => {
     const body = document.body;
     if (!body || !product) return false;
+    if (isSeniorLogin) {
+      clearSeniorLoginRuntimeMarkers();
+      requestAnimationFrame(() => root.classList.remove('nw-product-booting'));
+      return true;
+    }
     body.dataset.product = product;
     body.classList.toggle('senior-product', product === 'senioren');
     requestAnimationFrame(() => root.classList.remove('nw-product-booting'));
@@ -214,8 +241,13 @@
 
   const onReady = () => {
     if (product) applyProduct();
+    bindSeniorLoginGuard();
     removeStrayHeadMarker();
-    [120, 500, 1500].forEach((delay) => setTimeout(removeStrayHeadMarker, delay));
+    [120, 500, 1500].forEach((delay) => setTimeout(() => {
+      bindSeniorLoginGuard();
+      clearSeniorLoginRuntimeMarkers();
+      removeStrayHeadMarker();
+    }, delay));
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', onReady, { once:true });
