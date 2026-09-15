@@ -9,7 +9,7 @@ const konto=fs.readFileSync("konto.html","utf8");
 const carousel=fs.readFileSync("assets/concierge-carousel.js","utf8");
 const email=fs.readFileSync("assets/email-account-integration.js","utf8");
 const phone=fs.readFileSync("assets/telephone-reception-product.js","utf8");
-const home=fs.readFileSync("index.html","utf8");
+const home=fs.readFileSync("de/index.html","utf8");
 function hooks(){const sandbox={console,URL,TextEncoder,Uint8Array,crypto:webcrypto};vm.createContext(sandbox);vm.runInContext(js,sandbox);return sandbox.NAHWERKFamilyOwnerTestHooks}
 function storage(){const m=new Map();return {getItem:k=>m.has(k)?m.get(k):null,setItem:(k,v)=>m.set(k,String(v)),removeItem:k=>m.delete(k)}}
 function response(status,body){return {status,ok:status>=200&&status<300,json:async()=>body}}
