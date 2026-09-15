@@ -150,7 +150,7 @@
     if (!skipPremiumPreview && !document.querySelector('link[data-nw-premium-preview]')) {
       const premium = document.createElement('link');
       premium.rel = 'stylesheet';
-      premium.href = '/assets/premium-preview.css?v=1';
+      premium.href = '/assets/premium-preview.css?v=2';
       premium.dataset.nwPremiumPreview = 'true';
       document.head.append(premium);
     }
