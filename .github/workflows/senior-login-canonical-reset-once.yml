@@ -80,7 +80,7 @@ jobs:
               'grid-template-columns:minmax(0,45%) minmax(0,55%)',
               'max-width:440px',
               'height:56px',
-              'background-size:cover',
+              '/cover no-repeat',
               'senior-woman-overview.webp',
           ]
           for token in required_css:
