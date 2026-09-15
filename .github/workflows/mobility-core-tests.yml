@@ -1,0 +1,15 @@
+name: Mobility Core Tests
+on:
+  push:
+    branches: [design/nahwerk-mobility-concierge-core-01]
+  pull_request:
+    paths: ['mobility-core/**', 'package.json']
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm run test:mobility
