@@ -51,12 +51,8 @@
     html.nw-locale-pending body {
       visibility:hidden !important;
     }
-    html.nw-locale-pending.nw-product-senior-first-paint {
-      background:#f7f3ea !important;
-    }
-    html.nw-locale-pending:not(.nw-product-senior-first-paint) {
-      background:#070706 !important;
-    }
+    html.nw-locale-pending.nw-product-senior-first-paint { background:#f7f3ea !important; }
+    html.nw-locale-pending:not(.nw-product-senior-first-paint) { background:#070706 !important; }
 
     body.login-image-page.senior-product.nw-senior-login-composed,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed {
@@ -80,9 +76,11 @@
       padding:0 !important;
       overflow:hidden !important;
       background:#f7f3ea !important;
-      border-bottom:0 !important;
+      border:0 !important;
     }
+    body.login-image-page.senior-product.nw-senior-login-composed .hero:before,
     body.login-image-page.senior-product.nw-senior-login-composed .hero:after,
+    body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero:before,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero:after {
       display:none !important;
       content:none !important;
@@ -96,23 +94,36 @@
       padding:0 !important;
       box-sizing:border-box !important;
     }
+
     .nw-senior-login-copy {
       position:relative !important;
       z-index:3 !important;
+      display:flex !important;
+      flex-direction:column !important;
+      align-items:stretch !important;
+      justify-content:flex-start !important;
+      gap:0 !important;
       min-width:0 !important;
       width:100% !important;
       max-width:none !important;
       box-sizing:border-box !important;
-      padding:clamp(42px,5.2vw,78px) clamp(34px,5.6vw,86px) 48px !important;
+      padding:clamp(42px,5vw,72px) clamp(34px,5.4vw,82px) 48px !important;
       background:
         radial-gradient(700px 520px at 88% 24%,rgba(200,164,93,.17),transparent 66%),
         radial-gradient(560px 420px at 8% 12%,rgba(255,255,255,.8),transparent 66%),
         linear-gradient(145deg,#fbf8f1 0%,#f3eddf 62%,#eadfca 100%) !important;
     }
+    .nw-senior-login-copy > .eyebrow,
+    .nw-senior-login-copy > h1,
+    .nw-senior-login-copy > p,
+    .nw-senior-login-copy > .logincard {
+      flex:0 0 auto !important;
+      width:100% !important;
+      max-width:560px !important;
+      min-width:0 !important;
+    }
     body.login-image-page.senior-product.nw-senior-login-composed .hero h1,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero h1 {
-      width:auto !important;
-      max-width:560px !important;
       margin:10px 0 14px !important;
       color:#181713 !important;
       font-size:clamp(2.55rem,4.4vw,4.15rem) !important;
@@ -125,8 +136,6 @@
     }
     body.login-image-page.senior-product.nw-senior-login-composed .hero p,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero p {
-      width:auto !important;
-      max-width:560px !important;
       margin:0 !important;
       color:#655f55 !important;
       font-size:clamp(.98rem,1.15vw,1.1rem) !important;
@@ -137,15 +146,12 @@
     body.login-image-page.senior-product.nw-senior-login-composed .logincard,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed .logincard {
       display:block !important;
-      width:100% !important;
-      max-width:560px !important;
-      margin:28px 0 0 !important;
+      margin:24px 0 0 !important;
       padding:24px 26px !important;
       box-sizing:border-box !important;
       border:1px solid rgba(112,87,39,.16) !important;
-      border-left:1px solid rgba(112,87,39,.16) !important;
       border-radius:22px !important;
-      background:rgba(255,255,255,.84) !important;
+      background:rgba(255,255,255,.86) !important;
       box-shadow:0 22px 64px rgba(65,49,22,.10),inset 0 1px 0 rgba(255,255,255,.9) !important;
       backdrop-filter:blur(18px) saturate(115%) !important;
       -webkit-backdrop-filter:blur(18px) saturate(115%) !important;
@@ -158,13 +164,9 @@
       letter-spacing:-.035em !important;
     }
     body.login-image-page.senior-product.nw-senior-login-composed .field,
-    body.login-image-page[data-product="senioren"].nw-senior-login-composed .field {
-      margin-bottom:14px !important;
-    }
+    body.login-image-page[data-product="senioren"].nw-senior-login-composed .field { margin-bottom:14px !important; }
     body.login-image-page.senior-product.nw-senior-login-composed .field label,
-    body.login-image-page[data-product="senioren"].nw-senior-login-composed .field label {
-      color:#29251f !important;
-    }
+    body.login-image-page[data-product="senioren"].nw-senior-login-composed .field label { color:#29251f !important; }
     body.login-image-page.senior-product.nw-senior-login-composed .field input,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed .field input {
       width:100% !important;
@@ -174,6 +176,18 @@
       background:#fff !important;
       color:#1f1c17 !important;
     }
+
+    body.login-image-page.senior-product.nw-senior-login-composed .status,
+    body.login-image-page[data-product="senioren"].nw-senior-login-composed .status {
+      border:1px solid rgba(137,103,42,.20) !important;
+      border-left:4px solid #c99d43 !important;
+      border-radius:12px !important;
+      background:linear-gradient(145deg,#fffdf8,#f4ecdc) !important;
+      color:#29251f !important;
+      box-shadow:0 10px 26px rgba(92,68,28,.08) !important;
+    }
+    body.login-image-page.senior-product.nw-senior-login-composed .status strong,
+    body.login-image-page[data-product="senioren"].nw-senior-login-composed .status strong { color:#29251f !important; }
     body.login-image-page.senior-product.nw-senior-login-composed .mfa-step,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed .mfa-step {
       border-top:1px solid rgba(112,87,39,.16) !important;
@@ -182,23 +196,13 @@
     body.login-image-page.senior-product.nw-senior-login-composed .mfa-step .tiny,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed .mfa-step .tiny,
     body.login-image-page.senior-product.nw-senior-login-composed #mfaHint,
-    body.login-image-page[data-product="senioren"].nw-senior-login-composed #mfaHint {
-      color:#6b645a !important;
-    }
+    body.login-image-page[data-product="senioren"].nw-senior-login-composed #mfaHint { color:#6b645a !important; }
     body.login-image-page.senior-product.nw-senior-login-composed .mfa-step .btn.light,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed .mfa-step .btn.light {
       background:#f5efe4 !important;
       color:#29251f !important;
       border:1px solid rgba(120,91,39,.22) !important;
       box-shadow:inset 0 1px 0 rgba(255,255,255,.78),0 8px 20px rgba(74,55,23,.06) !important;
-    }
-    body.login-image-page.senior-product.nw-senior-login-composed .mfa-step .btn.light:hover,
-    body.login-image-page.senior-product.nw-senior-login-composed .mfa-step .btn.light:focus-visible,
-    body.login-image-page[data-product="senioren"].nw-senior-login-composed .mfa-step .btn.light:hover,
-    body.login-image-page[data-product="senioren"].nw-senior-login-composed .mfa-step .btn.light:focus-visible {
-      background:#eee5d5 !important;
-      color:#1f1b15 !important;
-      border-color:rgba(155,112,37,.42) !important;
     }
     body.login-image-page.senior-product.nw-senior-login-composed .mfa-step .btn.red,
     body.login-image-page[data-product="senioren"].nw-senior-login-composed .mfa-step .btn.red {
@@ -207,7 +211,8 @@
       border:1px solid rgba(132,96,30,.25) !important;
       box-shadow:0 10px 24px rgba(157,116,38,.14) !important;
     }
-    .nw-senior-login-portrait {
+
+    figure.nw-senior-login-portrait {
       position:relative !important;
       z-index:2 !important;
       min-width:0 !important;
@@ -220,35 +225,24 @@
       box-shadow:none !important;
       aspect-ratio:auto !important;
     }
-    .nw-senior-login-portrait img {
+    figure.nw-senior-login-portrait img {
+      position:absolute !important;
+      inset:0 !important;
       display:block !important;
       width:100% !important;
       height:100% !important;
       max-width:none !important;
+      border:0 !important;
+      border-radius:0 !important;
       object-fit:cover !important;
       object-position:68% 50% !important;
       transform:none !important;
-      transform-origin:center !important;
     }
     body.login-image-page.senior-product.nw-senior-login-composed .nw-senior-login-source-section,
-    body.login-image-page[data-product="senioren"].nw-senior-login-composed .nw-senior-login-source-section {
-      display:none !important;
-    }
+    body.login-image-page[data-product="senioren"].nw-senior-login-composed .nw-senior-login-source-section { display:none !important; }
+
     @media(max-width:820px) {
-      body.login-image-page.senior-product.nw-senior-login-composed .hero,
-      body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero {
-        min-height:0 !important;
-        padding:0 !important;
-        overflow:visible !important;
-      }
-      body.login-image-page.senior-product.nw-senior-login-composed .hero .wrap,
-      body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero .wrap {
-        width:100% !important;
-        max-width:none !important;
-      }
-      .nw-senior-login-copy {
-        padding:38px 20px 32px !important;
-      }
+      .nw-senior-login-copy { padding:38px 20px 32px !important; }
       body.login-image-page.senior-product.nw-senior-login-composed .hero h1,
       body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero h1 {
         max-width:none !important;
@@ -258,12 +252,6 @@
       body.login-image-page[data-product="senioren"].nw-senior-login-composed .logincard {
         padding:22px 20px !important;
         margin-top:24px !important;
-      }
-      .nw-senior-login-portrait {
-        width:100% !important;
-        max-width:none !important;
-        margin:0 !important;
-        border-radius:0 !important;
       }
     }
   `;
@@ -303,15 +291,34 @@
     const wrap = hero?.querySelector('.wrap');
     const copy = wrap?.querySelector('.nw-senior-login-copy');
     const portrait = wrap?.querySelector('.nw-senior-login-portrait');
-    if (!hero || !wrap || !copy || !portrait) return;
+    const image = portrait?.querySelector('img');
+    if (!hero || !wrap || !copy || !portrait || !image) return;
 
     const width = Math.max(320, Math.round(window.innerWidth || document.documentElement.clientWidth || 320));
     const stacked = width < 820;
 
     important(wrap, 'padding', '0');
     important(wrap, 'box-sizing', 'border-box');
+    important(copy, 'display', 'flex');
+    important(copy, 'flex-direction', 'column');
+    important(copy, 'align-items', 'stretch');
+    important(copy, 'justify-content', 'flex-start');
+    important(copy, 'gap', '0');
     important(copy, 'min-width', '0');
     important(copy, 'width', '100%');
+
+    important(portrait, 'border', '0');
+    important(portrait, 'border-radius', '0');
+    important(portrait, 'box-shadow', 'none');
+    important(portrait, 'overflow', 'hidden');
+    important(image, 'position', 'absolute');
+    important(image, 'inset', '0');
+    important(image, 'width', '100%');
+    important(image, 'height', '100%');
+    important(image, 'border-radius', '0');
+    important(image, 'object-fit', 'cover');
+    important(image, 'object-position', '68% 50%');
+    important(image, 'transform', 'none');
 
     if (stacked) {
       important(hero, 'display', 'flex');
@@ -325,13 +332,11 @@
       important(wrap, 'gap', '0');
       important(copy, 'max-width', 'none');
       important(portrait, 'position', 'relative');
-      important(portrait, 'top', 'auto');
-      important(portrait, 'right', 'auto');
       important(portrait, 'width', '100%');
       important(portrait, 'max-width', 'none');
       important(portrait, 'height', 'clamp(360px,72vw,560px)');
+      important(portrait, 'min-height', '0');
       important(portrait, 'margin', '0');
-      important(portrait, 'transform', 'none');
       important(portrait, 'aspect-ratio', 'auto');
       return;
     }
@@ -353,14 +358,11 @@
     important(copy, 'align-self', 'stretch');
 
     important(portrait, 'position', 'relative');
-    important(portrait, 'top', 'auto');
-    important(portrait, 'right', 'auto');
     important(portrait, 'width', '100%');
     important(portrait, 'max-width', 'none');
-    important(portrait, 'height', '100%');
+    important(portrait, 'height', 'auto');
     important(portrait, 'min-height', `${fillHeight}px`);
     important(portrait, 'margin', '0');
-    important(portrait, 'transform', 'none');
     important(portrait, 'justify-self', 'stretch');
     important(portrait, 'align-self', 'stretch');
     important(portrait, 'aspect-ratio', 'auto');
