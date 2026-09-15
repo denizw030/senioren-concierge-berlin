@@ -3,14 +3,20 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 
 const konto=fs.readFileSync("konto.html","utf8");
-const css=fs.readFileSync("assets/account-premium-ui.css","utf8");
+const theme=fs.readFileSync("assets/account-premium-ui.css","utf8");
+const base=fs.readFileSync("assets/account-premium-ui-base-v2.css","utf8");
+const css=base+"\n"+theme;
 const family=fs.readFileSync("assets/family-owner-sponsored-access.js","utf8");
 
-test("premium account stylesheet is page-scoped and loaded last in account head",()=>{
+test("premium account stylesheet is page-scoped and uses only the pinned local layout base",()=>{
   assert.match(konto,/assets\/account-premium-ui\.css\?v=2/);
   assert.match(konto,/<body class="account-premium-ui">/);
+  assert.match(theme,/^@import url\("\/assets\/account-premium-ui-base-v2\.css\?v=1"\);/);
   assert.match(css,/body\.account-premium-ui/);
-  assert.doesNotMatch(css,/@import|fonts\.googleapis|font-face/i);
+  assert.doesNotMatch(base,/@import|fonts\.googleapis|font-face/i);
+  const imports=[...theme.matchAll(/@import\s+url\(([^)]+)\)/gi)].map((m)=>m[1].replace(/["']/g,""));
+  assert.deepEqual(imports,["/assets/account-premium-ui-base-v2.css?v=1"]);
+  assert.doesNotMatch(theme,/fonts\.googleapis|font-face|https?:\/\//i);
 });
 
 test("all seven account tabs and functional ids remain intact",()=>{
