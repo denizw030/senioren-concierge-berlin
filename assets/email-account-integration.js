@@ -3,7 +3,7 @@
   const PLATFORM_CONTRACT = "WEBSITE_EMAIL_INTEGRATION_CONTRACT_V1";
   const PLATFORM_CONTRACT_SHA = "d9f91bb488f5895b27a0618e1a94188f1e9ee19b";
   const BASE = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-email-runtime";
-  const CAPABILITIES = ["EMAIL_READ", "EMAIL_SEARCH", "EMAIL_ATTACHMENTS", "EMAIL_DRAFT", "EMAIL_SEND"];
+  const CAPABILITIES = ["EMAIL_READ", "EMAIL_SEARCH", "EMAIL_ATTACHMENTS", "EMAIL_DRAFT", "EMAIL_MAILBOX", "EMAIL_SEND"];
   const STATES = ["DISCONNECTED", "CONNECTING", "CONNECTED", "REAUTH_REQUIRED", "SCOPE_REQUIRED", "ERROR"];
   const ERROR_COPY = {
     UNAUTHENTICATED: "Deine Sitzung ist nicht mehr gültig. Bitte melde dich erneut an.",
@@ -56,6 +56,17 @@
     };
   }
 
+  function normalizePreferences(body) {
+    if (body?.ok !== true || !body.preferences || typeof body.preferences !== "object" || Array.isArray(body.preferences)) return null;
+    const available = new Set(Array.isArray(body.available_capabilities) ? body.available_capabilities.map(String).filter((v) => CAPABILITIES.includes(v)) : []);
+    const out = Object.fromEntries(CAPABILITIES.map((capability) => [capability, available.has(capability) && body.preferences[capability] === true]));
+    if (!out.EMAIL_READ) {
+      out.EMAIL_SEARCH = false;
+      out.EMAIL_ATTACHMENTS = false;
+    }
+    return out;
+  }
+
   async function gatewayRequest({ base = BASE, token, method = "GET", path, body = null, fetchImpl = globalThis.fetch }) {
     if (!token) return { ok: false, error: "UNAUTHENTICATED", networkRequestMade: false };
     const headers = { Authorization: "Bearer " + token };
@@ -93,6 +104,7 @@
     safeGoogleRedirect,
     normalizeProviderList,
     normalizeConnection,
+    normalizePreferences,
     gatewayRequest,
     connectPayload
   });
@@ -106,6 +118,7 @@
   const stateMeta = document.getElementById("emailStateMeta");
   const accountHint = document.getElementById("emailAccountHint");
   const runtimeNote = document.getElementById("emailRuntimeNote");
+  const preferencesStatus = document.getElementById("emailPreferencesStatus");
   const connectButton = document.getElementById("emailConnectButton");
   const reauthButton = document.getElementById("emailReauthButton");
   const disconnectButton = document.getElementById("emailDisconnectButton");
@@ -117,6 +130,8 @@
 
   let providers = [];
   let connection = null;
+  let preferences = null;
+  let savingPreferences = false;
   let loading = false;
   let loaded = false;
 
@@ -179,12 +194,22 @@
     });
   }
 
-  function renderCapabilities(values = CAPABILITIES) {
-    const allowed = new Set(Array.isArray(values) && values.length ? values : CAPABILITIES);
+  function renderCapabilities() {
+    const connected = String(connection?.state || "") === "CONNECTED";
+    const available = new Set(Array.isArray(connection?.capabilities) ? connection.capabilities : []);
     capabilityInputs.forEach((input) => {
-      input.checked = allowed.has(String(input.value));
-      input.disabled = connection?.state === "CONNECTED" || !googleAvailable();
+      const key = String(input.value);
+      input.checked = connected ? preferences?.[key] === true : false;
+      input.disabled = !connected || !available.has(key) || savingPreferences;
+      input.closest(".email-capability")?.classList.toggle("is-disabled", input.disabled);
     });
+    if (preferencesStatus) {
+      preferencesStatus.textContent = !connected
+        ? "Nach bestätigter Verbindung kannst du diese Funktionen einzeln ein- oder ausschalten."
+        : savingPreferences
+          ? "Einstellungen werden sicher gespeichert …"
+          : "Änderungen gelten für deinen verbundenen Gmail-Zugang in allen NAHWERK-Kanälen.";
+    }
   }
 
   function resetActions() {
@@ -202,7 +227,7 @@
     if (state === "CONNECTED") {
       statusBadge.textContent = "Verbunden";
       stateTitle.textContent = "Gmail ist mit NAHWERK verbunden.";
-      stateMeta.textContent = "Dein Concierge kann E-Mails lesen und suchen, Entwürfe vorbereiten und nur nach der vorgesehenen Freigabe senden.";
+      stateMeta.textContent = "Dein Concierge nutzt nur die Funktionen, die du unten aktiviert hast und kann E-Mails nur nach der vorgesehenen Freigabe senden.";
       disconnectButton.hidden = false;
       renderCapabilities(connection?.capabilities);
       return;
@@ -260,12 +285,15 @@
     loading = true;
     setBusy(true);
     try {
-      const [providerData, connectionData] = await Promise.all([
+      const [providerData, connectionData, preferenceData] = await Promise.all([
         request("/email/providers"),
-        request("/email/connection")
+        request("/email/connection"),
+        request("/email/preferences")
       ]);
       providers = normalizeProviderList(providerData);
       connection = normalizeConnection(connectionData) || { state: "ERROR", provider: "GOOGLE", capabilities: [], account_display_hint: null };
+      preferences = normalizePreferences(preferenceData);
+      if (connection?.state === "CONNECTED" && !preferences) throw new Error("EMAIL_REQUEST_INVALID");
       renderProviders();
       renderConnection();
       loaded = true;
@@ -292,6 +320,33 @@
       setBusy(false);
     }
   }
+
+  async function savePreferences(changedInput) {
+    if (String(connection?.state || "") !== "CONNECTED" || savingPreferences) return;
+    if (String(changedInput?.value || "") === "EMAIL_READ" && changedInput.checked === false) {
+      for (const input of capabilityInputs) {
+        if (input.value === "EMAIL_SEARCH" || input.value === "EMAIL_ATTACHMENTS") input.checked = false;
+      }
+    }
+    savingPreferences = true;
+    renderCapabilities();
+    try {
+      const requested = Object.fromEntries(capabilityInputs.map((input) => [String(input.value), input.checked === true]));
+      const data = await request("/email/preferences", { method: "POST", body: { preferences: requested } });
+      const next = normalizePreferences(data);
+      if (!next) throw new Error("EMAIL_REQUEST_INVALID");
+      preferences = next;
+    } catch (error) {
+      loaded = false;
+      await load(true);
+      return;
+    } finally {
+      savingPreferences = false;
+      renderCapabilities();
+    }
+  }
+
+  capabilityInputs.forEach((input) => input.addEventListener("change", () => savePreferences(input)));
 
   connectButton.addEventListener("click", () => begin("/email/connect"));
   reauthButton.addEventListener("click", () => begin("/email/reauth"));

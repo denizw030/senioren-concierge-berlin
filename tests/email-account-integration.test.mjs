@@ -12,7 +12,7 @@ function loadHooks(){const sandbox={console,URL,URLSearchParams};vm.createContex
 function response(status,body){return {status,ok:status>=200&&status<300,json:async()=>body}}
 const hooks=loadHooks();
 const token="s".repeat(40);
-const allCaps=["EMAIL_READ","EMAIL_SEARCH","EMAIL_ATTACHMENTS","EMAIL_DRAFT","EMAIL_SEND"];
+const allCaps=["EMAIL_READ","EMAIL_SEARCH","EMAIL_ATTACHMENTS","EMAIL_DRAFT","EMAIL_MAILBOX","EMAIL_SEND"];
 
 test("email tab preserves all account tabs and family permissions",()=>{
   for(const [k,l] of [["overview","Übersicht"],["concierge","Concierge"],["email","E-Mail"],["safety","Sicherheit"],["usage","Nutzung"],["personal","Persönliche Daten"],["access","Zugänge"]])assert.match(konto,new RegExp('data-account-tab="'+k+'">'+l));
@@ -49,6 +49,15 @@ test("connection accepts exact states and only masked account hints",()=>{
   assert.equal(good.state,"CONNECTED");assert.equal(good.account_display_hint,"d•••@gmail.com");
   assert.equal(hooks.normalizeConnection({ok:true,provider:"GOOGLE",state:"ACTIVE",capabilities:[]}),null);
   assert.equal(hooks.normalizeConnection({ok:true,provider:"GOOGLE",state:"CONNECTED",capabilities:[],account_display_hint:"deniz@gmail.com"}).account_display_hint,null);
+});
+
+test("customer controls are server authoritative and read-off also disables search and attachments",()=>{
+  const allOn=Object.fromEntries(allCaps.map(k=>[k,true]));
+  const good=hooks.normalizePreferences({ok:true,available_capabilities:allCaps,preferences:allOn});
+  assert.equal(good.EMAIL_MAILBOX,true);assert.equal(good.EMAIL_SEND,true);
+  const restricted=hooks.normalizePreferences({ok:true,available_capabilities:allCaps,preferences:{...allOn,EMAIL_READ:false}});
+  assert.equal(restricted.EMAIL_READ,false);assert.equal(restricted.EMAIL_SEARCH,false);assert.equal(restricted.EMAIL_ATTACHMENTS,false);
+  assert.match(konto,/Endkunden-Steuerung/);assert.match(konto,/EMAIL_MAILBOX/);assert.match(js,/\/email\/preferences/);
 });
 
 test("browser can request Google only and carries no tenant or provider secret authority",()=>{
