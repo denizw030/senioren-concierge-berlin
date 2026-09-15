@@ -7,11 +7,13 @@ on:
     paths:
       - 'assets/email-account-integration.js'
       - 'email-concierge.html'
+      - 'tests/email-account-integration.test.mjs'
       - '.github/workflows/gmail-prod-account-ui-ci.yml'
   pull_request:
     paths:
       - 'assets/email-account-integration.js'
       - 'email-concierge.html'
+      - 'tests/email-account-integration.test.mjs'
       - '.github/workflows/gmail-prod-account-ui-ci.yml'
 
 permissions:
@@ -25,12 +27,15 @@ jobs:
       - uses: actions/checkout@v4
       - name: JavaScript syntax
         run: node --check assets/email-account-integration.js
+      - name: Gmail PROD unit contract
+        run: node --test tests/email-account-integration.test.mjs
       - name: PROD Gmail contract guards
         run: |
           python3 - <<'PY'
           from pathlib import Path
           js = Path('assets/email-account-integration.js').read_text()
           html = Path('email-concierge.html').read_text()
+          assert 'WEBSITE_EMAIL_INTEGRATION_CONTRACT_V1' in js
           assert 'https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-email-runtime' in js
           assert 'EMAIL_GATEWAY_BASE = null' not in js
           assert '/email/providers' in js and '/email/connection' in js
