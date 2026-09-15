@@ -27,6 +27,19 @@ jobs:
       - name: Apply isolated Gmail customer controls UI patch
         run: python .github/scripts/gmail-customer-controls-ui-v1.py
 
+      - name: Preserve explicit send approval copy contract
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('assets/email-account-integration.js')
+          s=p.read_text()
+          old='Dein Concierge nutzt nur die Funktionen, die du unten aktiviert hast. Senden bleibt zusätzlich an die vorgesehene Freigabe gebunden.'
+          new='Dein Concierge nutzt nur die Funktionen, die du unten aktiviert hast und kann E-Mails nur nach der vorgesehenen Freigabe senden.'
+          if s.count(old) != 1:
+              raise SystemExit('approval copy target mismatch')
+          p.write_text(s.replace(old,new,1))
+          PY
+
       - name: Run Gmail account integration tests
         run: node --test tests/email-account-integration.test.mjs
 
