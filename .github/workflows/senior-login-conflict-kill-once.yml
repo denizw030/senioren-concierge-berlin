@@ -23,116 +23,14 @@ jobs:
           fetch-depth: 0
 
       - name: Neutralize legacy senior login preview rules
-        shell: bash
         run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          css_path = Path('assets/premium-preview.css')
-          css = css_path.read_text()
-          marker = 'SENIOR_LOGIN_CANONICAL_BRIDGE_V2'
-          if marker not in css:
-              css += r'''
-
-/* SENIOR_LOGIN_CANONICAL_BRIDGE_V2
-   Keep the senior login stable even if premium-preview.css is loaded after the canonical login stylesheet. */
-html body.login-image-page.senior-product main>.hero,
-html body.login-image-page.senior-product main>.section,
-html body.login-image-page[data-product="senioren"] main>.hero,
-html body.login-image-page[data-product="senioren"] main>.section{
-  position:relative!important;
-  z-index:2!important;
-  display:block!important;
-  width:50%!important;
-  max-width:50%!important;
-  min-width:0!important;
-  min-height:0!important;
-  margin:0!important;
-  box-sizing:border-box!important;
-  overflow:visible!important;
-  background:transparent!important;
-  content-visibility:visible!important;
-  contain:none!important;
-}
-html body.login-image-page.senior-product main>.hero,
-html body.login-image-page[data-product="senioren"] main>.hero{
-  padding:clamp(46px,4.7vw,70px) clamp(38px,5.1vw,76px) 0!important;
-}
-html body.login-image-page.senior-product main>.section,
-html body.login-image-page[data-product="senioren"] main>.section{
-  padding:26px clamp(38px,5.1vw,76px) clamp(48px,5vw,72px)!important;
-}
-html body.login-image-page.senior-product main>.hero>.wrap,
-html body.login-image-page.senior-product main>.section>.wrap,
-html body.login-image-page.senior-product .loginwrap,
-html body.login-image-page[data-product="senioren"] main>.hero>.wrap,
-html body.login-image-page[data-product="senioren"] main>.section>.wrap,
-html body.login-image-page[data-product="senioren"] .loginwrap{
-  display:block!important;
-  width:100%!important;
-  max-width:560px!important;
-  min-width:0!important;
-  margin:0 auto!important;
-  padding:0!important;
-  box-sizing:border-box!important;
-}
-html body.login-image-page.senior-product main>.hero>.wrap>p,
-html body.login-image-page[data-product="senioren"] main>.hero>.wrap>p{
-  display:block!important;
-  width:100%!important;
-  max-width:560px!important;
-  min-width:0!important;
-  margin:0!important;
-  padding:0!important;
-  white-space:normal!important;
-  word-break:normal!important;
-  overflow-wrap:normal!important;
-}
-html body.login-image-page.senior-product main>.hero>.wrap>h1,
-html body.login-image-page[data-product="senioren"] main>.hero>.wrap>h1{
-  width:100%!important;
-  max-width:560px!important;
-  min-width:0!important;
-}
-html body.login-image-page.senior-product .logincard,
-html body.login-image-page[data-product="senioren"] .logincard{
-  display:block!important;
-  width:100%!important;
-  max-width:none!important;
-  min-width:0!important;
-  margin:0!important;
-  box-sizing:border-box!important;
-}
-@media(max-width:820px){
-  html body.login-image-page.senior-product main>.hero,
-  html body.login-image-page.senior-product main>.section,
-  html body.login-image-page[data-product="senioren"] main>.hero,
-  html body.login-image-page[data-product="senioren"] main>.section{
-    width:100%!important;
-    max-width:100%!important;
-  }
-  html body.login-image-page.senior-product main>.hero,
-  html body.login-image-page[data-product="senioren"] main>.hero{
-    padding:38px 20px 0!important;
-  }
-  html body.login-image-page.senior-product main>.section,
-  html body.login-image-page[data-product="senioren"] main>.section{
-    padding:24px 20px 32px!important;
-  }
-}
-'''
-              css_path.write_text(css)
-
-          js_path = Path('assets/site-ui.js')
-          js = js_path.read_text()
-          js = js.replace("premium.href = '/assets/premium-preview.css?v=1';", "premium.href = '/assets/premium-preview.css?v=2';")
-          js_path.write_text(js)
-          PY
+          python -c 'from pathlib import Path; import base64; p=Path("assets/premium-preview.css"); t=p.read_text(); s=base64.b64decode("Ci8qIFNFTklPUl9MT0dJTl9DQU5PTklDQUxfQlJJREdFX1YyCiAgIEtlZXAgdGhlIHNlbmlvciBsb2dpbiBzdGFibGUgZXZlbiBpZiBwcmVtaXVtLXByZXZpZXcuY3NzIGlzIGxvYWRlZCBhZnRlciB0aGUgY2Fub25pY2FsIGxvZ2luIHN0eWxlc2hlZXQuICovCmh0bWwgYm9keS5sb2dpbi1pbWFnZS1wYWdlLnNlbmlvci1wcm9kdWN0IG1haW4+Lmhlcm8sCmh0bWwgYm9keS5sb2dpbi1pbWFnZS1wYWdlLnNlbmlvci1wcm9kdWN0IG1haW4+LnNlY3Rpb24sCmh0bWwgYm9keS5sb2dpbi1pbWFnZS1wYWdlW2RhdGEtcHJvZHVjdD0ic2VuaW9yZW4iXSBtYWluPi5oZXJvLApodG1sIGJvZHkubG9naW4taW1hZ2UtcGFnZVtkYXRhLXByb2R1Y3Q9InNlbmlvcmVuIl0gbWFpbj4uc2VjdGlvbnsKICBwb3NpdGlvbjpyZWxhdGl2ZSFpbXBvcnRhbnQ7CiAgei1pbmRleDoyIWltcG9ydGFudDsKICBkaXNwbGF5OmJsb2NrIWltcG9ydGFudDsKICB3aWR0aDo1MCUhaW1wb3J0YW50OwogIG1heC13aWR0aDo1MCUhaW1wb3J0YW50OwogIG1pbi13aWR0aDowIWltcG9ydGFudDsKICBtaW4taGVpZ2h0OjAhaW1wb3J0YW50OwogIG1hcmdpbjowIWltcG9ydGFudDsKICBib3gtc2l6aW5nOmJvcmRlci1ib3ghaW1wb3J0YW50OwogIG92ZXJmbG93OnZpc2libGUhaW1wb3J0YW50OwogIGJhY2tncm91bmQ6dHJhbnNwYXJlbnQhaW1wb3J0YW50OwogIGNvbnRlbnQtdmlzaWJpbGl0eTp2aXNpYmxlIWltcG9ydGFudDsKICBjb250YWluOm5vbmUhaW1wb3J0YW50Owp9Cmh0bWwgYm9keS5sb2dpbi1pbWFnZS1wYWdlLnNlbmlvci1wcm9kdWN0IG1haW4+Lmhlcm8sCmh0bWwgYm9keS5sb2dpbi1pbWFnZS1wYWdlW2RhdGEtcHJvZHVjdD0ic2VuaW9yZW4iXSBtYWluPi5oZXJvewogIHBhZGRpbmc6Y2xhbXAoNDZweCw0Ljd2dyw3MHB4KSBjbGFtcCgzOHB4LDUuMXZ3LDc2cHgpIDAhaW1wb3J0YW50Owp9Cmh0bWwgYm9keS5sb2dpbi1pbWFnZS1wYWdlLnNlbmlvci1wcm9kdWN0IG1haW4+LnNlY3Rpb24sCmh0bWwgYm9keS5sb2dpbi1pbWFnZS1wYWdlW2RhdGEtcHJvZHVjdD0ic2VuaW9yZW4iXSBtYWluPi5zZWN0aW9uewogIHBhZGRpbmc6MjZweCBjbGFtcCgzOHB4LDUuMXZ3LDc2cHgpIGNsYW1wKDQ4cHgsNXZ3LDcycHgpIWltcG9ydGFudDsKfQpodG1sIGJvZHkubG9naW4taW1hZ2UtcGFnZS5zZW5pb3ItcHJvZHVjdCBtYWluPi5oZXJvPi53cmFwLApodG1sIGJvZHkubG9naW4taW1hZ2UtcGFnZS5zZW5pb3ItcHJvZHVjdCBtYWluPi5zZWN0aW9uPi53cmFwLApodG1sIGJvZHkubG9naW4taW1hZ2UtcGFnZS5zZW5pb3ItcHJvZHVjdCAubG9naW53cmFwLApodG1sIGJvZHkubG9naW4taW1hZ2UtcGFnZVtkYXRhLXByb2R1Y3Q9InNlbmlvcmVuIl0gbWFpbj4uaGVybz4ud3JhcCwKaHRtbCBib2R5LmxvZ2luLWltYWdlLXBhZ2VbZGF0YS1wcm9kdWN0PSJzZW5pb3JlbiJdIG1haW4+LnNlY3Rpb24+LndyYXAsCmh0bWwgYm9keS5sb2dpbi1pbWFnZS1wYWdlW2RhdGEtcHJvZHVjdD0ic2VuaW9yZW4iXSAubG9naW53cmFwewogIGRpc3BsYXk6YmxvY2shaW1wb3J0YW50OwogIHdpZHRoOjEwMCUhaW1wb3J0YW50OwogIG1heC13aWR0aDo1NjBweCFpbXBvcnRhbnQ7CiAgbWluLXdpZHRoOjAhaW1wb3J0YW50OwogIG1hcmdpbjowIGF1dG8haW1wb3J0YW50OwogIHBhZGRpbmc6MCFpbXBvcnRhbnQ7CiAgYm94LXNpemluZzpib3JkZXItYm94IWltcG9ydGFudDsKfQpodG1sIGJvZHkubG9naW4taW1hZ2UtcGFnZS5zZW5pb3ItcHJvZHVjdCBtYWluPi5oZXJvPi53cmFwPnAsCmh0bWwgYm9keS5sb2dpbi1pbWFnZS1wYWdlW2RhdGEtcHJvZHVjdD0ic2VuaW9yZW4iXSBtYWluPi5oZXJvPi53cmFwPnB7CiAgZGlzcGxheTpibG9jayFpbXBvcnRhbnQ7CiAgd2lkdGg6MTAwJSFpbXBvcnRhbnQ7CiAgbWF4LXdpZHRoOjU2MHB4IWltcG9ydGFudDsKICBtaW4td2lkdGg6MCFpbXBvcnRhbnQ7CiAgbWFyZ2luOjAhaW1wb3J0YW50OwogIHBhZGRpbmc6MCFpbXBvcnRhbnQ7CiAgd2hpdGUtc3BhY2U6bm9ybWFsIWltcG9ydGFudDsKICB3b3JkLWJyZWFrOm5vcm1hbCFpbXBvcnRhbnQ7CiAgb3ZlcmZsb3ctd3JhcDpub3JtYWwhaW1wb3J0YW50Owp9Cmh0bWwgYm9keS5sb2dpbi1pbWFnZS1wYWdlLnNlbmlvci1wcm9kdWN0IG1haW4+Lmhlcm8+LndyYXA+aDEsCmh0bWwgYm9keS5sb2dpbi1pbWFnZS1wYWdlW2RhdGEtcHJvZHVjdD0ic2VuaW9yZW4iXSBtYWluPi5oZXJvPi53cmFwPmgxewogIHdpZHRoOjEwMCUhaW1wb3J0YW50OwogIG1heC13aWR0aDo1NjBweCFpbXBvcnRhbnQ7CiAgbWluLXdpZHRoOjAhaW1wb3J0YW50Owp9Cmh0bWwgYm9keS5sb2dpbi1pbWFnZS1wYWdlLnNlbmlvci1wcm9kdWN0IC5sb2dpbmNhcmQsCmh0bWwgYm9keS5sb2dpbi1pbWFnZS1wYWdlW2RhdGEtcHJvZHVjdD0ic2VuaW9yZW4iXSAubG9naW5jYXJkewogIGRpc3BsYXk6YmxvY2shaW1wb3J0YW50OwogIHdpZHRoOjEwMCUhaW1wb3J0YW50OwogIG1heC13aWR0aDpub25lIWltcG9ydGFudDsKICBtaW4td2lkdGg6MCFpbXBvcnRhbnQ7CiAgbWFyZ2luOjAhaW1wb3J0YW50OwogIGJveC1zaXppbmc6Ym9yZGVyLWJveCFpbXBvcnRhbnQ7Cn0KQG1lZGlhKG1heC13aWR0aDo4MjBweCl7CiAgaHRtbCBib2R5LmxvZ2luLWltYWdlLXBhZ2Uuc2VuaW9yLXByb2R1Y3QgbWFpbj4uaGVybywKICBodG1sIGJvZHkubG9naW4taW1hZ2UtcGFnZS5zZW5pb3ItcHJvZHVjdCBtYWluPi5zZWN0aW9uLAogIGh0bWwgYm9keS5sb2dpbi1pbWFnZS1wYWdlW2RhdGEtcHJvZHVjdD0ic2VuaW9yZW4iXSBtYWluPi5oZXJvLAogIGh0bWwgYm9keS5sb2dpbi1pbWFnZS1wYWdlW2RhdGEtcHJvZHVjdD0ic2VuaW9yZW4iXSBtYWluPi5zZWN0aW9uewogICAgd2lkdGg6MTAwJSFpbXBvcnRhbnQ7CiAgICBtYXgtd2lkdGg6MTAwJSFpbXBvcnRhbnQ7CiAgfQogIGh0bWwgYm9keS5sb2dpbi1pbWFnZS1wYWdlLnNlbmlvci1wcm9kdWN0IG1haW4+Lmhlcm8sCiAgaHRtbCBib2R5LmxvZ2luLWltYWdlLXBhZ2VbZGF0YS1wcm9kdWN0PSJzZW5pb3JlbiJdIG1haW4+Lmhlcm97CiAgICBwYWRkaW5nOjM4cHggMjBweCAwIWltcG9ydGFudDsKICB9CiAgaHRtbCBib2R5LmxvZ2luLWltYWdlLXBhZ2Uuc2VuaW9yLXByb2R1Y3QgbWFpbj4uc2VjdGlvbiwKICBodG1sIGJvZHkubG9naW4taW1hZ2UtcGFnZVtkYXRhLXByb2R1Y3Q9InNlbmlvcmVuIl0gbWFpbj4uc2VjdGlvbnsKICAgIHBhZGRpbmc6MjRweCAyMHB4IDMycHghaW1wb3J0YW50OwogIH0KfQo=").decode(); p.write_text(t if "SENIOR_LOGIN_CANONICAL_BRIDGE_V2" in t else t+s)'
+          python -c 'from pathlib import Path; p=Path("assets/site-ui.js"); t=p.read_text(); p.write_text(t.replace("premium.href = '\''/assets/premium-preview.css?v=1'\'';", "premium.href = '\''/assets/premium-preview.css?v=2'\'';"))'
 
       - name: Validate isolated result
         run: |
           grep -q 'SENIOR_LOGIN_CANONICAL_BRIDGE_V2' assets/premium-preview.css
-          grep -q "premium-preview.css?v=2" assets/site-ui.js
+          grep -q 'premium-preview.css?v=2' assets/site-ui.js
           git diff --check
 
       - name: Publish without overwriting concurrent work
