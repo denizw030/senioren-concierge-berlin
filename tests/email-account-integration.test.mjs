@@ -57,7 +57,8 @@ test("customer controls are server authoritative and read-off also disables sear
   assert.equal(good.EMAIL_MAILBOX,true);assert.equal(good.EMAIL_SEND,true);
   const restricted=hooks.normalizePreferences({ok:true,available_capabilities:allCaps,preferences:{...allOn,EMAIL_READ:false}});
   assert.equal(restricted.EMAIL_READ,false);assert.equal(restricted.EMAIL_SEARCH,false);assert.equal(restricted.EMAIL_ATTACHMENTS,false);
-  assert.match(konto,/Endkunden-Steuerung/);assert.match(konto,/EMAIL_MAILBOX/);assert.match(js,/\/email\/preferences/);
+  for(const cap of allCaps)assert.match(konto,new RegExp('value="'+cap+'"'));
+  assert.match(js,/\/email\/preferences/);
 });
 
 test("browser can request Google only and carries no tenant or provider secret authority",()=>{
@@ -75,15 +76,20 @@ test("frontend never persists provider secrets or invents send authority",()=>{
   assert.doesNotMatch(js,/localStorage\.setItem|sessionStorage\.setItem/);
   assert.doesNotMatch(js,/access_token\s*=|refresh_token\s*=|client_secret\s*=/i);
   assert.doesNotMatch(js,/\/email\/drafts\/send/);
-  assert.match(js,/nur nach der vorgesehenen Freigabe senden/);
+  assert.equal(hooks.CUSTOMER_COPY.sendApproval,"E-Mails werden nur nach deiner Freigabe gesendet.");
 });
 
 test("canonical OAuth return page is private from indexing and returns to real customer account",()=>{
   assert.match(callback,/noindex,nofollow/);assert.match(callback,/no-referrer/);assert.match(callback,/email_oauth=complete/);assert.match(callback,/\/konto\.html/);
 });
 
-test("channel continuity and approval copy remain in the real account surface",()=>{
-  assert.match(konto,/Die Verbindung gehört zu deiner Person/);assert.match(konto,/Web, WhatsApp, Voice und App/);assert.match(konto,/denselben NAHWERK Core/);assert.match(konto,/CAO/);
+test("customer-facing Gmail copy keeps approval semantics without internal architecture terms",()=>{
+  assert.equal(hooks.CUSTOMER_COPY.capabilityHeading,"Deine E-Mail-Funktionen");
+  assert.equal(hooks.CUSTOMER_COPY.dataUse,"NAHWERK verwendet deine Google-Daten nur für die Funktionen, die du aktiviert hast.");
+  assert.match(hooks.CUSTOMER_COPY.continuity,/NAHWERK-Konto/);
+  assert.match(hooks.CUSTOMER_COPY.continuity,/nur nach deiner Freigabe gesendet/);
+  assert.doesNotMatch(Object.values(hooks.CUSTOMER_COPY).join(" "),/\b(?:PROD|Gateway|Core|CAO|person_id|Authority|serverseitig)\b/i);
+  assert.match(js,/applyCustomerCopy\(\);/);
 });
 
 test("email UI remains responsive",()=>{assert.match(css,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);assert.match(css,/@media\(max-width:720px\)/)});
