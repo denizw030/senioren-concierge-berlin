@@ -78,7 +78,8 @@ jobs:
           replace_exact(
               "konto.html",
               '<p class="email-generic-help">Die technische Verfügbarkeit hängt von den Einstellungen und Richtlinien deines E-Mail-Anbieters ab.</p>',
-              '<p class="email-generic-help">Ob diese Verbindung verfügbar ist, hängt von den Sicherheits- und Kontoeinstellungen deines E-Mail-Anbieters ab.</p>'
+              '<p class="email-generic-help">Ob diese Verbindung verfügbar ist, hängt von den Sicherheits- und Kontoeinstellungen deines E-Mail-Anbieters ab.</p>',
+              count=2
           )
           replace_exact(
               "konto.html",
