@@ -47,7 +47,7 @@ jobs:
           required = [
               "const SUPPORTED = {",
               "const createSwitcher = () => {",
-              "data.nwAppLanguageSwitcher",
+              "wrapper.dataset.nwAppLanguageSwitcher",
               "const place = () => {",
           ]
           for token in required:
