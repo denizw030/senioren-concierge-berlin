@@ -1,0 +1,61 @@
+name: A11y Diagnostic TEMP
+
+on:
+  push:
+    branches:
+      - fix/website-ci-localized-home-20260915
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Serve static site
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/nw-a11y-http.log 2>&1 &
+          echo $! >/tmp/nw-a11y-http.pid
+          for i in {1..20}; do
+            curl -fsS http://127.0.0.1:4173/index.html >/dev/null && exit 0
+            sleep 0.5
+          done
+          exit 1
+      - name: Install matching ChromeDriver
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          CHROME_MAJOR="$("$CHROME" --version | grep -oE '[0-9]+' | head -1)"
+          npx --yes browser-driver-manager@2.0.1 install "chrome@$CHROME_MAJOR"
+      - name: Run axe diagnostics per real page
+        shell: bash
+        run: |
+          set -u
+          set -a
+          source "$HOME/.browser-driver-manager/.env"
+          set +a
+          test -x "$CHROMEDRIVER_TEST_PATH"
+          mkdir -p /tmp/axe
+          pages=(index.html prime-concierge.html safety.html registrieren.html angehoerige.html leistungen.html pakete.html telefonannahme.html)
+          : > /tmp/axe/summary.txt
+          for page in "${pages[@]}"; do
+            echo "===== $page =====" | tee -a /tmp/axe/summary.txt
+            set +e
+            npx --yes @axe-core/cli@4.10.2 --chromedriver-path "$CHROMEDRIVER_TEST_PATH" "http://127.0.0.1:4173/$page" > "/tmp/axe/${page//\//_}.txt" 2>&1
+            rc=$?
+            set -e
+            echo "$page exit=$rc" | tee -a /tmp/axe/summary.txt
+            cat "/tmp/axe/${page//\//_}.txt" >> /tmp/axe/summary.txt
+          done
+          cat /tmp/axe/summary.txt
+      - name: Upload axe diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: axe-diagnostic-${{ github.sha }}
+          path: /tmp/axe
+          retention-days: 2
