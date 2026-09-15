@@ -1,0 +1,111 @@
+name: Senior Login browser smoke once
+
+on:
+  push:
+    branches:
+      - fix/senior-login-canonical-reset-20260915
+
+permissions:
+  contents: read
+
+concurrency:
+  group: senior-login-browser-smoke-20260915
+  cancel-in-progress: false
+
+jobs:
+  browser-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout isolated branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/senior-login-canonical-reset-20260915
+
+      - name: Install Playwright Chromium
+        shell: bash
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install chromium
+
+      - name: Start static server
+        shell: bash
+        run: |
+          python3 -m http.server 4173 >/tmp/nw-senior-login-http.log 2>&1 &
+          echo $! >/tmp/nw-senior-login-http.pid
+          sleep 2
+          curl -fsS http://127.0.0.1:4173/anmelden.html >/dev/null
+
+      - name: Verify real rendered senior login geometry
+        shell: bash
+        run: |
+          node <<'NODE'
+          const { chromium } = require('playwright');
+          (async()=>{
+            const browser = await chromium.launch({headless:true});
+            const page = await browser.newPage({viewport:{width:1640,height:960}, deviceScaleFactor:1});
+            await page.goto('http://127.0.0.1:4173/anmelden.html?produkt=senioren', {waitUntil:'domcontentloaded'});
+            await page.waitForTimeout(800);
+
+            const state = await page.evaluate(()=>{
+              const main = document.querySelector('main');
+              const hero = document.querySelector('main > .hero');
+              const section = document.querySelector('main > .section');
+              const intro = document.querySelector('main > .hero .wrap');
+              const p = document.querySelector('main > .hero p');
+              const form = document.querySelector('#loginForm');
+              const input = document.querySelector('#loginEmail');
+              const after = getComputedStyle(main,'::after');
+              const mr = main.getBoundingClientRect();
+              const hr = hero.getBoundingClientRect();
+              const sr = section.getBoundingClientRect();
+              const ir = intro.getBoundingClientRect();
+              const pr = p.getBoundingClientRect();
+              const fr = form.getBoundingClientRect();
+              const inr = input.getBoundingClientRect();
+              return {
+                htmlClass: document.documentElement.className,
+                bodyClass: document.body.className,
+                product: document.body.dataset.product || '',
+                main:{w:mr.width,h:mr.height},
+                hero:{x:hr.x,w:hr.width,h:hr.height},
+                section:{x:sr.x,w:sr.width,h:sr.height},
+                intro:{w:ir.width},
+                paragraph:{w:pr.width,h:pr.height},
+                form:{x:fr.x,y:fr.y,w:fr.width,h:fr.height,bottom:fr.bottom},
+                input:{w:inr.width,h:inr.height},
+                afterImage: after.backgroundImage,
+                afterPosition: after.backgroundPosition,
+                afterSize: after.backgroundSize,
+                afterLeft: after.left,
+                afterRight: after.right,
+                canonicalSheets:[...document.styleSheets].map(s=>s.href||'inline').filter(Boolean).filter(x=>x.includes('senior-login')),
+              };
+            });
+
+            console.log(JSON.stringify(state,null,2));
+            const ratio = state.hero.w/state.main.w;
+            if (state.product !== 'senioren') throw new Error('senior product binding missing');
+            if (!(ratio > 0.43 && ratio < 0.47)) throw new Error(`left column ratio wrong: ${ratio}`);
+            if (state.paragraph.w < 360) throw new Error(`paragraph still too narrow: ${state.paragraph.w}`);
+            if (state.form.w < 390 || state.form.w > 450) throw new Error(`form width wrong: ${state.form.w}`);
+            if (state.input.h < 55 || state.input.h > 57) throw new Error(`input height wrong: ${state.input.h}`);
+            if (!state.afterImage.includes('senior-woman-overview.webp')) throw new Error('right-side image not bound to main pseudo element');
+            if (state.afterSize !== 'cover') throw new Error(`right-side image is not cover: ${state.afterSize}`);
+            if (state.canonicalSheets.length !== 1 || !state.canonicalSheets[0].includes('senior-login-canonical-reset-20260915.css')) {
+              throw new Error(`legacy/multiple senior login stylesheets still active: ${state.canonicalSheets.join(', ')}`);
+            }
+            await page.screenshot({path:'senior-login-proof.png', fullPage:true});
+            await browser.close();
+            console.log('SENIOR_LOGIN_BROWSER_GEOMETRY=GREEN');
+            console.log('RIGHT_IMAGE_FULL_COLUMN=GREEN');
+            console.log('LOGIN_FORM_VISIBLE=GREEN');
+            console.log('LEGACY_SENIOR_STYLESHEETS_ACTIVE=0');
+          })().catch(err=>{console.error(err);process.exit(1)});
+          NODE
+
+      - name: Upload visual proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: senior-login-browser-proof
+          path: senior-login-proof.png
+          if-no-files-found: error
