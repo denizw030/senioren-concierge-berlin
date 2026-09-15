@@ -146,7 +146,8 @@
         funnel_step: /registrieren/.test(href) ? "cta" : null
       });
     }, { passive: true });
-    if (!document.querySelector('link[data-nw-premium-preview]')) {
+    const skipPremiumPreview = /(?:^|\/)anmelden\.html$/.test(location.pathname) && new URLSearchParams(location.search).get('produkt') === 'senioren';
+    if (!skipPremiumPreview && !document.querySelector('link[data-nw-premium-preview]')) {
       const premium = document.createElement('link');
       premium.rel = 'stylesheet';
       premium.href = '/assets/premium-preview.css?v=1';
