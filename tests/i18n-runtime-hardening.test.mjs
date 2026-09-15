@@ -8,7 +8,7 @@ const read = p => fs.readFileSync(path.join(root,p),"utf8");
 
 test("localized app pages hide German first paint until catalog is ready", () => {
   for (const page of ["registrieren.html","anmelden.html","erster-schritt.html"]) {
-    assert.match(read(page), /\/assets\/locale-boot\.js\?v=1/);
+    assert.match(read(page), /\/assets\/locale-boot\.js\?v=\d+/);
   }
   assert.match(read("assets/auth-i18n.js"), /revealLocalizedPage/);
 });
