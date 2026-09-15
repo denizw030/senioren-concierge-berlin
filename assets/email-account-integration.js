@@ -5,6 +5,14 @@
   const BASE = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-email-runtime";
   const CAPABILITIES = ["EMAIL_READ", "EMAIL_SEARCH", "EMAIL_ATTACHMENTS", "EMAIL_DRAFT", "EMAIL_MAILBOX", "EMAIL_SEND"];
   const STATES = ["DISCONNECTED", "CONNECTING", "CONNECTED", "REAUTH_REQUIRED", "SCOPE_REQUIRED", "ERROR"];
+  const CUSTOMER_COPY = Object.freeze({
+    capabilityHeading: "Deine E-Mail-Funktionen",
+    dataUse: "NAHWERK verwendet deine Google-Daten nur für die Funktionen, die du aktiviert hast.",
+    initialMeta: "Deine Verbindung wird sicher deinem NAHWERK-Konto zugeordnet.",
+    providerNote: "Welche E-Mail-Anbieter verfügbar sind, wird sicher über dein NAHWERK-Konto geprüft.",
+    continuity: "Deine Gmail-Verbindung steht dir in deinem NAHWERK-Konto über die unterstützten Zugänge zur Verfügung. E-Mails werden nur nach deiner Freigabe gesendet.",
+    sendApproval: "E-Mails werden nur nach deiner Freigabe gesendet."
+  });
   const ERROR_COPY = {
     UNAUTHENTICATED: "Deine Sitzung ist nicht mehr gültig. Bitte melde dich erneut an.",
     EMAIL_IDENTITY_BINDING_FAILED: "Die E-Mail-Verbindung konnte deinem Konto nicht sicher zugeordnet werden.",
@@ -101,6 +109,7 @@
     runtimeGatewayBase: BASE,
     CAPABILITIES: CAPABILITIES.slice(),
     STATES: STATES.slice(),
+    CUSTOMER_COPY,
     safeGoogleRedirect,
     normalizeProviderList,
     normalizeConnection,
@@ -135,12 +144,27 @@
   let loading = false;
   let loaded = false;
 
+  function applyCustomerCopy() {
+    const capabilityHeading = root.querySelector(".email-capabilities")?.previousElementSibling;
+    const providerNote = root.querySelector(".email-provider-note");
+    const continuityNote = root.querySelector(".email-continuity-note");
+    const sendCopy = root.querySelector('[data-email-capability][value="EMAIL_SEND"]')?.closest(".email-capability")?.querySelector("small");
+    if (capabilityHeading) capabilityHeading.textContent = CUSTOMER_COPY.capabilityHeading;
+    if (providerNote) providerNote.textContent = CUSTOMER_COPY.providerNote;
+    if (continuityNote) continuityNote.textContent = CUSTOMER_COPY.continuity;
+    if (sendCopy) sendCopy.textContent = CUSTOMER_COPY.sendApproval;
+    Object.values(providerStatus).forEach((node) => {
+      if (node) node.textContent = "Wird geprüft";
+    });
+  }
+
+  applyCustomerCopy();
   root.dataset.emailRuntime = "prod";
   if (genericForm) genericForm.hidden = true;
-  runtimeNote.textContent = "PROD · Verbindungsstatus und Berechtigungen werden ausschließlich serverseitig geprüft.";
+  runtimeNote.textContent = CUSTOMER_COPY.dataUse;
   statusBadge.textContent = "Wird geladen";
   stateTitle.textContent = "E-Mail-Verbindung wird geprüft …";
-  stateMeta.textContent = "Dein bestehender NAHWERK-Kontokontext bleibt die einzige Authority.";
+  stateMeta.textContent = CUSTOMER_COPY.initialMeta;
 
   function sessionToken() {
     try {
@@ -208,7 +232,7 @@
         ? "Nach bestätigter Verbindung kannst du diese Funktionen einzeln ein- oder ausschalten."
         : savingPreferences
           ? "Einstellungen werden sicher gespeichert …"
-          : "Änderungen gelten für deinen verbundenen Gmail-Zugang in allen NAHWERK-Kanälen.";
+          : "Änderungen gelten für deinen verbundenen Gmail-Zugang bei NAHWERK.";
     }
   }
 
@@ -227,7 +251,7 @@
     if (state === "CONNECTED") {
       statusBadge.textContent = "Verbunden";
       stateTitle.textContent = "Gmail ist mit NAHWERK verbunden.";
-      stateMeta.textContent = "Dein Concierge nutzt nur die Funktionen, die du unten aktiviert hast und kann E-Mails nur nach der vorgesehenen Freigabe senden.";
+      stateMeta.textContent = CUSTOMER_COPY.dataUse + " " + CUSTOMER_COPY.sendApproval;
       disconnectButton.hidden = false;
       renderCapabilities(connection?.capabilities);
       return;
@@ -244,7 +268,7 @@
     if (state === "CONNECTING") {
       statusBadge.textContent = "Verbindung läuft";
       stateTitle.textContent = "Google-Verbindung wird bestätigt …";
-      stateMeta.textContent = "Der endgültige Status wird serverseitig geprüft.";
+      stateMeta.textContent = "Deine Verbindung mit Google wird sicher bestätigt.";
       renderCapabilities();
       return;
     }
@@ -262,7 +286,7 @@
     stateTitle.textContent = googleAvailable() ? "Gmail mit NAHWERK verbinden" : "Gmail-Verbindung wird für den öffentlichen Start vorbereitet.";
     stateMeta.textContent = googleAvailable()
       ? "Die Verbindung erfolgt direkt über Google OAuth. Dein Google-Passwort wird nicht an NAHWERK übermittelt."
-      : "Für dein bereits freigegebenes Owner-Konto bleibt eine bestehende Verbindung nutzbar. Neue öffentliche Verbindungen bleiben bis zur Google-Freigabe geschlossen.";
+      : "Für dein bereits freigegebenes Konto bleibt eine bestehende Verbindung nutzbar. Neue öffentliche Verbindungen bleiben bis zur Google-Freigabe geschlossen.";
     connectButton.hidden = false;
     connectButton.disabled = !googleAvailable();
     renderCapabilities();
@@ -273,7 +297,7 @@
     const code = error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE";
     statusBadge.textContent = "Nicht verfügbar";
     stateTitle.textContent = ERROR_COPY[code] || "Die Gmail-Verbindung konnte gerade nicht geladen werden.";
-    stateMeta.textContent = "Es werden keine Provider-Geheimnisse oder internen Fehlermeldungen angezeigt.";
+    stateMeta.textContent = "Vertrauliche Zugangsdaten und technische Details werden nicht angezeigt.";
     accountHint.textContent = "";
     retryButton.hidden = code === "UNAUTHENTICATED";
     retryButton.disabled = false;
