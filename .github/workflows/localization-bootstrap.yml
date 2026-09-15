@@ -5,9 +5,11 @@ on:
     branches: [main]
     paths:
       - '*.html'
+      - 'de/**/*.html'
       - 'locales/*.json'
       - 'scripts/localization-bootstrap.py'
       - 'scripts/i18n-mirror.py'
+      - 'scripts/i18n-home-routing.py'
       - 'scripts/auth-locale-bootstrap.py'
       - 'assets/language-switcher.js'
       - 'assets/app-language-switcher.js'
@@ -16,6 +18,7 @@ on:
       - 'assets/locale-runtime.js'
       - 'assets/onboarding.js'
       - 'assets/story-conversion-final.css'
+      - 'tests/seo-indexing.test.mjs'
       - 'tests/i18n-design-parity.test.mjs'
       - 'tests/i18n-link-flow.test.mjs'
       - 'tests/i18n-completeness.test.mjs'
@@ -37,24 +40,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Save root redirect before localization
+        run: python scripts/i18n-home-routing.py save-root
       - name: Generate localized SEO seed and hreflang
         run: python scripts/localization-bootstrap.py
+      - name: Use canonical German /de/ homepage as mirror source
+        run: python scripts/i18n-home-routing.py use-de-source
       - name: Mirror exact PROD design and apply translations
         run: python scripts/i18n-mirror.py
+      - name: Restore root redirect and persist German homepage updates
+        run: python scripts/i18n-home-routing.py restore-root
       - name: Preserve language through registration and login
         run: python scripts/auth-locale-bootstrap.py
-      - name: Make SEO guard directory-index aware
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          p = Path('tests/seo-indexing.test.mjs')
-          text = p.read_text(encoding='utf-8')
-          old = "const file = pathname === '/' ? 'index.html' : pathname.slice(1);"
-          new = "const file = pathname === '/' ? 'index.html' : pathname.endsWith('/') ? `${pathname.slice(1)}index.html` : pathname.slice(1);"
-          if old in text:
-              text = text.replace(old, new, 1)
-              p.write_text(text, encoding='utf-8')
-          PY
       - name: Validate SEO, visual parity, link flow and complete EN/TR localization
         run: node --test tests/seo-indexing.test.mjs tests/i18n-design-parity.test.mjs tests/i18n-link-flow.test.mjs tests/i18n-completeness.test.mjs
       - name: Validate clean diff
@@ -67,6 +64,6 @@ jobs:
           fi
           git config user.name 'nahwerk-prod-bot'
           git config user.email 'actions@users.noreply.github.com'
-          git add en tr sitemap.xml tests/seo-indexing.test.mjs *.html assets/onboarding.js
-          git commit -m 'i18n: publish exact-design EN and TR pages'
+          git add de en tr sitemap.xml tests/seo-indexing.test.mjs *.html assets/onboarding.js
+          git commit -m 'i18n: publish exact-design DE EN and TR pages'
           git push origin HEAD:main
