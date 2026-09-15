@@ -1,0 +1,17 @@
+name: Concierge Case Handoff Core
+on:
+  push:
+    branches: [design/nahwerk-concierge-case-handoff-core-01]
+  pull_request:
+    paths: ['concierge-case-handoff/**']
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run 70 isolated core tests
+        working-directory: concierge-case-handoff
+        run: python -m unittest -v test_concierge_case_handoff_core.py
