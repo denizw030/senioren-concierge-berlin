@@ -1,0 +1,81 @@
+name: senior login brand scope once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/senior-login-brand-scope-once.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: senior-login-brand-scope-main
+  cancel-in-progress: false
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Scope generic login portrait rules away from senior login
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          css_path = Path('assets/brand-2026.css')
+          css = css_path.read_text()
+
+          replacements = {
+            '.login-image-page .hero .wrap { padding-right:min(39vw,500px); }': 'body.login-image-page:not(.senior-product):not([data-product="senioren"]) .hero .wrap { padding-right:min(39vw,500px); }',
+            '.login-image-page .hero:after {': 'body.login-image-page:not(.senior-product):not([data-product="senioren"]) .hero:after {',
+            '  .login-image-page .hero .wrap { padding-right:0; }': '  body.login-image-page:not(.senior-product):not([data-product="senioren"]) .hero .wrap { padding-right:0; }',
+            '  .login-image-page .hero { padding-bottom:calc(var(--nw-space) + 400px); }': '  body.login-image-page:not(.senior-product):not([data-product="senioren"]) .hero { padding-bottom:calc(var(--nw-space) + 400px); }',
+            '  .login-image-page .hero:after { top:auto; bottom:var(--nw-space); right:50%; transform:translateX(50%); width:min(320px,80vw); }': '  body.login-image-page:not(.senior-product):not([data-product="senioren"]) .hero:after { top:auto; bottom:var(--nw-space); right:50%; transform:translateX(50%); width:min(320px,80vw); }',
+          }
+
+          changed = False
+          for old, new in replacements.items():
+            if old in css:
+              css = css.replace(old, new)
+              changed = True
+
+          marker = 'SENIOR_LOGIN_GENERIC_BRAND_RULES_SCOPED_V1'
+          if marker not in css:
+            css += '\n/* SENIOR_LOGIN_GENERIC_BRAND_RULES_SCOPED_V1 */\n'
+            changed = True
+
+          if changed:
+            css_path.write_text(css)
+
+          html_path = Path('anmelden.html')
+          html = html_path.read_text()
+          html2 = html.replace('assets/brand-2026.css?v=23', 'assets/brand-2026.css?v=24')
+          if html2 != html:
+            html_path.write_text(html2)
+          PY
+
+      - name: Validate isolated result
+        run: |
+          grep -q 'SENIOR_LOGIN_GENERIC_BRAND_RULES_SCOPED_V1' assets/brand-2026.css
+          grep -q 'body.login-image-page:not(.senior-product):not(\[data-product="senioren"\]) .hero .wrap { padding-right:min(39vw,500px); }' assets/brand-2026.css
+          grep -q 'assets/brand-2026.css?v=24' anmelden.html
+          git diff --check
+
+      - name: Publish without overwriting concurrent work
+        run: |
+          if git diff --quiet; then
+            echo "No changes needed"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/brand-2026.css anmelden.html
+          git commit -m "Scope generic login CSS away from senior login"
+          git pull --rebase origin main
+          git push origin HEAD:main
