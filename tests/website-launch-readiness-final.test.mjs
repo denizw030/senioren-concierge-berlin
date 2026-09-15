@@ -30,7 +30,7 @@ test('launch-readiness cleanup does not change frozen public prices or FREE quot
 });
 
 test('homepage Safety copy is bound to configured escalation behavior', () => {
-  const home = read('index.html');
+  const home = read('de/index.html');
   assert.doesNotMatch(home, /startet sofort die vereinbarte Sicherheitskette/);
   assert.match(home, /kann die zuvor eingerichtete Sicherheitskette nach den festgelegten Regeln beginnen/);
 });
