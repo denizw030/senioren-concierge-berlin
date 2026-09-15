@@ -1,0 +1,119 @@
+name: Senior Login visual panel once
+
+on:
+  push:
+    branches:
+      - fix/senior-login-canonical-reset-20260915
+
+permissions:
+  contents: write
+
+concurrency:
+  group: senior-login-visual-panel-20260915
+  cancel-in-progress: false
+
+jobs:
+  migrate-visual:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout isolated branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/senior-login-canonical-reset-20260915
+          fetch-depth: 0
+
+      - name: Add real visual panel and disable pseudo-image architecture
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          html_path = Path('anmelden.html')
+          html = html_path.read_text(encoding='utf-8')
+          visual = '<div class="senior-login-visual" aria-hidden="true"></div>'
+          needle = '</section></main><footer class="footer">'
+          replacement = f'</section>{visual}</main><footer class="footer">'
+          if visual not in html:
+              if needle not in html:
+                  raise SystemExit('Expected main/footer boundary not found; refusing blind HTML rewrite')
+              html = html.replace(needle, replacement, 1)
+              html_path.write_text(html, encoding='utf-8')
+
+          css_path = Path('assets/senior-login-canonical-reset-20260915.css')
+          css = css_path.read_text(encoding='utf-8')
+          marker = '/* NW SENIOR LOGIN REAL VISUAL PANEL V1 */'
+          if marker not in css:
+              css += r'''
+
+/* NW SENIOR LOGIN REAL VISUAL PANEL V1 */
+html.nw-product-senior-first-paint body.login-image-page main::after,
+html body.login-image-page.senior-product main::after,
+html body.login-image-page[data-product="senioren"] main::after{
+  content:none!important;
+  display:none!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page .senior-login-visual,
+html body.login-image-page.senior-product .senior-login-visual,
+html body.login-image-page[data-product="senioren"] .senior-login-visual{
+  grid-column:2!important;
+  grid-row:1 / -1!important;
+  position:relative!important;
+  z-index:1!important;
+  display:block!important;
+  align-self:stretch!important;
+  justify-self:stretch!important;
+  width:100%!important;
+  min-width:0!important;
+  height:100%!important;
+  min-height:100%!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:#ddd4c8 url("/assets/lifestyle/senior-woman-overview.webp?v=6") 68% 50%/cover no-repeat!important;
+  box-shadow:none!important;
+  pointer-events:none!important;
+}
+
+@media (max-width:899px){
+  html.nw-product-senior-first-paint body.login-image-page .senior-login-visual,
+  html body.login-image-page.senior-product .senior-login-visual,
+  html body.login-image-page[data-product="senioren"] .senior-login-visual{
+    position:relative!important;
+    display:block!important;
+    width:100%!important;
+    height:clamp(360px,72vw,540px)!important;
+    min-height:360px!important;
+    margin:0!important;
+    background-position:68% 50%!important;
+  }
+}
+'''
+              css_path.write_text(css, encoding='utf-8')
+          PY
+
+      - name: Validate structural visual contract
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          html = Path('anmelden.html').read_text(encoding='utf-8')
+          css = Path('assets/senior-login-canonical-reset-20260915.css').read_text(encoding='utf-8')
+          if html.count('class="senior-login-visual"') != 1:
+              raise SystemExit('Senior visual panel must exist exactly once')
+          for token in ['grid-column:2!important','grid-row:1 / -1!important','height:100%!important','/cover no-repeat!important']:
+              if token not in css:
+                  raise SystemExit(f'missing visual invariant: {token}')
+          print('REAL_VISUAL_PANEL=GREEN')
+          print('PSEUDO_IMAGE_ARCHITECTURE=DISABLED')
+          PY
+
+      - name: Commit branch-only structural fix
+        shell: bash
+        run: |
+          git config user.name "nahwerk-prod-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add anmelden.html assets/senior-login-canonical-reset-20260915.css
+          git commit -m "[skip ci] senior login: use real full-height visual panel"
+          git push origin HEAD:fix/senior-login-canonical-reset-20260915
