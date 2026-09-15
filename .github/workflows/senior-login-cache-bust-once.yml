@@ -1,0 +1,90 @@
+name: Senior login cache bust once
+
+on:
+  push:
+    branches:
+      - senior-login-cache-bust-final-run
+    paths:
+      - .github/workflows/senior-login-cache-bust-once.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: senior-login-cache-bust-once
+  cancel-in-progress: false
+
+jobs:
+  cache-bust:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: senior-login-cache-bust-final-run
+
+      - name: Apply exact cache-bust changes safely
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git fetch origin senior-login-cache-bust-final-run
+          git reset --hard origin/senior-login-cache-bust-final-run
+
+          python - <<'PY'
+          from pathlib import Path
+
+          changes = [
+              (
+                  Path('anmelden.html'),
+                  '/assets/locale-boot.js?v=4',
+                  '/assets/locale-boot.js?v=5',
+              ),
+              (
+                  Path('assets/premium-preview.css'),
+                  '@import url("/assets/senior-login-final-v1.css?v=1");',
+                  '@import url("/assets/senior-login-final-v1.css?v=2");',
+              ),
+          ]
+
+          for path, old, new in changes:
+              text = path.read_text(encoding='utf-8')
+              old_count = text.count(old)
+              new_count = text.count(new)
+              if old_count == 0 and new_count >= 1:
+                  print(f'{path}: already updated')
+                  continue
+              if old_count != 1:
+                  raise SystemExit(f'{path}: expected exactly one old marker, found {old_count}; aborting without write')
+              path.write_text(text.replace(old, new, 1), encoding='utf-8')
+              print(f'{path}: updated')
+          PY
+
+          if git diff --quiet -- anmelden.html assets/premium-preview.css; then
+            echo "No target changes required."
+            exit 0
+          fi
+
+          changed="$(git diff --name-only)"
+          if [ "$changed" != $'anmelden.html\nassets/premium-preview.css' ] && [ "$changed" != $'assets/premium-preview.css\nanmelden.html' ]; then
+            echo "Unexpected changed files; aborting."
+            printf '%s\n' "$changed"
+            exit 1
+          fi
+
+          git diff --check
+          git add anmelden.html assets/premium-preview.css
+          git commit -m "Bust senior login asset cache"
+
+          base="$(git rev-parse HEAD^)"
+          git fetch origin senior-login-cache-bust-final-run
+          remote="$(git rev-parse origin/senior-login-cache-bust-final-run)"
+          if [ "$remote" != "$base" ]; then
+            echo "Branch advanced in parallel; aborting push to avoid collision."
+            exit 1
+          fi
+
+          git push origin HEAD:senior-login-cache-bust-final-run
