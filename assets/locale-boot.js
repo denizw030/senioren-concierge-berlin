@@ -50,15 +50,21 @@
     preload.fetchPriority = 'high';
     document.head.appendChild(preload);
 
-    if (!document.querySelector('link[data-nw-senior-login-stable]')) {
+    const reveal = () => {
+      root.classList.add('nw-senior-login-stable-ready');
+      root.classList.remove('nw-product-booting');
+    };
+
+    const existingStable = document.querySelector('link[data-nw-senior-login-stable]');
+    if (existingStable) {
+      /* The stylesheet is linked before this blocking script in anmelden.html,
+         so reaching this point means the canonical CSS is ready to paint. */
+      reveal();
+    } else {
       const stable = document.createElement('link');
       stable.rel = 'stylesheet';
-      stable.href = '/assets/senior-login-stable-20260915.css?v=1';
+      stable.href = '/assets/senior-login-stable-20260915.css?v=2';
       stable.dataset.nwSeniorLoginStable = 'true';
-      const reveal = () => {
-        root.classList.add('nw-senior-login-stable-ready');
-        root.classList.remove('nw-product-booting');
-      };
       stable.addEventListener('load', reveal, { once:true });
       stable.addEventListener('error', reveal, { once:true });
       document.head.appendChild(stable);
