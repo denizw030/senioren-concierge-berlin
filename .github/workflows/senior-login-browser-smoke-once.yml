@@ -44,7 +44,7 @@ jobs:
             const browser = await chromium.launch({headless:true});
             const page = await browser.newPage({viewport:{width:1640,height:960}, deviceScaleFactor:1});
             await page.goto('http://127.0.0.1:4173/anmelden.html?produkt=senioren', {waitUntil:'domcontentloaded'});
-            await page.waitForTimeout(800);
+            await page.waitForTimeout(900);
 
             const state = await page.evaluate(()=>{
               const main = document.querySelector('main');
@@ -54,6 +54,7 @@ jobs:
               const p = document.querySelector('main > .hero p');
               const form = document.querySelector('#loginForm');
               const input = document.querySelector('#loginEmail');
+              const visual = document.querySelector('main > .senior-login-visual');
               const after = getComputedStyle(main,'::after');
               const mr = main.getBoundingClientRect();
               const hr = hero.getBoundingClientRect();
@@ -62,22 +63,24 @@ jobs:
               const pr = p.getBoundingClientRect();
               const fr = form.getBoundingClientRect();
               const inr = input.getBoundingClientRect();
+              const vr = visual ? visual.getBoundingClientRect() : null;
+              const vs = visual ? getComputedStyle(visual) : null;
               return {
                 htmlClass: document.documentElement.className,
                 bodyClass: document.body.className,
                 product: document.body.dataset.product || '',
-                main:{w:mr.width,h:mr.height},
+                main:{x:mr.x,y:mr.y,w:mr.width,h:mr.height,bottom:mr.bottom},
                 hero:{x:hr.x,w:hr.width,h:hr.height},
                 section:{x:sr.x,w:sr.width,h:sr.height},
                 intro:{w:ir.width},
                 paragraph:{w:pr.width,h:pr.height},
                 form:{x:fr.x,y:fr.y,w:fr.width,h:fr.height,bottom:fr.bottom},
                 input:{w:inr.width,h:inr.height},
-                afterImage: after.backgroundImage,
-                afterPosition: after.backgroundPosition,
-                afterSize: after.backgroundSize,
-                afterLeft: after.left,
-                afterRight: after.right,
+                visual: vr ? {x:vr.x,y:vr.y,w:vr.width,h:vr.height,bottom:vr.bottom} : null,
+                visualImage: vs ? vs.backgroundImage : '',
+                visualSize: vs ? vs.backgroundSize : '',
+                pseudoDisplay: after.display,
+                pseudoContent: after.content,
                 canonicalSheets:[...document.styleSheets].map(s=>s.href||'inline').filter(Boolean).filter(x=>x.includes('senior-login')),
               };
             });
@@ -89,16 +92,24 @@ jobs:
             if (state.paragraph.w < 360) throw new Error(`paragraph still too narrow: ${state.paragraph.w}`);
             if (state.form.w < 390 || state.form.w > 450) throw new Error(`form width wrong: ${state.form.w}`);
             if (state.input.h < 55 || state.input.h > 57) throw new Error(`input height wrong: ${state.input.h}`);
-            if (!state.afterImage.includes('senior-woman-overview.webp')) throw new Error('right-side image not bound to main pseudo element');
-            if (state.afterSize !== 'cover') throw new Error(`right-side image is not cover: ${state.afterSize}`);
+            if (!state.visual) throw new Error('real senior visual panel missing');
+            const expectedLeft = state.main.w * 0.45;
+            if (Math.abs(state.visual.x - expectedLeft) > 3) throw new Error(`visual panel left edge wrong: ${state.visual.x} vs ${expectedLeft}`);
+            if (Math.abs(state.visual.w - state.main.w * 0.55) > 3) throw new Error(`visual panel width wrong: ${state.visual.w}`);
+            if (Math.abs(state.visual.y - state.main.y) > 3) throw new Error(`visual panel top wrong: ${state.visual.y}`);
+            if (Math.abs(state.visual.bottom - state.main.bottom) > 3) throw new Error(`visual panel bottom wrong: ${state.visual.bottom} vs ${state.main.bottom}`);
+            if (!state.visualImage.includes('senior-woman-overview.webp')) throw new Error('real panel image missing');
+            if (state.visualSize !== 'cover') throw new Error(`real panel image is not cover: ${state.visualSize}`);
+            if (state.pseudoDisplay !== 'none') throw new Error(`legacy pseudo image still displayed: ${state.pseudoDisplay}`);
             if (state.canonicalSheets.length !== 1 || !state.canonicalSheets[0].includes('senior-login-canonical-reset-20260915.css')) {
               throw new Error(`legacy/multiple senior login stylesheets still active: ${state.canonicalSheets.join(', ')}`);
             }
             await page.screenshot({path:'senior-login-proof.png', fullPage:true});
             await browser.close();
             console.log('SENIOR_LOGIN_BROWSER_GEOMETRY=GREEN');
-            console.log('RIGHT_IMAGE_FULL_COLUMN=GREEN');
+            console.log('RIGHT_IMAGE_REAL_FULL_HEIGHT_PANEL=GREEN');
             console.log('LOGIN_FORM_VISIBLE=GREEN');
+            console.log('LEGACY_PSEUDO_IMAGE=OFF');
             console.log('LEGACY_SENIOR_STYLESHEETS_ACTIVE=0');
           })().catch(err=>{console.error(err);process.exit(1)});
           NODE
