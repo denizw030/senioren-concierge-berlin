@@ -1,0 +1,90 @@
+name: Gmail customer copy polish once
+
+on:
+  push:
+    branches:
+      - fix/gmail-customer-copy-google-video-20260915
+    paths:
+      - .github/workflows/gmail-copy-polish-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  polish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/gmail-customer-copy-google-video-20260915
+          fetch-depth: 0
+
+      - name: Apply exact Gmail-only copy replacements
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          replacements = {
+            Path('konto.html'): [
+              ('data-email-runtime="inert"', 'data-email-runtime="prod"'),
+              ('id="emailConnectionStatus">PRE-PROD<', 'id="emailConnectionStatus">Wird geladen<'),
+              ('Runtime inert · Der Platform-Gateway ist vorbereitet, aber noch nicht als Website-Runtime deployed. Es wird keine OAuth-Anmeldung und kein Provider-Login gestartet.', 'Deine E-Mail-Verbindung und Berechtigungen werden sicher über dein NAHWERK-Konto verwaltet.'),
+              ('Nicht serverseitig bestätigt', 'Wird geprüft'),
+              ('Die Verfügbarkeit wird ausschließlich serverseitig über den NAHWERK E-Mail-Gateway bestätigt. Die technische Verfügbarkeit hängt von den Einstellungen und Richtlinien deines E-Mail-Anbieters ab.', 'Welche Funktionen verfügbar sind, richtet sich nach deinem E-Mail-Anbieter und den von dir freigegebenen Berechtigungen.'),
+              ('<div><div class="eyebrow">Endkunden-Steuerung</div>', '<div><div class="eyebrow">Deine E-Mail-Funktionen</div>'),
+              ('Verbindung technisch vorbereitet, derzeit noch nicht verfügbar.', 'E-Mail-Verbindung wird geprüft …'),
+              ('Der serverseitige Verbindungsstatus bleibt alleinige Authority.', 'Deine Verbindung wird sicher geladen.'),
+              ('<strong>Ein NAHWERK.</strong> Die Verbindung gehört zu deiner Person – nicht zu diesem Browser oder einem einzelnen Kanal. Nach einer real bestätigten Verbindung nutzen Web, WhatsApp, Voice und App dieselbe person_id, denselben NAHWERK Core, dieselben Tasks, Memory und Approvals sowie dieselbe email_connections-Wahrheit über den CAO.', '<strong>Ein NAHWERK.</strong> Deine E-Mail-Verbindung gehört zu deinem Konto und steht dir überall dort zur Verfügung, wo du deinen NAHWERK Concierge nutzt.'),
+              ('assets/email-account-integration.js?v=3', 'assets/email-account-integration.js?v=4'),
+            ],
+            Path('assets/email-account-integration.js'): [
+              ('runtimeNote.textContent = "PROD · Verbindungsstatus und Berechtigungen werden ausschließlich serverseitig geprüft.";', 'runtimeNote.textContent = "Deine E-Mail-Verbindung und Berechtigungen werden sicher über dein NAHWERK-Konto verwaltet.";'),
+              ('stateMeta.textContent = "Dein bestehender NAHWERK-Kontokontext bleibt die einzige Authority.";', 'stateMeta.textContent = "Deine E-Mail-Verbindung wird sicher deinem NAHWERK-Konto zugeordnet.";'),
+              ('stateMeta.textContent = "Der endgültige Status wird serverseitig geprüft.";', 'stateMeta.textContent = "Die Verbindung wird sicher bestätigt.";'),
+              ('stateMeta.textContent = "Es werden keine Provider-Geheimnisse oder internen Fehlermeldungen angezeigt.";', 'stateMeta.textContent = "Bitte versuche es erneut oder melde dich neu an, falls das Problem bestehen bleibt.";'),
+              (': "Für dein bereits freigegebenes Owner-Konto bleibt eine bestehende Verbindung nutzbar. Neue öffentliche Verbindungen bleiben bis zur Google-Freigabe geschlossen.";', ': "Neue Gmail-Verbindungen sind derzeit noch nicht verfügbar.";'),
+            ],
+          }
+
+          for path, pairs in replacements.items():
+            text = path.read_text()
+            for old, new in pairs:
+              count = text.count(old)
+              if count < 1:
+                raise SystemExit(f'Missing expected text in {path}: {old[:100]}')
+              text = text.replace(old, new)
+            path.write_text(text)
+
+          html = Path('konto.html').read_text()
+          js = Path('assets/email-account-integration.js').read_text()
+          forbidden = [
+            'PROD · Verbindungsstatus und Berechtigungen werden ausschließlich serverseitig geprüft.',
+            'Die Verfügbarkeit wird ausschließlich serverseitig über den NAHWERK E-Mail-Gateway bestätigt.',
+            'Endkunden-Steuerung',
+            'Runtime inert',
+            'person_id, denselben NAHWERK Core',
+            'Owner-Konto',
+          ]
+          combined = html + '\n' + js
+          for phrase in forbidden:
+            if phrase in combined:
+              raise SystemExit(f'Forbidden internal copy remains: {phrase}')
+          PY
+
+      - name: Run Gmail integration tests
+        run: node --test tests/email-account-integration.test.mjs
+
+      - name: Guard changed files
+        run: |
+          changed="$(git diff --name-only | sort)"
+          printf '%s\n' "$changed"
+          test "$changed" = $'assets/email-account-integration.js\nkonto.html'
+
+      - name: Commit product changes and remove helper
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/gmail-copy-polish-once.yml
+          git add konto.html assets/email-account-integration.js
+          git commit -m "Polish Gmail customer copy for Google verification"
+          git push origin HEAD:fix/gmail-customer-copy-google-video-20260915
