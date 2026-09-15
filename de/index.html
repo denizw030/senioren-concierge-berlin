@@ -1,0 +1,1500 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <base href="/" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>NAHWERK | Dein persönlicher Concierge</title>
+    <meta
+      name="description"
+      content="NAHWERK ist ein persönlicher Concierge, der versteht, organisiert und erledigt – mit klaren Freigaben, Safety, Family sowie einfachen Zugängen WhatsApp und Telefon."
+    />
+   <link rel="canonical" href="https://nahwerkconcierge.com/de/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="de_DE" />
+    <meta property="og:title" content="NAHWERK – Ihr persönlicher Concierge" />
+    <meta
+      property="og:description"
+      content="Ein persönlicher Concierge, der erledigt – mit klaren Freigaben, Safety, Family sowie einfachen Zugängen über WhatsApp und Telefon."
+    />
+   <meta property="og:url" content="https://nahwerkconcierge.com/de/" />
+    <meta
+      property="og:image"
+      content="https://nahwerkconcierge.com/assets/logos/nahwerk-concierge.png"
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="assets/logos/nahwerk-concierge-gold-transparent.svg?v=2"
+    />
+    <link rel="stylesheet" href="assets/site.css?v=24" />
+    <link rel="stylesheet" href="assets/brand-2026.css?v=23" />
+    <link rel="stylesheet" href="assets/nahwerk-logo-v2.css?v=9" />
+    <link rel="stylesheet" href="assets/concierge-voice-preview.css?v=8" />
+<link rel="stylesheet" href="assets/concierge-carousel.css?v=12" />
+    <link rel="stylesheet" href="assets/phone-concierge-sections.css?v=1" />
+    <link rel="stylesheet" href="assets/james-profile.css?v=1" />
+    <style>
+      .home-hero {
+        position: relative;
+        overflow: hidden;
+        padding: clamp(88px, 11vw, 150px) 0 90px;
+        background: radial-gradient(
+            circle at 75% 30%,
+            rgba(200, 164, 93, 0.16),
+            transparent 30%
+          ),
+          #070706;
+        border-bottom: 1px solid var(--nw-line-dark);
+      }
+      .hero-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.08fr) minmax(340px, 0.92fr);
+        gap: clamp(44px, 7vw, 96px);
+        align-items: center;
+      }
+      .hero-copy h1 {
+        max-width: 850px;
+        margin: 16px 0 24px;
+      }
+      .hero-copy > p {
+        max-width: 64ch;
+        font-size: clamp(1.08rem, 1.7vw, 1.3rem);
+        color: var(--nw-muted-dark);
+      }
+      .concierge-stage {
+        min-height: 500px;
+        display: grid;
+        place-items: center;
+      }
+      .portrait {
+        width: min(100%, 450px);
+        aspect-ratio: 4/5;
+        border: 1px solid rgba(200, 164, 93, 0.32);
+        border-radius: 32px;
+        background: #0a0907 url("assets/prime/prime-concierge-hero-transparent.png?v=1")
+          center top/cover no-repeat;
+        box-shadow: 0 35px 100px rgba(0, 0, 0, 0.42);
+      }
+      .trust {
+        border-bottom: 1px solid var(--nw-line-dark);
+      }
+      .trust-list {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        margin: 0;
+        padding: 22px 0;
+        list-style: none;
+      }
+      .trust-list li {
+        text-align: center;
+        color: #c5c0b6;
+        font-size: 13px;
+        border-right: 1px solid var(--nw-line-dark);
+      }
+      .trust-list li:last-child {
+        border: 0;
+      }
+      .home-section {
+        padding: var(--nw-space) 0;
+      }
+      .section-head {
+        max-width: 850px;
+        margin-bottom: 48px;
+      }
+      .section-head p {
+        max-width: 68ch;
+        color: var(--nw-muted-dark);
+        font-size: 18px;
+      }
+      .situations {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+      }
+      .situation {
+        padding: 28px;
+        border: 1px solid var(--nw-line-dark);
+        border-radius: var(--nw-r-md);
+        background: linear-gradient(145deg, #171714, #0d0d0b);
+      }
+      .situation span {
+        color: var(--nw-gold);
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .situation p {
+        color: var(--nw-muted-dark);
+      }
+      .product-band {
+        padding: var(--nw-space) 0;
+      }
+      .product-band-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+        gap: clamp(32px, 5vw, 72px);
+        align-items: center;
+      }
+      .product-band-copy p,
+      .product-band-copy li {
+        color: var(--nw-muted-dark);
+      }
+      .product-band-copy ul {
+        padding-left: 20px;
+        margin: 24px 0 30px;
+      }
+      .product-band.personal {
+        background: radial-gradient(
+            circle at 75% 30%,
+            rgba(200, 164, 93, 0.13),
+            transparent 28%
+          ),
+          #0d0d0b;
+        color: var(--nw-white);
+      }
+      .product-band.senior {
+        background: var(--nw-cream);
+        color: var(--nw-ink);
+      }
+      .product-band.senior h2,
+      .product-band.senior h3 {
+        color: var(--nw-ink) !important;
+      }
+      .product-band.senior .product-band-copy p,
+      .product-band.senior .product-band-copy li {
+        color: var(--nw-muted-light);
+      }
+      .product-band-image {
+        width: 100%;
+        aspect-ratio: 3/2;
+        object-fit: cover;
+        border-radius: var(--nw-r-lg);
+        box-shadow: var(--nw-shadow);
+      }
+      .steps {
+        counter-reset: steps;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 22px;
+      }
+      .step-home {
+        counter-increment: steps;
+        padding: 28px 0;
+        border-top: 1px solid var(--nw-line-dark);
+      }
+      .step-home:before {
+        content: "0" counter(steps);
+        display: block;
+        color: var(--nw-gold);
+        font-size: 13px;
+        letter-spacing: 0.12em;
+        margin-bottom: 30px;
+      }
+      .step-home p {
+        color: var(--nw-muted-dark);
+      }
+      .overview-story-image {
+        display: block;
+        width: 100%;
+        max-width: 1100px;
+        height: auto;
+        margin: clamp(36px, 5vw, 64px) auto 0;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: clamp(20px, 2.4vw, 30px);
+        box-shadow: 0 28px 80px rgba(0, 0, 0, 0.32);
+      }
+      .release-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+      }
+      .release-card {
+        padding: 28px;
+        border: 1px solid var(--nw-line-dark);
+        border-radius: 18px;
+        background: #151512;
+      }
+      .release-card p {
+        color: var(--nw-muted-dark);
+      }
+      .safety-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      .safety-card {
+        padding: 32px;
+        border-top: 1px solid var(--nw-line-dark);
+      }
+      .safety-card p {
+        color: var(--nw-muted-dark);
+      }
+      .final-cta {
+        width: 100% !important;
+        max-width: none !important;
+        margin-left: 0;
+        margin-right: 0;
+        margin-bottom: var(--nw-space);
+        padding: clamp(38px, 7vw, 80px);
+        padding-left: clamp(24px, 5vw, 72px) !important;
+        padding-right: clamp(24px, 5vw, 72px) !important;
+        border-radius: 0;
+        background: radial-gradient(
+            circle at 85% 20%,
+            rgba(200, 164, 93, 0.22),
+            transparent 32%
+          ),
+          #151512;
+      }
+      .final-cta h2 {
+        max-width: 800px;
+      }
+      @media (max-width: 1050px) {
+        .trust-list {
+          grid-template-columns: repeat(3, 1fr);
+          gap: 14px;
+        }
+        .trust-list li {
+          border: 0;
+        }
+        .situations,
+        .release-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 760px) {
+        .hero-grid,
+        .product-band-grid,
+        .steps,
+        .safety-grid {
+          grid-template-columns: 1fr;
+        }
+        .concierge-stage {
+          min-height: 380px;
+        }
+        .portrait {
+          width: 300px;
+        }
+        .trust-list,
+        .situations,
+        .release-grid {
+          grid-template-columns: 1fr;
+        }
+        .trust-list li {
+          text-align: left;
+        }
+        .home-section {
+          padding: 78px 0;
+        }
+      }
+    
+      /* OVERVIEW RECOVERY — restore the original hero portrait and the
+         restrained multi-tone premium atmosphere that made the overview
+         feel more dimensional than a single flat black surface. */
+      body.overview-page {
+        background: #070706 !important;
+      }
+      body.overview-page main {
+        background:
+          radial-gradient(920px 620px at 94% 7%, rgba(61, 117, 235, 0.09), transparent 64%),
+          radial-gradient(820px 560px at 4% 33%, rgba(135, 74, 182, 0.07), transparent 66%),
+          radial-gradient(760px 520px at 84% 68%, rgba(45, 160, 156, 0.06), transparent 67%),
+          radial-gradient(900px 560px at 104% 18%, rgba(212, 175, 55, 0.09), transparent 64%),
+          linear-gradient(180deg, #080807 0%, #0b0a09 48%, #060605 100%) !important;
+      }
+      body.overview-page .home-hero {
+        background:
+          radial-gradient(640px 500px at 78% 30%, rgba(58, 111, 224, 0.14), transparent 64%),
+          radial-gradient(560px 430px at 92% 60%, rgba(42, 164, 158, 0.09), transparent 66%),
+          radial-gradient(520px 400px at 58% 5%, rgba(130, 71, 180, 0.08), transparent 68%),
+          radial-gradient(620px 430px at 70% 46%, rgba(212, 175, 55, 0.13), transparent 67%),
+          linear-gradient(145deg, #070707, #0d0c0b 58%, #060606) !important;
+      }
+      body.overview-page .trust {
+        background:
+          linear-gradient(180deg, rgba(20, 19, 16, 0.96), rgba(10, 10, 9, 0.98)) !important;
+        border-top: 1px solid rgba(212, 175, 55, 0.08);
+      }
+      body.overview-page main > .home-section {
+        background:
+          radial-gradient(700px 420px at 92% 12%, rgba(61, 117, 235, 0.055), transparent 67%),
+          radial-gradient(620px 360px at 7% 88%, rgba(142, 76, 183, 0.045), transparent 69%),
+          linear-gradient(180deg, rgba(10, 10, 9, 0.96), rgba(7, 7, 6, 0.98)) !important;
+      }
+      body.overview-page main > .home-section:nth-of-type(even) {
+        background:
+          radial-gradient(720px 420px at 9% 14%, rgba(43, 157, 153, 0.055), transparent 68%),
+          radial-gradient(620px 360px at 91% 82%, rgba(212, 175, 55, 0.055), transparent 70%),
+          linear-gradient(180deg, rgba(12, 12, 10, 0.97), rgba(8, 8, 7, 0.99)) !important;
+      }
+      body.overview-page .product-band.personal {
+        background:
+          radial-gradient(760px 500px at 82% 30%, rgba(58, 111, 224, 0.08), transparent 64%),
+          radial-gradient(680px 460px at 10% 80%, rgba(43, 157, 153, 0.055), transparent 67%),
+          radial-gradient(circle at 75% 30%, rgba(212, 175, 55, 0.14), transparent 31%),
+          linear-gradient(145deg, #0d0d0b, #090907) !important;
+      }
+      body.overview-page .product-band.senior {
+        background:
+          radial-gradient(640px 360px at 88% 18%, rgba(212, 175, 55, 0.10), transparent 66%),
+          linear-gradient(145deg, #f7f1e6, #eee5d8) !important;
+        color: var(--nw-ink) !important;
+      }
+      body.overview-page .situation,
+      body.overview-page .release-card {
+        background:
+          radial-gradient(circle at 100% 0%, rgba(61, 117, 235, 0.055), transparent 36%),
+          radial-gradient(circle at 0% 100%, rgba(212, 175, 55, 0.055), transparent 40%),
+          linear-gradient(145deg, #171714, #0d0d0b) !important;
+      }
+      body.overview-page .final-cta {
+        background:
+          radial-gradient(circle at 86% 18%, rgba(212, 175, 55, 0.20), transparent 32%),
+          radial-gradient(circle at 12% 84%, rgba(132, 73, 177, 0.07), transparent 42%),
+          linear-gradient(145deg, #171611, #0c0c0a) !important;
+      }
+      body.overview-page .portrait {
+        background: #0a0907 url("assets/prime/prime-concierge-hero-transparent.png?v=1")
+          center top / cover no-repeat !important;
+        box-shadow:
+          0 35px 100px rgba(0, 0, 0, 0.42),
+          0 0 60px rgba(212, 175, 55, 0.10) !important;
+      }
+
+
+      /* PUBLIC Hero — free executive portrait */
+      .home-hero {
+        min-height: clamp(690px, calc(100svh - 150px), 900px);
+      }
+      .hero-grid {
+        position: relative;
+        z-index: 1;
+        grid-template-columns: minmax(0, 1.02fr) minmax(320px, 0.98fr);
+      }
+      .hero-copy {
+        position: relative;
+        z-index: 3;
+      }
+      .concierge-stage {
+        position: absolute;
+        z-index: 1;
+        top: 0;
+        right: -2vw;
+        bottom: 0;
+        width: min(56vw, 930px);
+        min-height: 0;
+        display: block;
+        pointer-events: none;
+      }
+      .portrait,
+      body.overview-page .portrait {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        aspect-ratio: auto;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background:
+          transparent
+          url("assets/prime/prime-concierge-hero-executive.jpg")
+          center 16% / cover no-repeat !important;
+        box-shadow: none !important;
+        -webkit-mask-image: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(0, 0, 0, 0.34) 7%,
+          #000 22%,
+          #000 100%
+        );
+        mask-image: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(0, 0, 0, 0.34) 7%,
+          #000 22%,
+          #000 100%
+        );
+      }
+      .home-hero::after {
+        content: "";
+        position: absolute;
+        z-index: 2;
+        inset: 0;
+        pointer-events: none;
+        background:
+          linear-gradient(
+            90deg,
+            #070706 0%,
+            #070706 39%,
+            rgba(7, 7, 6, 0.88) 49%,
+            rgba(7, 7, 6, 0.32) 64%,
+            rgba(7, 7, 6, 0.04) 82%,
+            rgba(7, 7, 6, 0) 100%
+          ),
+          linear-gradient(
+            180deg,
+            rgba(7, 7, 6, 0.03) 0%,
+            rgba(7, 7, 6, 0.02) 78%,
+            rgba(7, 7, 6, 0.16) 100%
+          );
+      }
+      .home-hero .hero-grid {
+        position: relative;
+        z-index: 3;
+      }
+
+      @media (max-width: 1050px) {
+        .concierge-stage {
+          right: -8vw;
+          width: 58vw;
+        }
+        .portrait,
+        body.overview-page .portrait {
+          background-position: center 16% !important;
+        }
+        .home-hero::after {
+          background:
+            linear-gradient(
+              90deg,
+              #070706 0%,
+              #070706 43%,
+              rgba(7, 7, 6, 0.80) 55%,
+              rgba(7, 7, 6, 0.25) 74%,
+              rgba(7, 7, 6, 0.03) 100%
+            ),
+            linear-gradient(180deg, transparent 70%, rgba(7, 7, 6, 0.18));
+        }
+      }
+
+      @media (max-width: 760px) {
+        .home-hero {
+          min-height: auto;
+          padding-bottom: 390px;
+        }
+        .hero-grid {
+          display: block;
+        }
+        .concierge-stage {
+          top: auto;
+          right: -24%;
+          bottom: 0;
+          width: 118%;
+          height: 430px;
+        }
+        .portrait,
+        body.overview-page .portrait {
+          background-size: contain !important;
+          background-position: right bottom !important;
+          -webkit-mask-image: linear-gradient(
+            180deg,
+            transparent 0%,
+            rgba(0, 0, 0, 0.40) 13%,
+            #000 30%,
+            #000 100%
+          );
+          mask-image: linear-gradient(
+            180deg,
+            transparent 0%,
+            rgba(0, 0, 0, 0.40) 13%,
+            #000 30%,
+            #000 100%
+          );
+        }
+        .home-hero::after {
+          background: linear-gradient(
+            180deg,
+            #070706 0%,
+            #070706 55%,
+            rgba(7, 7, 6, 0.70) 72%,
+            rgba(7, 7, 6, 0.14) 100%
+          );
+        }
+      }
+
+      @media (max-width: 480px) {
+        .home-hero {
+          padding-bottom: 340px;
+        }
+        .concierge-stage {
+          right: -31%;
+          width: 132%;
+          height: 390px;
+        }
+      }
+
+      /* PUBLIC Hero mobile visibility fix */
+      @media (max-width: 760px) {
+        .home-hero .hero-grid {
+          position: static;
+        }
+        .concierge-stage {
+          top: auto;
+          right: 0;
+          bottom: 0;
+          width: 100%;
+          height: 410px;
+        }
+        .portrait,
+        body.overview-page .portrait {
+          background-size: contain !important;
+          background-position: 76% 100% !important;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .concierge-stage {
+          right: 0;
+          width: 100%;
+          height: 370px;
+        }
+        .portrait,
+        body.overview-page .portrait {
+          background-position: 78% 100% !important;
+        }
+      }
+
+      /* PUBLIC Hero hard-render image fix */
+      .home-hero::after {
+        z-index: 1;
+      }
+      .home-hero .hero-grid {
+        position: relative;
+        z-index: 2;
+      }
+      .hero-copy {
+        position: relative;
+        z-index: 4;
+      }
+      .concierge-stage {
+        z-index: 3;
+        overflow: visible;
+      }
+      .public-hero-portrait {
+        display: block;
+        width: 100%;
+        height: 100%;
+        max-width: none;
+        object-fit: cover;
+        object-position: center 18%;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        filter: none;
+        opacity: 1;
+        -webkit-mask-image: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(0,0,0,.38) 8%,
+          #000 22%,
+          #000 100%
+        );
+        mask-image: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(0,0,0,.38) 8%,
+          #000 22%,
+          #000 100%
+        );
+      }
+      .portrait {
+        display: none !important;
+      }
+
+      @media (max-width: 1050px) {
+        .concierge-stage {
+          top: 0;
+          right: 0;
+          bottom: 0;
+          width: 52%;
+          min-height: 0;
+        }
+        .public-hero-portrait {
+          object-position: 56% 18%;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .home-hero {
+          padding-bottom: 390px;
+        }
+        .home-hero .hero-grid {
+          position: static;
+        }
+        .concierge-stage {
+          top: auto;
+          right: 0;
+          bottom: 0;
+          left: auto;
+          width: 100%;
+          height: 390px;
+        }
+        .public-hero-portrait {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          object-position: 72% 100%;
+          -webkit-mask-image: linear-gradient(
+            180deg,
+            transparent 0%,
+            rgba(0,0,0,.38) 12%,
+            #000 28%,
+            #000 100%
+          );
+          mask-image: linear-gradient(
+            180deg,
+            transparent 0%,
+            rgba(0,0,0,.38) 12%,
+            #000 28%,
+            #000 100%
+          );
+        }
+      }
+
+      @media (max-width: 480px) {
+        .home-hero {
+          padding-bottom: 360px;
+        }
+        .concierge-stage {
+          width: 100%;
+          height: 360px;
+          right: 0;
+        }
+        .public-hero-portrait {
+          object-position: 68% 100%;
+        }
+      }
+
+      /* PUBLIC Hero full-height figure sizing */
+      @media (max-width: 1050px) {
+        .home-hero {
+          position: relative;
+        }
+        .home-hero .hero-grid {
+          position: static;
+        }
+        .concierge-stage {
+          position: absolute;
+          top: 0;
+          right: -2%;
+          bottom: 0;
+          left: auto;
+          width: 56%;
+          height: auto;
+          min-height: 0;
+          overflow: hidden;
+        }
+        .public-hero-portrait {
+          position: absolute;
+          inset: 0;
+          width: 100% !important;
+          height: 100% !important;
+          max-width: none !important;
+          object-fit: cover !important;
+          object-position: 52% 18% !important;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .home-hero {
+          padding-bottom: 90px;
+        }
+        .home-hero .hero-grid {
+          position: static;
+        }
+        .concierge-stage {
+          top: 0;
+          right: -16%;
+          bottom: 0;
+          width: 76%;
+          height: auto;
+        }
+        .public-hero-portrait {
+          width: 100% !important;
+          height: 100% !important;
+          object-fit: cover !important;
+          object-position: 54% 18% !important;
+          -webkit-mask-image: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(0,0,0,.30) 8%,
+            #000 24%,
+            #000 100%
+          );
+          mask-image: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(0,0,0,.30) 8%,
+            #000 24%,
+            #000 100%
+          );
+        }
+      }
+
+      @media (max-width: 480px) {
+        .concierge-stage {
+          right: -24%;
+          width: 90%;
+        }
+        .public-hero-portrait {
+          object-position: 56% 18% !important;
+        }
+      }
+
+      /* PUBLIC Hero specificity collision fix */
+      body.overview-page .home-hero .concierge-stage {
+        position: absolute !important;
+        z-index: 3 !important;
+        top: 0 !important;
+        right: -2% !important;
+        bottom: 0 !important;
+        left: auto !important;
+        width: 56% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        display: block !important;
+        overflow: hidden !important;
+        isolation: auto !important;
+      }
+      body.overview-page .home-hero .concierge-stage::before {
+        display: none !important;
+      }
+      body.overview-page .home-hero .public-hero-portrait {
+        position: absolute !important;
+        inset: 0 !important;
+        display: block !important;
+        width: 100% !important;
+        height: 100% !important;
+        max-width: none !important;
+        object-fit: cover !important;
+        object-position: 52% 18% !important;
+        opacity: 1 !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+      }
+
+      @media (max-width: 760px) {
+        body.overview-page .home-hero .concierge-stage {
+          right: -14% !important;
+          width: 74% !important;
+        }
+        body.overview-page .home-hero .public-hero-portrait {
+          object-position: 54% 18% !important;
+        }
+      }
+
+      @media (max-width: 480px) {
+        body.overview-page .home-hero .concierge-stage {
+          right: -22% !important;
+          width: 88% !important;
+        }
+        body.overview-page .home-hero .public-hero-portrait {
+          object-position: 56% 18% !important;
+        }
+      }
+
+      /* PUBLIC Hero — Obsidian Luxury unified cinematic field */
+      body.overview-page:not(.senior-product):not([data-product="senioren"]) .home-hero {
+        background:
+          radial-gradient(720px 560px at 84% 38%, rgba(76, 96, 171, 0.13), transparent 66%),
+          radial-gradient(620px 500px at 90% 60%, rgba(109, 70, 155, 0.095), transparent 68%),
+          radial-gradient(660px 520px at 80% 76%, rgba(43, 139, 145, 0.065), transparent 70%),
+          radial-gradient(560px 440px at 76% 28%, rgba(151, 105, 139, 0.045), transparent 68%),
+          linear-gradient(#030304, #030304) !important;
+      }
+      body.overview-page:not(.senior-product):not([data-product="senioren"]) .home-hero::before {
+        content: "";
+        position: absolute;
+        z-index: 0;
+        inset: 0;
+        pointer-events: none;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.88),
+          rgba(255, 255, 255, 0.18) 52%,
+          rgba(255, 255, 255, 0.54)
+        );
+        -webkit-mask-image: url("assets/logos/nahwerk-concierge-wall-production.svg");
+        -webkit-mask-size: 184px 184px;
+        -webkit-mask-repeat: repeat;
+        -webkit-mask-position: 22px 18px;
+        mask-image: url("assets/logos/nahwerk-concierge-wall-production.svg");
+        mask-size: 184px 184px;
+        mask-repeat: repeat;
+        mask-position: 22px 18px;
+        opacity: 0.042;
+        filter:
+          drop-shadow(0 1px 0 rgba(255, 255, 255, 0.12))
+          drop-shadow(0 -1px 0 rgba(0, 0, 0, 0.72));
+      }
+      body.overview-page .home-hero::after {
+        background:
+          linear-gradient(
+            180deg,
+            rgba(0, 0, 0, 0.02) 0%,
+            rgba(0, 0, 0, 0) 58%,
+            rgba(0, 0, 0, 0.18) 100%
+          ) !important;
+      }
+      body.overview-page .home-hero .public-hero-portrait {
+        -webkit-mask-image:
+          linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(0, 0, 0, 0.08) 6%,
+            rgba(0, 0, 0, 0.34) 14%,
+            rgba(0, 0, 0, 0.72) 24%,
+            #000 36%,
+            #000 93%,
+            rgba(0, 0, 0, 0.72) 97%,
+            transparent 100%
+          ),
+          linear-gradient(
+            180deg,
+            transparent 0%,
+            rgba(0, 0, 0, 0.70) 6%,
+            #000 11%,
+            #000 92%,
+            rgba(0, 0, 0, 0.72) 97%,
+            transparent 100%
+          ) !important;
+        -webkit-mask-composite: source-in !important;
+        mask-image:
+          linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(0, 0, 0, 0.08) 6%,
+            rgba(0, 0, 0, 0.34) 14%,
+            rgba(0, 0, 0, 0.72) 24%,
+            #000 36%,
+            #000 93%,
+            rgba(0, 0, 0, 0.72) 97%,
+            transparent 100%
+          ),
+          linear-gradient(
+            180deg,
+            transparent 0%,
+            rgba(0, 0, 0, 0.70) 6%,
+            #000 11%,
+            #000 92%,
+            rgba(0, 0, 0, 0.72) 97%,
+            transparent 100%
+          ) !important;
+        mask-composite: intersect !important;
+      }
+
+      @media (max-width: 760px) {
+        body.overview-page:not(.senior-product):not([data-product="senioren"]) .home-hero {
+          background:
+            radial-gradient(420px 380px at 82% 72%, rgba(76, 96, 171, 0.12), transparent 66%),
+            radial-gradient(380px 340px at 88% 82%, rgba(43, 139, 145, 0.075), transparent 68%),
+            radial-gradient(360px 320px at 78% 58%, rgba(146, 101, 139, 0.045), transparent 68%),
+            linear-gradient(#030304, #030304) !important;
+        }
+        body.overview-page:not(.senior-product):not([data-product="senioren"]) .home-hero::before {
+          -webkit-mask-size: 136px 136px;
+          -webkit-mask-position: 12px 10px;
+          mask-size: 136px 136px;
+          mask-position: 12px 10px;
+          opacity: 0.036;
+        }
+        body.overview-page .home-hero::after {
+          background: linear-gradient(
+            180deg,
+            rgba(0, 0, 0, 0.03) 0%,
+            rgba(0, 0, 0, 0) 62%,
+            rgba(0, 0, 0, 0.14) 100%
+          ) !important;
+        }
+        body.overview-page .home-hero .public-hero-portrait {
+          -webkit-mask-image:
+            linear-gradient(
+              90deg,
+              transparent 0%,
+              rgba(0, 0, 0, 0.18) 7%,
+              rgba(0, 0, 0, 0.72) 18%,
+              #000 30%,
+              #000 100%
+            ),
+            linear-gradient(
+              180deg,
+              transparent 0%,
+              rgba(0, 0, 0, 0.10) 8%,
+              rgba(0, 0, 0, 0.46) 18%,
+              #000 34%,
+              #000 100%
+            ) !important;
+          -webkit-mask-composite: source-in !important;
+          mask-image:
+            linear-gradient(
+              90deg,
+              transparent 0%,
+              rgba(0, 0, 0, 0.18) 7%,
+              rgba(0, 0, 0, 0.72) 18%,
+              #000 30%,
+              #000 100%
+            ),
+            linear-gradient(
+              180deg,
+              transparent 0%,
+              rgba(0, 0, 0, 0.10) 8%,
+              rgba(0, 0, 0, 0.46) 18%,
+              #000 34%,
+              #000 100%
+            ) !important;
+          mask-composite: intersect !important;
+        }
+      }
+
+      /* OVERVIEW HEADER / TRANSITION — deep black navigation, warmer light-grey strip */
+      body.overview-page .top {
+        background: #000 !important;
+        border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: blur(24px) saturate(130%);
+        backdrop-filter: blur(24px) saturate(130%);
+        transition:
+          background-color 220ms ease,
+          border-color 220ms ease,
+          box-shadow 220ms ease;
+      }
+      body.overview-page.nw-header-scrolled .top {
+        background: rgba(7, 7, 6, 0.82) !important;
+      }
+      /* Overview hero CTAs — scoped premium treatment; no global button changes. */
+      body.overview-page .home-hero .hero-copy > .actions {
+        align-items: center;
+        gap: 10px;
+        flex-wrap: nowrap;
+      }
+      body.overview-page .home-hero .overview-hero-cta {
+        min-height: 48px;
+        padding: 0 20px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 600 !important;
+        line-height: 1;
+        letter-spacing: 0.01em;
+        text-align: center;
+        white-space: nowrap;
+        transition:
+          transform 200ms ease,
+          background-color 200ms ease,
+          border-color 200ms ease,
+          box-shadow 200ms ease;
+      }
+      body.overview-page .home-hero .overview-hero-cta-primary {
+        background: #f2eee6 !important;
+        color: #11110f !important;
+        border-color: rgba(255, 255, 255, 0.34) !important;
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.72),
+          0 8px 24px rgba(0, 0, 0, 0.18) !important;
+        filter: none !important;
+      }
+      body.overview-page .home-hero .overview-hero-cta-primary:hover {
+        background: #f7f4ed !important;
+        border-color: rgba(255, 255, 255, 0.46) !important;
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.82),
+          0 10px 28px rgba(0, 0, 0, 0.22) !important;
+        transform: translateY(-1px);
+        filter: none !important;
+      }
+      body.overview-page .home-hero .overview-hero-cta-secondary {
+        background: rgba(255, 255, 255, 0.045) !important;
+        color: #f5f5f3 !important;
+        border-color: rgba(255, 255, 255, 0.18) !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+        -webkit-backdrop-filter: blur(12px) saturate(115%);
+        backdrop-filter: blur(12px) saturate(115%);
+      }
+      body.overview-page .home-hero .overview-hero-cta-secondary:hover {
+        background: rgba(255, 255, 255, 0.07) !important;
+        border-color: rgba(255, 255, 255, 0.25) !important;
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.065),
+          0 8px 22px rgba(0, 0, 0, 0.16) !important;
+        transform: translateY(-1px);
+      }
+      body.overview-page .home-hero .overview-hero-cta:active {
+        transform: translateY(0);
+      }
+      body.overview-page .home-hero .overview-hero-cta:focus-visible {
+        outline: 2px solid rgba(242, 238, 230, 0.72);
+        outline-offset: 3px;
+      }
+      @media (max-width: 640px) {
+        body.overview-page .home-hero .hero-copy > .actions {
+          width: 100%;
+          flex-direction: column;
+          align-items: stretch;
+          gap: 10px;
+        }
+        body.overview-page .home-hero .overview-hero-cta {
+          width: 100%;
+          min-height: 48px;
+          padding: 0 18px;
+          white-space: normal;
+        }
+      }
+
+      /* OVERVIEW HERO — one continuous approved luxury artwork field */
+      body.overview-page:not(.senior-product):not([data-product="senioren"]) .home-hero {
+        position: relative !important;
+        overflow: hidden !important;
+        isolation: isolate;
+        min-height: clamp(620px, 45vw, 780px) !important;
+        background: #000 !important;
+      }
+
+      body.overview-page .home-hero .overview-hero-artwork {
+        position: absolute;
+        z-index: 0;
+        inset: 0;
+        display: block;
+        width: 100%;
+        height: 100%;
+        max-width: none;
+        object-fit: cover;
+        object-position: center center;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        transform: none;
+        transform-origin: 74% 46%;
+      }
+
+      @media (min-width: 1680px) {
+        body.overview-page:not(.senior-product):not([data-product="senioren"]) .home-hero {
+          min-height: clamp(760px, 48vw, 920px) !important;
+        }
+
+        body.overview-page .home-hero .overview-hero-artwork {
+          object-position: center top;
+          transform: none;
+          transform-origin: 74% 0%;
+        }
+      }
+
+      /* No split readability panel, no extra aurora and no extra monogram.
+         The approved artwork itself is the single visual hero surface. */
+      body.overview-page .home-hero::before,
+      body.overview-page .home-hero::after {
+        display: none !important;
+        content: none !important;
+        background: none !important;
+        -webkit-mask-image: none !important;
+        mask-image: none !important;
+        opacity: 0 !important;
+        filter: none !important;
+      }
+
+      body.overview-page .home-hero .hero-grid {
+        position: relative;
+        z-index: 2;
+      }
+
+      body.overview-page .home-hero .hero-copy {
+        position: relative;
+        z-index: 3;
+        max-width: 690px;
+        padding: 2px 0;
+      }
+      body.overview-page .home-hero .hero-proof-line {
+        max-width: 620px;
+        margin: 20px 0 0;
+        padding-left: 15px;
+        border-left: 2px solid #d4af37;
+        color: #f5f2eb;
+        font-size: clamp(1rem, 1.3vw, 1.12rem);
+        line-height: 1.58;
+      }
+      body.overview-page .home-hero .hero-proof-line strong {
+        color: #fff;
+      }
+      body.overview-page .home-hero .hero-free-note {
+        margin: 14px 0 0;
+        color: #d7d2c9;
+        font-size: 0.9rem;
+        line-height: 1.45;
+        letter-spacing: 0.01em;
+      }
+
+      /* The person is already part of the approved 16:9 artwork. */
+      body.overview-page .home-hero .concierge-stage,
+      body.overview-page .home-hero .public-hero-portrait,
+      body.overview-page .home-hero .portrait {
+        display: none !important;
+      }
+
+      @media (max-width: 760px) {
+        body.overview-page:not(.senior-product):not([data-product="senioren"]) .home-hero {
+          min-height: auto !important;
+          padding: 72px 0 330px !important;
+          background: #000 !important;
+        }
+
+        body.overview-page .home-hero .hero-grid {
+          display: block !important;
+          position: relative !important;
+        }
+
+        body.overview-page .home-hero .overview-hero-artwork {
+          inset: auto -5% 0 auto;
+          width: 154%;
+          height: auto;
+          max-width: none;
+          object-fit: contain;
+          object-position: right bottom;
+          transform: none;
+          -webkit-mask-image: linear-gradient(
+            180deg,
+            transparent 0%,
+            rgba(0, 0, 0, 0.42) 5%,
+            #000 14%,
+            #000 100%
+          );
+          mask-image: linear-gradient(
+            180deg,
+            transparent 0%,
+            rgba(0, 0, 0, 0.42) 5%,
+            #000 14%,
+            #000 100%
+          );
+        }
+      }
+
+      @media (max-width: 480px) {
+        body.overview-page:not(.senior-product):not([data-product="senioren"]) .home-hero {
+          padding-bottom: 305px !important;
+        }
+
+        body.overview-page .home-hero .overview-hero-artwork {
+          right: -7%;
+          width: 164%;
+        }
+      }
+    </style>
+      <link rel="stylesheet" href="assets/acquisition-v1.css?v=1" />
+      <link rel="stylesheet" href="assets/story-conversion-final.css?v=2" />
+      <link rel="stylesheet" href="/assets/overview-lifestyle.css?v=1" />
+    <!-- NW-I18N-START -->
+    <link rel="alternate" hreflang="de" href="https://nahwerkconcierge.com/" />
+    <link rel="alternate" hreflang="en" href="https://nahwerkconcierge.com/en/" />
+    <link rel="alternate" hreflang="tr" href="https://nahwerkconcierge.com/tr/" />
+    <link rel="alternate" hreflang="x-default" href="https://nahwerkconcierge.com/" />
+    <script src="/assets/language-switcher.js?v=12" defer></script>
+    <!-- NW-I18N-END -->
+  <script src="/assets/locale-runtime.js?v=1" defer></script>
+</head>
+  <body class="overview-page story-site">
+    <header class="top">
+      <div class="wrap nav">
+        <a class="brand" href="index.html" aria-label="NAHWERK Concierge – Startseite">
+          <span class="mark nahwerk-mark" aria-hidden="true"></span>
+          <span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span>
+        </a>
+        <nav class="links" aria-label="Hauptnavigation">
+          <a class="active" href="index.html">Übersicht</a>
+          <a href="prime-concierge.html">Concierge</a>
+          <a href="safety.html">Safety</a>
+          <a href="angehoerige.html">Family</a>
+          <a href="telefonannahme.html">Telefon</a>
+          <a href="pakete.html">Tarife</a>
+          <a class="auth-link login-link" href="anmelden.html">Anmelden</a>
+          <a class="auth-link register-link" href="registrieren.html">Registrieren</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <!-- 1 · Concierge als Begeisterung -->
+      <section class="story-hero" id="concierge" data-story-step="1">
+<picture>
+  <source
+    media="(max-width: 760px)"
+    srcset="assets/prime/nahwerk-mobile-hero-web-lossless.webp?v=1"
+  />
+  <img
+    class="story-hero-art"
+    src="assets/prime/nahwerk-hero-blue-red-goldmann.webp?v=2"
+    width="1916"
+    height="821"
+    alt=""
+    loading="eager"
+    fetchpriority="high"
+    decoding="async"
+  />
+</picture>
+        <div class="story-shell">
+          <div class="story-hero-copy">
+            <div class="story-kicker">NAHWERK Concierge</div>
+            <h1 class="story-title">Ein persönlicher Concierge, der erledigt.</h1>
+            <p class="story-lead">
+              Sag, was du brauchst. NAHWERK versteht das Anliegen, recherchiert, organisiert und führt den nächsten freigegebenen Schritt aus – ohne dass du dich durch Apps, Menüs oder Fachbegriffe arbeiten musst.
+            </p>
+            <p class="story-product-thought"><strong>Google findet. KI versteht. NAHWERK erledigt.</strong></p>
+            <div class="story-actions">
+              <a class="story-btn story-btn--primary" href="registrieren.html?produkt=prime&amp;paket=free&amp;source=home_hero" data-nw-cta="start_free" data-nw-step="home_hero">Kostenlos ausprobieren</a>
+              <a class="story-btn story-btn--secondary" href="#demo" data-nw-cta="see_demo" data-nw-step="home_hero">Echte Demo ansehen</a>
+            </div>
+            <div class="story-meta" aria-label="Einstieg">
+              <span>FREE · 0 €</span>
+              <span>Keine Zahlungsdaten</span>
+              <span>Freigaben bleiben bei dir</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2 · Echte Demo als Beweis -->
+      <section class="story-section story-section--soft" id="demo" data-story-step="2" aria-labelledby="story-demo-title">
+        <div class="story-shell">
+          <div class="story-demo-intro">
+            <div>
+              <div class="story-kicker">Echte Demo</div>
+              <h2 class="story-title story-title--section" id="story-demo-title">Vom Auftrag zum Ergebnis – in vier klaren Schritten.</h2>
+            </div>
+            <p class="story-demo-quote">
+              <strong>Beispielauftrag</strong>
+              „Finde mir für morgen einen Hautarzt in meiner Nähe zu dem ich ohne Termin hingehen kann und zeige mir auch den Weg an.“
+            </p>
+          </div>
+
+          <div class="story-demo-flow" aria-label="Auftrag, Freigabe, Durchführung und Ergebnis">
+            <article class="story-demo-step" data-step="01">
+              <h3>Auftrag</h3>
+              <p>NAHWERK versteht Ziel, Ort und Rahmen des Anliegens.</p>
+            </article>
+            <article class="story-demo-step" data-step="02">
+              <h3>Freigabe</h3>
+              <p>Wenn ein Schritt nach außen wirkt oder Kosten auslösen kann, fragt NAHWERK vorher.</p>
+            </article>
+            <article class="story-demo-step" data-step="03">
+              <h3>Durchführung</h3>
+              <p>Recherche, Vergleich und Organisation laufen im freigegebenen Rahmen weiter.</p>
+            </article>
+            <article class="story-demo-step" data-step="04">
+              <h3>Ergebnis</h3>
+              <p>Du erhältst eine klare Auswahl und den nächsten sinnvollen Schritt zurück.</p>
+            </article>
+          </div>
+
+          <p class="story-demo-result">
+            <strong>Der Unterschied:</strong> Nicht nur eine Antwort, sondern ein nachvollziehbarer Arbeitsweg
+            von der Aufgabe bis zum Ergebnis. Außenwirksame oder kostenpflichtige Schritte werden nicht einfach vorausgesetzt.
+          </p>
+        </div>
+      </section>
+
+
+      <!-- NW-OVERVIEW-LIFESTYLE-HOME-START -->
+      <section class="story-section nw-lifestyle-story nw-lifestyle-story--home" id="alltag-moment" data-nw-overview-lifestyle="home" aria-labelledby="nw-lifestyle-home-title">
+        <div class="story-shell nw-lifestyle-grid">
+          <figure class="nw-lifestyle-media">
+            <img
+              src="/assets/lifestyle/woman-living-room.png"
+              width="1536"
+              height="1024"
+              alt="Eine Frau nutzt zu Hause entspannt ihr Smartphone"
+              loading="lazy"
+              decoding="async"
+            />
+          </figure>
+          <div class="nw-lifestyle-copy">
+            <div class="story-kicker">Im Alltag</div>
+            <h2 class="story-title story-title--section" id="nw-lifestyle-home-title">Einfach sagen, was gebraucht wird.</h2>
+            <p class="story-lead">Ob zuhause, unterwegs oder zwischendurch: NAHWERK versteht das Anliegen, organisiert den nächsten Schritt und bleibt dran.</p>
+          </div>
+        </div>
+      </section>
+      <!-- NW-OVERVIEW-LIFESTYLE-HOME-END -->
+      <!-- 3 · Safety als Vertrauen -->
+      <section class="story-section story-section--quiet" id="safety" data-story-step="3" aria-labelledby="story-safety-title">
+        <div class="story-shell story-split">
+          <div>
+            <div class="story-kicker">NAHWERK Safety Check</div>
+            <h2 class="story-title story-title--section" id="story-safety-title">Da sein, auch wenn du gerade verhindert bist.</h2>
+            <p class="story-lead">
+              Mit dem NAHWERK Safety Check wird regelmäßig nachgefragt, ob alles in Ordnung ist.
+              Bleibt die vereinbarte Antwort aus, kann die zuvor eingerichtete Sicherheitskette nach den festgelegten Regeln beginnen. Sicherheitskontakte werden nur so benachrichtigt, wie es vorher bewusst eingerichtet wurde.
+            </p>
+            <div class="story-principles">
+              <div class="story-principle"><span>01</span><div><strong>Bewusst eingerichtet</strong><p>Zeiten, Verzögerungen und Sicherheitskontakte werden gezielt festgelegt.</p></div></div>
+              <div class="story-principle"><span>02</span><div><strong>Ruhig im Alltag</strong><p>Eine normale Antwort beendet den Check-in – ohne Kontrollgefühl und ohne permanente Überwachung.</p></div></div>
+              <div class="story-principle"><span>03</span><div><strong>Klare Grenzen</strong><p>Der Safety Check ergänzt persönliche Unterstützung und ersetzt keinen Notruf.</p></div></div>
+            </div>
+            <div class="story-actions">
+              <a class="story-btn story-btn--secondary" href="safety.html" data-nw-cta="safety_learn" data-nw-step="home_safety">Safety Check ansehen</a>
+            </div>
+          </div>
+
+          <div class="story-safety-preview" aria-label="Beispiel eines Safety Check-ins">
+            <div class="story-check-time"><span>Nächster Check-in</span><strong>08:30</strong></div>
+            <div class="story-check-message">Guten Morgen. Ist alles in Ordnung?</div>
+            <div class="story-check-reply">Ja.</div>
+            <p class="story-check-note">Eine Antwort beendet den Check-in. Nur wenn die vereinbarte Antwort ausbleibt, kann die eingerichtete Sicherheitskette beginnen.</p>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- NW-OVERVIEW-LIFESTYLE-ROAD-START -->
+      <section class="story-section nw-lifestyle-story nw-lifestyle-story--road nw-lifestyle-story--reverse" id="unterwegs-moment" data-nw-overview-lifestyle="road" aria-labelledby="nw-lifestyle-road-title">
+        <div class="story-shell nw-lifestyle-grid">
+          <figure class="nw-lifestyle-media">
+            <img
+              src="/assets/lifestyle/young-man-car.png"
+              width="1536"
+              height="1024"
+              alt="Ein Mann nutzt unterwegs im Auto sein Smartphone"
+              loading="lazy"
+              decoding="async"
+            />
+          </figure>
+          <div class="nw-lifestyle-copy">
+            <div class="story-kicker">Unterwegs</div>
+            <h2 class="story-title story-title--section" id="nw-lifestyle-road-title">Der Concierge bleibt erreichbar.</h2>
+            <p class="story-lead">Eine Nachricht genügt. NAHWERK übernimmt Recherche, Organisation und den nächsten freigegebenen Schritt – auch wenn gerade wenig Zeit ist.</p>
+          </div>
+        </div>
+      </section>
+      <!-- NW-OVERVIEW-LIFESTYLE-ROAD-END -->
+      <!-- 4 · Family als emotionaler Mehrwert -->
+      <section class="story-section" id="family" data-story-step="4" aria-labelledby="story-family-title">
+        <div class="story-shell story-split">
+          <figure class="story-family-media">
+            <img
+              src="assets/lifestyle/senior-woman-overview.webp?v=1"
+              width="1536"
+              height="1024"
+              alt="Eine Frau nutzt entspannt zu Hause ihr Smartphone"
+              loading="lazy"
+              decoding="async"
+            />
+          </figure>
+          <div>
+            <div class="story-kicker">NAHWERK Family</div>
+            <h2 class="story-title story-title--section" id="story-family-title">Unterstützung, ohne Selbstständigkeit abzunehmen.</h2>
+            <p class="story-lead">
+              NAHWERK lässt sich auch für einen Menschen einrichten, der dir wichtig ist. Der persönliche Concierge bleibt dabei dessen eigener Concierge – mit eigener Sprache, eigenem Kontext und klaren Berechtigungen.
+            </p>
+            <div class="story-principles">
+              <div class="story-principle"><span>01</span><div><strong>Eigener Zugang</strong><p>Die unterstützte Person nutzt NAHWERK selbstständig.</p></div></div>
+              <div class="story-principle"><span>02</span><div><strong>Eigene Sprache</strong><p>Sie kann einfach in der Sprache schreiben oder sprechen, die für sie natürlich ist.</p></div></div>
+              <div class="story-principle"><span>03</span><div><strong>Klare Privatsphäre</strong><p>Unterstützung bedeutet nicht automatische Einsicht in private Gespräche.</p></div></div>
+            </div>
+            <div class="story-actions">
+              <a class="story-btn story-btn--secondary" href="angehoerige.html" data-nw-cta="family_learn" data-nw-step="home_family">Family kennenlernen</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5 · WhatsApp + Telefon als Einfachheit -->
+      <section class="story-section story-section--soft" id="kanaele" data-story-step="5" aria-labelledby="story-channels-title">
+        <div class="story-shell">
+          <div class="story-kicker">Einfach erreichbar</div>
+          <h2 class="story-title story-title--section" id="story-channels-title">Ein Concierge. Dasselbe Gespräch. Egal über welchen Weg.</h2>
+          <p class="story-lead">
+            WhatsApp und Telefon sind zwei Zugänge zu NAHWERK – nicht zwei getrennte Gesprächswelten.
+            Verfügbare Telefonfunktionen richten sich nach dem jeweils eingerichteten Produkt und Zugang.
+          </p>
+
+          <div class="story-channels">
+            <article class="story-channel">
+              <div class="story-channel-label"><h3>WhatsApp</h3><span>Schreiben & sprechen</span></div>
+              <p>Nachrichten, Sprachnachrichten, Bilder und Dokumente dort senden, wo Kommunikation ohnehin stattfindet.</p>
+              <div class="story-channel-proof">Ein Anliegen nennen. NAHWERK übernimmt den nächsten sinnvollen Arbeitsschritt.</div>
+            </article>
+            <article class="story-channel">
+              <div class="story-channel-label"><h3>Telefon</h3><span>Je nach Einrichtung</span></div>
+              <p>Telefonische Nutzung und Telefonannahme werden in denselben persönlichen NAHWERK-Kontext eingebettet, soweit sie für den Zugang eingerichtet sind.</p>
+              <div class="story-channel-proof">Der Kanal kann wechseln, ohne dass aus dem Concierge ein zweites System werden muss.</div>
+            </article>
+          </div>
+
+          <div class="story-channel-media">
+            <div class="story-chat-proof" aria-label="Beispiel eines kanalübergreifenden Gesprächs">
+              <div class="story-chat-row story-chat-row--user">„Finde mir bitte eine passende Praxis für morgen.“</div>
+              <div class="story-chat-row story-chat-row--nw">„Ich habe passende Optionen eingegrenzt. Ich zeige dir jetzt die sinnvollsten nächsten Schritte.“</div>
+            </div>
+            <figure class="story-agent-mini">
+              <img src="assets/voice/alexander-telefon-agent-v2.webp" width="960" height="1200" alt="Alexander, NAHWERK Telefonagent" loading="lazy" decoding="async" />
+              <figcaption>Telefonannahme · eigene Produktoption</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6 · Conversion -->
+      <section class="story-final" id="starten" data-story-step="6" aria-labelledby="story-final-title">
+        <div class="story-shell">
+          <div class="story-kicker">Jetzt ausprobieren</div>
+          <h2 class="story-title story-title--section" id="story-final-title">Gib die erste Aufgabe ab.</h2>
+          <p class="story-lead">
+            Starte kostenlos, nenne ein echtes Anliegen und miss NAHWERK daran, wie viel Arbeit es dir abnimmt.
+          </p>
+          <div class="story-actions">
+            <a class="story-btn story-btn--primary" href="registrieren.html?produkt=prime&amp;paket=free&amp;source=home_final" data-nw-cta="start_free" data-nw-step="home_final">Kostenlos starten</a>
+            <a class="story-btn story-btn--secondary" href="prime-concierge.html">Concierge kennenlernen</a>
+          </div>
+          <div class="story-meta" aria-label="Tarifhinweise">
+            <span>FREE · 0 €</span>
+            <span>Keine Zahlungsdaten</span>
+            <span>Kein automatisches Upgrade</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer story-page-footer">
+      <div class="wrap">
+        <div class="footergrid">
+          <div>
+            <a class="brand" href="index.html" aria-label="NAHWERK Concierge – Startseite">
+              <span class="mark nahwerk-mark" aria-hidden="true"></span>
+              <span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span>
+            </a>
+            <p>Ein persönlicher Concierge, der erledigt.</p>
+          </div>
+          <div>
+            <h3>NAHWERK</h3>
+            <a href="prime-concierge.html">Concierge</a>
+            <a href="safety.html">Safety</a>
+            <a href="angehoerige.html">Family</a>
+            <a href="telefonannahme.html">Telefon</a>
+            <a href="pakete.html">Tarife</a>
+          </div>
+          <div>
+            <h3>Service</h3>
+            <a href="leistungen.html">Leistungen</a>
+            <a href="ablauf.html">So funktioniert's</a>
+            <a href="faq.html">FAQ</a>
+            <a href="kontakt.html">Kontakt</a>
+          </div>
+          <div>
+            <h3>Rechtliches</h3>
+            <a href="impressum.html">Impressum</a>
+            <a href="datenschutz.html">Datenschutz</a>
+            <a href="agb.html">AGB</a>
+            <a href="widerruf.html">Widerruf</a>
+            <a href="ki-transparenz.html">KI-Transparenz</a>
+            <a href="datenloeschung.html">Datenlöschung</a>
+          </div>
+        </div>
+        <div class="footbottom">
+          <span>© 2026 NAHWERK Concierge</span>
+          <span>Concierge · Safety · Family · Telefon</span>
+        </div>
+      </div>
+    </footer>
+
+    <script src="assets/auth-nav.js?v=40"></script>
+    <script src="assets/nahwerk-analytics.js?v=1"></script>
+    <script src="assets/acquisition-v1.js?v=2"></script>
+    <script src="assets/site-ui.js?v=6"></script>
+  </body>
+</html>
