@@ -1,4 +1,4 @@
-/* NAHWERK Senior Login — canonical light split layout.
+/* NAHWERK Senior Login — canonical static light split layout.
    Scope: anmelden.html with product=senioren only. */
 
 html body.login-image-page.senior-product,
@@ -25,7 +25,7 @@ html body.login-image-page[data-product="senioren"] .nw-language-button{
   box-shadow:inset 0 1px 0 rgba(255,255,255,.75)!important;
 }
 
-/* Desktop: normal document flow on the left, full-height image on the right. */
+/* One architecture only: static DOM, left content / right portrait. */
 html body.login-image-page.senior-product main,
 html body.login-image-page[data-product="senioren"] main{
   position:relative!important;
@@ -79,10 +79,9 @@ html body.login-image-page[data-product="senioren"] main>.hero::after{
   display:none!important;
 }
 
-/* Static DOM: text and form are consecutive blocks on exactly the same left rail. */
 html body.login-image-page.senior-product main>.hero,
-html body.login-image-page[data-product="senioren"] main>.hero,
 html body.login-image-page.senior-product main>.section,
+html body.login-image-page[data-product="senioren"] main>.hero,
 html body.login-image-page[data-product="senioren"] main>.section{
   position:relative!important;
   z-index:2!important;
@@ -90,6 +89,7 @@ html body.login-image-page[data-product="senioren"] main>.section{
   width:50%!important;
   max-width:50%!important;
   min-width:0!important;
+  min-height:0!important;
   margin:0!important;
   box-sizing:border-box!important;
   overflow:visible!important;
@@ -101,13 +101,11 @@ html body.login-image-page[data-product="senioren"] main>.section{
 
 html body.login-image-page.senior-product main>.hero,
 html body.login-image-page[data-product="senioren"] main>.hero{
-  min-height:0!important;
   padding:clamp(46px,4.7vw,70px) clamp(38px,5.1vw,76px) 0!important;
 }
 
 html body.login-image-page.senior-product main>.section,
 html body.login-image-page[data-product="senioren"] main>.section{
-  min-height:0!important;
   padding:26px clamp(38px,5.1vw,76px) clamp(48px,5vw,72px)!important;
 }
 
@@ -119,68 +117,11 @@ html body.login-image-page[data-product="senioren"] main>.section>.wrap,
 html body.login-image-page[data-product="senioren"] .loginwrap{
   display:block!important;
   width:100%!important;
-  max-width:none!important;
+  max-width:560px!important;
   min-width:0!important;
-  margin:0!important;
+  margin:0 auto!important;
   padding:0!important;
   box-sizing:border-box!important;
-}
-
-/* Runtime-composed DOM: keep the entire copy/form on the left half. */
-html body.login-image-page.senior-product.nw-senior-login-composed main>.hero,
-html body.login-image-page[data-product="senioren"].nw-senior-login-composed main>.hero{
-  width:50%!important;
-  max-width:50%!important;
-  min-width:0!important;
-  margin:0!important;
-  padding:0!important;
-  background:transparent!important;
-  overflow:visible!important;
-}
-
-html body.login-image-page.senior-product.nw-senior-login-composed .hero>.wrap,
-html body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero>.wrap{
-  width:100%!important;
-  max-width:none!important;
-  min-width:0!important;
-  margin:0!important;
-  padding:0!important;
-  gap:0!important;
-  box-sizing:border-box!important;
-}
-
-html body.login-image-page.senior-product .nw-senior-login-copy,
-html body.login-image-page[data-product="senioren"] .nw-senior-login-copy{
-  grid-column:1 / -1!important;
-  grid-row:1!important;
-  display:flex!important;
-  flex-direction:column!important;
-  align-items:stretch!important;
-  justify-content:flex-start!important;
-  gap:0!important;
-  width:100%!important;
-  max-width:none!important;
-  min-width:0!important;
-  min-height:0!important;
-  margin:0!important;
-  padding:clamp(46px,4.7vw,70px) clamp(38px,5.1vw,76px) clamp(48px,5vw,72px)!important;
-  box-sizing:border-box!important;
-  background:transparent!important;
-}
-
-html body.login-image-page.senior-product figure.nw-senior-login-portrait,
-html body.login-image-page[data-product="senioren"] figure.nw-senior-login-portrait,
-html body.login-image-page.senior-product .nw-senior-login-source-section,
-html body.login-image-page[data-product="senioren"] .nw-senior-login-source-section{
-  display:none!important;
-  visibility:hidden!important;
-  width:0!important;
-  height:0!important;
-  min-width:0!important;
-  min-height:0!important;
-  margin:0!important;
-  padding:0!important;
-  border:0!important;
 }
 
 html body.login-image-page.senior-product .hero .eyebrow,
@@ -215,7 +156,7 @@ html body.login-image-page[data-product="senioren"] .hero p{
   overflow-wrap:normal!important;
 }
 
-/* Login card: directly below the copy, same left/right rail, modern but calm. */
+/* Card sits directly beneath the text on the exact same rail. */
 html body.login-image-page.senior-product .logincard,
 html body.login-image-page[data-product="senioren"] .logincard{
   display:block!important;
@@ -232,16 +173,6 @@ html body.login-image-page[data-product="senioren"] .logincard{
   box-shadow:0 18px 48px rgba(65,49,22,.10),inset 0 1px 0 rgba(255,255,255,.96)!important;
   backdrop-filter:blur(18px) saturate(115%)!important;
   -webkit-backdrop-filter:blur(18px) saturate(115%)!important;
-}
-
-html body.login-image-page.senior-product .nw-senior-login-copy>.logincard,
-html body.login-image-page[data-product="senioren"] .nw-senior-login-copy>.logincard{
-  margin-top:26px!important;
-}
-
-html body.login-image-page.senior-product main>.section .logincard,
-html body.login-image-page[data-product="senioren"] main>.section .logincard{
-  margin-top:0!important;
 }
 
 html body.login-image-page.senior-product .logincard h2,
@@ -403,10 +334,8 @@ html body.login-image-page[data-product="senioren"] .mfa-step .btn.red{
 
   html body.login-image-page.senior-product main>.hero,
   html body.login-image-page.senior-product main>.section,
-  html body.login-image-page.senior-product.nw-senior-login-composed main>.hero,
   html body.login-image-page[data-product="senioren"] main>.hero,
-  html body.login-image-page[data-product="senioren"] main>.section,
-  html body.login-image-page[data-product="senioren"].nw-senior-login-composed main>.hero{
+  html body.login-image-page[data-product="senioren"] main>.section{
     width:100%!important;
     max-width:100%!important;
   }
@@ -419,11 +348,6 @@ html body.login-image-page[data-product="senioren"] .mfa-step .btn.red{
   html body.login-image-page.senior-product main>.section,
   html body.login-image-page[data-product="senioren"] main>.section{
     padding:24px 20px 32px!important;
-  }
-
-  html body.login-image-page.senior-product .nw-senior-login-copy,
-  html body.login-image-page[data-product="senioren"] .nw-senior-login-copy{
-    padding:38px 20px 32px!important;
   }
 
   html body.login-image-page.senior-product .hero h1,
