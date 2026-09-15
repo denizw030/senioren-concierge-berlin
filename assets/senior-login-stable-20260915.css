@@ -1,70 +1,144 @@
-/* NAHWERK Senioren-Login — final isolated layout guard.
-   Loaded only for anmelden.html?produkt=senioren via locale-boot.js. */
+/* NAHWERK Senioren Login — single canonical premium layout.
+   Scope: anmelden.html?produkt=senioren only. Auth and navigation logic stay untouched. */
 
 html.nw-product-senior-first-paint body.login-image-page,
-body.login-image-page.senior-product,
-body.login-image-page[data-product="senioren"]{
-  background:#f7f3ea!important;
-  color:#181713!important;
+html body.login-image-page.senior-product,
+html body.login-image-page[data-product="senioren"]{
+  background:#f5f1e8!important;
+  color:#1d1d1f!important;
   color-scheme:light!important;
 }
 
 html.nw-product-senior-first-paint body.login-image-page main,
-body.login-image-page.senior-product main,
-body.login-image-page[data-product="senioren"] main{
+html body.login-image-page.senior-product main,
+html body.login-image-page[data-product="senioren"] main{
   position:relative!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,45%) minmax(0,55%)!important;
+  grid-template-rows:minmax(34px,1fr) auto auto minmax(34px,1fr)!important;
   width:100%!important;
   max-width:none!important;
+  min-height:max(680px,calc(100svh - 126px))!important;
   margin:0!important;
   padding:0!important;
-  background:#f7f3ea!important;
+  overflow:hidden!important;
   isolation:isolate!important;
+  background:#f5f1e8!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page main::before,
+html body.login-image-page.senior-product main::before,
+html body.login-image-page[data-product="senioren"] main::before{
+  content:""!important;
+  position:absolute!important;
+  z-index:0!important;
+  inset:0 55% 0 0!important;
+  display:block!important;
+  background:
+    radial-gradient(720px 520px at 100% 14%,rgba(193,151,72,.13),transparent 68%),
+    radial-gradient(600px 440px at 0% 0%,rgba(255,255,255,.92),transparent 70%),
+    linear-gradient(145deg,#faf8f3 0%,#f5f1e8 58%,#ede5d7 100%)!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page main::after,
+html body.login-image-page.senior-product main::after,
+html body.login-image-page[data-product="senioren"] main::after{
+  content:""!important;
+  position:absolute!important;
+  z-index:1!important;
+  inset:0 0 0 45%!important;
+  display:block!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background-color:#ddd4c8!important;
+  background-image:url("/assets/lifestyle/senior-woman-overview.webp?v=6")!important;
+  background-repeat:no-repeat!important;
+  background-size:cover!important;
+  background-position:68% 50%!important;
+  box-shadow:none!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page main>.hero::before,
+html.nw-product-senior-first-paint body.login-image-page main>.hero::after,
+html body.login-image-page.senior-product main>.hero::before,
+html body.login-image-page.senior-product main>.hero::after,
+html body.login-image-page[data-product="senioren"] main>.hero::before,
+html body.login-image-page[data-product="senioren"] main>.hero::after{
+  content:none!important;
+  display:none!important;
 }
 
 html.nw-product-senior-first-paint body.login-image-page main>.hero,
-html.nw-product-senior-first-paint body.login-image-page main>.section,
-body.login-image-page.senior-product main>.hero,
-body.login-image-page.senior-product main>.section,
-body.login-image-page[data-product="senioren"] main>.hero,
-body.login-image-page[data-product="senioren"] main>.section{
+html body.login-image-page.senior-product main>.hero,
+html body.login-image-page[data-product="senioren"] main>.hero{
+  grid-column:1!important;
+  grid-row:2!important;
   position:relative!important;
   z-index:2!important;
+  display:block!important;
   float:none!important;
   clear:none!important;
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0 clamp(34px,4.5vw,72px)!important;
   box-sizing:border-box!important;
   border:0!important;
   overflow:visible!important;
+  background:transparent!important;
   contain:none!important;
   content-visibility:visible!important;
   opacity:1!important;
   transform:none!important;
   transition:none!important;
   animation:none!important;
-  background:transparent!important;
 }
 
-html.nw-product-senior-first-paint body.login-image-page main>.hero::before,
-html.nw-product-senior-first-paint body.login-image-page main>.hero::after,
-body.login-image-page.senior-product main>.hero::before,
-body.login-image-page.senior-product main>.hero::after,
-body.login-image-page[data-product="senioren"] main>.hero::before,
-body.login-image-page[data-product="senioren"] main>.hero::after{
-  content:none!important;
-  display:none!important;
+html.nw-product-senior-first-paint body.login-image-page main>.section,
+html body.login-image-page.senior-product main>.section,
+html body.login-image-page[data-product="senioren"] main>.section{
+  grid-column:1!important;
+  grid-row:3!important;
+  position:relative!important;
+  z-index:2!important;
+  display:block!important;
+  float:none!important;
+  clear:none!important;
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:28px clamp(34px,4.5vw,72px) 0!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  overflow:visible!important;
+  background:transparent!important;
+  contain:none!important;
+  content-visibility:visible!important;
+  opacity:1!important;
+  transform:none!important;
+  transition:none!important;
+  animation:none!important;
 }
 
 html.nw-product-senior-first-paint body.login-image-page main>.hero>.wrap,
 html.nw-product-senior-first-paint body.login-image-page main>.section>.wrap,
-body.login-image-page.senior-product main>.hero>.wrap,
-body.login-image-page.senior-product main>.section>.wrap,
-body.login-image-page.senior-product .loginwrap,
-body.login-image-page[data-product="senioren"] main>.hero>.wrap,
-body.login-image-page[data-product="senioren"] main>.section>.wrap,
-body.login-image-page[data-product="senioren"] .loginwrap{
+html.nw-product-senior-first-paint body.login-image-page .loginwrap,
+html body.login-image-page.senior-product main>.hero>.wrap,
+html body.login-image-page.senior-product main>.section>.wrap,
+html body.login-image-page.senior-product .loginwrap,
+html body.login-image-page[data-product="senioren"] main>.hero>.wrap,
+html body.login-image-page[data-product="senioren"] main>.section>.wrap,
+html body.login-image-page[data-product="senioren"] .loginwrap{
   display:block!important;
   width:100%!important;
+  max-width:440px!important;
   min-width:0!important;
-  max-width:560px!important;
   margin:0 auto!important;
   padding:0!important;
   box-sizing:border-box!important;
@@ -73,18 +147,18 @@ body.login-image-page[data-product="senioren"] .loginwrap{
 html.nw-product-senior-first-paint body.login-image-page main>.hero>.wrap>.eyebrow,
 html.nw-product-senior-first-paint body.login-image-page main>.hero>.wrap>h1,
 html.nw-product-senior-first-paint body.login-image-page main>.hero>.wrap>p,
-body.login-image-page.senior-product main>.hero>.wrap>.eyebrow,
-body.login-image-page.senior-product main>.hero>.wrap>h1,
-body.login-image-page.senior-product main>.hero>.wrap>p,
-body.login-image-page[data-product="senioren"] main>.hero>.wrap>.eyebrow,
-body.login-image-page[data-product="senioren"] main>.hero>.wrap>h1,
-body.login-image-page[data-product="senioren"] main>.hero>.wrap>p{
+html body.login-image-page.senior-product main>.hero>.wrap>.eyebrow,
+html body.login-image-page.senior-product main>.hero>.wrap>h1,
+html body.login-image-page.senior-product main>.hero>.wrap>p,
+html body.login-image-page[data-product="senioren"] main>.hero>.wrap>.eyebrow,
+html body.login-image-page[data-product="senioren"] main>.hero>.wrap>h1,
+html body.login-image-page[data-product="senioren"] main>.hero>.wrap>p{
   display:block!important;
   width:100%!important;
+  max-width:440px!important;
   min-width:0!important;
-  max-width:560px!important;
   inline-size:100%!important;
-  max-inline-size:560px!important;
+  max-inline-size:440px!important;
   margin-left:0!important;
   margin-right:0!important;
   padding-left:0!important;
@@ -96,221 +170,398 @@ body.login-image-page[data-product="senioren"] main>.hero>.wrap>p{
   box-sizing:border-box!important;
 }
 
-html.nw-product-senior-first-paint body.login-image-page main>.hero>.wrap>h1,
-body.login-image-page.senior-product main>.hero>.wrap>h1,
-body.login-image-page[data-product="senioren"] main>.hero>.wrap>h1{
-  margin:10px 0 14px!important;
-  color:#181713!important;
-  font-size:clamp(2.65rem,4.1vw,4rem)!important;
-  line-height:.98!important;
-  letter-spacing:-.055em!important;
-  text-shadow:none!important;
+html.nw-product-senior-first-paint body.login-image-page .hero .eyebrow,
+html body.login-image-page.senior-product .hero .eyebrow,
+html body.login-image-page[data-product="senioren"] .hero .eyebrow{
+  margin:0 0 12px!important;
+  color:#8d6a29!important;
+  font-size:12px!important;
+  font-weight:750!important;
+  line-height:1.2!important;
+  letter-spacing:.12em!important;
+  text-transform:uppercase!important;
 }
 
-html.nw-product-senior-first-paint body.login-image-page main>.hero>.wrap>p,
-body.login-image-page.senior-product main>.hero>.wrap>p,
-body.login-image-page[data-product="senioren"] main>.hero>.wrap>p{
+html.nw-product-senior-first-paint body.login-image-page .hero h1,
+html body.login-image-page.senior-product .hero h1,
+html body.login-image-page[data-product="senioren"] .hero h1{
+  margin:0 0 16px!important;
+  color:#1d1d1f!important;
+  font-size:clamp(2.7rem,3.65vw,4.15rem)!important;
+  font-weight:700!important;
+  line-height:1.01!important;
+  letter-spacing:-.055em!important;
+  text-shadow:none!important;
+  text-wrap:balance!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page .hero p,
+html body.login-image-page.senior-product .hero p,
+html body.login-image-page[data-product="senioren"] .hero p{
   margin:0!important;
-  color:#655f55!important;
-  font-size:clamp(.98rem,1.05vw,1.08rem)!important;
-  line-height:1.56!important;
+  color:#625f59!important;
+  font-size:17px!important;
+  line-height:1.55!important;
+  font-weight:450!important;
 }
 
 html.nw-product-senior-first-paint body.login-image-page .logincard,
-body.login-image-page.senior-product .logincard,
-body.login-image-page[data-product="senioren"] .logincard{
+html body.login-image-page.senior-product .logincard,
+html body.login-image-page[data-product="senioren"] .logincard{
   display:block!important;
   width:100%!important;
-  min-width:0!important;
   max-width:none!important;
+  min-width:0!important;
   margin:0!important;
   padding:26px!important;
   box-sizing:border-box!important;
-  border:1px solid rgba(112,87,39,.14)!important;
-  border-left:1px solid rgba(112,87,39,.14)!important;
-  border-radius:20px!important;
-  background:rgba(255,255,255,.94)!important;
-  color:#181713!important;
-  box-shadow:0 18px 48px rgba(65,49,22,.10),inset 0 1px 0 rgba(255,255,255,.96)!important;
+  border:1px solid rgba(66,55,36,.11)!important;
+  border-radius:24px!important;
+  background:rgba(255,255,255,.82)!important;
+  color:#1d1d1f!important;
+  box-shadow:0 18px 48px rgba(72,55,28,.08),inset 0 1px 0 rgba(255,255,255,.9)!important;
+  backdrop-filter:blur(22px) saturate(120%)!important;
+  -webkit-backdrop-filter:blur(22px) saturate(120%)!important;
 }
 
-@media (min-width:1181px){
+html.nw-product-senior-first-paint body.login-image-page .logincard h2,
+html body.login-image-page.senior-product .logincard h2,
+html body.login-image-page[data-product="senioren"] .logincard h2{
+  margin:0 0 22px!important;
+  color:#1d1d1f!important;
+  font-size:28px!important;
+  font-weight:700!important;
+  line-height:1.08!important;
+  letter-spacing:-.035em!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page .field,
+html body.login-image-page.senior-product .field,
+html body.login-image-page[data-product="senioren"] .field{
+  margin:0 0 17px!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page .field label,
+html body.login-image-page.senior-product .field label,
+html body.login-image-page[data-product="senioren"] .field label{
+  display:block!important;
+  margin:0 0 8px!important;
+  color:#33312d!important;
+  font-size:14px!important;
+  line-height:1.3!important;
+  font-weight:650!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page .field input,
+html body.login-image-page.senior-product .field input,
+html body.login-image-page[data-product="senioren"] .field input{
+  width:100%!important;
+  height:56px!important;
+  min-height:56px!important;
+  padding:0 17px!important;
+  box-sizing:border-box!important;
+  border:1px solid rgba(60,55,46,.17)!important;
+  border-radius:17px!important;
+  outline:none!important;
+  background:rgba(255,255,255,.96)!important;
+  color:#1d1d1f!important;
+  caret-color:#1d1d1f!important;
+  font:inherit!important;
+  font-size:17px!important;
+  line-height:1!important;
+  box-shadow:inset 0 1px 2px rgba(30,25,18,.025)!important;
+  transition:border-color .18s ease,box-shadow .18s ease,background-color .18s ease!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page .field input:hover,
+html body.login-image-page.senior-product .field input:hover,
+html body.login-image-page[data-product="senioren"] .field input:hover{
+  border-color:rgba(60,55,46,.27)!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page .field input:focus,
+html body.login-image-page.senior-product .field input:focus,
+html body.login-image-page[data-product="senioren"] .field input:focus{
+  border-color:#8d6a29!important;
+  background:#fff!important;
+  box-shadow:0 0 0 4px rgba(141,106,41,.12)!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page .field input:-webkit-autofill,
+html.nw-product-senior-first-paint body.login-image-page .field input:-webkit-autofill:hover,
+html.nw-product-senior-first-paint body.login-image-page .field input:-webkit-autofill:focus,
+html body.login-image-page.senior-product .field input:-webkit-autofill,
+html body.login-image-page.senior-product .field input:-webkit-autofill:hover,
+html body.login-image-page.senior-product .field input:-webkit-autofill:focus,
+html body.login-image-page[data-product="senioren"] .field input:-webkit-autofill,
+html body.login-image-page[data-product="senioren"] .field input:-webkit-autofill:hover,
+html body.login-image-page[data-product="senioren"] .field input:-webkit-autofill:focus{
+  -webkit-text-fill-color:#1d1d1f!important;
+  caret-color:#1d1d1f!important;
+  -webkit-box-shadow:0 0 0 1000px #fff inset!important;
+  box-shadow:0 0 0 1000px #fff inset!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page .password-wrap input,
+html body.login-image-page.senior-product .password-wrap input,
+html body.login-image-page[data-product="senioren"] .password-wrap input{
+  padding-right:58px!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page .password-toggle,
+html body.login-image-page.senior-product .password-toggle,
+html body.login-image-page[data-product="senioren"] .password-toggle{
+  right:9px!important;
+  width:40px!important;
+  height:40px!important;
+  border-radius:12px!important;
+  color:#5b5852!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page #loginSubmit,
+html body.login-image-page.senior-product #loginSubmit,
+html body.login-image-page[data-product="senioren"] #loginSubmit{
+  width:100%!important;
+  height:56px!important;
+  min-height:56px!important;
+  margin-top:2px!important;
+  border:1px solid #1d1d1f!important;
+  border-radius:17px!important;
+  outline:none!important;
+  background:#1d1d1f!important;
+  color:#fff!important;
+  font-size:17px!important;
+  font-weight:700!important;
+  line-height:1!important;
+  box-shadow:none!important;
+  transition:transform .16s ease,background-color .16s ease,box-shadow .16s ease!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page #loginSubmit:hover,
+html body.login-image-page.senior-product #loginSubmit:hover,
+html body.login-image-page[data-product="senioren"] #loginSubmit:hover{
+  background:#303033!important;
+  transform:translateY(-1px)!important;
+  box-shadow:0 8px 20px rgba(29,29,31,.14)!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page #loginSubmit:focus-visible,
+html body.login-image-page.senior-product #loginSubmit:focus-visible,
+html body.login-image-page[data-product="senioren"] #loginSubmit:focus-visible{
+  box-shadow:0 0 0 4px rgba(29,29,31,.15)!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page .split,
+html body.login-image-page.senior-product .split,
+html body.login-image-page[data-product="senioren"] .split{
+  display:flex!important;
+  justify-content:space-between!important;
+  align-items:center!important;
+  gap:12px 18px!important;
+  flex-wrap:wrap!important;
+  margin-top:18px!important;
+  padding-top:17px!important;
+  border-top:1px solid rgba(66,55,36,.10)!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page .split .tiny,
+html body.login-image-page.senior-product .split .tiny,
+html body.login-image-page[data-product="senioren"] .split .tiny{
+  color:#68645d!important;
+  font-size:13px!important;
+  line-height:1.45!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page .split a,
+html body.login-image-page.senior-product .split a,
+html body.login-image-page[data-product="senioren"] .split a{
+  color:#7f5e20!important;
+  text-underline-offset:3px!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page .status,
+html body.login-image-page.senior-product .status,
+html body.login-image-page[data-product="senioren"] .status{
+  margin-top:16px!important;
+  padding:14px 15px!important;
+  border:1px solid rgba(141,106,41,.18)!important;
+  border-left:4px solid #a77f33!important;
+  border-radius:14px!important;
+  background:#fffaf0!important;
+  color:#34312b!important;
+  box-shadow:none!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page .mfa-step,
+html body.login-image-page.senior-product .mfa-step,
+html body.login-image-page[data-product="senioren"] .mfa-step{
+  margin-top:20px!important;
+  padding-top:20px!important;
+  border-top:1px solid rgba(66,55,36,.11)!important;
+  color:#33312d!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page .mfa-step[hidden],
+html body.login-image-page.senior-product .mfa-step[hidden],
+html body.login-image-page[data-product="senioren"] .mfa-step[hidden]{
+  display:none!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page .mfa-step .btn,
+html body.login-image-page.senior-product .mfa-step .btn,
+html body.login-image-page[data-product="senioren"] .mfa-step .btn{
+  min-height:52px!important;
+  border-radius:15px!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page .mfa-step .btn.red,
+html body.login-image-page.senior-product .mfa-step .btn.red,
+html body.login-image-page[data-product="senioren"] .mfa-step .btn.red{
+  background:#1d1d1f!important;
+  color:#fff!important;
+  border:1px solid #1d1d1f!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page .mfa-step .btn.light,
+html body.login-image-page.senior-product .mfa-step .btn.light,
+html body.login-image-page[data-product="senioren"] .mfa-step .btn.light{
+  background:#fff!important;
+  color:#2d2b27!important;
+  border:1px solid rgba(60,55,46,.15)!important;
+}
+
+@media (min-width:900px) and (max-width:1180px){
   html.nw-product-senior-first-paint body.login-image-page main,
-  body.login-image-page.senior-product main,
-  body.login-image-page[data-product="senioren"] main{
-    display:grid!important;
-    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
-    grid-template-rows:auto auto minmax(0,1fr)!important;
-    align-content:start!important;
-    min-height:calc(100vh - 126px)!important;
-    overflow:hidden!important;
+  html body.login-image-page.senior-product main,
+  html body.login-image-page[data-product="senioren"] main{
+    grid-template-columns:minmax(0,47%) minmax(0,53%)!important;
+    min-height:max(650px,calc(100svh - 110px))!important;
   }
 
   html.nw-product-senior-first-paint body.login-image-page main::before,
-  body.login-image-page.senior-product main::before,
-  body.login-image-page[data-product="senioren"] main::before{
-    content:""!important;
-    position:absolute!important;
-    z-index:0!important;
-    inset:0 50% 0 0!important;
-    display:block!important;
-    background:radial-gradient(700px 520px at 92% 20%,rgba(200,164,93,.15),transparent 66%),radial-gradient(540px 400px at 8% 10%,rgba(255,255,255,.86),transparent 66%),linear-gradient(145deg,#fbf8f1 0%,#f3eddf 62%,#eadfca 100%)!important;
+  html body.login-image-page.senior-product main::before,
+  html body.login-image-page[data-product="senioren"] main::before{
+    inset:0 53% 0 0!important;
   }
 
   html.nw-product-senior-first-paint body.login-image-page main::after,
-  body.login-image-page.senior-product main::after,
-  body.login-image-page[data-product="senioren"] main::after{
-    content:""!important;
-    position:absolute!important;
-    z-index:1!important;
-    inset:0 0 0 50%!important;
-    display:block!important;
-    border:0!important;
-    border-radius:0!important;
-    background:#e8dfd2 url("/assets/lifestyle/senior-woman-overview.webp?v=6") 68% 50%/cover no-repeat!important;
-    box-shadow:none!important;
+  html body.login-image-page.senior-product main::after,
+  html body.login-image-page[data-product="senioren"] main::after{
+    inset:0 0 0 47%!important;
   }
 
   html.nw-product-senior-first-paint body.login-image-page main>.hero,
-  body.login-image-page.senior-product main>.hero,
-  body.login-image-page[data-product="senioren"] main>.hero{
-    grid-column:1!important;
-    grid-row:1!important;
-    display:block!important;
-    width:100%!important;
-    max-width:none!important;
-    min-width:0!important;
-    min-height:0!important;
-    margin:0!important;
-    padding:clamp(48px,5vw,72px) clamp(38px,5vw,72px) 0!important;
-  }
-
   html.nw-product-senior-first-paint body.login-image-page main>.section,
-  body.login-image-page.senior-product main>.section,
-  body.login-image-page[data-product="senioren"] main>.section{
-    grid-column:1!important;
-    grid-row:2!important;
-    display:block!important;
-    width:100%!important;
-    max-width:none!important;
-    min-width:0!important;
-    min-height:0!important;
-    margin:0!important;
-    padding:22px clamp(38px,5vw,72px) clamp(48px,5vw,72px)!important;
+  html body.login-image-page.senior-product main>.hero,
+  html body.login-image-page.senior-product main>.section,
+  html body.login-image-page[data-product="senioren"] main>.hero,
+  html body.login-image-page[data-product="senioren"] main>.section{
+    padding-left:clamp(28px,4vw,48px)!important;
+    padding-right:clamp(28px,4vw,48px)!important;
   }
 }
 
-@media (max-width:1180px){
+@media (max-width:899px){
   html.nw-product-senior-first-paint body.login-image-page main,
-  body.login-image-page.senior-product main,
-  body.login-image-page[data-product="senioren"] main{
+  html body.login-image-page.senior-product main,
+  html body.login-image-page[data-product="senioren"] main{
     display:block!important;
     min-height:0!important;
     overflow:visible!important;
+    background:#f5f1e8!important;
   }
 
   html.nw-product-senior-first-paint body.login-image-page main::before,
-  body.login-image-page.senior-product main::before,
-  body.login-image-page[data-product="senioren"] main::before{
-    content:""!important;
-    position:absolute!important;
-    z-index:0!important;
+  html body.login-image-page.senior-product main::before,
+  html body.login-image-page[data-product="senioren"] main::before{
     inset:0!important;
-    display:block!important;
-    background:radial-gradient(700px 520px at 92% 20%,rgba(200,164,93,.15),transparent 66%),radial-gradient(540px 400px at 8% 10%,rgba(255,255,255,.86),transparent 66%),linear-gradient(145deg,#fbf8f1 0%,#f3eddf 62%,#eadfca 100%)!important;
   }
 
   html.nw-product-senior-first-paint body.login-image-page main>.hero,
-  body.login-image-page.senior-product main>.hero,
-  body.login-image-page[data-product="senioren"] main>.hero{
+  html body.login-image-page.senior-product main>.hero,
+  html body.login-image-page[data-product="senioren"] main>.hero{
     display:block!important;
     width:100%!important;
     max-width:100%!important;
-    min-width:0!important;
-    min-height:0!important;
     margin:0!important;
-    padding:38px 20px 0!important;
-    align-items:initial!important;
+    padding:44px 22px 0!important;
   }
 
   html.nw-product-senior-first-paint body.login-image-page main>.section,
-  body.login-image-page.senior-product main>.section,
-  body.login-image-page[data-product="senioren"] main>.section{
+  html body.login-image-page.senior-product main>.section,
+  html body.login-image-page[data-product="senioren"] main>.section{
     display:block!important;
     width:100%!important;
     max-width:100%!important;
-    min-width:0!important;
-    min-height:0!important;
     margin:0!important;
-    padding:24px 20px 32px!important;
+    padding:28px 22px 38px!important;
   }
 
   html.nw-product-senior-first-paint body.login-image-page main::after,
-  body.login-image-page.senior-product main::after,
-  body.login-image-page[data-product="senioren"] main::after{
-    content:""!important;
+  html body.login-image-page.senior-product main::after,
+  html body.login-image-page[data-product="senioren"] main::after{
     position:relative!important;
     z-index:1!important;
     inset:auto!important;
     display:block!important;
     width:100%!important;
-    height:clamp(360px,70vw,560px)!important;
+    height:clamp(360px,72vw,540px)!important;
     margin:0!important;
-    border:0!important;
-    border-radius:0!important;
-    background:#e8dfd2 url("/assets/lifestyle/senior-woman-overview.webp?v=6") 68% 50%/cover no-repeat!important;
-    box-shadow:none!important;
+    background-position:68% 50%!important;
   }
 
   html.nw-product-senior-first-paint body.login-image-page main>.hero>.wrap,
   html.nw-product-senior-first-paint body.login-image-page main>.section>.wrap,
-  body.login-image-page.senior-product main>.hero>.wrap,
-  body.login-image-page.senior-product main>.section>.wrap,
-  body.login-image-page[data-product="senioren"] main>.hero>.wrap,
-  body.login-image-page[data-product="senioren"] main>.section>.wrap{
-    width:min(100%,560px)!important;
-    max-width:560px!important;
-    margin:0 auto!important;
-    padding:0!important;
+  html.nw-product-senior-first-paint body.login-image-page .loginwrap,
+  html body.login-image-page.senior-product main>.hero>.wrap,
+  html body.login-image-page.senior-product main>.section>.wrap,
+  html body.login-image-page.senior-product .loginwrap,
+  html body.login-image-page[data-product="senioren"] main>.hero>.wrap,
+  html body.login-image-page[data-product="senioren"] main>.section>.wrap,
+  html body.login-image-page[data-product="senioren"] .loginwrap{
+    max-width:520px!important;
+  }
+
+  html.nw-product-senior-first-paint body.login-image-page .hero h1,
+  html body.login-image-page.senior-product .hero h1,
+  html body.login-image-page[data-product="senioren"] .hero h1{
+    font-size:clamp(2.55rem,10vw,3.55rem)!important;
   }
 }
 
-/* Specificity bridge: while the html product marker is present but the body marker
-   has not been attached yet, the generic Prime login rules must not squeeze the
-   Senioren text rail to ~60px. This block intentionally outranks those rules. */
-html.nw-product-senior-first-paint body.login-image-page:not(.senior-product):not([data-product="senioren"]) main>.hero::before,
-html.nw-product-senior-first-paint body.login-image-page:not(.senior-product):not([data-product="senioren"]) main>.hero::after{
-  content:none!important;
-  display:none!important;
+@media (max-width:520px){
+  html.nw-product-senior-first-paint body.login-image-page main>.hero,
+  html body.login-image-page.senior-product main>.hero,
+  html body.login-image-page[data-product="senioren"] main>.hero{
+    padding:36px 18px 0!important;
+  }
+
+  html.nw-product-senior-first-paint body.login-image-page main>.section,
+  html body.login-image-page.senior-product main>.section,
+  html body.login-image-page[data-product="senioren"] main>.section{
+    padding:24px 18px 30px!important;
+  }
+
+  html.nw-product-senior-first-paint body.login-image-page .hero p,
+  html body.login-image-page.senior-product .hero p,
+  html body.login-image-page[data-product="senioren"] .hero p{
+    font-size:16px!important;
+  }
+
+  html.nw-product-senior-first-paint body.login-image-page .logincard,
+  html body.login-image-page.senior-product .logincard,
+  html body.login-image-page[data-product="senioren"] .logincard{
+    padding:22px 18px!important;
+    border-radius:21px!important;
+  }
 }
 
-html.nw-product-senior-first-paint body.login-image-page:not(.senior-product):not([data-product="senioren"]) main>.hero>.wrap,
-html.nw-product-senior-first-paint body.login-image-page:not(.senior-product):not([data-product="senioren"]) main>.section>.wrap{
-  display:block!important;
-  width:100%!important;
-  max-width:560px!important;
-  min-width:0!important;
-  margin:0 auto!important;
-  padding:0!important;
-  box-sizing:border-box!important;
-}
-
-html.nw-product-senior-first-paint body.login-image-page:not(.senior-product):not([data-product="senioren"]) main>.hero>.wrap>.eyebrow,
-html.nw-product-senior-first-paint body.login-image-page:not(.senior-product):not([data-product="senioren"]) main>.hero>.wrap>h1,
-html.nw-product-senior-first-paint body.login-image-page:not(.senior-product):not([data-product="senioren"]) main>.hero>.wrap>p{
-  display:block!important;
-  width:100%!important;
-  min-width:0!important;
-  max-width:560px!important;
-  inline-size:100%!important;
-  max-inline-size:560px!important;
-  margin-left:0!important;
-  margin-right:0!important;
-  padding-left:0!important;
-  padding-right:0!important;
-  white-space:normal!important;
-  word-break:normal!important;
-  overflow-wrap:normal!important;
-  writing-mode:horizontal-tb!important;
-  box-sizing:border-box!important;
+@media (prefers-reduced-motion:reduce){
+  html.nw-product-senior-first-paint body.login-image-page *,
+  html body.login-image-page.senior-product *,
+  html body.login-image-page[data-product="senioren"] *{
+    scroll-behavior:auto!important;
+    transition:none!important;
+    animation:none!important;
+  }
 }
