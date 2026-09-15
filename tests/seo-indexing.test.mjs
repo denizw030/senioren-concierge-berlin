@@ -28,28 +28,37 @@ test('robots exposes sitemap and protects non-search PROD surfaces', () => {
   }
 });
 
+test('root homepage redirects to the canonical German locale', () => {
+  const redirect = read('index.html');
+  assert.match(redirect, /http-equiv=["']refresh["'][^>]*url=\/de\//i);
+  assert.match(redirect, /window\.location\.replace\(["']\/de\/["']\)/);
+  assert.match(redirect, /rel=["']canonical["'][^>]*href=["']https:\/\/nahwerkconcierge\.com\/de\/["']/i);
+});
+
 test('sitemap contains only existing canonical public pages', () => {
   const urls = extractLocs(read('sitemap.xml'));
   assert.equal(urls.length, new Set(urls).size, 'duplicate sitemap URL');
+  assert.ok(urls.includes(`${DOMAIN}/de/`), 'German homepage /de/ missing from sitemap');
+  assert.ok(!urls.includes(`${DOMAIN}/`), 'redirect-only root homepage must not be indexed');
   for (const path of blocked) assert.ok(!urls.includes(`${DOMAIN}${path}`), `blocked path in sitemap: ${path}`);
 
   for (const url of urls) {
     assert.ok(url.startsWith(`${DOMAIN}/`), `wrong sitemap host: ${url}`);
     const { pathname } = new URL(url);
-    const file = pathname === '/' ? 'index.html' : pathname.endsWith('/') ? `${pathname.slice(1)}index.html` : pathname.slice(1);
+    const file = pathname.endsWith('/') ? `${pathname.slice(1)}index.html` : pathname.slice(1);
     assert.ok(existsSync(resolve(root, file)), `missing sitemap target: ${file}`);
     const html = read(file);
     assert.match(html, /<title>[^<]+<\/title>/i, `${file}: missing title`);
     assert.match(html, /<meta\s+[^>]*name=["']description["'][^>]*content=["'][^"']+["'][^>]*>/i, `${file}: missing description`);
     assert.ok(!/name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(html), `${file}: noindex in sitemap`);
-    const canonical = pathname === '/' ? `${DOMAIN}/` : `${DOMAIN}${pathname}`;
+    const canonical = `${DOMAIN}${pathname}`;
     assert.ok(html.includes(`href="${canonical}"`) || html.includes(`href='${canonical}'`), `${file}: canonical mismatch`);
   }
 });
 
-test('homepage publishes Open Graph and structured-data runtime', () => {
-  const home = read('index.html');
-  assert.match(home, /property=["']og:url["'][^>]*content=["']https:\/\/nahwerkconcierge\.com\/["']/s);
+test('German homepage publishes Open Graph and structured-data runtime', () => {
+  const home = read('de/index.html');
+  assert.match(home, /property=["']og:url["'][^>]*content=["']https:\/\/nahwerkconcierge\.com\/de\/["']/s);
   assert.match(home, /property=["']og:image["']/s);
   const runtime = read('assets/site-ui.js');
   assert.match(runtime, /data-nw-structured-data/);
