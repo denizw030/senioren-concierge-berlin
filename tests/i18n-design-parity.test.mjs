@@ -27,6 +27,10 @@ function read(file) {
   return fs.readFileSync(path.join(root, file), 'utf8');
 }
 
+function germanSource(page) {
+  return page === 'index.html' ? 'de/index.html' : page;
+}
+
 function normalizeAsset(value) {
   if (!value) return value;
   if (/^https?:\/\//i.test(value)) return value;
@@ -67,7 +71,7 @@ function bodyClass(html) {
 
 for (const page of pages) {
   test(`${page}: EN/TR keep exact German PROD visual structure`, () => {
-    const de = read(page);
+    const de = read(germanSource(page));
     assert.doesNotMatch(de, /international\.css/i);
 
     for (const lang of ['en', 'tr']) {
