@@ -17,5 +17,24 @@ html body.account-premium-ui .account-section,html body.account-premium-ui .acco
 html body.account-premium-ui .account-setup-by{box-sizing:border-box!important;min-height:66px!important}
 html body.account-premium-ui .account-tabs-shell:not(:has(+ #nwPortalThemeSetting)){margin-bottom:112px!important}
 html body.account-premium-ui #managedContextNotice:not([hidden]){display:none!important}
-html body.account-premium-ui #managedPersonContext.nw-managed-ready + #managedContextNotice:not([hidden]),html body.account-premium-ui #managedPersonContext[hidden] + #managedContextNotice:not([hidden]){display:block!important}
+html body.account-premium-ui #managedPersonContext.nw-managed-ready + #managedContextNotice:not([hidden]){display:block!important}
 @media(max-width:720px){html body.account-premium-ui .account-tabs-shell:not(:has(+ #nwPortalThemeSetting)){margin-bottom:132px!important}}
+
+/* Light account shell must stay fully light when the portal is in the light/senior presentation. */
+html body.account-premium-ui.senior-product,
+html body.account-premium-ui[data-product="senioren"]{
+  background:#f2ede2!important;
+  color:#1f1c17!important;
+}
+html body.account-premium-ui.senior-product main,
+html body.account-premium-ui.senior-product .hero,
+html body.account-premium-ui.senior-product main>.section,
+html body.account-premium-ui.senior-product .account-section,
+html body.account-premium-ui[data-product="senioren"] main,
+html body.account-premium-ui[data-product="senioren"] .hero,
+html body.account-premium-ui[data-product="senioren"] main>.section,
+html body.account-premium-ui[data-product="senioren"] .account-section{
+  background:
+    radial-gradient(820px 420px at 90% 8%,rgba(212,175,55,.10),transparent 66%),
+    linear-gradient(180deg,#f7f3ea 0%,#f1ece1 52%,#eee8dc 100%)!important;
+}
