@@ -49,12 +49,26 @@
     preload.href = '/assets/lifestyle/senior-woman-overview.webp?v=6';
     preload.fetchPriority = 'high';
     document.head.appendChild(preload);
+
+    if (!document.querySelector('link[data-nw-senior-login-stable]')) {
+      const stable = document.createElement('link');
+      stable.rel = 'stylesheet';
+      stable.href = '/assets/senior-login-stable-20260915.css?v=1';
+      stable.dataset.nwSeniorLoginStable = 'true';
+      const reveal = () => {
+        root.classList.add('nw-senior-login-stable-ready');
+        root.classList.remove('nw-product-booting');
+      };
+      stable.addEventListener('load', reveal, { once:true });
+      stable.addEventListener('error', reveal, { once:true });
+      document.head.appendChild(stable);
+      setTimeout(reveal, 2500);
+    }
   }
 
   /*
    * First-paint boot only.
-   * Do not duplicate or override the Senioren login layout here.
-   * The canonical layout lives in senior-login-canonical-20260915.css.
+   * The Senioren login is revealed only after its final isolated stylesheet is ready.
    */
   const style = document.createElement('style');
   style.id = 'nw-first-paint-boot';
@@ -95,7 +109,7 @@
     if (!body || !product) return false;
     body.dataset.product = product;
     body.classList.toggle('senior-product', product === 'senioren');
-    requestAnimationFrame(() => root.classList.remove('nw-product-booting'));
+    if (!isSeniorLogin) requestAnimationFrame(() => root.classList.remove('nw-product-booting'));
     return true;
   };
 
