@@ -39,7 +39,8 @@ jobs:
             return out
 
           # Customer-facing HTML only. Keep IDs/contracts intact.
-          html = sub_once(r'data-email-runtime="inert"', 'data-email-runtime="prod"', html, 'runtime marker')
+          if 'data-email-runtime="inert"' in html:
+            html = html.replace('data-email-runtime="inert"', 'data-email-runtime="prod"', 1)
           html = sub_once(r'(id="emailConnectionStatus">)[^<]*(</span>)', r'\1Wird geladen\2', html, 'status fallback')
           html = sub_once(r'(<p class="email-runtime-note" id="emailRuntimeNote">).*?(</p>)', r'\1Du behältst die Kontrolle. NAHWERK nutzt deine Google-Daten nur für die E-Mail-Funktionen, die du aktivierst.\2', html, 'runtime customer note', re.S)
           html = html.replace('Nicht serverseitig bestätigt', 'Wird geprüft')
