@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="referrer" content="no-referrer" />
+  <title>NAHWERK · E-Mail-Verbindung</title>
+  <style>
+    :root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#060606;color:#f5f3ed;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;padding:24px}.card{width:min(100%,560px);padding:34px;border:1px solid rgba(200,164,93,.28);border-radius:24px;background:#0d0d0c;box-shadow:0 30px 90px rgba(0,0,0,.42)}.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#c8a45d}.title{margin:10px 0 12px;font-size:28px}.copy{margin:0;color:#c9c5bc;line-height:1.6}.btn{display:inline-flex;margin-top:22px;padding:12px 18px;border-radius:999px;border:1px solid rgba(200,164,93,.48);color:#fff;text-decoration:none;background:rgba(200,164,93,.09)}
+  </style>
+</head>
+<body>
+  <main class="card" aria-live="polite">
+    <div class="eyebrow">NAHWERK Concierge</div>
+    <h1 class="title" id="title">E-Mail-Verbindung wird bestätigt …</h1>
+    <p class="copy" id="copy">Bitte dieses Fenster nicht schließen.</p>
+    <a class="btn" id="back" href="/konto.html#email" hidden>Zurück zum Kundenkonto</a>
+  </main>
+  <script>
+    (()=>{
+      const p=new URLSearchParams(location.search);
+      const connected=p.get("email")==="connected";
+      const provider=String(p.get("provider")||"GOOGLE").toUpperCase();
+      const flow=String(p.get("flow")||"CONNECT").toUpperCase();
+      const safeProvider=provider==="GOOGLE"?"GOOGLE":"GOOGLE";
+      const safeFlow=flow==="REAUTH"?"REAUTH":"CONNECT";
+      if(connected){
+        location.replace(`/konto.html?email_oauth=complete&provider=${safeProvider}&flow=${safeFlow}#email`);
+        return;
+      }
+      document.getElementById("title").textContent="E-Mail-Verbindung nicht abgeschlossen";
+      document.getElementById("copy").textContent="Die Verbindung wurde nicht bestätigt. Kehre zum Kundenkonto zurück und versuche es dort erneut.";
+      document.getElementById("back").hidden=false;
+    })();
+  </script>
+</body>
+</html>
