@@ -21,28 +21,11 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          import re
+          import base64, re
           p=Path('.github/workflows/acquisition-v1-ci.yml')
           s=p.read_text(encoding='utf-8')
-          replacement='''      - name: Accessibility smoke with axe
-        run: |
-          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
-          test -n "$CHROME"
-          CHROME_MAJOR="$("$CHROME" --version | grep -oE '[0-9]+' | head -1)"
-          npx --yes browser-driver-manager@2.0.1 install "chrome@$CHROME_MAJOR"
-          set -a
-          source "$HOME/.browser-driver-manager/.env"
-          set +a
-          test -x "$CHROMEDRIVER_TEST_PATH"
-          pages=(index.html prime-concierge.html safety.html registrieren.html angehoerige.html leistungen.html pakete.html telefonannahme.html __email-account-a11y.html __family-owner-a11y.html)
-          for page in "${pages[@]}"; do
-            echo "AXE $page"
-            npx --yes @axe-core/cli@4.10.2 \\
-              --chromedriver-path "$CHROMEDRIVER_TEST_PATH" \\
-              "http://127.0.0.1:4173/$page" \\
-              --exit
-          done
-'''
+          encoded='ICAgICAgLSBuYW1lOiBBY2Nlc3NpYmlsaXR5IHNtb2tlIHdpdGggYXhlCiAgICAgICAgcnVuOiB8CiAgICAgICAgICBDSFJPTUU9IiQoY29tbWFuZCAtdiBnb29nbGUtY2hyb21lIHx8IGNvbW1hbmQgLXYgZ29vZ2xlLWNocm9tZS1zdGFibGUgfHwgY29tbWFuZCAtdiBjaHJvbWl1bSB8fCBjb21tYW5kIC12IGNocm9taXVtLWJyb3dzZXIgfHwgdHJ1ZSkiCiAgICAgICAgICB0ZXN0IC1uICIkQ0hST01FIgogICAgICAgICAgQ0hST01FX01BSk9SPSIkKCIkQ0hST01FIiAtLXZlcnNpb24gfCBncmVwIC1vRSAnWzAtOV0rJyB8IGhlYWQgLTEpIgogICAgICAgICAgbnB4IC0teWVzIGJyb3dzZXItZHJpdmVyLW1hbmFnZXJAMi4wLjEgaW5zdGFsbCAiY2hyb21lQCRDSFJPTUVfTUFKT1IiCiAgICAgICAgICBzZXQgLWEKICAgICAgICAgIHNvdXJjZSAiJEhPTUUvLmJyb3dzZXItZHJpdmVyLW1hbmFnZXIvLmVudiIKICAgICAgICAgIHNldCArYQogICAgICAgICAgdGVzdCAteCAiJENIUk9NRURSSVZFUl9URVNUX1BBVEgiCiAgICAgICAgICBwYWdlcz0oaW5kZXguaHRtbCBwcmltZS1jb25jaWVyZ2UuaHRtbCBzYWZldHkuaHRtbCByZWdpc3RyaWVyZW4uaHRtbCBhbmdlaG9lcmlnZS5odG1sIGxlaXN0dW5nZW4uaHRtbCBwYWtldGUuaHRtbCB0ZWxlZm9uYW5uYWhtZS5odG1sIF9fZW1haWwtYWNjb3VudC1hMTF5Lmh0bWwgX19mYW1pbHktb3duZXItYTExeS5odG1sKQogICAgICAgICAgZm9yIHBhZ2UgaW4gIiR7cGFnZXNbQF19IjsgZG8KICAgICAgICAgICAgZWNobyAiQVhFICRwYWdlIgogICAgICAgICAgICBucHggLS15ZXMgQGF4ZS1jb3JlL2NsaUA0LjEwLjIgXAogICAgICAgICAgICAgIC0tY2hyb21lZHJpdmVyLXBhdGggIiRDSFJPTUVEUklWRVJfVEVTVF9QQVRIIiBcCiAgICAgICAgICAgICAgImh0dHA6Ly8xMjcuMC4wLjE6NDE3My8kcGFnZSIgXAogICAgICAgICAgICAgIC0tZXhpdAogICAgICAgICAgZG9uZQo='
+          replacement=base64.b64decode(encoded).decode('utf-8')
           pattern=r'      - name: Accessibility smoke with axe\n[\s\S]*?(?=      - name: Lighthouse desktop\n)'
           ns,n=re.subn(pattern,replacement,s,count=1)
           if n != 1:
@@ -52,11 +35,10 @@ jobs:
           rm -f .github/workflows/a11y-diagnostic-temp.yml
           rm -f .github/workflows/ci-axe-self-fix-temp.yml
           git diff --check
-          git diff -- .github/workflows/acquisition-v1-ci.yml .github/workflows/a11y-diagnostic-temp.yml .github/workflows/ci-axe-self-fix-temp.yml
       - name: Commit branch-only CI repair
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .github/workflows/acquisition-v1-ci.yml .github/workflows/a11y-diagnostic-temp.yml .github/workflows/ci-axe-self-fix-temp.yml
+          git add -A .github/workflows
           git commit -m "ci: run axe per page and remove diagnostics"
           git push origin HEAD:fix/website-ci-localized-home-20260915
