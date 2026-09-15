@@ -1,0 +1,50 @@
+name: Google OAuth logo artifact once
+
+on:
+  push:
+    branches:
+      - asset/google-oauth-logo-20260915
+    paths:
+      - '.github/workflows/google-oauth-logo-artifact-once.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout isolated asset branch
+        uses: actions/checkout@v4
+
+      - name: Install SVG renderer
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq librsvg2-bin imagemagick
+
+      - name: Render exact NAHWERK mark to Google OAuth PNG
+        shell: bash
+        run: |
+          mkdir -p out
+          rsvg-convert \
+            --keep-aspect-ratio \
+            --width 112 \
+            --height 112 \
+            assets/logos/nahwerk-concierge-gold-transparent.svg \
+            -o out/mark.png
+          convert out/mark.png \
+            -background none \
+            -gravity center \
+            -extent 120x120 \
+            out/NAHWERK-Concierge-Google-OAuth-120x120.png
+          identify out/NAHWERK-Concierge-Google-OAuth-120x120.png
+          test "$(identify -format '%wx%h' out/NAHWERK-Concierge-Google-OAuth-120x120.png)" = "120x120"
+          test "$(stat -c%s out/NAHWERK-Concierge-Google-OAuth-120x120.png)" -lt 1048576
+
+      - name: Upload Google OAuth logo
+        uses: actions/upload-artifact@v4
+        with:
+          name: nahwerk-google-oauth-logo
+          path: out/NAHWERK-Concierge-Google-OAuth-120x120.png
+          if-no-files-found: error
+          retention-days: 7
