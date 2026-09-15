@@ -1,0 +1,62 @@
+name: CI Axe Self Fix TEMP
+
+on:
+  push:
+    branches:
+      - fix/website-ci-localized-home-20260915
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/website-ci-localized-home-20260915
+          fetch-depth: 0
+      - name: Replace flaky multi-page axe invocation
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('.github/workflows/acquisition-v1-ci.yml')
+          s=p.read_text(encoding='utf-8')
+          replacement='''      - name: Accessibility smoke with axe
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          CHROME_MAJOR="$("$CHROME" --version | grep -oE '[0-9]+' | head -1)"
+          npx --yes browser-driver-manager@2.0.1 install "chrome@$CHROME_MAJOR"
+          set -a
+          source "$HOME/.browser-driver-manager/.env"
+          set +a
+          test -x "$CHROMEDRIVER_TEST_PATH"
+          pages=(index.html prime-concierge.html safety.html registrieren.html angehoerige.html leistungen.html pakete.html telefonannahme.html __email-account-a11y.html __family-owner-a11y.html)
+          for page in "${pages[@]}"; do
+            echo "AXE $page"
+            npx --yes @axe-core/cli@4.10.2 \\
+              --chromedriver-path "$CHROMEDRIVER_TEST_PATH" \\
+              "http://127.0.0.1:4173/$page" \\
+              --exit
+          done
+'''
+          pattern=r'      - name: Accessibility smoke with axe\n[\s\S]*?(?=      - name: Lighthouse desktop\n)'
+          ns,n=re.subn(pattern,replacement,s,count=1)
+          if n != 1:
+              raise SystemExit(f'expected one axe block, replaced {n}')
+          p.write_text(ns,encoding='utf-8')
+          PY
+          rm -f .github/workflows/a11y-diagnostic-temp.yml
+          rm -f .github/workflows/ci-axe-self-fix-temp.yml
+          git diff --check
+          git diff -- .github/workflows/acquisition-v1-ci.yml .github/workflows/a11y-diagnostic-temp.yml .github/workflows/ci-axe-self-fix-temp.yml
+      - name: Commit branch-only CI repair
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/acquisition-v1-ci.yml .github/workflows/a11y-diagnostic-temp.yml .github/workflows/ci-axe-self-fix-temp.yml
+          git commit -m "ci: run axe per page and remove diagnostics"
+          git push origin HEAD:fix/website-ci-localized-home-20260915
