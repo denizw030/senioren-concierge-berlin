@@ -6,7 +6,7 @@ import path from 'node:path';
 const root = process.cwd();
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const pages = [
-  ['index.html', 'Im Alltag', 'Einfach sagen, was gebraucht wird.', 'Unterwegs', 'Der Concierge bleibt erreichbar.'],
+  ['de/index.html', 'Im Alltag', 'Einfach sagen, was gebraucht wird.', 'Unterwegs', 'Der Concierge bleibt erreichbar.'],
   ['en/index.html', 'Everyday', 'Just say what you need.', 'On the go', 'Your Concierge stays within reach.'],
   ['tr/index.html', 'Günlük hayatta', 'Neye ihtiyacınız olduğunu söylemeniz yeterli.', 'Hareket halinde', 'Concierge’iniz her zaman ulaşılabilir.'],
 ];
