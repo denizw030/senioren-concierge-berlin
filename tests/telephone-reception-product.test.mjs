@@ -7,7 +7,7 @@ import { webcrypto } from "node:crypto";
 const r=(p)=>fs.readFileSync(p,"utf8");
 const page=r("telefonannahme.html");
 const js=r("assets/telephone-reception-product.js");
-const home=r("index.html");
+const home=r("de/index.html");
 const services=r("leistungen.html");
 const pricing=r("pakete.html");
 const registration=r("registrieren.html");
