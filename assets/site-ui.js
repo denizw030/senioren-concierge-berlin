@@ -2,6 +2,7 @@
   const isCustomerAccount = /(?:^|\/)konto\.html$/.test(location.pathname);
   const isProdCustomerSurface = /(?:^|\/)(?:konto|payg|web-concierge)\.html$/.test(location.pathname);
   const PORTAL_THEME_KEY = 'nw_portal_theme_v1';
+  const KONTO_FIX_STYLE_ID = 'nw-konto-targeted-fixes-v1';
 
   const readPortalTheme = () => {
     try {
@@ -22,6 +23,94 @@
     }
   };
 
+  const installCustomerAccountFixStyles = () => {
+    if (!isCustomerAccount) return;
+    let style = document.getElementById(KONTO_FIX_STYLE_ID);
+    if (!style) {
+      style = document.createElement('style');
+      style.id = KONTO_FIX_STYLE_ID;
+      style.textContent = `
+        body.account-premium-ui .status-summary[data-account-panel="overview"]{display:none!important}
+        body.account-premium-ui .customer-number-summary[data-account-panel="overview"]{order:-20;grid-column:span 6!important}
+        body.account-premium-ui .plan-summary[data-account-panel="overview"]{order:-10;grid-column:span 6!important}
+
+        html[data-nw-portal-theme="light"],
+        html[data-nw-portal-theme="light"] body.account-premium-ui,
+        body.account-premium-ui.nw-portal-light{
+          background:#f7f3ea!important;
+          color:#1c1a16!important;
+          color-scheme:light!important;
+        }
+        html[data-nw-portal-theme="light"] body.account-premium-ui main,
+        html[data-nw-portal-theme="light"] body.account-premium-ui .hero,
+        html[data-nw-portal-theme="light"] body.account-premium-ui main>.section,
+        html[data-nw-portal-theme="light"] body.account-premium-ui .account-section,
+        body.account-premium-ui.nw-portal-light main,
+        body.account-premium-ui.nw-portal-light .hero,
+        body.account-premium-ui.nw-portal-light main>.section,
+        body.account-premium-ui.nw-portal-light .account-section{
+          background:radial-gradient(900px 520px at 92% 2%,rgba(196,157,79,.12),transparent 68%),linear-gradient(180deg,#fbf8f1 0%,#f7f3ea 54%,#f2ebdf 100%)!important;
+          color:#1c1a16!important;
+        }
+        html[data-nw-portal-theme="light"] body.account-premium-ui .footer,
+        body.account-premium-ui.nw-portal-light .footer{
+          background:#ece4d8!important;
+          border-color:rgba(74,59,34,.15)!important;
+          color:#3f392f!important;
+        }
+        html[data-nw-portal-theme="light"] body.account-premium-ui .footergrid h4,
+        body.account-premium-ui.nw-portal-light .footergrid h4{color:#3d372e!important}
+        html[data-nw-portal-theme="light"] body.account-premium-ui .footergrid p,
+        html[data-nw-portal-theme="light"] body.account-premium-ui .footergrid a,
+        html[data-nw-portal-theme="light"] body.account-premium-ui .footbottom,
+        body.account-premium-ui.nw-portal-light .footergrid p,
+        body.account-premium-ui.nw-portal-light .footergrid a,
+        body.account-premium-ui.nw-portal-light .footbottom{color:#7a7267!important}
+        html[data-nw-portal-theme="light"] body.account-premium-ui .footergrid a:hover,
+        body.account-premium-ui.nw-portal-light .footergrid a:hover{color:#8b6828!important}
+
+        @media(max-width:700px){
+          body.account-premium-ui .customer-number-summary[data-account-panel="overview"],
+          body.account-premium-ui .plan-summary[data-account-panel="overview"]{grid-column:1!important}
+        }
+      `;
+    }
+    document.head.appendChild(style);
+  };
+
+  const bindSafetyLoadingGuard = () => {
+    if (!isCustomerAccount || document.documentElement.dataset.nwSafetyLoadingGuard === '1') return;
+    document.documentElement.dataset.nwSafetyLoadingGuard = '1';
+
+    const overview = document.getElementById('overviewSafety');
+    const overviewMeta = document.getElementById('overviewSafetyMeta');
+    const visible = document.getElementById('safetyVisibleStatus');
+    const summaryIntro = document.getElementById('safetySummaryIntro');
+    const accessibleStatus = document.getElementById('safetyStatus');
+    const accessibleMeta = document.getElementById('safetyMeta');
+    const loading = (element) => /wird geladen/i.test(String(element?.textContent || ''));
+
+    const applyOverviewFailState = () => {
+      if (overview && loading(overview)) overview.textContent = 'Nicht verfügbar';
+      if (overviewMeta) overviewMeta.textContent = 'Die Sicherheitseinstellungen konnten gerade nicht geladen werden.';
+    };
+
+    const syncFromSafetyPanel = () => {
+      if (String(visible?.textContent || '').trim() === 'Nicht verfügbar') applyOverviewFailState();
+    };
+
+    if (visible) new MutationObserver(syncFromSafetyPanel).observe(visible, { childList:true, subtree:true, characterData:true });
+    syncFromSafetyPanel();
+
+    window.setTimeout(() => {
+      if (visible && loading(visible)) visible.textContent = 'Nicht verfügbar';
+      if (summaryIntro && loading(summaryIntro)) summaryIntro.textContent = 'Die Sicherheitseinstellungen konnten gerade nicht geladen werden.';
+      if (accessibleStatus && loading(accessibleStatus)) accessibleStatus.textContent = 'Nicht verfügbar';
+      if (accessibleMeta && loading(accessibleMeta)) accessibleMeta.textContent = 'Die Sicherheitseinstellungen konnten gerade nicht geladen werden.';
+      if (overview && loading(overview)) applyOverviewFailState();
+    }, 11000);
+  };
+
   applyPortalTheme(readPortalTheme());
 
   // Customer PROD surfaces must never call a known STAGING endpoint.
@@ -34,7 +123,24 @@
       if (/staging/i.test(url)) {
         return Promise.reject(new TypeError("NAHWERK PROD web guard blocked a non-PROD endpoint."));
       }
-      return nativeFetch(input, init);
+
+      const method = String(init?.method || (input instanceof Request ? input.method : "GET") || "GET").toUpperCase();
+      const isSafetyRead = isCustomerAccount && method === "GET" && (
+        /denizw\.app\.n8n\.cloud\/webhook\/senioren-concierge\/web\/safety(?:$|\?)/i.test(url) ||
+        /\/functions\/v1\/web-safety-contacts(?:$|\?)/i.test(url) ||
+        /\/functions\/v1\/web-managed-safety-context(?:$|\?)/i.test(url)
+      );
+      if (!isSafetyRead) return nativeFetch(input, init);
+
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), 10000);
+      const upstreamSignal = init?.signal || (input instanceof Request ? input.signal : null);
+      if (upstreamSignal) {
+        if (upstreamSignal.aborted) controller.abort();
+        else upstreamSignal.addEventListener('abort', () => controller.abort(), { once:true });
+      }
+      const nextInit = { ...(init || {}), signal:controller.signal };
+      return nativeFetch(input, nextInit).finally(() => window.clearTimeout(timeoutId));
     };
   }
 
@@ -60,6 +166,8 @@
     if (!isCustomerAccount) return;
 
     applyPortalTheme(readPortalTheme());
+    installCustomerAccountFixStyles();
+    bindSafetyLoadingGuard();
 
     const reception = document.getElementById("telephoneReceptionCard");
     if (reception) {
@@ -103,6 +211,7 @@
         const next = toggle.checked ? 'dark' : 'light';
         try { localStorage.setItem(PORTAL_THEME_KEY, next); } catch (_) {}
         applyPortalTheme(next);
+        installCustomerAccountFixStyles();
         toggle.setAttribute('aria-checked', String(toggle.checked));
       });
     }
@@ -152,7 +261,10 @@
       premium.rel = 'stylesheet';
       premium.href = '/assets/premium-preview.css?v=2';
       premium.dataset.nwPremiumPreview = 'true';
+      if (isCustomerAccount) premium.addEventListener('load', installCustomerAccountFixStyles, { once:true });
       document.head.append(premium);
+    } else if (isCustomerAccount) {
+      installCustomerAccountFixStyles();
     }
 
     if (!document.querySelector('.skip-link')) {
