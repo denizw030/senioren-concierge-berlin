@@ -1,0 +1,109 @@
+name: google oauth compliance once
+
+on:
+  push:
+    branches:
+      - fix/google-oauth-compliance-20260915
+    paths:
+      - '.github/workflows/google-oauth-compliance-once.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: google-oauth-compliance-branch
+  cancel-in-progress: false
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout isolated branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply Google OAuth compliance fixes only
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          home_path = Path('de/index.html')
+          home = home_path.read_text(encoding='utf-8')
+          old_privacy = '<a href="datenschutz.html">Datenschutz</a>'
+          new_privacy = '<a href="/datenschutz/">Datenschutz</a>'
+          old_terms = '<a href="agb.html">AGB</a>'
+          new_terms = '<a href="/nutzungsbedingungen/">AGB</a>'
+
+          if old_privacy in home:
+              home = home.replace(old_privacy, new_privacy)
+          elif new_privacy not in home:
+              raise SystemExit('Privacy footer marker not found in de/index.html')
+
+          if old_terms in home:
+              home = home.replace(old_terms, new_terms)
+          elif new_terms not in home:
+              raise SystemExit('Terms footer marker not found in de/index.html')
+
+          home_path.write_text(home, encoding='utf-8')
+
+          privacy_path = Path('datenschutz/index.html')
+          privacy = privacy_path.read_text(encoding='utf-8')
+
+          marker = '<h2>13. Drittlandübermittlungen</h2>'
+          google_section = (
+              '<h2>13. Google-/Gmail-Daten (OAuth)</h2>'
+              '<p>Wenn du freiwillig ein Google-Konto mit NAHWERK verbindest, erhält NAHWERK ausschließlich die von dir über Google OAuth freigegebenen Berechtigungen. Je nach aktivierter Funktion kann NAHWERK Gmail-Nachrichten und zugehörige Metadaten lesen und durchsuchen, Nachrichten oder Labels ändern beziehungsweise archivieren sowie Entwürfe und E-Mails in deinem Auftrag erstellen und versenden.</p>'
+              '<p>Google-Nutzerdaten werden ausschließlich verwendet, um von dir angeforderte Concierge-Aufgaben auszuführen, dir die daraus entstehenden Ergebnisse bereitzustellen und die Google-Verbindung sicher zu betreiben. Technisch erforderliche OAuth-Verbindungsdaten, insbesondere Zugriffs- und Aktualisierungstokens, können serverseitig gespeichert werden, solange die Verbindung aktiv ist oder dies für die sichere Abwicklung erforderlich ist.</p>'
+              '<p>Google- und Gmail-Daten werden nicht verkauft, nicht für personalisierte Werbung verwendet und nicht zur Erstellung von Werbeprofilen genutzt. Eine Übermittlung an technisch erforderliche Dienstleister erfolgt nur, soweit dies zur Ausführung einer von dir angeforderten Funktion notwendig ist. Dazu können insbesondere Infrastruktur-, Sicherheits- und KI-Dienstleister gehören, wenn deren Verarbeitung für die konkrete Concierge-Aufgabe erforderlich ist. Ein menschlicher Zugriff erfolgt nur, soweit dies für Sicherheit, Missbrauchsprävention, Support auf deine ausdrückliche Anfrage oder zur Erfüllung gesetzlicher Pflichten erforderlich ist.</p>'
+              '<p>Du kannst die Google-Verbindung jederzeit trennen. Soweit keine gesetzliche Aufbewahrungspflicht oder andere Rechtsgrundlage entgegensteht, werden nicht mehr benötigte Google-Verbindungsdaten und daraus abgeleitete, nur für die Verbindung erforderliche Daten anschließend gelöscht beziehungsweise nach den hierfür geltenden Löschfristen entfernt.</p>'
+              '<p>Die Nutzung und Übertragung von Informationen aus Google APIs erfolgt gemäß der <a href="https://developers.google.com/terms/api-services-user-data-policy" rel="noopener noreferrer">Google API Services User Data Policy</a>, einschließlich der dort beschriebenen Limited Use Requirements.</p>'
+          )
+
+          if 'Google-/Gmail-Daten (OAuth)' not in privacy:
+              if marker not in privacy:
+                  raise SystemExit('Expected section marker not found in datenschutz/index.html')
+              privacy = privacy.replace(marker, google_section + marker, 1)
+
+              renumbers = [
+                  ('<h2>19. Änderungen</h2>', '<h2>20. Änderungen</h2>'),
+                  ('<h2>18. Datensicherheit</h2>', '<h2>19. Datensicherheit</h2>'),
+                  ('<h2>17. Automatisierte Entscheidungen</h2>', '<h2>18. Automatisierte Entscheidungen</h2>'),
+                  ('<h2>16. Datenlöschung</h2>', '<h2>17. Datenlöschung</h2>'),
+                  ('<h2>15. Deine Rechte</h2>', '<h2>16. Deine Rechte</h2>'),
+                  ('<h2>14. Speicherdauer</h2>', '<h2>15. Speicherdauer</h2>'),
+                  ('<h2>13. Drittlandübermittlungen</h2>', '<h2>14. Drittlandübermittlungen</h2>'),
+              ]
+              for old, new in renumbers:
+                  if old not in privacy:
+                      raise SystemExit(f'Expected heading not found: {old}')
+                  privacy = privacy.replace(old, new, 1)
+
+          privacy = privacy.replace('<a href="agb.html">AGB</a>', '<a href="/nutzungsbedingungen/">AGB</a>')
+          privacy_path.write_text(privacy, encoding='utf-8')
+          PY
+
+      - name: Validate exact isolated scope
+        shell: bash
+        run: |
+          git diff --check
+          grep -F '<a href="/datenschutz/">Datenschutz</a>' de/index.html
+          grep -F '<a href="/nutzungsbedingungen/">AGB</a>' de/index.html
+          grep -F 'Google-/Gmail-Daten (OAuth)' datenschutz/index.html
+          grep -F 'Google API Services User Data Policy' datenschutz/index.html
+          grep -F 'Limited Use Requirements' datenschutz/index.html
+          git diff -- de/index.html datenschutz/index.html
+
+      - name: Commit only Google OAuth compliance files
+        shell: bash
+        run: |
+          if git diff --quiet -- de/index.html datenschutz/index.html; then
+            echo 'No changes required.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add de/index.html datenschutz/index.html
+          git commit -m 'Complete Google OAuth website compliance'
+          git push origin HEAD:fix/google-oauth-compliance-20260915
