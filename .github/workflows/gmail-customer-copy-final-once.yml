@@ -1,0 +1,97 @@
+name: Gmail customer copy final once
+
+on:
+  push:
+    branches:
+      - fix/gmail-customer-copy-final-20260915
+    paths:
+      - .github/workflows/gmail-customer-copy-final-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  polish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/gmail-customer-copy-final-20260915
+          fetch-depth: 0
+
+      - name: Apply Gmail-only customer copy cleanup
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          html_path = Path('konto.html')
+          js_path = Path('assets/email-account-integration.js')
+          test_path = Path('tests/email-account-integration.test.mjs')
+          html = html_path.read_text()
+          js = js_path.read_text()
+          tests = test_path.read_text()
+
+          def sub_once(pattern, repl, text, label, flags=0):
+            out, count = re.subn(pattern, repl, text, count=1, flags=flags)
+            if count != 1:
+              raise SystemExit(f'{label}: expected 1 replacement, got {count}')
+            return out
+
+          # Customer-facing HTML only. Keep IDs/contracts intact.
+          html = sub_once(r'data-email-runtime="inert"', 'data-email-runtime="prod"', html, 'runtime marker')
+          html = sub_once(r'(id="emailConnectionStatus">)[^<]*(</span>)', r'\1Wird geladen\2', html, 'status fallback')
+          html = sub_once(r'(<p class="email-runtime-note" id="emailRuntimeNote">).*?(</p>)', r'\1Du behältst die Kontrolle. NAHWERK nutzt deine Google-Daten nur für die E-Mail-Funktionen, die du aktivierst.\2', html, 'runtime customer note', re.S)
+          html = html.replace('Nicht serverseitig bestätigt', 'Wird geprüft')
+          html = sub_once(r'<p class="email-provider-note">.*?</p>', '<p class="email-provider-note">Verfügbare Funktionen richten sich nach deinem E-Mail-Anbieter und deinen Freigaben.</p>', html, 'provider note', re.S)
+          html = sub_once(r'<div><div class="eyebrow">Endkunden-Steuerung</div>', '<div><div class="eyebrow">Deine E-Mail-Funktionen</div>', html, 'functions heading')
+          html = sub_once(r'(<h4 id="emailStateTitle">).*?(</h4>)', r'\1E-Mail-Verbindung wird geprüft …\2', html, 'state title', re.S)
+          html = sub_once(r'(<p id="emailStateMeta">).*?(</p>)', r'\1Deine Verbindung wird sicher geladen.\2', html, 'state meta', re.S)
+          html = sub_once(r'<p class="email-continuity-note">.*?</p>', '<p class="email-continuity-note"><strong>Ein NAHWERK.</strong> Deine E-Mail-Verbindung gehört zu deinem Konto und steht dir überall dort zur Verfügung, wo du deinen NAHWERK Concierge nutzt.</p>', html, 'continuity customer note', re.S)
+          html = sub_once(r'assets/email-account-integration\.js\?v=3', 'assets/email-account-integration.js?v=4', html, 'email JS cache bust')
+
+          replacements = {
+            'runtimeNote.textContent = "PROD · Verbindungsstatus und Berechtigungen werden ausschließlich serverseitig geprüft.";': 'runtimeNote.textContent = "Du behältst die Kontrolle. NAHWERK nutzt deine Google-Daten nur für die E-Mail-Funktionen, die du aktivierst.";',
+            'stateMeta.textContent = "Dein bestehender NAHWERK-Kontokontext bleibt die einzige Authority.";': 'stateMeta.textContent = "Deine E-Mail-Verbindung wird sicher deinem NAHWERK-Konto zugeordnet.";',
+            '? "Google-Verifizierung läuft"': '? "In Vorbereitung"',
+            'stateMeta.textContent = "Der endgültige Status wird serverseitig geprüft.";': 'stateMeta.textContent = "Die Verbindung wird sicher bestätigt.";',
+            'stateMeta.textContent = "Es werden keine Provider-Geheimnisse oder internen Fehlermeldungen angezeigt.";': 'stateMeta.textContent = "Bitte versuche es erneut oder melde dich neu an, falls das Problem bestehen bleibt.";',
+            ': "Für dein bereits freigegebenes Owner-Konto bleibt eine bestehende Verbindung nutzbar. Neue öffentliche Verbindungen bleiben bis zur Google-Freigabe geschlossen.";': ': "Neue Gmail-Verbindungen sind derzeit noch nicht verfügbar.";',
+          }
+          for old, new in replacements.items():
+            if js.count(old) != 1:
+              raise SystemExit(f'JS copy match expected once: {old[:90]}')
+            js = js.replace(old, new)
+
+          if 'assert.match(konto,/Endkunden-Steuerung/)' not in tests:
+            raise SystemExit('old customer-controls test marker missing')
+          tests = tests.replace('assert.match(konto,/Endkunden-Steuerung/)', 'assert.match(konto,/Deine E-Mail-Funktionen/)')
+
+          old_continuity = 'test("channel continuity and approval copy remain in the real account surface",()=>{\n  assert.match(konto,/Die Verbindung gehört zu deiner Person/);assert.match(konto,/Web, WhatsApp, Voice und App/);assert.match(konto,/denselben NAHWERK Core/);assert.match(konto,/CAO/);\n});'
+          new_continuity = 'test("customer-facing Gmail copy is clear while approval safety remains explicit",()=>{\n  assert.match(konto,/Deine E-Mail-Verbindung gehört zu deinem Konto/);assert.match(konto,/Deine E-Mail-Funktionen/);assert.match(konto,/Nach Freigabe senden/);\n  assert.match(js,/nur nach der vorgesehenen Freigabe senden/);\n  assert.doesNotMatch(konto,/PRE-PROD|Runtime inert|Endkunden-Steuerung|person_id|denselben NAHWERK Core|CAO|NAHWERK E-Mail-Gateway/);\n  assert.doesNotMatch(js,/PROD · Verbindungsstatus|Kontokontext bleibt die einzige Authority|Owner-Konto|Google-Verifizierung läuft|Der endgültige Status wird serverseitig geprüft/);\n});'
+          if old_continuity not in tests:
+            raise SystemExit('old continuity test block missing')
+          tests = tests.replace(old_continuity, new_continuity)
+
+          html_path.write_text(html)
+          js_path.write_text(js)
+          test_path.write_text(tests)
+          PY
+
+      - name: Run Gmail integration tests
+        run: node --test tests/email-account-integration.test.mjs
+
+      - name: Guard exact product files
+        run: |
+          changed="$(git diff --name-only | sort)"
+          printf '%s\n' "$changed"
+          test "$changed" = $'assets/email-account-integration.js\nkonto.html\ntests/email-account-integration.test.mjs'
+
+      - name: Commit product changes and remove helper
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/gmail-customer-copy-final-once.yml
+          git add konto.html assets/email-account-integration.js tests/email-account-integration.test.mjs
+          git commit -m "Polish Gmail customer copy for Google verification"
+          git push origin HEAD:fix/gmail-customer-copy-final-20260915
