@@ -274,3 +274,43 @@ body.login-image-page[data-product="senioren"] .logincard{
     padding:0!important;
   }
 }
+
+/* Specificity bridge: while the html product marker is present but the body marker
+   has not been attached yet, the generic Prime login rules must not squeeze the
+   Senioren text rail to ~60px. This block intentionally outranks those rules. */
+html.nw-product-senior-first-paint body.login-image-page:not(.senior-product):not([data-product="senioren"]) main>.hero::before,
+html.nw-product-senior-first-paint body.login-image-page:not(.senior-product):not([data-product="senioren"]) main>.hero::after{
+  content:none!important;
+  display:none!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page:not(.senior-product):not([data-product="senioren"]) main>.hero>.wrap,
+html.nw-product-senior-first-paint body.login-image-page:not(.senior-product):not([data-product="senioren"]) main>.section>.wrap{
+  display:block!important;
+  width:100%!important;
+  max-width:560px!important;
+  min-width:0!important;
+  margin:0 auto!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+}
+
+html.nw-product-senior-first-paint body.login-image-page:not(.senior-product):not([data-product="senioren"]) main>.hero>.wrap>.eyebrow,
+html.nw-product-senior-first-paint body.login-image-page:not(.senior-product):not([data-product="senioren"]) main>.hero>.wrap>h1,
+html.nw-product-senior-first-paint body.login-image-page:not(.senior-product):not([data-product="senioren"]) main>.hero>.wrap>p{
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:560px!important;
+  inline-size:100%!important;
+  max-inline-size:560px!important;
+  margin-left:0!important;
+  margin-right:0!important;
+  padding-left:0!important;
+  padding-right:0!important;
+  white-space:normal!important;
+  word-break:normal!important;
+  overflow-wrap:normal!important;
+  writing-mode:horizontal-tb!important;
+  box-sizing:border-box!important;
+}
