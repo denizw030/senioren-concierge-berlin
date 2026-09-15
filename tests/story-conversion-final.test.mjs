@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 
 const read=(p)=>fs.readFileSync(p,"utf8");
+const homepage="de/index.html";
 const visibleText=(html)=>html
   .replace(/<section[^>]*\bhidden\b[^>]*>[\s\S]*?<\/section>/gi," ")
   .replace(/<[^>]+>/g," ")
@@ -10,7 +11,7 @@ const visibleText=(html)=>html
   .trim();
 
 test("homepage follows the frozen six-step story exactly",()=>{
-  const home=read("index.html");
+  const home=read(homepage);
   const steps=[...home.matchAll(/data-story-step="([1-6])"/g)].map(m=>m[1]);
   assert.deepEqual(steps,["1","2","3","4","5","6"]);
   const positions=[
@@ -26,7 +27,7 @@ test("homepage follows the frozen six-step story exactly",()=>{
 });
 
 test("core marketing statements are preserved verbatim",()=>{
-  const home=visibleText(read("index.html"));
+  const home=visibleText(read(homepage));
   for(const statement of [
     "Ein persönlicher Concierge, der erledigt.",
     "Google findet. KI versteht. NAHWERK erledigt.",
@@ -46,12 +47,12 @@ test("FREE entry copy explains trial, limits and online credit without live gift
   assert.match(js,/bis zu 20 WhatsApp-Dialoge \/ Monat/);
   assert.match(js,/1 echte Concierge-Ausführung/);
   assert.match(js,/FUTURE COPY — erst nach produktiver Verfügbarkeit im UI aktivieren/);
-  const renderedMarkup=read("index.html");
+  const renderedMarkup=read(homepage);
   assert.doesNotMatch(renderedMarkup,/Guthabenkarten ab 10 €/);
 });
 
 test("demo makes Auftrag Freigabe Durchführung Ergebnis immediately explicit",()=>{
-  const home=read("index.html");
+  const home=read(homepage);
   const start=home.indexOf('id="demo"');
   const end=home.indexOf('data-story-step="3"',start);
   assert.ok(start>=0&&end>start);
@@ -63,7 +64,7 @@ test("demo makes Auftrag Freigabe Durchführung Ergebnis immediately explicit",(
 });
 
 test("public story avoids fear-first and surveillance positioning",()=>{
-  const pages=["index.html","prime-concierge.html","angehoerige.html","safety.html","telefonannahme.html"];
+  const pages=[homepage,"prime-concierge.html","angehoerige.html","safety.html","telefonannahme.html"];
   const text=pages.map(p=>visibleText(read(p))).join("\n");
   for(const forbidden of [
     "Was wenn deine Eltern stürzen?",
@@ -85,13 +86,13 @@ test("unreleased telephone setup and warm-transfer marketing stay hidden",()=>{
 });
 
 test("story product pages share the same brand layer and navigation logic",()=>{
-  for(const p of ["index.html","prime-concierge.html","safety.html","angehoerige.html","telefonannahme.html"]){
+  for(const p of [homepage,"prime-concierge.html","safety.html","angehoerige.html","telefonannahme.html"]){
     const html=read(p);
-    assert.match(html,/assets\/story-conversion-final\.css\?v=1/,p);
-    assert.match(html,/href="prime-concierge\.html">Concierge<\/a>/,p);
-    assert.match(html,/href="safety\.html">Safety<\/a>/,p);
-    assert.match(html,/href="angehoerige\.html">Family<\/a>/,p);
-    assert.match(html,/href="telefonannahme\.html">Telefon<\/a>/,p);
+    assert.match(html,/assets\/story-conversion-final\.css\?v=\d+/,p);
+    assert.match(html,/href="(?:\/de\/)?prime-concierge\.html">Concierge<\/a>/,p);
+    assert.match(html,/href="(?:\/de\/)?safety\.html">Safety<\/a>/,p);
+    assert.match(html,/href="(?:\/de\/)?angehoerige\.html">Family<\/a>/,p);
+    assert.match(html,/href="(?:\/de\/)?telefonannahme\.html">Telefon<\/a>/,p);
   }
 });
 
