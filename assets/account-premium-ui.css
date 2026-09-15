@@ -784,3 +784,8 @@ body.account-premium-ui .btn.light{
   body.account-premium-ui .family-owner-panel,
   body.account-premium-ui #familyAccessCard{padding:14px!important}
 }
+
+/* Account overview cards belong only to the overview tab. */
+body.account-premium-ui .account-overview-highlights[hidden]{
+  display:none!important;
+}
