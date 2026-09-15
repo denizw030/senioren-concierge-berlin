@@ -34,122 +34,32 @@ jobs:
               p.write_text(text.replace(old, new))
 
           # konto.html: remove implementation language from the customer surface.
-          replace_exact(
-              "konto.html",
-              '<span class="email-status-badge" id="emailConnectionStatus">PRE-PROD</span>',
-              '<span class="email-status-badge" id="emailConnectionStatus">Wird geladen</span>'
-          )
-          replace_exact(
-              "konto.html",
-              '<p class="email-runtime-note" id="emailRuntimeNote">Runtime inert · Der Platform-Gateway ist vorbereitet, aber noch nicht als Website-Runtime deployed. Es wird keine OAuth-Anmeldung und kein Provider-Login gestartet.</p>',
-              '<p class="email-runtime-note" id="emailRuntimeNote">Du behältst die Kontrolle: NAHWERK nutzt nur die E-Mail-Funktionen, die du hier aktivierst.</p>'
-          )
-          replace_exact(
-              "konto.html",
-              '>Nicht serverseitig bestätigt</span>',
-              '>Wird geprüft</span>',
-              count=3
-          )
-          replace_exact(
-              "konto.html",
-              '<p class="email-provider-note">Die Verfügbarkeit wird ausschließlich serverseitig über den NAHWERK E-Mail-Gateway bestätigt. Die technische Verfügbarkeit hängt von den Einstellungen und Richtlinien deines E-Mail-Anbieters ab.</p>',
-              '<p class="email-provider-note">Welche Anbieter und Funktionen verfügbar sind, hängt von deinem E-Mail-Anbieter und den von dir erteilten Berechtigungen ab.</p>'
-          )
-          replace_exact(
-              "konto.html",
-              '<div><div class="eyebrow">Endkunden-Steuerung</div><div class="email-capabilities"',
-              '<div><div class="eyebrow">Deine E-Mail-Funktionen</div><div class="email-capabilities"'
-          )
-          replace_exact(
-              "konto.html",
-              '<div class="email-state-card" aria-live="polite"><h4 id="emailStateTitle">Verbindung technisch vorbereitet, derzeit noch nicht verfügbar.</h4><p id="emailStateMeta">Der serverseitige Verbindungsstatus bleibt alleinige Authority.</p>',
-              '<div class="email-state-card" aria-live="polite"><h4 id="emailStateTitle">E-Mail-Verbindung wird geprüft …</h4><p id="emailStateMeta">Einen Moment – NAHWERK prüft den aktuellen Verbindungsstatus.</p>'
-          )
-          replace_exact(
-              "konto.html",
-              '<div class="eyebrow">Anderer Anbieter · APP_PASSWORD</div>',
-              '<div class="eyebrow">Anderer Anbieter</div>'
-          )
-          replace_exact(
-              "konto.html",
-              '<p class="email-generic-help">OAuth2 wird für „Anderer Anbieter“ in Website V1 nicht angeboten. Das App-Passwort wird nur für den unmittelbaren Verbindungsrequest verwendet, niemals gespeichert und nach dem Submit sofort aus dem Eingabefeld gelöscht.</p>',
-              '<p class="email-generic-help">Bei manchen E-Mail-Anbietern brauchst du ein separates App-Passwort. NAHWERK verwendet es nur zum Herstellen der Verbindung und speichert es nicht in diesem Formular.</p>'
-          )
-          replace_exact(
-              "konto.html",
-              '<p class="email-generic-help">Die technische Verfügbarkeit hängt von den Einstellungen und Richtlinien deines E-Mail-Anbieters ab.</p>',
-              '<p class="email-generic-help">Ob diese Verbindung verfügbar ist, hängt von den Sicherheits- und Kontoeinstellungen deines E-Mail-Anbieters ab.</p>',
-              count=2
-          )
-          replace_exact(
-              "konto.html",
-              '<p class="email-continuity-note"><strong>Ein NAHWERK.</strong> Die Verbindung gehört zu deiner Person – nicht zu diesem Browser oder einem einzelnen Kanal. Nach einer real bestätigten Verbindung nutzen Web, WhatsApp, Voice und App dieselbe person_id, denselben NAHWERK Core, dieselben Tasks, Memory und Approvals sowie dieselbe email_connections-Wahrheit über den CAO.</p>',
-              '<p class="email-continuity-note"><strong>Ein NAHWERK.</strong> Deine E-Mail-Verbindung steht dir in Web, WhatsApp, Voice und App zur Verfügung. Deine aktivierten Funktionen und Freigaben gelten überall einheitlich.</p>'
-          )
-          replace_exact(
-              "konto.html",
-              'assets/email-account-integration.js?v=3',
-              'assets/email-account-integration.js?v=4'
-          )
+          replace_exact("konto.html", '<span class="email-status-badge" id="emailConnectionStatus">PRE-PROD</span>', '<span class="email-status-badge" id="emailConnectionStatus">Wird geladen</span>')
+          replace_exact("konto.html", '<p class="email-runtime-note" id="emailRuntimeNote">Runtime inert · Der Platform-Gateway ist vorbereitet, aber noch nicht als Website-Runtime deployed. Es wird keine OAuth-Anmeldung und kein Provider-Login gestartet.</p>', '<p class="email-runtime-note" id="emailRuntimeNote">Du behältst die Kontrolle: NAHWERK nutzt nur die E-Mail-Funktionen, die du hier aktivierst.</p>')
+          replace_exact("konto.html", '>Nicht serverseitig bestätigt</span>', '>Wird geprüft</span>', count=3)
+          replace_exact("konto.html", '<p class="email-provider-note">Die Verfügbarkeit wird ausschließlich serverseitig über den NAHWERK E-Mail-Gateway bestätigt. Die technische Verfügbarkeit hängt von den Einstellungen und Richtlinien deines E-Mail-Anbieters ab.</p>', '<p class="email-provider-note">Welche Anbieter und Funktionen verfügbar sind, hängt von deinem E-Mail-Anbieter und den von dir erteilten Berechtigungen ab.</p>')
+          replace_exact("konto.html", '<div><div class="eyebrow">Endkunden-Steuerung</div><div class="email-capabilities"', '<div><div class="eyebrow">Deine E-Mail-Funktionen</div><div class="email-capabilities"')
+          replace_exact("konto.html", '<div class="email-state-card" aria-live="polite"><h4 id="emailStateTitle">Verbindung technisch vorbereitet, derzeit noch nicht verfügbar.</h4><p id="emailStateMeta">Der serverseitige Verbindungsstatus bleibt alleinige Authority.</p>', '<div class="email-state-card" aria-live="polite"><h4 id="emailStateTitle">E-Mail-Verbindung wird geprüft …</h4><p id="emailStateMeta">Einen Moment – NAHWERK prüft den aktuellen Verbindungsstatus.</p>')
+          replace_exact("konto.html", '<div class="eyebrow">Anderer Anbieter · APP_PASSWORD</div>', '<div class="eyebrow">Anderer Anbieter</div>')
+          replace_exact("konto.html", '<p class="email-generic-help">OAuth2 wird für „Anderer Anbieter“ in Website V1 nicht angeboten. Das App-Passwort wird nur für den unmittelbaren Verbindungsrequest verwendet, niemals gespeichert und nach dem Submit sofort aus dem Eingabefeld gelöscht.</p>', '<p class="email-generic-help">Bei manchen E-Mail-Anbietern brauchst du ein separates App-Passwort. NAHWERK verwendet es nur zum Herstellen der Verbindung und speichert es nicht in diesem Formular.</p>')
+          replace_exact("konto.html", '<p class="email-generic-help">Die technische Verfügbarkeit hängt von den Einstellungen und Richtlinien deines E-Mail-Anbieters ab.</p>', '<p class="email-generic-help">Ob diese Verbindung verfügbar ist, hängt von den Sicherheits- und Kontoeinstellungen deines E-Mail-Anbieters ab.</p>')
+          replace_exact("konto.html", '<p class="email-continuity-note"><strong>Ein NAHWERK.</strong> Die Verbindung gehört zu deiner Person – nicht zu diesem Browser oder einem einzelnen Kanal. Nach einer real bestätigten Verbindung nutzen Web, WhatsApp, Voice und App dieselbe person_id, denselben NAHWERK Core, dieselben Tasks, Memory und Approvals sowie dieselbe email_connections-Wahrheit über den CAO.</p>', '<p class="email-continuity-note"><strong>Ein NAHWERK.</strong> Deine E-Mail-Verbindung steht dir in Web, WhatsApp, Voice und App zur Verfügung. Deine aktivierten Funktionen und Freigaben gelten überall einheitlich.</p>')
+          replace_exact("konto.html", 'assets/email-account-integration.js?v=3', 'assets/email-account-integration.js?v=4')
 
           # JS runtime: keep security semantics, replace only customer-visible implementation wording.
-          replace_exact(
-              "assets/email-account-integration.js",
-              'runtimeNote.textContent = "PROD · Verbindungsstatus und Berechtigungen werden ausschließlich serverseitig geprüft.";',
-              'runtimeNote.textContent = "Du behältst die Kontrolle: NAHWERK nutzt nur die E-Mail-Funktionen, die du hier aktivierst.";'
-          )
-          replace_exact(
-              "assets/email-account-integration.js",
-              'stateMeta.textContent = "Dein bestehender NAHWERK-Kontokontext bleibt die einzige Authority.";',
-              'stateMeta.textContent = "Einen Moment – NAHWERK prüft den aktuellen Verbindungsstatus.";'
-          )
-          replace_exact(
-              "assets/email-account-integration.js",
-              '? "Google-Verifizierung läuft"',
-              '? "In Vorbereitung"'
-          )
-          replace_exact(
-              "assets/email-account-integration.js",
-              'stateMeta.textContent = "Dein Concierge nutzt nur die Funktionen, die du unten aktiviert hast und kann E-Mails nur nach der vorgesehenen Freigabe senden.";',
-              'stateMeta.textContent = "Dein Concierge nutzt nur die Funktionen, die du unten aktiviert hast. E-Mails werden nur nach deiner Freigabe gesendet.";'
-          )
-          replace_exact(
-              "assets/email-account-integration.js",
-              'stateMeta.textContent = "Der endgültige Status wird serverseitig geprüft.";',
-              'stateMeta.textContent = "Einen Moment – wir bestätigen die Verbindung mit deinem Konto.";'
-          )
-          replace_exact(
-              "assets/email-account-integration.js",
-              ': "Für dein bereits freigegebenes Owner-Konto bleibt eine bestehende Verbindung nutzbar. Neue öffentliche Verbindungen bleiben bis zur Google-Freigabe geschlossen.";',
-              ': "Neue Gmail-Verbindungen sind derzeit noch nicht verfügbar. Eine bestehende Verbindung kannst du weiter nutzen.";'
-          )
-          replace_exact(
-              "assets/email-account-integration.js",
-              'stateMeta.textContent = "Es werden keine Provider-Geheimnisse oder internen Fehlermeldungen angezeigt.";',
-              'stateMeta.textContent = "Deine Zugangsdaten bleiben geschützt. Versuche es erneut oder verbinde Gmail neu.";'
-          )
-          replace_exact(
-              "assets/email-account-integration.js",
-              ': "Änderungen gelten für deinen verbundenen Gmail-Zugang in allen NAHWERK-Kanälen.";',
-              ': "Änderungen gelten für deinen verbundenen Gmail-Zugang überall bei NAHWERK.";'
-          )
+          replace_exact("assets/email-account-integration.js", 'runtimeNote.textContent = "PROD · Verbindungsstatus und Berechtigungen werden ausschließlich serverseitig geprüft.";', 'runtimeNote.textContent = "Du behältst die Kontrolle: NAHWERK nutzt nur die E-Mail-Funktionen, die du hier aktivierst.";')
+          replace_exact("assets/email-account-integration.js", 'stateMeta.textContent = "Dein bestehender NAHWERK-Kontokontext bleibt die einzige Authority.";', 'stateMeta.textContent = "Einen Moment – NAHWERK prüft den aktuellen Verbindungsstatus.";')
+          replace_exact("assets/email-account-integration.js", '? "Google-Verifizierung läuft"', '? "In Vorbereitung"')
+          replace_exact("assets/email-account-integration.js", 'stateMeta.textContent = "Dein Concierge nutzt nur die Funktionen, die du unten aktiviert hast und kann E-Mails nur nach der vorgesehenen Freigabe senden.";', 'stateMeta.textContent = "Dein Concierge nutzt nur die Funktionen, die du unten aktiviert hast. E-Mails werden nur nach deiner Freigabe gesendet.";')
+          replace_exact("assets/email-account-integration.js", 'stateMeta.textContent = "Der endgültige Status wird serverseitig geprüft.";', 'stateMeta.textContent = "Einen Moment – wir bestätigen die Verbindung mit deinem Konto.";')
+          replace_exact("assets/email-account-integration.js", ': "Für dein bereits freigegebenes Owner-Konto bleibt eine bestehende Verbindung nutzbar. Neue öffentliche Verbindungen bleiben bis zur Google-Freigabe geschlossen.";', ': "Neue Gmail-Verbindungen sind derzeit noch nicht verfügbar. Eine bestehende Verbindung kannst du weiter nutzen.";')
+          replace_exact("assets/email-account-integration.js", 'stateMeta.textContent = "Es werden keine Provider-Geheimnisse oder internen Fehlermeldungen angezeigt.";', 'stateMeta.textContent = "Deine Zugangsdaten bleiben geschützt. Versuche es erneut oder verbinde Gmail neu.";')
+          replace_exact("assets/email-account-integration.js", ': "Änderungen gelten für deinen verbundenen Gmail-Zugang in allen NAHWERK-Kanälen.";', ': "Änderungen gelten für deinen verbundenen Gmail-Zugang überall bei NAHWERK.";')
 
           # Tests: preserve the security contract while validating customer-facing copy.
-          replace_exact(
-              "tests/email-account-integration.test.mjs",
-              'assert.match(konto,/Endkunden-Steuerung/);assert.match(konto,/EMAIL_MAILBOX/);assert.match(js,/\\/email\\/preferences/);',
-              'assert.match(konto,/Deine E-Mail-Funktionen/);assert.match(konto,/EMAIL_MAILBOX/);assert.match(js,/\\/email\\/preferences/);'
-          )
-          replace_exact(
-              "tests/email-account-integration.test.mjs",
-              'assert.match(js,/nur nach der vorgesehenen Freigabe senden/);',
-              'assert.match(js,/nur nach deiner Freigabe gesendet/);'
-          )
-          replace_exact(
-              "tests/email-account-integration.test.mjs",
-              'assert.match(konto,/Die Verbindung gehört zu deiner Person/);assert.match(konto,/Web, WhatsApp, Voice und App/);assert.match(konto,/denselben NAHWERK Core/);assert.match(konto,/CAO/);',
-              'assert.match(konto,/Deine E-Mail-Verbindung steht dir in Web, WhatsApp, Voice und App zur Verfügung/);assert.match(konto,/Deine aktivierten Funktionen und Freigaben gelten überall einheitlich/);assert.doesNotMatch(konto,/person_id|email_connections|denselben NAHWERK Core|über den CAO/);'
-          )
+          replace_exact("tests/email-account-integration.test.mjs", 'assert.match(konto,/Endkunden-Steuerung/);assert.match(konto,/EMAIL_MAILBOX/);assert.match(js,/\\/email\\/preferences/);', 'assert.match(konto,/Deine E-Mail-Funktionen/);assert.match(konto,/EMAIL_MAILBOX/);assert.match(js,/\\/email\\/preferences/);')
+          replace_exact("tests/email-account-integration.test.mjs", 'assert.match(js,/nur nach der vorgesehenen Freigabe senden/);', 'assert.match(js,/nur nach deiner Freigabe gesendet/);')
+          replace_exact("tests/email-account-integration.test.mjs", 'assert.match(konto,/Die Verbindung gehört zu deiner Person/);assert.match(konto,/Web, WhatsApp, Voice und App/);assert.match(konto,/denselben NAHWERK Core/);assert.match(konto,/CAO/);', 'assert.match(konto,/Deine E-Mail-Verbindung steht dir in Web, WhatsApp, Voice und App zur Verfügung/);assert.match(konto,/Deine aktivierten Funktionen und Freigaben gelten überall einheitlich/);assert.doesNotMatch(konto,/person_id|email_connections|denselben NAHWERK Core|über den CAO/);')
           PY
 
       - name: Guard isolated Gmail diff
