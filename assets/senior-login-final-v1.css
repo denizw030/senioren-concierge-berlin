@@ -1,17 +1,15 @@
-/* NAHWERK Senior Login — FINAL canonical light split layout.
-   Scope: anmelden.html when product=senioren. Prime and all other surfaces stay untouched. */
+/* NAHWERK Senior Login — canonical light split layout.
+   Scope: anmelden.html with product=senioren only. */
 
 html body.login-image-page.senior-product,
-html body.login-image-page[data-product="senioren"],
-html body.login-image-page.senior-product[data-product="senioren"]{
+html body.login-image-page[data-product="senioren"]{
   background:#f7f3ea!important;
   color:#181713!important;
   color-scheme:light!important;
 }
 
 html body.login-image-page.senior-product .top,
-html body.login-image-page[data-product="senioren"] .top,
-html body.login-image-page.senior-product[data-product="senioren"] .top{
+html body.login-image-page[data-product="senioren"] .top{
   background:#f7f3ea!important;
   border-color:rgba(65,51,26,.13)!important;
   box-shadow:0 1px 0 rgba(65,51,26,.06)!important;
@@ -27,12 +25,16 @@ html body.login-image-page[data-product="senioren"] .nw-language-button{
   box-shadow:inset 0 1px 0 rgba(255,255,255,.75)!important;
 }
 
-html body.login-image-page.senior-product[data-product="senioren"] main,
+/* Exact 50/50 desktop split. No center gutter. */
 html body.login-image-page.senior-product main,
 html body.login-image-page[data-product="senioren"] main{
+  position:relative!important;
   display:grid!important;
   grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
   grid-template-rows:auto 1fr!important;
+  gap:0!important;
+  column-gap:0!important;
+  row-gap:0!important;
   align-items:stretch!important;
   width:100%!important;
   max-width:none!important;
@@ -44,19 +46,26 @@ html body.login-image-page[data-product="senioren"] main{
   background:#f7f3ea!important;
 }
 
-/* Never allow the legacy portrait card/pseudo image back in. */
-html body.login-image-page.senior-product[data-product="senioren"] main>.hero::before,
-html body.login-image-page.senior-product[data-product="senioren"] main>.hero::after,
-html body.login-image-page.senior-product main>.hero::before,
-html body.login-image-page.senior-product main>.hero::after,
-html body.login-image-page[data-product="senioren"] main>.hero::before,
-html body.login-image-page[data-product="senioren"] main>.hero::after{
-  content:none!important;
-  display:none!important;
+/* Continuous left surface. */
+html body.login-image-page.senior-product main::before,
+html body.login-image-page[data-product="senioren"] main::before{
+  content:""!important;
+  display:block!important;
+  grid-column:1!important;
+  grid-row:1 / 3!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:100%!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  background:
+    radial-gradient(700px 520px at 92% 20%,rgba(200,164,93,.15),transparent 66%),
+    radial-gradient(540px 400px at 8% 10%,rgba(255,255,255,.86),transparent 66%),
+    linear-gradient(145deg,#fbf8f1 0%,#f3eddf 62%,#eadfca 100%)!important;
 }
 
-/* The whole right half is the senior portrait, edge-to-edge and square-cornered. */
-html body.login-image-page.senior-product[data-product="senioren"] main::after,
+/* Full right image, edge-to-edge. */
 html body.login-image-page.senior-product main::after,
 html body.login-image-page[data-product="senioren"] main::after{
   content:""!important;
@@ -72,17 +81,20 @@ html body.login-image-page[data-product="senioren"] main::after{
   padding:0!important;
   border:0!important;
   border-radius:0!important;
-  background-color:#e8dfd2!important;
-  background-image:url("/assets/lifestyle/senior-woman-overview.webp?v=6")!important;
-  background-repeat:no-repeat!important;
-  background-size:cover!important;
-  background-position:78% 50%!important;
+  background:#e8dfd2 url("/assets/lifestyle/senior-woman-overview.webp?v=6") 72% 50%/cover no-repeat!important;
   box-shadow:none!important;
   opacity:1!important;
 }
 
-/* STATIC DOM: heading/text first, login card directly underneath on the left. */
-html body.login-image-page.senior-product[data-product="senioren"] main>.hero,
+html body.login-image-page.senior-product main>.hero::before,
+html body.login-image-page.senior-product main>.hero::after,
+html body.login-image-page[data-product="senioren"] main>.hero::before,
+html body.login-image-page[data-product="senioren"] main>.hero::after{
+  content:none!important;
+  display:none!important;
+}
+
+/* Static DOM: text first, form directly beneath it. */
 html body.login-image-page.senior-product main>.hero,
 html body.login-image-page[data-product="senioren"] main>.hero{
   grid-column:1!important;
@@ -94,20 +106,17 @@ html body.login-image-page[data-product="senioren"] main>.hero{
   min-width:0!important;
   min-height:0!important;
   margin:0!important;
-  padding:clamp(46px,4.6vw,68px) clamp(38px,5.1vw,76px) 10px!important;
+  padding:clamp(46px,4.7vw,70px) clamp(38px,5.1vw,76px) 0!important;
   overflow:visible!important;
   border:0!important;
-  background:
-    radial-gradient(690px 520px at 90% 20%,rgba(200,164,93,.15),transparent 66%),
-    radial-gradient(520px 390px at 8% 10%,rgba(255,255,255,.84),transparent 66%),
-    linear-gradient(145deg,#fbf8f1 0%,#f3eddf 62%,#eadfca 100%)!important;
+  background:transparent!important;
   content-visibility:visible!important;
   contain:none!important;
 }
 
-html body.login-image-page.senior-product[data-product="senioren"] main>.hero>.wrap,
 html body.login-image-page.senior-product main>.hero>.wrap,
 html body.login-image-page[data-product="senioren"] main>.hero>.wrap{
+  display:block!important;
   width:100%!important;
   max-width:560px!important;
   min-width:0!important;
@@ -116,7 +125,6 @@ html body.login-image-page[data-product="senioren"] main>.hero>.wrap{
   box-sizing:border-box!important;
 }
 
-html body.login-image-page.senior-product[data-product="senioren"] main>.section,
 html body.login-image-page.senior-product main>.section,
 html body.login-image-page[data-product="senioren"] main>.section{
   grid-column:1!important;
@@ -127,20 +135,17 @@ html body.login-image-page[data-product="senioren"] main>.section{
   width:100%!important;
   min-width:0!important;
   margin:0!important;
-  padding:16px clamp(38px,5.1vw,76px) clamp(48px,5vw,72px)!important;
+  padding:28px clamp(38px,5.1vw,76px) clamp(48px,5vw,72px)!important;
   overflow:visible!important;
   border:0!important;
-  background:
-    radial-gradient(680px 500px at 90% -8%,rgba(200,164,93,.12),transparent 66%),
-    linear-gradient(145deg,#f5efe2 0%,#eadfca 100%)!important;
+  background:transparent!important;
   content-visibility:visible!important;
   contain:none!important;
 }
 
-html body.login-image-page.senior-product[data-product="senioren"] main>.section>.wrap,
 html body.login-image-page.senior-product main>.section>.wrap,
-html body.login-image-page[data-product="senioren"] main>.section>.wrap,
 html body.login-image-page.senior-product .loginwrap,
+html body.login-image-page[data-product="senioren"] main>.section>.wrap,
 html body.login-image-page[data-product="senioren"] .loginwrap{
   display:block!important;
   width:100%!important;
@@ -150,20 +155,21 @@ html body.login-image-page[data-product="senioren"] .loginwrap{
   padding:0!important;
 }
 
-/* COMPOSED DOM from locale-boot: collapse its internal two-column grid back to one left column.
-   The real right-side image is always main::after above, so runtime rebuilds cannot create a third column. */
-html body.login-image-page.senior-product[data-product="senioren"].nw-senior-login-composed main>.hero,
+/* locale-boot composed DOM: use only the left panel; right image remains main::after. */
 html body.login-image-page.senior-product.nw-senior-login-composed main>.hero,
 html body.login-image-page[data-product="senioren"].nw-senior-login-composed main>.hero{
   grid-column:1!important;
   grid-row:1 / 3!important;
   display:flex!important;
   align-items:stretch!important;
+  width:100%!important;
+  min-width:0!important;
   min-height:calc(100vh - 126px)!important;
+  margin:0!important;
   padding:0!important;
+  background:transparent!important;
 }
 
-html body.login-image-page.senior-product[data-product="senioren"].nw-senior-login-composed .hero>.wrap,
 html body.login-image-page.senior-product.nw-senior-login-composed .hero>.wrap,
 html body.login-image-page[data-product="senioren"].nw-senior-login-composed .hero>.wrap{
   width:100%!important;
@@ -176,7 +182,6 @@ html body.login-image-page[data-product="senioren"].nw-senior-login-composed .he
   box-sizing:border-box!important;
 }
 
-html body.login-image-page.senior-product[data-product="senioren"] .nw-senior-login-copy,
 html body.login-image-page.senior-product .nw-senior-login-copy,
 html body.login-image-page[data-product="senioren"] .nw-senior-login-copy{
   grid-column:1 / -1!important;
@@ -191,15 +196,11 @@ html body.login-image-page[data-product="senioren"] .nw-senior-login-copy{
   min-width:0!important;
   min-height:100%!important;
   margin:0!important;
-  padding:clamp(46px,4.6vw,68px) clamp(38px,5.1vw,76px) clamp(48px,5vw,72px)!important;
+  padding:clamp(46px,4.7vw,70px) clamp(38px,5.1vw,76px) clamp(48px,5vw,72px)!important;
   box-sizing:border-box!important;
-  background:
-    radial-gradient(690px 520px at 90% 20%,rgba(200,164,93,.15),transparent 66%),
-    radial-gradient(520px 390px at 8% 10%,rgba(255,255,255,.84),transparent 66%),
-    linear-gradient(145deg,#fbf8f1 0%,#f3eddf 62%,#eadfca 100%)!important;
+  background:transparent!important;
 }
 
-html body.login-image-page.senior-product[data-product="senioren"] figure.nw-senior-login-portrait,
 html body.login-image-page.senior-product figure.nw-senior-login-portrait,
 html body.login-image-page[data-product="senioren"] figure.nw-senior-login-portrait{
   display:none!important;
@@ -214,12 +215,12 @@ html body.login-image-page[data-product="senioren"] figure.nw-senior-login-portr
   box-shadow:none!important;
 }
 
-html body.login-image-page.senior-product[data-product="senioren"] .nw-senior-login-source-section,
 html body.login-image-page.senior-product .nw-senior-login-source-section,
 html body.login-image-page[data-product="senioren"] .nw-senior-login-source-section{
   display:none!important;
 }
 
+/* Copy alignment. */
 html body.login-image-page.senior-product .nw-senior-login-copy>.eyebrow,
 html body.login-image-page.senior-product .nw-senior-login-copy>h1,
 html body.login-image-page.senior-product .nw-senior-login-copy>p,
@@ -271,35 +272,48 @@ html body.login-image-page[data-product="senioren"] .hero p{
   overflow-wrap:normal!important;
 }
 
-/* Keep the exact current light login-card look, simply place it under the copy. */
+/* Modern login card, aligned exactly with the copy above. */
 html body.login-image-page.senior-product .logincard,
 html body.login-image-page[data-product="senioren"] .logincard{
   display:block!important;
   width:100%!important;
   max-width:560px!important;
   min-width:0!important;
-  margin:28px 0 0!important;
-  padding:24px 26px!important;
+  margin:0!important;
+  padding:26px!important;
   box-sizing:border-box!important;
-  border:1px solid rgba(112,87,39,.16)!important;
-  border-radius:20px!important;
-  background:rgba(255,255,255,.92)!important;
+  border:1px solid rgba(112,87,39,.15)!important;
+  border-radius:22px!important;
+  background:rgba(255,255,255,.93)!important;
   color:#181713!important;
-  box-shadow:0 20px 54px rgba(65,49,22,.10),inset 0 1px 0 rgba(255,255,255,.92)!important;
+  box-shadow:0 22px 56px rgba(65,49,22,.11),inset 0 1px 0 rgba(255,255,255,.96)!important;
   backdrop-filter:blur(18px) saturate(115%)!important;
   -webkit-backdrop-filter:blur(18px) saturate(115%)!important;
 }
 
+html body.login-image-page.senior-product .nw-senior-login-copy>.logincard,
+html body.login-image-page[data-product="senioren"] .nw-senior-login-copy>.logincard{
+  margin-top:28px!important;
+}
+
+html body.login-image-page.senior-product main>.section .logincard,
+html body.login-image-page[data-product="senioren"] main>.section .logincard{
+  margin-top:0!important;
+}
+
 html body.login-image-page.senior-product .logincard h2,
 html body.login-image-page[data-product="senioren"] .logincard h2{
-  margin:0 0 18px!important;
+  margin:0 0 20px!important;
   color:#181713!important;
-  font-size:1.75rem!important;
-  letter-spacing:-.035em!important;
+  font-size:1.78rem!important;
+  line-height:1.05!important;
+  letter-spacing:-.04em!important;
 }
 
 html body.login-image-page.senior-product .field,
-html body.login-image-page[data-product="senioren"] .field{margin-bottom:14px!important}
+html body.login-image-page[data-product="senioren"] .field{
+  margin-bottom:15px!important;
+}
 
 html body.login-image-page.senior-product .field label,
 html body.login-image-page[data-product="senioren"] .field label{
@@ -313,15 +327,23 @@ html body.login-image-page[data-product="senioren"] .field label{
 html body.login-image-page.senior-product .field input,
 html body.login-image-page[data-product="senioren"] .field input{
   width:100%!important;
-  min-height:50px!important;
+  min-height:52px!important;
   padding:0 15px!important;
   box-sizing:border-box!important;
-  border:1px solid rgba(90,72,40,.20)!important;
-  border-radius:13px!important;
+  border:1px solid rgba(90,72,40,.19)!important;
+  border-radius:14px!important;
   background:#fff!important;
   color:#1f1c17!important;
   caret-color:#1f1c17!important;
   box-shadow:inset 0 1px 2px rgba(44,34,18,.025)!important;
+  transition:border-color .18s ease,box-shadow .18s ease,background .18s ease!important;
+}
+
+html body.login-image-page.senior-product .field input:focus,
+html body.login-image-page[data-product="senioren"] .field input:focus{
+  outline:none!important;
+  border-color:rgba(184,137,48,.62)!important;
+  box-shadow:0 0 0 4px rgba(201,157,67,.10)!important;
 }
 
 html body.login-image-page.senior-product .field input:-webkit-autofill,
@@ -332,27 +354,61 @@ html body.login-image-page[data-product="senioren"] .field input:-webkit-autofil
 html body.login-image-page[data-product="senioren"] .field input:-webkit-autofill:focus{
   -webkit-text-fill-color:#1f1c17!important;
   caret-color:#1f1c17!important;
-  -webkit-box-shadow:0 0 0 1000px #eaf2ff inset!important;
-  box-shadow:0 0 0 1000px #eaf2ff inset!important;
+  -webkit-box-shadow:0 0 0 1000px #eef4ff inset!important;
+  box-shadow:0 0 0 1000px #eef4ff inset!important;
 }
 
 html body.login-image-page.senior-product .password-wrap input,
-html body.login-image-page[data-product="senioren"] .password-wrap input{padding-right:54px!important}
-
-html body.login-image-page.senior-product #loginSubmit,
-html body.login-image-page[data-product="senioren"] #loginSubmit,
-html body.login-image-page.senior-product .mfa-step .btn.red,
-html body.login-image-page[data-product="senioren"] .mfa-step .btn.red{
-  width:100%!important;
-  min-height:50px!important;
-  border-radius:13px!important;
-  background:linear-gradient(135deg,#e2c071,#c99d43)!important;
-  color:#1d1810!important;
-  border:1px solid rgba(132,96,30,.25)!important;
-  box-shadow:0 10px 24px rgba(157,116,38,.14)!important;
+html body.login-image-page[data-product="senioren"] .password-wrap input{
+  padding-right:54px!important;
 }
 
-/* MFA / password-reset messages must stay light and readable. */
+html body.login-image-page.senior-product #loginSubmit,
+html body.login-image-page[data-product="senioren"] #loginSubmit{
+  width:100%!important;
+  min-height:52px!important;
+  border:1px solid rgba(142,102,30,.18)!important;
+  border-radius:14px!important;
+  background:linear-gradient(135deg,#e7c675 0%,#d4a744 100%)!important;
+  color:#1d1810!important;
+  font-weight:800!important;
+  box-shadow:0 10px 24px rgba(157,116,38,.14),inset 0 1px 0 rgba(255,255,255,.38)!important;
+}
+
+html body.login-image-page.senior-product #loginSubmit:hover,
+html body.login-image-page[data-product="senioren"] #loginSubmit:hover{
+  filter:brightness(1.025)!important;
+  transform:translateY(-1px)!important;
+}
+
+html body.login-image-page.senior-product .split,
+html body.login-image-page[data-product="senioren"] .split{
+  margin-top:16px!important;
+  padding-top:15px!important;
+  border-top:1px solid rgba(112,87,39,.12)!important;
+}
+
+html body.login-image-page.senior-product .split a,
+html body.login-image-page[data-product="senioren"] .split a{
+  color:#a87819!important;
+}
+
+/* MFA / reset / status stay light and readable. */
+html body.login-image-page.senior-product .status,
+html body.login-image-page[data-product="senioren"] .status{
+  border:1px solid rgba(137,103,42,.18)!important;
+  border-left:4px solid #c99d43!important;
+  border-radius:13px!important;
+  background:linear-gradient(145deg,#fffdf8,#f4ecdc)!important;
+  color:#29251f!important;
+  box-shadow:0 10px 26px rgba(92,68,28,.08)!important;
+}
+
+html body.login-image-page.senior-product .status strong,
+html body.login-image-page[data-product="senioren"] .status strong{
+  color:#29251f!important;
+}
+
 html body.login-image-page.senior-product .mfa-step,
 html body.login-image-page[data-product="senioren"] .mfa-step{
   border-top:1px solid rgba(112,87,39,.16)!important;
@@ -368,27 +424,19 @@ html body.login-image-page[data-product="senioren"] #mfaHint{
 
 html body.login-image-page.senior-product .mfa-step .btn.light,
 html body.login-image-page[data-product="senioren"] .mfa-step .btn.light{
-  background:#fff!important;
+  background:#f7f2e8!important;
   color:#29251f!important;
   border:1px solid rgba(120,91,39,.22)!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.78),0 8px 20px rgba(74,55,23,.06)!important;
 }
 
-html body.login-image-page.senior-product .status,
-html body.login-image-page[data-product="senioren"] .status{
-  border:1px solid rgba(137,103,42,.20)!important;
-  border-left:4px solid #c99d43!important;
-  border-radius:12px!important;
-  background:linear-gradient(145deg,#fffdf8,#f4ecdc)!important;
-  color:#29251f!important;
-  box-shadow:0 10px 26px rgba(92,68,28,.08)!important;
+html body.login-image-page.senior-product .mfa-step .btn.red,
+html body.login-image-page[data-product="senioren"] .mfa-step .btn.red{
+  background:linear-gradient(135deg,#e7c675,#d4a744)!important;
+  color:#1d1810!important;
+  border:1px solid rgba(132,96,30,.22)!important;
 }
-
-html body.login-image-page.senior-product .status strong,
-html body.login-image-page[data-product="senioren"] .status strong{color:#29251f!important}
 
 @media(max-width:820px){
-  html body.login-image-page.senior-product[data-product="senioren"] main,
   html body.login-image-page.senior-product main,
   html body.login-image-page[data-product="senioren"] main{
     display:block!important;
@@ -396,37 +444,52 @@ html body.login-image-page[data-product="senioren"] .status strong{color:#29251f
     overflow:visible!important;
   }
 
-  html body.login-image-page.senior-product main>.hero,
-  html body.login-image-page[data-product="senioren"] main>.hero,
-  html body.login-image-page.senior-product.nw-senior-login-composed main>.hero,
-  html body.login-image-page[data-product="senioren"].nw-senior-login-composed main>.hero{
-    display:block!important;
-    min-height:0!important;
-    padding:38px 20px 10px!important;
-  }
-
-  html body.login-image-page.senior-product .nw-senior-login-copy,
-  html body.login-image-page[data-product="senioren"] .nw-senior-login-copy{
-    grid-column:1 / -1!important;
-    min-height:0!important;
-    padding:0!important;
-    background:transparent!important;
-  }
-
-  html body.login-image-page.senior-product main>.section,
-  html body.login-image-page[data-product="senioren"] main>.section{
-    display:block!important;
-    padding:14px 20px 32px!important;
+  html body.login-image-page.senior-product main::before,
+  html body.login-image-page[data-product="senioren"] main::before{
+    display:none!important;
   }
 
   html body.login-image-page.senior-product main::after,
   html body.login-image-page[data-product="senioren"] main::after{
     display:block!important;
     width:100%!important;
-    height:clamp(380px,78vw,560px)!important;
+    height:clamp(360px,78vw,560px)!important;
     min-height:0!important;
-    margin:0!important;
-    background-position:78% 50%!important;
+    background-position:68% 50%!important;
+  }
+
+  html body.login-image-page.senior-product main>.hero,
+  html body.login-image-page.senior-product main>.section,
+  html body.login-image-page[data-product="senioren"] main>.hero,
+  html body.login-image-page[data-product="senioren"] main>.section{
+    width:100%!important;
+    background:
+      radial-gradient(660px 480px at 90% 16%,rgba(200,164,93,.13),transparent 66%),
+      linear-gradient(145deg,#fbf8f1 0%,#f3eddf 100%)!important;
+  }
+
+  html body.login-image-page.senior-product main>.hero,
+  html body.login-image-page[data-product="senioren"] main>.hero{
+    padding:38px 20px 0!important;
+  }
+
+  html body.login-image-page.senior-product main>.section,
+  html body.login-image-page[data-product="senioren"] main>.section{
+    padding:24px 20px 32px!important;
+  }
+
+  html body.login-image-page.senior-product.nw-senior-login-composed main>.hero,
+  html body.login-image-page[data-product="senioren"].nw-senior-login-composed main>.hero{
+    min-height:0!important;
+    padding:0!important;
+  }
+
+  html body.login-image-page.senior-product .nw-senior-login-copy,
+  html body.login-image-page[data-product="senioren"] .nw-senior-login-copy{
+    padding:38px 20px 32px!important;
+    background:
+      radial-gradient(660px 480px at 90% 16%,rgba(200,164,93,.13),transparent 66%),
+      linear-gradient(145deg,#fbf8f1 0%,#f3eddf 100%)!important;
   }
 
   html body.login-image-page.senior-product .hero h1,
@@ -438,7 +501,6 @@ html body.login-image-page[data-product="senioren"] .status strong{color:#29251f
   html body.login-image-page.senior-product .logincard,
   html body.login-image-page[data-product="senioren"] .logincard{
     max-width:none!important;
-    margin-top:24px!important;
     padding:22px 20px!important;
   }
 }
