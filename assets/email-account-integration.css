@@ -17,5 +17,5 @@ html body.account-premium-ui .account-section,html body.account-premium-ui .acco
 html body.account-premium-ui .account-setup-by{box-sizing:border-box!important;min-height:66px!important}
 html body.account-premium-ui .account-tabs-shell:not(:has(+ #nwPortalThemeSetting)){margin-bottom:112px!important}
 html body.account-premium-ui #managedContextNotice:not([hidden]){display:none!important}
-html body.account-premium-ui #managedPersonContext.nw-managed-ready + #managedContextNotice:not([hidden]){display:block!important}
+html body.account-premium-ui #managedPersonContext.nw-managed-ready + #managedContextNotice:not([hidden]),html body.account-premium-ui #managedPersonContext[hidden] + #managedContextNotice:not([hidden]){display:block!important}
 @media(max-width:720px){html body.account-premium-ui .account-tabs-shell:not(:has(+ #nwPortalThemeSetting)){margin-bottom:132px!important}}
