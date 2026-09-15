@@ -1,0 +1,101 @@
+name: Gmail Google Verification Copy Final
+
+on:
+  push:
+    branches:
+      - fix/gmail-google-verification-copy-final-20260915
+    paths:
+      - .github/workflows/gmail-google-verification-copy-final.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gmail-google-verification-copy-final-20260915
+  cancel-in-progress: false
+
+jobs:
+  polish:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/gmail-google-verification-copy-final-20260915
+          fetch-depth: 0
+      - name: Apply customer-facing Gmail copy
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          def replace_exact(path, old, new, count=1):
+              p = Path(path)
+              text = p.read_text()
+              actual = text.count(old)
+              if actual != count:
+                  raise SystemExit(f"{path}: expected {count} occurrences, found {actual}: {old[:80]!r}")
+              p.write_text(text.replace(old, new))
+
+          # Customer-facing account surface: remove internal/runtime language.
+          replace_exact("konto.html", '<span class="email-status-badge" id="emailConnectionStatus">PRE-PROD</span>', '<span class="email-status-badge" id="emailConnectionStatus">Wird geladen</span>')
+          replace_exact("konto.html", 'Runtime inert · Der Platform-Gateway ist vorbereitet, aber noch nicht als Website-Runtime deployed. Es wird keine OAuth-Anmeldung und kein Provider-Login gestartet.', 'Deine Gmail-Verbindung wird sicher geprüft.')
+          replace_exact("konto.html", 'Nicht serverseitig bestätigt', 'Wird geprüft', count=3)
+          replace_exact("konto.html", 'Die Verfügbarkeit wird ausschließlich serverseitig über den NAHWERK E-Mail-Gateway bestätigt. Die technische Verfügbarkeit hängt von den Einstellungen und Richtlinien deines E-Mail-Anbieters ab.', 'Welche Funktionen verfügbar sind, richtet sich nach deinem verbundenen E-Mail-Konto und den von dir erteilten Berechtigungen.')
+          replace_exact("konto.html", 'Endkunden-Steuerung', 'Deine E-Mail-Funktionen')
+          replace_exact("konto.html", 'Versand bleibt immer an die vorgesehene Freigabe gebunden', 'E-Mails werden nur nach deiner Freigabe gesendet')
+          replace_exact("konto.html", 'Verbindung technisch vorbereitet, derzeit noch nicht verfügbar.', 'Verbindung wird geprüft …')
+          replace_exact("konto.html", 'Der serverseitige Verbindungsstatus bleibt alleinige Authority.', 'Deine Einstellungen werden sicher geladen.')
+          replace_exact("konto.html", 'Anderer Anbieter · APP_PASSWORD', 'Anderer Anbieter')
+          replace_exact("konto.html", 'OAuth2 wird für „Anderer Anbieter“ in Website V1 nicht angeboten. Das App-Passwort wird nur für den unmittelbaren Verbindungsrequest verwendet, niemals gespeichert und nach dem Submit sofort aus dem Eingabefeld gelöscht.', 'Für andere Anbieter wird ein App-Passwort verwendet. Es wird nur für die Verbindung genutzt, nicht im Browser gespeichert und nach dem Absenden aus dem Eingabefeld entfernt.')
+          replace_exact("konto.html", 'Die technische Verfügbarkeit hängt von den Einstellungen und Richtlinien deines E-Mail-Anbieters ab.', 'Ob die Verbindung möglich ist, hängt von deinem Anbieter und dessen Kontoeinstellungen ab.')
+          replace_exact("konto.html", '<p class="email-continuity-note"><strong>Ein NAHWERK.</strong> Die Verbindung gehört zu deiner Person – nicht zu diesem Browser oder einem einzelnen Kanal. Nach einer real bestätigten Verbindung nutzen Web, WhatsApp, Voice und App dieselbe person_id, denselben NAHWERK Core, dieselben Tasks, Memory und Approvals sowie dieselbe email_connections-Wahrheit über den CAO.</p>', '<p class="email-continuity-note"><strong>Ein NAHWERK.</strong> Deine E-Mail-Verbindung gehört zu deinem Konto und steht dir in Web, WhatsApp, Voice und App zur Verfügung. Deine Einstellungen gelten überall gleich; E-Mails werden nur mit den von dir aktivierten Funktionen verarbeitet und nur nach deiner Freigabe gesendet.</p>')
+
+          # Force fresh browser delivery after the JS copy update.
+          p = Path("konto.html")
+          text = p.read_text()
+          pattern = r'assets/email-account-integration\.js\?v=(\d+)'
+          match = re.search(pattern, text)
+          if not match:
+              raise SystemExit("konto.html: email-account-integration.js cache key not found")
+          current = int(match.group(1))
+          text, n = re.subn(pattern, f'assets/email-account-integration.js?v={current + 1}', text, count=1)
+          if n != 1:
+              raise SystemExit("konto.html: cache key update failed")
+          p.write_text(text)
+
+          # Runtime copy: preserve behavior and authority, remove implementation jargon.
+          replace_exact("assets/email-account-integration.js", 'runtimeNote.textContent = "PROD · Verbindungsstatus und Berechtigungen werden ausschließlich serverseitig geprüft.";', 'runtimeNote.textContent = "Deine Gmail-Verbindung wird sicher geprüft.";')
+          replace_exact("assets/email-account-integration.js", 'stateMeta.textContent = "Dein bestehender NAHWERK-Kontokontext bleibt die einzige Authority.";', 'stateMeta.textContent = "Deine Einstellungen werden sicher geladen.";')
+          replace_exact("assets/email-account-integration.js", '? "Google-Verifizierung läuft"', '? "Noch nicht verfügbar"')
+          replace_exact("assets/email-account-integration.js", 'stateMeta.textContent = "Dein Concierge nutzt nur die Funktionen, die du unten aktiviert hast und kann E-Mails nur nach der vorgesehenen Freigabe senden.";', 'stateMeta.textContent = "Dein Concierge nutzt nur die Funktionen, die du aktiviert hast. E-Mails werden nur nach deiner Freigabe gesendet.";')
+          replace_exact("assets/email-account-integration.js", 'stateMeta.textContent = "Der endgültige Status wird serverseitig geprüft.";', 'stateMeta.textContent = "Wir prüfen die Verbindung mit Google.";')
+          replace_exact("assets/email-account-integration.js", 'stateTitle.textContent = googleAvailable() ? "Gmail mit NAHWERK verbinden" : "Gmail-Verbindung wird für den öffentlichen Start vorbereitet.";', 'stateTitle.textContent = googleAvailable() ? "Gmail mit NAHWERK verbinden" : "Gmail ist derzeit noch nicht verfügbar.";')
+          replace_exact("assets/email-account-integration.js", ': "Für dein bereits freigegebenes Owner-Konto bleibt eine bestehende Verbindung nutzbar. Neue öffentliche Verbindungen bleiben bis zur Google-Freigabe geschlossen.";', ': "Neue Gmail-Verbindungen sind derzeit noch nicht verfügbar.";')
+          replace_exact("assets/email-account-integration.js", 'stateMeta.textContent = "Es werden keine Provider-Geheimnisse oder internen Fehlermeldungen angezeigt.";', 'stateMeta.textContent = "Bitte versuche es erneut. Es wurde keine E-Mail gesendet.";')
+
+          # Regression tests now assert the customer-facing contract instead of internal vocabulary.
+          replace_exact("tests/email-account-integration.test.mjs", 'assert.match(konto,/Endkunden-Steuerung/);assert.match(konto,/EMAIL_MAILBOX/);assert.match(js,/\\/email\\/preferences/);', 'assert.match(konto,/Deine E-Mail-Funktionen/);assert.match(konto,/EMAIL_MAILBOX/);assert.match(js,/\\/email\\/preferences/);')
+          replace_exact("tests/email-account-integration.test.mjs", 'assert.match(js,/nur nach der vorgesehenen Freigabe senden/);', 'assert.match(js,/nur nach deiner Freigabe gesendet/);')
+          replace_exact("tests/email-account-integration.test.mjs", 'assert.match(konto,/Die Verbindung gehört zu deiner Person/);assert.match(konto,/Web, WhatsApp, Voice und App/);assert.match(konto,/denselben NAHWERK Core/);assert.match(konto,/CAO/);', 'assert.match(konto,/Deine E-Mail-Verbindung gehört zu deinem Konto/);assert.match(konto,/Web, WhatsApp, Voice und App/);assert.match(konto,/nur nach deiner Freigabe gesendet/);')
+      - name: Run Gmail and account regression tests
+        run: |
+          node --test tests/email-account-integration.test.mjs
+          node --test tests/account-premium-ui.test.mjs
+          node --test tests/auth-security.test.mjs
+      - name: Guard final product diff
+        run: |
+          git rm .github/workflows/gmail-google-verification-copy-final.yml
+          git add konto.html assets/email-account-integration.js tests/email-account-integration.test.mjs
+          files="$(git diff --cached --name-only | sort)"
+          expected="assets/email-account-integration.js
+          konto.html
+          tests/email-account-integration.test.mjs"
+          test "$files" = "$expected"
+          ! git diff --cached -- konto.html assets/email-account-integration.js | grep -E 'anmelden\.html|senior-login|senioren-login' || false
+      - name: Commit verified Gmail copy
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "polish: customer-ready Gmail verification copy"
+          git push origin HEAD:fix/gmail-google-verification-copy-final-20260915
