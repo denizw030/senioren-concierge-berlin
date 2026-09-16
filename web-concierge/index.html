@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="de">
+<head><base href="/">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Web Concierge | NAHWERK Kundenkonto</title>
+  <meta name="description" content="NAHWERK Web Concierge im Kundenkonto." />
+  <meta name="robots" content="noindex,nofollow" />
+  <link rel="stylesheet" href="assets/site.css?v=24" />
+  <link rel="stylesheet" href="assets/brand-2026.css?v=23" />
+  <link rel="stylesheet" href="assets/nahwerk-logo-v2.css?v=9" />
+  <link rel="stylesheet" href="assets/web-customer-concierge.css?v=3" />
+  <link rel="icon" type="image/svg+xml" href="assets/logos/nahwerk-concierge-gold-transparent.svg?v=1" />
+</head>
+<body>
+  <header class="top"><div class="wrap nav"><a class="brand" href="/de/" aria-label="NAHWERK Concierge – Startseite"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Hauptnavigation"><a href="/de/">Übersicht</a><a href="/prime-concierge">Persönlicher Concierge</a><a href="/concierges">NAHWERK weltweit</a><a href="/senioren-concierge">Senioren Concierge</a><a href="/leistungen">Leistungen</a><a href="/kontakt">Kontakt</a></nav></div></header>
+
+  <main id="main-content" class="web-concierge-shell">
+    <div class="web-concierge-head">
+      <div><div class="eyebrow">Kundenkonto · Concierge</div><h1>Dein Web Concierge.</h1><p>Die Website spricht ausschließlich den final vorgesehenen PROD-Vertrag <strong>web-concierge-gateway-v1</strong>. Antworten erscheinen nur, wenn Core-v1 sie für <strong>WEB</strong> autoritativ zur Kundenausgabe freigibt.</p></div>
+      <a class="btn light" href="/konto">Zurück zum Konto</a>
+    </div>
+
+    <section class="web-concierge-card" aria-labelledby="webConciergeStateTitle">
+      <div class="web-concierge-status" id="webConciergeStatus">Wird geprüft …</div>
+      <h2 id="webConciergeStateTitle">PROD-Verfügbarkeit wird geprüft</h2>
+      <p id="webConciergeStateMeta">Der echte Kundenkanal wird geprüft.</p>
+      <div class="web-concierge-log" id="webConciergeLog" aria-live="polite"><div class="web-concierge-empty">Keine Shadow-Antworten, keine Testnachrichten und keine erfundenen Kundenausgaben.</div></div>
+      <form class="web-concierge-form" onsubmit="return false" aria-label="Nachricht an den Web Concierge">
+        <textarea id="webConciergeInput" rows="2" maxlength="4000" placeholder="Nachricht an deinen Concierge" disabled aria-disabled="true"></textarea>
+        <button class="btn red" id="webConciergeSend" type="submit" disabled>Nachricht senden</button>
+      </form>
+      <div class="web-concierge-note"><strong>Fail-closed:</strong> Die Eingabe wird erst freigegeben, wenn der PROD-Gateway gleichzeitig `channel=WEB`, `core-v1`, autoritative Core-Ausgabe und autoritative CAO-Ausführung bestätigt. PAYG-Kostenfreigaben werden zum bestehenden geschützten PAYG-Freigabeflow geleitet.</div>
+    </section>
+  </main>
+
+  <footer class="footer"><div class="wrap"><div class="footline"><span>© 2026 NAHWERK Concierge</span><span><a href="/datenschutz">Datenschutz</a> · <a href="/impressum">Impressum</a> · <a href="/widerruf">Widerruf</a> · <a href="/vertrag-widerrufen">Vertrag widerrufen</a></span></div></div></footer>
+  <script src="assets/auth-nav.js?v=40"></script>
+  <script src="assets/site-ui.js?v=7"></script>
+  <script src="assets/web-customer-concierge.js?v=3"></script>
+</body>
+</html>

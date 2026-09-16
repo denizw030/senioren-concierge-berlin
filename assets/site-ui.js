@@ -1,6 +1,6 @@
 (() => {
-  const isCustomerAccount = /(?:^|\/)konto\.html$/.test(location.pathname);
-  const isProdCustomerSurface = /(?:^|\/)(?:konto|payg|web-concierge)\.html$/.test(location.pathname);
+  const isCustomerAccount = /(?:^|\/)konto(?:\.html)?\/?$/.test(location.pathname);
+  const isProdCustomerSurface = /(?:^|\/)(?:konto|payg|web-concierge)(?:\.html)?\/?$/.test(location.pathname);
   const PORTAL_THEME_KEY = 'nw_portal_theme_v1';
   const KONTO_FIX_STYLE_ID = 'nw-konto-targeted-fixes-v1';
 
@@ -221,7 +221,7 @@
       const payg = document.createElement("a");
       payg.id = "accountPaygEntry";
       payg.className = "account-overview-link";
-      payg.href = "payg.html";
+      payg.href = "/payg";
       payg.setAttribute("aria-label", "PAYG – Bezahlen pro Auftrag öffnen");
       payg.innerHTML = '<span class="eyebrow">PAYG</span><strong>Bezahlen pro Auftrag</strong><span>Status, Zahlungsmethode und Kosten transparent anzeigen.</span>';
       highlights.appendChild(payg);
@@ -231,7 +231,7 @@
       const concierge = document.createElement("a");
       concierge.id = "accountWebConciergeEntry";
       concierge.className = "account-overview-link";
-      concierge.href = "web-concierge.html";
+      concierge.href = "/web-concierge";
       concierge.setAttribute("aria-label", "Web Concierge öffnen");
       concierge.innerHTML = '<span class="eyebrow">Web Concierge</span><strong>Concierge im Kundenkonto</strong><span>Aktuelle PROD-Verfügbarkeit des persönlichen Webkanals ansehen.</span>';
       highlights.appendChild(concierge);
@@ -255,7 +255,7 @@
         funnel_step: /registrieren/.test(href) ? "cta" : null
       });
     }, { passive: true });
-    const skipPremiumPreview = /(?:^|\/)anmelden\.html$/.test(location.pathname) && new URLSearchParams(location.search).get('produkt') === 'senioren';
+    const skipPremiumPreview = /(?:^|\/)anmelden(?:\.html)?\/?$/.test(location.pathname) && new URLSearchParams(location.search).get('produkt') === 'senioren';
     if (!skipPremiumPreview && !document.querySelector('link[data-nw-premium-preview]')) {
       const premium = document.createElement('link');
       premium.rel = 'stylesheet';
@@ -368,7 +368,7 @@
         '@id': 'https://nahwerkconcierge.com/#personal-concierge',
         name: 'Persönlicher NAHWERK Concierge',
         serviceType: 'Persönlicher Concierge',
-        url: 'https://nahwerkconcierge.com/prime-concierge.html',
+        url: 'https://nahwerkconcierge.com/prime-concierge',
         provider: { '@id': 'https://nahwerkconcierge.com/#organization' }
       }
     ]
@@ -519,7 +519,7 @@
   };
 
   const stabilizeAccount = () => {
-    if (!/(?:^|\/)konto\.html$/.test(location.pathname)) return;
+    if (!/(?:^|\/)konto(?:\.html)?\/?$/.test(location.pathname)) return;
 
     document.querySelectorAll('.person-summary[data-account-panel="overview"]').forEach((element) => element.remove());
 

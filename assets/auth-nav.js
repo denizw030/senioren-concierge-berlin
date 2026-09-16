@@ -9,12 +9,17 @@
   const LOGOUT_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-session-secure";
   const PROTECTED = new Set(["konto.html", "concierge-anpassen.html"]);
   const CONTEXT_PAGES = new Set(["pakete.html", "registrieren.html", "anmelden.html", "konto.html", "concierge-anpassen.html"]);
-  const NAV = [["index.html", "Übersicht"], ["prime-concierge.html", "Persönlicher Concierge"], ["concierges.html", "NAHWERK weltweit"], ["senioren-concierge.html", "Senioren Concierge"], ["senioren-concierge.html#angehoerige", "Für Angehörige"], ["leistungen.html", "Leistungen"], ["kontakt.html", "Kontakt"]];
+  const NAV = [["/de/", "Übersicht"], ["/prime-concierge", "Persönlicher Concierge"], ["/concierges", "NAHWERK weltweit"], ["/senioren-concierge", "Senioren Concierge"], ["/senioren-concierge#angehoerige", "Für Angehörige"], ["/leistungen", "Leistungen"], ["/kontakt", "Kontakt"]];
   let sessionValidated = false;
   let validatedSession = null;
   let validationPromise = null;
   let lastValidatedProfile = null;
-  const page = () => location.pathname.split("/").pop() || "index.html";
+  const page = () => {
+    const pathname = String(location.pathname || "/").replace(/\/+$/, "");
+    const last = pathname.split("/").filter(Boolean).pop() || "index";
+    if (last === "de" || last === "en" || last === "tr" || last === "index") return "index.html";
+    return last.endsWith(".html") ? last : last + ".html";
+  };
   function productContext(current = page()) {
     if (PROTECTED.has(current)) {
       const accountProduct = getSession()?.product_context;
@@ -118,7 +123,7 @@
   }
   function makeAccountLink(cls = "") {
     const link = document.createElement("a");
-    link.href = "konto.html";
+    link.href = "/konto";
     link.className = ("nw-account-link " + cls).trim();
     link.setAttribute("aria-label", "Kundenkonto öffnen");
     const name = sessionFirstName();
@@ -156,7 +161,7 @@
       } catch (_) {}
     }
     clearLocalAuth();
-    location.href = "index.html";
+    location.href = "/de/";
   }
   function ensureOdysxBar() {
     document.querySelectorAll(".odysx-info-bar").forEach((element) => element.remove());
@@ -176,14 +181,14 @@
     document.body.classList.toggle("senior-product", product === "senioren");
     if (current === "pakete.html" && product === "senioren") {
       document.title = "Senioren-Concierge Tarife | NAHWERK";
-      document.querySelectorAll('[href^="registrieren.html"]').forEach((link) => {
+      document.querySelectorAll('[href^="registrieren.html"],[href^="/registrieren"]').forEach((link) => {
         const url = new URL(link.getAttribute("href"), location.href);
         url.searchParams.set("produkt", "senioren");
-        link.setAttribute("href", `${url.pathname.split("/").pop()}?${url.searchParams.toString()}`);
+        link.setAttribute("href", `/registrieren?${url.searchParams.toString()}`);
       });
     }
     document.querySelectorAll("header.top .brand").forEach((brand) => {
-      brand.href = "index.html";
+      brand.href = "/de/";
       brand.innerHTML = '<span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span>';
     });
     document.querySelectorAll("nav.links").forEach((nav) => {
@@ -199,8 +204,8 @@
         nav.appendChild(accountCluster);
       } else {
         const suffix = `?produkt=${product}`;
-        nav.appendChild(makeLink(`anmelden.html${suffix}`, "Anmelden", `${current === "anmelden.html" ? "active " : ""}auth-link login-link`.trim()));
-        nav.appendChild(makeLink(`registrieren.html${suffix}`, "Registrieren", `${current === "registrieren.html" ? "active " : ""}auth-link register-link`.trim()));
+        nav.appendChild(makeLink(`/anmelden${suffix}`, "Anmelden", `${current === "anmelden.html" ? "active " : ""}auth-link login-link`.trim()));
+        nav.appendChild(makeLink(`/registrieren${suffix}`, "Registrieren", `${current === "registrieren.html" ? "active " : ""}auth-link register-link`.trim()));
       }
       nav.id ||= "main-navigation";
       if (!nav.previousElementSibling?.classList.contains("nav-toggle")) {
@@ -252,14 +257,14 @@
     document.querySelectorAll("nav.links").forEach((nav) => syncMobileAccount(nav));
     ensureOdysxBar();
     document.querySelectorAll(".footbottom > span:first-child").forEach((element) => { element.textContent = "© 2026 Nahwerk Concierge"; });
-    document.querySelectorAll('.footer a[href="anmelden.html"],.footer a[href="registrieren.html"]').forEach((link) => { if (hasRenderableSession()) link.remove(); });
+    document.querySelectorAll('.footer a[href="anmelden.html"],.footer a[href="/anmelden"],.footer a[href="registrieren.html"],.footer a[href="/registrieren"]').forEach((link) => { if (hasRenderableSession()) link.remove(); });
   }
   function updateNav() {
     normalizeShell();
     if (!isLoggedIn()) return;
     document.querySelectorAll(".footergrid>div").forEach((box) => {
-      if (box.querySelector("h4")?.textContent.trim() === "Informationen" && !box.querySelector('a[href="konto.html"]')) {
-        box.appendChild(makeLink("konto.html", "Kundenbereich"));
+      if (box.querySelector("h4")?.textContent.trim() === "Informationen" && !box.querySelector('a[href="konto.html"],a[href="/konto"]')) {
+        box.appendChild(makeLink("/konto", "Kundenbereich"));
         const out = makeLink("#", "Abmelden");
         out.dataset.logout = "1";
         out.addEventListener("click", (event) => { event.preventDefault(); logout(); });
@@ -403,6 +408,23 @@
       node.replaceWith(fragment);
     });
   }
+  // NAHWERK CLEAN ROUTES + FLOATING CONCIERGE 2026-09-16
+  const FLOATING_CONCIERGE_EXCLUDE = new Set(["web-concierge.html", "anmelden.html", "registrieren.html", "passwort-zuruecksetzen.html"]);
+  function removeFloatingConcierge() {
+    document.getElementById("nwFloatingConcierge")?.remove();
+  }
+  function ensureFloatingConcierge() {
+    removeFloatingConcierge();
+    if (!isLoggedIn() || FLOATING_CONCIERGE_EXCLUDE.has(page())) return;
+    const link = document.createElement("a");
+    link.id = "nwFloatingConcierge";
+    link.className = "nw-floating-concierge";
+    link.href = "/web-concierge";
+    link.setAttribute("aria-label", "Persönlichen NAHWERK Concierge öffnen");
+    link.innerHTML = '<span class="nw-floating-concierge-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 6.8A2.8 2.8 0 0 1 7.8 4h8.4A2.8 2.8 0 0 1 19 6.8v5.9a2.8 2.8 0 0 1-2.8 2.8h-4.7L7 19v-3.5A2.8 2.8 0 0 1 5 12.8Z"></path><path d="M9 9h6M9 12h4"></path></svg></span><span>Concierge</span>';
+    document.body.appendChild(link);
+  }
+
   document.addEventListener("DOMContentLoaded", async () => {
     decorateWhatsApp();
     activatePlanCards();
@@ -417,10 +439,12 @@
     const valid = await validateSession();
     if (valid) {
       updateNav();
-      if (current === "anmelden.html" || current === "registrieren.html") location.replace("konto.html");
+      ensureFloatingConcierge();
+      if (current === "anmelden.html" || current === "registrieren.html") location.replace("/konto");
     } else {
+      removeFloatingConcierge();
       normalizeShell();
-      if (PROTECTED.has(current)) location.replace("anmelden.html");
+      if (PROTECTED.has(current)) location.replace("/anmelden");
     }
   });
   window.SCBAuth = {

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
@@ -45,7 +45,8 @@ test('sitemap contains only existing canonical public pages', () => {
   for (const url of urls) {
     assert.ok(url.startsWith(`${DOMAIN}/`), `wrong sitemap host: ${url}`);
     const { pathname } = new URL(url);
-    const file = pathname.endsWith('/') ? `${pathname.slice(1)}index.html` : pathname.slice(1);
+    const candidate = pathname.endsWith('/') ? `${pathname.slice(1)}index.html` : pathname.slice(1);
+    const file = existsSync(resolve(root, candidate)) && statSync(resolve(root, candidate)).isDirectory() ? `${candidate}/index.html` : candidate;
     assert.ok(existsSync(resolve(root, file)), `missing sitemap target: ${file}`);
     const html = read(file);
     assert.match(html, /<title>[^<]+<\/title>/i, `${file}: missing title`);

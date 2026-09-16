@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="tr">
+  <head><base href="/tr/">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Senior Concierge | NAHWERK</title>
+    <meta
+      name="description"
+      content="İleri yaştaki kullanıcılar ve aileleri düşünülerek tasarlanmış sade ve erişilebilir NAHWERK Concierge deneyimi."
+    />
+    <style>
+      html,
+      body.senior-product {
+        background-color: #f7f3ea;
+      }
+    </style>
+    <link rel="stylesheet" href="/assets/site.css?v=24" />
+    <link
+      rel="canonical"
+      href="https://nahwerkconcierge.com/tr/senioren-concierge"
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/assets/logos/nahwerk-concierge-gold-transparent.svg?v=1"
+    />
+    <link rel="stylesheet" href="/assets/brand-2026.css?v=22" />
+    <link rel="stylesheet" href="/assets/nahwerk-logo-v2.css?v=9" />
+    <link rel="stylesheet" href="/assets/concierge-voice-preview.css?v=8" />
+<link rel="stylesheet" href="/assets/concierge-carousel.css?v=12" />
+    <link rel="stylesheet" href="/assets/phone-concierge-sections.css?v=1" />
+    <link rel="stylesheet" href="/assets/james-profile.css?v=1" />
+    <style>
+      /* Page-scoped neutral base: prevents the global dark main background from showing between senior sections. */
+      body.senior-product > main {
+        background: #f7f3ea !important;
+      }
+      .senior-image-hero {
+        min-height: calc(100svh - 100px);
+        display: grid;
+        align-items: center;
+        padding: clamp(72px, 9vw, 120px) 0 !important;
+        overflow: hidden;
+      }
+      .senior-hero-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.03fr) minmax(380px, 0.97fr);
+        gap: clamp(44px, 7vw, 96px);
+        align-items: center;
+      }
+      .senior-hero-copy {
+        max-width: 700px;
+      }
+      .senior-image-hero h1 {
+        max-width: 11ch;
+        margin: 12px 0 26px;
+        font-size: clamp(56px, 6.2vw, 90px) !important;
+        line-height: 0.94 !important;
+        letter-spacing: -0.06em !important;
+        text-wrap: balance;
+      }
+      .senior-hero-lead {
+        max-width: 620px;
+        font-size: clamp(18px, 1.55vw, 22px) !important;
+        line-height: 1.58 !important;
+        color: #625b50 !important;
+      }
+      .senior-benefit-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin: 26px 0;
+      }
+      .senior-benefit-chip {
+        display: inline-flex;
+        align-items: center;
+        min-height: 38px;
+        padding: 8px 13px;
+        border: 1px solid rgba(185, 135, 36, 0.28);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.68);
+        font-size: 13px;
+        font-weight: 750;
+        color: #3d321f;
+      }
+      .senior-hero-photo {
+        margin: 0;
+        aspect-ratio: 4/5;
+        overflow: hidden;
+        border-radius: 34px;
+        box-shadow: 0 34px 80px rgba(73, 52, 18, 0.16);
+      }
+      .senior-hero-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .senior-story {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+      .senior-story article {
+        padding: 26px;
+        border: 1px solid #e2d2ab;
+        border-radius: 20px;
+        background: #fffdf9;
+        color: #1f1c17;
+        box-shadow: 0 14px 34px rgba(104, 78, 28, 0.06);
+      }
+      .senior-story h3 {
+        color: #1f1c17 !important;
+      }
+      .senior-story p {
+        color: #625b50 !important;
+        line-height: 1.65;
+      }
+      .senior-family-section {
+        scroll-margin-top: 110px;
+        padding: clamp(28px, 5vw, 48px);
+        border: 1px solid #dec98f;
+        border-radius: 28px;
+        background: #fffdf9;
+        box-shadow: 0 18px 46px rgba(104, 78, 28, 0.08);
+      }
+      .senior-family-section > p {
+        max-width: 820px;
+        color: #5f594f;
+        line-height: 1.7;
+      }
+      .senior-family-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 24px;
+      }
+      .senior-family-card {
+        padding: 22px;
+        border: 1px solid #eadab3;
+        border-radius: 16px;
+        background: #fff;
+        color: #1e1c18;
+      }
+      .senior-family-card h3 {
+        color: #1e1c18 !important;
+      }
+      .senior-family-card p {
+        color: #665f54 !important;
+        line-height: 1.6;
+      }
+      .senior-family-notice {
+        margin-top: 18px;
+        padding: 18px;
+        border-left: 3px solid #c99b38;
+        border-radius: 12px;
+        background: #fff7e7;
+        color: #544d42;
+        line-height: 1.65;
+      }
+      .senior-release {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+      .senior-release article {
+        padding: 24px;
+        border: 1px solid #e1d2af;
+        border-radius: 18px;
+        background: #fffdf9;
+        color: #201d17;
+      }
+      .senior-release h3 {
+        color: #201d17 !important;
+      }
+      .senior-release p {
+        color: #675f53 !important;
+        line-height: 1.6;
+      }
+      .senior-package-note {
+        padding: 22px;
+        border-left: 3px solid #c99b38;
+        border-radius: 14px;
+        background: #fffaf0;
+        color: #5d564b;
+        line-height: 1.65;
+      }
+      @media (max-width: 1000px) {
+        .senior-hero-layout {
+          grid-template-columns: 1fr;
+        }
+        .senior-hero-photo {
+          max-width: 760px;
+          aspect-ratio: 16/10;
+        }
+        .senior-story,
+        .senior-family-grid,
+        .senior-release {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 700px) {
+        .senior-image-hero {
+          min-height: 0;
+          padding: 58px 0 68px !important;
+        }
+        .senior-image-hero h1 {
+          font-size: clamp(46px, 14vw, 64px) !important;
+        }
+        .senior-benefit-chips {
+          justify-content: center;
+        }
+        .senior-benefit-chip {
+          width: auto;
+          max-width: 100%;
+          justify-content: center;
+        }
+        .senior-story,
+        .senior-family-grid,
+        .senior-release {
+          grid-template-columns: 1fr;
+        }
+        .senior-family-section {
+          padding: 24px 20px;
+        }
+        .senior-hero-photo {
+          aspect-ratio: 4/3;
+          border-radius: 24px;
+        }
+      }
+    </style>
+  <link rel="stylesheet" href="/assets/acquisition-v1.css?v=1" />
+    <!-- NW-I18N-START -->
+    <link rel="alternate" hreflang="de" href="/senioren-concierge" />
+    <link rel="alternate" hreflang="en" href="/en/senioren-concierge" />
+    <link rel="alternate" hreflang="tr" href="/tr/senioren-concierge" />
+    <link rel="alternate" hreflang="x-default" href="/senioren-concierge" />
+    <script src="/assets/language-switcher.js?v=12" defer></script>
+    <!-- NW-I18N-END -->
+<  <script src="/assets/locale-runtime.js?v=1" defer></script>
+/head>
+  <body class="senior-product">
+    <header class="top"><div class="wrap nav"><a class="brand" href="/tr/" aria-label="NAHWERK Concierge — ana sayfa"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Ana navigasyon"><a href="/tr/">Genel bakış</a><a href="/tr/prime-concierge">Kişisel Concierge</a><a href="/tr/concierges">Dünya çapında NAHWERK</a><a class="active" href="/tr/senioren-concierge">İleri yaş Concierge</a><a href="/tr/angehoerige">Yakınlar için</a><a href="/tr/leistungen">Hizmetler</a><a href="/tr/kontakt">İletişim</a><a class="auth-link login-link" href="/anmelden?produkt=senioren&amp;lang=tr">Giriş yap</a><a class="auth-link register-link" href="/registrieren?produkt=senioren&amp;lang=tr">Kayıt ol</a></nav></div></header>
+    <div class="odysx-info-bar"><span>Bir ODYSX markası <strong>ODYSX</strong></span></div>
+    <main>
+      <section class="hero senior-image-hero">
+        <div class="wrap senior-hero-layout">
+          <div class="senior-hero-copy">
+            <div class="eyebrow">İleri yaştakiler için NAHWERK</div>
+            <h1>
+              Bağımsız kal. Faydalı olduğunda destek al.
+            </h1>
+            <p class="senior-hero-lead">
+              Günlük yaşam, teknoloji, belgeler ve anlaşılır açıklamalar için kişisel Concierge — sakin, saygılı ve WhatsApp üzerinden kolayca.
+            </p>
+            <div class="senior-benefit-chips" aria-label="Avantajlar">
+              <span class="senior-benefit-chip">Ek uygulama gerekmez</span
+              ><span class="senior-benefit-chip">Metin &amp; sesli mesajlar</span
+              ><span class="senior-benefit-chip">Sakin şekilde açıklanır</span
+              ><span class="senior-benefit-chip"
+                >Yakınlar destek olabilir</span
+              >
+            </div>
+            <p class="senior-app-note">Kendi NAHWERK uygulamamız geliştiriliyor ve NAHWERK müşterileri için ücretsiz kullanılabilir olacak.</p>
+            <div class="actions">
+              <a class="btn red" href="/registrieren?produkt=senioren&amp;lang=tr"
+                >NAHWERK'i dene</a
+              ><a class="btn light" href="#angehoerige"
+                >Birisi için kur</a
+              >
+            </div>
+          </div>
+          <figure class="senior-hero-photo">
+            <img
+              src="/assets/lifestyle/senior-man-phone.webp?v=1"
+              width="1536"
+              height="1024"
+              alt="Yaşlı bir adam evinde akıllı telefonunu kişisel destekle kullanıyor"
+            />
+          </figure>
+        </div>
+      </section>
+      <section class="section">
+        <div class="wrap">
+          <div class="eyebrow">Kontrol etmeden destek</div>
+          <h2>Kolay erişim. Açık dil. Kendi kararların.</h2>
+          <div class="senior-story">
+            <article>
+              <h3>Soruları kendi sözlerinizle sorun</h3>
+              <p>
+                Komut veya teknik terim bilmeniz gerekmez. Talebinizi doğal şekilde yazın veya anlatın.
+              </p>
+            </article>
+            <article>
+              <h3>Adım adım</h3>
+              <p>
+                Karmaşık süreçler küçük, anlaşılır adımlara bölünebilir ve gerektiğinde yeniden açıklanabilir.
+              </p>
+            </article>
+            <article>
+              <h3>Teknolojiyi anlaşılır kıl</h3>
+              <p>
+                Akıllı telefonlar, bilgisayarlar ve dijital hizmetler gereksiz teknik terimler olmadan açıklanır.
+              </p>
+            </article>
+            <article>
+              <h3>Belgeleri daha iyi anla</h3>
+              <p>
+                Mektuplar veya diğer belgeler onaylanan kapsam içinde değerlendirilebilir ve anlaşılır biçimde özetlenebilir.
+              </p>
+            </article>
+            <article>
+              <h3>Kişisel iletişim</h3>
+              <p>
+                Hitap şekli, açıklama düzeyi ve yararlı tercihler belirlenen kapsam içinde dikkate alınabilir.
+              </p>
+            </article>
+            <article>
+              <h3>Kontrol sizde kalır</h3>
+              <p>
+                Dışarıda sonuç doğuran önemli işlemler hiçbir zaman kendiliğinden varsayılmaz.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+      <section class="section">
+        <div class="wrap">
+          <div
+            data-concierge-carousel
+            data-variant="senior"
+            data-selected="hartmut"
+            data-register-url="registrieren.html?produkt=senioren"
+            data-label="Persönliche NAHWERK Concierges für Senioren"
+          ></div>
+        </div>
+      </section>
+      <section class="section alt" id="beispiele">
+        <div class="wrap">
+          <div class="eyebrow">Günlük normal sorular</div>
+          <h2>Bugün ne daha kolay olabilir?</h2>
+          <p class="request-intro">
+            NAHWERK'e kolayca yazabilir veya sesli mesaj gönderebilirsiniz. Concierge dinler, belirsizliklerde sorar ve her adımı sakin şekilde açıklar.
+          </p>
+          <div class="request-grid">
+            <article class="request-card featured">
+              <span class="request-card-kicker"
+                >Ulaşım · yalnızca onaydan sonra</span
+              >
+              <blockquote>“Bana bir Uber ayarlayabilir misin?”</blockquote>
+              <p>
+                NAHWERK Uber, taksi veya başka uygun bir seçenekle yolculuk arayabilir ve rezervasyonu hazırlayabilir. Herhangi bir maliyet oluşmadan önce hedef, saat ve fiyat birlikte kontrol edilir ve sizin tarafınızdan onaylanır.
+              </p>
+            </article>
+            <article class="request-card">
+              <span class="request-card-kicker">Mektupları anla</span>
+              <blockquote>
+                “Bu mektubu bana basitçe açıklayabilir misin?”
+              </blockquote>
+              <p>
+                Tek bir fotoğraf yeter. Önemli içerikler ve olası sonraki adımlar açık bir dille özetlenir.
+              </p>
+            </article>
+            <article class="request-card">
+              <span class="request-card-kicker">İnternette daha güvenli</span>
+              <blockquote>
+                “Bu mesaj gerçek mi yoksa dolandırıcılık olabilir mi?”
+              </blockquote>
+              <p>
+                Şüpheli işaretleri birlikte incele ve phishing ya da güvenilmez taleplerin nasıl fark edilebileceğini açıkla.
+              </p>
+            </article>
+            <article class="request-card">
+              <span class="request-card-kicker">Randevular</span>
+              <blockquote>“Yarın randevumu hatırlat.”</blockquote>
+              <p>
+                Önemli konuları yapılandır ve onaylanan kapsam içinde hatırlatmaları hazırla.
+              </p>
+            </article>
+            <article class="request-card">
+              <span class="request-card-kicker">Teknoloji</span>
+              <blockquote>
+                “Telefonda bunun nasıl yapıldığını bana adım adım göster.”
+              </blockquote>
+              <p>
+                Teknik jargon olmadan sakin açıklamalar — gerektiğinde sabırsızlanmadan tekrar.
+              </p>
+            </article>
+            <article class="request-card">
+              <span class="request-card-kicker">Yolculuk &amp; boş zaman</span>
+              <blockquote>“Yakınımda sakin bir kafe bul.”</blockquote>
+              <p>
+                Yerleri mesafe, erişilebilirlik, çalışma saatleri ve kişisel tercihlere göre karşılaştır.
+              </p>
+            </article>
+            <article class="request-card">
+              <span class="request-card-kicker">Günlük hayatı düzenle</span>
+              <blockquote>
+                “Bir usta randevusunu hazırlamama yardım et.”
+              </blockquote>
+              <p>
+                Doğru soruları topla, sağlayıcıları araştır ve sonraki adımı anlaşılır şekilde hazırla.
+              </p>
+            </article>
+            <article class="request-card">
+              <span class="request-card-kicker">Sesli mesajlar</span>
+              <blockquote>
+                “Bu uzun mesajda önemli olan neydi?”
+              </blockquote>
+              <p>
+                İçeriği kısa şekilde özetle ve açık kalan noktaları okunaklı biçimde vurgula.
+              </p>
+            </article>
+          </div>
+          <p class="request-safety">
+            <strong>Önemli:</strong> NAHWERK destek olur ve hazırlar. Ücretli rezervasyonlar açık onay olmadan yapılmaz; tıbbi acil durumlarda 112 geçerlidir.
+          </p>
+        </div>
+      </section>
+      <section
+        class="section senior-concierge-selection"
+        aria-labelledby="senior-carousel-title"
+      >
+        <div class="wrap">
+          <div class="eyebrow">Kişisel Concierge'iniz</div>
+          <h2 id="senior-carousel-title">
+            Size uygun bir kişilik bulun.
+          </h2>
+          <p class="lead">
+            23 Concierge'in tamamı aynı temel olanakları sunar. Sadece kendinizi rahat hissettiğiniz kişiliği ve iletişim tarzını seçersiniz; tercih ettiğiniz dil bundan bağımsızdır.
+          </p>
+          <div
+            data-concierge-carousel
+            data-variant="senior"
+            data-selected="frida"
+            data-register-url="registrieren.html?produkt=senioren"
+            data-label="Persönliche NAHWERK Concierges"
+          ></div>
+        </div>
+      </section>
+      <section class="section alt">
+        <div class="wrap">
+          <div id="angehoerige" class="senior-family-section">
+            <div class="eyebrow">Yakınlar için</div>
+            <h2>Günlük hayatı devralmadan destek ol.</h2>
+            <p>
+              NAHWERK ebeveynleri, büyükanne ve büyükbabaları ve yakın kişileri günlük yaşamda destekleyebilir. Önemli olan kişinin bilgilendirilmiş kalması, kendi kararlarını vermesi ve hassas özelliklerin üçüncü kişilere genel olarak açılmamasıdır.
+            </p>
+            <div class="senior-family-grid">
+              <article class="senior-family-card">
+                <h3>Kurulumu kolaylaştır</h3>
+                <p>
+                  Güvendiğin biri başlangıçta yardımcı olabilir ve NAHWERK'in nasıl kullanıldığını açıklayabilir.
+                </p>
+              </article>
+              <article class="senior-family-card">
+                <h3>Tercihleri hazırla</h3>
+                <p>
+                  Yararlı iletişim tercihleri, ikinci bir teknik çekirdek oluşturmadan belirlenen kapsam içinde kaydedilebilir.
+                </p>
+              </article>
+              <article class="senior-family-card">
+                <h3>Gizliliğe saygı göster</h3>
+                <p>
+                  Özel iletişim gereksiz yere açığa çıkarılmamalıdır. Yetkiler ve Family özellikleri kontrollü kalmalıdır.
+                </p>
+              </article>
+            </div>
+            <div class="actions">
+              <a class="btn red" href="/registrieren?produkt=senioren&amp;lang=tr"
+                >Erişimi hazırla</a
+              ><a class="btn light" href="/tr/kontakt">Soru sor</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="nw-growth-section nw-growth-section-light" aria-labelledby="senior-activation-title">
+        <div class="wrap">
+          <div class="nw-growth-kicker">Kolayca başla</div>
+          <h2 id="senior-activation-title">İlk görev hemen anlaşılır olmalıdır.</h2>
+          <div class="nw-journey-grid">
+            <article class="nw-journey-card"><span>01</span><h3>Erişim kur</h3><p>Kendin için veya — açık onayla — bir yakının için.</p></article>
+            <article class="nw-journey-card"><span>02</span><h3>Somut bir soru gönder</h3><p>Örneğin: “Bu mektubu bana basit sözlerle açıkla.”</p></article>
+            <article class="nw-journey-card"><span>03</span><h3>Yanıtı kontrol et</h3><p>NAHWERK sakin ve şeffaf biçimde açıklar; önemli uzmanlık kararları uygun profesyonellerde kalır.</p></article>
+          </div>
+          <div class="actions">
+            <a class="btn red" href="/registrieren?produkt=senioren&amp;paket=free&amp;source=senior_journey&amp;lang=tr" data-nw-cta="start_senior_free" data-nw-step="senior_journey">Kendim için ücretsiz başla</a>
+            <a class="btn light" href="/tr/angehoerige" data-nw-cta="family_journey" data-nw-step="senior_journey">Yakınlar için</a>
+          </div>
+        </div>
+      </section>
+      <section class="nw-phone-section nw-phone-section--senior" aria-labelledby="nw-phone-senior-title">
+        <div class="wrap nw-phone-shell">
+          <div class="nw-phone-copy">
+            <span class="nw-phone-kicker">Kolayca telefon et</span>
+            <h2 id="nw-phone-senior-title">Concierge'iniz telefonda da aynı kalır.</h2>
+            <p class="nw-phone-lead">NAHWERK'i aradığınızda seçtiğiniz kişisel Concierge ile — örneğin Hartmut ile — konuşmaya devam edersiniz. Alexander ise NAHWERK sizin adınıza bir yeri aradığında veya arama asistanlığı kullanıldığında özel telefon görevlerini üstlenir.</p>
+            <ul class="nw-phone-benefits">
+              <li>Seçtiğiniz Concierge tanıdık sesiniz olarak kalır</li>
+              <li>Alexander dış arama görevlerini üstlenir</li>
+              <li>Arama asistanlığı kişisel Concierge'den açıkça ayrı kalır</li>
+            </ul>
+            <div class="nw-phone-safety">
+              <h3>Bilinmeyen aramalarda daha fazla güven</h3>
+              <p>NAHWERK telefon karşılama bilinmeyen arayanları önce ayırabilir, ad ve arama nedenini sorabilir, mesaj alabilir ve güvenilir kişileri uygun şekilde yönlendirebilir.</p>
+              <p>Gelişmiş koruma modunda şüpheli arama kalıpları özellikle dikkatli ele alınır — örneğin para talep edilen sözde aile acil durumları, sahte banka veya polis aramaları, PIN, TAN ya da tek kullanımlık kod talepleri, zaman baskısı, gizlilik isteği veya uzaktan erişim, hediye kartı, kripto para ya da değerli eşya teslimi talepleri.</p>
+              <p>Şüpheli aramalar otomatik olarak bağlanmaz; bunun yerine bekletilebilir ve bildirilebilir. Bu ek bir koruma katmanıdır ve her dolandırıcılık girişimini tespit etme garantisi değildir.</p>
+            </div>
+          </div>
+          <figure class="nw-phone-media">
+            <img class="nw-phone-image" src="/assets/concierges/large/hartmut.webp?v=1" loading="lazy" decoding="async" alt="Hartmut, kişisel NAHWERK İleri Yaş Concierge&#x27;i" />
+          </figure>
+        </div>
+      </section>
+      <section class="section alt">
+        <div class="wrap">
+          <div class="eyebrow">Paketler &amp; kullanım</div>
+          <h2>Ücretsiz başla ve acele etmeden karar ver.</h2>
+          <div class="senior-package-note">
+            <strong
+              >FREE ayda 50 uygulama ve 20 WhatsApp diyaloğu içerir ve kalıcı olarak 0 €'dur.</strong
+            >
+            Daha sık kullanım için final paket modelinde STANDARD, PLUS, PREMIUM, PREMIUM PLUS ve FAMILY bulunur. Kullanım hakları uygulama ve WhatsApp için ayrı gösterilir.
+          </div>
+          <div class="actions">
+            <a class="btn light" href="/tr/pakete"
+              >Paketleri acele etmeden karşılaştır</a
+            >
+          </div>
+        </div>
+      </section>
+      <section class="section">
+        <div class="wrap">
+          <div class="eyebrow">Net sınırlar</div>
+          <h2>NAHWERK destek olur — ancak profesyonel uzmanlığın yerine geçmez.</h2>
+          <p class="lead">
+            NAHWERK yapay zekâ destekli bir Concierge'dir. Yanıtlar hata içerebilir. Hizmet tıbbi tedavinin, profesyonel bakımın, hukuki veya vergi danışmanlığının ya da acil çağrı hizmetinin yerine geçmez.
+          </p>
+          <div class="actions">
+            <a class="btn light" href="/ki-transparenz">Yapay zekâ şeffaflığı</a
+            ><a class="btn light" href="/datenschutz">Gizlilik</a>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="footer">
+      <div class="wrap">
+        <div class="footergrid">
+          <div>
+            <a class="brand" href="/tr/" aria-label="NAHWERK Concierge — ana sayfa">
+              <span class="mark nahwerk-mark" aria-hidden="true"></span>
+              <span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span>
+            </a>
+            <p>Günlük yaşam, organizasyon ve anlaşılır destek için kişisel Concierge'iniz.</p>
+          </div>
+          <div>
+            <h4>Hizmetler</h4>
+            <a href="/tr/prime-concierge">Kişisel Concierge</a>
+            <a href="/tr/concierges">Dünya çapında NAHWERK</a>
+            <a href="/tr/senioren-concierge">İleri yaştakiler için</a>
+            <a href="/tr/angehoerige">Yakınlar için</a>
+            <a href="/tr/pakete">Paketler</a>
+          </div>
+          <div>
+            <h4>Servis</h4>
+            <a href="/tr/leistungen">Hizmetler</a>
+            <a href="/tr/ablauf">Nasıl çalışır</a>
+            <a href="/tr/faq">FAQ</a>
+            <a href="/tr/kontakt">İletişim</a>
+          </div>
+          <div>
+            <h4>Hukuki</h4>
+            <a href="/impressum">Künye</a>
+            <a href="/datenschutz">Gizlilik</a>
+            <a href="/agb">Şartlar</a>
+            <a href="/widerruf">Cayma</a>
+            <a href="/ki-transparenz">Yapay zekâ şeffaflığı</a>
+            <a href="/datenloeschung">Veri silme</a>
+          </div>
+        </div>
+        <div class="footbottom">
+          <span>© 2026 NAHWERK Concierge</span>
+          <span>WhatsApp üzerinden kişisel Concierge</span>
+        </div>
+      </div>
+    </footer>
+    <script src="/assets/concierge-voice-preview.js?v=7"></script>
+    <script src="/assets/james-profile.js?v=1"></script>
+<script src="/assets/concierge-locale-defaults.js?v=1"></script>
+    <script src="/assets/concierge-carousel.js?v=20"></script>
+    <script src="/assets/auth-nav.js?v=40"></script>
+    <script src="/assets/site-ui.js?v=5"></script>
+  <script src="/assets/nahwerk-analytics.js?v=1"></script><script src="/assets/acquisition-v1.js?v=2"></script></body>
+</html>
