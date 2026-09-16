@@ -1,0 +1,49 @@
+name: E-Mail multi-account customer UI one-time
+
+on:
+  push:
+    branches:
+      - feat/email-multi-account-customer-ui-20260917
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: JavaScript syntax
+        run: |
+          node --check assets/email-provider-logo-connect-v3.js
+          node --check assets/email-multi-account-concierge-v1.js
+      - name: Multi-account customer contract
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          provider=Path('assets/email-provider-logo-connect-v3.js').read_text()
+          concierge=Path('assets/email-multi-account-concierge-v1.js').read_text()
+          css=Path('assets/email-multi-account-v1.css').read_text()
+          for p in ['google','microsoft','yahoo','icloud','gmx','webde','telekom','fastmail','zoho','ionos','strato']:
+              assert f'id:"{p}"' in provider
+          assert 'providerConnections' in provider
+          assert 'Weiteres Konto verbinden' in provider
+          assert '/email/connections/disconnect' in provider
+          assert '/email/connect/microsoft/web' in provider
+          assert '/email/connect/manual' in provider
+          assert 'secretEl.value=""' in provider
+          assert 'emailGenericImapHost' in provider and 'hidden=true' in provider
+          assert '/email/concierge/accounts-overview' in concierge
+          assert '/email/concierge/query-all' in concierge
+          assert '/email/concierge/messages/open' in concierge
+          assert 'connection_id' in concierge
+          assert 'Alle Postfächer' in concierge
+          assert 'window.confirm' in concierge
+          assert '/email/concierge/drafts/approve-send' in concierge
+          assert 'email.send' not in provider
+          assert 'email.send' not in concierge
+          assert 'email-provider-account-row' in css
+          assert 'email-multi-account-source' in css
+          print('EMAIL_MULTI_ACCOUNT_CUSTOMER_UI=GREEN')
+          PY
