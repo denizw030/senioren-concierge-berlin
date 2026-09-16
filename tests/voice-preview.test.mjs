@@ -135,7 +135,7 @@ test("carousel and overview use one clipped radius owner",()=>{
 
 test("optimized lifestyle assets are assigned by audience",()=>{
   const senior=read("senioren-concierge.html");
-  const home=read("index.html");
+  const home=read("de/index.html");
   const services=read("leistungen.html");
   assert.match(senior,/assets\/lifestyle\/senior-man-phone\.webp/);
   assert.match(home,/assets\/lifestyle\/senior-woman-overview\.webp/);
@@ -220,7 +220,7 @@ test("portrait clicks route to registration while voice controls stay separate",
 });
 
 test("app-free wording, future free app, senior logo and stable dark first paint are present",()=>{
-  const home=read("index.html");
+  const home=read("de/index.html");
   const senior=read("senioren-concierge.html");
   const brand=read("assets/brand-2026.css");
   const registration=read("registrieren.html");

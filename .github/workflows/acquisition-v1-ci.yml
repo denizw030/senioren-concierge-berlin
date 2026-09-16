@@ -424,64 +424,59 @@ jobs:
           source "$HOME/.browser-driver-manager/.env"
           set +a
           test -x "$CHROMEDRIVER_TEST_PATH"
-          npx --yes @axe-core/cli@4.10.2 \
-            --chromedriver-path "$CHROMEDRIVER_TEST_PATH" \
-            http://127.0.0.1:4173/index.html \
-            http://127.0.0.1:4173/prime-concierge.html \
-            http://127.0.0.1:4173/safety.html \
-            http://127.0.0.1:4173/registrieren.html \
-            http://127.0.0.1:4173/angehoerige.html \
-            http://127.0.0.1:4173/leistungen.html \
-            http://127.0.0.1:4173/pakete.html \
-            http://127.0.0.1:4173/telefonannahme.html \
-            http://127.0.0.1:4173/__email-account-a11y.html \
-            http://127.0.0.1:4173/__family-owner-a11y.html \
-            --exit
+          pages=(index.html prime-concierge.html safety.html registrieren.html angehoerige.html leistungen.html pakete.html telefonannahme.html __email-account-a11y.html __family-owner-a11y.html)
+          for page in "${pages[@]}"; do
+            echo "AXE $page"
+            npx --yes @axe-core/cli@4.10.2 \
+              --chromedriver-path "$CHROMEDRIVER_TEST_PATH" \
+              "http://127.0.0.1:4173/$page" \
+              --exit
+          done
       - name: Lighthouse desktop
         run: |
-          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/index.html \
+          npx --yes lighthouse@13.4.1 http://127.0.0.1:4173/de/index.html \
             --quiet --chrome-flags="--headless --no-sandbox" \
             --preset=desktop --only-categories=performance,accessibility \
             --output=json --output-path=/tmp/lh-desktop.json
       - name: Lighthouse mobile
         run: |
-          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/index.html \
+          npx --yes lighthouse@13.4.1 http://127.0.0.1:4173/de/index.html \
             --quiet --chrome-flags="--headless --no-sandbox" \
             --only-categories=performance,accessibility \
             --output=json --output-path=/tmp/lh-mobile.json
       - name: Lighthouse telephone reception desktop
         run: |
-          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/telefonannahme.html \
+          npx --yes lighthouse@13.4.1 http://127.0.0.1:4173/telefonannahme.html \
             --quiet --chrome-flags="--headless --no-sandbox" \
             --preset=desktop --only-categories=performance,accessibility \
             --output=json --output-path=/tmp/lh-telephone-desktop.json
       - name: Lighthouse telephone reception mobile
         run: |
-          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/telefonannahme.html \
+          npx --yes lighthouse@13.4.1 http://127.0.0.1:4173/telefonannahme.html \
             --quiet --chrome-flags="--headless --no-sandbox" \
             --only-categories=performance,accessibility \
             --output=json --output-path=/tmp/lh-telephone-mobile.json
       - name: Lighthouse email account desktop
         run: |
-          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/__email-account-a11y.html \
+          npx --yes lighthouse@13.4.1 http://127.0.0.1:4173/__email-account-a11y.html \
             --quiet --chrome-flags="--headless --no-sandbox" \
             --preset=desktop --only-categories=performance,accessibility \
             --output=json --output-path=/tmp/lh-email-desktop.json
       - name: Lighthouse email account mobile
         run: |
-          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/__email-account-a11y.html \
+          npx --yes lighthouse@13.4.1 http://127.0.0.1:4173/__email-account-a11y.html \
             --quiet --chrome-flags="--headless --no-sandbox" \
             --only-categories=performance,accessibility \
             --output=json --output-path=/tmp/lh-email-mobile.json
       - name: Lighthouse family owner desktop
         run: |
-          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/__family-owner-a11y.html \
+          npx --yes lighthouse@13.4.1 http://127.0.0.1:4173/__family-owner-a11y.html \
             --quiet --chrome-flags="--headless --no-sandbox" \
             --preset=desktop --only-categories=performance,accessibility \
             --output=json --output-path=/tmp/lh-family-desktop.json
       - name: Lighthouse family owner mobile
         run: |
-          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/__family-owner-a11y.html \
+          npx --yes lighthouse@13.4.1 http://127.0.0.1:4173/__family-owner-a11y.html \
             --quiet --chrome-flags="--headless --no-sandbox" \
             --only-categories=performance,accessibility \
             --output=json --output-path=/tmp/lh-family-mobile.json

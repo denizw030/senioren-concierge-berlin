@@ -7,7 +7,7 @@ import { webcrypto } from "node:crypto";
 const r=(p)=>fs.readFileSync(p,"utf8");
 const page=r("telefonannahme.html");
 const js=r("assets/telephone-reception-product.js");
-const home=r("index.html");
+const home=r("de/index.html");
 const services=r("leistungen.html");
 const pricing=r("pakete.html");
 const registration=r("registrieren.html");
@@ -234,7 +234,7 @@ test("prepared fixed-line markup stays inert while shared-context story is prese
 
 test("product integration, pricing, hero and header regressions stay intact",()=>{
   for(const body of [home,services,pricing,registration]) assert.match(body,/telefonannahme\.html/);
-  assert.match(home,/assets\/prime\/nahwerk-hero-web-lossless-optimized-hq\.webp/);
+  assert.match(home,/assets\/prime\/nahwerk-hero-blue-red-goldmann\.webp\?v=2/);
   assert.match(home,/Ein persönlicher Concierge, der erledigt\./);
   assert.deepEqual([...home.matchAll(/data-story-step="([1-6])"/g)].map(m=>m[1]),["1","2","3","4","5","6"]);
   assert.match(home,/body\.overview-page\.nw-header-scrolled \.top/);
