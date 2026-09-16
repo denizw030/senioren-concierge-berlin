@@ -196,7 +196,7 @@
     appendMessage("user",content,now,clientId);input.value="";resizeInput();sending=true;setComposerReady(true);showTyping();
     try{
       const response=await gatewayRequest("/web/chat",{method:"POST",body:{message:content,source_message_id:sourceMessageId,thread_id:activeThreadId}});
-      if(response?.ok!==true||response?.environment!=="PROD"||response?.authoritative!==true||response?.thread_id!==activeThreadId)throw new Error("gateway_response_not_authoritative");
+      if(response?.ok!==true||response?.environment!=="PROD"||response?.authoritative!==true||(response?.thread_id&&response?.thread_id!==activeThreadId))throw new Error("gateway_response_not_authoritative");
       if(!renderCoreV1Response(response.core))throw new Error("core_response_not_authoritative");
       await loadThreads();
     }catch{
