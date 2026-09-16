@@ -1,0 +1,163 @@
+/* NAHWERK E-Mail multi-account customer UI */
+.email-provider-account-list {
+  display: grid;
+  gap: 9px;
+  margin: 4px 0 14px;
+}
+.email-provider-account-list[hidden] { display: none !important; }
+.email-provider-account-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 13px;
+  border: 1px solid rgba(133,154,182,.18);
+  border-radius: 12px;
+  background: rgba(255,255,255,.035);
+}
+.email-provider-account-row strong,
+.email-provider-account-row span { display: block; }
+.email-provider-account-row strong { font-size: 13px; }
+.email-provider-account-row span { margin-top: 3px; color: #8f9bab; font-size: 11px; }
+.email-provider-account-row button,
+.email-provider-add-account {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.email-provider-account-row button:hover,
+.email-provider-add-account:hover { border-color: rgba(212,175,55,.55); }
+.email-provider-add-account { margin: 0 0 12px; }
+.email-provider-add-account[hidden] { display: none !important; }
+
+.email-multi-account-concierge {
+  margin-top: 22px;
+  padding: 20px;
+  border: 1px solid rgba(212,175,55,.24);
+  border-radius: 18px;
+  background: linear-gradient(145deg,rgba(9,15,22,.90),rgba(6,10,15,.76));
+}
+.email-multi-account-concierge[hidden] { display: none !important; }
+.email-multi-account-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+.email-multi-account-head h4 { margin: 4px 0 5px; font-size: 19px; }
+.email-multi-account-head p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.email-multi-account-count {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  border: 1px solid rgba(212,175,55,.30);
+  border-radius: 999px;
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 800;
+}
+.email-multi-account-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0,260px) 1fr;
+  gap: 12px;
+  align-items: end;
+  margin-top: 17px;
+}
+.email-multi-account-field { display: grid; gap: 6px; }
+.email-multi-account-field > span { font-size: 11px; font-weight: 800; }
+.email-multi-account-field select,
+.email-multi-account-query input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid rgba(133,154,182,.20);
+  border-radius: 11px;
+  background: rgba(255,255,255,.045);
+  color: inherit;
+  font: inherit;
+}
+.email-multi-account-field select { padding: 0 12px; }
+.email-multi-account-query { display: flex; gap: 9px; }
+.email-multi-account-query input { padding: 0 13px; }
+.email-multi-account-query button {
+  min-height: 44px;
+  padding: 0 17px;
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  background: var(--gold);
+  color: #111;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 850;
+  cursor: pointer;
+}
+.email-multi-account-query button:disabled { opacity: .5; cursor: not-allowed; }
+.email-multi-account-scope-note { margin: 10px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+.email-multi-account-results { display: grid; gap: 9px; margin-top: 16px; }
+.email-multi-account-message {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px 16px;
+  padding: 13px 14px;
+  border: 1px solid rgba(133,154,182,.16);
+  border-radius: 12px;
+  background: rgba(255,255,255,.03);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.email-multi-account-message:hover,
+.email-multi-account-message:focus-visible { border-color: rgba(212,175,55,.5); outline: none; }
+.email-multi-account-message strong { display: block; font-size: 13px; }
+.email-multi-account-message small { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; }
+.email-multi-account-source {
+  align-self: start;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: rgba(212,175,55,.09);
+  color: var(--gold);
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.email-multi-account-snippet { grid-column: 1/-1; color: #aeb8c4; font-size: 11px; line-height: 1.5; }
+.email-multi-account-answer {
+  margin-top: 14px;
+  padding: 11px 13px;
+  border-left: 2px solid var(--gold);
+  background: rgba(212,175,55,.05);
+  color: #c8d0da;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.email-multi-account-detail {
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid rgba(133,154,182,.18);
+  border-radius: 12px;
+  background: rgba(4,8,12,.55);
+}
+.email-multi-account-detail h5 { margin: 0 0 7px; font-size: 14px; }
+.email-multi-account-detail-meta { color: var(--muted); font-size: 10px; line-height: 1.45; }
+.email-multi-account-detail-body { margin: 11px 0 0; white-space: pre-wrap; color: #c0c8d2; font-size: 12px; line-height: 1.58; }
+.email-multi-account-empty { padding: 13px; color: var(--muted); font-size: 12px; text-align: center; }
+
+@media (max-width: 720px) {
+  .email-multi-account-head { display: block; }
+  .email-multi-account-count { display: inline-block; margin-top: 9px; }
+  .email-multi-account-toolbar { grid-template-columns: 1fr; }
+}
+@media (max-width: 460px) {
+  .email-provider-account-row { align-items: flex-start; }
+  .email-multi-account-concierge { padding: 16px; }
+  .email-multi-account-query { display: grid; }
+  .email-multi-account-query button { width: 100%; }
+  .email-multi-account-message { grid-template-columns: 1fr; }
+  .email-multi-account-source { justify-self: start; }
+}
