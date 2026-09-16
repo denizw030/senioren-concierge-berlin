@@ -152,6 +152,7 @@
   let savingPreferences = false;
   let loading = false;
   let loaded = false;
+  let productAssetPromise = null;
 
   function sessionToken() {
     try {
@@ -159,6 +160,39 @@
     } catch {
       return "";
     }
+  }
+
+  function ensureProductAssets() {
+    if (globalThis.NAHWERKEmailConciergeProduct) return Promise.resolve(globalThis.NAHWERKEmailConciergeProduct);
+    if (productAssetPromise) return productAssetPromise;
+    if (!document.getElementById("emailConciergeProductStyles")) {
+      const link = document.createElement("link");
+      link.id = "emailConciergeProductStyles";
+      link.rel = "stylesheet";
+      link.href = "/assets/email-concierge-product.css?v=20260916-1";
+      document.head.appendChild(link);
+    }
+    productAssetPromise = new Promise((resolve) => {
+      const existing = document.getElementById("emailConciergeProductRuntime");
+      if (existing) {
+        if (globalThis.NAHWERKEmailConciergeProduct) resolve(globalThis.NAHWERKEmailConciergeProduct);
+        else window.addEventListener("nahwerk:email-concierge-product-ready", () => resolve(globalThis.NAHWERKEmailConciergeProduct || null), { once: true });
+        return;
+      }
+      const script = document.createElement("script");
+      script.id = "emailConciergeProductRuntime";
+      script.src = "/assets/email-concierge-product.js?v=20260916-1";
+      script.async = true;
+      script.addEventListener("load", () => resolve(globalThis.NAHWERKEmailConciergeProduct || null), { once: true });
+      script.addEventListener("error", () => resolve(null), { once: true });
+      document.body.appendChild(script);
+    });
+    return productAssetPromise;
+  }
+
+  async function syncProduct(connected) {
+    const product = await ensureProductAssets();
+    if (product?.setConnectionState) await product.setConnectionState(connected === true);
   }
 
   function applyCustomerCopy() {
@@ -191,6 +225,7 @@
   statusBadge.textContent = "Wird geladen";
   stateTitle.textContent = "E-Mail-Verbindung wird geprüft …";
   stateMeta.textContent = CUSTOMER_COPY.initialMeta;
+  ensureProductAssets();
 
   function setBusy(value) {
     [connectButton, disconnectButton].forEach((button) => {
@@ -282,6 +317,7 @@
     resetActions();
     accountHint.textContent = connection?.account_display_hint || "";
     const state = String(connection?.state || "DISCONNECTED").toUpperCase();
+    queueMicrotask(() => syncProduct(state === "CONNECTED"));
 
     if (state === "CONNECTED") {
       selectedProvider = "GOOGLE";
@@ -351,6 +387,7 @@
       connectButton.disabled = !sessionToken() || selectedProvider !== "GOOGLE";
     }
     renderCapabilities();
+    queueMicrotask(() => syncProduct(false));
   }
 
   async function load(force = false) {
@@ -401,6 +438,7 @@
     const body = connectPayload("GOOGLE", selectedCapabilities());
     if (!body || !sessionToken()) return;
     setBusy(true);
+    connectButton.textContent = "Verbindung wird gestartet …";
     try {
       const data = await request(connectPathForState(state), { method: "POST", body });
       const redirect = safeGoogleRedirect(data.authorization_redirect_url);
@@ -427,6 +465,7 @@
       const next = normalizePreferences(data);
       if (!next) throw new Error("EMAIL_REQUEST_INVALID");
       preferences = next;
+      globalThis.NAHWERKEmailConciergeProduct?.refresh?.();
     } catch {
       loaded = false;
       await load(true);
@@ -448,6 +487,7 @@
       selectedProvider = null;
       preferences = null;
       loaded = false;
+      await syncProduct(false);
       await load(true);
     } catch (error) {
       renderError(error);
