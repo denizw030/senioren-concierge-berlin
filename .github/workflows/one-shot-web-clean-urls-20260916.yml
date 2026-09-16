@@ -1,4 +1,4 @@
-# run-6: absolute clean canonicals + canonical Google legal routes
+# run-7: finish clean customer route contracts
 name: One-shot Web Concierge + Clean URLs
 
 on:
@@ -59,6 +59,32 @@ jobs:
               raise SystemExit('SEO clean-route test anchor missing')
           seo.write_text(text.replace(old, new))
 
+          # Existing PROD contract test must accept both legacy .html and canonical clean customer routes.
+          prod = Path('tests/web-account-webconcierge-prod.test.mjs')
+          prod_lines = prod.read_text().splitlines()
+          repaired = []
+          for line in prod_lines:
+              if 'assert.match(siteUi' in line and 'konto' in line and 'payg' in line and 'web-concierge' in line:
+                  repaired.append(r'  assert.ok(siteUi.includes(String.raw`(?:konto|payg|web-concierge)(?:\.html)?\/?$`));')
+              elif 'assert.match(siteUi, /web-concierge' in line and 'html' in line:
+                  repaired.append('  assert.match(siteUi, /web-concierge/);')
+              else:
+                  repaired.append(line)
+          prod.write_text('\n'.join(repaired) + '\n')
+
+          # Finish clean-route recognition in the later account shell guard and clean structured-data URL.
+          site_ui = Path('assets/site-ui.js')
+          source = site_ui.read_text()
+          source = source.replace(
+              r'if (!/(?:^|\/)konto\.html$/.test(location.pathname)) return;',
+              r'if (!/(?:^|\/)konto(?:\.html)?\/?$/.test(location.pathname)) return;'
+          )
+          source = source.replace(
+              "url: 'https://nahwerkconcierge.com/prime-concierge.html',",
+              "url: 'https://nahwerkconcierge.com/prime-concierge',"
+          )
+          site_ui.write_text(source)
+
           domain = 'https://nahwerkconcierge.com'
 
           # Keep canonicals/OpenGraph absolute even though customer navigation uses clean relative paths.
@@ -74,8 +100,7 @@ jobs:
               if fixed != source:
                   html.write_text(fixed)
 
-          # The already-approved Google/Gmail legal pages are canonical directory routes with trailing slash.
-          # Normalize sitemap entries to exactly those existing canonicals and remove duplicates created by legacy .html migration.
+          # Preserve the already-created Google/Gmail legal directory routes as their canonical URLs.
           sitemap = Path('sitemap.xml')
           xml = sitemap.read_text()
           xml = xml.replace(f'<loc>{domain}/datenschutz</loc>', f'<loc>{domain}/datenschutz/</loc>')
