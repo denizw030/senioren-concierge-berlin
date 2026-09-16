@@ -48,11 +48,6 @@ jobs:
           if old not in s:
               raise SystemExit('legal-i18n locale-boot canonical read marker missing')
           s = s.replace(old, new, 1)
-          old = "    const html = read(page);\n    assert.match(html, /\\/assets\\/legal-locale\\.js/);"
-          new = "    const html = read(canonicalFile(page));\n    assert.match(html, /\\/assets\\/legal-locale\\.js/);"
-          if old not in s:
-              raise SystemExit('legal-i18n legal-locale canonical read marker missing')
-          s = s.replace(old, new, 1)
           old = "for (const target of ['datenschutz.html','agb.html','ki-transparenz.html']) {\n    assert.ok(registration.includes(`href=\"${target}\"`), `registration missing ${target}`);\n  }"
           new = "for (const target of ['/datenschutz','/agb','/ki-transparenz']) {\n    assert.ok(registration.includes(`href=\"${target}\"`), `registration missing ${target}`);\n  }"
           if old not in s:
