@@ -260,6 +260,7 @@
   ensureShell();
   ensureModal();
   forceTechnicalFieldsHidden();
+  renderGrid();
 
   const observer = new MutationObserver(forceTechnicalFieldsHidden);
   if (legacyGenericForm) observer.observe(legacyGenericForm, { attributes: true, attributeFilter: ["hidden", "style", "class"] });
