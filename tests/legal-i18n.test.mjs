@@ -9,6 +9,7 @@ const legalPages = [
   'impressum.html','datenschutz.html','agb.html','widerruf.html',
   'ki-transparenz.html','datenloeschung.html','vertrag-widerrufen.html'
 ];
+const canonicalFile = page => page === 'datenschutz.html' ? 'datenschutz/index.html' : page;
 
 test('legal locale runtime parses and contains complete EN/TR legal surfaces', () => {
   const js = read('assets/legal-i18n.js');
@@ -35,7 +36,7 @@ test('legal locale runtime parses and contains complete EN/TR legal surfaces', (
 
 test('every legal page boots locale before paint and loads all locale runtimes', () => {
   for (const page of legalPages) {
-    const html = read(page);
+    const html = read(canonicalFile(page));
     assert.match(html, /\/assets\/locale-boot\.js\?v=1/, `${page} missing locale boot`);
     assert.match(html, /\/assets\/legal-i18n\.js\?v=1/, `${page} missing legal locale runtime`);
     assert.match(html, /\/assets\/auth-i18n\.js\?v=3/, `${page} missing shared locale routing`);
@@ -47,7 +48,7 @@ test('every legal page boots locale before paint and loads all locale runtimes',
 
 test('registration legal links are recognized as locale-preserving query pages', () => {
   const registration = read('registrieren.html');
-  for (const target of ['datenschutz.html','agb.html','ki-transparenz.html']) {
+  for (const target of ['/datenschutz','/agb','/ki-transparenz']) {
     assert.ok(registration.includes(`href="${target}"`), `registration missing ${target}`);
   }
   const auth = read('assets/auth-i18n.js');

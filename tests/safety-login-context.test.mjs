@@ -7,7 +7,7 @@ const read = (path) => fs.readFileSync(path, "utf8");
 test("Safety customer-area entry is explicitly Prime", () => {
   const safety = read("safety.html");
   const customerAreaLinks = [...safety.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>Zum Kundenbereich<\/a>/g)].map((m) => m[1]);
-  assert.deepEqual(customerAreaLinks, ["anmelden.html?produkt=prime", "anmelden.html?produkt=prime"]);
+  assert.deepEqual(customerAreaLinks, ["/anmelden?produkt=prime", "/anmelden?produkt=prime"]);
 });
 
 test("auth-nav keeps explicit URL context authoritative over stale session context", () => {
@@ -22,7 +22,7 @@ test("auth-nav keeps explicit URL context authoritative over stale session conte
 test("Senior and Prime product entry semantics remain explicit", () => {
   const senior = read("senioren-concierge.html");
   const prime = read("prime-concierge.html");
-  assert.match(senior, /anmelden\.html\?produkt=senioren/);
-  assert.match(senior, /registrieren\.html\?produkt=senioren/);
-  assert.match(prime, /registrieren\.html\?produkt=prime/);
+  assert.match(senior, /href="\/anmelden\?produkt=senioren"/);
+  assert.match(senior, /href="\/registrieren\?produkt=senioren"/);
+  assert.match(prime, /href="\/registrieren\?produkt=prime/);
 });

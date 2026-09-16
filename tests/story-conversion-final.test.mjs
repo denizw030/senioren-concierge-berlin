@@ -89,10 +89,10 @@ test("story product pages share the same brand layer and navigation logic",()=>{
   for(const p of [homepage,"prime-concierge.html","safety.html","angehoerige.html","telefonannahme.html"]){
     const html=read(p);
     assert.match(html,/assets\/story-conversion-final\.css\?v=\d+/,p);
-    assert.match(html,/href="(?:\/de\/)?prime-concierge\.html">Concierge<\/a>/,p);
-    assert.match(html,/href="(?:\/de\/)?safety\.html">Safety<\/a>/,p);
-    assert.match(html,/href="(?:\/de\/)?angehoerige\.html">Family<\/a>/,p);
-    assert.match(html,/href="(?:\/de\/)?telefonannahme\.html">Telefon<\/a>/,p);
+    assert.match(html,/href="(?:\/de\/|\/)?prime-concierge(?:\.html)?">Concierge<\/a>/,p);
+    assert.match(html,/href="(?:\/de\/|\/)?safety(?:\.html)?">Safety<\/a>/,p);
+    assert.match(html,/href="(?:\/de\/|\/)?angehoerige(?:\.html)?">Family<\/a>/,p);
+    assert.match(html,/href="(?:\/de\/|\/)?telefonannahme(?:\.html)?">Telefon<\/a>/,p);
   }
 });
 
