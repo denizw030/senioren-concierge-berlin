@@ -1,4 +1,4 @@
-# run-2: deterministic retest after assertion escape fix
+# run-4: clean-route SEO test understands directory index routes
 name: One-shot Web Concierge + Clean URLs
 
 on:
@@ -31,11 +31,12 @@ jobs:
           node-version: '22'
       - name: Apply isolated website transformation
         run: node scripts/one-shot-web-clean-urls-20260916.mjs
-      - name: Repair generated test assertion
+      - name: Repair generated clean-route tests
         shell: bash
         run: |
           python3 - <<'PY'
           from pathlib import Path
+
           p = Path('tests/web-clean-routes-floating.test.mjs')
           lines = p.read_text().splitlines()
           lines = [
@@ -44,6 +45,18 @@ jobs:
               for line in lines
           ]
           p.write_text('\n'.join(lines) + '\n')
+
+          seo = Path('tests/seo-indexing.test.mjs')
+          text = seo.read_text()
+          text = text.replace(
+              "import { existsSync, readFileSync } from 'node:fs';",
+              "import { existsSync, readFileSync, statSync } from 'node:fs';"
+          )
+          old = "    const file = pathname.endsWith('/') ? `${pathname.slice(1)}index.html` : pathname.slice(1);"
+          new = "    const candidate = pathname.endsWith('/') ? `${pathname.slice(1)}index.html` : pathname.slice(1);\n    const file = existsSync(resolve(root, candidate)) && statSync(resolve(root, candidate)).isDirectory() ? `${candidate}/index.html` : candidate;"
+          if old not in text:
+              raise SystemExit('SEO clean-route test anchor missing')
+          seo.write_text(text.replace(old, new))
           PY
       - name: Scope guard
         shell: bash
