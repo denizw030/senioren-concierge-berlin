@@ -10,7 +10,6 @@ permissions:
 
 jobs:
   fix-tests-once:
-    if: github.event.head_commit.message == 'chore(test): align clean URL regression checks'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,16 +28,11 @@ jobs:
               s = p.read_text()
               if old not in s:
                   raise SystemExit(f'missing expected text in {path}: {old!r}')
-              if count is None:
-                  s = s.replace(old, new)
-              else:
-                  if s.count(old) != count:
-                      raise SystemExit(f'unexpected count in {path}: {s.count(old)} != {count} for {old!r}')
-                  s = s.replace(old, new)
-              p.write_text(s)
+              if count is not None and s.count(old) != count:
+                  raise SystemExit(f'unexpected count in {path}: {s.count(old)} != {count} for {old!r}')
+              p.write_text(s.replace(old, new))
 
           replace('tests/acquisition-v1.test.mjs', 'const privacy=read("datenschutz.html")', 'const privacy=read("datenschutz/index.html")', 1)
-
           replace('tests/i18n-link-flow.test.mjs', "const authTargets = new Set(['registrieren.html','anmelden.html']);", "const authTargets = new Set(['registrieren','anmelden','registrieren.html','anmelden.html']);", 1)
           replace('tests/i18n-link-flow.test.mjs', ".find((href) => href.includes('registrieren.html') && href.includes('produkt=prime') && href.includes('paket=free'));", ".find((href) => href.includes('/registrieren') && href.includes('produkt=prime') && href.includes('paket=free'));", 1)
           replace('tests/i18n-link-flow.test.mjs', "assert.equal(url.pathname, '/registrieren.html');", "assert.equal(url.pathname, '/registrieren');", 1)
@@ -76,22 +70,13 @@ jobs:
           p.write_text(s)
 
           replace('tests/telephone-reception-product.test.mjs', 'for(const body of [home,services,pricing,registration]) assert.match(body,/telefonannahme\\.html/);', 'for(const body of [home,services,pricing,registration]) assert.match(body,/href="\\/telefonannahme"/);', 1)
-
           replace('tests/website-launch-readiness-final.test.mjs', "const privacy = read('datenschutz.html');", "const privacy = read('datenschutz/index.html');", 1)
           replace('tests/website-launch-readiness-final.test.mjs', '/<a href="leistungen\\.html">Leistungen<\\/a><a class="active" href="pakete\\.html" aria-current="page">Tarife<\\/a>/', '/<a href="\\/leistungen">Leistungen<\\/a><a class="active" href="\\/pakete" aria-current="page">Tarife<\\/a>/', 1)
           replace('tests/website-launch-readiness-final.test.mjs', '/<a class="active" href="leistungen\\.html">Leistungen<\\/a>/', '/<a class="active" href="\\/leistungen">Leistungen<\\/a>/', 1)
           PY
       - name: Run targeted regression checks
-        run: >-
-          node --test
-          tests/acquisition-v1.test.mjs
-          tests/i18n-link-flow.test.mjs
-          tests/legal-i18n.test.mjs
-          tests/safety-login-context.test.mjs
-          tests/story-conversion-final.test.mjs
-          tests/telephone-reception-product.test.mjs
-          tests/website-launch-readiness-final.test.mjs
-      - name: Commit only validated test alignment and remove one-shot workflow
+        run: node --test tests/acquisition-v1.test.mjs tests/i18n-link-flow.test.mjs tests/legal-i18n.test.mjs tests/safety-login-context.test.mjs tests/story-conversion-final.test.mjs tests/telephone-reception-product.test.mjs tests/website-launch-readiness-final.test.mjs
+      - name: Commit validated test alignment and remove one-shot workflow
         run: |
           rm .github/workflows/web-clean-url-regression-fix-once.yml
           git config user.name "github-actions[bot]"
