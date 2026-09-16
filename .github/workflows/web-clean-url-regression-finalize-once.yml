@@ -59,17 +59,6 @@ jobs:
           replace('tests/safety-login-context.test.mjs', '/registrieren\\.html\\?produkt=senioren/', '/href="\\/registrieren\\?produkt=senioren"/', 1)
           replace('tests/safety-login-context.test.mjs', '/registrieren\\.html\\?produkt=prime/', '/href="\\/registrieren\\?produkt=prime/', 1)
 
-          p = Path('tests/story-conversion-final.test.mjs')
-          lines = p.read_text().splitlines()
-          slash = chr(92) + '/'
-          labels = {'prime-concierge':'Concierge','safety':'Safety','angehoerige':'Family','telefonannahme':'Telefon'}
-          for slug, label in labels.items():
-              matches = [i for i, line in enumerate(lines) if 'assert.match(html,/href=' in line and slug in line and '.html' in line]
-              if len(matches) != 1:
-                  raise SystemExit(f'unexpected story nav line count for {slug}: {len(matches)}')
-              lines[matches[0]] = f'    assert.match(html,/href="{slash}(?:de{slash})?{slug}">{label}<{slash}a>/,p);'
-          p.write_text('\n'.join(lines) + '\n')
-
           replace('tests/telephone-reception-product.test.mjs', 'for(const body of [home,services,pricing,registration]) assert.match(body,/telefonannahme\\.html/);', 'for(const body of [home,services,pricing,registration]) assert.match(body,/href="\\/telefonannahme"/);', 1)
           replace('tests/website-launch-readiness-final.test.mjs', "const privacy = read('datenschutz.html');", "const privacy = read('datenschutz/index.html');", 1)
           replace('tests/website-launch-readiness-final.test.mjs', '/<a href="leistungen\\.html">Leistungen<\\/a><a class="active" href="pakete\\.html" aria-current="page">Tarife<\\/a>/', '/<a href="\\/leistungen">Leistungen<\\/a><a class="active" href="\\/pakete" aria-current="page">Tarife<\\/a>/', 1)
@@ -83,7 +72,7 @@ jobs:
         run: node --test tests/legal-i18n.test.mjs
       - name: Test safety login context
         run: node --test tests/safety-login-context.test.mjs
-      - name: Test story conversion
+      - name: Test story conversion unchanged
         run: node --test tests/story-conversion-final.test.mjs
       - name: Test telephone reception
         run: node --test tests/telephone-reception-product.test.mjs
@@ -94,6 +83,6 @@ jobs:
           rm .github/workflows/web-clean-url-regression-finalize-once.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tests/acquisition-v1.test.mjs tests/i18n-link-flow.test.mjs tests/legal-i18n.test.mjs tests/safety-login-context.test.mjs tests/story-conversion-final.test.mjs tests/telephone-reception-product.test.mjs tests/website-launch-readiness-final.test.mjs .github/workflows/web-clean-url-regression-finalize-once.yml
+          git add tests/acquisition-v1.test.mjs tests/i18n-link-flow.test.mjs tests/legal-i18n.test.mjs tests/safety-login-context.test.mjs tests/telephone-reception-product.test.mjs tests/website-launch-readiness-final.test.mjs .github/workflows/web-clean-url-regression-finalize-once.yml
           git commit -m "test(web): align clean URL regression expectations"
           git push origin HEAD:${GITHUB_REF_NAME}
