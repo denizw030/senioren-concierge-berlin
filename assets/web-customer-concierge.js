@@ -3,15 +3,11 @@
 
   const SESSION_KEY = "scb_web_session";
   const CORE_CONTRACT_VERSION = "core-v1";
-  const GATEWAY_CONTRACT_VERSION = "web-concierge-gateway-v1";
-  const GATEWAY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-concierge-gateway";
+  const GATEWAY_CONTRACT_VERSION = "web-gateway-v1";
+  const GATEWAY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway";
   const RESPONSE_STATES = new Set(["ANSWER","QUESTION","ACTION_STARTED","ACTION_PENDING","ACTION_RESULT","ERROR_RESPONSE","HANDOFF","SAFE_TERMINATION"]);
-  const POLLABLE_STATES = new Set(["ACTION_STARTED","ACTION_PENDING"]);
 
   let gatewayReady = false;
-  let lastResponse = null;
-  let pollTimer = null;
-  let pollCount = 0;
 
   function sessionToken() {
     try { return String(JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null")?.session_token || ""); }
@@ -23,22 +19,28 @@
       const url = new URL(GATEWAY_ENDPOINT);
       if (url.protocol !== "https:") return null;
       if (url.hostname !== "djicahhmnnamtjuqedqd.supabase.co") return null;
-      if (url.pathname !== "/functions/v1/web-concierge-gateway") return null;
+      if (url.pathname !== "/functions/v1/nahwerk-web-gateway") return null;
       if (/staging|shadow/i.test(url.href)) return null;
-      return url.href;
+      return url.href.replace(/\/$/,"");
     } catch { return null; }
   }
 
   function normalizeGatewayReadiness(raw) {
     if (!raw || typeof raw !== "object") return null;
-    const ready = raw.ok === true && raw.contract_version === GATEWAY_CONTRACT_VERSION && raw.core_contract_version === CORE_CONTRACT_VERSION && String(raw.channel || "").toUpperCase() === "WEB" && raw.authoritative === true && raw.cao_authoritative === true && raw.shadow === false;
+    const ready = raw.ok === true
+      && raw.service === "nahwerk-web-gateway"
+      && raw.production === true
+      && raw.contract_version === GATEWAY_CONTRACT_VERSION
+      && raw.web_route_authoritative === true
+      && raw.cao_web_authoritative === true
+      && raw.fail_safe === "closed";
     return Object.freeze({
-      contract_version: String(raw.contract_version || ""),
-      core_contract_version: String(raw.core_contract_version || ""),
-      channel: String(raw.channel || "").toUpperCase(),
-      authoritative: raw.authoritative === true,
-      cao_authoritative: raw.cao_authoritative === true,
-      shadow: raw.shadow === true,
+      service:String(raw.service || ""),
+      contract_version:String(raw.contract_version || ""),
+      production:raw.production === true,
+      web_route_authoritative:raw.web_route_authoritative === true,
+      cao_web_authoritative:raw.cao_web_authoritative === true,
+      fail_safe:String(raw.fail_safe || ""),
       ready
     });
   }
@@ -104,19 +106,13 @@
     if (quoteId) {
       const link = document.createElement("a");
       link.className = "btn red";
-      link.href = `payg.html#quote-${encodeURIComponent(quoteId)}`;
+      link.href = `/payg#quote-${encodeURIComponent(quoteId)}`;
       link.textContent = "Preis prüfen und freigeben";
       actions.appendChild(link);
     } else {
-      for (const [decision,label,klass] of [["APPROVE","Freigeben","btn red"],["DENY","Ablehnen","btn light"]]) {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = klass;
-        button.dataset.webApproval = decision;
-        button.dataset.approvalId = approvalId;
-        button.textContent = label;
-        actions.appendChild(button);
-      }
+      const hint = document.createElement("span");
+      hint.textContent = "Antworte im Chat mit deiner Entscheidung. Die Freigabe bleibt an die offene Core-Freigabe gebunden.";
+      actions.appendChild(hint);
     }
     card.appendChild(actions);
   }
@@ -125,7 +121,6 @@
     const response = normalizeCoreV1Response(raw);
     const log = document.getElementById("webConciergeLog");
     if (!response || !log || !response.authoritative) return false;
-    lastResponse = response;
     clearNode(log);
     const summary = document.createElement("div");
     summary.className = "web-concierge-core-state";
@@ -143,20 +138,26 @@
     return true;
   }
 
-  async function gateway(action,payload = {}) {
-    const token = sessionToken();
+  async function gatewayRequest(path,{ method="GET",body=null,auth=true } = {}) {
     const endpoint = configuredEndpoint();
-    if (!token || !endpoint) throw new Error("gateway_not_ready");
-    const response = await fetch(endpoint,{
-      method:"POST",
-      headers:{ "Authorization":`Bearer ${token}`, "Content-Type":"application/json" },
-      body:JSON.stringify({ action,...payload }),
+    if (!endpoint) throw new Error("gateway_not_configured");
+    const headers = {};
+    if (auth) {
+      const token = sessionToken();
+      if (!token) throw new Error("session_required");
+      headers.Authorization = `Bearer ${token}`;
+    }
+    if (body !== null) headers["Content-Type"] = "application/json";
+    const response = await fetch(`${endpoint}${path}`,{
+      method,
+      headers,
+      body:body === null ? undefined : JSON.stringify(body),
       cache:"no-store",
       credentials:"omit"
     });
-    const body = await response.json().catch(() => ({}));
-    if (!response.ok || body?.ok === false) throw new Error(String(body?.status || `http_${response.status}`));
-    return body;
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok || payload?.ok === false) throw new Error(String(payload?.error || `http_${response.status}`));
+    return payload;
   }
 
   function setComposerReady(ready) {
@@ -171,18 +172,6 @@
     if (log) addRuntimeCard(log,"Web Concierge nicht verfügbar",message,"is-error");
   }
 
-  function scheduleSync() {
-    clearTimeout(pollTimer);
-    if (!lastResponse?.conversation_id || !POLLABLE_STATES.has(lastResponse.response_state) || pollCount >= 15) return;
-    pollTimer = setTimeout(async () => {
-      try {
-        pollCount += 1;
-        const response = await gateway("sync",{ conversation_id:lastResponse.conversation_id });
-        if (renderCoreV1Response(response)) scheduleSync();
-      } catch {}
-    },2000);
-  }
-
   async function sendTurn() {
     const input = document.getElementById("webConciergeInput");
     if (!(input instanceof HTMLTextAreaElement) || !gatewayReady) return;
@@ -190,11 +179,13 @@
     if (!content || content.length > 4000) return;
     setComposerReady(false);
     try {
-      const response = await gateway("turn",{ source_message_id:crypto.randomUUID(), content });
-      if (!renderCoreV1Response(response)) throw new Error("non_authoritative_response");
+      const response = await gatewayRequest("/web/chat",{
+        method:"POST",
+        body:{ message:content, source_message_id:crypto.randomUUID() }
+      });
+      if (response?.ok !== true || response?.environment !== "PROD" || response?.authoritative !== true) throw new Error("gateway_response_not_authoritative");
+      if (!renderCoreV1Response(response.core)) throw new Error("core_response_not_authoritative");
       input.value = "";
-      pollCount = 0;
-      scheduleSync();
     } catch {
       customerError("Die Nachricht wurde nicht als autoritative WEB-Core-Antwort bestätigt. Es wird kein Erfolg angezeigt.");
     } finally {
@@ -203,27 +194,16 @@
     }
   }
 
-  async function decideApproval(button) {
-    if (!gatewayReady || !(button instanceof HTMLButtonElement)) return;
-    const approvalId = String(button.dataset.approvalId || "");
-    const decision = String(button.dataset.webApproval || "");
-    if (!validUuid(approvalId) || !["APPROVE","DENY"].includes(decision)) return;
-    button.disabled = true;
-    try {
-      const response = await gateway("approval",{ source_message_id:crypto.randomUUID(), approval_id:approvalId, decision });
-      if (!renderCoreV1Response(response)) throw new Error("non_authoritative_response");
-      pollCount = 0;
-      scheduleSync();
-    } catch {
-      customerError("Die Freigabe wurde nicht autoritativ vom Core bestätigt. Es wird kein Ausführungserfolg angezeigt.");
-    }
-  }
-
   async function checkReadiness() {
     try {
-      const readiness = normalizeGatewayReadiness(await gateway("readiness"));
-      gatewayReady = readiness?.ready === true;
-      return gatewayReady;
+      const readiness = normalizeGatewayReadiness(await gatewayRequest("/health",{ auth:false }));
+      if (readiness?.ready !== true) throw new Error("gateway_not_authoritative");
+      const me = await gatewayRequest("/web/me");
+      const identity = me?.identity && typeof me.identity === "object" ? me.identity : {};
+      if (me?.ok !== true || me?.environment !== "PROD" || me?.authoritative !== true) throw new Error("gateway_identity_not_authoritative");
+      if (![identity.person_id,identity.customer_account_id,identity.customer_member_id].every(validUuid)) throw new Error("gateway_identity_invalid");
+      gatewayReady = true;
+      return true;
     } catch {
       gatewayReady = false;
       return false;
@@ -231,30 +211,26 @@
   }
 
   async function boot() {
-    const valid = window.SCBAuth?.validateSession ? await window.SCBAuth.validateSession().catch(() => false) : Boolean(sessionToken());
-    if (!valid) { location.replace("anmelden.html"); return; }
+    const valid = window.SCBAuth?.validateSession ? await window.SCBAuth.validateSession().catch(() => false) : false;
+    if (!valid) { location.replace("/anmelden"); return; }
     const status = document.getElementById("webConciergeStatus");
     const title = document.getElementById("webConciergeStateTitle");
     const meta = document.getElementById("webConciergeStateMeta");
     setComposerReady(false);
     const ready = await checkReadiness();
-    if (status) status.textContent = ready ? "PROD · autoritativ" : "Shared Gateway noch gesperrt";
+    if (status) status.textContent = ready ? "PROD · autoritativ" : "PROD-Gateway nicht erreichbar";
     if (title) title.textContent = ready ? "Web-Concierge ist verbunden" : "Web-Concierge noch nicht verfügbar";
     if (meta) meta.textContent = ready
-      ? "Deine Web-Sitzung wird serverseitig auf deine kanonische Kundenidentität gebunden. Antworten werden nur bei autoritativer WEB-Core-v1-Auslieferung angezeigt."
-      : "Die Website ist vollständig für web-concierge-gateway-v1 vorbereitet. Solange WEB→Core-v1→CAO in PROD nicht autoritativ freigegeben ist, bleibt Senden gesperrt.";
+      ? "Deine Web-Sitzung ist serverseitig auf deine kanonische Kundenidentität gebunden. Antworten werden nur bei autoritativer WEB-Core-v1-Auslieferung angezeigt."
+      : "Die Website ist auf web-gateway-v1 vorbereitet. Senden bleibt gesperrt, bis der PROD-Gateway, die autoritative WEB-Route und deine serverseitig validierte Kundensitzung gemeinsam bestätigt sind.";
     setComposerReady(ready);
     document.getElementById("webConciergeSend")?.addEventListener("click",sendTurn);
     document.getElementById("webConciergeInput")?.addEventListener("keydown",(event) => {
       if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); sendTurn(); }
     });
-    document.getElementById("webConciergeLog")?.addEventListener("click",(event) => {
-      const button = event.target instanceof Element ? event.target.closest("button[data-web-approval]") : null;
-      if (button instanceof HTMLButtonElement) decideApproval(button);
-    });
   }
 
-  window.NAHWERKWebCustomerConciergeTestHooks = Object.freeze({ configuredEndpoint,sessionToken,normalizeGatewayReadiness,normalizeCoreV1Response,renderCoreV1Response,CORE_CONTRACT_VERSION,GATEWAY_CONTRACT_VERSION,GATEWAY_ENDPOINT });
+  window.NAHWERKWebCustomerConciergeTestHooks = Object.freeze({ configuredEndpoint,sessionToken,normalizeGatewayReadiness,normalizeCoreV1Response,renderCoreV1Response,gatewayRequest,CORE_CONTRACT_VERSION,GATEWAY_CONTRACT_VERSION,GATEWAY_ENDPOINT });
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded",boot,{ once:true });
   else boot();
 })();

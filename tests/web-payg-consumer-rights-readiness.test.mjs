@@ -62,7 +62,7 @@ test("withdrawal information contains current provider details and electronic-fu
   assert.match(withdrawalInfo, /dw@nahwerkconcierge\.com/);
   assert.match(withdrawalInfo, /Elektronische Widerrufsfunktion/);
   assert.doesNotMatch(withdrawalInfo, /legal-placeholder/);
-  assert.match(payg, /vertrag-widerrufen\.html/);
+  assert.match(payg, /href="\/vertrag-widerrufen"/);
 });
 
 test("one-off PAYG legal surface does not invent subscription cancellation semantics", () => {

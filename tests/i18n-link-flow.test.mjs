@@ -11,7 +11,7 @@ const pages = [
   'technik-verstehen.html','ueber-mich.html'
 ];
 const localized = new Set(pages);
-const authTargets = new Set(['registrieren.html','anmelden.html']);
+const authTargets = new Set(['registrieren','anmelden','registrieren.html','anmelden.html']);
 
 function read(file) {
   return fs.readFileSync(path.join(root, file), 'utf8');
@@ -47,10 +47,10 @@ for (const lang of ['en', 'tr']) {
 
   test(`${lang}: Personal Concierge primary registration CTA preserves product, plan and language`, () => {
     const html = read(`${lang}/prime-concierge.html`);
-    const candidate = hrefs(html).map(decodeHref).find((href) => href.includes('registrieren.html') && href.includes('produkt=prime') && href.includes('paket=free'));
+    const candidate = hrefs(html).map(decodeHref).find((href) => href.includes('/registrieren') && href.includes('produkt=prime') && href.includes('paket=free'));
     assert.ok(candidate, `${lang}/prime-concierge.html has no intact primary registration CTA`);
     const url = new URL(candidate, 'https://nahwerkconcierge.com/');
-    assert.equal(url.pathname, '/registrieren.html');
+    assert.equal(url.pathname, '/registrieren');
     assert.equal(url.searchParams.get('produkt'), 'prime');
     assert.equal(url.searchParams.get('paket'), 'free');
     assert.equal(url.searchParams.get('lang'), lang);

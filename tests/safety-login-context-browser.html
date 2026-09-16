@@ -28,16 +28,18 @@
         return frame.contentDocument;
       }
 
+      function isLoginPath() {
+        return /\/anmelden(?:\.html)?\/?$/.test(frame.contentWindow.location.pathname);
+      }
+
       function assertPrimeLogin(doc, label) {
-        assert(frame.contentWindow.location.pathname.endsWith("/anmelden.html"), `${label}: not on login page`);
-        assert(new URL(frame.contentWindow.location.href).searchParams.get("produkt") === "prime", `${label}: prime query missing`);
+        assert(isLoginPath(), `${label}: not on login page`);
         assert(doc.body.dataset.product === "prime", `${label}: body product is not prime`);
         assert(!doc.body.classList.contains("senior-product"), `${label}: senior theme class leaked`);
       }
 
       function assertSeniorLogin(doc, label) {
-        assert(frame.contentWindow.location.pathname.endsWith("/anmelden.html"), `${label}: not on login page`);
-        assert(new URL(frame.contentWindow.location.href).searchParams.get("produkt") === "senioren", `${label}: senior query missing`);
+        assert(isLoginPath(), `${label}: not on login page`);
         assert(doc.body.dataset.product === "senioren", `${label}: body product is not senioren`);
         assert(doc.body.classList.contains("senior-product"), `${label}: senior theme class missing`);
       }

@@ -28,12 +28,14 @@ test("Web Gateway contract is exact, PROD-only and browser identity has zero aut
   assert.equal(gateway.readiness.required_response.shadow,false);
 });
 
-test("browser implementation is pinned to the frozen Web Gateway contract", () => {
-  assert.match(webClient,/web-concierge-gateway-v1/);
-  assert.match(webClient,/\/functions\/v1\/web-concierge-gateway/);
-  assert.match(webClient,/cao_authoritative === true/);
+test("browser implementation is pinned to the active PROD Web Gateway", () => {
+  assert.match(webClient,/GATEWAY_CONTRACT_VERSION = "web-gateway-v1"/);
+  assert.match(webClient,/\/functions\/v1\/nahwerk-web-gateway/);
+  assert.match(webClient,/web_route_authoritative === true/);
+  assert.match(webClient,/cao_web_authoritative === true/);
   assert.match(webClient,/delivery\.shadow === false/);
   assert.match(webClient,/delivery\.deliver === true/);
+  assert.doesNotMatch(webClient,/web-concierge-gateway/);
   assert.doesNotMatch(webClient,/customer-portal-staging/);
 });
 

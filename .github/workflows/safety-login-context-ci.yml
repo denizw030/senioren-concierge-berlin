@@ -76,7 +76,7 @@ jobs:
           for attempt in $(seq 1 36); do
             safety="$(curl -fsSL "https://nahwerkconcierge.com/safety.html?deploy=${GITHUB_SHA}-${attempt}" || true)"
             fixture="$(curl -fsSL "https://nahwerkconcierge.com/tests/safety-login-context-browser.html?deploy=${GITHUB_SHA}-${attempt}" || true)"
-            count="$(printf '%s' "$safety" | grep -o 'href="anmelden.html?produkt=prime"[^>]*>Zum Kundenbereich</a>' | wc -l | tr -d ' ')"
+            count="$(printf '%s' "$safety" | grep -o 'href="/anmelden?produkt=prime"[^>]*>Zum Kundenbereich</a>' | wc -l | tr -d ' ')"
             if [ "$count" = "2" ] && printf '%s' "$fixture" | grep -q 'SAFETY_LOGIN_CONTEXT_BROWSER=GREEN'; then
               green=1
               break
