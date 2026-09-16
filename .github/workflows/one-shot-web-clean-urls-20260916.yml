@@ -1,3 +1,4 @@
+# run-2: deterministic retest after assertion escape fix
 name: One-shot Web Concierge + Clean URLs
 
 on:
