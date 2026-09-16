@@ -9,7 +9,6 @@
     capabilityHeading: "Deine E-Mail-Funktionen",
     dataUse: "NAHWERK verwendet deine Google-Daten nur für die Funktionen, die du aktiviert hast.",
     initialMeta: "Deine Verbindung wird sicher deinem NAHWERK-Konto zugeordnet.",
-    providerNote: "Gmail ist der aktuell unterstützte E-Mail-Anbieter für dein NAHWERK-Konto.",
     continuity: "Deine Gmail-Verbindung steht dir in deinem NAHWERK-Konto über die unterstützten Zugänge zur Verfügung. E-Mails werden nur nach deiner Freigabe gesendet.",
     sendApproval: "E-Mails werden nur nach deiner Freigabe gesendet."
   });
@@ -149,9 +148,18 @@
   let providers = [];
   let connection = null;
   let preferences = null;
+  let selectedProvider = null;
   let savingPreferences = false;
   let loading = false;
   let loaded = false;
+
+  function sessionToken() {
+    try {
+      return String(JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null")?.session_token || "");
+    } catch {
+      return "";
+    }
+  }
 
   function applyCustomerCopy() {
     const capabilityHeading = root.querySelector(".email-capabilities")?.previousElementSibling;
@@ -159,11 +167,17 @@
     const continuityNote = root.querySelector(".email-continuity-note");
     const sendCopy = root.querySelector('[data-email-capability][value="EMAIL_SEND"]')?.closest(".email-capability")?.querySelector("small");
     if (capabilityHeading) capabilityHeading.textContent = CUSTOMER_COPY.capabilityHeading;
-    if (providerNote) providerNote.textContent = CUSTOMER_COPY.providerNote;
+    providerNote?.remove();
     if (continuityNote) continuityNote.textContent = CUSTOMER_COPY.continuity;
     if (sendCopy) sendCopy.textContent = CUSTOMER_COPY.sendApproval;
     if (connectButton) connectButton.textContent = "Gmail verbinden";
-    if (providerStatus.GOOGLE) providerStatus.GOOGLE.textContent = "Wird geprüft";
+    const googleButton = providerButtons.find((button) => String(button.dataset.emailProvider || "").toUpperCase() === "GOOGLE");
+    if (googleButton) {
+      googleButton.disabled = false;
+      googleButton.setAttribute("aria-disabled", "false");
+      googleButton.setAttribute("aria-pressed", "false");
+    }
+    if (providerStatus.GOOGLE) providerStatus.GOOGLE.textContent = "Auswählen";
     if (providerStatus.MICROSOFT) providerStatus.MICROSOFT.textContent = "Noch nicht verfügbar";
     if (providerStatus.GENERIC) providerStatus.GENERIC.textContent = "Noch nicht verfügbar";
   }
@@ -175,14 +189,6 @@
   statusBadge.textContent = "Wird geladen";
   stateTitle.textContent = "E-Mail-Verbindung wird geprüft …";
   stateMeta.textContent = CUSTOMER_COPY.initialMeta;
-
-  function sessionToken() {
-    try {
-      return String(JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null")?.session_token || "");
-    } catch {
-      return "";
-    }
-  }
 
   function setBusy(value) {
     [connectButton, disconnectButton].forEach((button) => {
@@ -209,9 +215,19 @@
     return providerRow("GOOGLE")?.availability === "AVAILABLE";
   }
 
+  function googleSelectable() {
+    const row = providerRow("GOOGLE");
+    return !row || row.availability !== "UNAVAILABLE" || connection?.provider === "GOOGLE";
+  }
+
+  function connectionHasGoogleContext() {
+    const state = String(connection?.state || "DISCONNECTED").toUpperCase();
+    return connection?.provider === "GOOGLE" && state !== "DISCONNECTED";
+  }
+
   function connectionCanUseGoogle() {
     const state = String(connection?.state || "").toUpperCase();
-    return googleAvailable() || connection?.provider === "GOOGLE" || state === "REAUTH_REQUIRED" || state === "SCOPE_REQUIRED";
+    return selectedProvider === "GOOGLE" || googleAvailable() || connectionHasGoogleContext() || state === "REAUTH_REQUIRED" || state === "SCOPE_REQUIRED";
   }
 
   function renderProviders() {
@@ -219,19 +235,18 @@
       const key = String(button.dataset.emailProvider || "").toUpperCase();
       const row = providerRow(key);
       const isGoogle = key === "GOOGLE";
-      const isCurrentGoogle = isGoogle && connection?.provider === "GOOGLE";
-      const canUseGoogle = isGoogle && (row?.availability === "AVAILABLE" || isCurrentGoogle);
+      const selectable = isGoogle && googleSelectable();
+      const selected = isGoogle && (selectedProvider === "GOOGLE" || connectionHasGoogleContext());
+      const connected = selected && String(connection?.state || "").toUpperCase() === "CONNECTED";
 
-      button.disabled = !canUseGoogle;
+      button.disabled = !selectable;
       button.setAttribute("aria-disabled", String(button.disabled));
-      button.setAttribute("aria-pressed", String(canUseGoogle));
-      button.classList.toggle("is-selected", canUseGoogle);
+      button.setAttribute("aria-pressed", String(selected));
+      button.classList.toggle("is-selected", selected);
 
       if (!providerStatus[key]) return;
-      if (isGoogle && canUseGoogle) {
-        providerStatus[key].textContent = "Ausgewählt";
-      } else if (row?.availability === "CONFIGURATION_REQUIRED") {
-        providerStatus[key].textContent = "Google-Verifizierung läuft";
+      if (isGoogle) {
+        providerStatus[key].textContent = connected ? "Verbunden" : selected ? "Ausgewählt" : selectable ? "Auswählen" : "Nicht verfügbar";
       } else {
         providerStatus[key].textContent = "Noch nicht verfügbar";
       }
@@ -277,26 +292,32 @@
     const state = String(connection?.state || "DISCONNECTED").toUpperCase();
 
     if (state === "CONNECTED") {
+      selectedProvider = "GOOGLE";
       statusBadge.textContent = "Verbunden";
       stateTitle.textContent = "Gmail ist mit NAHWERK verbunden.";
       stateMeta.textContent = CUSTOMER_COPY.dataUse + " " + CUSTOMER_COPY.sendApproval;
       disconnectButton.hidden = false;
+      renderProviders();
       renderCapabilities();
       return;
     }
 
     if (state === "CONNECTING") {
+      selectedProvider = "GOOGLE";
       statusBadge.textContent = "Verbindung läuft";
       stateTitle.textContent = "Google-Verbindung wird bestätigt …";
       stateMeta.textContent = "Deine Verbindung mit Google wird sicher bestätigt.";
+      renderProviders();
       renderCapabilities();
       return;
     }
 
     if (state === "REAUTH_REQUIRED" || state === "SCOPE_REQUIRED") {
+      selectedProvider = "GOOGLE";
       statusBadge.textContent = "Nicht verbunden";
       stateTitle.textContent = "Gmail mit NAHWERK verbinden";
       stateMeta.textContent = "Melde dich bei Google an, um Gmail wieder mit deinem NAHWERK-Konto zu verbinden.";
+      renderProviders();
       showConnectButton();
       renderCapabilities();
       return;
@@ -305,34 +326,37 @@
     if (state === "ERROR") {
       statusBadge.textContent = "Nicht verbunden";
       stateTitle.textContent = "Gmail mit NAHWERK verbinden";
-      stateMeta.textContent = "Die letzte Verbindung konnte nicht bestätigt werden. Starte die Gmail-Verbindung einfach erneut.";
+      stateMeta.textContent = "Wähle Gmail aus und starte die Verbindung erneut.";
+      renderProviders();
       showConnectButton();
       renderCapabilities();
       return;
     }
 
     statusBadge.textContent = "Nicht verbunden";
-    stateTitle.textContent = googleAvailable() ? "Gmail mit NAHWERK verbinden" : "Gmail-Verbindung wird für den öffentlichen Start vorbereitet.";
-    stateMeta.textContent = googleAvailable()
-      ? "Die Verbindung erfolgt direkt über Google OAuth. Dein Google-Passwort wird nicht an NAHWERK übermittelt."
-      : "Neue öffentliche Gmail-Verbindungen bleiben bis zur Google-Freigabe geschlossen.";
+    stateTitle.textContent = "Gmail mit NAHWERK verbinden";
+    stateMeta.textContent = selectedProvider === "GOOGLE"
+      ? "Gmail ist ausgewählt. Starte jetzt die sichere Verbindung über Google OAuth."
+      : "Wähle oben Google Gmail / Google Workspace aus.";
+    renderProviders();
     showConnectButton();
     renderCapabilities();
   }
 
   function renderError(error) {
-    connection = connection || { state: "ERROR", provider: "GOOGLE", capabilities: [], account_display_hint: null };
+    connection = connection || { state: "ERROR", provider: null, capabilities: [], account_display_hint: null };
     resetActions();
     const code = error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE";
     statusBadge.textContent = code === "UNAUTHENTICATED" ? "Sitzung abgelaufen" : "Nicht verbunden";
     stateTitle.textContent = ERROR_COPY[code] || "Gmail mit NAHWERK verbinden";
     stateMeta.textContent = code === "UNAUTHENTICATED"
       ? "Bitte melde dich erneut bei NAHWERK an."
-      : "Du kannst die Gmail-Verbindung erneut starten. Es wurde keine E-Mail gesendet.";
+      : "Wähle Gmail aus und starte die Verbindung erneut. Es wurde keine E-Mail gesendet.";
     accountHint.textContent = "";
+    renderProviders();
     if (code !== "UNAUTHENTICATED") {
       connectButton.hidden = false;
-      connectButton.disabled = !sessionToken();
+      connectButton.disabled = !sessionToken() || selectedProvider !== "GOOGLE";
     }
     renderCapabilities();
   }
@@ -347,7 +371,7 @@
         request("/email/connection")
       ]);
       providers = normalizeProviderList(providerData);
-      connection = normalizeConnection(connectionData) || { state: "ERROR", provider: "GOOGLE", capabilities: [], account_display_hint: null };
+      connection = normalizeConnection(connectionData) || { state: "ERROR", provider: null, capabilities: [], account_display_hint: null };
       preferences = null;
       renderProviders();
       renderConnection();
@@ -375,6 +399,12 @@
 
   async function begin() {
     const state = String(connection?.state || "DISCONNECTED").toUpperCase();
+    const hasGoogleSelection = selectedProvider === "GOOGLE" || connectionHasGoogleContext();
+    if (!hasGoogleSelection) {
+      stateTitle.textContent = "Gmail auswählen";
+      stateMeta.textContent = "Wähle zuerst Google Gmail / Google Workspace aus.";
+      return;
+    }
     const body = connectPayload("GOOGLE", selectedCapabilities());
     if (!body || !sessionToken()) return;
     setBusy(true);
@@ -422,6 +452,7 @@
     try {
       await request("/email/disconnect", { method: "POST", body: { mode: "LOCAL" } });
       connection = { state: "DISCONNECTED", provider: null, capabilities: [], account_display_hint: null };
+      selectedProvider = null;
       preferences = null;
       loaded = false;
       await load(true);
@@ -434,9 +465,11 @@
 
   providerButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      if (String(button.dataset.emailProvider || "").toUpperCase() !== "GOOGLE" || button.disabled) return;
-      button.setAttribute("aria-pressed", "true");
-      button.classList.add("is-selected");
+      const key = String(button.dataset.emailProvider || "").toUpperCase();
+      if (key !== "GOOGLE" || button.disabled) return;
+      selectedProvider = "GOOGLE";
+      renderProviders();
+      renderConnection();
     });
   });
 
