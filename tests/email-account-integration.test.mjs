@@ -77,14 +77,17 @@ test("browser can request Google only and carries no tenant or provider secret a
   for(const key of ["person_id","customer_account_id","customer_member_id","connection_id","access_token","refresh_token","client_secret"])assert.equal(Object.hasOwn(body,key),false);
 });
 
-test("customer has one Gmail connect action while reconnect remains an internal route",()=>{
+test("connect action stays neutral and is disabled until Gmail is selected",()=>{
   assert.equal(hooks.connectPathForState("DISCONNECTED"),"/email/connect");
   assert.equal(hooks.connectPathForState("ERROR"),"/email/connect");
   assert.equal(hooks.connectPathForState("REAUTH_REQUIRED"),"/email/reauth");
   assert.equal(hooks.connectPathForState("SCOPE_REQUIRED"),"/email/reauth");
   assert.match(js,/obsoleteReauthButton\?\.remove\(\)/);
   assert.match(js,/obsoleteRetryButton\?\.remove\(\)/);
-  assert.match(js,/connectButton\.textContent = "Gmail verbinden"/);
+  assert.match(js,/connectButton\.textContent = "Verbinden"/);
+  assert.match(js,/googleLabel\.textContent = "Google Gmail"/);
+  assert.match(js,/connectButton\.disabled = !sessionToken\(\) \|\| selectedProvider !== "GOOGLE"/);
+  assert.match(js,/Wähle oben Google Gmail aus/);
   assert.equal((js.match(/disconnectButton\.hidden = false/g)||[]).length,1);
 });
 
