@@ -61,12 +61,16 @@ jobs:
 
           p = Path('tests/story-conversion-final.test.mjs')
           s = p.read_text()
+          old_prefix = 'href=\\"(?:\\/de\\/)?'
+          new_prefix = 'href=\\"\\/(?:de\\/)?'
+          if s.count(old_prefix) != 4:
+              raise SystemExit(f'unexpected story nav prefix count: {s.count(old_prefix)}')
+          s = s.replace(old_prefix, new_prefix)
           for slug in ['prime-concierge','safety','angehoerige','telefonannahme']:
-              old = rf'href=\"(?:\\/de\\/)?{slug}\\.html\">'
-              new = rf'href=\"\\/(?:de\\/)?{slug}\">'
-              if old not in s:
-                  raise SystemExit(f'story nav marker missing: {slug}: {old!r}')
-              s = s.replace(old, new, 1)
+              old = f'{slug}\\.html'
+              if s.count(old) != 1:
+                  raise SystemExit(f'unexpected story slug marker count for {slug}: {s.count(old)}')
+              s = s.replace(old, slug, 1)
           p.write_text(s)
 
           replace('tests/telephone-reception-product.test.mjs', 'for(const body of [home,services,pricing,registration]) assert.match(body,/telefonannahme\\.html/);', 'for(const body of [home,services,pricing,registration]) assert.match(body,/href="\\/telefonannahme"/);', 1)
