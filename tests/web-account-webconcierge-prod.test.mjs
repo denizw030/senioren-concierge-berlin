@@ -54,11 +54,12 @@ test("website renderer consumes exact Core v1 authoritative response semantics o
   assert.match(client, /!response\|\|!response\.authoritative/);
 });
 
-test("customer message appears immediately and browser sends only message plus thread correlation", () => {
+test("customer message appears immediately and browser sends only message plus canonical thread id", () => {
   assert.match(client, /appendMessage\("user",content,now,clientId\)/);
   assert.match(client, /showTyping\(\)/);
   assert.match(client, /gatewayRequest\("\/web\/chat"/);
-  assert.match(client, /message:content,source_message_id:sourceMessageId,correlation_id:activeThreadId/);
+  assert.match(client, /message:content,source_message_id:sourceMessageId,thread_id:activeThreadId/);
+  assert.match(client, /response\?\.thread_id!==activeThreadId/);
   assert.match(client, /renderCoreV1Response\(response\.core\)/);
   assert.doesNotMatch(client, /customer_account_id\s*:/);
   assert.doesNotMatch(client, /customer_member_id\s*:/);
@@ -67,12 +68,15 @@ test("customer message appears immediately and browser sends only message plus t
   assert.match(client, /\/payg#quote-/);
 });
 
-test("persisted chat history is authenticated and uses the dedicated PROD history function", () => {
-  assert.match(client, /HISTORY_ENDPOINT = "https:\/\/djicahhmnnamtjuqedqd\.supabase\.co\/functions\/v1\/nahwerk-web-chat-history"/);
+test("persisted chat history is authenticated and reuses the canonical PROD web gateway", () => {
+  assert.match(client, /HISTORY_ENDPOINT = "https:\/\/djicahhmnnamtjuqedqd\.supabase\.co\/functions\/v1\/nahwerk-web-gateway\/web\/history"/);
+  assert.match(client, /url\.pathname !== "\/functions\/v1\/nahwerk-web-gateway\/web\/history"/);
+  assert.match(client, /history_contract!=="canonical-core-receipts-v1"/);
   assert.match(client, /headers:\{Authorization:`Bearer \$\{token\}`\}/);
   assert.match(client, /historyRequest\(threadId\)/);
   assert.match(client, /crypto\.randomUUID\(\)/);
   assert.match(client, /webConciergeThreads/);
+  assert.doesNotMatch(client, /nahwerk-web-chat-history/);
 });
 
 test("legacy Shadow transport and UI remain inert", () => {
