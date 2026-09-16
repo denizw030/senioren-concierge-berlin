@@ -1,0 +1,101 @@
+name: Web Clean URL Regression Fix Once
+
+on:
+  push:
+    branches:
+      - fix/web-concierge-prod-contract-20260916
+
+permissions:
+  contents: write
+
+jobs:
+  fix-tests-once:
+    if: github.event.head_commit.message == 'chore(test): align clean URL regression checks'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Align stale regression expectations with canonical clean URLs
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace(path, old, new, count=None):
+              p = Path(path)
+              s = p.read_text()
+              if old not in s:
+                  raise SystemExit(f'missing expected text in {path}: {old!r}')
+              if count is None:
+                  s = s.replace(old, new)
+              else:
+                  if s.count(old) != count:
+                      raise SystemExit(f'unexpected count in {path}: {s.count(old)} != {count} for {old!r}')
+                  s = s.replace(old, new)
+              p.write_text(s)
+
+          replace('tests/acquisition-v1.test.mjs', 'const privacy=read("datenschutz.html")', 'const privacy=read("datenschutz/index.html")', 1)
+
+          replace('tests/i18n-link-flow.test.mjs', "const authTargets = new Set(['registrieren.html','anmelden.html']);", "const authTargets = new Set(['registrieren','anmelden','registrieren.html','anmelden.html']);", 1)
+          replace('tests/i18n-link-flow.test.mjs', ".find((href) => href.includes('registrieren.html') && href.includes('produkt=prime') && href.includes('paket=free'));", ".find((href) => href.includes('/registrieren') && href.includes('produkt=prime') && href.includes('paket=free'));", 1)
+          replace('tests/i18n-link-flow.test.mjs', "assert.equal(url.pathname, '/registrieren.html');", "assert.equal(url.pathname, '/registrieren');", 1)
+
+          p = Path('tests/legal-i18n.test.mjs')
+          s = p.read_text()
+          marker = "];\n\ntest('legal locale runtime parses"
+          if marker not in s:
+              raise SystemExit('legal-i18n insertion marker missing')
+          s = s.replace(marker, "];\nconst canonicalFile = page => page === 'datenschutz.html' ? 'datenschutz/index.html' : page;\n\ntest('legal locale runtime parses", 1)
+          old = "    const html = read(page);\n    assert.match(html, /\\/assets\\/locale-boot"
+          new = "    const html = read(canonicalFile(page));\n    assert.match(html, /\\/assets\\/locale-boot"
+          if old not in s:
+              raise SystemExit('legal-i18n canonical read marker missing')
+          s = s.replace(old, new, 1)
+          old = "for (const target of ['datenschutz.html','agb.html','ki-transparenz.html']) {\n    assert.ok(registration.includes(`href=\"${target}\"`), `registration missing ${target}`);\n  }"
+          new = "for (const target of ['/datenschutz','/agb','/ki-transparenz']) {\n    assert.ok(registration.includes(`href=\"${target}\"`), `registration missing ${target}`);\n  }"
+          if old not in s:
+              raise SystemExit('legal-i18n registration links marker missing')
+          p.write_text(s.replace(old, new, 1))
+
+          replace('tests/safety-login-context.test.mjs', '["anmelden.html?produkt=prime", "anmelden.html?produkt=prime"]', '["/anmelden?produkt=prime", "/anmelden?produkt=prime"]', 1)
+          replace('tests/safety-login-context.test.mjs', '/anmelden\\.html\\?produkt=senioren/', '/href="\\/anmelden\\?produkt=senioren"/', 1)
+          replace('tests/safety-login-context.test.mjs', '/registrieren\\.html\\?produkt=senioren/', '/href="\\/registrieren\\?produkt=senioren"/', 1)
+          replace('tests/safety-login-context.test.mjs', '/registrieren\\.html\\?produkt=prime/', '/href="\\/registrieren\\?produkt=prime/', 1)
+
+          p = Path('tests/story-conversion-final.test.mjs')
+          s = p.read_text()
+          for slug in ['prime-concierge','safety','angehoerige','telefonannahme']:
+              old = f'/href="(?:\\/de\\/)?{slug}\\.html">'
+              new = f'/href="\\/(?:de\\/)?{slug}">'
+              if old not in s:
+                  raise SystemExit(f'story nav marker missing: {slug}')
+              s = s.replace(old, new, 1)
+          p.write_text(s)
+
+          replace('tests/telephone-reception-product.test.mjs', 'for(const body of [home,services,pricing,registration]) assert.match(body,/telefonannahme\\.html/);', 'for(const body of [home,services,pricing,registration]) assert.match(body,/href="\\/telefonannahme"/);', 1)
+
+          replace('tests/website-launch-readiness-final.test.mjs', "const privacy = read('datenschutz.html');", "const privacy = read('datenschutz/index.html');", 1)
+          replace('tests/website-launch-readiness-final.test.mjs', '/<a href="leistungen\\.html">Leistungen<\\/a><a class="active" href="pakete\\.html" aria-current="page">Tarife<\\/a>/', '/<a href="\\/leistungen">Leistungen<\\/a><a class="active" href="\\/pakete" aria-current="page">Tarife<\\/a>/', 1)
+          replace('tests/website-launch-readiness-final.test.mjs', '/<a class="active" href="leistungen\\.html">Leistungen<\\/a>/', '/<a class="active" href="\\/leistungen">Leistungen<\\/a>/', 1)
+          PY
+      - name: Run targeted regression checks
+        run: >-
+          node --test
+          tests/acquisition-v1.test.mjs
+          tests/i18n-link-flow.test.mjs
+          tests/legal-i18n.test.mjs
+          tests/safety-login-context.test.mjs
+          tests/story-conversion-final.test.mjs
+          tests/telephone-reception-product.test.mjs
+          tests/website-launch-readiness-final.test.mjs
+      - name: Commit only validated test alignment and remove one-shot workflow
+        run: |
+          rm .github/workflows/web-clean-url-regression-fix-once.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tests/acquisition-v1.test.mjs tests/i18n-link-flow.test.mjs tests/legal-i18n.test.mjs tests/safety-login-context.test.mjs tests/story-conversion-final.test.mjs tests/telephone-reception-product.test.mjs tests/website-launch-readiness-final.test.mjs .github/workflows/web-clean-url-regression-fix-once.yml
+          git commit -m "test(web): align clean URL regression expectations"
+          git push origin HEAD:${GITHUB_REF_NAME}
