@@ -1,0 +1,39 @@
+name: PR94 optimize mobile hero once
+
+on:
+  push:
+    branches:
+      - "fix/website-ci-localized-home-20260915"
+
+permissions:
+  contents: write
+
+jobs:
+  optimize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/website-ci-localized-home-20260915
+          fetch-depth: 0
+      - name: Optimize existing mobile hero without resizing
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq webp
+          src="assets/prime/nahwerk-mobile-hero-web-lossless.webp"
+          out="assets/prime/nahwerk-mobile-hero-web-optimized.webp"
+          echo "SOURCE"
+          webpinfo "$src" | grep -E 'Canvas size|Width|Height' || true
+          wc -c "$src"
+          cwebp -quiet -q 82 -m 6 -mt "$src" -o "$out"
+          echo "OPTIMIZED"
+          webpinfo "$out" | grep -E 'Canvas size|Width|Height' || true
+          wc -c "$out"
+          test "$(wc -c < "$out")" -lt "$(wc -c < "$src")"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$out"
+          git commit -m "perf: add optimized mobile homepage hero"
+          git push origin HEAD:fix/website-ci-localized-home-20260915
