@@ -60,18 +60,15 @@ jobs:
           replace('tests/safety-login-context.test.mjs', '/registrieren\\.html\\?produkt=prime/', '/href="\\/registrieren\\?produkt=prime/', 1)
 
           p = Path('tests/story-conversion-final.test.mjs')
-          s = p.read_text()
-          old_prefix = 'href=\\"(?:\\/de\\/)?'
-          new_prefix = 'href=\\"\\/(?:de\\/)?'
-          if s.count(old_prefix) != 4:
-              raise SystemExit(f'unexpected story nav prefix count: {s.count(old_prefix)}')
-          s = s.replace(old_prefix, new_prefix)
-          for slug in ['prime-concierge','safety','angehoerige','telefonannahme']:
-              old = f'{slug}\\.html'
-              if s.count(old) != 1:
-                  raise SystemExit(f'unexpected story slug marker count for {slug}: {s.count(old)}')
-              s = s.replace(old, slug, 1)
-          p.write_text(s)
+          lines = p.read_text().splitlines()
+          slash = chr(92) + '/'
+          labels = {'prime-concierge':'Concierge','safety':'Safety','angehoerige':'Family','telefonannahme':'Telefon'}
+          for slug, label in labels.items():
+              matches = [i for i, line in enumerate(lines) if 'assert.match(html,/href=' in line and slug in line and '.html' in line]
+              if len(matches) != 1:
+                  raise SystemExit(f'unexpected story nav line count for {slug}: {len(matches)}')
+              lines[matches[0]] = f'    assert.match(html,/href="{slash}(?:de{slash})?{slug}">{label}<{slash}a>/,p);'
+          p.write_text('\n'.join(lines) + '\n')
 
           replace('tests/telephone-reception-product.test.mjs', 'for(const body of [home,services,pricing,registration]) assert.match(body,/telefonannahme\\.html/);', 'for(const body of [home,services,pricing,registration]) assert.match(body,/href="\\/telefonannahme"/);', 1)
           replace('tests/website-launch-readiness-final.test.mjs', "const privacy = read('datenschutz.html');", "const privacy = read('datenschutz/index.html');", 1)
