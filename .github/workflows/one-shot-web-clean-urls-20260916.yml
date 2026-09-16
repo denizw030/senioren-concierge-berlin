@@ -1,4 +1,4 @@
-# run-5: absolute clean canonicals + directory-route SEO
+# run-6: absolute clean canonicals + canonical Google legal routes
 name: One-shot Web Concierge + Clean URLs
 
 on:
@@ -59,8 +59,9 @@ jobs:
               raise SystemExit('SEO clean-route test anchor missing')
           seo.write_text(text.replace(old, new))
 
-          # Canonicals/OpenGraph must remain absolute even though customer links are clean relative paths.
           domain = 'https://nahwerkconcierge.com'
+
+          # Keep canonicals/OpenGraph absolute even though customer navigation uses clean relative paths.
           canonical = re.compile(r'(<link\b[^>]*\brel=(["\'])canonical\2[^>]*\bhref=(["\']))(/[^"\']*)', re.I)
           og_url = re.compile(r'(<meta\b[^>]*\bproperty=(["\'])og:url\2[^>]*\bcontent=(["\']))(/[^"\']*)', re.I)
           for html in Path('.').rglob('*.html'):
@@ -72,6 +73,26 @@ jobs:
               fixed = og_url.sub(lambda m: m.group(1) + domain + m.group(4), fixed)
               if fixed != source:
                   html.write_text(fixed)
+
+          # The already-approved Google/Gmail legal pages are canonical directory routes with trailing slash.
+          # Normalize sitemap entries to exactly those existing canonicals and remove duplicates created by legacy .html migration.
+          sitemap = Path('sitemap.xml')
+          xml = sitemap.read_text()
+          xml = xml.replace(f'<loc>{domain}/datenschutz</loc>', f'<loc>{domain}/datenschutz/</loc>')
+          xml = xml.replace(f'<loc>{domain}/nutzungsbedingungen</loc>', f'<loc>{domain}/nutzungsbedingungen/</loc>')
+          seen = set()
+          def dedupe_url(match):
+              block = match.group(0)
+              loc_match = re.search(r'<loc>([^<]+)</loc>', block)
+              if not loc_match:
+                  return block
+              loc = loc_match.group(1)
+              if loc in seen:
+                  return ''
+              seen.add(loc)
+              return block
+          xml = re.sub(r'\s*<url>.*?</url>\s*', lambda m: '\n' + dedupe_url(m), xml, flags=re.S)
+          sitemap.write_text(xml)
           PY
       - name: Scope guard
         shell: bash
