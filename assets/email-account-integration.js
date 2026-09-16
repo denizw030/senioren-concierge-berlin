@@ -170,8 +170,10 @@
     providerNote?.remove();
     if (continuityNote) continuityNote.textContent = CUSTOMER_COPY.continuity;
     if (sendCopy) sendCopy.textContent = CUSTOMER_COPY.sendApproval;
-    if (connectButton) connectButton.textContent = "Gmail verbinden";
+    if (connectButton) connectButton.textContent = "Verbinden";
     const googleButton = providerButtons.find((button) => String(button.dataset.emailProvider || "").toUpperCase() === "GOOGLE");
+    const googleLabel = googleButton?.querySelector("strong");
+    if (googleLabel) googleLabel.textContent = "Google Gmail";
     if (googleButton) {
       googleButton.disabled = false;
       googleButton.setAttribute("aria-disabled", "false");
@@ -211,10 +213,6 @@
     return providers.find((row) => String(row?.provider || "").toUpperCase() === key) || null;
   }
 
-  function googleAvailable() {
-    return providerRow("GOOGLE")?.availability === "AVAILABLE";
-  }
-
   function googleSelectable() {
     const row = providerRow("GOOGLE");
     return !row || row.availability !== "UNAVAILABLE" || connection?.provider === "GOOGLE";
@@ -225,15 +223,9 @@
     return connection?.provider === "GOOGLE" && state !== "DISCONNECTED";
   }
 
-  function connectionCanUseGoogle() {
-    const state = String(connection?.state || "").toUpperCase();
-    return selectedProvider === "GOOGLE" || googleAvailable() || connectionHasGoogleContext() || state === "REAUTH_REQUIRED" || state === "SCOPE_REQUIRED";
-  }
-
   function renderProviders() {
     providerButtons.forEach((button) => {
       const key = String(button.dataset.emailProvider || "").toUpperCase();
-      const row = providerRow(key);
       const isGoogle = key === "GOOGLE";
       const selectable = isGoogle && googleSelectable();
       const selected = isGoogle && (selectedProvider === "GOOGLE" || connectionHasGoogleContext());
@@ -278,12 +270,12 @@
     disconnectButton.hidden = true;
     connectButton.disabled = false;
     disconnectButton.disabled = false;
-    connectButton.textContent = "Gmail verbinden";
+    connectButton.textContent = "Verbinden";
   }
 
   function showConnectButton() {
     connectButton.hidden = false;
-    connectButton.disabled = !sessionToken() || !connectionCanUseGoogle();
+    connectButton.disabled = !sessionToken() || selectedProvider !== "GOOGLE";
   }
 
   function renderConnection() {
@@ -337,7 +329,7 @@
     stateTitle.textContent = "Gmail mit NAHWERK verbinden";
     stateMeta.textContent = selectedProvider === "GOOGLE"
       ? "Gmail ist ausgewählt. Starte jetzt die sichere Verbindung über Google OAuth."
-      : "Wähle oben Google Gmail / Google Workspace aus.";
+      : "Wähle oben Google Gmail aus.";
     renderProviders();
     showConnectButton();
     renderCapabilities();
@@ -403,7 +395,7 @@
     const hasGoogleSelection = selectedProvider === "GOOGLE" || connectionHasGoogleContext();
     if (!hasGoogleSelection) {
       stateTitle.textContent = "Gmail auswählen";
-      stateMeta.textContent = "Wähle zuerst Google Gmail / Google Workspace aus.";
+      stateMeta.textContent = "Wähle zuerst Google Gmail aus.";
       return;
     }
     const body = connectPayload("GOOGLE", selectedCapabilities());
