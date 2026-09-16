@@ -1,0 +1,39 @@
+name: E-Mail provider button freeze fix one-time
+
+on:
+  push:
+    branches:
+      - fix/email-provider-buttons-freeze-20260917
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: JavaScript syntax
+        run: node --check assets/email-provider-logo-connect-v3.js
+      - name: Customer provider action contract
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('assets/email-provider-logo-connect-v3.js').read_text()
+          assert 'MutationObserver' not in p
+          assert 'email-logo-provider-arrow' not in p
+          assert 'data-provider-primary' in p
+          assert 'connected ? "Trennen" : "Verbinden"' in p
+          assert 'data-provider-add' in p
+          assert 'stateCard.hidden = true' in p
+          assert 'actions.hidden = true' in p
+          assert 'runtimeNote.hidden = true' in p
+          assert 'badge.hidden = true' in p
+          assert 'window.location.assign' in p
+          assert 'AbortController' in p
+          assert 'email.send' not in p
+          for provider in ['google','microsoft','yahoo','icloud','gmx','webde','telekom','fastmail','zoho','ionos','strato']:
+              assert f'id: "{provider}"' in p
+          print('EMAIL_PROVIDER_BUTTON_FREEZE_FIX=GREEN')
+          PY
