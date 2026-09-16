@@ -33,6 +33,7 @@ jobs:
           assert '/email/connect/microsoft/web' in provider
           assert '/email/connect/manual' in provider
           assert 'secretEl.value=""' in provider
+          assert 'if(!selected||selected.mode!=="manual")return' in provider
           assert 'emailGenericImapHost' in provider and 'hidden=true' in provider
           assert '/email/concierge/accounts-overview' in concierge
           assert '/email/concierge/query-all' in concierge
