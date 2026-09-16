@@ -6,6 +6,8 @@
   const GATEWAY_CONTRACT_VERSION = "web-gateway-v1";
   const GATEWAY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway";
   const HISTORY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway/web/history";
+  const HISTORY_CONTRACT_VERSION = "canonical-core-receipts-v1";
+  const SYNC_INTERVAL_MS = 3000;
   const RESPONSE_STATES = new Set(["ANSWER","QUESTION","ACTION_STARTED","ACTION_PENDING","ACTION_RESULT","ERROR_RESPONSE","HANDOFF","SAFE_TERMINATION"]);
 
   let gatewayReady = false;
@@ -13,6 +15,8 @@
   let activeThreadId = null;
   let threadCache = [];
   let lastDateKey = "";
+  let historyFingerprint = "";
+  let syncTimer = null;
 
   function sessionToken() {
     try { return String(JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null")?.session_token || ""); }
@@ -108,7 +112,7 @@
     bubble.append(body,time);row.appendChild(bubble);log.appendChild(row);scrollBottom();return row;
   }
   function emptyChat() {
-    const log=logNode(); if(!log)return;clearNode(log);lastDateKey="";
+    const log=logNode(); if(!log)return;clearNode(log);lastDateKey="";historyFingerprint="";
     const empty=document.createElement("div");empty.className="web-concierge-empty";
     const strong=document.createElement("strong");strong.textContent="Wie kann ich dir helfen?";
     const span=document.createElement("span");span.textContent="Schreib mir einfach, was du brauchst.";empty.append(strong,span);log.appendChild(empty);
@@ -155,7 +159,7 @@
     const endpoint=configuredHistoryEndpoint(),token=sessionToken();if(!endpoint||!token)throw new Error("history_unavailable");
     const url=threadId?`${endpoint}?thread_id=${encodeURIComponent(threadId)}`:endpoint;
     const response=await fetch(url,{headers:{Authorization:`Bearer ${token}`},cache:"no-store",credentials:"omit"});
-    const payload=await response.json().catch(()=>({}));if(!response.ok||payload?.ok!==true||payload?.history_contract!=="canonical-core-receipts-v1")throw new Error("history_unavailable");return payload;
+    const payload=await response.json().catch(()=>({}));if(!response.ok||payload?.ok!==true||payload?.history_contract!==HISTORY_CONTRACT_VERSION)throw new Error("history_unavailable");return payload;
   }
 
   function setComposerReady(ready) {
@@ -167,7 +171,7 @@
   function sidebarDate(value){const d=new Date(value||Date.now()),now=new Date();if(Number.isNaN(d.getTime()))return "";if(dateKey(d)===dateKey(now))return timeLabel(d);return new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"2-digit"}).format(d);}
   function renderThreads() {
     const box=document.getElementById("webConciergeThreads");if(!box)return;clearNode(box);
-    const list=[...threadCache];if(activeThreadId&&activeThreadId!=="legacy"&&!list.some((t)=>t.thread_id===activeThreadId))list.unshift({thread_id:activeThreadId,title:"Neuer Chat",preview:"",updated_at:new Date().toISOString(),draft:true});
+    const list=[...threadCache];if(activeThreadId&&!list.some((t)=>t.thread_id===activeThreadId))list.unshift({thread_id:activeThreadId,title:"Neuer Chat",preview:"",updated_at:new Date().toISOString(),draft:true});
     if(!list.length){const e=document.createElement("div");e.className="web-concierge-threads-empty";e.textContent="Noch keine gespeicherten Chats.";box.appendChild(e);return;}
     for(const thread of list){const b=document.createElement("button");b.type="button";b.className=`web-concierge-thread${thread.thread_id===activeThreadId?" is-active":""}`;b.dataset.threadId=thread.thread_id;
       const title=document.createElement("span");title.className="web-concierge-thread-title";title.textContent=thread.title||"Chat";
@@ -176,18 +180,46 @@
       b.append(title,preview,date);b.addEventListener("click",()=>selectThread(thread.thread_id));box.appendChild(b);
     }
   }
+  function historySignature(messages) {
+    return (Array.isArray(messages)?messages:[]).map((m)=>`${m?.id||""}|${m?.at||""}|${m?.role||""}|${m?.text||""}`).join("\n");
+  }
+  function renderHistory(messages,{force=false}={}) {
+    const list=Array.isArray(messages)?messages.filter((m)=>(m?.role==="user"||m?.role==="assistant")&&m?.text):[];
+    const signature=historySignature(list);if(!force&&signature===historyFingerprint)return false;
+    const log=logNode();if(!log)return false;clearNode(log);lastDateKey="";removeTyping();
+    if(!list.length){emptyChat();return true;}
+    for(const m of list)appendMessage(m.role,m.text,m.at,m.id);
+    historyFingerprint=signature;return true;
+  }
   async function loadThreads({selectFirst=false}={}) {
     try{const data=await historyRequest();threadCache=Array.isArray(data.threads)?data.threads:[];if(selectFirst&&!activeThreadId&&threadCache[0])activeThreadId=threadCache[0].thread_id;renderThreads();return true;}catch{renderThreads();return false;}
   }
+  async function refreshThread(threadId,{force=false,showError=false}={}) {
+    if(!validUuid(threadId))return false;
+    try{const data=await historyRequest(threadId);if(activeThreadId!==threadId)return false;renderHistory(data.messages,{force});return true;}
+    catch{if(showError)addRuntimeCard("Verlauf nicht verfügbar","Der gespeicherte Verlauf konnte gerade nicht geladen werden. Neue Nachrichten kannst du weiterhin senden.","is-error");return false;}
+  }
   async function selectThread(threadId) {
-    if(sending)return;activeThreadId=threadId;renderThreads();emptyChat();
-    if(validUuid(threadId)||threadId==="legacy"){
-      try{const data=await historyRequest(threadId),messages=Array.isArray(data.messages)?data.messages:[];if(messages.length){const log=logNode();clearNode(log);lastDateKey="";for(const m of messages)if((m.role==="user"||m.role==="assistant")&&m.text)appendMessage(m.role,m.text,m.at,m.id);}}
-      catch{addRuntimeCard("Verlauf nicht verfügbar","Der gespeicherte Verlauf konnte gerade nicht geladen werden. Neue Nachrichten kannst du weiterhin senden.","is-error");}
-    }
+    if(sending)return;activeThreadId=threadId;historyFingerprint="";renderThreads();emptyChat();
+    if(validUuid(threadId))await refreshThread(threadId,{force:true,showError:true});
     document.getElementById("webConciergeInput")?.focus();
   }
   function newChat() { if(sending)return;activeThreadId=crypto.randomUUID();emptyChat();renderThreads();document.getElementById("webConciergeInput")?.focus(); }
+
+  async function syncHistory() {
+    if(!gatewayReady||sending||document.hidden)return false;
+    const selectedBefore=activeThreadId;
+    const loaded=await loadThreads();if(!loaded)return false;
+    const serverHasSelected=selectedBefore&&threadCache.some((thread)=>thread.thread_id===selectedBefore);
+    if(serverHasSelected)return refreshThread(selectedBefore);
+    if(!selectedBefore&&threadCache[0]){activeThreadId=threadCache[0].thread_id;renderThreads();return refreshThread(activeThreadId,{force:true});}
+    return true;
+  }
+  function startLiveSync() {
+    if(syncTimer)clearInterval(syncTimer);
+    syncTimer=setInterval(()=>{void syncHistory();},SYNC_INTERVAL_MS);
+    document.addEventListener("visibilitychange",()=>{if(!document.hidden)void syncHistory();});
+  }
 
   async function sendTurn() {
     const input=document.getElementById("webConciergeInput");if(!(input instanceof HTMLTextAreaElement)||!gatewayReady||sending)return;
@@ -198,7 +230,9 @@
       const response=await gatewayRequest("/web/chat",{method:"POST",body:{message:content,source_message_id:sourceMessageId,thread_id:activeThreadId}});
       if(response?.ok!==true||response?.environment!=="PROD"||response?.authoritative!==true||(response?.thread_id&&response?.thread_id!==activeThreadId))throw new Error("gateway_response_not_authoritative");
       if(!renderCoreV1Response(response.core))throw new Error("core_response_not_authoritative");
+      const canonicalThreadId=String(response?.core?.conversation_id||"");if(validUuid(canonicalThreadId))activeThreadId=canonicalThreadId;
       await loadThreads();
+      if(validUuid(activeThreadId))await refreshThread(activeThreadId,{force:true});
     }catch{
       removeTyping();const row=document.querySelector(`[data-message-id="${CSS.escape(clientId)}"]`);row?.classList.add("is-failed");
       if(row){const state=document.createElement("span");state.className="web-concierge-message-state";state.textContent="Nicht gesendet – bitte noch einmal versuchen.";row.appendChild(state);}
@@ -219,13 +253,13 @@
     const valid=window.SCBAuth?.validateSession?await window.SCBAuth.validateSession().catch(()=>false):false;if(!valid){location.replace("/anmelden");return;}
     const status=document.getElementById("webConciergeStatus");setComposerReady(false);const ready=await checkReadiness();
     if(status){status.textContent=ready?"Online":"Verbindung momentan nicht möglich";status.classList.toggle("is-online",ready);}
-    setComposerReady(ready);if(ready){const loaded=await loadThreads({selectFirst:true});if(activeThreadId)await selectThread(activeThreadId);else{newChat();if(!loaded)renderThreads();}}
+    setComposerReady(ready);if(ready){const loaded=await loadThreads({selectFirst:true});if(activeThreadId)await selectThread(activeThreadId);else{newChat();if(!loaded)renderThreads();}startLiveSync();}
     document.getElementById("webConciergeNewChat")?.addEventListener("click",newChat);
     document.getElementById("webConciergeSend")?.addEventListener("click",sendTurn);
     document.getElementById("webConciergeInput")?.addEventListener("input",resizeInput);
     document.getElementById("webConciergeInput")?.addEventListener("keydown",(event)=>{if(event.key==="Enter"&&!event.shiftKey){event.preventDefault();sendTurn();}});
   }
 
-  window.NAHWERKWebCustomerConciergeTestHooks=Object.freeze({configuredEndpoint,configuredHistoryEndpoint,sessionToken,normalizeGatewayReadiness,normalizeCoreV1Response,renderCoreV1Response,gatewayRequest,historyRequest,CORE_CONTRACT_VERSION,GATEWAY_CONTRACT_VERSION,GATEWAY_ENDPOINT,HISTORY_ENDPOINT});
+  window.NAHWERKWebCustomerConciergeTestHooks=Object.freeze({configuredEndpoint,configuredHistoryEndpoint,sessionToken,normalizeGatewayReadiness,normalizeCoreV1Response,renderCoreV1Response,gatewayRequest,historyRequest,syncHistory,CORE_CONTRACT_VERSION,GATEWAY_CONTRACT_VERSION,HISTORY_CONTRACT_VERSION,SYNC_INTERVAL_MS,GATEWAY_ENDPOINT,HISTORY_ENDPOINT});
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();
