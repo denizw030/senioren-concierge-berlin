@@ -40,8 +40,8 @@ test("gateway readiness proves PROD WEB and CAO authority plus canonical server 
   assert.match(client, /raw\.web_route_authoritative === true/);
   assert.match(client, /raw\.cao_web_authoritative === true/);
   assert.match(client, /raw\.fail_safe === "closed"/);
-  assert.match(client, /me\?\.environment !== "PROD"/);
-  assert.match(client, /me\?\.authoritative !== true/);
+  assert.match(client, /me\?\.environment\s*!==\s*"PROD"/);
+  assert.match(client, /me\?\.authoritative\s*!==\s*true/);
   for (const field of ["person_id","customer_account_id","customer_member_id"]) assert.ok(client.includes(field));
 });
 
