@@ -5,7 +5,7 @@
   const CORE_CONTRACT_VERSION = "core-v1";
   const GATEWAY_CONTRACT_VERSION = "web-gateway-v1";
   const GATEWAY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway";
-  const HISTORY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-chat-history";
+  const HISTORY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway/web/history";
   const RESPONSE_STATES = new Set(["ANSWER","QUESTION","ACTION_STARTED","ACTION_PENDING","ACTION_RESULT","ERROR_RESPONSE","HANDOFF","SAFE_TERMINATION"]);
 
   let gatewayReady = false;
@@ -34,7 +34,7 @@
     try {
       const url = new URL(HISTORY_ENDPOINT);
       if (url.protocol !== "https:" || url.hostname !== "djicahhmnnamtjuqedqd.supabase.co") return null;
-      if (url.pathname !== "/functions/v1/nahwerk-web-chat-history") return null;
+      if (url.pathname !== "/functions/v1/nahwerk-web-gateway/web/history") return null;
       return url.href.replace(/\/$/,"");
     } catch { return null; }
   }
@@ -155,7 +155,7 @@
     const endpoint=configuredHistoryEndpoint(),token=sessionToken();if(!endpoint||!token)throw new Error("history_unavailable");
     const url=threadId?`${endpoint}?thread_id=${encodeURIComponent(threadId)}`:endpoint;
     const response=await fetch(url,{headers:{Authorization:`Bearer ${token}`},cache:"no-store",credentials:"omit"});
-    const payload=await response.json().catch(()=>({}));if(!response.ok||payload?.ok!==true)throw new Error("history_unavailable");return payload;
+    const payload=await response.json().catch(()=>({}));if(!response.ok||payload?.ok!==true||payload?.history_contract!=="canonical-core-receipts-v1")throw new Error("history_unavailable");return payload;
   }
 
   function setComposerReady(ready) {
@@ -195,8 +195,8 @@
     const sourceMessageId=crypto.randomUUID(),clientId=`local:${sourceMessageId}`,now=new Date().toISOString();
     appendMessage("user",content,now,clientId);input.value="";resizeInput();sending=true;setComposerReady(true);showTyping();
     try{
-      const response=await gatewayRequest("/web/chat",{method:"POST",body:{message:content,source_message_id:sourceMessageId,correlation_id:activeThreadId}});
-      if(response?.ok!==true||response?.environment!=="PROD"||response?.authoritative!==true)throw new Error("gateway_response_not_authoritative");
+      const response=await gatewayRequest("/web/chat",{method:"POST",body:{message:content,source_message_id:sourceMessageId,thread_id:activeThreadId}});
+      if(response?.ok!==true||response?.environment!=="PROD"||response?.authoritative!==true||response?.thread_id!==activeThreadId)throw new Error("gateway_response_not_authoritative");
       if(!renderCoreV1Response(response.core))throw new Error("core_response_not_authoritative");
       await loadThreads();
     }catch{
