@@ -1,0 +1,307 @@
+#accountEmailCard .email-provider-grid,
+#accountEmailCard .email-provider-note,
+#accountEmailCard #emailGenericForm {
+  display: none !important;
+}
+
+#accountEmailCard .email-logo-connect-shell {
+  margin-top: 10px;
+}
+
+#accountEmailCard .email-logo-connect-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 14px;
+}
+
+#accountEmailCard .email-logo-connect-heading h4 {
+  margin: 4px 0 0;
+  font-size: 19px;
+  line-height: 1.25;
+}
+
+#accountEmailCard .email-logo-connect-heading p {
+  max-width: 520px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: right;
+}
+
+#accountEmailCard .email-logo-provider-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+#accountEmailCard .email-logo-provider-card {
+  position: relative;
+  min-height: 126px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid rgba(133,154,182,.16);
+  border-radius: 16px;
+  background: rgba(7,13,20,.46);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
+}
+
+#accountEmailCard .email-logo-provider-card:hover,
+#accountEmailCard .email-logo-provider-card:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(212,175,55,.58);
+  background: rgba(13,20,29,.70);
+  box-shadow: 0 12px 34px rgba(0,0,0,.20);
+  outline: none;
+}
+
+#accountEmailCard .email-logo-provider-card.is-connected {
+  border-color: rgba(212,175,55,.66);
+  box-shadow: inset 0 0 0 1px rgba(212,175,55,.08);
+}
+
+#accountEmailCard .email-logo-provider-card.is-unavailable {
+  opacity: .62;
+}
+
+#accountEmailCard .email-logo-provider-top {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+#accountEmailCard .email-provider-logo {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: #fff;
+  color: #111;
+  box-shadow: 0 5px 18px rgba(0,0,0,.18);
+  overflow: hidden;
+  font-weight: 900;
+  letter-spacing: -.04em;
+}
+
+#accountEmailCard .email-provider-logo svg {
+  width: 29px;
+  height: 29px;
+  display: block;
+}
+
+#accountEmailCard .email-provider-logo--gmail { color: #ea4335; }
+#accountEmailCard .email-provider-logo--microsoft { background: #0a64c9; color: #fff; font-size: 25px; }
+#accountEmailCard .email-provider-logo--yahoo { background: #6001d2; color: #fff; font-size: 21px; }
+#accountEmailCard .email-provider-logo--icloud { background: linear-gradient(145deg,#44b7f7,#1689e7); color: #fff; }
+#accountEmailCard .email-provider-logo--gmx { background: #153a7a; color: #fff; font-size: 14px; letter-spacing: -.06em; }
+#accountEmailCard .email-provider-logo--webde { background: #ffd500; color: #111; font-size: 11px; letter-spacing: -.04em; }
+#accountEmailCard .email-provider-logo--telekom { background: #e20074; color: #fff; font-size: 28px; }
+#accountEmailCard .email-provider-logo--fastmail { background: linear-gradient(145deg,#1b63d9,#6f3be7); color: #fff; font-size: 24px; }
+#accountEmailCard .email-provider-logo--zoho { background: #fff; color: #1f1f1f; font-size: 13px; letter-spacing: -.04em; }
+#accountEmailCard .email-provider-logo--ionos { background: #003d8f; color: #fff; font-size: 12px; letter-spacing: -.04em; }
+#accountEmailCard .email-provider-logo--strato { background: #0069b4; color: #fff; font-size: 10px; letter-spacing: -.02em; }
+
+#accountEmailCard .email-logo-provider-arrow {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(255,255,255,.055);
+  color: var(--muted);
+  font-size: 17px;
+}
+
+#accountEmailCard .email-logo-provider-card strong {
+  display: block;
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+#accountEmailCard .email-logo-provider-status {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+#accountEmailCard .email-logo-provider-card.is-connected .email-logo-provider-status {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.email-provider-connect-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10020;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  background: rgba(0,0,0,.68);
+  backdrop-filter: blur(10px);
+}
+
+.email-provider-connect-backdrop[hidden] { display: none !important; }
+
+.email-provider-connect-modal {
+  width: min(480px, 100%);
+  max-height: min(720px, calc(100vh - 44px));
+  overflow: auto;
+  padding: 24px;
+  border: 1px solid rgba(212,175,55,.28);
+  border-radius: 22px;
+  background: #0a0e13;
+  color: #f5f4ef;
+  box-shadow: 0 30px 90px rgba(0,0,0,.55);
+}
+
+.email-provider-connect-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.email-provider-connect-identity {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.email-provider-connect-identity .email-provider-logo { width: 48px; height: 48px; }
+.email-provider-connect-identity h3 { margin: 0; font-size: 20px; }
+.email-provider-connect-identity p { margin: 4px 0 0; color: #99a5b4; font-size: 12px; }
+
+.email-provider-connect-close {
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.email-provider-connect-copy {
+  margin: 0 0 18px;
+  color: #b5bec9;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.email-provider-connect-field {
+  display: grid;
+  gap: 7px;
+  margin-top: 13px;
+}
+
+.email-provider-connect-field span {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.email-provider-connect-field input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid rgba(133,154,182,.25);
+  border-radius: 12px;
+  background: rgba(255,255,255,.045);
+  color: #fff;
+  font: inherit;
+  outline: none;
+}
+
+.email-provider-connect-field input:focus {
+  border-color: rgba(212,175,55,.72);
+  box-shadow: 0 0 0 3px rgba(212,175,55,.08);
+}
+
+.email-provider-connect-help {
+  margin: 10px 0 0;
+  color: #8492a2;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.email-provider-connect-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.email-provider-connect-primary,
+.email-provider-connect-secondary {
+  min-height: 46px;
+  padding: 0 17px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.email-provider-connect-primary {
+  flex: 1;
+  border: 1px solid #d4af37;
+  background: #d4af37;
+  color: #111;
+}
+
+.email-provider-connect-secondary {
+  border: 1px solid rgba(255,255,255,.16);
+  background: transparent;
+  color: #f5f4ef;
+}
+
+.email-provider-connect-primary:disabled,
+.email-provider-connect-secondary:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.email-provider-connect-message {
+  min-height: 18px;
+  margin-top: 13px;
+  color: #b5bec9;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.email-provider-connect-message.is-error { color: #ff9e9e; }
+.email-provider-connect-message.is-success { color: #d4af37; }
+
+@media (max-width: 980px) {
+  #accountEmailCard .email-logo-provider-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
+}
+
+@media (max-width: 720px) {
+  #accountEmailCard .email-logo-connect-heading { display: block; }
+  #accountEmailCard .email-logo-connect-heading p { margin-top: 7px; text-align: left; }
+  #accountEmailCard .email-logo-provider-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  #accountEmailCard .email-logo-provider-card { min-height: 116px; padding: 14px; }
+}
+
+@media (max-width: 430px) {
+  #accountEmailCard .email-logo-provider-grid { grid-template-columns: 1fr; }
+  #accountEmailCard .email-logo-provider-card { min-height: 100px; }
+  .email-provider-connect-backdrop { padding: 12px; }
+  .email-provider-connect-modal { padding: 19px; border-radius: 18px; }
+}
