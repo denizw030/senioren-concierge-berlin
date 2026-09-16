@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  optimize:
+  finalize:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
@@ -17,23 +17,22 @@ jobs:
         with:
           ref: fix/website-ci-localized-home-20260915
           fetch-depth: 0
-      - name: Optimize existing mobile hero without resizing
+      - name: Switch canonical DE homepage to optimized mobile hero
         run: |
           set -euo pipefail
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq webp
-          src="assets/prime/nahwerk-mobile-hero-web-lossless.webp"
-          out="assets/prime/nahwerk-mobile-hero-web-optimized.webp"
-          echo "SOURCE"
-          webpinfo "$src" | grep -E 'Canvas size|Width|Height' || true
-          wc -c "$src"
-          cwebp -quiet -q 82 -m 6 -mt "$src" -o "$out"
-          echo "OPTIMIZED"
-          webpinfo "$out" | grep -E 'Canvas size|Width|Height' || true
-          wc -c "$out"
-          test "$(wc -c < "$out")" -lt "$(wc -c < "$src")"
+          python3 - <<'PY'
+          from pathlib import Path
+          path=Path('de/index.html')
+          text=path.read_text(encoding='utf-8')
+          old='assets/prime/nahwerk-mobile-hero-web-lossless.webp?v=1'
+          new='assets/prime/nahwerk-mobile-hero-web-optimized.webp?v=1'
+          count=text.count(old)
+          if count != 1:
+              raise SystemExit(f'Expected exactly one mobile hero reference, got {count}')
+          path.write_text(text.replace(old,new),encoding='utf-8')
+          PY
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$out"
-          git commit -m "perf: add optimized mobile homepage hero"
+          git add de/index.html
+          git commit -m "perf: serve optimized mobile homepage hero"
           git push origin HEAD:fix/website-ci-localized-home-20260915
