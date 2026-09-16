@@ -75,8 +75,20 @@ jobs:
           replace('tests/website-launch-readiness-final.test.mjs', '/<a href="leistungen\\.html">Leistungen<\\/a><a class="active" href="pakete\\.html" aria-current="page">Tarife<\\/a>/', '/<a href="\\/leistungen">Leistungen<\\/a><a class="active" href="\\/pakete" aria-current="page">Tarife<\\/a>/', 1)
           replace('tests/website-launch-readiness-final.test.mjs', '/<a class="active" href="leistungen\\.html">Leistungen<\\/a>/', '/<a class="active" href="\\/leistungen">Leistungen<\\/a>/', 1)
           PY
-      - name: Run targeted regression checks
-        run: node --test tests/acquisition-v1.test.mjs tests/i18n-link-flow.test.mjs tests/legal-i18n.test.mjs tests/safety-login-context.test.mjs tests/story-conversion-final.test.mjs tests/telephone-reception-product.test.mjs tests/website-launch-readiness-final.test.mjs
+      - name: Test acquisition clean URL
+        run: node --test tests/acquisition-v1.test.mjs
+      - name: Test i18n link flow
+        run: node --test tests/i18n-link-flow.test.mjs
+      - name: Test legal i18n
+        run: node --test tests/legal-i18n.test.mjs
+      - name: Test safety login context
+        run: node --test tests/safety-login-context.test.mjs
+      - name: Test story conversion
+        run: node --test tests/story-conversion-final.test.mjs
+      - name: Test telephone reception
+        run: node --test tests/telephone-reception-product.test.mjs
+      - name: Test website launch readiness
+        run: node --test tests/website-launch-readiness-final.test.mjs
       - name: Commit validated alignment and remove one-shot workflow
         run: |
           rm .github/workflows/web-clean-url-regression-finalize-once.yml
