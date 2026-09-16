@@ -1,4 +1,200 @@
-@import url("email-provider-brandmarks-final.css?v=20260916-1");
+/* NAHWERK E-Mail provider brandmarks — local, no external image requests */
+#accountEmailCard .email-provider-logo { position: relative; }
+
+/* Gmail: multicolor M */
+#accountEmailCard .email-provider-logo--gmail { background:#fff; color:transparent; }
+#accountEmailCard .email-provider-logo--gmail svg { display:none; }
+#accountEmailCard .email-provider-logo--gmail::before,
+.email-provider-connect-identity .email-provider-logo--gmail::before {
+  content:"";
+  width:30px;
+  height:22px;
+  display:block;
+  background:
+    linear-gradient(135deg, transparent 0 42%, #ea4335 43% 58%, transparent 59%) left/50% 100% no-repeat,
+    linear-gradient(45deg, transparent 0 42%, #ea4335 43% 58%, transparent 59%) right/50% 100% no-repeat,
+    linear-gradient(90deg,#4285f4 0 18%,transparent 18% 82%,#34a853 82% 100%),
+    linear-gradient(0deg,#fbbc04 0 24%,transparent 24% 100%);
+  border-radius:3px;
+}
+
+/* Microsoft / Outlook: Microsoft four-square mark */
+#accountEmailCard .email-provider-logo--microsoft,
+.email-provider-connect-identity .email-provider-logo--microsoft {
+  font-size:0;
+  background:#fff;
+  color:transparent;
+}
+#accountEmailCard .email-provider-logo--microsoft::before,
+.email-provider-connect-identity .email-provider-logo--microsoft::before {
+  content:"";
+  width:28px;
+  height:28px;
+  display:block;
+  background:
+    linear-gradient(#f25022 0 0) 0 0/13px 13px no-repeat,
+    linear-gradient(#7fba00 0 0) 15px 0/13px 13px no-repeat,
+    linear-gradient(#00a4ef 0 0) 0 15px/13px 13px no-repeat,
+    linear-gradient(#ffb900 0 0) 15px 15px/13px 13px no-repeat;
+}
+
+/* Yahoo Mail */
+#accountEmailCard .email-provider-logo--yahoo,
+.email-provider-connect-identity .email-provider-logo--yahoo {
+  font-size:0;
+  background:#6001d2;
+  color:#fff;
+}
+#accountEmailCard .email-provider-logo--yahoo::before,
+.email-provider-connect-identity .email-provider-logo--yahoo::before {
+  content:"yahoo!";
+  font:900 12px/1 Arial,sans-serif;
+  letter-spacing:-.07em;
+  color:#fff;
+  transform:skew(-4deg);
+}
+
+/* iCloud */
+#accountEmailCard .email-provider-logo--icloud,
+.email-provider-connect-identity .email-provider-logo--icloud {
+  background:linear-gradient(145deg,#59c3ff,#1689e7);
+}
+
+/* GMX */
+#accountEmailCard .email-provider-logo--gmx,
+.email-provider-connect-identity .email-provider-logo--gmx {
+  background:#123b7a;
+  color:#fff;
+  font-size:13px;
+  letter-spacing:-.05em;
+}
+#accountEmailCard .email-provider-logo--gmx::after,
+.email-provider-connect-identity .email-provider-logo--gmx::after {
+  content:"";
+  position:absolute;
+  right:6px;
+  top:7px;
+  width:7px;
+  height:7px;
+  border:2px solid #ffd200;
+  border-left-color:transparent;
+  border-radius:50%;
+}
+
+/* WEB.DE */
+#accountEmailCard .email-provider-logo--webde,
+.email-provider-connect-identity .email-provider-logo--webde {
+  background:#ffd500;
+  color:#111;
+  font-size:10px;
+  font-weight:950;
+  letter-spacing:-.045em;
+}
+
+/* Deutsche Telekom T with dot rhythm */
+#accountEmailCard .email-provider-logo--telekom,
+.email-provider-connect-identity .email-provider-logo--telekom {
+  font-size:0;
+  background:#e20074;
+  color:#fff;
+}
+#accountEmailCard .email-provider-logo--telekom::before,
+.email-provider-connect-identity .email-provider-logo--telekom::before {
+  content:"T";
+  font:900 27px/1 Arial,sans-serif;
+  color:#fff;
+}
+#accountEmailCard .email-provider-logo--telekom::after,
+.email-provider-connect-identity .email-provider-logo--telekom::after {
+  content:"";
+  position:absolute;
+  left:7px;
+  bottom:8px;
+  width:3px;
+  height:3px;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:6px 0 #fff,12px 0 #fff,30px 0 #fff,36px 0 #fff,42px 0 #fff;
+}
+
+/* Fastmail: envelope mark */
+#accountEmailCard .email-provider-logo--fastmail,
+.email-provider-connect-identity .email-provider-logo--fastmail {
+  font-size:0;
+  background:linear-gradient(145deg,#1c62d8,#7040e7);
+  color:#fff;
+}
+#accountEmailCard .email-provider-logo--fastmail::before,
+.email-provider-connect-identity .email-provider-logo--fastmail::before {
+  content:"";
+  width:30px;
+  height:22px;
+  border:2px solid rgba(255,255,255,.95);
+  border-radius:5px;
+  background:
+    linear-gradient(35deg,transparent 47%,#fff 48% 51%,transparent 52%) left/50% 100% no-repeat,
+    linear-gradient(-35deg,transparent 47%,#fff 48% 51%,transparent 52%) right/50% 100% no-repeat;
+}
+
+/* Zoho */
+#accountEmailCard .email-provider-logo--zoho,
+.email-provider-connect-identity .email-provider-logo--zoho {
+  font-size:0;
+  background:#fff;
+  color:#111;
+}
+#accountEmailCard .email-provider-logo--zoho::before,
+.email-provider-connect-identity .email-provider-logo--zoho::before {
+  content:"ZOHO";
+  display:grid;
+  place-items:center;
+  width:38px;
+  height:20px;
+  border-radius:3px;
+  background:linear-gradient(90deg,#e43f3a 0 25%,#1684d5 25% 50%,#f4c430 50% 75%,#39a852 75% 100%);
+  color:#fff;
+  font:900 9px/1 Arial,sans-serif;
+  letter-spacing:.05em;
+  text-shadow:0 1px 1px rgba(0,0,0,.25);
+}
+
+/* IONOS */
+#accountEmailCard .email-provider-logo--ionos,
+.email-provider-connect-identity .email-provider-logo--ionos {
+  font-size:0;
+  background:#003d8f;
+  color:#fff;
+}
+#accountEmailCard .email-provider-logo--ionos::before,
+.email-provider-connect-identity .email-provider-logo--ionos::before {
+  content:"IONOS";
+  color:#fff;
+  font:900 10px/1 Arial,sans-serif;
+  letter-spacing:-.03em;
+}
+#accountEmailCard .email-provider-logo--ionos::after,
+.email-provider-connect-identity .email-provider-logo--ionos::after {
+  content:"";
+  position:absolute;
+  left:6px;
+  top:8px;
+  width:10px;
+  height:7px;
+  border:1.7px solid #fff;
+  border-radius:50%;
+  transform:rotate(-20deg);
+  opacity:.95;
+}
+
+/* STRATO */
+#accountEmailCard .email-provider-logo--strato,
+.email-provider-connect-identity .email-provider-logo--strato {
+  background:#0069b4;
+  color:#fff;
+  font-size:9px;
+  font-weight:950;
+  letter-spacing:.02em;
+}
 
 #accountEmailCard .email-provider-grid,
 #accountEmailCard .email-provider-note,
