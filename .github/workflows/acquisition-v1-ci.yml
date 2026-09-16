@@ -434,13 +434,13 @@ jobs:
           done
       - name: Lighthouse desktop
         run: |
-          npx --yes lighthouse@13.4.1 http://127.0.0.1:4173/index.html \
+          npx --yes lighthouse@13.4.1 http://127.0.0.1:4173/de/index.html \
             --quiet --chrome-flags="--headless --no-sandbox" \
             --preset=desktop --only-categories=performance,accessibility \
             --output=json --output-path=/tmp/lh-desktop.json
       - name: Lighthouse mobile
         run: |
-          npx --yes lighthouse@13.4.1 http://127.0.0.1:4173/index.html \
+          npx --yes lighthouse@13.4.1 http://127.0.0.1:4173/de/index.html \
             --quiet --chrome-flags="--headless --no-sandbox" \
             --only-categories=performance,accessibility \
             --output=json --output-path=/tmp/lh-mobile.json
