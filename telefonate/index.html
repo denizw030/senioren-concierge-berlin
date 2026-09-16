@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Telefonate | NAHWERK Concierge</title>
+  <meta name="description" content="Persönlicher Telefonverlauf im NAHWERK Kundenportal." />
+  <link rel="icon" type="image/svg+xml" href="/assets/logos/nahwerk-concierge-gold-transparent.svg?v=1" />
+  <style>
+    :root{color-scheme:dark;--bg:#05090f;--card:#0b121c;--line:rgba(145,163,188,.16);--text:#f3f1eb;--muted:#9c9b96;--gold:#d7a934;--soft:rgba(255,255,255,.025)}
+    html[data-theme="light"]{color-scheme:light;--bg:#f7f3ea;--card:#fffdf8;--line:rgba(93,73,38,.16);--text:#211e18;--muted:#70695e;--gold:#9b7429;--soft:rgba(112,87,39,.035)}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(900px 540px at 90% 0%,rgba(39,80,155,.14),transparent 66%),var(--bg);color:var(--text);font:15px/1.55 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+    html[data-theme="light"] body{background:radial-gradient(900px 540px at 90% 0%,rgba(196,157,79,.12),transparent 66%),var(--bg)}
+    a{color:inherit}.shell{width:min(1040px,calc(100% - 34px));margin:0 auto;padding:34px 0 80px}.top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:54px}.brand{font-weight:850;letter-spacing:.12em}.back{display:inline-flex;align-items:center;min-height:42px;padding:0 15px;border:1px solid var(--line);border-radius:999px;text-decoration:none;background:var(--soft)}
+    .eyebrow{color:var(--gold);font-size:12px;font-weight:850;letter-spacing:.1em;text-transform:uppercase}.hero{max-width:760px;margin-bottom:30px}.hero h1{font-size:clamp(2.6rem,7vw,5.1rem);line-height:.96;letter-spacing:-.055em;margin:10px 0 18px}.hero p{color:var(--muted);font-size:17px;max-width:690px;margin:0}
+    .notice,.empty,.error{border:1px solid var(--line);border-radius:18px;padding:18px 20px;background:var(--card);color:var(--muted)}.error{color:#d88f8f}.list{display:grid;gap:13px}.call{border:1px solid var(--line);border-radius:20px;padding:22px;background:linear-gradient(145deg,var(--card),var(--soft));box-shadow:0 18px 54px rgba(0,0,0,.10)}
+    .call-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}.call-title{min-width:0}.call-title strong{display:block;font-size:19px;letter-spacing:-.02em}.meta{margin-top:5px;color:var(--muted);font-size:13px}.pill{flex:0 0 auto;display:inline-flex;align-items:center;min-height:29px;padding:0 10px;border:1px solid var(--line);border-radius:999px;color:var(--gold);font-size:11px;font-weight:800}.summary{margin:17px 0 0;padding-top:16px;border-top:1px solid var(--line)}.summary strong{display:block;margin-bottom:5px;font-size:12px;color:var(--gold);text-transform:uppercase;letter-spacing:.07em}.summary p{margin:0;color:var(--text)}.purpose{margin-top:10px;color:var(--muted)}.privacy{margin-top:24px;color:var(--muted);font-size:12px}
+    @media(max-width:620px){.shell{width:min(100% - 24px,1040px);padding-top:20px}.top{margin-bottom:38px}.call-head{flex-direction:column}.pill{align-self:flex-start}.call{padding:18px}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="top"><div class="brand">NAHWERK</div><a class="back" href="/konto">Zurück zum Konto</a></header>
+    <section class="hero">
+      <div class="eyebrow">Kundenportal · Telefon</div>
+      <h1>Telefonate</h1>
+      <p>Hier findest du nachvollziehbar, was NAHWERK telefonisch für dich erledigt hat – mit Ergebnis, Dauer und kurzer Zusammenfassung. Der normale Chat bleibt davon getrennt.</p>
+    </section>
+    <div id="phoneState" class="notice">Telefonverlauf wird sicher geladen …</div>
+    <section id="phoneList" class="list" hidden aria-live="polite"></section>
+    <p class="privacy">Aus Datenschutzgründen zeigt dieser Bereich keine vollständigen Gesprächstranskripte und keine internen Provider-Daten.</p>
+  </main>
+  <script>
+    (() => {
+      const ENDPOINT='https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-customer-history/phone/calls';
+      const state=document.getElementById('phoneState');
+      const list=document.getElementById('phoneList');
+      const theme=(()=>{try{return localStorage.getItem('nw_portal_theme_v1')==='light'?'light':'dark'}catch(_){return'dark'}})();
+      document.documentElement.dataset.theme=theme;
+      const token=()=>{try{return JSON.parse(sessionStorage.getItem('scb_web_session')||'null')?.session_token||''}catch(_){return''}};
+      const date=(value)=>{const d=new Date(value||'');return Number.isNaN(d.getTime())?'':d.toLocaleString('de-DE',{dateStyle:'medium',timeStyle:'short'})};
+      const duration=(seconds)=>{const n=Number(seconds);if(!Number.isFinite(n)||n<=0)return'';const m=Math.floor(n/60),s=Math.round(n%60);return m?`${m} Min.${s?` ${s} Sek.`:''}`:`${s} Sek.`};
+      const escape=(value)=>String(value??'').replace(/[&<>"']/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      const render=(calls)=>{
+        list.innerHTML='';
+        if(!calls.length){state.className='empty';state.textContent='Noch keine dokumentierten Telefonate vorhanden.';state.hidden=false;list.hidden=true;return}
+        state.hidden=true;list.hidden=false;
+        calls.forEach((call)=>{
+          const article=document.createElement('article');article.className='call';
+          const direction=call.direction==='INBOUND'?'Eingehend':'Ausgehend';
+          const meta=[date(call.started_at),duration(call.duration_seconds),call.phone_masked].filter(Boolean).join(' · ');
+          article.innerHTML=`<div class="call-head"><div class="call-title"><strong>${escape(call.title||'Telefonat')}</strong><div class="meta">${escape(meta)}</div></div><span class="pill">${escape(direction)} · ${escape(call.result||'Abgeschlossen')}</span></div>${call.summary?`<div class="summary"><strong>Ergebnis</strong><p>${escape(call.summary)}</p></div>`:''}${call.purpose?`<div class="purpose"><strong>Auftrag:</strong> ${escape(call.purpose)}</div>`:''}`;
+          list.appendChild(article);
+        });
+      };
+      const load=async()=>{
+        const sessionToken=token();
+        if(!sessionToken){state.className='error';state.innerHTML='Deine sichere Sitzung ist abgelaufen. <a href="/anmelden">Bitte erneut anmelden.</a>';return}
+        try{
+          const response=await fetch(ENDPOINT,{headers:{Authorization:`Bearer ${sessionToken}`,Accept:'application/json'},cache:'no-store'});
+          const body=await response.json().catch(()=>({}));
+          if(response.status===401){state.className='error';state.innerHTML='Deine sichere Sitzung ist abgelaufen. <a href="/anmelden">Bitte erneut anmelden.</a>';return}
+          if(!response.ok||body?.ok!==true||body?.environment!=='PROD'||body?.authoritative!==true||body?.raw_transcripts_included!==false)throw new Error('PHONE_HISTORY_NOT_AUTHORITATIVE');
+          render(Array.isArray(body.calls)?body.calls:[]);
+        }catch(_){state.className='error';state.textContent='Der Telefonverlauf konnte gerade nicht sicher geladen werden.'}
+      };
+      load();
+    })();
+  </script>
+</body>
+</html>
