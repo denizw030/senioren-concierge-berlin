@@ -61,6 +61,16 @@ test("customer controls are server authoritative and read-off also disables sear
   assert.match(js,/\/email\/preferences/);
 });
 
+test("preference toggles preserve the clicked state until the server confirms it",()=>{
+  assert.match(js,/if \(!savingPreferences\) input\.checked = connected \? preferences\?\.\[key\] === true : false;/);
+  const snapshot=js.indexOf("const requested = Object.fromEntries(capabilityInputs.map");
+  const busy=js.indexOf("savingPreferences = true;",snapshot);
+  assert.ok(snapshot>=0&&busy>snapshot,"clicked preference must be snapshotted before busy rendering");
+  const prefLoad=js.indexOf('const preferenceData = await request("/email/preferences")');
+  const connectedRender=js.indexOf("renderConnection();",prefLoad);
+  assert.ok(prefLoad>=0&&connectedRender>prefLoad,"connected UI must render only after preferences are hydrated");
+});
+
 test("browser can request Google only and carries no tenant or provider secret authority",()=>{
   const body=hooks.connectPayload("GOOGLE",allCaps);assert.equal(JSON.stringify(body),JSON.stringify({provider:"GOOGLE",requested_capabilities:allCaps}));
   assert.equal(hooks.connectPayload("MICROSOFT",allCaps),null);
