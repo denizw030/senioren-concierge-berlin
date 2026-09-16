@@ -169,7 +169,7 @@
       const link = document.createElement("link");
       link.id = "emailConciergeProductStyles";
       link.rel = "stylesheet";
-      link.href = "/assets/email-concierge-product.css?v=20260916-1";
+      link.href = "/assets/email-concierge-product.css?v=20260916-2";
       document.head.appendChild(link);
     }
     productAssetPromise = new Promise((resolve) => {
