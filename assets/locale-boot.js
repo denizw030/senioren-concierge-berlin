@@ -4,7 +4,7 @@
   const root = document.documentElement;
   const params = new URLSearchParams(location.search);
   const requestedProduct = String(params.get('produkt') || params.get('product') || '').toLowerCase();
-  const isLoginPage = /(?:^|\/)anmelden\.html$/.test(location.pathname);
+  const isLoginPage = /(?:^|\/)anmelden(?:\.html)?\/?$/.test(location.pathname);
 
   let storedProduct = null;
   try { storedProduct = sessionStorage.getItem('nahwerk_product'); } catch (_) {}
@@ -169,4 +169,64 @@
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', onReady, { once:true });
   else onReady();
+})();
+
+(() => {
+  'use strict';
+  // NAHWERK CLEAN ROUTES + FLOATING CONCIERGE 2026-09-16
+  const SECURITY_PATH = /^\/oauth\//i;
+  const COSMETIC_PARAMS = ['produkt','product','lang'];
+  const cleanPath = (pathname) => {
+    if (SECURITY_PATH.test(pathname)) return pathname;
+    if (/\/index\.html$/i.test(pathname)) return pathname.replace(/\/index\.html$/i,'/');
+    if (/\.html$/i.test(pathname)) return pathname.replace(/\.html$/i,'');
+    if (/^\/(?:de|en|tr)\/$/i.test(pathname)) return pathname;
+    if (pathname.length > 1 && pathname.endsWith('/')) return pathname.slice(0,-1);
+    return pathname;
+  };
+  const cleanInternal = (raw) => {
+    if (!raw || /^(?:#|mailto:|tel:|javascript:|data:)/i.test(raw)) return raw;
+    let url;
+    try { url = new URL(raw, location.href); } catch (_) { return raw; }
+    if (url.origin !== location.origin || SECURITY_PATH.test(url.pathname)) return raw;
+    const next = cleanPath(url.pathname);
+    if (next === url.pathname) return raw;
+    url.pathname = next;
+    return url.pathname + url.search + url.hash;
+  };
+  const rewriteLinks = (root=document) => {
+    root.querySelectorAll?.('a[href],form[action],[data-plan-url]').forEach((el) => {
+      ['href','action','data-plan-url'].forEach((attr) => {
+        if (!el.hasAttribute(attr)) return;
+        const raw = el.getAttribute(attr);
+        const next = cleanInternal(raw);
+        if (next !== raw) el.setAttribute(attr,next);
+      });
+    });
+  };
+  const cleanAddress = () => {
+    if (SECURITY_PATH.test(location.pathname)) return;
+    const url = new URL(location.href);
+    url.pathname = cleanPath(url.pathname);
+    COSMETIC_PARAMS.forEach((key) => url.searchParams.delete(key));
+    const next = url.pathname + (url.searchParams.toString() ? '?' + url.searchParams.toString() : '') + url.hash;
+    const current = location.pathname + location.search + location.hash;
+    if (next !== current) history.replaceState(history.state,'',next);
+  };
+  const install = () => {
+    rewriteLinks();
+    cleanAddress();
+    if (document.documentElement.dataset.nwCleanRouteObserver === '1') return;
+    document.documentElement.dataset.nwCleanRouteObserver = '1';
+    new MutationObserver((mutations) => mutations.forEach((m) => m.addedNodes.forEach((node) => {
+      if (node.nodeType === Node.ELEMENT_NODE) rewriteLinks(node);
+    }))).observe(document.body,{childList:true,subtree:true});
+  };
+  const afterAuth = () => {
+    const auth = window.SCBAuth;
+    if (auth?.validateSession) Promise.resolve(auth.validateSession()).finally(() => setTimeout(install,0));
+    else setTimeout(install,0);
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',afterAuth,{once:true});
+  else afterAuth();
 })();

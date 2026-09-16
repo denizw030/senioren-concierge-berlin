@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="tr">
+  <head><base href="/tr/">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>İletişim | NAHWERK</title>
+    <meta
+      name="description"
+      content="Ürün, erişim veya destek soruları için NAHWERK Concierge ile iletişime geçin."
+    />
+    <link rel="canonical" href="https://nahwerkconcierge.com/tr/kontakt" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="tr_TR" />
+    <meta property="og:title" content="İletişim | NAHWERK" />
+    <meta
+      property="og:description"
+      content="Ürün, erişim veya destek soruları için NAHWERK Concierge ile iletişime geçin."
+    />
+    <meta property="og:url" content="https://nahwerkconcierge.com/tr/kontakt" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/assets/logos/nahwerk-concierge-gold-transparent.svg?v=2"
+    />
+    <link rel="stylesheet" href="/assets/site.css?v=24" />
+    <link rel="stylesheet" href="/assets/brand-2026.css?v=23" />
+    <link rel="stylesheet" href="/assets/nahwerk-logo-v2.css?v=9" />
+    <style>
+      body.contact-page main {
+        background:
+          radial-gradient(900px 560px at 102% 8%, rgba(212, 175, 55, 0.1), transparent 64%),
+          radial-gradient(760px 520px at -8% 68%, rgba(151, 92, 27, 0.07), transparent 67%),
+          linear-gradient(180deg, #080807 0%, #0b0a08 48%, #060605 100%) !important;
+      }
+      body.contact-page .contact-hero {
+        position: relative;
+        overflow: hidden;
+        padding: clamp(82px, 10vw, 138px) 0 clamp(72px, 8vw, 112px);
+        background:
+          radial-gradient(720px 520px at 78% 26%, rgba(212, 175, 55, 0.13), transparent 62%),
+          radial-gradient(620px 440px at 10% 86%, rgba(125, 76, 25, 0.06), transparent 68%),
+          linear-gradient(145deg, #070706, #0e0d0a 58%, #060605) !important;
+        border-bottom: 1px solid var(--nw-line-dark);
+      }
+      body.contact-page .contact-hero:before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: .34;
+        background-image:
+          linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,.012) 1px, transparent 1px);
+        background-size: 58px 58px;
+        mask-image: linear-gradient(to bottom, rgba(0,0,0,.9), transparent 88%);
+      }
+      body.contact-page .contact-hero:after { display: none !important; }
+      .contact-hero-grid {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: minmax(0, 1.08fr) minmax(330px, .72fr);
+        gap: clamp(42px, 7vw, 96px);
+        align-items: center;
+      }
+      .contact-hero-copy h1 {
+        max-width: 800px;
+        margin: 14px 0 22px;
+        font-size: clamp(44px, 6vw, 72px);
+        line-height: .98;
+        letter-spacing: -.052em;
+      }
+      .contact-hero-copy > p {
+        max-width: 67ch;
+        margin: 0;
+        color: var(--nw-muted-dark);
+        font-size: clamp(1.05rem, 1.55vw, 1.22rem);
+        line-height: 1.7;
+      }
+      .contact-hero-copy .actions { margin-top: 30px; }
+      .contact-hero-panel {
+        padding: clamp(26px, 3vw, 34px);
+        border: 1px solid rgba(212,175,55,.22);
+        border-radius: 28px;
+        background:
+          radial-gradient(circle at 100% 0, rgba(212,175,55,.13), transparent 38%),
+          linear-gradient(145deg, rgba(24,23,18,.96), rgba(9,9,8,.98));
+        box-shadow: 0 28px 86px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.035);
+      }
+      .contact-hero-panel .panel-kicker,
+      .contact-card-kicker,
+      .contact-guide-label {
+        color: #d9bd75;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+      }
+      .contact-hero-panel h2 {
+        margin: 10px 0 12px;
+        font-size: clamp(26px, 3vw, 34px);
+      }
+      .contact-hero-panel p {
+        margin: 0;
+        color: var(--nw-muted-dark);
+      }
+      .contact-hero-meta {
+        display: grid;
+        gap: 10px;
+        margin: 24px 0 0;
+        padding: 18px 0 0;
+        border-top: 1px solid rgba(255,255,255,.09);
+      }
+      .contact-hero-meta span {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        color: #c5c0b6;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+      .contact-hero-meta span:before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        flex: 0 0 7px;
+        margin-top: 7px;
+        border-radius: 50%;
+        background: var(--nw-gold);
+        box-shadow: 0 0 0 4px rgba(212,175,55,.08);
+      }
+      .contact-section {
+        padding: var(--nw-space) 0;
+      }
+      .contact-section.alt {
+        border-top: 1px solid rgba(255,255,255,.065);
+        border-bottom: 1px solid rgba(255,255,255,.065);
+        background:
+          radial-gradient(680px 420px at 10% 12%, rgba(212,175,55,.075), transparent 68%),
+          linear-gradient(145deg, rgba(19,18,14,.98), rgba(8,8,7,.98)) !important;
+      }
+      .contact-section-head {
+        max-width: 840px;
+        margin-bottom: 42px;
+      }
+      .contact-section-head p {
+        max-width: 68ch;
+        margin: 12px 0 0;
+        color: var(--nw-muted-dark);
+        font-size: 17px;
+      }
+      .contact-methods {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0,1fr));
+        gap: 18px;
+      }
+      .contact-card {
+        position: relative;
+        display: flex;
+        min-height: 290px;
+        flex-direction: column;
+        padding: clamp(26px, 3vw, 34px);
+        overflow: hidden;
+        border: 1px solid rgba(212,175,55,.17);
+        border-radius: 24px;
+        background:
+          radial-gradient(circle at 100% 0, rgba(212,175,55,.08), transparent 36%),
+          linear-gradient(145deg, #171714, #0d0d0b);
+        box-shadow: 0 22px 62px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.025);
+      }
+      .contact-card.primary {
+        border-color: rgba(212,175,55,.35);
+        background:
+          radial-gradient(circle at 92% 6%, rgba(212,175,55,.19), transparent 38%),
+          linear-gradient(135deg, #211d12, #0d0d0a);
+      }
+      .contact-card h3 {
+        margin: 16px 0 10px;
+        font-size: clamp(23px, 2.4vw, 30px);
+      }
+      .contact-card p {
+        max-width: 62ch;
+        margin: 0;
+        color: #aaa69d !important;
+        line-height: 1.65;
+      }
+      .contact-card .actions { margin-top: auto; padding-top: 26px; }
+      .contact-card-note {
+        margin-top: 12px !important;
+        color: #8f8a80 !important;
+        font-size: 12px;
+        line-height: 1.55;
+      }
+      .contact-guide {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0,1fr));
+        gap: 16px;
+      }
+      .contact-guide-item {
+        padding: 24px;
+        border-top: 1px solid rgba(212,175,55,.22);
+        background: linear-gradient(180deg, rgba(255,255,255,.018), transparent);
+      }
+      .contact-guide-item h3 {
+        margin: 12px 0 9px;
+        font-size: 19px;
+      }
+      .contact-guide-item p {
+        margin: 0;
+        color: var(--nw-muted-dark);
+        font-size: 14px;
+      }
+      .contact-guide-item a {
+        display: inline-block;
+        margin-top: 14px;
+        color: var(--nw-gold-light);
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .contact-trust-grid {
+        display: grid;
+        grid-template-columns: minmax(0,1.15fr) minmax(280px,.85fr);
+        gap: 18px;
+        align-items: stretch;
+      }
+      .contact-trust,
+      .contact-emergency {
+        padding: clamp(26px, 3vw, 34px);
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 22px;
+        background: linear-gradient(145deg, rgba(21,21,18,.95), rgba(9,9,8,.97));
+      }
+      .contact-trust h2,
+      .contact-emergency h2 {
+        margin-bottom: 12px;
+        font-size: clamp(24px, 2.7vw, 32px);
+      }
+      .contact-trust p,
+      .contact-emergency p {
+        margin: 0;
+        color: var(--nw-muted-dark);
+      }
+      .contact-trust a,
+      .contact-emergency a {
+        color: var(--nw-gold-light);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      .contact-emergency {
+        border-color: rgba(212,175,55,.18);
+        background:
+          radial-gradient(circle at 100% 0, rgba(212,175,55,.08), transparent 44%),
+          linear-gradient(145deg, rgba(21,20,16,.97), rgba(9,9,8,.98));
+      }
+      .contact-customer-band {
+        display: flex;
+        gap: 26px;
+        align-items: center;
+        justify-content: space-between;
+        padding: clamp(28px, 4vw, 42px);
+        border: 1px solid rgba(212,175,55,.22);
+        border-radius: 26px;
+        background:
+          radial-gradient(circle at 92% 0, rgba(212,175,55,.14), transparent 34%),
+          linear-gradient(135deg, #1b1912, #0c0c0a);
+        box-shadow: 0 24px 72px rgba(0,0,0,.24);
+      }
+      .contact-customer-band h2 { margin-bottom: 9px; }
+      .contact-customer-band p {
+        max-width: 70ch;
+        margin: 0;
+        color: var(--nw-muted-dark);
+      }
+      .contact-customer-band .actions {
+        flex: 0 0 auto;
+        margin: 0;
+      }
+      body.contact-page .btn:hover {
+        outline: 1px solid rgba(212,175,55,.42);
+        outline-offset: 2px;
+      }
+      @media (max-width: 980px) {
+        .contact-hero-grid,
+        .contact-trust-grid { grid-template-columns: 1fr; }
+        .contact-hero-panel { max-width: 720px; }
+        .contact-guide { grid-template-columns: 1fr 1fr; }
+        .contact-customer-band { align-items: flex-start; flex-direction: column; }
+        .contact-customer-band .actions { width: 100%; }
+      }
+      @media (max-width: 720px) {
+        .contact-hero { padding: 78px 0 70px; }
+        .contact-hero-grid,
+        .contact-methods,
+        .contact-guide,
+        .contact-trust-grid { grid-template-columns: 1fr; }
+        .contact-card { min-height: 0; }
+        .contact-card .actions { margin-top: 22px; padding-top: 0; }
+        .contact-guide-item { padding: 22px 4px; }
+      }
+    </style>
+    <!-- NW-I18N-START -->
+    <link rel="alternate" hreflang="de" href="/kontakt" />
+    <link rel="alternate" hreflang="en" href="/en/kontakt" />
+    <link rel="alternate" hreflang="tr" href="/tr/kontakt" />
+    <link rel="alternate" hreflang="x-default" href="/kontakt" />
+    <script src="/assets/language-switcher.js?v=12" defer></script>
+    <!-- NW-I18N-END -->
+</  <script src="/assets/locale-runtime.js?v=1" defer></script>
+head>
+  <body class="contact-page">
+    <a class="skip-link" href="#main-content">İçeriğe geç</a>
+    <header class="top">
+      <div class="wrap nav">
+        <a class="brand" href="/tr/" aria-label="NAHWERK Concierge — ana sayfa">
+          <span class="mark nahwerk-mark" aria-hidden="true"></span>
+          <span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span>
+        </a>
+        <nav class="links" aria-label="Ana navigasyon">
+          <a href="/tr/">Genel bakış</a>
+          <a href="/tr/prime-concierge">Kişisel Concierge</a>
+          <a href="/tr/concierges">Dünya çapında NAHWERK</a>
+          <a href="/tr/senioren-concierge">İleri yaş Concierge</a>
+          <a href="/tr/angehoerige">Yakınlar için</a>
+          <a href="/tr/leistungen">Hizmetler</a>
+          <a class="active" href="/tr/kontakt" aria-current="page">İletişim</a>
+          <a class="auth-link login-link" href="/anmelden?lang=tr">Giriş yap</a>
+          <a class="auth-link register-link" href="/registrieren?lang=tr">Kayıt ol</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main-content">
+      <section class="contact-hero" aria-labelledby="contact-title">
+        <div class="wrap contact-hero-grid">
+          <div class="contact-hero-copy">
+            <div class="eyebrow">İletişim</div>
+            <h1 id="contact-title">Sana nasıl yardımcı olabiliriz?</h1>
+            <p>
+              NAHWERK, Concierge'in veya hesabın hakkında soruların mı var? Talebine en uygun yolu seç. Çoğu soru için WhatsApp en doğrudan başlangıç noktasıdır.
+            </p>
+            <div class="actions">
+              <a
+                class="btn red"
+                href="https://wa.me/491633900770?text=Kundenservice%20starten%20%5BSCB-CS-START%5D"
+                target="_blank"
+                rel="noopener"
+              >WhatsApp'tan yaz</a>
+              <a class="btn light" href="/konto">Müşteri alanına git</a>
+            </div>
+          </div>
+
+          <aside class="contact-hero-panel" aria-label="Doğrudan iletişim yolu">
+            <span class="panel-kicker">Doğrudan yol</span>
+            <h2>WhatsApp'ta NAHWERK müşteri hizmetleri</h2>
+            <p>
+              Kayıt, giriş, paketler, kullanım, yakın erişimleri ve Concierge'inle ilgili genel sorular için.
+            </p>
+            <div class="contact-hero-meta">
+              <span>Talebin kişisel Concierge modundan ayrı başlar.</span>
+              <span>Kişisel işlem mantıklı olduğunda bir destek kaydı oluşturulabilir.</span>
+              <span>Bir insanın hemen canlı olarak devraldığı iddia edilmez.</span>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="contact-section" aria-labelledby="contact-methods-title">
+        <div class="wrap">
+          <div class="contact-section-head">
+            <div class="eyebrow">İletişim yolları</div>
+            <h2 id="contact-methods-title">Doğrudan doğru kişiye ulaş.</h2>
+            <p>
+              Gereksiz yönlendirme yok: talebin için en mantıklı kanalı kullan.
+            </p>
+          </div>
+
+          <div class="contact-methods">
+            <article class="contact-card primary">
+              <span class="contact-card-kicker">WhatsApp</span>
+              <h3>Genel sorular ve müşteri hizmetleri</h3>
+              <p>
+                Kayıt, giriş, çalışma şekli, paketler, kullanım ve farklı NAHWERK hizmetleriyle ilgili sorular için en hızlı başlangıç noktası.
+              </p>
+              <div class="actions">
+                <a
+                  class="btn red"
+                  href="https://wa.me/491633900770?text=Kundenservice%20starten%20%5BSCB-CS-START%5D"
+                  target="_blank"
+                  rel="noopener"
+                >Müşteri hizmetlerini aç</a>
+              </div>
+            </article>
+
+            <article class="contact-card" id="persoenlich">
+              <span class="contact-card-kicker">Kişisel geri dönüş</span>
+              <h3>Bir insanın devralması gerektiğinde</h3>
+              <p>
+                Şikâyetlerde, ödeme veya hesap sorunlarında ya da talebin otomatik olarak güvenilir biçimde çözülemiyorsa müşteri hizmetleri üzerinden kişisel işlem talep edebilirsin.
+              </p>
+              <div class="actions">
+                <a
+                  class="btn light"
+                  href="https://wa.me/491633900770?text=Kundenservice%20starten%20%5BSCB-CS-START%5D"
+                  target="_blank"
+                  rel="noopener"
+                >Kişisel işlem talep et</a>
+              </div>
+              <p class="contact-card-note">
+                Onayınla birlikte bir işlem numarasına sahip destek kaydı oluşturulabilir. Anında canlı devralma sözü verilmez.
+              </p>
+            </article>
+
+            <article class="contact-card">
+              <span class="contact-card-kicker">Mevcut müşteriler</span>
+              <h3>Ayarları doğrudan yönet</h3>
+              <p>
+                Concierge, Safety, kullanım ve kişisel hesap verilerini en hızlı şekilde korumalı müşteri alanından yönetebilirsin.
+              </p>
+              <div class="actions">
+                <a class="btn light" href="/konto">Müşteri alanını aç</a>
+              </div>
+            </article>
+
+            <article class="contact-card">
+              <span class="contact-card-kicker">Yakınlar için</span>
+              <h3>Başka biri için destek</h3>
+              <p>
+                NAHWERK'i ebeveynlerin, büyükanne ve büyükbaban veya desteklenen başka biri için kurmak istiyorsan yakınlar bölümü seni uygun başlangıçtan geçirir.
+              </p>
+              <div class="actions">
+                <a class="btn light" href="/tr/angehoerige">Yakınlar için</a>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="contact-section alt" aria-labelledby="contact-guide-title">
+        <div class="wrap">
+          <div class="contact-section-head">
+            <div class="eyebrow">Çözüme daha hızlı ulaş</div>
+            <h2 id="contact-guide-title">Talebine hangi kanal uygun?</h2>
+          </div>
+          <div class="contact-guide">
+            <article class="contact-guide-item">
+              <span class="contact-guide-label">Hesap &amp; kullanım</span>
+              <h3>Giriş, güvenlik veya kullanım hakkı</h3>
+              <p>
+                Kişisel ayarları doğrudan müşteri alanında kontrol et ve yönet. Sorunlarda WhatsApp müşteri hizmetleri yardımcı olur.
+              </p>
+              <a href="/konto">Müşteri alanına git</a>
+            </article>
+            <article class="contact-guide-item">
+              <span class="contact-guide-label">Ürün &amp; süreç</span>
+              <h3>Kayıttan önce sorular</h3>
+              <p>
+                Hizmetleri, işleyişi ve sık sorulan soruları giriş yapmadan web sitesinde bulabilirsin. Kişisel sorular için WhatsApp'ı kullanabilirsin.
+              </p>
+              <a href="/tr/faq">Sık sorulan soruları gör</a>
+            </article>
+            <article class="contact-guide-item">
+              <span class="contact-guide-label">Gizlilik &amp; yapay zekâ</span>
+              <h3>NAHWERK veri ve yapay zekâyı nasıl kullanır</h3>
+              <p>
+                Hukuki ve teknik temeller ilgili bilgi sayfalarında şeffaf biçimde açıklanmıştır.
+              </p>
+              <a href="/datenschutz">Gizlilik bilgilerini gör</a>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="contact-section" aria-labelledby="customer-title">
+        <div class="wrap">
+          <div class="contact-customer-band">
+            <div>
+              <div class="eyebrow">Zaten müşteri misin?</div>
+              <h2 id="customer-title">Birçok şey doğrudan halledilebilir.</h2>
+              <p>
+                Concierge ayarları, Safety özellikleri, kullanım ve kişisel hesap verileri müşteri alanında bir aradadır. Orada çözülemeyen her şey için WhatsApp doğrudan hizmet kanalı olarak kalır.
+              </p>
+            </div>
+            <div class="actions">
+              <a class="btn red" href="/konto">Müşteri alanına git</a>
+              <a
+                class="btn light"
+                href="https://wa.me/491633900770?text=Kundenservice%20starten%20%5BSCB-CS-START%5D"
+                target="_blank"
+                rel="noopener"
+              >WhatsApp'ı aç</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="contact-section" aria-labelledby="trust-title">
+        <div class="wrap contact-trust-grid">
+          <article class="contact-trust">
+            <div class="eyebrow">Kişisel ve anlaşılır</div>
+            <h2 id="trust-title">Talebin kendi konuna odaklı kalır.</h2>
+            <p>
+              Bir destek talebindeki bilgiler ilgili konuyu ele almak için işlenir. Hangi verilerin işlendiği ve hangi hakların geçerli olduğu gizlilik bilgilerimizde açıklanır.
+              <a href="/datenschutz">Gizlilik politikası</a>. Kişisel işlem gerektiğinde NAHWERK, sabit bir yanıt süresi vaat etmeden mümkün olan en kısa sürede geri dönüş yapar.
+            </p>
+          </article>
+
+          <aside class="contact-emergency" aria-labelledby="emergency-title">
+            <div class="eyebrow">Önemli bilgi</div>
+            <h2 id="emergency-title">Acil durum kanalı değildir.</h2>
+            <p>
+              İletişim sayfası ve NAHWERK Concierge tıbbi acil çağrının veya ev acil çağrı sisteminin yerine geçmez. Akut tıbbi veya diğer acil durumlarda doğrudan yetkili acil servislerle iletişime geç. Almanya'da numara <strong>112</strong>.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="contact-section alt" aria-labelledby="ai-title">
+        <div class="wrap">
+          <div class="contact-section-head">
+            <div class="eyebrow">Şeffaflık</div>
+            <h2 id="ai-title">Yapay zekâ, yapay zekâ olarak açıkça tanınabilir kalır.</h2>
+            <p>
+              NAHWERK Concierge profilleri yapay zekâ sistemleridir, insan çalışanlar değildir. Kişisel iletişim yalnızca gerçekten bir insan devraldığında bu şekilde adlandırılır.
+            </p>
+            <div class="actions">
+              <a class="btn light" href="/ki-transparenz">Yapay zekâ şeffaflığı</a>
+              <a class="btn light" href="/datenschutz">Gizlilik</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="wrap">
+        <div class="footergrid">
+          <div>
+            <a class="brand" href="/tr/" aria-label="NAHWERK Concierge — ana sayfa">
+              <span class="mark nahwerk-mark" aria-hidden="true"></span>
+              <span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span>
+            </a>
+            <p>Günlük yaşam, organizasyon ve anlaşılır destek için kişisel Concierge'in.</p>
+          </div>
+          <div>
+            <h4>Hizmetler</h4>
+            <a href="/tr/prime-concierge">Kişisel Concierge</a>
+            <a href="/tr/concierges">Dünya çapında NAHWERK</a>
+            <a href="/tr/senioren-concierge">İleri yaştakiler için</a>
+            <a href="/tr/angehoerige">Yakınlar için</a>
+            <a href="/tr/pakete">Paketler</a>
+          </div>
+          <div>
+            <h4>Servis</h4>
+            <a href="/tr/leistungen">Hizmetler</a>
+            <a href="/tr/ablauf">Nasıl çalışır</a>
+            <a href="/tr/faq">FAQ</a>
+            <a href="/tr/kontakt">İletişim</a>
+          </div>
+          <div>
+            <h4>Hukuki</h4>
+            <a href="/impressum">Künye</a>
+            <a href="/datenschutz">Gizlilik</a>
+            <a href="/agb">Şartlar</a>
+            <a href="/widerruf">Cayma</a>
+            <a href="/ki-transparenz">Yapay zekâ şeffaflığı</a>
+            <a href="/datenloeschung">Veri silme</a>
+          </div>
+        </div>
+        <div class="footbottom">
+          <span>© 2026 NAHWERK Concierge</span>
+          <span>WhatsApp üzerinden kişisel Concierge</span>
+        </div>
+      </div>
+    </footer>
+
+    <script src="/assets/auth-nav.js?v=40"></script>
+    <script src="/assets/site-ui.js?v=5"></script>
+  </body>
+</html>

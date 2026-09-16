@@ -70,10 +70,10 @@ test("legacy Shadow transport and UI remain inert", () => {
 });
 
 test("customer PROD guard covers account PAYG and Web Concierge", () => {
-  assert.match(siteUi, /\(\?:konto\|payg\|web-concierge\)\\\.html/);
+  assert.ok(siteUi.includes(String.raw`(?:konto|payg|web-concierge)(?:\.html)?\/?$`));
   assert.match(siteUi, /PROD web guard blocked a non-PROD endpoint/);
   assert.match(siteUi, /accountWebConciergeEntry/);
-  assert.match(siteUi, /web-concierge\.html/);
+  assert.match(siteUi, /web-concierge/);
 });
 
 test("Web Concierge surface is responsive and does not claim execution success locally", () => {

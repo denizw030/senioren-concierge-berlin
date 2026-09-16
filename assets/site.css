@@ -597,7 +597,7 @@ h3 {
   text-decoration: underline;
 }
 .footer {
-  background: #020202 !important;
+  background: #000 !important;
   color: #fff;
   padding: 46px 0 20px;
   border-top: 1px solid #262626;
@@ -982,3 +982,14 @@ body:not(.overview-page) > main {
     radial-gradient(900px 560px at 104% 18%, rgba(212, 175, 55, 0.09), transparent 64%),
     linear-gradient(180deg, #080807 0%, #0b0a09 48%, #060605 100%) !important;
 }
+
+
+/* NAHWERK CLEAN ROUTES + FLOATING CONCIERGE 2026-09-16 */
+body:not(.nw-portal-light) .footer{background:#000!important}
+.nw-floating-concierge{position:fixed;z-index:46;right:max(18px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));display:inline-flex;align-items:center;gap:9px;min-height:46px;padding:9px 14px 9px 10px;border:1px solid rgba(218,187,112,.24);border-radius:999px;background:rgba(5,6,8,.88);color:#f4f2ec!important;box-shadow:0 14px 40px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.05);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);font-size:13px;font-weight:700;letter-spacing:-.01em;text-decoration:none!important;transition:transform .18s ease,border-color .18s ease,background .18s ease}
+.nw-floating-concierge:hover{transform:translateY(-1px);border-color:rgba(218,187,112,.46);background:rgba(10,11,14,.94)}
+.nw-floating-concierge:focus-visible{outline:2px solid #e4c477!important;outline-offset:3px!important}
+.nw-floating-concierge-icon{display:grid;place-items:center;width:29px;height:29px;border-radius:50%;background:rgba(214,182,107,.1);color:#e3c474}
+.nw-floating-concierge-icon svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+body.nw-portal-light .nw-floating-concierge,body.senior-product .nw-floating-concierge{border-color:rgba(112,87,39,.18);background:rgba(250,247,240,.92);color:#2c2922!important;box-shadow:0 12px 34px rgba(70,53,24,.14),inset 0 1px 0 rgba(255,255,255,.7)}
+@media(max-width:620px){.nw-floating-concierge{right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom));min-height:44px;padding:8px 12px 8px 9px}.nw-floating-concierge-icon{width:28px;height:28px}}

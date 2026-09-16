@@ -1,0 +1,1199 @@
+<!doctype html>
+<html lang="de">
+  <head><base href="/">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Registrieren | Nahwerk Concierge</title>
+    <meta
+      name="description"
+      content="Dauerhaft kostenlosen Nahwerk-Concierge-Zugang registrieren."
+    />
+    <meta name="theme-color" content="#070706" />
+    <meta name="color-scheme" content="dark light" />
+    <style id="registration-first-paint">html,body{margin:0;background:#070706;color-scheme:dark}.family-message-field textarea{min-height:112px;resize:vertical}.family-message-field .tiny{display:block;margin-top:7px}</style>
+    <link rel="stylesheet" href="assets/site.css?v=24" />
+    <style>
+      .signup {
+        display: grid;
+        grid-template-columns: 1.18fr 0.72fr;
+        gap: 30px;
+        align-items: start;
+      }
+      .formcard,
+      .preview {
+        padding: 30px;
+      }
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .row.name {
+        grid-template-columns: 0.72fr 1fr 1fr;
+      }
+      .password-single-row {
+        grid-template-columns: 1fr;
+      }
+      .recipient-contact-row .field {
+        display: flex;
+        flex-direction: column;
+      }
+      .recipient-contact-row .field > label {
+        display: flex;
+        min-height: 46px;
+        align-items: flex-end;
+      }
+      .recipient-contact-row :is(select, input) {
+        box-sizing: border-box;
+        height: 54px;
+      }
+      .field {
+        margin: 0 0 17px;
+      }
+      .field input,
+      .field select,
+      .field textarea {
+        padding: 13px 14px;
+        font: inherit;
+      }
+      .field textarea {
+        min-height: 96px;
+        resize: vertical;
+      }
+      #ownerSalutation,
+      #recipientSalutation {
+        appearance: none;
+        -webkit-appearance: none;
+        padding-right: 46px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23c7a24d' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: right 16px center !important;
+        background-size: 16px !important;
+      }
+      .choice {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin: 10px 0 24px;
+      }
+      .choice label {
+        border-radius: 11px;
+        padding: 16px;
+        cursor: pointer;
+        transition: 0.18s ease;
+      }
+      .setup-choice label {
+        display: grid;
+        min-height: 62px;
+        place-items: center;
+        padding: 16px 20px;
+        text-align: center;
+        font-weight: 700;
+      }
+      .setup-choice input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+      }
+      .setup-choice label:has(input:focus-visible) {
+        outline: 3px solid rgba(191, 143, 40, 0.38);
+        outline-offset: 3px;
+      }
+      .concierge-intro {
+        margin: 8px 0 18px;
+        color: #66635d;
+        line-height: 1.6;
+      }
+      .concierge-choice {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        margin: 14px 0 15px;
+      }
+      .concierge-choice .concierge-card {
+        position: relative;
+        display: block;
+        min-width: 0;
+        overflow: hidden;
+        border: 1px solid rgba(26, 25, 22, 0.12);
+        border-radius: 24px;
+        background: #090909;
+        box-shadow: 0 12px 34px rgba(37, 31, 19, 0.08);
+        cursor: pointer;
+        transition:
+          transform 180ms ease,
+          border-color 180ms ease,
+          box-shadow 180ms ease,
+          background 180ms ease;
+      }
+      .concierge-choice .concierge-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(192, 145, 49, 0.48);
+        box-shadow: 0 18px 42px rgba(37, 31, 19, 0.12);
+      }
+      .concierge-choice .concierge-card:has(input:focus-visible) {
+        outline: 3px solid rgba(191, 143, 40, 0.38);
+        outline-offset: 3px;
+      }
+      .concierge-choice .concierge-card.selected,
+      .concierge-choice .concierge-card:has(input:checked) {
+        border-color: #bd8f2f;
+        background: #090909;
+        box-shadow:
+          0 0 0 2px rgba(189, 143, 47, 0.16),
+          0 18px 44px rgba(86, 62, 14, 0.14);
+      }
+      .concierge-card input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .concierge-image {
+        display: block;
+        width: 100%;
+        aspect-ratio: 4 / 4.25;
+        object-fit: cover;
+        object-position: center 18%;
+        background: #eeeae2;
+      }
+      .concierge-card-body {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 28px;
+        gap: 10px;
+        align-items: start;
+        padding: 16px 16px 18px;
+      }
+      .concierge-choice .concierge-copy strong {
+        display: block;
+        margin-bottom: 5px;
+        color: #fff;
+        font-size: 19px;
+      }
+      .concierge-choice .concierge-copy span {
+        display: block;
+        color: #c9c9c5;
+        font-size: 13px;
+        line-height: 1.45;
+      }
+      .concierge-check {
+        display: grid;
+        place-items: center;
+        width: 28px;
+        height: 28px;
+        border: 1px solid rgba(222, 222, 218, 0.58);
+        border-radius: 50%;
+        color: transparent;
+        background: transparent;
+        font-weight: 800;
+        transition: 180ms ease;
+      }
+      .concierge-card.selected .concierge-check,
+      .concierge-card:has(input:checked) .concierge-check {
+        border-color: #bd8f2f;
+        color: #fff;
+        background: #bd8f2f;
+      }
+      .check {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        font-size: 13px;
+        line-height: 1.5;
+        margin: 14px 0;
+      }
+      #signupForm [hidden] {
+        display: none !important;
+      }
+      .preview h3 {
+        font-size: 23px;
+        margin: 8px 0 16px;
+      }
+      .preview .msg {
+        border-radius: 13px;
+        padding: 22px;
+        line-height: 1.6;
+        font-size: 15px;
+        color: #fff !important;
+        background: #090909 !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+      }
+      .preview .msg strong {
+        color: #fff;
+      }
+      body[data-product="senioren"] .preview .msg,
+      body.senior-product .preview .msg {
+        color: #2a2317 !important;
+        background: #fbf8f1 !important;
+        border-color: rgba(112, 87, 39, 0.2) !important;
+        box-shadow: 0 12px 32px rgba(83, 64, 27, 0.08);
+      }
+      body[data-product="senioren"] .preview .msg strong,
+      body.senior-product .preview .msg strong {
+        color: #17130d !important;
+      }
+      .status {
+        display: none;
+        margin-top: 16px;
+        padding: 14px;
+        border-radius: 9px;
+        line-height: 1.5;
+      }
+      .tiny {
+        font-size: 12px;
+        line-height: 1.5;
+      }
+      .planbox-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+      }
+      .planbox-kicker {
+        display: block;
+        margin-bottom: 6px;
+        color: #aaa69d;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .planbox strong {
+        display: block;
+        font-size: 18px;
+        letter-spacing: 0.3px;
+      }
+      .planbox .plan-sub {
+        display: block;
+        margin-top: 3px;
+        color: #f5f0df;
+        font-weight: 700;
+      }
+      .plan-change-button {
+        min-height: 42px;
+        flex: 0 0 auto;
+        padding: 0 17px;
+        border: 1px solid rgba(230, 180, 58, 0.48);
+        border-radius: 999px;
+        color: #f4d98f;
+        background: rgba(255, 255, 255, 0.04);
+        font:
+          750 13px/1 -apple-system,
+          BlinkMacSystemFont,
+          "SF Pro Text",
+          "Helvetica Neue",
+          Arial,
+          sans-serif;
+        cursor: pointer;
+        transition:
+          transform 180ms ease,
+          border-color 180ms ease,
+          background 180ms ease;
+      }
+      .plan-change-button:hover {
+        transform: translateY(-1px);
+        border-color: #e6b43a;
+        background: rgba(230, 180, 58, 0.1);
+      }
+      .plan-picker {
+        margin-top: 18px;
+        padding-top: 18px;
+        border: 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+      }
+      .plan-picker legend {
+        margin-bottom: 6px;
+        color: #fff;
+        font-size: 18px;
+        font-weight: 760;
+      }
+      .plan-picker-intro {
+        margin: 0 0 14px;
+        color: #aaa69d;
+        font-size: 13px;
+        line-height: 1.55;
+      }
+      .plan-options {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+      .plan-option {
+        position: relative;
+        display: block;
+        min-width: 0;
+        cursor: pointer;
+      }
+      .plan-option input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .plan-option-card {
+        display: grid;
+        min-height: 108px;
+        align-content: start;
+        gap: 6px;
+        padding: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.025);
+        transition:
+          transform 180ms ease,
+          border-color 180ms ease,
+          background 180ms ease,
+          box-shadow 180ms ease;
+      }
+      .plan-option:hover .plan-option-card {
+        transform: translateY(-2px);
+        border-color: rgba(230, 180, 58, 0.52);
+      }
+      .plan-option input:checked + .plan-option-card {
+        border-color: #e6b43a;
+        background: rgba(24, 55, 101, 0.2);
+        box-shadow: 0 0 0 2px rgba(121, 151, 194, 0.1);
+      }
+      .plan-option input:focus-visible + .plan-option-card {
+        outline: 3px solid rgba(230, 180, 58, 0.38);
+        outline-offset: 3px;
+      }
+      .plan-option-name {
+        color: #fff;
+        font-size: 15px;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+      }
+      .plan-option-price {
+        color: #e6b43a;
+        font-size: 14px;
+        font-weight: 760;
+      }
+      .plan-option-usage {
+        color: #aaa69d;
+        font-size: 12px;
+        line-height: 1.4;
+      }
+      .plan-option-state {
+        justify-self: start;
+        margin-top: 2px;
+        padding: 4px 7px;
+        border-radius: 999px;
+        color: #d7d3ca;
+        background: rgba(255, 255, 255, 0.08);
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .plan-selection-note a {
+        color: #f4d98f;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+      body[data-product="senioren"] .plan-picker,
+      body.senior-product .plan-picker {
+        border-top-color: rgba(112, 87, 39, 0.2);
+      }
+      body[data-product="senioren"] .plan-picker :is(legend, .plan-option-name),
+      body.senior-product .plan-picker :is(legend, .plan-option-name) {
+        color: #211f1a;
+      }
+      body[data-product="senioren"] .plan-picker-intro,
+      body[data-product="senioren"] .plan-option-usage,
+      body.senior-product .plan-picker-intro,
+      body.senior-product .plan-option-usage {
+        color: #6e685f;
+      }
+      body[data-product="senioren"] .plan-option-card,
+      body.senior-product .plan-option-card {
+        border-color: #ded2bc;
+        background: rgba(255, 255, 255, 0.76);
+      }
+      body[data-product="senioren"]
+        .plan-option
+        input:checked
+        + .plan-option-card,
+      body.senior-product .plan-option input:checked + .plan-option-card {
+        border-color: #c99b2d;
+        background: #fff5dc;
+      }
+      body[data-product="senioren"] .plan-change-button,
+      body.senior-product .plan-change-button {
+        color: #5d481e;
+        border-color: #d8bd7d;
+        background: #fff;
+      }
+      .benefits {
+        margin: 12px 0 0;
+      }
+      .benefits li {
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      .selfhint {
+        border-radius: 8px;
+        padding: 14px 16px;
+        margin: 0 0 18px;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+      .passwordhint {
+        margin-top: 7px;
+      }
+      .password-wrap {
+        position: relative;
+      }
+      .password-wrap input {
+        padding-right: 54px;
+      }
+      .password-toggle {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 38px;
+        height: 38px;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .preview-note {
+        font-size: 13px;
+        color: #a8a8a4;
+        line-height: 1.55;
+        margin-top: 14px;
+      }
+      .trustline svg {
+        flex: 0 0 auto;
+      }
+      @media (max-width: 900px) {
+        .signup {
+          grid-template-columns: 1fr;
+        }
+        .preview {
+          position: static;
+        }
+      }
+      @media (max-width: 700px) {
+        .row,
+        .row.name,
+        .choice {
+          grid-template-columns: 1fr;
+        }
+        .formcard,
+        .preview {
+          padding: 22px;
+        }
+        .concierge-choice {
+          grid-template-columns: 1fr;
+        }
+        .concierge-image {
+          aspect-ratio: 4 / 3.35;
+          object-position: center 20%;
+        }
+        .recipient-contact-row .field > label {
+          min-height: 0;
+        }
+        .planbox-head {
+          align-items: stretch;
+          flex-direction: column;
+        }
+        .plan-change-button {
+          width: 100%;
+        }
+        .plan-options {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+    <link
+      rel="canonical"
+      href="https://nahwerkconcierge.com/registrieren"
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="assets/logos/nahwerk-concierge-gold-transparent.svg?v=1"
+    />
+    <link rel="stylesheet" href="assets/brand-2026.css?v=23" />
+    <link rel="stylesheet" href="assets/nahwerk-logo-v2.css?v=9" />
+    <link rel="stylesheet" href="assets/concierge-voice-preview.css?v=8" />
+<link rel="stylesheet" href="assets/concierge-carousel.css?v=12" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="de_DE" />
+    <meta property="og:title" content="NAHWERK Concierge" />
+    <meta
+      property="og:description"
+      content="Persönliche, verständliche Concierge-Unterstützung direkt über WhatsApp."
+    />
+  <style>
+      /* Page-scoped surface treatment: colors/contours only. */
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) main{
+        background:
+          radial-gradient(920px 620px at 94% 7%,rgba(35,78,160,.18),transparent 64%),
+          radial-gradient(780px 540px at 5% 44%,rgba(50,62,110,.055),transparent 68%),
+          radial-gradient(720px 500px at 82% 86%,rgba(20,91,110,.035),transparent 70%),
+          linear-gradient(180deg,#05080d 0%,#08111c 52%,#05080c 100%)!important;
+      }
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) main>.section{
+        background:
+          radial-gradient(760px 480px at 92% 10%,rgba(32,72,150,.15),transparent 67%),
+          radial-gradient(680px 430px at 8% 86%,rgba(44,58,104,.035),transparent 72%),
+          rgba(5,9,14,.99)!important;
+      }
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .formcard,
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .preview,
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .planbox{
+        border-color:rgba(126,148,178,.14)!important;
+        box-shadow:
+          inset 0 1px 0 rgba(174,195,222,.03),
+          0 24px 64px rgba(0,0,0,.40)!important;
+      }
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .formcard{
+        background:
+          radial-gradient(circle at 100% 0%,rgba(34,72,144,.13),transparent 42%),
+          radial-gradient(circle at 0% 100%,rgba(21,89,108,.025),transparent 52%),
+          linear-gradient(145deg,#0b1119,#080d14)!important;
+      }
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .preview{
+        background:
+          radial-gradient(circle at 100% 0%,rgba(33,71,140,.12),transparent 43%),
+          radial-gradient(circle at 0% 100%,rgba(22,83,103,.022),transparent 54%),
+          linear-gradient(145deg,#0b1119,#080d14)!important;
+      }
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .planbox{
+        background:
+          radial-gradient(circle at 100% 0%,rgba(32,70,140,.12),transparent 44%),
+          radial-gradient(circle at 0% 100%,rgba(31,56,103,.035),transparent 54%),
+          linear-gradient(145deg,#0b121b,#081019)!important;
+      }
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .preview .msg{
+        border-color:rgba(124,146,174,.14)!important;
+        background:
+          radial-gradient(circle at 100% 0%,rgba(34,72,144,.11),transparent 45%),
+          linear-gradient(145deg,#0b1119,#080d14)!important;
+        box-shadow:0 12px 32px rgba(0,0,0,.24)!important;
+      }
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .selfhint{
+        border-left-color:rgba(255,255,255,.13)!important;
+      }
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .selfhint,
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .plan-selection-note,
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .status,
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .progressive-panel{
+        background:
+          radial-gradient(circle at 100% 0%,rgba(31,68,135,.08),transparent 48%),
+          linear-gradient(145deg,#0b1119,#080d14)!important;
+      }
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .plan-change-button{
+        border-color:rgba(132,151,176,.13)!important;
+      }
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .plan-change-button:hover{
+        border-color:rgba(181,145,78,.42)!important;
+      }
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .plan-option-card,
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .plan-option input:checked+.plan-option-card{
+        border-color:rgba(125,145,172,.14)!important;
+        background:
+          radial-gradient(circle at 100% 0%,rgba(31,68,137,.10),transparent 48%),
+          linear-gradient(145deg,#0b121b,#081019)!important;
+        box-shadow:0 12px 30px rgba(0,0,0,.16)!important;
+      }
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .plan-option:hover .plan-option-card{
+        border-color:rgba(154,132,94,.24)!important;
+      }
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .setup-choice label,
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .setup-choice label.selected{
+        border-color:rgba(125,145,172,.14)!important;
+        background:
+          radial-gradient(circle at 100% 0%,rgba(30,67,136,.09),transparent 50%),
+          linear-gradient(145deg,#0b121b,#081019)!important;
+        box-shadow:0 10px 28px rgba(0,0,0,.14)!important;
+      }
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .setup-choice label:hover{
+        border-color:rgba(154,132,94,.22)!important;
+      }
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .concierge-choice .concierge-card,
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .nw-carousel-card{
+        border-color:rgba(124,144,170,.13)!important;
+        background:
+          radial-gradient(circle at 100% 0%,rgba(30,67,135,.085),transparent 50%),
+          linear-gradient(145deg,#0b121b,#081019)!important;
+        box-shadow:0 18px 44px rgba(0,0,0,.27)!important;
+      }
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .concierge-choice .concierge-card.selected,
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .concierge-choice .concierge-card:has(input:checked){
+        border-color:rgba(130,150,176,.15)!important;
+        background:
+          radial-gradient(circle at 100% 0%,rgba(32,70,140,.10),transparent 49%),
+          linear-gradient(145deg,#0b121b,#081019)!important;
+        box-shadow:0 18px 44px rgba(0,0,0,.32)!important;
+      }
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .concierge-choice .concierge-card:hover{
+        border-color:rgba(154,132,94,.22)!important;
+      }
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .nw-carousel-card.is-active{
+        box-shadow:
+          0 34px 86px rgba(0,0,0,.56),
+          0 0 0 1px rgba(130,150,176,.12)!important;
+      }
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .nw-carousel-card:hover{
+        box-shadow:
+          0 34px 86px rgba(0,0,0,.56),
+          0 0 0 1px rgba(154,132,94,.24)!important;
+      }
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .nw-carousel-arrow,
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .nw-carousel-status{
+        border-color:rgba(130,150,176,.14)!important;
+        background:rgba(8,14,21,.90)!important;
+      }
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .nw-carousel-arrow:hover,
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) .nw-carousel-status:not(:disabled):hover{
+        border-color:rgba(158,132,88,.25)!important;
+        background:rgba(13,20,29,.94)!important;
+      }
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) a.btn:hover,
+      body.registration-page:not(.senior-product):not([data-product="senioren"]) button:not(:disabled):hover{
+        outline:1px solid rgba(212,175,55,.44);
+        outline-offset:1px;
+      }
+    </style>    <link rel="stylesheet" href="assets/acquisition-v1.css?v=1" />
+    <style id="registration-whatsapp-step-premium">
+      /* Keep steps 1 and 3 on the same restrained corner geometry as step 2. */
+      body.registration-page .nw-registration-progress > strong,
+      body.registration-page .nw-registration-progress > span:not(.nw-registration-progress-whatsapp) {
+        border-radius: 11px;
+      }
+
+      /* Step 2 only: one restrained Apple-like status chip, no nested WhatsApp decoration. */
+      body.registration-page .nw-registration-progress > .nw-registration-progress-whatsapp {
+        box-sizing: border-box;
+        min-height: 42px;
+        padding: 0 12px;
+        gap: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.11);
+        border-radius: 11px;
+        background: rgba(255, 255, 255, 0.028);
+        color: #f4f4f1;
+        font-size: 0.79rem;
+        font-weight: 580;
+        line-height: 1;
+        letter-spacing: 0;
+        white-space: nowrap;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+        -webkit-backdrop-filter: blur(8px) saturate(108%);
+        backdrop-filter: blur(8px) saturate(108%);
+      }
+      body.registration-page .nw-registration-progress > .nw-registration-progress-whatsapp .nw-registration-progress-index {
+        display: inline;
+        width: auto;
+        height: auto;
+        flex: 0 0 auto;
+        margin: 0 1px 0 0;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.52);
+        font: 500 0.76rem/1 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+        letter-spacing: 0;
+      }
+      body.registration-page .nw-registration-progress > .nw-registration-progress-whatsapp .nw-registration-progress-whatsapp-icon {
+        display: block;
+        width: 15px;
+        height: 15px;
+        flex: 0 0 15px;
+        margin: 0;
+        object-fit: contain;
+      }
+      @media (max-width: 720px) {
+        body.registration-page .nw-registration-progress > .nw-registration-progress-whatsapp {
+          width: 100%;
+          min-height: 44px;
+          padding: 0 13px;
+          white-space: nowrap;
+        }
+      }
+    </style>
+      <script src="/assets/locale-boot.js?v=1"></script>
+  </head>
+  <body class="registration-page">
+    <header class="top"><div class="wrap nav"><a class="brand" href="/de/" aria-label="NAHWERK Concierge – Startseite"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Hauptnavigation"><a href="/de/">Übersicht</a><a href="/prime-concierge">Persönlicher Concierge</a><a href="/concierges">NAHWERK weltweit</a><a href="/telefonannahme">Telefonannahme</a><a href="/senioren-concierge">Senioren Concierge</a><a href="/angehoerige">Für Angehörige</a><a href="/leistungen">Leistungen</a><a href="/kontakt">Kontakt</a><a class="auth-link login-link" href="/anmelden">Anmelden</a><a class="active auth-link register-link" href="/registrieren">Registrieren</a></nav></div></header>
+    <main>
+      <section class="section">
+        <div class="wrap signup">
+          <form class="formcard" id="signupForm" data-nw-registration="v1">
+            <h1
+              id="registrationTitle"
+              style="
+                font:700 38px/1.1 -apple-system,BlinkMacSystemFont,Arial,sans-serif;
+                margin: 0 0 18px;
+              "
+            >
+              Zugang registrieren
+            </h1>
+            <div class="nw-registration-progress" role="status" aria-live="polite">
+              <strong>1. Zugang anlegen</strong>
+              <span class="nw-registration-progress-whatsapp whatsapp-label"><b class="nw-registration-progress-index">2</b><img class="nw-registration-progress-whatsapp-icon" src="assets/icons/whatsapp-mark.svg" alt="" aria-hidden="true" />WhatsApp bestätigen</span>
+              <span>3. Erste Aufgabe senden</span>
+            </div>
+            <p class="nw-registration-note">FREE ist vorausgewählt. Sicherheitsoptionen bleiben freiwillig; kostenpflichtige Tarife werden ohne freigegebenen Checkout nicht bestellt.</p>
+            <div class="progressive-panel" id="telephoneReceptionRegistrationPath">
+              <strong>Du möchtest die NAHWERK Telefonannahme einrichten?</strong>
+              <p class="tiny">Die Telefonannahme ist ein eigener Produkt- und Festnetz-Onboarding-Pfad. Eine normale Concierge-Registrierung bucht oder aktiviert sie nicht.</p>
+              <a href="/telefonannahme#einrichtung" style="color:var(--gold);text-decoration:underline;font-weight:750">Zur Telefonannahme-Einrichtung</a>
+            </div>
+            <section
+              class="planbox"
+              id="selectedPlanBox"
+              aria-labelledby="selectedPlanName"
+            >
+              <div class="planbox-head">
+                <div>
+                  <span class="planbox-kicker">Dein gewählter Tarif</span>
+                  <strong id="selectedPlanName">FREE · 0 € / MONAT</strong>
+                  <span class="plan-sub" id="productLabel"
+                    >Persönlicher Concierge</span
+                  >
+                </div>
+                <button
+                  class="plan-change-button"
+                  type="button"
+                  id="planChangeButton"
+                  aria-controls="registrationPlanPicker"
+                  aria-expanded="false"
+                >
+                  Tarif ändern
+                </button>
+              </div>
+              <fieldset class="plan-picker" id="registrationPlanPicker" hidden>
+                <legend>Tarif auswählen</legend>
+                <p class="plan-picker-intro">
+                  Tarif und Concierge werden unabhängig gewählt. Deine übrigen Angaben bleiben beim Wechsel erhalten.
+                </p>
+                <div class="plan-options" id="registrationPlanOptions"></div>
+              </fieldset>
+              <ul class="benefits" id="selectedPlanBenefits">
+                <li>Dauerhaft kostenlos</li>
+                <li>50 App-Dialoge pro Monat</li>
+                <li>20 WhatsApp-Dialoge pro Monat</li>
+                <li>Direkt in WhatsApp</li>
+                <li>Text- und Sprachnachrichten</li>
+                <li>
+                  Keine Zahlungsdaten und keine automatische kostenpflichtige
+                  Umwandlung
+                </li>
+              </ul>
+              <div
+                class="plan-selection-note"
+                id="planSelectionNote"
+                role="status"
+                aria-live="polite"
+              ></div>
+            </section>
+            <fieldset
+              class="field"
+              style="border: 0; padding: 0; margin-inline: 0"
+            >
+              <legend
+                style="
+                  font:700 25px/1.2 -apple-system,BlinkMacSystemFont,Arial,sans-serif;
+                "
+              >
+                Wer darf dich begleiten?
+              </legend>
+              <p class="concierge-intro">
+                Wähle den Concierge, dessen Auftreten und Kommunikationsstil am besten zu dir passt. Die grundlegenden Möglichkeiten bleiben bei allen Profilen gleich.
+              </p>
+              <div
+                class="concierge-choice"
+                data-concierge-carousel
+                data-variant="selection"
+                data-input-name="conciergeChoice"
+                data-selected="nilo"
+                data-label="Persönlichen KI-Concierge auswählen"
+              ></div>
+              <span class="tiny"
+                >Alle 23 Profile gehören zum selben NAHWERK-Concierge-System.
+                Die Auswahl bestimmt vor allem Ansprache, Stimme und
+                Kommunikationsstil und kann später geändert werden.</span
+              >
+            </fieldset>
+            <div class="field">
+              <label>Für wen richtest du den Zugang ein?</label>
+              <div class="choice setup-choice">
+                <label
+                  ><input type="radio" name="setupFor" value="self" checked />
+                  Für mich selbst</label
+                ><label
+                  ><input type="radio" name="setupFor" value="other" /> Für
+                  jemand anderen</label
+                >
+              </div>
+            </div>
+            <h2 style="font-size: 25px">Deine Angaben</h2>
+            <div class="row name">
+              <div class="field">
+                <label for="ownerSalutation">Anrede</label
+                ><select id="ownerSalutation">
+                  <option value="" aria-label="Keine Angabe"></option>
+                  <option value="Herr">Herr</option>
+                  <option value="Frau">Frau</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="ownerFirstName">Vorname</label
+                ><input
+                  id="ownerFirstName"
+                  autocomplete="given-name"
+                  required
+                />
+              </div>
+              <div class="field">
+                <label for="ownerLastName">Nachname</label
+                ><input
+                  id="ownerLastName"
+                  autocomplete="family-name"
+                  required
+                />
+              </div>
+            </div>
+            <div class="field">
+              <label for="ownerEmail">E-Mail-Adresse für deinen Web-Zugang</label
+              ><input
+                id="ownerEmail"
+                type="email"
+                autocomplete="email"
+                required
+              />
+            </div>
+            <div class="row password-single-row">
+              <div class="field">
+                <label for="webPassword">Passwort</label>
+                <div class="password-wrap">
+                  <input
+                    id="webPassword"
+                    type="password"
+                    autocomplete="new-password"
+                    minlength="15"
+                    maxlength="128"
+                    aria-describedby="webPasswordHint"
+                    required
+                  /><button
+                    class="password-toggle"
+                    type="button"
+                    data-password-toggle="webPassword"
+                    aria-label="Passwort anzeigen"
+                    title="Passwort anzeigen"
+                  >
+                    <svg
+                      class="eye-icon"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"
+                      ></path>
+                      <circle cx="12" cy="12" r="2.7"></circle>
+                    </svg>
+                  </button>
+                </div>
+                <div class="tiny passwordhint" id="webPasswordHint">Mindestens 15 Zeichen. Verwende eine lange, nicht vorhersehbare Passphrase; Sonderzeichen sind nicht vorgeschrieben.</div>
+              </div>
+            </div>
+            <div class="field" id="ownerPhoneField">
+              <label for="ownerPhone">Deine WhatsApp-Telefonnummer</label
+              ><input
+                id="ownerPhone"
+                type="tel"
+                autocomplete="tel"
+                placeholder="z. B. +49 170 ..."
+              /><span class="tiny" id="ownerPhoneHint"
+                >Nur nötig, wenn du Nilo selbst über WhatsApp nutzt.</span
+              >
+            </div>
+            <div class="selfhint" id="selfHint">
+              <strong>Für dich selbst:</strong> Deine Telefonnummer wird als WhatsApp-Zugang verwendet.
+            </div>
+            <div id="recipientBlock" hidden>
+              <h2 id="recipientHeading" style="font-size: 25px">
+                Wen darf Nilo unterstützen?
+              </h2>
+              <div class="row name">
+                <div class="field">
+                  <label for="recipientSalutation">Anrede</label
+                  ><select id="recipientSalutation">
+                    <option value="" aria-label="Keine Angabe"></option>
+                    <option value="Herr">Herr</option>
+                    <option value="Frau">Frau</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="recipientFirstName">Vorname</label
+                  ><input id="recipientFirstName" autocomplete="given-name" />
+                </div>
+                <div class="field">
+                  <label for="recipientLastName">Nachname</label
+                  ><input id="recipientLastName" autocomplete="family-name" />
+                </div>
+              </div>
+              <div class="row recipient-contact-row">
+                <div class="field">
+                  <label for="relationship">Beziehung</label
+                  ><select id="relationship">
+                    <option value="mutter">Mutter</option>
+                    <option value="vater">Vater</option>
+                    <option value="grossmutter">Großmutter</option>
+                    <option value="grossvater">Großvater</option>
+                    <option value="partner">Partner/in</option>
+                    <option value="angehoerige">Andere/r Angehörige/r</option>
+                    <option value="andere">Andere Person</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="recipientPhone"
+                    >WhatsApp-Telefonnummer der unterstützten Person</label
+                  ><input
+                    id="recipientPhone"
+                    type="tel"
+                    placeholder="+49 ..."
+                  />
+                </div>
+              </div>
+              <div class="field">
+                <label for="note"
+                  ><span id="notePrompt"
+                    >Was sollte Nilo am Anfang wissen?</span
+                  >
+                  <span class="tiny">(optional)</span></label
+                ><textarea
+                  id="note"
+                  placeholder="Zum Beispiel: Bitte langsam sprechen und Technik in kleinen Schritten erklären."
+                ></textarea>
+              <div class="field family-message-field">
+                <label for="familyMessage">
+                  Persönliche Nachricht für die unterstützte Person
+                  <span class="tiny">(optional)</span>
+                </label>
+                <textarea
+                  id="familyMessage"
+                  maxlength="600"
+                  placeholder="Zum Beispiel: Mama, ich habe dir NAHWERK eingerichtet, damit du jederzeit jemanden hast, der dir in Ruhe weiterhilft. Liebe Grüße, Deniz."
+                ></textarea>
+                <span class="tiny">Deine Nachricht kann beim ersten Kontakt zusätzlich zur NAHWERK-Begrüßung übermittelt werden.</span>
+              </div>
+              </div>
+            </div>
+            <div class="field">
+              <label id="addressingLabel" for="addressing"
+                >Wie soll Nilo die unterstützte Person ansprechen?</label
+              ><select id="addressing">
+                <option value="du">Du – mit Vornamen</option>
+                <option value="sie">Sie – mit Anrede und Nachnamen</option>
+              </select>
+            </div>
+            <label class="check" id="safetyToggleRow"
+              ><input type="checkbox" id="safetyEnabled" /><span
+                ><strong>Optionale Sicherheitsfunktion einrichten</strong
+                ><br />Standardmäßig deaktiviert.
+                <span id="safetyConciergeName">Nilo</span> kann zu vereinbarten
+                Zeiten nachfragen, ob alles in Ordnung ist.</span
+              ></label
+            >
+            <div class="progressive-panel" id="safetyFields" hidden>
+              <div class="row">
+                <div class="field">
+                  <label for="checkinTimes">Gewünschte Check-in-Zeit(en)</label
+                  ><input
+                    id="checkinTimes"
+                    placeholder="z. B. täglich um 9:00 Uhr"
+                  />
+                </div>
+                <div class="field">
+                  <label for="trustedContactPhone"
+                    >Telefonnummer der Vertrauensperson</label
+                  ><input
+                    id="trustedContactPhone"
+                    type="tel"
+                    placeholder="+49 ..."
+                  />
+                </div>
+              </div>
+              <div class="field">
+                <label for="trustedContactName"
+                  >Name der Vertrauensperson
+                  <span class="tiny">(freiwillig)</span></label
+                ><input id="trustedContactName" />
+              </div>
+              <p class="tiny">
+                Diese Nummer wird ausschließlich für die von dir aktivierten Sicherheitsfunktionen verwendet, damit im vorgesehenen Fall eine von dir bestimmte Vertrauensperson informiert werden kann. Die Vertrauensperson erhält nicht allein durch die Registrierung automatisch eine WhatsApp-Nachricht.
+              </p>
+              <p class="tiny">
+                <strong>Kein Notruf:</strong> Die Sicherheitsfunktionen ersetzen
+                keinen medizinischen Notruf oder Hausnotruf. In akuten Notfällen
+                gilt weiterhin 112.
+              </p>
+            </div>
+            <label class="check" id="consentRow" hidden
+              ><input type="checkbox" id="consent" /><span
+                >Die unterstützte Person ist mit der Kontaktaufnahme über
+                WhatsApp einverstanden und weiß, dass ich den Zugang für sie
+                einrichte.</span
+              ></label
+            ><label class="check"
+              ><input type="checkbox" id="privacy" required /><span
+                >Ich habe die
+                <a
+                  href="/datenschutz"
+                  style="color: var(--gold); text-decoration: underline"
+                  >Datenschutzerklärung</a
+                >
+                zur Kenntnis genommen.</span
+              ></label
+            ><label class="check"
+              ><input type="checkbox" id="terms" required /><span
+                >Ich habe die
+                <a
+                  href="/agb"
+                  style="color: var(--gold); text-decoration: underline"
+                  >AGB</a
+                >
+                und Hinweise zur
+                <a
+                  href="/ki-transparenz"
+                  style="color: var(--gold); text-decoration: underline"
+                  >KI-Transparenz</a
+                >
+                zur Kenntnis genommen.</span
+              ></label
+            ><button class="btn red" type="submit" id="registrationSubmit">
+              Kostenlosen Zugang registrieren
+            </button>
+            <div class="status" id="status"></div>
+            <p class="tiny">
+              Schon registriert?
+              <a
+                href="/anmelden"
+                style="
+                  color: var(--gold);
+                  text-decoration: underline;
+                  font-weight: 700;
+                "
+                >Hier anmelden</a
+              >.
+            </p>
+          </form>
+          <div class="preview" role="region" aria-label="Concierge-Vorschau">
+            <div class="eyebrow">Persönlicher Zugang</div>
+            <h3>Web-Konto + WhatsApp.</h3>
+            <div class="msg" id="messagePreview">
+              <strong>Hallo 👋</strong><br /><br />Willkommen bei Prime
+              Concierge.<br /><br />Ich bin Nilo oder Mira, dein digitaler,
+              KI-gestützter Concierge.<br /><br />Ich helfe dir bei
+              Organisation, Informationen, Technik und vielem mehr – schnell,
+              persönlich und zuverlässig.<br /><br />Einfach schreiben, ich bin
+              für dich da.
+            </div>
+            <p class="preview-note">
+              Die tatsächliche Du-/Sie-Ansprache richtet sich nach der bei der
+              Registrierung gewählten Einstellung.
+            </p>
+            <div class="trustline">
+              <svg class="trust-shield" viewBox="0 0 32 36" aria-hidden="true">
+                <path
+                  d="M16 2 28 7v9c0 8-4.8 14.2-12 18-7.2-3.8-12-10-12-18V7l12-5Z"
+                ></path>
+                <path d="m10.5 17 3.5 3.5 7.5-8"></path></svg
+              ><span
+                >Deine Daten sind bei uns sicher und DSGVO-konform
+                geschützt.</span
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="footer">
+      <div class="wrap">
+        <div class="footergrid">
+          <div>
+            <a class="brand" href="/de/" aria-label="NAHWERK Concierge – Startseite">
+              <span class="mark nahwerk-mark" aria-hidden="true"></span>
+              <span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span>
+            </a>
+            <p>Dein persönlicher Concierge für Alltag, Organisation und verständliche Unterstützung.</p>
+          </div>
+          <div>
+            <h4>Angebot</h4>
+            <a href="/prime-concierge">Persönlicher Concierge</a>
+            <a href="/telefonannahme">Telefonannahme</a>
+            <a href="/concierges">NAHWERK weltweit</a>
+            <a href="/senioren-concierge">Für Senioren</a>
+            <a href="/angehoerige">Für Angehörige</a>
+            <a href="/pakete">Pakete</a>
+          </div>
+          <div>
+            <h4>Service</h4>
+            <a href="/leistungen">Leistungen</a>
+            <a href="/ablauf">So funktioniert's</a>
+            <a href="/faq">FAQ</a>
+            <a href="/kontakt">Kontakt</a>
+          </div>
+          <div>
+            <h4>Rechtliches</h4>
+            <a href="/impressum">Impressum</a>
+            <a href="/datenschutz">Datenschutz</a>
+            <a href="/agb">AGB</a>
+            <a href="/widerruf">Widerruf</a>
+            <a href="/ki-transparenz">KI-Transparenz</a>
+            <a href="/datenloeschung">Datenlöschung</a>
+          </div>
+        </div>
+        <div class="footbottom">
+          <span>© 2026 NAHWERK Concierge</span>
+          <span>Persönlicher Concierge über WhatsApp</span>
+        </div>
+      </div>
+    </footer>
+    <script src="assets/concierge-voice-preview.js?v=7"></script>
+<script src="/assets/concierge-locale-defaults.js?v=1"></script>
+    <script src="assets/concierge-carousel.js?v=20"></script>
+    <script src="assets/auth-nav.js?v=40"></script>
+    <script src="assets/nahwerk-analytics.js?v=1"></script>
+    <script src="assets/acquisition-v1.js?v=2"></script>
+    <script src="assets/onboarding.js?v=23"></script>
+    <script>
+      const eye =
+        '<svg class="eye-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.7"></circle></svg>';
+      const eyeOff =
+        '<svg class="eye-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 3 18 18"></path><path d="M10.7 6.1A10.8 10.8 0 0 1 12 6c6 0 9.5 6 9.5 6a16.3 16.3 0 0 1-2.2 2.8"></path><path d="M6.2 6.2C3.8 8 2.5 12 2.5 12s3.5 6 9.5 6a10 10 0 0 0 4.1-.9"></path><path d="M9.8 9.8A3.1 3.1 0 0 0 14.2 14.2"></path></svg>';
+      document.querySelectorAll("[data-password-toggle]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const input = document.getElementById(btn.dataset.passwordToggle);
+          const show = input.type === "password";
+          input.type = show ? "text" : "password";
+          btn.setAttribute(
+            "aria-label",
+            show ? "Passwort ausblenden" : "Passwort anzeigen",
+          );
+          btn.title = show ? "Passwort ausblenden" : "Passwort anzeigen";
+          btn.innerHTML = show ? eyeOff : eye;
+        });
+      });
+    </script>
+    <script src="assets/site-ui.js?v=5"></script>
+      <script src="assets/auth-i18n.js?v=3"></script>
+    <script src="assets/auth-slider-i18n.js?v=2"></script>
+    <script src="assets/locale-runtime.js?v=1"></script>
+    <script src="assets/app-language-switcher.js?v=2"></script>
+  </body>
+</html>

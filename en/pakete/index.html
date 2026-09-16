@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en">
+  <head><base href="/en/">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Plans &amp; Pricing | NAHWERK</title>
+    <meta
+      name="description"
+      content="Compare NAHWERK plans from FREE to PREMIUM PLUS and FAMILY."
+    />
+    <link rel="stylesheet" href="/assets/site.css?v=24" />
+    <link rel="canonical" href="https://nahwerkconcierge.com/en/pakete" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/assets/logos/nahwerk-concierge-gold-transparent.svg?v=1"
+    />
+    <link rel="stylesheet" href="/assets/brand-2026.css?v=23" />
+    <link rel="stylesheet" href="/assets/nahwerk-logo-v2.css?v=9" />
+    <style>
+      .package-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 34px;
+      }
+      .package-card {
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        padding: 28px;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: var(--panel);
+      }
+      .package-card.featured {
+        border-color: rgba(215, 169, 52, 0.58) !important;
+        box-shadow:
+          0 24px 70px rgba(0, 0, 0, 0.28),
+          0 0 0 1px rgba(215, 169, 52, 0.08) !important;
+      }
+      .package-card h3 {
+        margin: 0 0 8px;
+        font-size: 24px;
+      }
+      .package-price {
+        display: block;
+        color: #fff;
+        font-size: clamp(30px, 3.1vw, 43px);
+        font-weight: 680;
+        line-height: 1;
+        letter-spacing: -0.045em;
+      }
+      .package-price small {
+        color: #aaa69d;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0;
+      }
+      .package-usage {
+        display: block;
+        margin: 14px 0 20px;
+        color: #d8be7d;
+        font-size: 14px;
+        font-weight: 750;
+      }
+      .package-card p {
+        color: var(--muted);
+        line-height: 1.65;
+      }
+      .package-card ul {
+        padding-left: 20px;
+        line-height: 1.7;
+      }
+      .package-card .actions {
+        margin-top: auto;
+      }
+      .status-pill {
+        display: inline-flex;
+        align-self: flex-start;
+        margin-bottom: 18px;
+        padding: 6px 10px;
+        border: 1px solid rgba(215, 169, 52, 0.34);
+        border-radius: 999px;
+        color: var(--gold2);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+      .status-pill.future {
+        color: #c5c1b8;
+        border-color: rgba(255, 255, 255, 0.18);
+      }
+      .pricing-note {
+        margin-top: 26px;
+        padding: 20px;
+        border-left: 3px solid var(--gold);
+        border-radius: 12px;
+        background: rgba(215, 169, 52, 0.06);
+        color: #c8c4ba;
+        line-height: 1.65;
+      }
+
+      /* Axe closure: pricing page uses explicit dark surfaces and AA text contrast. */
+      body.pricing-page {
+        background: #070706 !important;
+        color: #fff !important;
+      }
+      body.pricing-page .odysx-info-bar,
+      body.pricing-page .odysx-info-bar span,
+      body.pricing-page .nw-capability-banner,
+      body.pricing-page .nw-capability-banner span {
+        color: #fff !important;
+        opacity: 1 !important;
+      }
+      body.pricing-page .package-card,
+      body.pricing-page .package-card.featured {
+        background: #151512 !important;
+        border-color: rgba(255,255,255,.18) !important;
+        color: #fff !important;
+      }
+      body.pricing-page .package-card h3,
+      body.pricing-page .package-price {
+        color: #fff !important;
+      }
+      body.pricing-page .package-price small,
+      body.pricing-page .package-card p,
+      body.pricing-page .package-card li,
+      body.pricing-page .package-card .whatsapp-label {
+        color: #d8d4cc !important;
+        opacity: 1 !important;
+      }
+      body.pricing-page .package-usage,
+      body.pricing-page .status-pill {
+        color: #f0d58d !important;
+        opacity: 1 !important;
+      }
+      body.pricing-page .btn.red {
+        background: #861f24 !important;
+        border-color: #861f24 !important;
+        color: #fff !important;
+      }
+      body.pricing-page .btn.light {
+        background: #f3eee4 !important;
+        border-color: #f3eee4 !important;
+        color: #17130d !important;
+      }
+      body.pricing-page .footer,
+      body.pricing-page .footer a,
+      body.pricing-page .footer p,
+      body.pricing-page .footer h3,
+      body.pricing-page .footbottom,
+      body.pricing-page .footbottom span,
+      body.pricing-page .footer .whatsapp-label {
+        color: #fff !important;
+        opacity: 1 !important;
+      }
+
+      /* Deterministic axe snapshot: disable transient reveal opacity on pricing. */
+      body.pricing-page main > section.reveal,
+      body.pricing-page .footer.reveal {
+        opacity:1!important;
+        transform:none!important;
+        transition:none!important;
+        filter:none!important;
+      }
+      body.pricing-page .odysx-info-bar,
+      body.pricing-page .odysx-info-bar *,
+      body.pricing-page .package-card,
+      body.pricing-page .package-card * {
+        opacity:1!important;
+        filter:none!important;
+        text-shadow:none!important;
+      }
+      body.pricing-page .odysx-info-bar,
+      body.pricing-page .odysx-info-bar * {
+        background:#0b0b09!important;
+        color:#fff!important;
+      }
+      body.pricing-page .package-card {
+        background:#11110f!important;
+      }
+      body.pricing-page .package-card h3,
+      body.pricing-page .package-card p,
+      body.pricing-page .package-card li,
+      body.pricing-page .package-card .package-price,
+      body.pricing-page .package-card .package-price small,
+      body.pricing-page .package-card .package-usage,
+      body.pricing-page .package-card .whatsapp-label,
+      body.pricing-page .package-card .status-pill {
+        color:#fff!important;
+      }
+      body.pricing-page .package-card .btn.light,
+      body.pricing-page #telefonannahme-modelle .btn.light {
+        background:#fff!important;
+        border-color:#fff!important;
+        color:#111!important;
+        opacity:1!important;
+        filter:none!important;
+      }
+      body.pricing-page .package-card .btn.red {
+        background:#651418!important;
+        border-color:#651418!important;
+        color:#fff!important;
+        opacity:1!important;
+        filter:none!important;
+      }
+
+      body.pricing-page .odysx-info-bar > span > strong {
+        color:#fff!important;
+        opacity:1!important;
+      }
+      body.pricing-page .pricing-note,
+      body.pricing-page .pricing-note strong {
+        color:#fff!important;
+        background:#11110f!important;
+        opacity:1!important;
+        filter:none!important;
+      }
+      body.pricing-page #telefonannahme-modelle .eyebrow,
+      body.pricing-page .section.alt .eyebrow {
+        color:#f7dc92!important;
+        opacity:1!important;
+        filter:none!important;
+      }
+
+      @media (max-width: 1120px) {
+        .package-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 700px) {
+        .package-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  <link rel="stylesheet" href="/assets/acquisition-v1.css?v=1" />
+    <!-- NW-I18N-START -->
+    <link rel="alternate" hreflang="de" href="/pakete" />
+    <link rel="alternate" hreflang="en" href="/en/pakete" />
+    <link rel="alternate" hreflang="tr" href="/tr/pakete" />
+    <link rel="alternate" hreflang="x-default" href="/pakete" />
+    <script src="/assets/language-switcher.js?v=12" defer></script>
+    <!-- NW-I18N-END -->
+  <script src="/assets/locale-runtime.js?v=1" defer></script>
+</head>
+  <body class="pricing-page">
+    <header class="top"><div class="wrap nav"><a class="brand" href="/en/" aria-label="NAHWERK Concierge — homepage"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Main navigation"><a href="/en/">Overview</a><a href="/en/prime-concierge">Personal Concierge</a><a href="/en/concierges">NAHWERK worldwide</a><a href="/en/telefonannahme">Phone reception</a><a href="/en/senioren-concierge">Senior Concierge</a><a href="/en/angehoerige">For relatives</a><a href="/en/leistungen">Services</a><a class="active" href="/en/pakete" aria-current="page">Plans</a><a href="/en/kontakt">Contact</a><a class="auth-link login-link" href="/anmelden?lang=en">Sign in</a><a class="auth-link register-link" href="/registrieren?lang=en">Register</a></nav></div></header>
+    <main>
+      <section class="hero">
+        <div class="wrap">
+          <div class="eyebrow">Plans &amp; usage</div>
+          <h1>Start simply. Continue in the way that suits you.</h1>
+          <p>
+            Six clear plans — from the permanently free entry plan to a shared family allowance. You can compare and change the plan directly during registration.
+          </p>
+          <div class="actions">
+            <a class="btn red" href="/registrieren?paket=free&amp;source=pricing_free&amp;lang=en" data-nw-cta="start_free" data-nw-step="pricing"
+              >Start free</a
+            ><a class="btn light" href="#paketvergleich">Compare plans</a>
+          </div>
+        </div>
+      </section>
+      <section class="section" id="paketvergleich">
+        <div class="wrap">
+          <h2>Compare plans</h2>
+          <div class="package-grid">
+            <article class="package-card">
+              <h3>FREE</h3>
+              <span class="package-price">0 € <small>/ month</small></span
+              ><span class="package-usage">50 app conversations · 20 WhatsApp conversations</span>
+              <p>For getting to know NAHWERK and occasional support.</p>
+              <ul>
+                <li>WhatsApp with text and voice messages</li>
+                <li>Choose personal concierge</li>
+                <li>No payment details</li>
+                <li>No automatic conversion to a paid plan</li>
+              </ul>
+              <div class="actions">
+                <a class="btn red" href="/registrieren?paket=free&amp;source=pricing_free&amp;lang=en" data-nw-cta="start_free" data-nw-step="pricing"
+                  >Choose FREE</a
+                >
+              </div>
+            </article>
+            <article class="package-card">
+              <h3>STANDARD</h3>
+              <span class="package-price">5,99 € <small>/ month</small></span
+              ><span class="package-usage">100 app conversations · 30 WhatsApp conversations</span>
+              <p>
+                For regular help with everyday life, research and organisation.
+              </p>
+              <ul>
+                <li>More room for daily questions</li>
+                <li>Present documents and comparisons clearly</li>
+                <li>Plan selectable during registration</li>
+              </ul>
+              <div class="actions">
+                <a class="btn light" href="/registrieren?paket=standard&amp;lang=en"
+                  >Choose STANDARD</a
+                >
+              </div>
+            </article>
+            <article class="package-card featured">
+              <span class="status-pill">Popular choice</span>
+              <h3>PLUS</h3>
+              <span class="package-price">10,99 € <small>/ month</small></span
+              ><span class="package-usage">180 app conversations · 50 WhatsApp conversations</span>
+              <p>
+                For intensive use and a concierge that thinks along more often.
+              </p>
+              <ul>
+                <li>Generous monthly allowance</li>
+                <li>Ideal for many small and larger everyday matters</li>
+                <li>Plan selectable during registration</li>
+              </ul>
+              <div class="actions">
+                <a class="btn light" href="/registrieren?paket=plus&amp;lang=en"
+                  >Choose PLUS</a
+                >
+              </div>
+            </article>
+            <article class="package-card">
+              <h3>PREMIUM</h3>
+              <span class="package-price">19,99 € <small>/ month</small></span
+              ><span class="package-usage">400 app conversations · 100 WhatsApp conversations</span>
+              <p>For extensive personal concierge support.</p>
+              <ul>
+                <li>Generous separate monthly allowances</li>
+                <li>For frequent and more demanding requests</li>
+                <li>Plan selectable during registration</li>
+              </ul>
+              <div class="actions">
+                <a class="btn light" href="/registrieren?paket=premium&amp;lang=en"
+                  >Choose PREMIUM</a
+                >
+              </div>
+            </article>
+            <article class="package-card">
+              <h3>PREMIUM PLUS</h3>
+              <span class="package-price">34,99 € <small>/ month</small></span
+              ><span class="package-usage">750 app conversations · 160 WhatsApp conversations</span>
+              <p>For particularly intensive personal concierge use.</p>
+              <ul>
+                <li>Very large monthly allowance</li>
+                <li>App and WhatsApp clearly separated</li>
+                <li>Plan selectable during registration</li>
+              </ul>
+              <div class="actions">
+                <a class="btn light" href="/registrieren?paket=premium_plus&amp;lang=en"
+                  >Choose PREMIUM PLUS</a
+                >
+              </div>
+            </article>
+            <article class="package-card">
+              <h3>FAMILIE</h3>
+              <span class="package-price">59,66 € <small>/ month</small></span
+              ><span class="package-usage">1,200 app conversations · 300 WhatsApp conversations</span>
+              <p>
+                For families who want to share a larger allowance.
+              </p>
+              <ul>
+                <li>Shared monthly allowance</li>
+                <li>Support for relatives with clear consent</li>
+                <li>Privacy and permissions remain important</li>
+              </ul>
+              <div class="actions">
+                <a class="btn light" href="/registrieren?paket=familie&amp;lang=en"
+                  >Choose FAMILY</a
+                >
+              </div>
+            </article>
+          </div>
+          <div class="pricing-note">
+            <strong>Full control:</strong> You can change the selected plan at any time during registration. Before a paid order, price, term, cancellation rights and payment are explicitly confirmed.
+          </div>
+        </div>
+      </section>
+      <section class="section" id="telefonannahme-modelle">
+        <div class="wrap">
+          <div class="eyebrow" style="display:inline-flex;padding:4px 7px;border-radius:6px;background:#000!important;color:#fff!important;opacity:1!important">Phone reception · separate product area</div>
+          <h2>Set up phone reception to suit you.</h2>
+          <p class="lead">NAHWERK phone reception can be used independently or together with your personal concierge. During setup, you choose the usage model that fits your everyday life.</p>
+          <div class="grid">
+            <article class="card"><h3>Standalone phone reception</h3><p>Can be used without a personal concierge. A specialised phone agent handles incoming calls for you.</p></article>
+            <article class="card"><h3>Concierge + phone reception</h3><p>When used together, phone reception and your personal concierge can use the same context you have approved.</p></article>
+          </div>
+          <div class="actions"><a class="btn light" href="/en/telefonannahme#einrichtung">Prepare setup</a></div>
+        </div>
+      </section>
+      <section class="section alt">
+        <div class="wrap">
+          <div class="eyebrow" style="display:inline-flex;padding:4px 7px;border-radius:6px;background:#000!important;color:#fff!important;opacity:1!important">What remains important regardless of plan</div>
+          <h2>Personal service, clear control.</h2>
+          <div class="grid">
+            <article class="card">
+              <h3>Clear</h3>
+              <p>
+                NAHWERK should not feel like a technical platform. Requests come before features and internal system terminology.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Transparent and understandable</h3>
+              <p>
+                Where actions require confirmation, the decision remains with the customer.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="footer">
+      <div class="wrap">
+        <div class="footergrid">
+          <div>
+            <a class="brand" href="/en/" aria-label="NAHWERK Concierge — homepage">
+              <span class="mark nahwerk-mark" aria-hidden="true"></span>
+              <span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span>
+            </a>
+            <p>Your personal concierge for everyday life, organisation and clear support.</p>
+          </div>
+          <div>
+            <h3>Offering</h3>
+            <a href="/en/prime-concierge">Personal Concierge</a>
+            <a href="/en/telefonannahme">Phone reception</a>
+            <a href="/en/concierges">NAHWERK worldwide</a>
+            <a href="/en/senioren-concierge">For seniors</a>
+            <a href="/en/angehoerige">For relatives</a>
+            <a href="/en/pakete">Plans</a>
+          </div>
+          <div>
+            <h3>Service</h3>
+            <a href="/en/leistungen">Services</a>
+            <a href="/en/ablauf">How it works</a>
+            <a href="/en/faq">FAQ</a>
+            <a href="/en/kontakt">Contact</a>
+          </div>
+          <div>
+            <h3>Legal</h3>
+            <a href="/impressum">Legal notice</a>
+            <a href="/datenschutz">Privacy</a>
+            <a href="/agb">Terms</a>
+            <a href="/widerruf">Cancellation</a>
+            <a href="/ki-transparenz">AI transparency</a>
+            <a href="/datenloeschung">Data deletion</a>
+          </div>
+        </div>
+        <div class="footbottom">
+          <span>© 2026 NAHWERK Concierge</span>
+          <span>Personal concierge via WhatsApp</span>
+        </div>
+      </div>
+    </footer>
+    <script src="/assets/auth-nav.js?v=40"></script>
+    <script src="/assets/site-ui.js?v=5"></script>
+  <script src="/assets/nahwerk-analytics.js?v=1"></script><script src="/assets/acquisition-v1.js?v=2"></script></body>
+</html>
