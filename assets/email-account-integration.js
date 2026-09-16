@@ -258,7 +258,7 @@
     const available = new Set(Array.isArray(connection?.capabilities) ? connection.capabilities : []);
     capabilityInputs.forEach((input) => {
       const key = String(input.value);
-      input.checked = connected ? preferences?.[key] === true : false;
+      if (!savingPreferences) input.checked = connected ? preferences?.[key] === true : false;
       input.disabled = !connected || !preferences || !available.has(key) || savingPreferences;
       input.closest(".email-capability")?.classList.toggle("is-disabled", input.disabled);
     });
@@ -373,22 +373,23 @@
       providers = normalizeProviderList(providerData);
       connection = normalizeConnection(connectionData) || { state: "ERROR", provider: null, capabilities: [], account_display_hint: null };
       preferences = null;
-      renderProviders();
-      renderConnection();
-      loaded = true;
+      let preferenceLoadFailed = false;
 
       if (connection.state === "CONNECTED") {
         try {
           const preferenceData = await request("/email/preferences");
           preferences = normalizePreferences(preferenceData);
           if (!preferences) throw new Error("EMAIL_REQUEST_INVALID");
-          renderCapabilities();
         } catch {
           preferences = null;
-          if (preferencesStatus) preferencesStatus.textContent = "Deine E-Mail-Funktionen konnten gerade nicht geladen werden.";
-          renderCapabilities();
+          preferenceLoadFailed = true;
         }
       }
+
+      renderProviders();
+      renderConnection();
+      if (preferenceLoadFailed && preferencesStatus) preferencesStatus.textContent = "Deine E-Mail-Funktionen konnten gerade nicht geladen werden.";
+      loaded = true;
     } catch (error) {
       renderError(error);
     } finally {
@@ -426,10 +427,10 @@
         if (input.value === "EMAIL_SEARCH" || input.value === "EMAIL_ATTACHMENTS") input.checked = false;
       }
     }
+    const requested = Object.fromEntries(capabilityInputs.map((input) => [String(input.value), input.checked === true]));
     savingPreferences = true;
     renderCapabilities();
     try {
-      const requested = Object.fromEntries(capabilityInputs.map((input) => [String(input.value), input.checked === true]));
       const data = await request("/email/preferences", { method: "POST", body: { preferences: requested } });
       const next = normalizePreferences(data);
       if (!next) throw new Error("EMAIL_REQUEST_INVALID");
