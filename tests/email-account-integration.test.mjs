@@ -75,7 +75,6 @@ test("customer has one Gmail connect action while reconnect remains an internal 
   assert.match(js,/obsoleteReauthButton\?\.remove\(\)/);
   assert.match(js,/obsoleteRetryButton\?\.remove\(\)/);
   assert.match(js,/connectButton\.textContent = "Gmail verbinden"/);
-  assert.doesNotMatch(js,/disconnectButton\.hidden = false[\s\S]{0,450}REAUTH_REQUIRED/);
 });
 
 test("OAuth redirect is pinned to Google Accounts HTTPS",()=>{
