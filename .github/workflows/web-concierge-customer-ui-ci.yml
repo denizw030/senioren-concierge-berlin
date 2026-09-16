@@ -1,0 +1,30 @@
+name: Web Concierge Customer UI CI
+
+on:
+  pull_request:
+    paths:
+      - 'web-concierge.html'
+      - 'web-concierge/**'
+      - 'assets/web-customer-concierge.js'
+      - 'assets/web-customer-concierge.css'
+      - 'assets/web-core-shadow.js'
+      - 'assets/web-concierge-chat.js'
+      - 'assets/site-ui.js'
+      - 'tests/web-account-webconcierge-prod.test.mjs'
+      - '.github/workflows/web-concierge-customer-ui-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  customer-ui-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run Web Concierge customer UI contract
+        run: node --test tests/web-account-webconcierge-prod.test.mjs
