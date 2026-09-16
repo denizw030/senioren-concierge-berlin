@@ -59,10 +59,24 @@ jobs:
           replace('tests/safety-login-context.test.mjs', '/registrieren\\.html\\?produkt=senioren/', '/href="\\/registrieren\\?produkt=senioren"/', 1)
           replace('tests/safety-login-context.test.mjs', '/registrieren\\.html\\?produkt=prime/', '/href="\\/registrieren\\?produkt=prime/', 1)
 
-          replace('tests/telephone-reception-product.test.mjs', 'for(const body of [home,services,pricing,registration]) assert.match(body,/telefonannahme\\.html/);', 'for(const body of [home,services,pricing,registration]) assert.match(body,/href="\\/telefonannahme"/);', 1)
+          p = Path('tests/story-conversion-final.test.mjs')
+          s = p.read_text()
+          pairs = [
+              ('href="(?:\\/de\\/)?prime-concierge\\.html">Concierge', 'href="(?:\\/de\\/|\\/)?prime-concierge(?:\\.html)?">Concierge'),
+              ('href="(?:\\/de\\/)?safety\\.html">Safety', 'href="(?:\\/de\\/|\\/)?safety(?:\\.html)?">Safety'),
+              ('href="(?:\\/de\\/)?angehoerige\\.html">Family', 'href="(?:\\/de\\/|\\/)?angehoerige(?:\\.html)?">Family'),
+              ('href="(?:\\/de\\/)?telefonannahme\\.html">Telefon', 'href="(?:\\/de\\/|\\/)?telefonannahme(?:\\.html)?">Telefon'),
+          ]
+          for old,new in pairs:
+              if s.count(old) != 1:
+                  raise SystemExit(f'unexpected story navigation marker count: {old!r} -> {s.count(old)}')
+              s = s.replace(old,new,1)
+          p.write_text(s)
+
+          replace('tests/telephone-reception-product.test.mjs', 'for(const body of [home,services,pricing,registration]) assert.match(body,/telefonannahme\\.html/);', 'for(const body of [home,services,pricing,registration]) assert.match(body,/href="(?:\\/)?telefonannahme(?:\\.html)?"/);', 1)
           replace('tests/website-launch-readiness-final.test.mjs', "const privacy = read('datenschutz.html');", "const privacy = read('datenschutz/index.html');", 1)
-          replace('tests/website-launch-readiness-final.test.mjs', '/<a href="leistungen\\.html">Leistungen<\\/a><a class="active" href="pakete\\.html" aria-current="page">Tarife<\\/a>/', '/<a href="\\/leistungen">Leistungen<\\/a><a class="active" href="\\/pakete" aria-current="page">Tarife<\\/a>/', 1)
-          replace('tests/website-launch-readiness-final.test.mjs', '/<a class="active" href="leistungen\\.html">Leistungen<\\/a>/', '/<a class="active" href="\\/leistungen">Leistungen<\\/a>/', 1)
+          replace('tests/website-launch-readiness-final.test.mjs', '/<a href="leistungen\\.html">Leistungen<\\/a><a class="active" href="pakete\\.html" aria-current="page">Tarife<\\/a>/', '/<a href="(?:\\/)?leistungen(?:\\.html)?">Leistungen<\\/a><a class="active" href="(?:\\/)?pakete(?:\\.html)?" aria-current="page">Tarife<\\/a>/', 1)
+          replace('tests/website-launch-readiness-final.test.mjs', '/<a class="active" href="leistungen\\.html">Leistungen<\\/a>/', '/<a class="active" href="(?:\\/)?leistungen(?:\\.html)?">Leistungen<\\/a>/', 1)
           PY
       - name: Test acquisition clean URL
         run: node --test tests/acquisition-v1.test.mjs
@@ -72,7 +86,7 @@ jobs:
         run: node --test tests/legal-i18n.test.mjs
       - name: Test safety login context
         run: node --test tests/safety-login-context.test.mjs
-      - name: Test story conversion unchanged
+      - name: Test story navigation compatibility
         run: node --test tests/story-conversion-final.test.mjs
       - name: Test telephone reception
         run: node --test tests/telephone-reception-product.test.mjs
@@ -83,6 +97,6 @@ jobs:
           rm .github/workflows/web-clean-url-regression-finalize-once.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tests/acquisition-v1.test.mjs tests/i18n-link-flow.test.mjs tests/legal-i18n.test.mjs tests/safety-login-context.test.mjs tests/telephone-reception-product.test.mjs tests/website-launch-readiness-final.test.mjs .github/workflows/web-clean-url-regression-finalize-once.yml
+          git add tests/acquisition-v1.test.mjs tests/i18n-link-flow.test.mjs tests/legal-i18n.test.mjs tests/safety-login-context.test.mjs tests/story-conversion-final.test.mjs tests/telephone-reception-product.test.mjs tests/website-launch-readiness-final.test.mjs .github/workflows/web-clean-url-regression-finalize-once.yml
           git commit -m "test(web): align clean URL regression expectations"
           git push origin HEAD:${GITHUB_REF_NAME}
