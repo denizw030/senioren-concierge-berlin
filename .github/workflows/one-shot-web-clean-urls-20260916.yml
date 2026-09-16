@@ -1,0 +1,74 @@
+name: One-shot Web Concierge + Clean URLs
+
+on:
+  push:
+    branches:
+      - feat/customer-floating-chat-20260916
+    paths:
+      - scripts/one-shot-web-clean-urls-20260916.mjs
+      - .github/workflows/one-shot-web-clean-urls-20260916.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: one-shot-web-clean-urls-20260916
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/customer-floating-chat-20260916
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apply isolated website transformation
+        run: node scripts/one-shot-web-clean-urls-20260916.mjs
+      - name: Scope guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          changed="$(git diff --name-only)"
+          echo "$changed"
+          if echo "$changed" | grep -E '^(oauth/|assets/email-|assets/account-premium-ui|konto\.html$)'; then
+            echo 'Forbidden shared/account/Gmail path changed.' >&2
+            exit 1
+          fi
+      - name: Focused tests
+        run: |
+          node --test tests/web-clean-routes-floating.test.mjs
+          node --test tests/auth-security.test.mjs
+          node --test tests/seo-indexing.test.mjs
+          node --test tests/web-account-webconcierge-prod.test.mjs
+          node --test tests/web-concierge-chat-ui.test.mjs
+      - name: Local direct-reload proof for directory routes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4173 >/tmp/nw-http.log 2>&1 &
+          pid=$!
+          trap 'kill $pid || true' EXIT
+          sleep 1
+          for route in anmelden impressum agb widerruf konto kontakt leistungen web-concierge datenschutz nutzungsbedingungen; do
+            code="$(curl -sS -o /tmp/$route.html -w '%{http_code}' http://127.0.0.1:4173/$route/)"
+            test "$code" = '200'
+            test -s "/tmp/$route.html"
+          done
+      - name: Remove one-shot machinery and commit result
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f scripts/one-shot-web-clean-urls-20260916.mjs
+          rm -f .github/workflows/one-shot-web-clean-urls-20260916.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m 'Website: Web Concierge und Clean URLs'
+          git push origin HEAD:feat/customer-floating-chat-20260916
