@@ -1,0 +1,44 @@
+name: PR94 canonical homepage CI fix once
+
+on:
+  push:
+    branches:
+      - "fix/website-ci-localized-home-20260915"
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/website-ci-localized-home-20260915
+      - name: Measure canonical homepage and remove one-shot workflow
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path=Path('.github/workflows/acquisition-v1-ci.yml')
+          text=path.read_text(encoding='utf-8')
+          old='http://127.0.0.1:4173/index.html'
+          new='http://127.0.0.1:4173/de/index.html'
+          marker='npx --yes lighthouse@13.4.1 '
+          lines=[]
+          changed=0
+          for line in text.splitlines(True):
+            if marker in line and old in line:
+              line=line.replace(old,new)
+              changed+=1
+            lines.append(line)
+          if changed != 2:
+            raise SystemExit(f'Expected exactly 2 Lighthouse canonical-home replacements, got {changed}')
+          path.write_text(''.join(lines),encoding='utf-8')
+          PY
+          git rm .github/workflows/pr94-ci-canonical-home-fix-once.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/acquisition-v1-ci.yml
+          git commit -m "ci: measure canonical de homepage in Lighthouse"
+          git push origin HEAD:fix/website-ci-localized-home-20260915
