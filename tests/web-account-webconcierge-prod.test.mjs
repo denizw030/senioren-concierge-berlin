@@ -9,10 +9,11 @@ const client = read("assets/web-customer-concierge.js");
 const shadow = read("assets/web-core-shadow.js");
 const legacyUi = read("assets/web-concierge-chat.js");
 const siteUi = read("assets/site-ui.js");
+const css = read("assets/web-customer-concierge.css");
 
-test("authenticated Web Concierge surface is present and fail closed by default", () => {
-  assert.match(page, /Dein Web Concierge/);
-  assert.match(page, /id="webConciergeLog"/);
+test("authenticated Web Concierge is a customer messenger and remains fail closed internally", () => {
+  assert.match(page, /Dein Concierge/);
+  for (const id of ["webConciergeNewChat","webConciergeThreads","webConciergeLog","webConciergeInput","webConciergeSend"]) assert.ok(page.includes(`id="${id}"`));
   assert.match(page, /id="webConciergeInput"[^>]*disabled/);
   assert.match(page, /id="webConciergeSend"[^>]*disabled/);
   assert.match(page, /assets\/auth-nav\.js/);
@@ -31,7 +32,7 @@ test("Web Concierge is pinned to the exact active PROD gateway and never STAGING
 });
 
 test("gateway readiness proves PROD WEB and CAO authority plus canonical server identity", () => {
-  assert.match(client, /gatewayRequest\("\/health",\{ auth:false \}\)/);
+  assert.match(client, /gatewayRequest\("\/health",\{auth:false\}\)/);
   assert.match(client, /gatewayRequest\("\/web\/me"\)/);
   assert.match(client, /raw\.service === "nahwerk-web-gateway"/);
   assert.match(client, /raw\.production === true/);
@@ -46,26 +47,32 @@ test("gateway readiness proves PROD WEB and CAO authority plus canonical server 
 
 test("website renderer consumes exact Core v1 authoritative response semantics only", () => {
   assert.match(client, /CORE_CONTRACT_VERSION = "core-v1"/);
-  for (const field of ["response_id","conversation_id","turn_id","active_task_id","response_state","messages","pending_approval","action_refs","error","state_version","correlation_id"]) {
-    assert.ok(client.includes(field), `missing Core v1 response field ${field}`);
-  }
+  for (const field of ["response_id","conversation_id","turn_id","active_task_id","response_state","messages","pending_approval","action_refs","error","state_version","correlation_id"]) assert.ok(client.includes(field), `missing Core v1 response field ${field}`);
   assert.match(client, /delivery\.shadow === false/);
   assert.match(client, /delivery\.deliver === true/);
   assert.match(client, /delivery\.channel \|\| ""\)\.toUpperCase\(\) === "WEB"/);
-  assert.match(client, /!response\.authoritative/);
+  assert.match(client, /!response\|\|!response\.authoritative/);
 });
 
-test("browser sends only customer message input and never owns identity or Core business logic", () => {
+test("customer message appears immediately and browser sends only message plus thread correlation", () => {
+  assert.match(client, /appendMessage\("user",content,now,clientId\)/);
+  assert.match(client, /showTyping\(\)/);
   assert.match(client, /gatewayRequest\("\/web\/chat"/);
-  assert.match(client, /message:content, source_message_id:crypto\.randomUUID\(\)/);
+  assert.match(client, /message:content,source_message_id:sourceMessageId,correlation_id:activeThreadId/);
   assert.match(client, /renderCoreV1Response\(response\.core\)/);
   assert.doesNotMatch(client, /customer_account_id\s*:/);
   assert.doesNotMatch(client, /customer_member_id\s*:/);
   assert.doesNotMatch(client, /person_id\s*:/);
   assert.doesNotMatch(client, /service_role|SUPABASE_SERVICE_ROLE|core_decide_action_approval|core_create_action_request/);
-  assert.doesNotMatch(client, /gateway\("(?:readiness|turn|approval|sync)"/);
-  assert.doesNotMatch(client, /POLLABLE_STATES/);
   assert.match(client, /\/payg#quote-/);
+});
+
+test("persisted chat history is authenticated and uses the dedicated PROD history function", () => {
+  assert.match(client, /HISTORY_ENDPOINT = "https:\/\/djicahhmnnamtjuqedqd\.supabase\.co\/functions\/v1\/nahwerk-web-chat-history"/);
+  assert.match(client, /headers:\{Authorization:`Bearer \$\{token\}`\}/);
+  assert.match(client, /historyRequest\(threadId\)/);
+  assert.match(client, /crypto\.randomUUID\(\)/);
+  assert.match(client, /webConciergeThreads/);
 });
 
 test("legacy Shadow transport and UI remain inert", () => {
@@ -86,19 +93,23 @@ test("customer PROD guard covers account PAYG and Web Concierge", () => {
   assert.match(siteUi, /web-concierge/);
 });
 
-test("legacy and clean Web Concierge pages expose the same current contract", () => {
+test("legacy and clean routes expose the same end-customer messenger", () => {
   for (const surface of [page,cleanPage]) {
-    assert.match(surface, /web-gateway-v1/);
-    assert.match(surface, /assets\/web-customer-concierge\.js\?v=4/);
-    assert.match(surface, /Keine Shadow-Antworten/);
-    assert.doesNotMatch(surface, /web-concierge-gateway-v1/);
+    assert.match(surface, /Neuer Chat/);
+    assert.match(surface, /Deine Chats/);
+    assert.match(surface, /aria-label="Chatverlauf"/);
+    assert.match(surface, /assets\/web-customer-concierge\.js\?v=6/);
+    assert.doesNotMatch(surface, /PROD|autoritativ|Core-v1|web-gateway-v1|Fail-closed|Shadow-Antworten|kanonische Kundenidentität/i);
   }
 });
 
-test("Web Concierge surface is responsive and does not claim execution success locally", () => {
-  const css = read("assets/web-customer-concierge.css");
-  assert.match(css, /@media\(max-width:700px\)/);
+test("messenger is tall, responsive and uses compact user/assistant bubbles", () => {
+  assert.match(css, /height:clamp\(680px/);
+  assert.match(css, /web-concierge-sidebar/);
+  assert.match(css, /web-concierge-message-user/);
+  assert.match(css, /web-concierge-message-assistant/);
+  assert.match(css, /web-concierge-message-time/);
+  assert.match(css, /@media\(max-width:820px\)/);
   assert.match(css, /web-concierge-approval-actions/);
   assert.doesNotMatch(page, /erfolgreich gesendet|Auftrag ausgeführt|Nachricht gesendet/i);
-  assert.match(page, /Keine Shadow-Antworten/);
 });
