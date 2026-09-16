@@ -59,8 +59,9 @@ test("customer message appears immediately and browser sends only message plus c
   assert.match(client, /showTyping\(\)/);
   assert.match(client, /gatewayRequest\("\/web\/chat"/);
   assert.match(client, /message:content,source_message_id:sourceMessageId,thread_id:activeThreadId/);
-  assert.match(client, /response\?\.thread_id!==activeThreadId/);
+  assert.match(client, /response\?\.thread_id&&response\?\.thread_id!==activeThreadId/);
   assert.match(client, /renderCoreV1Response\(response\.core\)/);
+  assert.match(client, /response\?\.core\?\.conversation_id/);
   assert.doesNotMatch(client, /customer_account_id\s*:/);
   assert.doesNotMatch(client, /customer_member_id\s*:/);
   assert.doesNotMatch(client, /person_id\s*:/);
@@ -70,13 +71,24 @@ test("customer message appears immediately and browser sends only message plus c
 
 test("persisted chat history is authenticated and reuses the canonical PROD web gateway", () => {
   assert.match(client, /HISTORY_ENDPOINT = "https:\/\/djicahhmnnamtjuqedqd\.supabase\.co\/functions\/v1\/nahwerk-web-gateway\/web\/history"/);
+  assert.match(client, /HISTORY_CONTRACT_VERSION = "canonical-core-receipts-v1"/);
   assert.match(client, /url\.pathname !== "\/functions\/v1\/nahwerk-web-gateway\/web\/history"/);
-  assert.match(client, /history_contract!=="canonical-core-receipts-v1"/);
+  assert.match(client, /payload\?\.history_contract!==HISTORY_CONTRACT_VERSION/);
   assert.match(client, /headers:\{Authorization:`Bearer \$\{token\}`\}/);
   assert.match(client, /historyRequest\(threadId\)/);
   assert.match(client, /crypto\.randomUUID\(\)/);
   assert.match(client, /webConciergeThreads/);
   assert.doesNotMatch(client, /nahwerk-web-chat-history/);
+});
+
+test("open Web Concierge refreshes shared Web and WhatsApp history automatically", () => {
+  assert.match(client, /SYNC_INTERVAL_MS = 3000/);
+  assert.match(client, /setInterval\(\(\)=>\{void syncHistory\(\);\},SYNC_INTERVAL_MS\)/);
+  assert.match(client, /document\.hidden/);
+  assert.match(client, /visibilitychange/);
+  assert.match(client, /threadCache\.some\(\(thread\)=>thread\.thread_id===selectedBefore\)/);
+  assert.match(client, /refreshThread\(selectedBefore\)/);
+  assert.match(client, /historySignature\(messages\)/);
 });
 
 test("legacy Shadow transport and UI remain inert", () => {
@@ -102,7 +114,7 @@ test("legacy and clean routes expose the same end-customer messenger", () => {
     assert.match(surface, /Neuer Chat/);
     assert.match(surface, /Deine Chats/);
     assert.match(surface, /aria-label="Chatverlauf"/);
-    assert.match(surface, /assets\/web-customer-concierge\.js\?v=7/);
+    assert.match(surface, /assets\/web-customer-concierge\.js\?v=8/);
     assert.doesNotMatch(surface, /PROD|autoritativ|Core-v1|web-gateway-v1|Fail-closed|Shadow-Antworten|kanonische Kundenidentität/i);
   }
 });
