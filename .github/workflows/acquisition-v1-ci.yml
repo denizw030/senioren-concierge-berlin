@@ -434,49 +434,49 @@ jobs:
           done
       - name: Lighthouse desktop
         run: |
-          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/index.html \
+          npx --yes lighthouse@13.4.1 http://127.0.0.1:4173/index.html \
             --quiet --chrome-flags="--headless --no-sandbox" \
             --preset=desktop --only-categories=performance,accessibility \
             --output=json --output-path=/tmp/lh-desktop.json
       - name: Lighthouse mobile
         run: |
-          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/index.html \
+          npx --yes lighthouse@13.4.1 http://127.0.0.1:4173/index.html \
             --quiet --chrome-flags="--headless --no-sandbox" \
             --only-categories=performance,accessibility \
             --output=json --output-path=/tmp/lh-mobile.json
       - name: Lighthouse telephone reception desktop
         run: |
-          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/telefonannahme.html \
+          npx --yes lighthouse@13.4.1 http://127.0.0.1:4173/telefonannahme.html \
             --quiet --chrome-flags="--headless --no-sandbox" \
             --preset=desktop --only-categories=performance,accessibility \
             --output=json --output-path=/tmp/lh-telephone-desktop.json
       - name: Lighthouse telephone reception mobile
         run: |
-          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/telefonannahme.html \
+          npx --yes lighthouse@13.4.1 http://127.0.0.1:4173/telefonannahme.html \
             --quiet --chrome-flags="--headless --no-sandbox" \
             --only-categories=performance,accessibility \
             --output=json --output-path=/tmp/lh-telephone-mobile.json
       - name: Lighthouse email account desktop
         run: |
-          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/__email-account-a11y.html \
+          npx --yes lighthouse@13.4.1 http://127.0.0.1:4173/__email-account-a11y.html \
             --quiet --chrome-flags="--headless --no-sandbox" \
             --preset=desktop --only-categories=performance,accessibility \
             --output=json --output-path=/tmp/lh-email-desktop.json
       - name: Lighthouse email account mobile
         run: |
-          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/__email-account-a11y.html \
+          npx --yes lighthouse@13.4.1 http://127.0.0.1:4173/__email-account-a11y.html \
             --quiet --chrome-flags="--headless --no-sandbox" \
             --only-categories=performance,accessibility \
             --output=json --output-path=/tmp/lh-email-mobile.json
       - name: Lighthouse family owner desktop
         run: |
-          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/__family-owner-a11y.html \
+          npx --yes lighthouse@13.4.1 http://127.0.0.1:4173/__family-owner-a11y.html \
             --quiet --chrome-flags="--headless --no-sandbox" \
             --preset=desktop --only-categories=performance,accessibility \
             --output=json --output-path=/tmp/lh-family-desktop.json
       - name: Lighthouse family owner mobile
         run: |
-          npx --yes lighthouse@12.8.2 http://127.0.0.1:4173/__family-owner-a11y.html \
+          npx --yes lighthouse@13.4.1 http://127.0.0.1:4173/__family-owner-a11y.html \
             --quiet --chrome-flags="--headless --no-sandbox" \
             --only-categories=performance,accessibility \
             --output=json --output-path=/tmp/lh-family-mobile.json
