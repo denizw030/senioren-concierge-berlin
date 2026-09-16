@@ -3,6 +3,7 @@
 
   const BASE = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-email-runtime";
   const SESSION_KEY = "scb_web_session";
+  const CAPABILITIES = ["EMAIL_READ", "EMAIL_SEARCH", "EMAIL_ATTACHMENTS", "EMAIL_DRAFT", "EMAIL_MAILBOX", "EMAIL_SEND"];
 
   const PROVIDERS = Object.freeze([
     { id: "google", name: "Gmail", mode: "google", logo: "gmail", secret: "", help: "Mit deinem Google-Konto anmelden und NAHWERK freigeben." },
@@ -37,18 +38,33 @@
   if (!root) return;
 
   const legacyGrid = root.querySelector(".email-provider-grid");
-  const legacyGoogle = root.querySelector('[data-email-provider="GOOGLE"]');
   const legacyGenericForm = document.getElementById("emailGenericForm");
-  const legacyConnect = document.getElementById("emailConnectButton");
   const stateTitle = document.getElementById("emailStateTitle");
   const stateMeta = document.getElementById("emailStateMeta");
-  const accountHint = document.getElementById("emailAccountHint");
   const runtimeNote = document.getElementById("emailRuntimeNote");
 
   let catalog = [];
   let connections = [];
   let selected = null;
   let busy = false;
+  let addMode = false;
+
+  function ensureMultiAccountAssets() {
+    if (!document.getElementById("emailMultiAccountStyles")) {
+      const link = document.createElement("link");
+      link.id = "emailMultiAccountStyles";
+      link.rel = "stylesheet";
+      link.href = "/assets/email-multi-account-v1.css?v=20260917-1";
+      document.head.appendChild(link);
+    }
+    if (!document.getElementById("emailMultiAccountConciergeRuntime")) {
+      const script = document.createElement("script");
+      script.id = "emailMultiAccountConciergeRuntime";
+      script.src = "/assets/email-multi-account-concierge-v1.js?v=20260917-1";
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  }
 
   function sessionToken() {
     try { return String(JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null")?.session_token || ""); }
@@ -62,13 +78,13 @@
     if (options.body != null) headers["Content-Type"] = "application/json";
     const response = await fetch(BASE + path, { ...options, headers, credentials: "omit" });
     const data = await response.json().catch(() => ({}));
-    if (!response.ok || data?.ok === false) throw new Error(String(data?.error || "EMAIL_REQUEST_FAILED"));
+    if (!response.ok || data?.ok === false) throw new Error(String(data?.error?.code || data?.error || "EMAIL_REQUEST_FAILED"));
     return data;
   }
 
   function catalogRow(id) { return catalog.find((row) => String(row?.id || "").toLowerCase() === id) || null; }
-  function connectionFor(id) { return connections.find((row) => String(row?.provider || "").toLowerCase() === id && String(row?.state || "").toUpperCase() === "CONNECTED") || null; }
   function providerById(id) { return PROVIDERS.find((provider) => provider.id === id) || null; }
+  function providerConnections(id) { return connections.filter((row) => String(row?.provider || "").toLowerCase() === id && String(row?.state || "").toUpperCase() === "CONNECTED"); }
   function setText(el, value) { if (el && el.textContent !== value) el.textContent = value; }
 
   function forceTechnicalFieldsHidden() {
@@ -83,8 +99,9 @@
   }
 
   function cardStatus(provider) {
-    const connection = connectionFor(provider.id);
-    if (connection) return connection.account_display_hint ? `Verbunden · ${connection.account_display_hint}` : "Verbunden";
+    const count = providerConnections(provider.id).length;
+    if (count === 1) return "1 Konto verbunden";
+    if (count > 1) return `${count} Konten verbunden`;
     if (provider.id === "microsoft" && catalogRow("microsoft")?.connection_ready !== true) return "Einrichtung läuft";
     if (provider.id === "google") return "Mit Google verbinden";
     if (provider.id === "microsoft") return "Mit Microsoft verbinden";
@@ -95,9 +112,9 @@
     const grid = document.getElementById("emailLogoProviderGrid");
     if (!grid) return;
     grid.innerHTML = PROVIDERS.map((provider) => {
-      const connection = connectionFor(provider.id);
+      const count = providerConnections(provider.id).length;
       const unavailable = provider.id === "microsoft" && catalogRow("microsoft")?.connection_ready !== true;
-      return `<button class="email-logo-provider-card${connection ? " is-connected" : ""}${unavailable ? " is-unavailable" : ""}" type="button" data-logo-provider="${provider.id}" aria-label="${provider.name} ${connection ? "verbunden" : "verbinden"}">
+      return `<button class="email-logo-provider-card${count ? " is-connected" : ""}${unavailable ? " is-unavailable" : ""}" type="button" data-logo-provider="${provider.id}" aria-label="${provider.name}: ${cardStatus(provider)}">
         <span class="email-logo-provider-top">${LOGOS[provider.logo]}<span class="email-logo-provider-arrow" aria-hidden="true">›</span></span>
         <span><strong>${provider.name}</strong><span class="email-logo-provider-status">${cardStatus(provider)}</span></span>
       </button>`;
@@ -111,7 +128,7 @@
     const shell = document.createElement("div");
     shell.id = "emailLogoConnectShell";
     shell.className = "email-logo-connect-shell";
-    shell.innerHTML = `<div class="email-logo-connect-heading"><div><div class="eyebrow">E-Mail-Anbieter</div><h4>Wähle dein Postfach.</h4></div><p>Anbieter anklicken, anmelden und verbinden. Die technische Einrichtung übernimmt NAHWERK im Hintergrund.</p></div><div class="email-logo-provider-grid" id="emailLogoProviderGrid" aria-label="E-Mail-Anbieter"></div>`;
+    shell.innerHTML = `<div class="email-logo-connect-heading"><div><div class="eyebrow">E-Mail-Anbieter</div><h4>Verbinde deine Postfächer.</h4></div><p>Du kannst mehrere Konten gleichzeitig verbinden – auch mehrere beim selben Anbieter. Dein Concierge behält die Quellen getrennt und kann sie gemeinsam durchsuchen.</p></div><div class="email-logo-provider-grid" id="emailLogoProviderGrid" aria-label="E-Mail-Anbieter"></div>`;
     wrapper.insertBefore(shell, legacyGrid || null);
   }
 
@@ -124,74 +141,88 @@
     backdrop.innerHTML = `<section class="email-provider-connect-modal" role="dialog" aria-modal="true" aria-labelledby="emailProviderConnectTitle">
       <div class="email-provider-connect-head"><div class="email-provider-connect-identity"><span id="emailProviderConnectLogo"></span><div><h3 id="emailProviderConnectTitle">E-Mail verbinden</h3><p id="emailProviderConnectSubtitle">Sicher mit NAHWERK verbinden</p></div></div><button class="email-provider-connect-close" id="emailProviderConnectClose" type="button" aria-label="Schließen">×</button></div>
       <p class="email-provider-connect-copy" id="emailProviderConnectCopy"></p>
+      <div class="email-provider-account-list" id="emailProviderAccountList"></div>
+      <button class="email-provider-add-account" id="emailProviderAddAccount" type="button" hidden>+ Weiteres Konto verbinden</button>
       <div id="emailProviderCredentialFields"><label class="email-provider-connect-field"><span>E-Mail-Adresse</span><input id="emailProviderConnectEmail" type="email" inputmode="email" autocomplete="email" maxlength="320" /></label><label class="email-provider-connect-field"><span id="emailProviderConnectSecretLabel">Passwort</span><input id="emailProviderConnectSecret" type="password" autocomplete="new-password" maxlength="512" /></label><p class="email-provider-connect-help" id="emailProviderConnectHelp"></p></div>
       <div class="email-provider-connect-message" id="emailProviderConnectMessage" aria-live="polite"></div>
-      <div class="email-provider-connect-actions"><button class="email-provider-connect-secondary" id="emailProviderDisconnect" type="button" hidden>Verbindung trennen</button><button class="email-provider-connect-primary" id="emailProviderConnectSubmit" type="button">Verbinden</button></div>
+      <div class="email-provider-connect-actions"><button class="email-provider-connect-secondary" id="emailProviderCancelAdd" type="button" hidden>Abbrechen</button><button class="email-provider-connect-primary" id="emailProviderConnectSubmit" type="button">Verbinden</button></div>
     </section>`;
     document.body.appendChild(backdrop);
     backdrop.addEventListener("click", (event) => { if (event.target === backdrop) closeModal(); });
     document.getElementById("emailProviderConnectClose")?.addEventListener("click", closeModal);
-    document.getElementById("emailProviderConnectSubmit")?.addEventListener("click", () => void submitManual());
-    document.getElementById("emailProviderDisconnect")?.addEventListener("click", () => void disconnectSelected());
+    document.getElementById("emailProviderConnectSubmit")?.addEventListener("click", () => void submitSelected());
+    document.getElementById("emailProviderAddAccount")?.addEventListener("click", () => { addMode = true; renderModal(); });
+    document.getElementById("emailProviderCancelAdd")?.addEventListener("click", () => { addMode = false; clearCredentials(); renderModal(); });
     document.addEventListener("keydown", (event) => { if (event.key === "Escape" && !backdrop.hidden) closeModal(); });
   }
 
-  function openModal(provider) {
-    selected = provider;
-    const backdrop = document.getElementById("emailProviderConnectBackdrop");
-    const connection = connectionFor(provider.id);
-    const logo = document.getElementById("emailProviderConnectLogo");
-    if (logo) logo.innerHTML = LOGOS[provider.logo];
-    setText(document.getElementById("emailProviderConnectTitle"), provider.name);
-    setText(document.getElementById("emailProviderConnectSubtitle"), connection ? "Mit NAHWERK verbunden" : "Sicher mit NAHWERK verbinden");
-    setText(document.getElementById("emailProviderConnectCopy"), connection ? "Dieses Postfach ist bereits verbunden. Du kannst die Verbindung hier bei Bedarf trennen." : "Gib nur deine Anmeldedaten ein. Server, Ports und weitere technische Einstellungen übernimmt NAHWERK automatisch.");
-    setText(document.getElementById("emailProviderConnectSecretLabel"), provider.secret || "Passwort");
-    setText(document.getElementById("emailProviderConnectHelp"), provider.help);
-    setText(document.getElementById("emailProviderConnectMessage"), "");
-    const fields = document.getElementById("emailProviderCredentialFields");
-    if (fields) fields.hidden = Boolean(connection);
+  function clearCredentials() {
     const email = document.getElementById("emailProviderConnectEmail");
     const secret = document.getElementById("emailProviderConnectSecret");
     if (email) email.value = "";
     if (secret) secret.value = "";
-    const submit = document.getElementById("emailProviderConnectSubmit");
-    if (submit) { submit.hidden = Boolean(connection); submit.disabled = false; submit.textContent = "Verbinden"; }
-    const disconnect = document.getElementById("emailProviderDisconnect");
-    if (disconnect) { disconnect.hidden = !connection; disconnect.disabled = false; }
-    if (backdrop) backdrop.hidden = false;
-    setTimeout(() => (connection ? document.getElementById("emailProviderDisconnect") : email)?.focus?.(), 0);
   }
 
-  function closeModal() {
-    const secret = document.getElementById("emailProviderConnectSecret");
-    if (secret) secret.value = "";
-    const backdrop = document.getElementById("emailProviderConnectBackdrop");
-    if (backdrop) backdrop.hidden = true;
-    selected = null;
+  function renderAccountList() {
+    const list = document.getElementById("emailProviderAccountList");
+    if (!list || !selected) return;
+    const rows = providerConnections(selected.id);
+    list.innerHTML = rows.map((connection) => `<div class="email-provider-account-row"><div><strong>${connection.account_display_hint || "Verbundenes Konto"}</strong><span>Verbunden</span></div><button type="button" data-disconnect-connection="${String(connection.connection_id || "")}">Trennen</button></div>`).join("");
+    list.hidden = rows.length === 0;
+    list.querySelectorAll("[data-disconnect-connection]").forEach((button) => button.addEventListener("click", () => void disconnectConnection(String(button.dataset.disconnectConnection || ""))));
+  }
+
+  function renderModal() {
+    if (!selected) return;
+    const rows = providerConnections(selected.id);
+    const ready = selected.id !== "microsoft" || catalogRow("microsoft")?.connection_ready === true;
+    const logo = document.getElementById("emailProviderConnectLogo");
+    if (logo) logo.innerHTML = LOGOS[selected.logo];
+    setText(document.getElementById("emailProviderConnectTitle"), selected.name);
+    setText(document.getElementById("emailProviderConnectSubtitle"), rows.length ? `${rows.length} Konto${rows.length === 1 ? "" : "en"} mit NAHWERK verbunden` : "Sicher mit NAHWERK verbinden");
+    setText(document.getElementById("emailProviderConnectCopy"), rows.length ? "Du kannst jedes Postfach einzeln trennen oder ein weiteres Konto hinzufügen. Der Concierge hält alle Quellen sauber getrennt." : (selected.mode === "manual" ? "Gib nur deine E-Mail-Adresse und das für Mail-Apps vorgesehene Passwort ein. Server, Ports und technische Einstellungen übernimmt NAHWERK." : "Du meldest dich direkt beim Anbieter an. Dein Anbieter-Passwort wird nicht bei NAHWERK eingegeben."));
+    setText(document.getElementById("emailProviderConnectSecretLabel"), selected.secret || "Passwort");
+    setText(document.getElementById("emailProviderConnectHelp"), selected.help);
+    renderAccountList();
+
+    const credentials = document.getElementById("emailProviderCredentialFields");
+    const add = document.getElementById("emailProviderAddAccount");
+    const cancel = document.getElementById("emailProviderCancelAdd");
+    const submit = document.getElementById("emailProviderConnectSubmit");
+    const showConnect = addMode || rows.length === 0;
+    if (credentials) credentials.hidden = selected.mode !== "manual" || !showConnect;
+    if (add) add.hidden = rows.length === 0 || addMode || !ready;
+    if (cancel) cancel.hidden = !addMode || rows.length === 0;
+    if (submit) {
+      submit.hidden = !showConnect;
+      submit.disabled = busy || !ready;
+      if (selected.mode === "google") submit.textContent = rows.length ? "Weiteres Gmail-Konto verbinden" : "Mit Google verbinden";
+      else if (selected.mode === "microsoft") submit.textContent = ready ? (rows.length ? "Weiteres Outlook-Konto verbinden" : "Mit Microsoft verbinden") : "Microsoft wird freigeschaltet";
+      else submit.textContent = rows.length ? "Weiteres Konto verbinden" : "Verbinden";
+    }
+    if (!ready) setText(document.getElementById("emailProviderConnectMessage"), "Microsoft Outlook ist vorbereitet. Die Microsoft-Anmeldung muss für NAHWERK noch freigeschaltet werden.");
   }
 
   function openProvider(id) {
     const provider = providerById(id);
     if (!provider) return;
     forceTechnicalFieldsHidden();
-    if (provider.mode === "google") {
-      setText(stateTitle, "Gmail mit NAHWERK verbinden");
-      setText(stateMeta, "Du wirst sicher zu Google weitergeleitet. Dein Google-Passwort wird nicht bei NAHWERK eingegeben.");
-      legacyGoogle?.click();
-      return;
-    }
-    if (provider.mode === "microsoft") {
-      if (catalogRow("microsoft")?.connection_ready === true) {
-        setText(stateTitle, "Outlook mit NAHWERK verbinden");
-        setText(stateMeta, "Die Microsoft-Anmeldung ist vorbereitet. Dein Microsoft-Passwort wird nicht bei NAHWERK eingegeben.");
-      } else {
-        setText(stateTitle, "Microsoft-Anmeldung wird eingerichtet.");
-        setText(stateMeta, "Outlook ist bereits im NAHWERK E-Mail-System vorbereitet. Die Microsoft-Freigabe für die Anmeldung steht noch aus.");
-      }
-      if (legacyConnect) legacyConnect.hidden = true;
-      return;
-    }
-    openModal(provider);
+    selected = provider;
+    addMode = providerConnections(provider.id).length === 0;
+    clearCredentials();
+    setText(document.getElementById("emailProviderConnectMessage"), "");
+    renderModal();
+    const backdrop = document.getElementById("emailProviderConnectBackdrop");
+    if (backdrop) backdrop.hidden = false;
+    setTimeout(() => document.getElementById(provider.mode === "manual" && addMode ? "emailProviderConnectEmail" : "emailProviderConnectSubmit")?.focus?.(), 0);
+  }
+
+  function closeModal() {
+    clearCredentials();
+    const backdrop = document.getElementById("emailProviderConnectBackdrop");
+    if (backdrop) backdrop.hidden = true;
+    selected = null;
+    addMode = false;
   }
 
   async function refresh() {
@@ -199,6 +230,26 @@
     catalog = Array.isArray(catalogData?.providers) ? catalogData.providers : [];
     connections = Array.isArray(connectionsData?.connections) ? connectionsData.connections : [];
     renderGrid();
+    if (selected) renderModal();
+    window.dispatchEvent(new CustomEvent("nahwerk:email-connections-updated", { detail: { connections: connections.slice() } }));
+  }
+
+  async function connectGoogle() {
+    const data = await api("/email/connect", { method: "POST", body: JSON.stringify({ provider: "GOOGLE", requested_capabilities: CAPABILITIES }) });
+    const raw = String(data?.authorization_redirect_url || "");
+    let url = null;
+    try { const parsed = new URL(raw); if (parsed.protocol === "https:" && parsed.hostname === "accounts.google.com") url = parsed.toString(); } catch {}
+    if (!url) throw new Error("EMAIL_OAUTH_FAILED");
+    window.location.assign(url);
+  }
+
+  async function connectMicrosoft() {
+    const data = await api("/email/connect/microsoft/web", { method: "POST", body: "{}" });
+    const raw = String(data?.authorization_url || "");
+    let url = null;
+    try { const parsed = new URL(raw); if (parsed.protocol === "https:" && parsed.hostname.endsWith("microsoftonline.com")) url = parsed.toString(); } catch {}
+    if (!url) throw new Error("MICROSOFT_OAUTH_FAILED");
+    window.location.assign(url);
   }
 
   async function submitManual() {
@@ -206,57 +257,59 @@
     const emailEl = document.getElementById("emailProviderConnectEmail");
     const secretEl = document.getElementById("emailProviderConnectSecret");
     const message = document.getElementById("emailProviderConnectMessage");
-    const submit = document.getElementById("emailProviderConnectSubmit");
     const email = String(emailEl?.value || "").trim();
     const secret = String(secretEl?.value || "");
-    if (!email.includes("@") || !secret) {
-      if (message) { message.className = "email-provider-connect-message is-error"; message.textContent = "Bitte E-Mail-Adresse und Passwort prüfen."; }
-      return;
-    }
+    if (!email.includes("@") || !secret) { if (message) message.textContent = "Bitte E-Mail-Adresse und Passwort prüfen."; return; }
+    const payload = { provider: selected.id, provider_email: email, username: email, secret };
+    if (selected.id === "zoho") payload.connection_metadata = { zoho_datacenter: "com" };
+    await api("/email/connect/manual", { method: "POST", body: JSON.stringify(payload) });
+    if (secretEl) secretEl.value = "";
+    await refresh();
+    addMode = false;
+    setText(message, `${selected.name} ist verbunden.`);
+    setText(stateTitle, `${selected.name} ist mit NAHWERK verbunden.`);
+    setText(stateMeta, "Fertig. Dieses Postfach gehört jetzt zu deiner gemeinsamen E-Mail-Übersicht.");
+    setText(runtimeNote, "Dein Concierge kann alle verbundenen Postfächer gemeinsam berücksichtigen. Antworten und Versand bleiben immer dem richtigen Konto zugeordnet.");
+    renderModal();
+  }
+
+  async function submitSelected() {
+    if (!selected || busy) return;
+    const message = document.getElementById("emailProviderConnectMessage");
+    const submit = document.getElementById("emailProviderConnectSubmit");
     busy = true;
-    if (submit) { submit.disabled = true; submit.textContent = "Wird verbunden …"; }
-    if (message) { message.className = "email-provider-connect-message"; message.textContent = "NAHWERK prüft die Verbindung. Es wird keine E-Mail gesendet."; }
+    if (submit) submit.disabled = true;
     try {
-      const payload = { provider: selected.id, provider_email: email, username: email, secret };
-      if (selected.id === "zoho") payload.connection_metadata = { zoho_datacenter: "com" };
-      const data = await api("/email/connect/manual", { method: "POST", body: JSON.stringify(payload) });
-      if (secretEl) secretEl.value = "";
-      await refresh();
-      if (message) { message.className = "email-provider-connect-message is-success"; message.textContent = `${selected.name} ist verbunden.`; }
-      setText(stateTitle, `${selected.name} ist mit NAHWERK verbunden.`);
-      setText(stateMeta, "Fertig. Dein Concierge kann dieses Postfach jetzt im Rahmen deiner freigegebenen E-Mail-Funktionen nutzen.");
-      setText(accountHint, data?.account_display_hint || "");
-      setText(runtimeNote, "NAHWERK nutzt deine E-Mail-Verbindung nur für die Funktionen, die du aktiviert hast. Senden bleibt freigabepflichtig.");
-      setTimeout(closeModal, 650);
+      if (selected.mode === "google") { setText(message, "Google-Anmeldung wird geöffnet …"); await connectGoogle(); return; }
+      if (selected.mode === "microsoft") { setText(message, "Microsoft-Anmeldung wird geöffnet …"); await connectMicrosoft(); return; }
+      await submitManual();
     } catch (error) {
-      if (secretEl) secretEl.value = "";
-      if (message) { message.className = "email-provider-connect-message is-error"; message.textContent = "Anmeldung konnte nicht bestätigt werden. Prüfe bitte E-Mail-Adresse und das für Mail-Apps vorgesehene Passwort."; }
+      clearCredentials();
+      setText(message, selected?.mode === "manual" ? "Anmeldung konnte nicht bestätigt werden. Prüfe bitte E-Mail-Adresse und das für Mail-Apps vorgesehene Passwort." : "Die Anbieter-Anmeldung konnte gerade nicht gestartet werden.");
     } finally {
       busy = false;
-      if (submit) { submit.disabled = false; submit.textContent = "Verbinden"; }
+      if (submit) submit.disabled = false;
     }
   }
 
-  async function disconnectSelected() {
-    if (!selected || busy) return;
-    const connection = connectionFor(selected.id);
-    if (!connection?.connection_id) return;
-    const button = document.getElementById("emailProviderDisconnect");
+  async function disconnectConnection(connectionId) {
+    if (!connectionId || busy) return;
     const message = document.getElementById("emailProviderConnectMessage");
     busy = true;
-    if (button) button.disabled = true;
     try {
-      await api("/email/provider/disconnect", { method: "POST", body: JSON.stringify({ connection_id: connection.connection_id }) });
+      await api("/email/connections/disconnect", { method: "POST", body: JSON.stringify({ connection_id: connectionId }) });
       await refresh();
-      if (message) { message.className = "email-provider-connect-message is-success"; message.textContent = "Verbindung wurde getrennt."; }
-      setText(stateTitle, `${selected.name} wurde getrennt.`);
-      setText(stateMeta, "Die gespeicherten Zugangsdaten dieser Verbindung wurden entfernt.");
-      setTimeout(closeModal, 500);
+      setText(message, "Dieses Postfach wurde getrennt.");
+      setText(stateTitle, "E-Mail-Verbindung wurde getrennt.");
+      setText(stateMeta, "Nur dieses ausgewählte Postfach wurde entfernt. Deine anderen Verbindungen bleiben aktiv.");
+      if (selected && providerConnections(selected.id).length === 0) addMode = true;
+      renderModal();
     } catch {
-      if (message) { message.className = "email-provider-connect-message is-error"; message.textContent = "Die Verbindung konnte gerade nicht getrennt werden."; }
-    } finally { busy = false; if (button) button.disabled = false; }
+      setText(message, "Dieses Postfach konnte gerade nicht getrennt werden. Bitte versuche es erneut.");
+    } finally { busy = false; }
   }
 
+  ensureMultiAccountAssets();
   ensureShell();
   ensureModal();
   forceTechnicalFieldsHidden();
