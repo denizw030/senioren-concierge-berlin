@@ -1,4 +1,4 @@
-# run-4: clean-route SEO test understands directory index routes
+# run-5: absolute clean canonicals + directory-route SEO
 name: One-shot Web Concierge + Clean URLs
 
 on:
@@ -31,10 +31,11 @@ jobs:
           node-version: '22'
       - name: Apply isolated website transformation
         run: node scripts/one-shot-web-clean-urls-20260916.mjs
-      - name: Repair generated clean-route tests
+      - name: Repair generated clean-route contracts
         shell: bash
         run: |
           python3 - <<'PY'
+          import re
           from pathlib import Path
 
           p = Path('tests/web-clean-routes-floating.test.mjs')
@@ -57,6 +58,20 @@ jobs:
           if old not in text:
               raise SystemExit('SEO clean-route test anchor missing')
           seo.write_text(text.replace(old, new))
+
+          # Canonicals/OpenGraph must remain absolute even though customer links are clean relative paths.
+          domain = 'https://nahwerkconcierge.com'
+          canonical = re.compile(r'(<link\b[^>]*\brel=(["\'])canonical\2[^>]*\bhref=(["\']))(/[^"\']*)', re.I)
+          og_url = re.compile(r'(<meta\b[^>]*\bproperty=(["\'])og:url\2[^>]*\bcontent=(["\']))(/[^"\']*)', re.I)
+          for html in Path('.').rglob('*.html'):
+              rel = html.as_posix()
+              if rel.startswith('oauth/') or rel == 'konto.html':
+                  continue
+              source = html.read_text()
+              fixed = canonical.sub(lambda m: m.group(1) + domain + m.group(4), source)
+              fixed = og_url.sub(lambda m: m.group(1) + domain + m.group(4), fixed)
+              if fixed != source:
+                  html.write_text(fixed)
           PY
       - name: Scope guard
         shell: bash
@@ -87,9 +102,15 @@ jobs:
           trap 'kill $pid || true' EXIT
           sleep 1
           for route in anmelden impressum agb widerruf konto kontakt leistungen web-concierge datenschutz nutzungsbedingungen; do
-            code="$(curl -sS -o /tmp/$route.html -w '%{http_code}' http://127.0.0.1:4173/$route/)"
+            result="$(curl -sSL -o /tmp/$route.html -w '%{http_code}|%{url_effective}' http://127.0.0.1:4173/$route)"
+            code="${result%%|*}"
+            effective="${result#*|}"
             test "$code" = '200'
             test -s "/tmp/$route.html"
+            if echo "$effective" | grep -q '\.html'; then
+              echo "Clean route leaked .html: $effective" >&2
+              exit 1
+            fi
           done
       - name: Remove one-shot machinery and commit result
         shell: bash
