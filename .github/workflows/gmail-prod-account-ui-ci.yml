@@ -3,17 +3,24 @@ name: Gmail PROD account UI CI
 on:
   push:
     branches:
+      - feat/email-concierge-product-ui-prod-20260916
       - prod/gmail-account-cutover-20260915-1352
     paths:
       - 'assets/email-account-integration.js'
+      - 'assets/email-concierge-product.js'
+      - 'assets/email-concierge-product.css'
       - 'email-concierge.html'
       - 'tests/email-account-integration.test.mjs'
+      - 'tests/email-concierge-product.test.mjs'
       - '.github/workflows/gmail-prod-account-ui-ci.yml'
   pull_request:
     paths:
       - 'assets/email-account-integration.js'
+      - 'assets/email-concierge-product.js'
+      - 'assets/email-concierge-product.css'
       - 'email-concierge.html'
       - 'tests/email-account-integration.test.mjs'
+      - 'tests/email-concierge-product.test.mjs'
       - '.github/workflows/gmail-prod-account-ui-ci.yml'
 
 permissions:
@@ -22,18 +29,24 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 7
     steps:
       - uses: actions/checkout@v4
       - name: JavaScript syntax
-        run: node --check assets/email-account-integration.js
-      - name: Gmail PROD unit contract
+        run: |
+          node --check assets/email-account-integration.js
+          node --check assets/email-concierge-product.js
+      - name: Gmail PROD account unit contract
         run: node --test tests/email-account-integration.test.mjs
+      - name: Standalone E-Mail-Concierge product contract
+        run: node --test tests/email-concierge-product.test.mjs
       - name: PROD Gmail contract guards
         run: |
           python3 - <<'PY'
           from pathlib import Path
           js = Path('assets/email-account-integration.js').read_text()
+          product = Path('assets/email-concierge-product.js').read_text()
+          css = Path('assets/email-concierge-product.css').read_text()
           html = Path('email-concierge.html').read_text()
           assert 'WEBSITE_EMAIL_INTEGRATION_CONTRACT_V1' in js
           assert 'https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-email-runtime' in js
@@ -42,8 +55,18 @@ jobs:
           assert '/email/connect' in js and '/email/reauth' in js and '/email/disconnect' in js
           assert 'accounts.google.com' in js
           assert 'scb_web_session' in js
+          assert '/assets/email-concierge-product.js' in js
+          assert '/assets/email-concierge-product.css' in js
+          assert '/email/concierge/dashboard' in product
+          assert '/email/concierge/query' in product
+          assert '/email/concierge/messages/open' in product
+          assert '/email/concierge/drafts/approve-send' in product
+          assert 'Diese E-Mail jetzt wirklich senden?' in product
+          assert '/email/drafts/send' not in product
+          assert 'Was dein E-Mail-Concierge erledigt hat' in product
+          assert '.email-concierge-product' in css
           assert 'email_oauth=complete' in html
           assert '/konto.html' in html
           assert 'noindex,nofollow' in html
-          print('GMAIL_PROD_ACCOUNT_UI=GREEN')
+          print('GMAIL_PROD_ACCOUNT_AND_PRODUCT_UI=GREEN')
           PY
