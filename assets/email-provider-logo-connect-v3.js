@@ -16,7 +16,17 @@
     { id: "fastmail", name: "Fastmail", mode: "manual", logo: "fastmail", secret: "App-Passwort", help: "Nutze ein Fastmail App-Passwort. IMAP/SMTP muss in deinem Tarif verfügbar sein." },
     { id: "zoho", name: "Zoho Mail", mode: "manual", logo: "zoho", secret: "App- oder Mail-Passwort", help: "Wähle dein Zoho-Rechenzentrum. Bei aktivierter Zwei-Faktor-Authentifizierung nutzt du ein App-Passwort." },
     { id: "ionos", name: "IONOS", mode: "manual", logo: "ionos", secret: "E-Mail-Passwort", help: "Nutze das Passwort deines IONOS-Postfachs." },
-    { id: "strato", name: "STRATO", mode: "manual", logo: "strato", secret: "E-Mail-Passwort", help: "Nutze das Passwort deines STRATO-Postfachs." }
+    { id: "strato", name: "STRATO", mode: "manual", logo: "strato", secret: "E-Mail-Passwort", help: "Nutze das Passwort deines STRATO-Postfachs." },
+    { id: "mailcom", name: "mail.com", mode: "manual", logo: "mailcom", secret: "E-Mail-Passwort", help: "Direkter IMAP-Zugriff ist bei mail.com für Premium-Konten vorgesehen." },
+    { id: "freenet", name: "freenet", mode: "manual", logo: "freenet", secret: "E-Mail-Passwort", help: "Nutze dein freenet E-Mail-Passwort und stelle sicher, dass IMAP/SMTP im Postfach aktiviert ist." },
+    { id: "mailboxorg", name: "mailbox.org", mode: "manual", logo: "mailboxorg", secret: "Passwort / Mail-App-Passwort", help: "Bei aktivierter Zwei-Faktor-Authentifizierung nutzt du für Mail-Programme ein Mail-App-Passwort." },
+    { id: "vodafone", name: "Vodafone Mail", mode: "manual", logo: "vodafone", secret: "E-Mail-/IMAP-Passwort", help: "Nutze deine vollständige E-Mail-Adresse und das E-Mail-/IMAP-Passwort." },
+    { id: "arcor", name: "Arcor Mail", mode: "manual", logo: "arcor", secret: "E-Mail-/IMAP-Passwort", help: "Arcor-Postfächer verwenden die sichere Vodafone-Mail-Infrastruktur. Nutze deine vollständige E-Mail-Adresse und das E-Mail-/IMAP-Passwort." },
+    { id: "kabeldeutschland", name: "Kabel Deutschland Mail", mode: "manual", logo: "kabeldeutschland", secret: "E-Mail-/IMAP-Passwort", help: "Kabel-Deutschland-Postfächer verwenden die sichere Vodafone-Mail-Infrastruktur. Nutze deine vollständige E-Mail-Adresse und das E-Mail-/IMAP-Passwort." },
+    { id: "unitymedia", name: "Unitymedia Mail", mode: "manual", logo: "unitymedia", secret: "E-Mail-/IMAP-Passwort", help: "Unitymedia-Postfächer verwenden die sichere Vodafone-Mail-Infrastruktur. Nutze deine vollständige E-Mail-Adresse und das E-Mail-/IMAP-Passwort." },
+    { id: "migadu", name: "Migadu", mode: "manual", logo: "migadu", secret: "Mailbox-Passwort", help: "Nutze die vollständige Mailbox-Adresse und das zugehörige Migadu-Passwort." },
+    { id: "proton", name: "Proton Mail", mode: "unsupported", logo: "proton", secret: "", help: "Proton Mail benötigt Proton Bridge auf einem lokalen Gerät. Eine direkte serverseitige Verbindung zu NAHWERK wird derzeit nicht unterstützt." },
+    { id: "tuta", name: "Tuta Mail", mode: "unsupported", logo: "tuta", secret: "", help: "Tuta bietet keinen normalen IMAP-Zugriff. Eine direkte Verbindung zu NAHWERK wird derzeit nicht unterstützt." }
   ]);
   const LOGOS = Object.freeze({
     gmail: '<span class="email-provider-logo email-provider-logo--gmail" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg></span>',
@@ -29,7 +39,17 @@
     fastmail: '<span class="email-provider-logo email-provider-logo--fastmail" aria-hidden="true">F</span>',
     zoho: '<span class="email-provider-logo email-provider-logo--zoho" aria-hidden="true">Zoho</span>',
     ionos: '<span class="email-provider-logo email-provider-logo--ionos" aria-hidden="true">IONOS</span>',
-    strato: '<span class="email-provider-logo email-provider-logo--strato" aria-hidden="true">STRATO</span>'
+    strato: '<span class="email-provider-logo email-provider-logo--strato" aria-hidden="true">STRATO</span>',
+    mailcom: '<span class="email-provider-logo" aria-hidden="true">mail.com</span>',
+    freenet: '<span class="email-provider-logo" aria-hidden="true">freenet</span>',
+    mailboxorg: '<span class="email-provider-logo" aria-hidden="true">mailbox.org</span>',
+    vodafone: '<span class="email-provider-logo" aria-hidden="true">V</span>',
+    arcor: '<span class="email-provider-logo" aria-hidden="true">Arcor</span>',
+    kabeldeutschland: '<span class="email-provider-logo" aria-hidden="true">Kabel</span>',
+    unitymedia: '<span class="email-provider-logo" aria-hidden="true">Unity</span>',
+    migadu: '<span class="email-provider-logo" aria-hidden="true">Migadu</span>',
+    proton: '<span class="email-provider-logo" aria-hidden="true">Proton</span>',
+    tuta: '<span class="email-provider-logo" aria-hidden="true">Tuta</span>'
   });
 
   if (typeof document === "undefined") return;
@@ -103,9 +123,10 @@
   const catalogRow = (id) => catalog.find((provider) => String(provider?.id || "").toLowerCase() === id) || null;
   const providerConnections = (id) => connections.filter((connection) => String(connection?.provider || "").toLowerCase() === id && String(connection?.state || "").toUpperCase() === "CONNECTED");
   const providerReady = (provider) => {
+    if (provider.mode === "unsupported") return false;
     const row = catalogRow(provider.id);
     if (!row) return provider.id === "google";
-    return row.backend_ready !== false && row.connection_ready !== false;
+    return row.backend_ready !== false && row.connection_ready !== false && row.direct_support !== false;
   };
 
   function ensureShell() {
@@ -125,12 +146,16 @@
       const rows = providerConnections(provider.id);
       const connected = rows.length > 0;
       const ready = providerReady(provider);
-      const status = connected ? `${rows.length} Konto${rows.length === 1 ? "" : "en"} verbunden` : (!ready ? "Noch nicht verfügbar" : "");
+      const unsupported = provider.mode === "unsupported";
+      const status = connected ? `${rows.length} Konto${rows.length === 1 ? "" : "en"} verbunden` : (unsupported ? "Derzeit nicht direkt unterstützt" : (!ready ? "Noch nicht verfügbar" : ""));
+      const primary = unsupported
+        ? '<span class="email-logo-provider-status" aria-disabled="true">Keine direkte Verbindung</span>'
+        : `<button class="email-provider-add-account email-provider-card-primary" type="button" data-provider-primary="${provider.id}"${!ready && !connected ? " disabled" : ""}>${connected ? "Trennen" : "Verbinden"}</button>`;
       return `<article class="email-logo-provider-card${connected ? " is-connected" : ""}${!ready ? " is-unavailable" : ""}" data-logo-provider="${provider.id}">
         <span class="email-logo-provider-top">${LOGOS[provider.logo]}</span>
         <span><strong>${esc(provider.name)}</strong>${status ? `<span class="email-logo-provider-status">${esc(status)}</span>` : ""}</span>
         <div class="email-provider-card-actions">
-          <button class="email-provider-add-account email-provider-card-primary" type="button" data-provider-primary="${provider.id}"${!ready && !connected ? " disabled" : ""}>${connected ? "Trennen" : "Verbinden"}</button>
+          ${primary}
           ${connected && ready ? `<button class="email-provider-connect-secondary email-provider-card-secondary" type="button" data-provider-add="${provider.id}">+ Weiteres Konto</button>` : ""}
         </div>
       </article>`;
@@ -275,7 +300,7 @@
   }
 
   async function connectProvider(provider) {
-    if (busy || !providerReady(provider)) return;
+    if (busy || provider.mode === "unsupported" || !providerReady(provider)) return;
     if (provider.mode === "manual") { openManual(provider, true); return; }
     busy = true;
     renderGrid();
@@ -291,7 +316,7 @@
 
   async function primaryAction(id) {
     const provider = providerById(id);
-    if (!provider || busy) return;
+    if (!provider || busy || provider.mode === "unsupported") return;
     const rows = providerConnections(id);
     if (!rows.length) { await connectProvider(provider); return; }
     if (rows.length === 1) {
@@ -304,8 +329,16 @@
 
   async function addAccount(id) {
     const provider = providerById(id);
-    if (!provider || busy) return;
+    if (!provider || busy || provider.mode === "unsupported") return;
     await connectProvider(provider);
+  }
+
+  function connectionErrorMessage(error) {
+    const code = String(error?.message || error || "");
+    if (code === "provider_authentication_failed") return "Anmeldung abgelehnt. Prüfe E-Mail-Adresse und Passwort/App-Passwort sowie, ob IMAP/SMTP beim Anbieter aktiviert ist.";
+    if (code === "provider_tls_connection_failed") return "Die sichere Verbindung zum E-Mail-Anbieter konnte nicht hergestellt werden. Bitte versuche es später erneut.";
+    if (code === "provider_connection_failed") return "Der E-Mail-Anbieter ist gerade nicht erreichbar. Bitte versuche es später erneut.";
+    return "Anmeldung konnte nicht bestätigt werden. Prüfe bitte E-Mail-Adresse und das für Mail-Apps vorgesehene Passwort.";
   }
 
   async function connectManual() {
@@ -337,9 +370,9 @@
     busy = true;
     if (button) button.disabled = true;
     try { await connectManual(); }
-    catch {
+    catch (error) {
       clearCredentials();
-      setText(message, "Anmeldung konnte nicht bestätigt werden. Prüfe bitte E-Mail-Adresse und das für Mail-Apps vorgesehene Passwort.");
+      setText(message, connectionErrorMessage(error));
     } finally {
       busy = false;
       if (button) button.disabled = false;
