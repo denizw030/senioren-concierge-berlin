@@ -16,7 +16,8 @@ internal data class RegistrationInput(
     val email: String,
     val phone: String,
     val password: String,
-    val conciergeChoice: String = "nilo"
+    // Registration must never choose the authoritative concierge locally.
+    val conciergeChoice: String? = null
 )
 
 internal data class RegistrationState(

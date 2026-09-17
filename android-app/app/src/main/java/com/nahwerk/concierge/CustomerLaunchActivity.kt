@@ -6,13 +6,10 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -21,9 +18,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -34,7 +29,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -45,13 +39,6 @@ import com.nahwerk.concierge.data.ProdCustomerPolicy
 import com.nahwerk.concierge.data.ProductAuthState
 import kotlinx.coroutines.launch
 
-/**
- * Customer PROD launch shell.
- *
- * Authentication uses the canonical PROD customer-account session. Home,
- * Concierge and Reminders use the authoritative APP/core-v1 gateway. Account,
- * PAYG, payment, Safety and Family continue to use their published PROD contracts.
- */
 class CustomerLaunchActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,44 +46,60 @@ class CustomerLaunchActivity : ComponentActivity() {
     }
 }
 
+private enum class PublicRoute {
+    HOME,
+    LOGIN,
+    REGISTER
+}
+
 @Composable
 internal fun CustomerLaunchRoot() {
     val context = LocalContext.current
     val productApi = remember { ProdCustomerApi(context) }
     var auth by remember { mutableStateOf(productApi.pendingAuthState()) }
-    var registration by rememberSaveable { mutableStateOf(false) }
+    var route by rememberSaveable { mutableStateOf(PublicRoute.HOME) }
 
     NahwerkTheme {
-        when {
-            registration -> Surface(Modifier.fillMaxSize(), color = NahwerkPalette.Background) {
-                ProdRegistrationSurface(onBack = {
-                    registration = false
-                    auth = productApi.pendingAuthState()
-                })
-            }
-            !auth.authenticated -> Surface(Modifier.fillMaxSize(), color = NahwerkPalette.Background) {
-                ProdLaunchLoginSurface(
-                    api = productApi,
-                    auth = auth,
-                    onAuthChange = { auth = it },
-                    onRegister = { registration = true }
-                )
-            }
-            else -> CustomerAccountScreen(
+        if (auth.authenticated) {
+            CustomerAppShell(
                 onLogout = {
                     productApi.clearLocalSession()
                     auth = productApi.pendingAuthState()
+                    route = PublicRoute.HOME
                 }
             )
+        } else {
+            when (route) {
+                PublicRoute.HOME -> PublicEntrySurface(
+                    onLogin = { route = PublicRoute.LOGIN },
+                    onRegister = { route = PublicRoute.REGISTER }
+                )
+                PublicRoute.LOGIN -> Surface(Modifier.fillMaxSize(), color = NahwerkPalette.Background) {
+                    CustomerLoginSurface(
+                        api = productApi,
+                        auth = auth,
+                        onAuthChange = { auth = it },
+                        onBack = { route = PublicRoute.HOME },
+                        onRegister = { route = PublicRoute.REGISTER }
+                    )
+                }
+                PublicRoute.REGISTER -> FreeRegistrationSurface(
+                    onBackToLogin = {
+                        auth = productApi.pendingAuthState()
+                        route = PublicRoute.LOGIN
+                    }
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun ProdLaunchLoginSurface(
+private fun CustomerLoginSurface(
     api: ProdCustomerApi,
     auth: ProductAuthState,
     onAuthChange: (ProductAuthState) -> Unit,
+    onBack: () -> Unit,
     onRegister: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -110,10 +113,11 @@ private fun ProdLaunchLoginSurface(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(NahwerkSpacing.Xxl),
         verticalArrangement = Arrangement.spacedBy(NahwerkSpacing.Xl)
     ) {
+        TextButton(onClick = onBack, enabled = !busy) { Text("‹ Zur Übersicht") }
         Text("NAHWERK", color = NahwerkPalette.Gold, style = MaterialTheme.typography.labelLarge)
-        Text("Dein persönlicher Concierge", style = MaterialTheme.typography.headlineMedium)
+        Text("Anmelden", style = MaterialTheme.typography.headlineMedium)
         Text(
-            "Sichere Anmeldung an deinem echten NAHWERK-PROD-Konto.",
+            "Melde dich sicher an, um deinen persönlichen Concierge, deine Nutzung und deine privaten Kontodaten zu öffnen.",
             color = NahwerkPalette.SecondaryText,
             style = MaterialTheme.typography.bodyMedium
         )
@@ -133,7 +137,7 @@ private fun ProdLaunchLoginSurface(
                     if (auth.mfaMethod == "choice") {
                         Text("Wähle deine hinterlegte Bestätigungsmethode.", color = NahwerkPalette.SecondaryText)
                         auth.mfaMethods.forEach { method ->
-                            OutlinedButton(
+                            Button(
                                 onClick = {
                                     busy = true
                                     error = null
@@ -174,7 +178,6 @@ private fun ProdLaunchLoginSurface(
                         ) { Text("Bestätigen") }
                     }
                 } else {
-                    Text("Anmelden", style = MaterialTheme.typography.titleLarge)
                     OutlinedTextField(
                         value = email,
                         onValueChange = { email = it },
@@ -204,85 +207,32 @@ private fun ProdLaunchLoginSurface(
                             }
                         },
                         enabled = !busy && ProdCustomerPolicy.validEmail(email) && password.isNotBlank(),
-                        modifier = Modifier.fillMaxWidth().heightIn(min = NahwerkSizes.PrimaryTouch)
+                        modifier = Modifier.fillMaxWidth().heightIn(min = NahwerkSizes.PrimaryTouch).testTag("customer_login")
                     ) {
-                        if (busy) CircularProgressIndicator(strokeWidth = 2.dp)
-                        else Text("Sicher anmelden")
+                        if (busy) CircularProgressIndicator(strokeWidth = 2.dp) else Text("Anmelden")
                     }
                 }
 
                 if (!error.isNullOrBlank()) {
-                    Text(requireNotNull(error), color = NahwerkPalette.Error, style = MaterialTheme.typography.bodySmall)
+                    Text(customerLoginError(error), color = NahwerkPalette.Error, style = MaterialTheme.typography.bodySmall)
                 }
             }
         }
 
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            color = NahwerkPalette.Surface.copy(alpha = 0.96f),
-            shape = RoundedCornerShape(NahwerkRadii.Pill),
-            border = BorderStroke(1.dp, NahwerkPalette.Divider)
-        ) {
-            TextButton(
-                onClick = onRegister,
-                enabled = !busy,
-                modifier = Modifier.fillMaxWidth().testTag("registration_open")
-            ) { Text("Noch kein Konto? Kostenlos registrieren", color = NahwerkPalette.Gold) }
-        }
+        TextButton(
+            onClick = onRegister,
+            enabled = !busy,
+            modifier = Modifier.fillMaxWidth().testTag("login_register")
+        ) { Text("Noch kein Konto? Kostenlos registrieren", color = NahwerkPalette.Gold) }
     }
 }
 
-@Composable
-private fun CustomerAccountScreen(onLogout: () -> Unit) {
-    Scaffold(
-        containerColor = NahwerkPalette.Background,
-        topBar = {
-            Surface(color = NahwerkPalette.Surface, border = BorderStroke(1.dp, NahwerkPalette.Divider)) {
-                Row(
-                    Modifier.fillMaxWidth().safeDrawingPadding().padding(horizontal = NahwerkSpacing.Md, vertical = NahwerkSpacing.Sm),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(Modifier.weight(1f)) {
-                        Text("NAHWERK", style = MaterialTheme.typography.titleLarge)
-                        Text("ECHTES PROD-KONTO", color = NahwerkPalette.Gold, style = MaterialTheme.typography.labelSmall)
-                    }
-                }
-            }
-        }
-    ) { padding ->
-        Column(
-            Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState()).padding(NahwerkSpacing.Xl),
-            verticalArrangement = Arrangement.spacedBy(NahwerkSpacing.Xl)
-        ) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(NahwerkRadii.Large),
-                colors = CardDefaults.cardColors(containerColor = NahwerkPalette.ElevatedSurface),
-                border = BorderStroke(1.dp, NahwerkPalette.Divider)
-            ) {
-                Column(Modifier.fillMaxWidth().padding(NahwerkSpacing.Lg), verticalArrangement = Arrangement.spacedBy(NahwerkSpacing.Xs)) {
-                    Text("KUNDENKONTO", color = NahwerkPalette.Gold, style = MaterialTheme.typography.labelSmall)
-                    Text("Nur bestätigte PROD-Zustände", style = MaterialTheme.typography.titleMedium)
-                    Text(
-                        "Profil, Concierge, Erinnerungen, Nutzung, PAYG, Zahlungsmethoden, Safety und Family werden direkt aus veröffentlichten PROD-Verträgen geladen.",
-                        color = NahwerkPalette.SecondaryText,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-            }
-
-            AppProdGatewaySurface(onSessionExpired = onLogout)
-            CustomerSharedHistorySurface(onSessionExpired = onLogout)
-            ProdCustomerHub()
-            PaygQuoteApprovalSurface()
-            PaymentMethodProdSurface()
-
-            OutlinedButton(
-                onClick = onLogout,
-                modifier = Modifier.fillMaxWidth(),
-                border = BorderStroke(1.dp, NahwerkPalette.Gold),
-                contentPadding = PaddingValues(NahwerkSpacing.Md)
-            ) { Text("Abmelden") }
-        }
+private fun customerLoginError(raw: String?): String {
+    val text = raw.orEmpty()
+    return when {
+        text.contains("Passwort", ignoreCase = true) -> text
+        text.contains("Code", ignoreCase = true) -> text
+        text.contains("Sicherheits", ignoreCase = true) -> text
+        else -> "Die Anmeldung konnte nicht abgeschlossen werden. Bitte prüfe deine Angaben und versuche es erneut."
     }
 }

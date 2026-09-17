@@ -13,6 +13,12 @@ import java.util.UUID
 
 internal class AppGatewaySessionExpiredException : IllegalStateException("Deine sichere Sitzung ist abgelaufen. Bitte erneut anmelden.")
 
+internal data class AppPersonaSnapshot(
+    val key: String,
+    val displayName: String,
+    val imageUrl: String?
+)
+
 internal data class AppHomeSnapshot(
     val personId: String,
     val customerAccountId: String,
@@ -22,7 +28,8 @@ internal data class AppHomeSnapshot(
     val pendingApproval: Boolean,
     val intelligenceMode: String,
     val reminderCountActive: Int,
-    val reminders: List<AppReminder>
+    val reminders: List<AppReminder>,
+    val persona: AppPersonaSnapshot?
 )
 
 internal data class AppIntelligenceMode(
@@ -87,7 +94,8 @@ internal class AppGatewayApi(context: Context) {
                 pendingApproval = body.has("pending_approval") && !body.isNull("pending_approval"),
                 intelligenceMode = mode,
                 reminderCountActive = body.optInt("reminder_count_active", reminders.count { it.status == "active" }),
-                reminders = reminders
+                reminders = reminders,
+                persona = parsePersona(body.opt("persona"))
             )
         }
     }
@@ -101,7 +109,7 @@ internal class AppGatewayApi(context: Context) {
     suspend fun setIntelligenceMode(mode: String, acknowledgeHigherConsumption: Boolean): Result<AppIntelligenceMode> = withContext(Dispatchers.IO) {
         val normalized = mode.trim().uppercase()
         if (normalized != "ECONOMY" && normalized != "SMART") {
-            return@withContext Result.failure(IllegalArgumentException("Unbekannter Concierge-Modus."))
+            return@withContext Result.failure(IllegalArgumentException("Dieser Concierge-Modus ist nicht verfügbar."))
         }
         if (normalized == "SMART" && !acknowledgeHigherConsumption) {
             return@withContext Result.failure(IllegalArgumentException("Bitte bestätige zuerst den höheren KI-Verbrauch."))
@@ -168,9 +176,9 @@ internal class AppGatewayApi(context: Context) {
             sessions.clear()
             Result.failure(AppGatewaySessionExpiredException())
         } else if (response.code !in 200..299 || response.body.optBoolean("ok") == false) {
-            Result.failure(IllegalStateException(readableError(response.body, response.code)))
+            Result.failure(IllegalStateException(readableError(response.body)))
         } else if (response.body.optString("environment") != "PROD" || response.body.optBoolean("authoritative", true) == false) {
-            Result.failure(IllegalStateException("PROD-Antwort konnte nicht autoritativ bestätigt werden."))
+            Result.failure(IllegalStateException("Die App-Verbindung konnte nicht bestätigt werden. Bitte erneut versuchen."))
         } else Result.success(parser(response.body))
     } catch (e: Exception) {
         Result.failure(e)
@@ -205,10 +213,45 @@ internal class AppGatewayApi(context: Context) {
             val body = runCatching { JSONObject(text) }.getOrElse { JSONObject().put("error", "INVALID_SERVER_RESPONSE") }
             HttpJson(code, body)
         } catch (e: Exception) {
-            HttpJson(503, JSONObject().put("error", "NETWORK_UNAVAILABLE").put("detail", e.javaClass.simpleName))
+            HttpJson(503, JSONObject().put("error", "NETWORK_UNAVAILABLE"))
         } finally {
             connection.disconnect()
         }
+    }
+
+    private fun parsePersona(raw: Any?): AppPersonaSnapshot? {
+        if (raw == null || raw == JSONObject.NULL) return null
+        val body = raw as? JSONObject
+        val rawKey = when {
+            body != null -> sequenceOf("persona_key", "key", "id", "slug")
+                .map { body.optString(it).trim() }
+                .firstOrNull(String::isNotBlank)
+                .orEmpty()
+            raw is String -> raw.trim()
+            else -> ""
+        }
+        val key = rawKey.takeIf { it.matches(Regex("^[A-Za-z0-9_-]{1,80}$")) }.orEmpty()
+        val displayName = body?.let {
+            sequenceOf("display_name", "name", "label")
+                .map { field -> it.optString(field).trim() }
+                .firstOrNull(String::isNotBlank)
+                .orEmpty()
+        }.orEmpty()
+        if (key.isBlank() && displayName.isBlank()) return null
+
+        val suppliedImage = body?.let {
+            sequenceOf("image_url", "imageUrl", "profile_image_url", "avatar_url")
+                .map { field -> it.optString(field).trim() }
+                .firstOrNull { url -> url.startsWith("https://") }
+        }
+        val derivedImage = key.lowercase().takeIf(String::isNotBlank)
+            ?.let { "https://nahwerkconcierge.com/assets/concierges/large/$it.webp" }
+
+        return AppPersonaSnapshot(
+            key = key,
+            displayName = displayName,
+            imageUrl = suppliedImage ?: derivedImage
+        )
     }
 
     private fun parseIntelligenceMode(raw: JSONObject?): AppIntelligenceMode {
@@ -260,12 +303,12 @@ internal class AppGatewayApi(context: Context) {
         }
     }
 
-    private fun readableError(body: JSONObject, code: Int): String = when (body.optString("error", "REQUEST_FAILED")) {
+    private fun readableError(body: JSONObject): String = when (body.optString("error", "REQUEST_FAILED")) {
         "APP_AUTHORITATIVE_ROUTE_DISABLED" -> "Der App-Concierge ist momentan nicht verfügbar. Bitte erneut versuchen."
         "CAO_APP_ROUTE_DISABLED" -> "Die Auftragsausführung ist momentan nicht verfügbar. Es wurde nichts ausgeführt."
         "SMART_HIGHER_CONSUMPTION_ACK_REQUIRED" -> "Bitte bestätige zuerst, dass der intelligente Modus mehr KI nutzt und dein Guthaben schneller verbrauchen kann."
         "INVALID_INTELLIGENCE_MODE" -> "Dieser Concierge-Modus ist nicht verfügbar."
-        "NETWORK_UNAVAILABLE" -> "PROD ist gerade nicht erreichbar. Bitte erneut versuchen."
-        else -> "PROD-Anfrage fehlgeschlagen (${body.optString("error", "REQUEST_FAILED")}, HTTP $code)."
+        "NETWORK_UNAVAILABLE" -> "NAHWERK ist gerade nicht erreichbar. Bitte erneut versuchen."
+        else -> "Die Anfrage konnte gerade nicht abgeschlossen werden. Bitte erneut versuchen."
     }
 }

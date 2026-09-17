@@ -29,7 +29,9 @@
   </main>
   <script>
     (() => {
-      const ENDPOINT='https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-customer-history/phone/calls';
+      // PROD history implementation currently runs in this retired function slot because the
+      // Supabase project has reached its function-count quota. Contract remains customer-main-history-v1.
+      const ENDPOINT='https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/account-security-auth-cleanup-temp/phone/calls';
       const state=document.getElementById('phoneState'),list=document.getElementById('phoneList');
       document.documentElement.dataset.theme=(()=>{try{return localStorage.getItem('nw_portal_theme_v1')==='light'?'light':'dark'}catch(_){return'dark'}})();
       const token=()=>{try{return JSON.parse(sessionStorage.getItem('scb_web_session')||'null')?.session_token||''}catch(_){return''}};
