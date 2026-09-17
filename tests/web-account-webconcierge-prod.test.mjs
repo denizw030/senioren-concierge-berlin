@@ -69,13 +69,16 @@ test("customer message appears immediately and browser sends only message plus c
   assert.match(client, /\/payg#quote-/);
 });
 
-test("persisted chat history is authenticated and reuses the canonical PROD web gateway", () => {
+test("persisted chat history is authenticated, paginated and reuses the canonical PROD web gateway", () => {
   assert.match(client, /HISTORY_ENDPOINT = "https:\/\/djicahhmnnamtjuqedqd\.supabase\.co\/functions\/v1\/nahwerk-web-gateway\/web\/history"/);
   assert.match(client, /HISTORY_CONTRACT_VERSION = "canonical-core-receipts-v1"/);
+  assert.match(client, /HISTORY_PAGE_SIZE = 60/);
   assert.match(client, /url\.pathname !== "\/functions\/v1\/nahwerk-web-gateway\/web\/history"/);
   assert.match(client, /payload\?\.history_contract!==HISTORY_CONTRACT_VERSION/);
   assert.match(client, /headers:\{Authorization:`Bearer \$\{token\}`\}/);
-  assert.match(client, /historyRequest\(threadId\)/);
+  assert.match(client, /historyRequest\(threadId,\{limit:HISTORY_PAGE_SIZE\}\)/);
+  assert.match(client, /historyRequest\(threadId,\{before:historyNextBefore,limit:HISTORY_PAGE_SIZE\}\)/);
+  assert.match(client, /Ältere Nachrichten laden/);
   assert.match(client, /crypto\.randomUUID\(\)/);
   assert.match(client, /webConciergeThreads/);
   assert.doesNotMatch(client, /nahwerk-web-chat-history/);
@@ -97,6 +100,16 @@ test("account Concierge entry opens the real main customer chat without a Web Ch
   assert.match(legacyUi, /data-open-account-tab="concierge"/);
   assert.match(legacyUi, /location\.href = CHAT_URL/);
   assert.doesNotMatch(page, /Web Chat/i);
+});
+
+test("account overview reads the same authoritative central Concierge persona", () => {
+  assert.match(legacyUi, /nahwerk-web-gateway/);
+  assert.match(legacyUi, /\/web\/me/);
+  assert.match(legacyUi, /method: "GET"/);
+  assert.match(legacyUi, /body\?\.environment !== "PROD"/);
+  assert.match(legacyUi, /body\?\.authoritative !== true/);
+  assert.match(legacyUi, /renderOverviewPersona\(body\.persona\)/);
+  assert.doesNotMatch(legacyUi, /method:\s*"POST"|method:\s*"PUT"|\/web\/chat|whatsapp/i);
 });
 
 test("chat header displays only the authoritative central Concierge persona", () => {
@@ -126,14 +139,15 @@ test("WhatsApp messages in shared history are visibly identified", () => {
 });
 
 test("legacy Shadow transport remains inert", () => {
-  for (const source of [shadow, legacyUi]) {
-    assert.doesNotMatch(source, /\bfetch\s*\(/);
-    assert.doesNotMatch(source, /https?:\/\//);
-    assert.doesNotMatch(source, /customer-portal-staging/);
-  }
+  assert.doesNotMatch(shadow, /\bfetch\s*\(/);
+  assert.doesNotMatch(shadow, /https?:\/\//);
+  assert.doesNotMatch(shadow, /customer-portal-staging/);
   assert.match(shadow, /web_prod_gateway_required/);
   assert.match(shadow, /isEnabled: \(\) => false/);
   assert.match(legacyUi, /mount: \(\) => null/);
+  assert.match(legacyUi, /isTransportEnabled: \(\) => false/);
+  assert.doesNotMatch(legacyUi, /method:\s*"POST"|method:\s*"PUT"|method:\s*"PATCH"|method:\s*"DELETE"/);
+  assert.doesNotMatch(legacyUi, /customer-portal-staging/);
 });
 
 test("customer PROD guard covers account PAYG and Web Concierge", () => {
