@@ -55,7 +55,7 @@ test("website renderer consumes exact Core v1 authoritative response semantics o
 });
 
 test("customer message appears immediately and browser sends only message plus canonical thread id", () => {
-  assert.match(client, /appendMessage\("user",content,now,clientId\)/);
+  assert.match(client, /appendMessage\("user",content,now,clientId,"WEB"\)/);
   assert.match(client, /showTyping\(\)/);
   assert.match(client, /gatewayRequest\("\/web\/chat"/);
   assert.match(client, /message:content,source_message_id:sourceMessageId,thread_id:activeThreadId/);
@@ -91,7 +91,41 @@ test("open Web Concierge refreshes shared Web and WhatsApp history automatically
   assert.match(client, /historySignature\(messages\)/);
 });
 
-test("legacy Shadow transport and UI remain inert", () => {
+test("account Concierge entry opens the real main customer chat without a Web Chat layer", () => {
+  assert.match(legacyUi, /const CHAT_URL = "\/web-concierge"/);
+  assert.match(legacyUi, /data-account-tab="concierge"/);
+  assert.match(legacyUi, /data-open-account-tab="concierge"/);
+  assert.match(legacyUi, /location\.href = CHAT_URL/);
+  assert.doesNotMatch(page, /Web Chat/i);
+});
+
+test("chat header displays only the authoritative central Concierge persona", () => {
+  assert.match(client, /await refreshPersona\(true\)/);
+  assert.match(client, /applyPersona\(me\.persona\)/);
+  assert.match(client, /raw\.display_name,raw\.name,raw\.persona_name,raw\.label/);
+  assert.match(client, /webConciergeTitle/);
+  assert.match(client, /assets\/concierges\/large/);
+  assert.doesNotMatch(client, /\bNilo\b|"nilo"|'nilo'/i);
+  assert.doesNotMatch(client, /localStorage\.(setItem|getItem)|localStorage\[/);
+});
+
+test("Concierge avatar and name open central Concierge settings", () => {
+  assert.match(client, /SETTINGS_URL = "\/concierge-anpassen"/);
+  assert.match(client, /title\.onclick = openConciergeSettings/);
+  assert.match(client, /avatar\.onclick = openConciergeSettings/);
+  assert.match(client, /title\.onkeydown/);
+  assert.match(client, /avatar\.onkeydown/);
+});
+
+test("WhatsApp messages in shared history are visibly identified", () => {
+  assert.match(client, /normalizedChannel==="WHATSAPP"/);
+  assert.match(client, /badge\.textContent="WhatsApp"/);
+  assert.match(client, /aria-label","Nachricht über WhatsApp"/);
+  assert.match(client, /m\.channel\|\|"WEB"/);
+  assert.match(client, /m\?\.channel/);
+});
+
+test("legacy Shadow transport remains inert", () => {
   for (const source of [shadow, legacyUi]) {
     assert.doesNotMatch(source, /\bfetch\s*\(/);
     assert.doesNotMatch(source, /https?:\/\//);
