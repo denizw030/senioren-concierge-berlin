@@ -5,21 +5,26 @@ import { readFileSync } from "node:fs";
 const source = readFileSync(new URL("../assets/web-concierge-chat.js", import.meta.url), "utf8");
 const konto = readFileSync(new URL("../konto.html", import.meta.url), "utf8");
 
-test("legacy chat asset may remain loaded for compatibility", () => {
+test("legacy compatibility asset may remain loaded for the account entry", () => {
   assert.match(konto, /assets\/web-concierge-chat\.js\?v=1/);
 });
 
-test("legacy Shadow chat UI is permanently disabled", () => {
+test("legacy Shadow chat UI and transport remain permanently disabled", () => {
   assert.match(source, /isEnabled: \(\) => false/);
   assert.match(source, /isTransportEnabled: \(\) => false/);
   assert.match(source, /mount: \(\) => null/);
-});
-
-test("legacy chat has no network, STAGING, Shadow rendering or customer semantics", () => {
-  assert.doesNotMatch(source, /\bfetch\s*\(/);
-  assert.doesNotMatch(source, /staging/i);
   assert.doesNotMatch(source, /NAHWERKWebCoreShadow/);
   assert.doesNotMatch(source, /customer_delivery/);
-  assert.doesNotMatch(source, /innerHTML|textContent|appendChild/);
-  assert.doesNotMatch(source, /person_id|customer_account_id|approval_id|action_id|task_id/);
+  assert.doesNotMatch(source, /method:\s*"POST"|method:\s*"PUT"|method:\s*"PATCH"|method:\s*"DELETE"/);
+});
+
+test("account helper performs only authenticated central persona read plus local rendering", () => {
+  assert.match(source, /nahwerk-web-gateway/);
+  assert.match(source, /\/web\/me/);
+  assert.match(source, /method: "GET"/);
+  assert.match(source, /renderOverviewPersona\(body\.persona\)/);
+  assert.match(source, /overviewConcierge/);
+  assert.doesNotMatch(source, /staging/i);
+  assert.doesNotMatch(source, /\/web\/chat|approval_id|action_id|task_id/);
+  assert.doesNotMatch(source, /\bNilo\b|"nilo"|'nilo'/i);
 });

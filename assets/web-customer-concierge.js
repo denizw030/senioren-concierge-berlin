@@ -7,6 +7,7 @@
   const GATEWAY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway";
   const HISTORY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway/web/history";
   const HISTORY_CONTRACT_VERSION = "canonical-core-receipts-v1";
+  const HISTORY_PAGE_SIZE = 60;
   const SYNC_INTERVAL_MS = 3000;
   const PERSONA_SYNC_INTERVAL_MS = 30000;
   const SETTINGS_URL = "/concierge-anpassen";
@@ -18,6 +19,11 @@
   let threadCache = [];
   let lastDateKey = "";
   let historyFingerprint = "";
+  let historyMessages = [];
+  let historyHasMore = false;
+  let historyNextBefore = null;
+  let historyLoadedOlder = false;
+  let loadingOlder = false;
   let syncTimer = null;
   let lastPersonaSyncAt = 0;
 
@@ -161,7 +167,7 @@
     const log=logNode(),key=dateKey(at); if(!log||!key||key===lastDateKey)return;
     lastDateKey=key; const el=document.createElement("div");el.className="web-concierge-date";el.textContent=dayLabel(at);log.appendChild(el);
   }
-  function appendMessage(role,text,at=new Date().toISOString(),id="",channel="WEB") {
+  function appendMessage(role,text,at=new Date().toISOString(),id="",channel="WEB",{scroll=true}={}) {
     const log=logNode(); if(!log||!text)return null;
     log.querySelector(".web-concierge-empty")?.remove(); appendDateIfNeeded(at);
     const normalizedChannel=String(channel||"WEB").toUpperCase();
@@ -179,7 +185,15 @@
     }
     const time=document.createElement("span");time.className="web-concierge-message-time";time.textContent=timeLabel(at);time.style.cssText="float:none;margin:0";
     meta.appendChild(time);
-    bubble.append(body,meta);row.appendChild(bubble);log.appendChild(row);scrollBottom();return row;
+    bubble.append(body,meta);row.appendChild(bubble);log.appendChild(row);if(scroll)scrollBottom();return row;
+  }
+  function resetHistoryState() {
+    historyMessages=[];
+    historyHasMore=false;
+    historyNextBefore=null;
+    historyLoadedOlder=false;
+    loadingOlder=false;
+    historyFingerprint="";
   }
   function emptyChat() {
     const log=logNode(); if(!log)return;clearNode(log);lastDateKey="";historyFingerprint="";
@@ -225,10 +239,11 @@
     const response=await fetch(`${endpoint}${path}`,{method,headers,body:body===null?undefined:JSON.stringify(body),cache:"no-store",credentials:"omit"});
     const payload=await response.json().catch(()=>({}));if(!response.ok||payload?.ok===false)throw new Error(String(payload?.error||`http_${response.status}`));return payload;
   }
-  async function historyRequest(threadId=null) {
+  async function historyRequest(threadId=null,{before=null,limit=HISTORY_PAGE_SIZE}={}) {
     const endpoint=configuredHistoryEndpoint(),token=sessionToken();if(!endpoint||!token)throw new Error("history_unavailable");
-    const url=threadId?`${endpoint}?thread_id=${encodeURIComponent(threadId)}`:endpoint;
-    const response=await fetch(url,{headers:{Authorization:`Bearer ${token}`},cache:"no-store",credentials:"omit"});
+    const url=new URL(endpoint);
+    if(threadId){url.searchParams.set("thread_id",threadId);url.searchParams.set("limit",String(limit));if(before)url.searchParams.set("before",before);}
+    const response=await fetch(url.href,{headers:{Authorization:`Bearer ${token}`},cache:"no-store",credentials:"omit"});
     const payload=await response.json().catch(()=>({}));if(!response.ok||payload?.ok!==true||payload?.history_contract!==HISTORY_CONTRACT_VERSION)throw new Error("history_unavailable");return payload;
   }
 
@@ -262,30 +277,73 @@
     }
   }
   function historySignature(messages) {
-    return (Array.isArray(messages)?messages:[]).map((m)=>`${m?.id||""}|${m?.at||""}|${m?.role||""}|${m?.channel||""}|${m?.text||""}`).join("\n");
+    return `${historyHasMore?"more":"end"}\n`+(Array.isArray(messages)?messages:[]).map((m)=>`${m?.id||""}|${m?.at||""}|${m?.role||""}|${m?.channel||""}|${m?.text||""}`).join("\n");
   }
-  function renderHistory(messages,{force=false}={}) {
+  function mergeHistory(existing,incoming) {
+    const byId=new Map();
+    for(const item of [...(Array.isArray(existing)?existing:[]),...(Array.isArray(incoming)?incoming:[])]){
+      if(!item||!item.text||(item.role!=="user"&&item.role!=="assistant"))continue;
+      const key=String(item.id||`${item.role}:${item.channel||"WEB"}:${item.at||""}:${item.text}`);
+      byId.set(key,item);
+    }
+    return [...byId.values()].sort((a,b)=>Date.parse(String(a.at||0))-Date.parse(String(b.at||0))||String(a.id||"").localeCompare(String(b.id||"")));
+  }
+  function renderOlderControl() {
+    const log=logNode();if(!log||!historyHasMore||!historyNextBefore)return;
+    const wrap=document.createElement("div");wrap.className="web-concierge-history-more";wrap.style.cssText="display:flex;justify-content:center;padding:6px 0 12px";
+    const button=document.createElement("button");button.type="button";button.className="btn light";button.textContent=loadingOlder?"Wird geladen …":"Ältere Nachrichten laden";button.disabled=loadingOlder;
+    button.addEventListener("click",()=>{void loadOlderMessages();});wrap.appendChild(button);log.appendChild(wrap);
+  }
+  function renderHistory(messages,{force=false,scrollToBottom=true,preserveScroll=false}={}) {
     const list=Array.isArray(messages)?messages.filter((m)=>(m?.role==="user"||m?.role==="assistant")&&m?.text):[];
     const signature=historySignature(list);if(!force&&signature===historyFingerprint)return false;
-    const log=logNode();if(!log)return false;clearNode(log);lastDateKey="";removeTyping();
+    const log=logNode();if(!log)return false;const previousHeight=log.scrollHeight,previousTop=log.scrollTop;clearNode(log);lastDateKey="";removeTyping();
     if(!list.length){emptyChat();return true;}
-    for(const m of list)appendMessage(m.role,m.text,m.at,m.id,m.channel||"WEB");
-    historyFingerprint=signature;return true;
+    renderOlderControl();
+    for(const m of list)appendMessage(m.role,m.text,m.at,m.id,m.channel||"WEB",{scroll:false});
+    historyFingerprint=signature;
+    requestAnimationFrame(()=>{
+      if(preserveScroll)log.scrollTop=Math.max(0,log.scrollHeight-previousHeight+previousTop);
+      else if(scrollToBottom)log.scrollTop=log.scrollHeight;
+    });
+    return true;
   }
   async function loadThreads({selectFirst=false}={}) {
     try{const data=await historyRequest();threadCache=Array.isArray(data.threads)?data.threads:[];if(selectFirst&&!activeThreadId&&threadCache[0])activeThreadId=threadCache[0].thread_id;renderThreads();return true;}catch{renderThreads();return false;}
   }
-  async function refreshThread(threadId,{force=false,showError=false}={}) {
+  async function refreshThread(threadId,{force=false,reset=false}={}) {
     if(!validUuid(threadId))return false;
-    try{const data=await historyRequest(threadId);if(activeThreadId!==threadId)return false;renderHistory(data.messages,{force});return true;}
-    catch{if(showError)addRuntimeCard("Verlauf nicht verfügbar","Der gespeicherte Verlauf konnte gerade nicht geladen werden. Neue Nachrichten kannst du weiterhin senden.","is-error");return false;}
+    try{
+      const data=await historyRequest(threadId,{limit:HISTORY_PAGE_SIZE});if(activeThreadId!==threadId)return false;
+      if(reset){historyMessages=mergeHistory([],data.messages);historyHasMore=data.has_more===true;historyNextBefore=data.next_before||null;historyLoadedOlder=false;}
+      else{
+        historyMessages=mergeHistory(historyMessages,data.messages);
+        if(!historyLoadedOlder){historyHasMore=data.has_more===true;historyNextBefore=data.next_before||null;}
+      }
+      renderHistory(historyMessages,{force,scrollToBottom:reset||force});return true;
+    } catch { return false; }
+  }
+  async function loadOlderMessages() {
+    if(loadingOlder||!activeThreadId||!historyHasMore||!historyNextBefore)return false;
+    loadingOlder=true;renderHistory(historyMessages,{force:true,scrollToBottom:false,preserveScroll:true});
+    try{
+      const threadId=activeThreadId;
+      const data=await historyRequest(threadId,{before:historyNextBefore,limit:HISTORY_PAGE_SIZE});
+      if(activeThreadId!==threadId)return false;
+      historyMessages=mergeHistory(data.messages,historyMessages);
+      historyHasMore=data.has_more===true;
+      historyNextBefore=data.next_before||null;
+      historyLoadedOlder=true;
+      return true;
+    } catch { return false; }
+    finally { loadingOlder=false;renderHistory(historyMessages,{force:true,scrollToBottom:false,preserveScroll:true}); }
   }
   async function selectThread(threadId) {
-    if(sending)return;activeThreadId=threadId;historyFingerprint="";renderThreads();emptyChat();
-    if(validUuid(threadId))await refreshThread(threadId,{force:true,showError:true});
+    if(sending)return;activeThreadId=threadId;resetHistoryState();renderThreads();emptyChat();
+    if(validUuid(threadId))await refreshThread(threadId,{force:true,reset:true});
     document.getElementById("webConciergeInput")?.focus();
   }
-  function newChat() { if(sending)return;activeThreadId=crypto.randomUUID();emptyChat();renderThreads();document.getElementById("webConciergeInput")?.focus(); }
+  function newChat() { if(sending)return;activeThreadId=crypto.randomUUID();resetHistoryState();emptyChat();renderThreads();document.getElementById("webConciergeInput")?.focus(); }
 
   async function syncHistory() {
     if(!gatewayReady||sending||document.hidden)return false;
@@ -294,7 +352,7 @@
     const serverHasSelected=selectedBefore&&threadCache.some((thread)=>thread.thread_id===selectedBefore);
     if(Date.now()-lastPersonaSyncAt>=PERSONA_SYNC_INTERVAL_MS){try{await refreshPersona();}catch{}}
     if(serverHasSelected)return refreshThread(selectedBefore);
-    if(!selectedBefore&&threadCache[0]){activeThreadId=threadCache[0].thread_id;renderThreads();return refreshThread(activeThreadId,{force:true});}
+    if(!selectedBefore&&threadCache[0]){activeThreadId=threadCache[0].thread_id;renderThreads();return refreshThread(activeThreadId,{force:true,reset:true});}
     return true;
   }
   function startLiveSync() {
@@ -341,6 +399,6 @@
     document.getElementById("webConciergeInput")?.addEventListener("keydown",(event)=>{if(event.key==="Enter"&&!event.shiftKey){event.preventDefault();sendTurn();}});
   }
 
-  window.NAHWERKWebCustomerConciergeTestHooks=Object.freeze({configuredEndpoint,configuredHistoryEndpoint,sessionToken,normalizeGatewayReadiness,normalizeCoreV1Response,normalizePersona,applyPersona,renderCoreV1Response,gatewayRequest,historyRequest,refreshPersona,syncHistory,CORE_CONTRACT_VERSION,GATEWAY_CONTRACT_VERSION,HISTORY_CONTRACT_VERSION,SYNC_INTERVAL_MS,PERSONA_SYNC_INTERVAL_MS,GATEWAY_ENDPOINT,HISTORY_ENDPOINT});
+  window.NAHWERKWebCustomerConciergeTestHooks=Object.freeze({configuredEndpoint,configuredHistoryEndpoint,sessionToken,normalizeGatewayReadiness,normalizeCoreV1Response,normalizePersona,applyPersona,renderCoreV1Response,gatewayRequest,historyRequest,refreshPersona,syncHistory,loadOlderMessages,mergeHistory,CORE_CONTRACT_VERSION,GATEWAY_CONTRACT_VERSION,HISTORY_CONTRACT_VERSION,HISTORY_PAGE_SIZE,SYNC_INTERVAL_MS,PERSONA_SYNC_INTERVAL_MS,GATEWAY_ENDPOINT,HISTORY_ENDPOINT});
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();

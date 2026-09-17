@@ -30,7 +30,7 @@ test('customer account website blocks staging calls and suppresses staging telep
   assert.match(ui, /reception\.hidden = true/);
 });
 
-test('legacy Web Concierge Shadow path is removed and cannot be mistaken for PROD delivery', () => {
+test('legacy Web Concierge Shadow path is removed; account helper only reads central persona', () => {
   const shadow = read('assets/web-core-shadow.js');
   const chat = read('assets/web-concierge-chat.js');
   assert.doesNotMatch(shadow, /customer-portal-staging\/portal\/web-core-shadow/);
@@ -38,8 +38,13 @@ test('legacy Web Concierge Shadow path is removed and cannot be mistaken for PRO
   assert.match(shadow, /shadow_only: false/);
   assert.match(shadow, /customer_delivery: false/);
   assert.match(shadow, /web_prod_gateway_required/);
-  assert.doesNotMatch(chat, /\bfetch\s*\(/);
+  assert.match(chat, /nahwerk-web-gateway/);
+  assert.match(chat, /\/web\/me/);
+  assert.match(chat, /method: "GET"/);
+  assert.doesNotMatch(chat, /method:\s*"POST"|method:\s*"PUT"|method:\s*"PATCH"|method:\s*"DELETE"/);
+  assert.doesNotMatch(chat, /\/web\/chat|customer-portal-staging/i);
   assert.match(chat, /isEnabled: \(\) => false/);
+  assert.match(chat, /isTransportEnabled: \(\) => false/);
   assert.match(chat, /mount: \(\) => null/);
 });
 
