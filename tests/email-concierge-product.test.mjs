@@ -74,3 +74,16 @@ test("product layout is responsive across desktop and mobile",()=>{
   assert.match(css,/@media\(max-width:980px\)/);
   assert.match(css,/@media\(max-width:640px\)/);
 });
+
+
+test("connected account overview is topmost and follows canonical provider status",()=>{
+  const multi=fs.readFileSync("assets/email-multi-account-concierge-v1.js","utf8");
+  assert.match(js,/accountRoot\.querySelector\("\.email-account-head"\)/);
+  assert.match(js,/accountHead\.insertAdjacentElement\("afterend", host\)/);
+  assert.match(js,/__nahwerkEmailConnections/);
+  assert.match(js,/nahwerk:email-connections-updated/);
+  assert.match(js,/canonicalGoogleConnection/);
+  assert.match(multi,/emailConciergeProduct/);
+  assert.match(multi,/accountRoot\.querySelector\("\.email-account-head"\)/);
+  assert.doesNotMatch(multi,/emailLogoConnectShell/);
+});
