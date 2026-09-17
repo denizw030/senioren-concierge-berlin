@@ -1,0 +1,100 @@
+name: NAHWERK Theme Footer PROD E2E
+
+on:
+  pull_request:
+    paths:
+      - "assets/site-ui.js"
+      - "web-concierge.html"
+      - "web-concierge/index.html"
+      - "senioren-concierge.html"
+      - "tests/website-theme-footer-consistency.test.mjs"
+      - "tests/theme-footer-production-browser.html"
+      - ".github/workflows/theme-footer-prod-e2e.yml"
+  push:
+    branches: [main]
+    paths:
+      - "assets/site-ui.js"
+      - "web-concierge.html"
+      - "web-concierge/index.html"
+      - "senioren-concierge.html"
+      - "tests/website-theme-footer-consistency.test.mjs"
+      - "tests/theme-footer-production-browser.html"
+      - ".github/workflows/theme-footer-prod-e2e.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Theme and footer contract
+        run: node --test tests/website-theme-footer-consistency.test.mjs
+
+  browser-local:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: contract
+    steps:
+      - uses: actions/checkout@v4
+      - name: Serve repository
+        run: |
+          nohup python3 -m http.server 4173 >/tmp/nw-theme-footer-http.log 2>&1 &
+          for attempt in 1 2 3 4 5; do
+            curl -fsS http://127.0.0.1:4173/tests/theme-footer-production-browser.html >/dev/null && break
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:4173/tests/theme-footer-production-browser.html >/dev/null
+      - name: Real browser light and dark theme proof
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          for width in 1440 390; do
+            "$CHROME" --headless --no-sandbox --disable-gpu --window-size="$width,1100" --virtual-time-budget=15000 --dump-dom \
+              "http://127.0.0.1:4173/tests/theme-footer-production-browser.html?width=$width" > "/tmp/theme-footer-$width.html"
+            grep -q 'data-theme-footer-e2e="green"' "/tmp/theme-footer-$width.html" || { cat "/tmp/theme-footer-$width.html"; exit 1; }
+          done
+          echo "THEME_FOOTER_LOCAL_BROWSER=GREEN"
+
+  production-proof:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    needs: [contract, browser-local]
+    steps:
+      - name: Wait for exact GitHub Pages production content
+        run: |
+          green=0
+          for attempt in $(seq 1 48); do
+            fixture="$(curl -fsSL "https://nahwerkconcierge.com/tests/theme-footer-production-browser.html?deploy=${GITHUB_SHA}-${attempt}" || true)"
+            siteui="$(curl -fsSL "https://nahwerkconcierge.com/assets/site-ui.js?deploy=${GITHUB_SHA}-${attempt}" || true)"
+            chat="$(curl -fsSL "https://nahwerkconcierge.com/web-concierge.html?deploy=${GITHUB_SHA}-${attempt}" || true)"
+            senior="$(curl -fsSL "https://nahwerkconcierge.com/senioren-concierge.html?deploy=${GITHUB_SHA}-${attempt}" || true)"
+            if printf '%s' "$fixture" | grep -q 'THEME_FOOTER_PRODUCTION_BROWSER' \
+              && printf '%s' "$siteui" | grep -q 'nw-theme-surface-v2' \
+              && printf '%s' "$siteui" | grep -q 'nw_portal_theme_v1' \
+              && printf '%s' "$chat" | grep -q 'Vertrag widerrufen' \
+              && printf '%s' "$senior" | grep -q 'assets/site-ui.js'; then
+              green=1
+              break
+            fi
+            sleep 5
+          done
+          test "$green" = "1"
+          echo "THEME_FOOTER_PRODUCTION_CONTENT=GREEN"
+      - name: Real production browser proof desktop and mobile
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          for width in 1440 390; do
+            "$CHROME" --headless --no-sandbox --disable-gpu --window-size="$width,1100" --virtual-time-budget=18000 --dump-dom \
+              "https://nahwerkconcierge.com/tests/theme-footer-production-browser.html?deploy=${GITHUB_SHA}&width=$width" > "/tmp/theme-footer-production-$width.html"
+            grep -q 'data-theme-footer-e2e="green"' "/tmp/theme-footer-production-$width.html" || { cat "/tmp/theme-footer-production-$width.html"; exit 1; }
+          done
+          echo "THEME_FOOTER_FINAL_PRODUCTION_BROWSER=GREEN"
