@@ -728,7 +728,7 @@ private struct AuthView: View {
                 }
             } else {
                 if let masked = pending.maskedPhone, !masked.isEmpty {
-                    Text("Code an (masked)")
+                    Text("Code an \(masked)")
                         .foregroundStyle(NahwerkDesign.secondaryText)
                 }
                 textField("6-stelliger Code", text: $code, contentType: .oneTimeCode)
