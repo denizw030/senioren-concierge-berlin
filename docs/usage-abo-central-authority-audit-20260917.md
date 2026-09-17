@@ -21,16 +21,26 @@ Scope: customer portal Nutzung/Abo only. No E-Mail, WhatsApp adapter, Voice, Saf
    - The central runtime consumer uses `plan_feature_entitlements.included_quantity` for `app_dialog` / `whatsapp_dialog`.
    - These values are not identical for multiple paid plans. A portal-only choice would create a second authority.
 
-3. **Subscription metadata not exposed to the portal**
+3. **Displayed usage source differs from enforcement source**
+   - `web-profile` derives App/WhatsApp usage from `concierge_request_usage`.
+   - The central channel entitlement runtime enforces through `channel_usage_counters`.
+   - A real PROD readback on 2026-09-17 returned different values between those sources. No customer values are recorded in this repository.
+   - The portal cannot truthfully show `used`, `remaining` or 100%-behavior until one canonical counter/read model is selected.
+
+4. **Subscription metadata not exposed to the portal**
    - The current `web-profile` response does not expose subscription status, activation/start date, cancellation/end date, billing/renewal date or a canonical next usage reset.
    - These fields are required before the top Abo block can be rendered without invented values.
 
-4. **Full feature usage summary not exposed**
+5. **Full feature usage summary not exposed**
    - Central entitlements exist for additional product features, but `web-profile` currently returns only App and WhatsApp usage/limits.
    - E-Mail, Voice/phone, real Concierge executions and other defined features cannot be safely rendered as used/included/remaining until a central read model exposes both entitlement and matching usage source.
 
-5. **FAMILY summary not exposed as one canonical portal read**
+6. **FAMILY summary not exposed as one canonical portal read**
    - Existing account/family authorization is available, but a complete shared-pool usage summary is not part of the current `web-profile` snapshot.
+
+7. **Required PROD fixtures are not present**
+   - The current PROD subscription inventory contains only one active FREE subscription and no paid, canceled or FAMILY subscription fixture.
+   - Paid/canceled/FAMILY behavior therefore cannot be certified by real PROD readback yet.
 
 ## Required central read contract before PROD promotion
 
@@ -49,6 +59,7 @@ Do not mark FINAL GREEN or deploy the expanded Nutzung/Abo UI until:
 
 - one central usage-period authority is selected and enforced,
 - channel-limit duplication is reconciled,
+- displayed usage and enforced usage use the same canonical source,
 - the authenticated read model exposes the required subscription/usage fields,
 - FREE + paid + canceled + unlimited + FAMILY fixtures pass,
 - real PROD readback matches the central data,
