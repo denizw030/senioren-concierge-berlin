@@ -426,7 +426,7 @@ actor NAHWERKAPI {
         return response.messages ?? []
     }
 
-    private func perform<T: Decodable>(
+    func perform<T: Decodable>(
         path: String,
         method: String,
         token: String? = nil,
