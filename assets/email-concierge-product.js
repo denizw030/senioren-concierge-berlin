@@ -78,6 +78,7 @@
   let dashboard = null;
   let classification = null;
   let classificationBucket = "UNIMPORTANT";
+  let classificationLoading = false;
   let busy = false;
   let chatMessages = [];
   let activityExpanded = false;
@@ -285,7 +286,7 @@
   }
   function renderClassificationReview(card) {
     card.id = "emailClassificationReview";
-    if (!classification) { card.append(el("div", "ecp-section-empty", "Die Sortierung wird gerade geladen.")); return; }
+    if (!classification) { card.append(el("div", "ecp-section-empty", classificationLoading ? "Die Sortierung wird im Hintergrund vorbereitet. Der restliche E-Mail-Concierge ist bereits nutzbar." : "Die Sortierung konnte gerade nicht geladen werden. Der restliche E-Mail-Concierge bleibt verfügbar.")); return; }
     const tabs = el("div", "ecp-sort-tabs");
     [["IMPORTANT", `Wichtig (${classification.counts.IMPORTANT})`], ["UNIMPORTANT", `Unwichtig (${classification.counts.UNIMPORTANT})`], ["MARKETING", `Werbung / Spam (${classification.counts.MARKETING})`]].forEach(([value, label]) => {
       const tab = button(label, "ecp-sort-tab"); tab.setAttribute("aria-pressed", String(classificationBucket === value)); tab.addEventListener("click", () => { classificationBucket = value; render(); }); tabs.append(tab);
@@ -334,7 +335,12 @@
   }
   async function approveAndSend(draft) {
     if (busy || !draft.approval_id || !draft.send_action_id) return;
-    const ok = confirm(`Diese E-Mail jetzt wirklich senden?\n\nAn: ${text(draft.to, 240) || "Empfänger"}\nBetreff: ${text(draft.subject, 240) || "(kein Betreff)"}\n\nErst mit „OK“ gibst du den Versand ausdrücklich frei.`);
+    const ok = confirm(`Diese E-Mail jetzt wirklich senden?\
+\
+An: ${text(draft.to, 240) || "Empfänger"}\
+Betreff: ${text(draft.subject, 240) || "(kein Betreff)"}\
+\
+Erst mit „OK“ gibst du den Versand ausdrücklich frei.`);
     if (!ok) return;
     setBusy(true);
     try {
@@ -399,7 +405,7 @@
     root.replaceChildren();
     if (!dashboard) { root.append(el("div", "ecp-loading", "Dein E-Mail-Concierge wird geladen …")); return; }
     const head = el("div", "ecp-head"), copy = el("div"); copy.append(el("p", "ecp-eyebrow", "E-Mail-Concierge"), el("h2", "ecp-title", "Deine E-Mails. Von NAHWERK im Blick behalten."), el("p", "ecp-subtitle", "Suchen, verstehen, schützen und Antworten vorbereiten – direkt in deinem Kundenkonto. Du entscheidest, was aktiv ist und was gesendet wird.")); head.append(copy, el("div", "ecp-status", "Aktiv")); root.append(head);
-    const s = dashboard.summary, summary = el("div", "ecp-summary"), c = classification?.counts || { IMPORTANT: s.important, UNIMPORTANT: 0, MARKETING: s.spam_likely }, total = classification?.total ?? s.recent;
+    const s = dashboard.summary, summary = el("div", "ecp-summary"), c = classification?.counts || { IMPORTANT: s.important, UNIMPORTANT: "…", MARKETING: "…" }, total = classification?.total ?? "…";
     summary.append(stat(total, "Gesamt"), stat(c.IMPORTANT, "Wichtig", classification ? () => focusClassification("IMPORTANT") : null), stat(s.unread, "Ungelesen"), stat(s.today, "Heute"), stat(c.UNIMPORTANT, "Unwichtig", classification ? () => focusClassification("UNIMPORTANT") : null), stat(c.MARKETING, "Werbung / Spam", classification ? () => focusClassification("MARKETING") : null)); root.append(summary);
     const digest = classificationDigest(s); if (digest) root.append(el("p", "ecp-digest", digest));
     const layout = el("div", "ecp-layout"), main = el("div", "ecp-stack"), side = el("div", "ecp-stack");
@@ -414,15 +420,26 @@
     section = sectionCard("Automatik & Schutz", "Du bestimmst, was NAHWERK für dich hervorhebt."); renderSettings(section.card); side.append(section.card);
     layout.append(main, side); root.append(layout);
   }
+  async function loadClassification() {
+    if (!connected || classificationLoading) return;
+    classificationLoading = true;
+    render();
+    try {
+      const next = normalizeClassification(await request("/email/concierge/classification/summary"));
+      if (next) classification = next;
+    } catch { classification = null; }
+    finally { classificationLoading = false; render(); }
+  }
   async function loadDashboard(showLoading = true) {
-    if (!connected || busy) return;
+    if (!connected) return;
     if (showLoading) { dashboard = null; classification = null; render(); }
     try {
-      const [dashboardData, classificationData] = await Promise.all([request("/email/concierge/dashboard"), request("/email/concierge/classification/summary")]);
-      dashboard = normalizeDashboard(dashboardData); classification = normalizeClassification(classificationData);
-      if (!dashboard || !classification) throw new Error("EMAIL_PROVIDER_UNAVAILABLE");
+      const dashboardData = await request("/email/concierge/dashboard");
+      dashboard = normalizeDashboard(dashboardData);
+      if (!dashboard) throw new Error("EMAIL_PROVIDER_UNAVAILABLE");
     } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
     render();
+    if (dashboard) void loadClassification();
   }
   function canonicalGoogleConnection(rows = globalThis.__nahwerkEmailConnections) {
     if (!Array.isArray(rows)) return null;
