@@ -205,8 +205,8 @@ struct ChatFirstView: View {
             )
         }
         .sheet(item: $destination) { target in
-            if session.isAuthenticated {
-                ProtectedFeatureView(destination: target)
+            if let token = session.validToken {
+                ProtectedFeatureView(destination: target, token: token)
             } else {
                 AccountRequiredView(
                     destination: target,
@@ -561,20 +561,14 @@ private struct AccountRequiredView: View {
 
 private struct ProtectedFeatureView: View {
     let destination: CustomerDestination
+    let token: String
 
     var body: some View {
-        NavigationStack {
-            VStack(alignment: .leading, spacing: 14) {
-                Text(destination.title)
-                    .font(.largeTitle.weight(.semibold))
-                Text("Dieser Bereich verwendet ausschließlich die zentrale NAHWERK-Authority. Die native Detailoberfläche wird separat angebunden; lokale Ersatzdaten werden nicht erzeugt.")
-                    .foregroundStyle(NahwerkDesign.secondaryText)
-                Spacer()
-            }
-            .padding(24)
-            .background(NahwerkDesign.background.ignoresSafeArea())
-            .preferredColorScheme(.dark)
-        }
+        CustomerAreaContent(
+            kind: destination.rawValue,
+            title: destination.title,
+            token: token
+        )
     }
 }
 
