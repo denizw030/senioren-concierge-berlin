@@ -69,18 +69,13 @@ class CustomerLaunchActivity : ComponentActivity() {
 
     @Suppress("DEPRECATION")
     private fun setLaunchSystemBars(splash: Boolean) {
-        val customerBackground = AndroidColor.rgb(255, 253, 248)
-        window.statusBarColor = if (splash) AndroidColor.BLACK else customerBackground
-        window.navigationBarColor = if (splash) AndroidColor.BLACK else customerBackground
+        val appBackground = AndroidColor.rgb(7, 8, 9)
+        window.statusBarColor = if (splash) AndroidColor.BLACK else appBackground
+        window.navigationBarColor = if (splash) AndroidColor.BLACK else appBackground
 
         val lightSystemBars =
             View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-        val currentFlags = window.decorView.systemUiVisibility
-        window.decorView.systemUiVisibility = if (splash) {
-            currentFlags and lightSystemBars.inv()
-        } else {
-            currentFlags or lightSystemBars
-        }
+        window.decorView.systemUiVisibility = window.decorView.systemUiVisibility and lightSystemBars.inv()
     }
 }
 
@@ -136,7 +131,7 @@ private fun NahwerkSplashScreen() {
 }
 
 private enum class PublicRoute {
-    HOME,
+    CHAT,
     LOGIN,
     REGISTER
 }
@@ -146,7 +141,7 @@ internal fun CustomerLaunchRoot() {
     val context = LocalContext.current
     val productApi = remember { ProdCustomerApi(context) }
     var auth by remember { mutableStateOf(productApi.pendingAuthState()) }
-    var route by rememberSaveable { mutableStateOf(PublicRoute.HOME) }
+    var route by rememberSaveable { mutableStateOf(PublicRoute.CHAT) }
 
     NahwerkTheme {
         if (auth.authenticated) {
@@ -154,12 +149,12 @@ internal fun CustomerLaunchRoot() {
                 onLogout = {
                     productApi.clearLocalSession()
                     auth = productApi.pendingAuthState()
-                    route = PublicRoute.HOME
+                    route = PublicRoute.CHAT
                 }
             )
         } else {
             when (route) {
-                PublicRoute.HOME -> PublicEntrySurface(
+                PublicRoute.CHAT -> PublicChatFirstShell(
                     onLogin = { route = PublicRoute.LOGIN },
                     onRegister = { route = PublicRoute.REGISTER }
                 )
@@ -168,7 +163,7 @@ internal fun CustomerLaunchRoot() {
                         api = productApi,
                         auth = auth,
                         onAuthChange = { auth = it },
-                        onBack = { route = PublicRoute.HOME },
+                        onBack = { route = PublicRoute.CHAT },
                         onRegister = { route = PublicRoute.REGISTER }
                     )
                 }
@@ -202,7 +197,7 @@ private fun CustomerLoginSurface(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(NahwerkSpacing.Xxl),
         verticalArrangement = Arrangement.spacedBy(NahwerkSpacing.Xl)
     ) {
-        TextButton(onClick = onBack, enabled = !busy) { Text("‹ Zur Übersicht") }
+        TextButton(onClick = onBack, enabled = !busy) { Text("‹ Zurück zum Chat") }
         Text("NAHWERK", color = NahwerkPalette.Gold, style = MaterialTheme.typography.labelLarge)
         Text("Anmelden", style = MaterialTheme.typography.headlineMedium)
         Text(
