@@ -6,6 +6,7 @@ on:
       - 'web-concierge.html'
       - 'web-concierge/**'
       - 'assets/web-customer-concierge.js'
+      - 'assets/web-customer-concierge-thread-scope.js'
       - 'assets/web-customer-concierge.css'
       - 'assets/web-core-shadow.js'
       - 'assets/web-concierge-chat.js'
