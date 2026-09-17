@@ -187,7 +187,11 @@ jobs:
           grep -F 'nahwerk-app-gateway' "$DEX_STRINGS" >/dev/null
           APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
           "$APKSIGNER" verify --verbose "$APK"
-          jarsigner -verify -strict "$AAB"
+          # Android app-signing certificates are normally self-signed. `-strict` turns
+          # that expected trust-chain warning into exit code 4 even when the AAB's
+          # JAR signature is cryptographically valid, so verify integrity without PKIX strictness.
+          jarsigner -verify "$AAB"
+          unzip -l "$AAB" | grep -E 'META-INF/[^ ]+\.(RSA|DSA|EC|SF)$' >/dev/null
 
       - name: Enable KVM for signed install smoke
         shell: bash
