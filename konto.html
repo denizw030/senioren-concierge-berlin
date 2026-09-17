@@ -92,6 +92,100 @@
         margin-top: 8px;
         font-weight: 700;
       }
+      .usage-feature-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 14px;
+      }
+      .usage-feature-card {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 16px 18px;
+        background: #fff;
+      }
+      .usage-feature-card strong {
+        display: block;
+        margin: 5px 0 4px;
+        font-size: 18px;
+      }
+      .usage-feature-card .usage-feature-value {
+        display: block;
+        font-size: 13px;
+        font-weight: 800;
+        line-height: 1.45;
+      }
+      .owner-self-usage {
+        margin-top: 20px;
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: color-mix(in srgb, var(--panel) 94%, var(--gold) 6%);
+      }
+      .owner-self-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      .owner-badge {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        padding: 5px 9px;
+        border-radius: 999px;
+        border: 1px solid var(--gold);
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: .08em;
+      }
+      .owner-self-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 16px;
+      }
+      .owner-quota-row {
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--panel);
+      }
+      .owner-quota-row strong,
+      .owner-quota-row span {
+        display: block;
+      }
+      .owner-quota-controls {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(90px, .65fr) auto;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .owner-quota-controls select,
+      .owner-quota-controls input {
+        min-height: 42px;
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--panel);
+        color: inherit;
+        padding: 8px 10px;
+        font: inherit;
+      }
+      .owner-quota-controls .btn {
+        min-height: 42px;
+        padding: 8px 12px;
+      }
+      body.account-theme-dark .usagebox,
+      body.account-theme-dark .usage-feature-card,
+      body.account-theme-dark .owner-quota-row {
+        background: #000;
+      }
+      @media (max-width: 850px) {
+        .usage-feature-grid,
+        .owner-self-grid { grid-template-columns: 1fr; }
+        .owner-quota-controls { grid-template-columns: 1fr; }
+      }
       .privacy-note {
         font-size: 12px;
         color: var(--muted);
@@ -1895,34 +1989,42 @@
             </div>
             <div class="account-panel-heading" data-account-panel="usage" hidden><div class="eyebrow">Nutzung</div><h2>Deine aktuelle Nutzung.</h2><p>Nur tatsächlich verfügbare Verbrauchsdaten werden angezeigt.</p></div>
             <article class="card wide usage-panel" data-account-panel="usage" role="tabpanel" aria-labelledby="accountTabUsage" hidden>
-              <div class="eyebrow">Nutzung diesen Kalendermonat</div>
-              <h3>Aktueller Verbrauch</h3>
+              <div class="eyebrow">Aktueller 30-Tage-Nutzungszeitraum</div>
+              <h3>Deine Nutzung</h3>
               <div class="empty" id="usageState">Tarif- und Verbrauchsdaten werden sicher geladen …</div>
               <div class="usagegrid" id="usageGrid" hidden>
                 <div class="usagebox">
-                  <span class="muted">APP-DIALOGE</span>
+                  <span class="muted">APP STANDARD</span>
                   <div class="big" id="appUsageSummary">–</div>
                   <div class="bar" id="appUsageBarTrack" hidden><span id="appUsageBar"></span></div>
                   <span class="muted usage-detail" id="appUsageDetail">–</span>
                 </div>
                 <div class="usagebox">
-                  <span class="muted">WHATSAPP-DIALOGE</span>
+                  <span class="muted">WHATSAPP</span>
                   <div class="big" id="whatsappUsageSummary">–</div>
                   <div class="bar" id="whatsappUsageBarTrack" hidden><span id="whatsappUsageBar"></span></div>
                   <span class="muted usage-detail" id="whatsappUsageDetail">–</span>
                 </div>
               </div>
+              <div class="usage-feature-grid" id="usageFeatureGrid" hidden></div>
+              <section class="owner-self-usage" id="ownerSelfUsage" hidden aria-labelledby="ownerSelfUsageTitle">
+                <div class="owner-self-head">
+                  <div>
+                    <div class="eyebrow">Owner</div>
+                    <h3 id="ownerSelfUsageTitle">Meine Kontingente</h3>
+                    <p class="muted">Als Owner kannst du jedes eigene Kontingent unbegrenzt lassen oder dir selbst ein Limit setzen. Reale Nutzung und Providerkosten werden trotzdem gemessen.</p>
+                  </div>
+                  <span class="owner-badge">OWNER</span>
+                </div>
+                <div class="owner-self-grid" id="ownerSelfGrid"></div>
+                <div class="profile-save-status" id="ownerLimitSaveStatus" role="status" aria-live="polite"></div>
+              </section>
               <div class="recommend" id="recommendation">
-                <strong>Monatlicher Neustart</strong><br /><span class="muted"
-                  >Die Dialogkontingente werden zu Beginn jedes Kalendermonats
-                  automatisch zurückgesetzt. Allgemeine Kundenservice- und
-                  Accountfragen belasten das Dialogkontingent nicht.</span
-                >
+                <strong>Dein persönlicher Nutzungszeitraum</strong><br />
+                <span class="muted" id="usagePeriodText">Kontingente werden exakt alle 30 Tage ab Aktivierung erneuert. Web und App Standard können unbegrenzt sein; kostenpflichtige Zusatzfunktionen werden getrennt geführt.</span>
               </div>
               <p class="privacy-note">
-                Angehörige sollen Verbrauch und organisatorische Informationen
-                sehen können – nicht automatisch den privaten Inhalt jedes
-                WhatsApp-Gesprächs.
+                Angehörige sollen Verbrauch und organisatorische Informationen sehen können – nicht automatisch den privaten Inhalt jedes Gesprächs.
               </p>
             </article>
             <div class="account-panel-heading" data-account-panel="safety" hidden><div class="eyebrow">Sicherheit</div><h2>Sicherheit und Vertrauenskontakt.</h2><p>Deine wichtigsten Sicherheitseinstellungen auf einen Blick. Details öffnest du erst über „Bearbeiten“.</p></div>
@@ -2541,63 +2643,220 @@
             maximumFractionDigits: 2
           }) + " €";
         }
-        function renderChannelUsage(prefix, usedValue, limitValue) {
-          const used = numberOrNull(usedValue);
-          const limit = numberOrNull(limitValue);
+        const USAGE_LABELS = {
+          web_standard_dialog: "Web Standard",
+          app_dialog: "App Standard",
+          whatsapp_dialog: "WhatsApp",
+          intelligent_mode: "Intelligent-Modus",
+          concierge_execution: "Concierge-Ausführungen",
+          phone_concierge: "Telefon / Voice",
+          external_paid_action: "Externe Aktionen",
+          document_analysis: "Dokumentanalyse",
+          image_analysis: "Bildanalyse",
+          image_generation: "Bildgenerierung",
+          web_research: "Web-Recherche",
+          reminders: "Erinnerungen",
+          voice_input: "Sprachnachrichten"
+        };
+        const USAGE_UNITS = {
+          dialog: "Dialoge", message: "Nachrichten", task: "Aufgaben", execution: "Ausführungen",
+          minute: "Minuten", document: "Dokumente", image: "Bilder", research: "Recherchen",
+          active_reminder: "Erinnerungen", action: "Aktionen"
+        };
+        function formatUsageDate(value) {
+          if (!value) return "";
+          const date = new Date(value);
+          return Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString("de-DE", { day:"2-digit", month:"2-digit", year:"numeric" });
+        }
+        function renderChannelUsage(prefix, node, legacyUsed, legacyLimit) {
+          const used = numberOrNull(node?.used ?? legacyUsed);
+          const limit = numberOrNull(node?.limit ?? legacyLimit);
+          const unlimited = node?.unlimited === true || (node && node.limit === null && node.unlimited !== false);
           const summary = document.getElementById(prefix + "UsageSummary");
           const detail = document.getElementById(prefix + "UsageDetail");
           const track = document.getElementById(prefix + "UsageBarTrack");
           const bar = document.getElementById(prefix + "UsageBar");
 
-          if (limit === null) {
-            summary.textContent = "Kontingent nicht verfügbar";
-            detail.textContent = "Die Tarifdaten konnten derzeit nicht geladen werden.";
+          if (unlimited) {
+            summary.textContent = "Unbegrenzt";
+            detail.textContent = used === null ? "Kein festes Standard-Limit." : formatCount(used) + " bisher genutzt · ohne festes Limit";
             track.hidden = true;
-            return { used: null, limit: null, remaining: null };
+            return { used, limit:null, remaining:null, unlimited:true };
+          }
+          if (limit === null) {
+            summary.textContent = "Noch nicht festgelegt";
+            detail.textContent = "Für diese Funktion ist aktuell kein Kundenlimit hinterlegt.";
+            track.hidden = true;
+            return { used, limit:null, remaining:null, unlimited:false };
           }
           if (used === null) {
-            summary.textContent = formatCount(limit) + " Dialoge im Tarif enthalten";
-            detail.textContent = "Aktueller Verbrauch konnte gerade nicht geladen werden.";
+            summary.textContent = formatCount(limit) + " enthalten";
+            detail.textContent = "Das Kontingent ist im Tarif hinterlegt.";
             track.hidden = true;
-            return { used: null, limit, remaining: null };
+            return { used:null, limit, remaining:null, unlimited:false };
           }
-
-          const remaining = Math.max(0, limit - used);
-          summary.textContent = formatCount(remaining) + " Dialoge verbleibend";
-          detail.textContent = formatCount(used) + " von " + formatCount(limit) + " Dialogen genutzt";
-          track.hidden = false;
-          bar.style.width = pct(used, limit) + "%";
-          return { used, limit, remaining };
+          const remaining=Math.max(0,limit-used);
+          summary.textContent=formatCount(remaining)+" verbleibend";
+          detail.textContent=formatCount(used)+" von "+formatCount(limit)+" genutzt";
+          track.hidden=false;
+          bar.style.width=pct(used,limit)+"%";
+          return {used,limit,remaining,unlimited:false};
         }
-        function setUsage(plan, usage) {
-          document.getElementById("usageState").hidden = true;
-          document.getElementById("usageGrid").hidden = false;
-          const app = renderChannelUsage("app", usage?.app_dialogues_used, plan?.app_dialogue_limit);
-          const whatsapp = renderChannelUsage("whatsapp", usage?.whatsapp_dialogues_used, plan?.whatsapp_dialogue_limit);
-          window.NahwerkActivation?.observeUsage?.(usage);
-          const overviewUsage = document.getElementById("overviewUsage");
-          if (overviewUsage) {
-            if (whatsapp.remaining !== null) {
-              overviewUsage.textContent = formatCount(whatsapp.remaining) + " von " + formatCount(whatsapp.limit) + " WhatsApp-Dialogen übrig";
-            } else if (app.limit !== null && whatsapp.limit !== null) {
-              overviewUsage.textContent = "Tarifkontingent: " + formatCount(app.limit) + " App · " + formatCount(whatsapp.limit) + " WhatsApp";
-            } else {
-              overviewUsage.textContent = "Nutzung derzeit nicht verfügbar";
+        function renderExtendedUsage(account, catalog) {
+          const grid=document.getElementById("usageFeatureGrid");
+          if(!grid)return;
+          const catalogMap=new Map((Array.isArray(catalog)?catalog:[]).map((item)=>[item.code,item]));
+          const entitlements=Array.isArray(account?.entitlements)?account.entitlements:[];
+          const exclude=new Set(["app_dialog","whatsapp_dialog"]);
+          grid.innerHTML="";
+          entitlements.filter((e)=>e?.feature_code&&!exclude.has(e.feature_code)).forEach((ent)=>{
+            const code=String(ent.feature_code);
+            const meta=catalogMap.get(code)||{};
+            const card=document.createElement("div");
+            card.className="usage-feature-card";
+            const title=document.createElement("span");
+            title.className="muted";
+            title.textContent=USAGE_LABELS[code]||meta.name||code.replace(/_/g," ");
+            const value=document.createElement("strong");
+            const detail=document.createElement("span");
+            detail.className="usage-feature-value muted";
+            const unit=USAGE_UNITS[meta.unit]||meta.unit||"Nutzungen";
+            if(ent.unlimited===true){
+              value.textContent="Unbegrenzt";
+              detail.textContent=ent.usage_known&&numberOrNull(ent.used)!==null
+                ? formatCount(ent.used)+" bisher genutzt"
+                : "Kein festes Kontingent.";
+            }else if(numberOrNull(ent.included_quantity)!==null){
+              const limit=numberOrNull(ent.included_quantity);
+              const used=numberOrNull(ent.used);
+              if(ent.usage_known&&used!==null){
+                value.textContent=formatCount(Math.max(0,limit-used))+" verbleibend";
+                detail.textContent=formatCount(used)+" von "+formatCount(limit)+" "+unit+" genutzt";
+              }else{
+                value.textContent=formatCount(limit)+" "+unit+" enthalten";
+                detail.textContent="Tarifkontingent hinterlegt; Verbrauch wird bei zentral erfasster Nutzung angezeigt.";
+              }
+            }else{
+              value.textContent="Nach Bedarf";
+              detail.textContent="Wird separat nach Nutzung bzw. PAYG geführt.";
+            }
+            card.append(title,value,detail);
+            grid.appendChild(card);
+          });
+          grid.hidden=!grid.children.length;
+        }
+        function renderOwnerSelfLimits(ownerLimits) {
+          const section=document.getElementById("ownerSelfUsage");
+          const grid=document.getElementById("ownerSelfGrid");
+          if(!section||!grid)return;
+          const rows=Array.isArray(ownerLimits)?ownerLimits.filter((x)=>x?.available!==false):[];
+          section.hidden=!rows.length;
+          grid.innerHTML="";
+          rows.forEach((item)=>{
+            const row=document.createElement("div");
+            row.className="owner-quota-row";
+            row.dataset.featureCode=String(item.feature_code||"");
+            const title=document.createElement("strong");
+            title.textContent=item.label||USAGE_LABELS[item.feature_code]||String(item.feature_code||"").replace(/_/g," ");
+            const current=document.createElement("span");
+            current.className="muted";
+            const used=numberOrNull(item.used)||0;
+            current.textContent=item.unlimited===true
+              ? formatCount(used)+" genutzt · aktuell unbegrenzt"
+              : formatCount(used)+" genutzt · "+formatCount(numberOrNull(item.remaining)||0)+" verbleibend";
+            const controls=document.createElement("div");
+            controls.className="owner-quota-controls";
+            const mode=document.createElement("select");
+            mode.setAttribute("aria-label",title.textContent+" Modus");
+            mode.innerHTML='<option value="unlimited">Unbegrenzt</option><option value="custom">Eigenes Limit</option>';
+            mode.value=item.limit===null||item.limit===undefined?"unlimited":"custom";
+            const input=document.createElement("input");
+            input.type="number"; input.min="0"; input.step="1"; input.max="1000000000";
+            input.placeholder="Limit";
+            input.value=item.limit===null||item.limit===undefined?"":String(item.limit);
+            input.disabled=mode.value==="unlimited";
+            const save=document.createElement("button");
+            save.type="button"; save.className="btn light"; save.textContent="Speichern";
+            mode.addEventListener("change",()=>{input.disabled=mode.value==="unlimited";if(input.disabled)input.value="";});
+            save.addEventListener("click",()=>saveOwnerSelfLimit(item.feature_code,mode.value,input,save));
+            controls.append(mode,input,save);
+            row.append(title,current,controls);
+            grid.appendChild(row);
+          });
+        }
+        async function saveOwnerSelfLimit(featureCode, mode, input, button) {
+          const token=sessionToken();
+          const status=document.getElementById("ownerLimitSaveStatus");
+          if(!token){if(status)status.textContent="Sitzung abgelaufen. Bitte erneut anmelden.";return;}
+          let limitValue=null;
+          if(mode==="custom"){
+            const parsed=Number(input.value);
+            if(!Number.isSafeInteger(parsed)||parsed<0){if(status)status.textContent="Bitte ein gültiges ganzzahliges Limit eingeben.";return;}
+            limitValue=parsed;
+          }
+          button.disabled=true;
+          if(status)status.textContent="Wird gespeichert …";
+          try{
+            const response=await fetch(PROFILE_URL,{
+              method:"POST",
+              headers:{"Content-Type":"application/json",Authorization:"Bearer "+token},
+              body:JSON.stringify({action:"owner_self_limit_set",feature_code:featureCode,limit_value:limitValue})
+            });
+            const body=await response.json().catch(()=>({}));
+            if(!response.ok||body?.ok!==true)throw new Error(body?.status||"owner_limit_update_failed");
+            renderProfilePayload(body);
+            storeProfileCache(body);
+            if(status)status.textContent="Kontingent gespeichert.";
+          }catch(error){
+            const code=String(error?.message||"");
+            if(status)status.textContent=code==="mfa_enrollment_required"
+              ?"Bitte zuerst den Kontoschutz einrichten."
+              :"Kontingent konnte gerade nicht gespeichert werden.";
+          }finally{button.disabled=false;}
+        }
+        function setUsage(plan, legacyUsage, account, catalog, ownerLimits) {
+          document.getElementById("usageState").hidden=true;
+          document.getElementById("usageGrid").hidden=false;
+          const canonicalUsage=account?.usage||{};
+          const app=renderChannelUsage("app",canonicalUsage?.app_dialog,legacyUsage?.app_dialogues_used,plan?.app_dialogue_limit);
+          const whatsapp=renderChannelUsage("whatsapp",canonicalUsage?.whatsapp_dialog,legacyUsage?.whatsapp_dialogues_used,plan?.whatsapp_dialogue_limit);
+          renderExtendedUsage(account,catalog);
+          renderOwnerSelfLimits(ownerLimits);
+          window.NahwerkActivation?.observeUsage?.(canonicalUsage||legacyUsage);
+          const reset=canonicalUsage?.next_reset_at||account?.subscription?.current_usage_period?.next_reset_at;
+          const periodText=document.getElementById("usagePeriodText");
+          if(periodText){
+            const date=formatUsageDate(reset);
+            periodText.textContent=date
+              ?"Dein aktueller 30-Tage-Zeitraum erneuert sich am "+date+". Web und App Standard können unbegrenzt sein; weitere Kontingente werden getrennt geführt."
+              :"Kontingente werden exakt alle 30 Tage ab Aktivierung erneuert.";
+          }
+          const overviewUsage=document.getElementById("overviewUsage");
+          if(overviewUsage){
+            if(whatsapp.remaining!==null){
+              overviewUsage.textContent=formatCount(whatsapp.remaining)+" von "+formatCount(whatsapp.limit)+" WhatsApp-Nachrichten übrig";
+            }else if(whatsapp.unlimited){
+              overviewUsage.textContent="WhatsApp unbegrenzt";
+            }else if(app.unlimited){
+              overviewUsage.textContent="Web & App Standard unbegrenzt";
+            }else{
+              overviewUsage.textContent="Nutzung sicher mit deinem Konto synchronisiert";
             }
           }
         }
-        function applyPlanAndUsage(plan, usage) {
-          if (!plan?.code) return;
-          const label = String(plan.code).replace(/_/g, " ");
-          const appLimit = numberOrNull(plan.app_dialogue_limit);
-          const whatsappLimit = numberOrNull(plan.whatsapp_dialogue_limit);
-          document.getElementById("planName").textContent = label + " · " + formatPrice(plan.monthly_price_cents) + " / MONAT";
-          document.getElementById("planMeta").textContent = appLimit !== null && whatsappLimit !== null
-            ? formatCount(appLimit) + " App-Dialoge · " + formatCount(whatsappLimit) + " WhatsApp-Dialoge pro Monat."
-            : "Die Tarifkontingente konnten derzeit nicht geladen werden.";
-          document.getElementById("contactStatus").textContent = label + " aktiv";
-          document.getElementById("planStatusMeta").textContent = "Ihr aktuell gebuchter Tarif ist diesem Konto sicher zugeordnet.";
-          setUsage(plan, usage || null);
+        function applyPlanAndUsage(plan, usage, account, catalog, ownerLimits) {
+          if(!plan?.code&&!account?.plan?.code)return;
+          const canonicalPlan=account?.plan||plan||{};
+          const label=String(canonicalPlan.code||"").replace(/_/g," ");
+          document.getElementById("planName").textContent=label+" · "+formatPrice(canonicalPlan.monthly_price_cents)+" / MONAT";
+          const appNode=account?.usage?.app_dialog;
+          const waNode=account?.usage?.whatsapp_dialog;
+          const appText=appNode?.unlimited===true?"App Standard unbegrenzt":(numberOrNull(appNode?.limit)!==null?formatCount(appNode.limit)+" App-Nutzungen":"App nach Tarif");
+          const waText=waNode?.unlimited===true?"WhatsApp unbegrenzt":(numberOrNull(waNode?.limit)!==null?formatCount(waNode.limit)+" WhatsApp-Nachrichten / 30 Tage":"WhatsApp nach Tarif");
+          document.getElementById("planMeta").textContent=appText+" · "+waText+".";
+          document.getElementById("contactStatus").textContent=label+" aktiv";
+          document.getElementById("planStatusMeta").textContent="Dein aktuell gebuchter Tarif ist diesem Konto sicher zugeordnet.";
+          setUsage(plan,usage||null,account||null,catalog||[],ownerLimits||[]);
         }
         function prefSummary(p) {
           if (!p) return;
@@ -2984,7 +3243,13 @@
           applyProfile(body?.profile || {});
           const customerNumber = document.getElementById("customerNumber");
           if (customerNumber) customerNumber.textContent = body?.customer_number || "Nicht verfügbar";
-          applyPlanAndUsage(body?.plan || null, body?.usage || null);
+          applyPlanAndUsage(
+            body?.plan || null,
+            body?.usage || null,
+            body?.account || null,
+            body?.usage_feature_catalog || [],
+            body?.owner_self_limits || []
+          );
         }
         function storeProfileCache(body) {
           const session = accountSession();
@@ -3001,7 +3266,10 @@
                 customer_number: body.customer_number || "",
                 brand: body.brand || null,
                 plan: body.plan || null,
-                usage: body.usage || null
+                usage: body.usage || null,
+                account: body.account || null,
+                usage_feature_catalog: body.usage_feature_catalog || [],
+                owner_self_limits: body.owner_self_limits || []
               }
             }));
             session.customer_number = body.customer_number || "";
