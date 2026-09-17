@@ -21,7 +21,7 @@ struct RawUIAction: Codable, Identifiable, Equatable {
     let label: String?
 
     var stableID: String {
-        id?.isEmpty == false ? id! : "(type):(label ?? "")"
+        id?.isEmpty == false ? id! : "\(type):\(label ?? \"\")"
     }
 
     var allowedType: AllowedUIActionType? {
@@ -203,7 +203,7 @@ struct HistoryMessage: Codable, Identifiable, Equatable {
     let receivedAt: String?
 
     var id: String {
-        idValue ?? "(role ?? ""):(createdAt ?? receivedAt ?? ""):(content ?? text ?? "")"
+        idValue ?? "\(role ?? \"\"):\(createdAt ?? receivedAt ?? \"\"):\(content ?? text ?? \"\")"
     }
 
     enum CodingKeys: String, CodingKey {
@@ -246,7 +246,7 @@ enum NAHWERKAPIError: LocalizedError, Equatable {
         case .invalidResponse:
             return "NAHWERK hat keine gültige Antwort geliefert."
         case .server(let code):
-            return "Die Anfrage konnte gerade nicht abgeschlossen werden ((code))."
+            return "Die Anfrage konnte gerade nicht abgeschlossen werden (\(code))."
         case .sessionRequired:
             return "Bitte melde dich erneut an."
         case .guestRuntimeUnavailable:
@@ -397,7 +397,7 @@ actor NAHWERKAPI {
             json: [
                 "message": message,
                 "source_message_id": UUID().uuidString.lowercased(),
-                "correlation_id": "ios-(UUID().uuidString.lowercased())"
+                "correlation_id": "ios-\(UUID().uuidString.lowercased())"
             ]
         )
     }
@@ -455,7 +455,7 @@ actor NAHWERKAPI {
         request.setValue("no-store", forHTTPHeaderField: "Cache-Control")
 
         if let token {
-            request.setValue("Bearer (token)", forHTTPHeaderField: "Authorization")
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
 
         if let json {
@@ -474,7 +474,7 @@ actor NAHWERKAPI {
 
         guard (200..<300).contains(http.statusCode) else {
             let object = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
-            let code = (object?["error"] as? String) ?? (object?["status"] as? String) ?? "HTTP_(http.statusCode)"
+            let code = (object?["error"] as? String) ?? (object?["status"] as? String) ?? "HTTP_\(http.statusCode)"
             throw NAHWERKAPIError.server(code)
         }
 
