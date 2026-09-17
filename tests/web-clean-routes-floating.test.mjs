@@ -5,7 +5,9 @@ import fs from 'node:fs';
 const read=(p)=>fs.readFileSync(p,'utf8');
 const auth=read('assets/auth-nav.js');
 const boot=read('assets/locale-boot.js');
-const css=read('assets/site.css');
+const site=read('assets/site.css');
+const base=read('assets/site-base.css');
+const css=base+'\n'+site;
 const sitemap=read('sitemap.xml');
 
 test('auth recognizes clean and legacy customer routes',()=>{
@@ -41,7 +43,8 @@ test('public sitemap and key canonicals contain no html suffixes',()=>{
 });
 
 test('dark footer is deep black and floating button has mobile safe-area',()=>{
-  assert.match(css,/body:not\(\.nw-portal-light\) \.footer\{background:#000!important\}/);
+  assert.match(site,/@import\s+url\(["'](?:\.\/)?site-base\.css(?:\?[^"']*)?/);
+  assert.match(css,/body:not\(\.nw-portal-light\)[^\n{]*\.footer[\s\S]{0,180}background\s*:\s*#000\s*!important/);
   assert.match(css,/env\(safe-area-inset-right\)/);
   assert.match(css,/env\(safe-area-inset-bottom\)/);
 });

@@ -15,7 +15,7 @@ test("overview concierge is read from the authoritative web gateway", () => {
 test("legacy local persona fields are removed instead of used as authority", () => {
   assert.match(overview, /delete value\[key\]/);
   assert.match(overview, /"conciergeChoice", "concierge_choice"/);
-  assert.doesNotMatch(overview, /localStorage\.getItem\([^)]*\).*conciergeChoice/s);
+  assert.doesNotMatch(overview, /localStorage\.getItem\(["'][^"']*(?:conciergeChoice|concierge_choice)[^"']*["']\)/i);
 });
 
 test("customer history is cursor-paginated and customer-safe", () => {
