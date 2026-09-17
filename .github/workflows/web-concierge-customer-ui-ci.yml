@@ -12,6 +12,7 @@ on:
       - 'assets/web-concierge-chat.js'
       - 'assets/site-ui.js'
       - 'tests/web-account-webconcierge-prod.test.mjs'
+      - 'tests/website-theme-footer-consistency.test.mjs'
       - '.github/workflows/web-concierge-customer-ui-ci.yml'
   workflow_dispatch:
 
@@ -28,4 +29,4 @@ jobs:
         with:
           node-version: '22'
       - name: Run Web Concierge customer UI contract
-        run: node --test tests/web-account-webconcierge-prod.test.mjs
+        run: node --test tests/web-account-webconcierge-prod.test.mjs tests/website-theme-footer-consistency.test.mjs
