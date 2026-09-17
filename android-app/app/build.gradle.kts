@@ -1,3 +1,6 @@
+import java.security.MessageDigest
+import java.util.Base64
+
 val releaseKeystorePath = System.getenv("NAHWERK_ANDROID_KEYSTORE_PATH")?.trim().orEmpty()
 val releaseStorePassword = System.getenv("NAHWERK_ANDROID_STORE_PASSWORD")?.trim().orEmpty()
 val releaseKeyAlias = System.getenv("NAHWERK_ANDROID_KEY_ALIAS")?.trim().orEmpty()
@@ -35,6 +38,36 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
+val splashAssetPartsDir = layout.projectDirectory.dir("src/main/splash-reference")
+val generatedSplashResDir = layout.buildDirectory.dir("generated/nahwerkSplashRes")
+val splashAssetSha256 = "40d81ef0f53c31a48cc9ca2ec2ca8dfca2ead41c897aa0c1a673ddac43a980a3"
+
+val prepareNahwerkSplashAsset = tasks.register("prepareNahwerkSplashAsset") {
+    val parts = fileTree(splashAssetPartsDir) {
+        include("nahwerk_brand_coin.b64.part*")
+    }
+    inputs.files(parts)
+    outputs.file(generatedSplashResDir.map { it.file("drawable-nodpi/nahwerk_brand_coin.webp") })
+
+    doLast {
+        val orderedParts = parts.files.sortedBy { it.name }
+        check(orderedParts.size == 6) {
+            "NAHWERK splash asset requires exactly 6 canonical reference chunks."
+        }
+        val encoded = orderedParts.joinToString(separator = "") { it.readText().trim() }
+        val bytes = Base64.getDecoder().decode(encoded)
+        val digest = MessageDigest.getInstance("SHA-256")
+            .digest(bytes)
+            .joinToString(separator = "") { byte -> "%02x".format(byte.toInt() and 0xff) }
+        check(digest == splashAssetSha256) {
+            "NAHWERK splash reference checksum mismatch: $digest"
+        }
+        val output = generatedSplashResDir.get().file("drawable-nodpi/nahwerk_brand_coin.webp").asFile
+        output.parentFile.mkdirs()
+        output.writeBytes(bytes)
+    }
+}
+
 android {
     namespace = "com.nahwerk.concierge"
     compileSdk = 35
@@ -48,6 +81,7 @@ android {
         buildConfigField("String", "CUSTOMER_PRODUCT_BASE_URL", buildConfigString(customerProductBaseUrl))
     }
     buildFeatures { compose = true; buildConfig = true }
+    sourceSets.getByName("main").res.srcDir(generatedSplashResDir)
 
     signingConfigs {
         if (releaseSigningComplete) {
@@ -81,6 +115,10 @@ android {
     }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     kotlinOptions { jvmTarget = "17" }
+}
+
+tasks.named("preBuild").configure {
+    dependsOn(prepareNahwerkSplashAsset)
 }
 
 dependencies {

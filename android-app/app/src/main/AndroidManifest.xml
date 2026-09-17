@@ -6,13 +6,16 @@
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="false"
+        android:icon="@drawable/nahwerk_brand_coin_dimmed"
         android:label="NAHWERK Concierge"
+        android:roundIcon="@drawable/nahwerk_brand_coin_dimmed"
         android:supportsRtl="true"
         android:theme="@style/Theme.Nahwerk"
         android:usesCleartextTraffic="false">
         <activity
             android:name=".CustomerLaunchActivity"
             android:exported="true"
+            android:theme="@style/Theme.Nahwerk.Launch"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
