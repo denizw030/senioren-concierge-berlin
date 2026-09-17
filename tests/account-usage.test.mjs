@@ -8,6 +8,7 @@ const account = read("konto.html");
 const onboarding = read("assets/onboarding.js");
 const packages = read("pakete.html");
 const packageText = packages.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+const freeRegistrationPlan = onboarding.match(/free:\s*\{([\s\S]*?)\n    \},\n    standard:/)?.[1] || "";
 
 const packageMatrix = [
   ["FREE", "0 € / Monat", "50 App-Dialoge", "20 WhatsApp-Dialoge"],
@@ -33,8 +34,9 @@ test("FREE registration uses the central account entitlement contract", () => {
   assert.match(onboarding, /code: "FREE"[\s\S]*price: "0 € \/ Monat"[\s\S]*bookable: true/);
   assert.match(onboarding, /Zentrales FREE-Kontingent · nach Login live sichtbar/);
   assert.match(onboarding, /FREE wird ohne Zahlungsdaten angelegt/);
-  assert.equal(onboarding.includes("50 App-Dialoge pro Monat"), false, "FREE App quota is not maintained in registration code");
-  assert.equal(onboarding.includes("20 WhatsApp-Dialoge pro Monat"), false, "FREE WhatsApp quota is not maintained in registration code");
+  assert.ok(freeRegistrationPlan, "FREE registration plan block exists");
+  assert.doesNotMatch(freeRegistrationPlan, /\b50 App-Dialoge\b/, "FREE App quota is not maintained in the active registration plan");
+  assert.doesNotMatch(freeRegistrationPlan, /\b20 WhatsApp-Dialoge\b/, "FREE WhatsApp quota is not maintained in the active registration plan");
 });
 
 test("public package overview and paid registration choices remain unchanged", () => {
