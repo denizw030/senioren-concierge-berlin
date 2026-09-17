@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>NAHWERK Theme/Footer Production Browser E2E</title>
+  <style>body{margin:0;font-family:Arial,sans-serif}iframe{width:100%;height:900px;border:0}</style>
+</head>
+<body>
+  <div id="status" role="status">RUNNING</div>
+  <main class="web-concierge-shell">
+    <div class="web-concierge-workspace">
+      <aside class="web-concierge-sidebar">Chats</aside>
+      <section class="web-concierge-chat-panel">
+        <header class="web-concierge-chat-head">Concierge</header>
+        <div class="web-concierge-log">Verlauf</div>
+        <form class="web-concierge-form"><textarea aria-label="Nachricht"></textarea></form>
+      </section>
+    </div>
+  </main>
+  <footer class="footer"><div class="footergrid"><h4>Rechtliches</h4><a href="/impressum">Impressum</a></div></footer>
+  <iframe id="target" title="Öffentliche Senioren-Seite"></iframe>
+  <script>
+    (() => {
+      const KEY = "nw_portal_theme_v1";
+      const status = document.getElementById("status");
+      const frame = document.getElementById("target");
+      const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      const normalize = (value) => String(value || "").replace(/\s+/g, "").toLowerCase();
+      const isBlack = (value) => ["rgb(0,0,0)", "rgba(0,0,0,1)"].includes(normalize(value));
+      const assert = (condition, message) => { if (!condition) throw new Error(message); };
+      const nextLoad = () => new Promise((resolve) => frame.addEventListener("load", resolve, { once:true }));
+
+      async function loadSenior(theme) {
+        localStorage.setItem(KEY, theme);
+        const loaded = nextLoad();
+        frame.src = `/senioren-concierge.html?theme_footer_e2e=${theme}-${Date.now()}`;
+        await loaded;
+        await wait(350);
+        const doc = frame.contentDocument;
+        assert(doc, `${theme}: senior document unavailable`);
+        assert(doc.documentElement.dataset.nwPortalTheme === theme, `${theme}: senior html theme mismatch`);
+        assert(doc.body.classList.contains(`nw-portal-${theme}`), `${theme}: senior body theme class missing`);
+        const footer = doc.querySelector(".footer");
+        assert(footer, `${theme}: senior footer missing`);
+        const footerBg = frame.contentWindow.getComputedStyle(footer).backgroundColor;
+        if (theme === "light") assert(!isBlack(footerBg), `light: senior footer stayed black (${footerBg})`);
+        else assert(isBlack(footerBg), `dark: senior footer not deep black (${footerBg})`);
+      }
+
+      async function loadThemeRuntime() {
+        history.replaceState({}, "", "/web-concierge");
+        localStorage.setItem(KEY, "light");
+        const script = document.createElement("script");
+        script.src = `/assets/site-ui.js?theme_footer_e2e=${Date.now()}`;
+        const loaded = new Promise((resolve, reject) => {
+          script.onload = resolve;
+          script.onerror = () => reject(new Error("site-ui production asset failed to load"));
+        });
+        document.head.appendChild(script);
+        await loaded;
+        await wait(100);
+      }
+
+      function assertChatTheme(theme) {
+        assert(document.documentElement.dataset.nwPortalTheme === theme, `${theme}: chat html theme mismatch`);
+        assert(document.body.classList.contains(`nw-portal-${theme}`), `${theme}: chat body theme class missing`);
+        const footerBg = getComputedStyle(document.querySelector(".footer")).backgroundColor;
+        const workspaceBg = getComputedStyle(document.querySelector(".web-concierge-workspace")).backgroundColor;
+        if (theme === "light") {
+          assert(!isBlack(footerBg), `light: chat footer stayed black (${footerBg})`);
+          assert(!isBlack(workspaceBg), `light: chat workspace stayed black (${workspaceBg})`);
+        } else {
+          assert(isBlack(footerBg), `dark: chat footer not deep black (${footerBg})`);
+          assert(["rgb(3,4,5)","rgba(3,4,5,1)","rgb(0,0,0)","rgba(0,0,0,1)"].includes(normalize(workspaceBg)), `dark: chat workspace not deep black (${workspaceBg})`);
+        }
+      }
+
+      async function run() {
+        localStorage.removeItem(KEY);
+        await loadThemeRuntime();
+        assertChatTheme("light");
+
+        localStorage.setItem(KEY, "dark");
+        window.dispatchEvent(new StorageEvent("storage", { key:KEY, oldValue:"light", newValue:"dark", storageArea:localStorage, url:location.href }));
+        await wait(100);
+        assertChatTheme("dark");
+
+        await loadSenior("light");
+        await loadSenior("dark");
+        localStorage.setItem(KEY, "light");
+        await loadSenior("light");
+        assert(localStorage.getItem(KEY) === "light", "final light preference did not persist");
+
+        document.documentElement.dataset.themeFooterE2e = "green";
+        status.textContent = "THEME_FOOTER_PRODUCTION_BROWSER=GREEN";
+      }
+
+      run().catch((error) => {
+        document.documentElement.dataset.themeFooterE2e = "red";
+        status.textContent = `THEME_FOOTER_PRODUCTION_BROWSER=RED ${error.message}`;
+      });
+    })();
+  </script>
+</body>
+</html>
