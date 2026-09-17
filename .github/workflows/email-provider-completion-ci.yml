@@ -19,6 +19,8 @@ jobs:
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Provider UI syntax
         run: node --check assets/email-provider-logo-connect-v3.js
       - name: Existing provider button contract
@@ -26,4 +28,4 @@ jobs:
       - name: Provider completion contract
         run: node tests/email-provider-completion.test.mjs
       - name: No accidental whitespace errors
-        run: git diff --check HEAD^ HEAD
+        run: git diff --check origin/${{ github.base_ref }}...HEAD
