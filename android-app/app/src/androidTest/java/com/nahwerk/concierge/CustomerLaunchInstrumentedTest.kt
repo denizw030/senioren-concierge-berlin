@@ -17,13 +17,12 @@ class CustomerLaunchInstrumentedTest {
     val composeRule = createAndroidComposeRule<CustomerLaunchActivity>()
 
     @Test
-    fun launcherStartsPublicAndExposesFreeRegistrationWithoutNetworkCall() {
-        composeRule.onNodeWithText("Dein persönlicher Concierge").assertIsDisplayed()
-        composeRule.onNodeWithTag("public_menu").assertIsDisplayed()
-        composeRule.onNodeWithText("FREE & Tarife").performClick()
-        composeRule.onNodeWithText("Kostenlos starten – ohne Kreditkarte").assertIsDisplayed()
-
-        composeRule.onNodeWithTag("public_register").performScrollTo().assertIsDisplayed().performClick()
+    fun launcherStartsPublicChatBeforeLoginAndExposesAccountActionsWithoutNetworkCall() {
+        composeRule.onNodeWithText("Wie kann ich dir helfen?").assertIsDisplayed()
+        composeRule.onNodeWithTag("guest_chat_input").assertIsDisplayed()
+        composeRule.onNodeWithTag("open_chat_drawer").assertIsDisplayed().performClick()
+        composeRule.onNodeWithTag("guest_profile_menu").assertIsDisplayed().performClick()
+        composeRule.onNodeWithText("Kostenlos registrieren").assertIsDisplayed().performClick()
         composeRule.onNodeWithText("Kostenlos starten").assertIsDisplayed()
         composeRule.onNodeWithText("Kostenlos registrieren").performScrollTo().assertIsDisplayed()
     }
