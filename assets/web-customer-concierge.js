@@ -8,6 +8,8 @@
   const HISTORY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway/web/history";
   const HISTORY_CONTRACT_VERSION = "canonical-core-receipts-v1";
   const SYNC_INTERVAL_MS = 3000;
+  const PERSONA_SYNC_INTERVAL_MS = 30000;
+  const SETTINGS_URL = "/concierge-anpassen";
   const RESPONSE_STATES = new Set(["ANSWER","QUESTION","ACTION_STARTED","ACTION_PENDING","ACTION_RESULT","ERROR_RESPONSE","HANDOFF","SAFE_TERMINATION"]);
 
   let gatewayReady = false;
@@ -17,6 +19,7 @@
   let lastDateKey = "";
   let historyFingerprint = "";
   let syncTimer = null;
+  let lastPersonaSyncAt = 0;
 
   function sessionToken() {
     try { return String(JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null")?.session_token || ""); }
@@ -82,6 +85,62 @@
   function logNode() { return document.getElementById("webConciergeLog"); }
   function scrollBottom() { const log=logNode(); if (log) requestAnimationFrame(() => { log.scrollTop=log.scrollHeight; }); }
 
+  function normalizePersona(raw) {
+    if (!raw || typeof raw !== "object") return null;
+    const rawKey = [raw.persona_id,raw.persona_key,raw.key,raw.slug,raw.id,raw.code].map((v)=>String(v||"").trim().toLowerCase()).find(Boolean) || "";
+    const key = /^[a-z0-9_-]{1,64}$/.test(rawKey) ? rawKey : "";
+    const name = [raw.display_name,raw.name,raw.persona_name,raw.label].map((v)=>String(v||"").trim()).find(Boolean) || (key ? key.charAt(0).toUpperCase()+key.slice(1) : "");
+    const directImage = [raw.image_url,raw.avatar_url,raw.portrait_url,raw.photo_url,raw.image,raw.avatar,raw.portrait].map((v)=>String(v||"").trim()).find(Boolean) || "";
+    let image = "";
+    if (directImage) {
+      try {
+        const url = new URL(directImage,location.origin);
+        if (url.origin === location.origin || url.protocol === "https:") image = url.href;
+      } catch {}
+    }
+    if (!image && key) image = `/assets/concierges/large/${encodeURIComponent(key)}.webp`;
+    return { key, name, image };
+  }
+
+  function openConciergeSettings() { location.href = SETTINGS_URL; }
+
+  function applyPersona(raw) {
+    const persona = normalizePersona(raw);
+    const title = document.getElementById("webConciergeTitle");
+    const avatar = document.querySelector(".web-concierge-avatar");
+    const name = persona?.name || "Dein Concierge";
+    if (title) {
+      title.textContent = name;
+      title.setAttribute("role","link");
+      title.tabIndex = 0;
+      title.setAttribute("aria-label",`${name} – Concierge-Einstellungen öffnen`);
+      title.title = "Concierge-Einstellungen öffnen";
+      title.style.cursor = "pointer";
+      title.onclick = openConciergeSettings;
+      title.onkeydown = (event) => {
+        if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openConciergeSettings(); }
+      };
+    }
+    if (avatar) {
+      avatar.setAttribute("role","link");
+      avatar.tabIndex = 0;
+      avatar.setAttribute("aria-label",`${name} – Concierge-Einstellungen öffnen`);
+      avatar.title = "Concierge-Einstellungen öffnen";
+      avatar.style.cursor = "pointer";
+      avatar.onclick = openConciergeSettings;
+      avatar.onkeydown = (event) => {
+        if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openConciergeSettings(); }
+      };
+      if (persona?.image) {
+        avatar.classList.remove("nahwerk-mark");
+        avatar.style.backgroundImage = `url("${persona.image.replaceAll('"','%22')}")`;
+        avatar.style.backgroundSize = "cover";
+        avatar.style.backgroundPosition = "center top";
+      }
+    }
+    return persona;
+  }
+
   function dateKey(value) {
     const d=new Date(value || Date.now());
     return Number.isNaN(d.getTime()) ? "" : `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
@@ -102,14 +161,25 @@
     const log=logNode(),key=dateKey(at); if(!log||!key||key===lastDateKey)return;
     lastDateKey=key; const el=document.createElement("div");el.className="web-concierge-date";el.textContent=dayLabel(at);log.appendChild(el);
   }
-  function appendMessage(role,text,at=new Date().toISOString(),id="") {
+  function appendMessage(role,text,at=new Date().toISOString(),id="",channel="WEB") {
     const log=logNode(); if(!log||!text)return null;
     log.querySelector(".web-concierge-empty")?.remove(); appendDateIfNeeded(at);
-    const row=document.createElement("div");row.className=`web-concierge-message-row is-${role}`;if(id)row.dataset.messageId=id;
+    const normalizedChannel=String(channel||"WEB").toUpperCase();
+    const row=document.createElement("div");row.className=`web-concierge-message-row is-${role}`;row.dataset.channel=normalizedChannel;if(id)row.dataset.messageId=id;
     const bubble=document.createElement("div");bubble.className=`web-concierge-message web-concierge-message-${role}`;
     const body=document.createElement("span");body.className="web-concierge-message-text";body.textContent=text;
-    const time=document.createElement("span");time.className="web-concierge-message-time";time.textContent=timeLabel(at);
-    bubble.append(body,time);row.appendChild(bubble);log.appendChild(row);scrollBottom();return row;
+    const meta=document.createElement("span");meta.style.cssText="display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-top:3px;min-height:14px";
+    if(normalizedChannel==="WHATSAPP"){
+      const badge=document.createElement("span");
+      badge.className="web-concierge-channel-badge is-whatsapp";
+      badge.textContent="WhatsApp";
+      badge.setAttribute("aria-label","Nachricht über WhatsApp");
+      badge.style.cssText="display:inline-flex;align-items:center;min-height:16px;padding:1px 6px;border:1px solid rgba(93,188,124,.28);border-radius:999px;background:rgba(54,145,84,.12);color:#91cda4;font-size:.58rem;font-weight:800;letter-spacing:.02em";
+      meta.appendChild(badge);
+    }
+    const time=document.createElement("span");time.className="web-concierge-message-time";time.textContent=timeLabel(at);time.style.cssText="float:none;margin:0";
+    meta.appendChild(time);
+    bubble.append(body,meta);row.appendChild(bubble);log.appendChild(row);scrollBottom();return row;
   }
   function emptyChat() {
     const log=logNode(); if(!log)return;clearNode(log);lastDateKey="";historyFingerprint="";
@@ -120,7 +190,7 @@
   function showTyping() {
     const log=logNode(); if(!log)return;removeTyping();
     const row=document.createElement("div");row.className="web-concierge-message-row is-assistant";row.id="webConciergeTyping";
-    const typing=document.createElement("div");typing.className="web-concierge-typing";typing.setAttribute("aria-label","NAHWERK Concierge schreibt");
+    const typing=document.createElement("div");typing.className="web-concierge-typing";typing.setAttribute("aria-label","Dein Concierge schreibt");
     for(let i=0;i<3;i++)typing.appendChild(document.createElement("i"));row.appendChild(typing);log.appendChild(row);scrollBottom();
   }
   function removeTyping(){document.getElementById("webConciergeTyping")?.remove();}
@@ -142,7 +212,7 @@
   function renderCoreV1Response(raw) {
     const response=normalizeCoreV1Response(raw);if(!response||!response.authoritative)return false;
     removeTyping();const now=new Date().toISOString();
-    for(const message of response.messages)appendMessage("assistant",message.text,now,`a:${response.turn_id}`);
+    for(const message of response.messages)appendMessage("assistant",message.text,now,`a:${response.turn_id}`,"WEB");
     if(response.pending_approval)renderApproval(response.pending_approval);
     if(response.error)addRuntimeCard("Das hat noch nicht geklappt",String(response.error.customer_safe_message||"Bitte versuche es noch einmal."),"is-error");
     return true;
@@ -160,6 +230,17 @@
     const url=threadId?`${endpoint}?thread_id=${encodeURIComponent(threadId)}`:endpoint;
     const response=await fetch(url,{headers:{Authorization:`Bearer ${token}`},cache:"no-store",credentials:"omit"});
     const payload=await response.json().catch(()=>({}));if(!response.ok||payload?.ok!==true||payload?.history_contract!==HISTORY_CONTRACT_VERSION)throw new Error("history_unavailable");return payload;
+  }
+
+  async function refreshPersona(force=false) {
+    const now=Date.now();
+    if(!force && now-lastPersonaSyncAt<PERSONA_SYNC_INTERVAL_MS)return true;
+    const me=await gatewayRequest("/web/me"),identity=me?.identity&&typeof me.identity==="object"?me.identity:{};
+    if(me?.ok!==true||me?.environment!=="PROD"||me?.authoritative!==true)throw new Error("gateway_identity_not_authoritative");
+    if(![identity.person_id,identity.customer_account_id,identity.customer_member_id].every(validUuid))throw new Error("gateway_identity_invalid");
+    applyPersona(me.persona);
+    lastPersonaSyncAt=now;
+    return true;
   }
 
   function setComposerReady(ready) {
@@ -181,14 +262,14 @@
     }
   }
   function historySignature(messages) {
-    return (Array.isArray(messages)?messages:[]).map((m)=>`${m?.id||""}|${m?.at||""}|${m?.role||""}|${m?.text||""}`).join("\n");
+    return (Array.isArray(messages)?messages:[]).map((m)=>`${m?.id||""}|${m?.at||""}|${m?.role||""}|${m?.channel||""}|${m?.text||""}`).join("\n");
   }
   function renderHistory(messages,{force=false}={}) {
     const list=Array.isArray(messages)?messages.filter((m)=>(m?.role==="user"||m?.role==="assistant")&&m?.text):[];
     const signature=historySignature(list);if(!force&&signature===historyFingerprint)return false;
     const log=logNode();if(!log)return false;clearNode(log);lastDateKey="";removeTyping();
     if(!list.length){emptyChat();return true;}
-    for(const m of list)appendMessage(m.role,m.text,m.at,m.id);
+    for(const m of list)appendMessage(m.role,m.text,m.at,m.id,m.channel||"WEB");
     historyFingerprint=signature;return true;
   }
   async function loadThreads({selectFirst=false}={}) {
@@ -211,6 +292,7 @@
     const selectedBefore=activeThreadId;
     const loaded=await loadThreads();if(!loaded)return false;
     const serverHasSelected=selectedBefore&&threadCache.some((thread)=>thread.thread_id===selectedBefore);
+    if(Date.now()-lastPersonaSyncAt>=PERSONA_SYNC_INTERVAL_MS){try{await refreshPersona();}catch{}}
     if(serverHasSelected)return refreshThread(selectedBefore);
     if(!selectedBefore&&threadCache[0]){activeThreadId=threadCache[0].thread_id;renderThreads();return refreshThread(activeThreadId,{force:true});}
     return true;
@@ -218,14 +300,14 @@
   function startLiveSync() {
     if(syncTimer)clearInterval(syncTimer);
     syncTimer=setInterval(()=>{void syncHistory();},SYNC_INTERVAL_MS);
-    document.addEventListener("visibilitychange",()=>{if(!document.hidden)void syncHistory();});
+    document.addEventListener("visibilitychange",()=>{if(!document.hidden){void refreshPersona(true).catch(()=>{});void syncHistory();}});
   }
 
   async function sendTurn() {
     const input=document.getElementById("webConciergeInput");if(!(input instanceof HTMLTextAreaElement)||!gatewayReady||sending)return;
     const content=input.value.trim();if(!content||content.length>4000)return;if(!activeThreadId)activeThreadId=crypto.randomUUID();
     const sourceMessageId=crypto.randomUUID(),clientId=`local:${sourceMessageId}`,now=new Date().toISOString();
-    appendMessage("user",content,now,clientId);input.value="";resizeInput();sending=true;setComposerReady(true);showTyping();
+    appendMessage("user",content,now,clientId,"WEB");input.value="";resizeInput();sending=true;setComposerReady(true);showTyping();
     try{
       const response=await gatewayRequest("/web/chat",{method:"POST",body:{message:content,source_message_id:sourceMessageId,thread_id:activeThreadId}});
       if(response?.ok!==true||response?.environment!=="PROD"||response?.authoritative!==true||(response?.thread_id&&response?.thread_id!==activeThreadId))throw new Error("gateway_response_not_authoritative");
@@ -242,15 +324,14 @@
   async function checkReadiness() {
     try{
       const readiness=normalizeGatewayReadiness(await gatewayRequest("/health",{auth:false}));if(readiness?.ready!==true)throw new Error("gateway_not_authoritative");
-      const me=await gatewayRequest("/web/me"),identity=me?.identity&&typeof me.identity==="object"?me.identity:{};
-      if(me?.ok!==true||me?.environment!=="PROD"||me?.authoritative!==true)throw new Error("gateway_identity_not_authoritative");
-      if(![identity.person_id,identity.customer_account_id,identity.customer_member_id].every(validUuid))throw new Error("gateway_identity_invalid");
+      await refreshPersona(true);
       gatewayReady=true;return true;
-    }catch{gatewayReady=false;return false;}
+    }catch{gatewayReady=false;applyPersona(null);return false;}
   }
 
   async function boot() {
     const valid=window.SCBAuth?.validateSession?await window.SCBAuth.validateSession().catch(()=>false):false;if(!valid){location.replace("/anmelden");return;}
+    applyPersona(null);
     const status=document.getElementById("webConciergeStatus");setComposerReady(false);const ready=await checkReadiness();
     if(status){status.textContent=ready?"Online":"Verbindung momentan nicht möglich";status.classList.toggle("is-online",ready);}
     setComposerReady(ready);if(ready){const loaded=await loadThreads({selectFirst:true});if(activeThreadId)await selectThread(activeThreadId);else{newChat();if(!loaded)renderThreads();}startLiveSync();}
@@ -260,6 +341,6 @@
     document.getElementById("webConciergeInput")?.addEventListener("keydown",(event)=>{if(event.key==="Enter"&&!event.shiftKey){event.preventDefault();sendTurn();}});
   }
 
-  window.NAHWERKWebCustomerConciergeTestHooks=Object.freeze({configuredEndpoint,configuredHistoryEndpoint,sessionToken,normalizeGatewayReadiness,normalizeCoreV1Response,renderCoreV1Response,gatewayRequest,historyRequest,syncHistory,CORE_CONTRACT_VERSION,GATEWAY_CONTRACT_VERSION,HISTORY_CONTRACT_VERSION,SYNC_INTERVAL_MS,GATEWAY_ENDPOINT,HISTORY_ENDPOINT});
+  window.NAHWERKWebCustomerConciergeTestHooks=Object.freeze({configuredEndpoint,configuredHistoryEndpoint,sessionToken,normalizeGatewayReadiness,normalizeCoreV1Response,normalizePersona,applyPersona,renderCoreV1Response,gatewayRequest,historyRequest,refreshPersona,syncHistory,CORE_CONTRACT_VERSION,GATEWAY_CONTRACT_VERSION,HISTORY_CONTRACT_VERSION,SYNC_INTERVAL_MS,PERSONA_SYNC_INTERVAL_MS,GATEWAY_ENDPOINT,HISTORY_ENDPOINT});
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();
