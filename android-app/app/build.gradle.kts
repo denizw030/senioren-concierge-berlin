@@ -1,3 +1,6 @@
+import java.security.MessageDigest
+import java.util.Base64
+
 val releaseKeystorePath = System.getenv("NAHWERK_ANDROID_KEYSTORE_PATH")?.trim().orEmpty()
 val releaseStorePassword = System.getenv("NAHWERK_ANDROID_STORE_PASSWORD")?.trim().orEmpty()
 val releaseKeyAlias = System.getenv("NAHWERK_ANDROID_KEY_ALIAS")?.trim().orEmpty()
@@ -52,10 +55,10 @@ val prepareNahwerkSplashAsset = tasks.register("prepareNahwerkSplashAsset") {
             "NAHWERK splash asset requires exactly 6 canonical reference chunks."
         }
         val encoded = orderedParts.joinToString(separator = "") { it.readText().trim() }
-        val bytes = java.util.Base64.getDecoder().decode(encoded)
-        val digest = java.security.MessageDigest.getInstance("SHA-256")
+        val bytes = Base64.getDecoder().decode(encoded)
+        val digest = MessageDigest.getInstance("SHA-256")
             .digest(bytes)
-            .joinToString(separator = "") { "%02x".format(it.toInt() and 0xff) }
+            .joinToString(separator = "") { byte -> "%02x".format(byte.toInt() and 0xff) }
         check(digest == splashAssetSha256) {
             "NAHWERK splash reference checksum mismatch: $digest"
         }
