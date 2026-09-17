@@ -42,8 +42,11 @@
       host.className = "email-multi-account-concierge";
       host.setAttribute("aria-label", "Alle E-Mail-Postfächer");
       host.hidden = true;
-      const shell = document.getElementById("emailLogoConnectShell");
-      (shell?.parentElement || accountRoot).insertBefore(host, shell?.nextSibling || null);
+      const product = document.getElementById("emailConciergeProduct");
+      const accountHead = accountRoot.querySelector(".email-account-head");
+      if (product?.parentElement === accountRoot) product.insertAdjacentElement("afterend", host);
+      else if (accountHead) accountHead.insertAdjacentElement("afterend", host);
+      else accountRoot.prepend(host);
     }
     return host;
   }

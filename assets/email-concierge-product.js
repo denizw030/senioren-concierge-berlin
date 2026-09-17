@@ -107,7 +107,9 @@
       host.id = "emailConciergeProduct";
       host.setAttribute("aria-label", "E-Mail-Concierge");
       host.hidden = true;
-      accountRoot.appendChild(host);
+      const accountHead = accountRoot.querySelector(".email-account-head");
+      if (accountHead) accountHead.insertAdjacentElement("afterend", host);
+      else accountRoot.prepend(host);
     }
     return host;
   }
@@ -328,12 +330,22 @@
     catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
     render();
   }
+  function canonicalGoogleConnection(rows = globalThis.__nahwerkEmailConnections) {
+    if (!Array.isArray(rows)) return null;
+    return rows.some((row) => String(row?.provider || "").toUpperCase() === "GOOGLE" && String(row?.state || row?.status || "").toUpperCase() === "CONNECTED");
+  }
   async function setConnectionState(isConnected) {
-    connected = isConnected === true;
+    const canonical = canonicalGoogleConnection();
+    connected = canonical === null ? isConnected === true : canonical;
     ensureHost();
     if (!connected) { dashboard = null; chatMessages = []; render(); return; }
     await loadDashboard();
   }
+  window.addEventListener("nahwerk:email-connections-updated", (event) => {
+    const rows = Array.isArray(event.detail?.connections) ? event.detail.connections : globalThis.__nahwerkEmailConnections;
+    const canonical = canonicalGoogleConnection(rows);
+    if (canonical !== null) void setConnectionState(canonical);
+  });
   globalThis.NAHWERKEmailConciergeProduct = Object.freeze({
     setConnectionState,
     refresh() { return loadDashboard(false); }
