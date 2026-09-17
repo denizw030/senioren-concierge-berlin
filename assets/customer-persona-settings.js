@@ -3,6 +3,7 @@
 
   const SESSION_KEY = "scb_web_session";
   const GATEWAY = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway";
+  const PERSONA_API = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-persona-secure";
   let currentKey = "";
   let selectedKey = "";
   let personas = [];
@@ -29,12 +30,12 @@
     return `/assets/concierges/large/${encodeURIComponent(key)}.webp`;
   }
 
-  async function request(path, { method = "GET", body = null } = {}) {
+  async function requestUrl(url, { method = "GET", body = null } = {}) {
     const token = sessionToken();
     if (!token) throw new Error("session_required");
     const headers = { Authorization: `Bearer ${token}` };
     if (body !== null) headers["Content-Type"] = "application/json";
-    const response = await fetch(`${GATEWAY}${path}`, {
+    const response = await fetch(url, {
       method,
       headers,
       body: body === null ? undefined : JSON.stringify(body),
@@ -46,6 +47,16 @@
       throw new Error(String(payload?.error || `http_${response.status}`));
     }
     return payload;
+  }
+
+  const readCurrentPersona = () => requestUrl(`${GATEWAY}/web/me`);
+  const readAvailablePersonas = () => requestUrl(PERSONA_API);
+  const savePersona = (personaKey) => requestUrl(PERSONA_API, { method: "POST", body: { persona_key: personaKey } });
+
+  function personaKeyOf(raw) {
+    return [raw?.persona_id, raw?.persona_key, raw?.key, raw?.slug, raw?.id]
+      .map((value) => String(value || "").trim().toLowerCase())
+      .find((value) => /^[a-z0-9_-]{1,64}$/.test(value)) || "";
   }
 
   function status(text, type = "") {
@@ -110,11 +121,9 @@
 
   async function load() {
     status("Deine Concierge-Auswahl wird geladen …");
-    const [me, list] = await Promise.all([request("/web/me"), request("/web/personas")]);
-    const rawKey = [me?.persona?.persona_id, me?.persona?.persona_key, me?.persona?.key, me?.persona?.slug, me?.persona?.id]
-      .map((value) => String(value || "").trim().toLowerCase()).find(Boolean) || "";
-    currentKey = rawKey;
-    selectedKey = rawKey;
+    const [me, list] = await Promise.all([readCurrentPersona(), readAvailablePersonas()]);
+    currentKey = personaKeyOf(me?.persona);
+    selectedKey = currentKey;
     personas = Array.isArray(list?.personas) ? list.personas : [];
     render();
     updateSave();
@@ -127,11 +136,14 @@
     if (button) button.disabled = true;
     status("Auswahl wird gespeichert …");
     try {
-      const result = await request("/web/persona", { method: "POST", body: { persona_key: selectedKey } });
-      const saved = String(result?.persona?.persona_key || result?.persona_key || "").trim().toLowerCase();
-      if (saved !== selectedKey) throw new Error("persona_confirmation_mismatch");
-      currentKey = saved;
-      selectedKey = saved;
+      const result = await savePersona(selectedKey);
+      const written = String(result?.persona_key || "").trim().toLowerCase();
+      if (written !== selectedKey) throw new Error("persona_write_confirmation_mismatch");
+      const me = await readCurrentPersona();
+      const confirmed = personaKeyOf(me?.persona);
+      if (confirmed !== selectedKey) throw new Error("persona_read_after_write_mismatch");
+      currentKey = confirmed;
+      selectedKey = confirmed;
       render();
       updateSave();
       status("Gespeichert. Deine Auswahl gilt automatisch für NAHWERK.", "success");
@@ -150,7 +162,7 @@
     catch { status("Deine Concierge-Auswahl ist momentan nicht verfügbar. Bitte versuche es erneut.", "error"); }
   }
 
-  window.NAHWERKCustomerPersonaSettingsTestHooks = Object.freeze({ cleanName, imageFor, request });
+  window.NAHWERKCustomerPersonaSettingsTestHooks = Object.freeze({ cleanName, imageFor, personaKeyOf, readCurrentPersona, readAvailablePersonas, savePersona });
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot, { once: true });
   else void boot();
 })();
