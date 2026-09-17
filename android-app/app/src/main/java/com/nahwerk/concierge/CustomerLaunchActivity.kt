@@ -272,6 +272,7 @@ private fun CustomerAccountScreen(onLogout: () -> Unit) {
             }
 
             AppProdGatewaySurface(onSessionExpired = onLogout)
+            CustomerSharedHistorySurface(onSessionExpired = onLogout)
             ProdCustomerHub()
             PaygQuoteApprovalSurface()
             PaymentMethodProdSurface()
