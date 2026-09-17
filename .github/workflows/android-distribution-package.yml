@@ -209,11 +209,7 @@ jobs:
           profile: pixel_2
           disable-animations: true
           script: |
-            APK="$(find android-app/app/build/outputs/apk/release -type f -name '*.apk' | head -n 1)"
-            test -n "$APK"
-            adb install -r "$APK"
-            adb shell am start -W -n com.nahwerk.concierge/.CustomerLaunchActivity
-            adb shell dumpsys activity activities | grep -F 'com.nahwerk.concierge/.CustomerLaunchActivity'
+            APK="$(find android-app/app/build/outputs/apk/release -type f -name '*.apk' | head -n 1)"; test -n "$APK"; adb install -r "$APK"; adb shell am start -W -n com.nahwerk.concierge/.CustomerLaunchActivity; adb shell dumpsys activity activities | grep -F 'com.nahwerk.concierge/.CustomerLaunchActivity'
 
       - name: Package signed artifacts without publishing
         shell: bash
