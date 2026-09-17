@@ -1,15 +1,26 @@
 package com.nahwerk.concierge
 
+import android.graphics.Color as AndroidColor
 import android.os.Bundle
+import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -23,26 +34,103 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.nahwerk.concierge.data.ProdCustomerApi
 import com.nahwerk.concierge.data.ProdCustomerPolicy
 import com.nahwerk.concierge.data.ProductAuthState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class CustomerLaunchActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { CustomerLaunchRoot() }
+        setLaunchSystemBars(splash = true)
+        setContent {
+            CustomerLaunchExperience(
+                onSplashCompleted = { setLaunchSystemBars(splash = false) }
+            )
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun setLaunchSystemBars(splash: Boolean) {
+        val customerBackground = AndroidColor.rgb(255, 253, 248)
+        window.statusBarColor = if (splash) AndroidColor.BLACK else customerBackground
+        window.navigationBarColor = if (splash) AndroidColor.BLACK else customerBackground
+
+        val lightSystemBars =
+            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+        val currentFlags = window.decorView.systemUiVisibility
+        window.decorView.systemUiVisibility = if (splash) {
+            currentFlags and lightSystemBars.inv()
+        } else {
+            currentFlags or lightSystemBars
+        }
+    }
+}
+
+@Composable
+private fun CustomerLaunchExperience(onSplashCompleted: () -> Unit) {
+    var showSplash by rememberSaveable { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        if (showSplash) {
+            delay(850)
+            showSplash = false
+            delay(260)
+        }
+        onSplashCompleted()
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+    ) {
+        CustomerLaunchRoot()
+
+        AnimatedVisibility(
+            visible = showSplash,
+            enter = EnterTransition.None,
+            exit = fadeOut(animationSpec = tween(durationMillis = 260))
+        ) {
+            NahwerkSplashScreen()
+        }
+    }
+}
+
+@Composable
+private fun NahwerkSplashScreen() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black),
+        contentAlignment = Alignment.Center
+    ) {
+        Image(
+            painter = painterResource(R.drawable.nahwerk_brand_coin_dimmed),
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxWidth(0.53f)
+                .widthIn(max = 190.dp)
+                .aspectRatio(1f),
+            contentScale = ContentScale.Fit
+        )
     }
 }
 
