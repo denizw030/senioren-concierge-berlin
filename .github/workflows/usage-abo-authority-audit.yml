@@ -1,0 +1,33 @@
+name: Nutzung Abo Authority Audit
+
+on:
+  push:
+    branches:
+      - audit/usage-abo-central-authority-20260917
+  pull_request:
+    paths:
+      - "konto.html"
+      - "assets/site-ui.js"
+      - "assets/account-premium-ui.css"
+      - "tests/usage-abo-central-authority-guard.test.mjs"
+      - "docs/usage-abo-central-authority-audit-20260917.md"
+      - ".github/workflows/usage-abo-authority-audit.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  authority-guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Nutzung/Abo central-authority guard
+        run: node --test tests/usage-abo-central-authority-guard.test.mjs
+      - name: Existing account usage regression
+        run: node --test tests/account-usage.test.mjs
+      - name: Whitespace check
+        run: git diff --check HEAD^ HEAD
