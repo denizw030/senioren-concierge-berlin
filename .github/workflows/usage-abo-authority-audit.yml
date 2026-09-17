@@ -22,6 +22,8 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -30,4 +32,4 @@ jobs:
       - name: Existing account usage regression
         run: node --test tests/account-usage.test.mjs
       - name: Whitespace check
-        run: git diff --check HEAD^ HEAD
+        run: git diff --check origin/${{ github.base_ref || 'main' }}...HEAD
