@@ -77,8 +77,9 @@ jobs:
             chat="$(curl -fsSL "https://nahwerkconcierge.com/web-concierge.html?deploy=${GITHUB_SHA}-${attempt}" || true)"
             senior="$(curl -fsSL "https://nahwerkconcierge.com/senioren-concierge.html?deploy=${GITHUB_SHA}-${attempt}" || true)"
             if printf '%s' "$fixture" | grep -q 'THEME_FOOTER_PRODUCTION_BROWSER' \
-              && printf '%s' "$siteui" | grep -q 'nw-theme-surface-v2' \
               && printf '%s' "$siteui" | grep -q 'nw_portal_theme_v1' \
+              && printf '%s' "$siteui" | grep -q 'body.nw-portal-light .web-concierge-shell' \
+              && printf '%s' "$siteui" | grep -q 'body.senior-product.nw-portal-dark>main' \
               && printf '%s' "$chat" | grep -q 'Vertrag widerrufen' \
               && printf '%s' "$senior" | grep -q 'assets/site-ui.js'; then
               green=1
