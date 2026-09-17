@@ -40,9 +40,14 @@ jobs:
         run: |
           set -euo pipefail
           SDK="$(xcrun --sdk iphonesimulator --show-sdk-path)"
-          mapfile -t SOURCES < <(find ios-app/NAHWERK -name '*.swift' -print | sort)
-          test "${#SOURCES[@]}" -gt 0
-          xcrun swiftc             -typecheck             -module-name NAHWERK             -sdk "$SDK"             -target arm64-apple-ios17.0-simulator             "${SOURCES[@]}"
+          SOURCES="$(find ios-app/NAHWERK -name '*.swift' -print | sort)"
+          test -n "$SOURCES"
+          xcrun swiftc \
+            -typecheck \
+            -module-name NAHWERK \
+            -sdk "$SDK" \
+            -target arm64-apple-ios17.0-simulator \
+            $SOURCES
 
       - name: Install XcodeGen
         shell: bash
@@ -63,7 +68,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          xcodebuild             -project ios-app/NAHWERK.xcodeproj             -scheme NAHWERK             -sdk iphonesimulator             -destination 'generic/platform=iOS Simulator'             CODE_SIGNING_ALLOWED=NO             NAHWERK_IOS_BUNDLE_ID="$NAHWERK_IOS_BUNDLE_ID"             build
+          xcodebuild \
+            -project ios-app/NAHWERK.xcodeproj \
+            -scheme NAHWERK \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            NAHWERK_IOS_BUNDLE_ID="$NAHWERK_IOS_BUNDLE_ID" \
+            build
 
       - name: Explain build gate
         if: ${{ vars.NAHWERK_IOS_BUNDLE_ID == '' }}
@@ -81,4 +93,10 @@ jobs:
             echo "iPhone 13 Pro simulator runtime is not installed on this runner."
             exit 0
           fi
-          xcodebuild             -project ios-app/NAHWERK.xcodeproj             -scheme NAHWERK             -destination 'platform=iOS Simulator,name=iPhone 13 Pro'             CODE_SIGNING_ALLOWED=NO             NAHWERK_IOS_BUNDLE_ID="$NAHWERK_IOS_BUNDLE_ID"             test
+          xcodebuild \
+            -project ios-app/NAHWERK.xcodeproj \
+            -scheme NAHWERK \
+            -destination 'platform=iOS Simulator,name=iPhone 13 Pro' \
+            CODE_SIGNING_ALLOWED=NO \
+            NAHWERK_IOS_BUNDLE_ID="$NAHWERK_IOS_BUNDLE_ID" \
+            test
