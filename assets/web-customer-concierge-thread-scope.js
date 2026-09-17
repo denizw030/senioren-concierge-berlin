@@ -50,16 +50,17 @@
       const title=button.querySelector(".web-concierge-thread-title");
       const preview=button.querySelector(".web-concierge-thread-preview");
       const isMain=(mainThreadId&&button.dataset.threadId===mainThreadId)||title?.textContent==="Hauptchat";
-      button.dataset.chatScope=isMain?"MAIN":"EXTRA";
+      const scope=isMain?"MAIN":"EXTRA";
+      if(button.dataset.chatScope!==scope)button.dataset.chatScope=scope;
       if(isMain){
-        if(title)title.textContent="Hauptchat";
-        if(preview)preview.textContent="Web · App · WhatsApp";
-        button.setAttribute("aria-label","Hauptchat – Web, App und WhatsApp");
-        button.style.border="1px solid rgba(205,168,78,.26)";
-        button.style.background="rgba(205,168,78,.065)";
+        if(title&&title.textContent!=="Hauptchat")title.textContent="Hauptchat";
+        if(preview&&preview.textContent!=="Web · App · WhatsApp")preview.textContent="Web · App · WhatsApp";
+        if(button.getAttribute("aria-label")!=="Hauptchat – Web, App und WhatsApp")button.setAttribute("aria-label","Hauptchat – Web, App und WhatsApp");
+        if(button.style.border!=="1px solid rgba(205, 168, 78, 0.26)")button.style.border="1px solid rgba(205,168,78,.26)";
+        if(button.style.background!=="rgba(205, 168, 78, 0.065)")button.style.background="rgba(205,168,78,.065)";
       }else{
-        button.style.border="1px solid transparent";
-        button.style.background="";
+        if(button.style.border!=="1px solid transparent")button.style.border="1px solid transparent";
+        if(button.style.background)button.style.background="";
       }
     }
   }
