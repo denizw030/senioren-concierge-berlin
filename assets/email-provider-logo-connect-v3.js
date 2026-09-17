@@ -3,17 +3,18 @@
 
   const BASE = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-email-runtime";
   const SESSION_KEY = "scb_web_session";
+  const RETURN_TO = "https://nahwerkconcierge.com/email-concierge.html";
   const CAPABILITIES = ["EMAIL_READ", "EMAIL_SEARCH", "EMAIL_ATTACHMENTS", "EMAIL_DRAFT", "EMAIL_MAILBOX", "EMAIL_SEND"];
   const PROVIDERS = Object.freeze([
     { id: "google", name: "Gmail", mode: "google", logo: "gmail", secret: "", help: "Mit deinem Google-Konto anmelden und NAHWERK freigeben." },
     { id: "microsoft", name: "Outlook", mode: "microsoft", logo: "microsoft", secret: "", help: "Mit deinem Microsoft-Konto anmelden und NAHWERK freigeben." },
-    { id: "yahoo", name: "Yahoo Mail", mode: "manual", logo: "yahoo", secret: "App-Passwort", help: "Yahoo nutzt für verbundene Apps ein eigenes App-Passwort." },
+    { id: "yahoo", name: "Yahoo Mail", mode: "yahoo", logo: "yahoo", secret: "", help: "Mit deinem Yahoo-Konto anmelden und NAHWERK freigeben." },
     { id: "icloud", name: "iCloud Mail", mode: "manual", logo: "icloud", secret: "App-spezifisches Passwort", help: "Apple nutzt für Mail-Apps ein app-spezifisches Passwort." },
-    { id: "gmx", name: "GMX", mode: "manual", logo: "gmx", secret: "Passwort für E-Mail-Programme", help: "Nutze dein für E-Mail-Programme freigegebenes Passwort." },
-    { id: "webde", name: "WEB.DE", mode: "manual", logo: "webde", secret: "Passwort für E-Mail-Programme", help: "Nutze dein für E-Mail-Programme freigegebenes Passwort." },
+    { id: "gmx", name: "GMX", mode: "manual", logo: "gmx", secret: "App-Passwort", help: "Nutze das separate GMX App-Passwort für externe E-Mail-Programme." },
+    { id: "webde", name: "WEB.DE", mode: "manual", logo: "webde", secret: "App-Passwort", help: "Nutze das separate WEB.DE App-Passwort für externe E-Mail-Programme." },
     { id: "telekom", name: "Telekom Mail", mode: "manual", logo: "telekom", secret: "Passwort für E-Mail-Programme", help: "Nutze das separate Passwort für E-Mail-Programme." },
-    { id: "fastmail", name: "Fastmail", mode: "manual", logo: "fastmail", secret: "App-Passwort", help: "Fastmail nutzt für verbundene Apps ein App-Passwort." },
-    { id: "zoho", name: "Zoho Mail", mode: "manual", logo: "zoho", secret: "App- oder Mail-Passwort", help: "Nutze das für externe Mail-Apps freigegebene Passwort." },
+    { id: "fastmail", name: "Fastmail", mode: "manual", logo: "fastmail", secret: "App-Passwort", help: "Nutze ein Fastmail App-Passwort. IMAP/SMTP muss in deinem Tarif verfügbar sein." },
+    { id: "zoho", name: "Zoho Mail", mode: "manual", logo: "zoho", secret: "App- oder Mail-Passwort", help: "Wähle dein Zoho-Rechenzentrum. Bei aktivierter Zwei-Faktor-Authentifizierung nutzt du ein App-Passwort." },
     { id: "ionos", name: "IONOS", mode: "manual", logo: "ionos", secret: "E-Mail-Passwort", help: "Nutze das Passwort deines IONOS-Postfachs." },
     { id: "strato", name: "STRATO", mode: "manual", logo: "strato", secret: "E-Mail-Passwort", help: "Nutze das Passwort deines STRATO-Postfachs." }
   ]);
@@ -44,7 +45,7 @@
   let busy = false;
   let addMode = false;
 
-  const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[ch]));
+  const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
   const setText = (element, value) => { if (element && element.textContent !== String(value ?? "")) element.textContent = String(value ?? ""); };
 
   function token() {
@@ -101,7 +102,11 @@
   const providerById = (id) => PROVIDERS.find((provider) => provider.id === id) || null;
   const catalogRow = (id) => catalog.find((provider) => String(provider?.id || "").toLowerCase() === id) || null;
   const providerConnections = (id) => connections.filter((connection) => String(connection?.provider || "").toLowerCase() === id && String(connection?.state || "").toUpperCase() === "CONNECTED");
-  const providerReady = (provider) => provider.id !== "microsoft" || catalogRow("microsoft")?.connection_ready === true;
+  const providerReady = (provider) => {
+    const row = catalogRow(provider.id);
+    if (!row) return provider.id === "google";
+    return row.backend_ready !== false && row.connection_ready !== false;
+  };
 
   function ensureShell() {
     if (document.getElementById("emailLogoConnectShell")) return;
@@ -120,7 +125,7 @@
       const rows = providerConnections(provider.id);
       const connected = rows.length > 0;
       const ready = providerReady(provider);
-      const status = connected ? `${rows.length} Konto${rows.length === 1 ? "" : "en"} verbunden` : "";
+      const status = connected ? `${rows.length} Konto${rows.length === 1 ? "" : "en"} verbunden` : (!ready ? "Noch nicht verfügbar" : "");
       return `<article class="email-logo-provider-card${connected ? " is-connected" : ""}${!ready ? " is-unavailable" : ""}" data-logo-provider="${provider.id}">
         <span class="email-logo-provider-top">${LOGOS[provider.logo]}</span>
         <span><strong>${esc(provider.name)}</strong>${status ? `<span class="email-logo-provider-status">${esc(status)}</span>` : ""}</span>
@@ -149,7 +154,7 @@
     backdrop.id = "emailProviderConnectBackdrop";
     backdrop.className = "email-provider-connect-backdrop";
     backdrop.hidden = true;
-    backdrop.innerHTML = '<section class="email-provider-connect-modal" role="dialog" aria-modal="true" aria-labelledby="emailProviderConnectTitle"><div class="email-provider-connect-head"><div class="email-provider-connect-identity"><span id="emailProviderConnectLogo"></span><div><h3 id="emailProviderConnectTitle">E-Mail verbinden</h3><p id="emailProviderConnectSubtitle">Sicher mit NAHWERK verbinden</p></div></div><button class="email-provider-connect-close" id="emailProviderConnectClose" type="button" aria-label="Schließen">×</button></div><p class="email-provider-connect-copy" id="emailProviderConnectCopy"></p><div class="email-provider-account-list" id="emailProviderAccountList"></div><button class="email-provider-add-account" id="emailProviderAddAccount" type="button" hidden>+ Weiteres Konto verbinden</button><div id="emailProviderCredentialFields"><label class="email-provider-connect-field"><span>E-Mail-Adresse</span><input id="emailProviderConnectEmail" type="email" inputmode="email" autocomplete="email" maxlength="320"></label><label class="email-provider-connect-field"><span id="emailProviderConnectSecretLabel">Passwort</span><input id="emailProviderConnectSecret" type="password" autocomplete="new-password" maxlength="512"></label><p class="email-provider-connect-help" id="emailProviderConnectHelp"></p></div><div class="email-provider-connect-message" id="emailProviderConnectMessage" aria-live="polite"></div><div class="email-provider-connect-actions"><button class="email-provider-connect-secondary" id="emailProviderCancelAdd" type="button" hidden>Abbrechen</button><button class="email-provider-connect-primary" id="emailProviderConnectSubmit" type="button">Verbinden</button></div></section>';
+    backdrop.innerHTML = '<section class="email-provider-connect-modal" role="dialog" aria-modal="true" aria-labelledby="emailProviderConnectTitle"><div class="email-provider-connect-head"><div class="email-provider-connect-identity"><span id="emailProviderConnectLogo"></span><div><h3 id="emailProviderConnectTitle">E-Mail verbinden</h3><p id="emailProviderConnectSubtitle">Sicher mit NAHWERK verbinden</p></div></div><button class="email-provider-connect-close" id="emailProviderConnectClose" type="button" aria-label="Schließen">×</button></div><p class="email-provider-connect-copy" id="emailProviderConnectCopy"></p><div class="email-provider-account-list" id="emailProviderAccountList"></div><button class="email-provider-add-account" id="emailProviderAddAccount" type="button" hidden>+ Weiteres Konto verbinden</button><div id="emailProviderCredentialFields"><label class="email-provider-connect-field"><span>E-Mail-Adresse</span><input id="emailProviderConnectEmail" type="email" inputmode="email" autocomplete="email" maxlength="320"></label><label class="email-provider-connect-field"><span id="emailProviderConnectSecretLabel">Passwort</span><input id="emailProviderConnectSecret" type="password" autocomplete="new-password" maxlength="512"></label><div id="emailProviderZohoOptions" hidden><label class="email-provider-connect-field"><span>Zoho-Rechenzentrum</span><select id="emailProviderZohoDc"><option value="com">Global (.com)</option><option value="eu">Europa (.eu)</option><option value="in">Indien (.in)</option><option value="com.au">Australien (.com.au)</option><option value="jp">Japan (.jp)</option><option value="ca">Kanada (.ca)</option><option value="sa">Saudi-Arabien (.sa)</option></select></label><label class="email-provider-connect-field"><span><input id="emailProviderZohoOrganization" type="checkbox"> Organisations-/Business-Postfach</span></label></div><p class="email-provider-connect-help" id="emailProviderConnectHelp"></p></div><div class="email-provider-connect-message" id="emailProviderConnectMessage" aria-live="polite"></div><div class="email-provider-connect-actions"><button class="email-provider-connect-secondary" id="emailProviderCancelAdd" type="button" hidden>Abbrechen</button><button class="email-provider-connect-primary" id="emailProviderConnectSubmit" type="button">Verbinden</button></div></section>';
     document.body.appendChild(backdrop);
     backdrop.addEventListener("click", (event) => { if (event.target === backdrop) closeModal(); });
     document.getElementById("emailProviderConnectClose")?.addEventListener("click", closeModal);
@@ -162,8 +167,12 @@
   function clearCredentials() {
     const email = document.getElementById("emailProviderConnectEmail");
     const secret = document.getElementById("emailProviderConnectSecret");
+    const zohoDc = document.getElementById("emailProviderZohoDc");
+    const zohoOrg = document.getElementById("emailProviderZohoOrganization");
     if (email) email.value = "";
     if (secret) secret.value = "";
+    if (zohoDc) zohoDc.value = "com";
+    if (zohoOrg) zohoOrg.checked = false;
   }
 
   function renderAccounts() {
@@ -188,11 +197,13 @@
     renderAccounts();
 
     const fields = document.getElementById("emailProviderCredentialFields");
+    const zohoOptions = document.getElementById("emailProviderZohoOptions");
     const add = document.getElementById("emailProviderAddAccount");
     const cancel = document.getElementById("emailProviderCancelAdd");
     const submit = document.getElementById("emailProviderConnectSubmit");
     const showCredentials = selected.mode === "manual" && (addMode || rows.length === 0);
     if (fields) fields.hidden = !showCredentials;
+    if (zohoOptions) zohoOptions.hidden = !showCredentials || selected.id !== "zoho";
     if (add) add.hidden = selected.mode !== "manual" || rows.length === 0 || addMode;
     if (cancel) cancel.hidden = !addMode || rows.length === 0;
     if (submit) {
@@ -241,20 +252,26 @@
     window.dispatchEvent(new CustomEvent("nahwerk:email-connections-updated", { detail: { connections: connections.slice() } }));
   }
 
+  async function redirectOAuth(data, hostTest, errorCode) {
+    const raw = String(data?.authorization_url || data?.authorization_redirect_url || "");
+    const url = new URL(raw);
+    if (url.protocol !== "https:" || !hostTest(url.hostname)) throw new Error(errorCode);
+    window.location.assign(url.toString());
+  }
+
   async function startGoogle() {
     const data = await api("/email/connect", { method: "POST", body: JSON.stringify({ provider: "GOOGLE", requested_capabilities: CAPABILITIES }) });
-    const raw = String(data?.authorization_redirect_url || "");
-    const url = new URL(raw);
-    if (url.protocol !== "https:" || url.hostname !== "accounts.google.com") throw new Error("EMAIL_OAUTH_FAILED");
-    window.location.assign(url.toString());
+    await redirectOAuth(data, (host) => host === "accounts.google.com", "EMAIL_OAUTH_FAILED");
   }
 
   async function startMicrosoft() {
     const data = await api("/email/connect/microsoft/web", { method: "POST", body: "{}" });
-    const raw = String(data?.authorization_url || "");
-    const url = new URL(raw);
-    if (url.protocol !== "https:" || !url.hostname.endsWith("microsoftonline.com")) throw new Error("MICROSOFT_OAUTH_FAILED");
-    window.location.assign(url.toString());
+    await redirectOAuth(data, (host) => host.endsWith("microsoftonline.com"), "MICROSOFT_OAUTH_FAILED");
+  }
+
+  async function startYahoo() {
+    const data = await api("/email/connect/yahoo/web", { method: "POST", body: JSON.stringify({ return_to: RETURN_TO }) });
+    await redirectOAuth(data, (host) => host === "api.login.yahoo.com", "YAHOO_OAUTH_FAILED");
   }
 
   async function connectProvider(provider) {
@@ -264,7 +281,8 @@
     renderGrid();
     try {
       if (provider.mode === "google") await startGoogle();
-      else await startMicrosoft();
+      else if (provider.mode === "microsoft") await startMicrosoft();
+      else if (provider.mode === "yahoo") await startYahoo();
     } catch {
       busy = false;
       renderGrid();
@@ -299,7 +317,11 @@
     const secret = String(secretElement?.value || "");
     if (!email.includes("@") || !secret) { setText(message, "Bitte E-Mail-Adresse und Passwort prüfen."); return; }
     const payload = { provider: selected.id, provider_email: email, username: email, secret };
-    if (selected.id === "zoho") payload.connection_metadata = { zoho_datacenter: "com" };
+    if (selected.id === "zoho") {
+      const dc = String(document.getElementById("emailProviderZohoDc")?.value || "com");
+      const organization = Boolean(document.getElementById("emailProviderZohoOrganization")?.checked);
+      payload.connection_metadata = { zoho_datacenter: dc, zoho_organization: organization };
+    }
     await api("/email/connect/manual", { method: "POST", body: JSON.stringify(payload) });
     if (secretElement) secretElement.value = "";
     await refresh();
@@ -328,10 +350,13 @@
   async function disconnect(id, closeAfter) {
     if (!id || busy) return;
     const message = document.getElementById("emailProviderConnectMessage");
+    const row = connections.find((connection) => String(connection?.connection_id || "") === id);
+    const provider = String(row?.provider || "").toLowerCase();
+    const path = provider === "yahoo" ? "/email/yahoo/disconnect/web" : "/email/connections/disconnect";
     busy = true;
     renderGrid();
     try {
-      await api("/email/connections/disconnect", { method: "POST", body: JSON.stringify({ connection_id: id }) });
+      await api(path, { method: "POST", body: JSON.stringify({ connection_id: id }) });
       await refresh();
       if (closeAfter) closeModal();
       else {
