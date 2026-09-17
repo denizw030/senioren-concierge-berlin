@@ -42,47 +42,51 @@ jobs:
           )
 
           old_state = '''  async function setConnectionState(isConnected) {
-              connected = isConnected === true;
-              ensureHost();
-              if (!connected) { dashboard = null; chatMessages = []; render(); return; }
-              await loadDashboard();
-            }'''
+    connected = isConnected === true;
+    ensureHost();
+    if (!connected) { dashboard = null; chatMessages = []; render(); return; }
+    await loadDashboard();
+  }'''
           new_state = '''  function canonicalGoogleConnection(rows = globalThis.__nahwerkEmailConnections) {
-              if (!Array.isArray(rows)) return null;
-              return rows.some((row) => String(row?.provider || "").toUpperCase() === "GOOGLE" && String(row?.state || row?.status || "").toUpperCase() === "CONNECTED");
-            }
-            async function setConnectionState(isConnected) {
-              const canonical = canonicalGoogleConnection();
-              connected = canonical === null ? isConnected === true : canonical;
-              ensureHost();
-              if (!connected) { dashboard = null; chatMessages = []; render(); return; }
-              await loadDashboard();
-            }'''
+    if (!Array.isArray(rows)) return null;
+    return rows.some((row) => String(row?.provider || "").toUpperCase() === "GOOGLE" && String(row?.state || row?.status || "").toUpperCase() === "CONNECTED");
+  }
+  async function setConnectionState(isConnected) {
+    const canonical = canonicalGoogleConnection();
+    connected = canonical === null ? isConnected === true : canonical;
+    ensureHost();
+    if (!connected) { dashboard = null; chatMessages = []; render(); return; }
+    await loadDashboard();
+  }'''
           replace_once(product, old_state, new_state)
 
           old_export = '''  globalThis.NAHWERKEmailConciergeProduct = Object.freeze({
-              setConnectionState,
-              refresh() { return loadDashboard(false); }
-            });'''
+    setConnectionState,
+    refresh() { return loadDashboard(false); }
+  });'''
           new_export = '''  window.addEventListener("nahwerk:email-connections-updated", (event) => {
-              const rows = Array.isArray(event.detail?.connections) ? event.detail.connections : globalThis.__nahwerkEmailConnections;
-              const canonical = canonicalGoogleConnection(rows);
-              if (canonical !== null) void setConnectionState(canonical);
-            });
-            globalThis.NAHWERKEmailConciergeProduct = Object.freeze({
-              setConnectionState,
-              refresh() { return loadDashboard(false); }
-            });'''
+    const rows = Array.isArray(event.detail?.connections) ? event.detail.connections : globalThis.__nahwerkEmailConnections;
+    const canonical = canonicalGoogleConnection(rows);
+    if (canonical !== null) void setConnectionState(canonical);
+  });
+  globalThis.NAHWERKEmailConciergeProduct = Object.freeze({
+    setConnectionState,
+    refresh() { return loadDashboard(false); }
+  });'''
           replace_once(product, old_export, new_export)
 
           multi = "assets/email-multi-account-concierge-v1.js"
-          old_multi = '''      const shell = document.getElementById("emailLogoConnectShell");
-              (shell?.parentElement || accountRoot).insertBefore(host, shell?.nextSibling || null);'''
-          new_multi = '''      const product = document.getElementById("emailConciergeProduct");
-              const accountHead = accountRoot.querySelector(".email-account-head");
-              if (product?.parentElement === accountRoot) product.insertAdjacentElement("afterend", host);
-              else if (accountHead) accountHead.insertAdjacentElement("afterend", host);
-              else accountRoot.prepend(host);'''
+          old_multi = (
+              '      const shell = document.getElementById("emailLogoConnectShell");\n'
+              '      (shell?.parentElement || accountRoot).insertBefore(host, shell?.nextSibling || null);'
+          )
+          new_multi = (
+              '      const product = document.getElementById("emailConciergeProduct");\n'
+              '      const accountHead = accountRoot.querySelector(".email-account-head");\n'
+              '      if (product?.parentElement === accountRoot) product.insertAdjacentElement("afterend", host);\n'
+              '      else if (accountHead) accountHead.insertAdjacentElement("afterend", host);\n'
+              '      else accountRoot.prepend(host);'
+          )
           replace_once(multi, old_multi, new_multi)
 
           test_path = Path("tests/email-concierge-product.test.mjs")
