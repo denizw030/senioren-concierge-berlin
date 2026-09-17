@@ -1,20 +1,24 @@
 (() => {
   const isCustomerAccount = /(?:^|\/)konto(?:\.html)?\/?$/.test(location.pathname);
   const isProdCustomerSurface = /(?:^|\/)(?:konto|payg|web-concierge)(?:\.html)?\/?$/.test(location.pathname);
+  const isPublicSeniorSurface = /(?:^|\/)(?:senioren-concierge|angehoerige)(?:\.html)?\/?$/.test(location.pathname) || Boolean(document.body?.classList?.contains('senior-product'));
+  const isThemeAwareSurface = isProdCustomerSurface || isPublicSeniorSurface;
   const PORTAL_THEME_KEY = 'nw_portal_theme_v1';
   const KONTO_FIX_STYLE_ID = 'nw-konto-targeted-fixes-v1';
 
-  const readPortalTheme = () => {
+  const readStoredPortalTheme = () => {
     try {
       const value = localStorage.getItem(PORTAL_THEME_KEY);
-      return value === 'light' || value === 'dark' ? value : 'dark';
+      return value === 'light' || value === 'dark' ? value : null;
     } catch (_) {
-      return 'dark';
+      return null;
     }
   };
 
+  const readPortalTheme = () => readStoredPortalTheme() || (isPublicSeniorSurface && !isProdCustomerSurface ? 'light' : 'dark');
+
   const applyPortalTheme = (theme) => {
-    if (!isProdCustomerSurface) return;
+    if (!isThemeAwareSurface) return;
     const normalized = theme === 'light' ? 'light' : 'dark';
     document.documentElement.dataset.nwPortalTheme = normalized;
     if (document.body) {
@@ -112,6 +116,11 @@
   };
 
   applyPortalTheme(readPortalTheme());
+  if (isThemeAwareSurface) {
+    addEventListener('storage', (event) => {
+      if (event.key === PORTAL_THEME_KEY) applyPortalTheme(readPortalTheme());
+    });
+  }
 
   // Customer PROD surfaces must never call a known STAGING endpoint.
   if (isProdCustomerSurface && typeof window.fetch === "function") {
@@ -239,6 +248,7 @@
   };
 
   const ready = async () => {
+    applyPortalTheme(readPortalTheme());
     prepareCustomerAccount();
     const a = await ensureAnalytics();
     void a?.track("page_view");
@@ -262,7 +272,7 @@
       premium.href = '/assets/premium-preview.css?v=2';
       premium.dataset.nwPremiumPreview = 'true';
       if (isCustomerAccount) premium.addEventListener('load', installCustomerAccountFixStyles, { once:true });
-      document.head.append(premium);
+      document.head.appendChild(premium);
     } else if (isCustomerAccount) {
       installCustomerAccountFixStyles();
     }
@@ -491,6 +501,103 @@
       body.account-premium-ui.nw-portal-light .footer{background:#ece4d8!important;border-color:rgba(74,59,34,.15)!important;color:#3a342b!important}
       body.account-premium-ui.nw-portal-light .nw-theme-switch-track{background:#e8dfd0;border-color:rgba(120,91,38,.28)}
 
+      /* Canonical persisted appearance for the authenticated chat and public Senioren surfaces. */
+      html[data-nw-portal-theme="dark"] body.nw-portal-dark:not(.account-premium-ui),
+      html[data-nw-portal-theme="dark"] body.nw-portal-dark:not(.account-premium-ui)>main{
+        background:#000!important;
+        color:#f3f0e8!important;
+        color-scheme:dark!important;
+      }
+      html[data-nw-portal-theme="dark"] body.nw-portal-dark:not(.account-premium-ui) .footer{
+        background:#000!important;
+        border-top-color:#1d1d1d!important;
+        color:#f3f0e8!important;
+      }
+      html[data-nw-portal-theme="dark"] body.nw-portal-dark:not(.account-premium-ui) :is(.footergrid h4,.footergrid a,.footergrid p,.footbottom,.footline,.footline a){color:#a9a59c!important}
+      html[data-nw-portal-theme="dark"] body.nw-portal-dark:not(.account-premium-ui) .footergrid h4{color:#f3f0e8!important}
+
+      html[data-nw-portal-theme="light"] body.nw-portal-light:not(.account-premium-ui),
+      html[data-nw-portal-theme="light"] body.nw-portal-light:not(.account-premium-ui)>main{
+        background:#f7f3ea!important;
+        color:#201d17!important;
+        color-scheme:light!important;
+      }
+      html[data-nw-portal-theme="light"] body.nw-portal-light:not(.account-premium-ui) .top{
+        background:rgba(247,243,234,.96)!important;
+        border-bottom-color:rgba(74,59,34,.14)!important;
+        color:#252119!important;
+      }
+      html[data-nw-portal-theme="light"] body.nw-portal-light:not(.account-premium-ui) .top .links,
+      html[data-nw-portal-theme="light"] body.nw-portal-light:not(.account-premium-ui) .top .links a{color:#393229!important}
+      html[data-nw-portal-theme="light"] body.nw-portal-light:not(.account-premium-ui) .nav-toggle{background:#fffdf8!important;color:#393229!important;border-color:rgba(74,59,34,.22)!important}
+      html[data-nw-portal-theme="light"] body.nw-portal-light:not(.account-premium-ui) .footer{
+        background:#ece4d8!important;
+        border-top-color:rgba(74,59,34,.15)!important;
+        color:#3f392f!important;
+      }
+      html[data-nw-portal-theme="light"] body.nw-portal-light:not(.account-premium-ui) :is(.footergrid h4,.footergrid a,.footergrid p,.footbottom,.footline,.footline a){color:#746c61!important}
+      html[data-nw-portal-theme="light"] body.nw-portal-light:not(.account-premium-ui) .footergrid h4{color:#3d372e!important}
+      html[data-nw-portal-theme="light"] body.nw-portal-light:not(.account-premium-ui) .footer .brandtext strong:before,
+      html[data-nw-portal-theme="light"] body.nw-portal-light:not(.account-premium-ui) .footer .brandtext span:before{color:#9a7020!important}
+
+      /* Chat surface: one palette follows the same persisted theme instead of hardcoded dark values. */
+      body.nw-portal-dark .web-concierge-shell{background:#000!important;color:#f3f0e8!important}
+      body.nw-portal-dark .web-concierge-workspace{background:#030405!important;border-color:#181a1d!important;box-shadow:0 24px 70px rgba(0,0,0,.42)!important}
+      body.nw-portal-dark .web-concierge-sidebar,
+      body.nw-portal-dark .web-concierge-form{background:#000!important;border-color:#17191c!important}
+      body.nw-portal-dark .web-concierge-chat-panel{background:radial-gradient(750px 420px at 100% 0%,rgba(44,61,92,.08),transparent 70%),#030405!important}
+      body.nw-portal-dark .web-concierge-chat-head{background:rgba(0,0,0,.96)!important;border-color:#17191c!important}
+      body.nw-portal-dark .web-concierge-log{background:#030405!important}
+      body.nw-portal-dark .web-concierge-form textarea{background:#090b0e!important;color:#f3f0e8!important;border-color:#24272c!important}
+      body.nw-portal-dark .web-concierge-message-assistant,
+      body.nw-portal-dark .web-concierge-typing,
+      body.nw-portal-dark .web-concierge-runtime-card{background:#0b0d10!important;border-color:#202327!important;color:#f0eee8!important}
+
+      body.nw-portal-light .web-concierge-shell{background:linear-gradient(180deg,#fbf8f1,#f7f3ea)!important;color:#201d17!important}
+      body.nw-portal-light .web-concierge-pagebar h1{color:#201d17!important}
+      body.nw-portal-light .web-concierge-workspace{background:#fffdf8!important;border-color:rgba(74,59,34,.15)!important;box-shadow:0 24px 70px rgba(74,57,27,.08)!important}
+      body.nw-portal-light .web-concierge-sidebar{background:#f2ecdf!important;border-color:rgba(74,59,34,.13)!important}
+      body.nw-portal-light .web-concierge-new-chat{background:rgba(185,141,45,.08)!important;border-color:rgba(154,112,32,.24)!important;color:#30291e!important}
+      body.nw-portal-light .web-concierge-sidebar-title,
+      body.nw-portal-light .web-concierge-thread-preview,
+      body.nw-portal-light .web-concierge-thread-date,
+      body.nw-portal-light .web-concierge-threads-empty{color:#7b7368!important}
+      body.nw-portal-light .web-concierge-thread{color:#312b23!important}
+      body.nw-portal-light .web-concierge-thread:hover{background:rgba(90,69,31,.055)!important}
+      body.nw-portal-light .web-concierge-thread.is-active{background:#fff!important;box-shadow:inset 0 0 0 1px rgba(74,59,34,.10)!important}
+      body.nw-portal-light .web-concierge-chat-panel{background:radial-gradient(750px 420px at 100% 0%,rgba(196,157,79,.10),transparent 70%),#fffdf8!important}
+      body.nw-portal-light .web-concierge-chat-head{background:rgba(255,253,248,.96)!important;border-color:rgba(74,59,34,.12)!important}
+      body.nw-portal-light .web-concierge-chat-identity h2{color:#201d17!important}
+      body.nw-portal-light .web-concierge-chat-identity span{color:#756e63!important}
+      body.nw-portal-light .web-concierge-log{background:transparent!important}
+      body.nw-portal-light .web-concierge-empty{color:#756e63!important}
+      body.nw-portal-light .web-concierge-empty strong{color:#2a261f!important}
+      body.nw-portal-light .web-concierge-date{background:#eee7db!important;color:#756e63!important}
+      body.nw-portal-light .web-concierge-message-user{background:#e8d8ad!important;color:#211c13!important;border-color:rgba(154,112,32,.22)!important}
+      body.nw-portal-light .web-concierge-message-assistant,
+      body.nw-portal-light .web-concierge-typing,
+      body.nw-portal-light .web-concierge-runtime-card{background:#f3eee5!important;color:#28231d!important;border-color:rgba(74,59,34,.12)!important}
+      body.nw-portal-light .web-concierge-runtime-card span{color:#6e675d!important}
+      body.nw-portal-light .web-concierge-form{background:#f2ecdf!important;border-color:rgba(74,59,34,.12)!important}
+      body.nw-portal-light .web-concierge-form textarea{background:#fff!important;color:#201d17!important;border-color:rgba(74,59,34,.18)!important}
+      body.nw-portal-light .web-concierge-form textarea::placeholder{color:#948b7f!important}
+
+      /* Senioren public surface: light remains calm/cream, dark becomes genuinely black instead of mixed brown/grey. */
+      body.senior-product.nw-portal-light>main,
+      body.senior-product.nw-portal-light>main>.section,
+      body.senior-product.nw-portal-light>main>.hero{background:#f7f3ea!important;color:#201d17!important}
+      body.senior-product.nw-portal-dark,
+      body.senior-product.nw-portal-dark>main,
+      body.senior-product.nw-portal-dark>main>.section,
+      body.senior-product.nw-portal-dark>main>.hero,
+      body.senior-product.nw-portal-dark>main>.section.alt{background:#000!important;color:#f3f0e8!important;border-color:#1d1d1d!important}
+      body.senior-product.nw-portal-dark :is(h1,h2,h3){color:#f5f2eb!important;text-shadow:none!important}
+      body.senior-product.nw-portal-dark :is(.senior-hero-lead,.senior-story p,.senior-family-section>p,.senior-family-card p,.senior-release p,.senior-package-note,.request-intro){color:#b9b4aa!important}
+      body.senior-product.nw-portal-dark :is(.senior-story article,.senior-family-section,.senior-family-card,.senior-release article,.senior-package-note,.request-card){background:#060606!important;border-color:#28241d!important;color:#f0eee8!important;box-shadow:none!important}
+      body.senior-product.nw-portal-dark .senior-family-notice{background:#0b0905!important;border-left-color:#c99b38!important;color:#c9c2b5!important}
+      body.senior-product.nw-portal-dark .senior-benefit-chip{background:#090909!important;border-color:rgba(185,135,36,.28)!important;color:#e8dfcb!important}
+      body.senior-product.nw-portal-dark .btn.light{background:#0b0b0b!important;color:#e8dfcb!important;border-color:#6e592e!important}
+
       @media(min-width:1281px){
         .top .links,.home-reference .top .links{flex:1 1 auto!important}
         .top .links>.nw-language,.home-reference .top .links>.nw-language{margin-left:auto!important;margin-right:0!important}
@@ -503,6 +610,7 @@
         .nw-account-cluster-mobile{top:16px!important;right:calc(clamp(10px,3vw,28px) + 144px)!important;transform:none!important;height:48px!important}
         .nw-account-mobile{height:48px!important;min-height:48px!important}
         .nw-account-cluster-mobile .nw-account-logout{width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important}
+        html[data-nw-portal-theme="light"] body.nw-portal-light:not(.account-premium-ui) .top .links{background:#fffdf8!important;border-color:rgba(74,59,34,.15)!important}
       }
       @media(max-width:720px){
         .nw-theme-setting{align-items:flex-start;flex-direction:column;gap:12px}
