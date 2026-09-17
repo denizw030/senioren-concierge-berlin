@@ -11,20 +11,20 @@ const packageText = packages.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
 const freeRegistrationPlan = onboarding.match(/free:\s*\{([\s\S]*?)\n    \},\n    standard:/)?.[1] || "";
 
 const packageMatrix = [
-  ["FREE", "0 € / Monat", "50 App-Dialoge", "20 WhatsApp-Dialoge"],
-  ["STANDARD", "5,99 € / Monat", "100 App-Dialoge", "30 WhatsApp-Dialoge"],
-  ["PLUS", "10,99 € / Monat", "180 App-Dialoge", "50 WhatsApp-Dialoge"],
-  ["PREMIUM", "19,99 € / Monat", "400 App-Dialoge", "100 WhatsApp-Dialoge"],
-  ["PREMIUM PLUS", "34,99 € / Monat", "750 App-Dialoge", "160 WhatsApp-Dialoge"],
-  ["FAMILIE", "59,66 € / Monat", "1.200 App-Dialoge", "300 WhatsApp-Dialoge"]
+  ["FREE", "0 € / Monat", "Web & App Standard unbegrenzt", "30 WhatsApp-Nachrichten / 30 Tage"],
+  ["STANDARD", "5,99 € / Monat", "Web & App Standard unbegrenzt", "30 WhatsApp-Nachrichten / 30 Tage"],
+  ["PLUS", "10,99 € / Monat", "Web & App Standard unbegrenzt", "30 WhatsApp-Nachrichten / 30 Tage"],
+  ["PREMIUM", "19,99 € / Monat", "Web & App Standard unbegrenzt", "30 WhatsApp-Nachrichten / 30 Tage"],
+  ["PREMIUM PLUS", "34,99 € / Monat", "Web & App Standard unbegrenzt", "30 WhatsApp-Nachrichten / 30 Tage"],
+  ["FAMILIE", "59,66 € / Monat", "Web Standard unbegrenzt", "300 App · 300 WhatsApp gemeinsam / 30 Tage"]
 ];
 
 const paidRegistrationMatrix = [
-  ["STANDARD", "5,99 € / Monat", "100 App-Dialoge", "30 WhatsApp-Dialoge"],
-  ["PLUS", "10,99 € / Monat", "180 App-Dialoge", "50 WhatsApp-Dialoge"],
-  ["PREMIUM", "19,99 € / Monat", "400 App-Dialoge", "100 WhatsApp-Dialoge"],
-  ["PREMIUM PLUS", "34,99 € / Monat", "750 App-Dialoge", "160 WhatsApp-Dialoge"],
-  ["FAMILIE", "59,66 € / Monat", "1.200 App-Dialoge", "300 WhatsApp-Dialoge"]
+  ["STANDARD", "5,99 € / Monat", "Web & App Standard unbegrenzt", "30 WhatsApp-Nachrichten / 30 Tage"],
+  ["PLUS", "10,99 € / Monat", "Web & App Standard unbegrenzt", "30 WhatsApp-Nachrichten / 30 Tage"],
+  ["PREMIUM", "19,99 € / Monat", "Web & App Standard unbegrenzt", "30 WhatsApp-Nachrichten / 30 Tage"],
+  ["PREMIUM PLUS", "34,99 € / Monat", "Web & App Standard unbegrenzt", "30 WhatsApp-Nachrichten / 30 Tage"],
+  ["FAMILIE", "59,66 € / Monat", "Web Standard unbegrenzt", "300 App · 300 WhatsApp gemeinsam / 30 Tage"]
 ];
 
 test("FREE registration uses the central account entitlement contract", () => {
@@ -39,14 +39,14 @@ test("FREE registration uses the central account entitlement contract", () => {
   assert.doesNotMatch(freeRegistrationPlan, /\b20 WhatsApp-Dialoge\b/, "FREE WhatsApp quota is not maintained in the active registration plan");
 });
 
-test("public package overview and paid registration choices remain unchanged", () => {
+test("public package overview and registration preview match the central authority", () => {
   for (const values of packageMatrix) {
     for (const value of values) assert.equal(packageText.includes(value), true, `${value} is shown on packages`);
   }
   for (const values of paidRegistrationMatrix) {
     for (const value of values) assert.equal(onboarding.includes(value), true, `${value} remains available in paid registration preview`);
   }
-  for (const obsolete of ["KOMFORT", "200 Dialoge", "350 Dialoge", "600 Dialoge"])
+  for (const obsolete of ["KOMFORT", "50 App-Dialoge", "100 App-Dialoge", "180 App-Dialoge", "400 App-Dialoge", "750 App-Dialoge", "1.200 App-Dialoge", "20 WhatsApp-Dialoge", "50 WhatsApp-Dialoge", "100 WhatsApp-Dialoge", "160 WhatsApp-Dialoge"])
     assert.equal(onboarding.includes(obsolete) || packages.includes(obsolete), false, `${obsolete} is removed`);
 });
 
@@ -58,15 +58,18 @@ test("account preview remains console-only and reversible", () => {
   assert.equal(account.includes("NAHWERKAccountPreview.prime()"), false, "no visible preview command or switch exists");
 });
 
-test("account usage comes from the central customer profile and never invents zero usage", () => {
+test("account usage renders the canonical 30-day authority and owner controls without inventing usage", () => {
   assert.match(account, /web-profile/);
+  assert.match(account, /Aktueller 30-Tage-Nutzungszeitraum/);
   assert.match(account, /id="appUsageSummary"/);
   assert.match(account, /id="whatsappUsageSummary"/);
-  assert.match(account, /Aktueller Verbrauch derzeit nicht verfügbar/);
-  assert.match(account, /usage\?\.app_dialogues_used/);
-  assert.match(account, /usage\?\.whatsapp_dialogues_used/);
-  assert.match(account, /plan\?\.app_dialogue_limit/);
-  assert.match(account, /plan\?\.whatsapp_dialogue_limit/);
+  assert.match(account, /account\?\.usage\?\.app_dialog/);
+  assert.match(account, /account\?\.usage\?\.whatsapp_dialog/);
+  assert.match(account, /usage_feature_catalog/);
+  assert.match(account, /owner_self_limits/);
+  assert.match(account, /action:"owner_self_limit_set"/);
+  assert.match(account, /Meine Kontingente/);
+  assert.equal(account.includes("Nutzung diesen Kalendermonat"), false);
   assert.equal(account.includes('localStorage.getItem("scb_usage")'), false);
   assert.equal(account.includes("u.dialogues_used || 0"), false);
 });
