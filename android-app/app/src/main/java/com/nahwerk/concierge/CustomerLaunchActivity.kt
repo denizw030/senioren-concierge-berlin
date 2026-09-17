@@ -123,13 +123,14 @@ private fun NahwerkSplashScreen() {
         contentAlignment = Alignment.Center
     ) {
         Image(
-            painter = painterResource(R.drawable.nahwerk_brand_coin_dimmed),
+            painter = painterResource(R.drawable.nahwerk_brand_coin),
             contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth(0.53f)
                 .widthIn(max = 190.dp)
                 .aspectRatio(1f),
-            contentScale = ContentScale.Fit
+            contentScale = ContentScale.Fit,
+            alpha = 0.93f
         )
     }
 }
