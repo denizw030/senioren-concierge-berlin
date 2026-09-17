@@ -335,12 +335,7 @@
   }
   async function approveAndSend(draft) {
     if (busy || !draft.approval_id || !draft.send_action_id) return;
-    const ok = confirm(`Diese E-Mail jetzt wirklich senden?\
-\
-An: ${text(draft.to, 240) || "Empfänger"}\
-Betreff: ${text(draft.subject, 240) || "(kein Betreff)"}\
-\
-Erst mit „OK“ gibst du den Versand ausdrücklich frei.`);
+    const ok = confirm(`Diese E-Mail jetzt wirklich senden?\n\nAn: ${text(draft.to, 240) || "Empfänger"}\nBetreff: ${text(draft.subject, 240) || "(kein Betreff)"}\n\nErst mit „OK“ gibst du den Versand ausdrücklich frei.`);
     if (!ok) return;
     setBusy(true);
     try {
