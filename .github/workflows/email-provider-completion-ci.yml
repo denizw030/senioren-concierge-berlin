@@ -1,0 +1,29 @@
+name: Email Provider Completion CI
+
+on:
+  pull_request:
+    paths:
+      - 'assets/email-provider-logo-connect-v3.js'
+      - 'oauth/yahoo/callback/index.html'
+      - 'tests/email-provider-completion.test.mjs'
+      - 'tests/email-provider-button-freeze-contract.test.mjs'
+      - '.github/workflows/email-provider-completion-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  provider-completion:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Provider UI syntax
+        run: node --check assets/email-provider-logo-connect-v3.js
+      - name: Existing provider button contract
+        run: node tests/email-provider-button-freeze-contract.test.mjs
+      - name: Provider completion contract
+        run: node tests/email-provider-completion.test.mjs
+      - name: No accidental whitespace errors
+        run: git diff --check HEAD^ HEAD
