@@ -21,7 +21,7 @@ struct RawUIAction: Codable, Identifiable, Equatable {
     let label: String?
 
     var stableID: String {
-        id?.isEmpty == false ? id! : "\(type):\(label ?? \"\")"
+        id?.isEmpty == false ? id! : "\(type):\(label ?? "")"
     }
 
     var allowedType: AllowedUIActionType? {
@@ -203,7 +203,7 @@ struct HistoryMessage: Codable, Identifiable, Equatable {
     let receivedAt: String?
 
     var id: String {
-        idValue ?? "\(role ?? \"\"):\(createdAt ?? receivedAt ?? \"\"):\(content ?? text ?? \"\")"
+        idValue ?? "\(role ?? ""):\(createdAt ?? receivedAt ?? ""):\(content ?? text ?? "")"
     }
 
     enum CodingKeys: String, CodingKey {
