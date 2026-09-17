@@ -30,7 +30,9 @@ internal data class CustomerHistoryThread(
 internal class CustomerHistoryApi(context: Context) {
     companion object {
         private const val PROD_HOST = "djicahhmnnamtjuqedqd.supabase.co"
-        private const val HISTORY_SLUG = "nahwerk-customer-history"
+        // PROD runtime alias: the project function quota is currently full, so the canonical
+        // nahwerk-customer-history implementation runs in a retired 410/GONE slot.
+        private const val HISTORY_SLUG = "account-security-auth-cleanup-temp"
     }
 
     private val sessions = SecureProductSessionStore(context.applicationContext)

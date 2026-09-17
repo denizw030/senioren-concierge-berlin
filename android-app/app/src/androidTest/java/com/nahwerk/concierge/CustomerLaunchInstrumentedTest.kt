@@ -17,9 +17,14 @@ class CustomerLaunchInstrumentedTest {
     val composeRule = createAndroidComposeRule<CustomerLaunchActivity>()
 
     @Test
-    fun launcherExposesRegistrationWithoutCallingProd() {
-        composeRule.onNodeWithTag("registration_open").assertIsDisplayed().performClick()
-        composeRule.onNodeWithText("NAHWERK Konto erstellen").assertIsDisplayed()
+    fun launcherStartsPublicAndExposesFreeRegistrationWithoutNetworkCall() {
+        composeRule.onNodeWithText("Dein persönlicher Concierge").assertIsDisplayed()
+        composeRule.onNodeWithTag("public_menu").assertIsDisplayed()
+        composeRule.onNodeWithText("FREE & Tarife").performClick()
+        composeRule.onNodeWithText("Kostenlos starten – ohne Kreditkarte").assertIsDisplayed()
+
+        composeRule.onNodeWithTag("public_register").performScrollTo().assertIsDisplayed().performClick()
+        composeRule.onNodeWithText("Kostenlos starten").assertIsDisplayed()
         composeRule.onNodeWithText("Kostenlos registrieren").performScrollTo().assertIsDisplayed()
     }
 }
