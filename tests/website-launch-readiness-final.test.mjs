@@ -21,12 +21,16 @@ test('pricing page marks Tarife, not Leistungen, as the current navigation item'
   assert.doesNotMatch(pricing, /<a class="active" href="(?:\/)?leistungen(?:\.html)?">Leistungen<\/a>/);
 });
 
-test('launch-readiness cleanup does not change frozen public prices or FREE quotas', () => {
+test('launch-readiness cleanup keeps frozen public prices and current central usage authority', () => {
   const pricing = read('pakete.html');
   for (const expected of ['0 €', '5,99 €', '10,99 €', '19,99 €', '34,99 €', '59,66 €']) {
     assert.ok(pricing.includes(expected), `missing frozen price ${expected}`);
   }
-  assert.ok(pricing.includes('50 App-Dialoge · 20 WhatsApp-Dialoge'));
+  assert.ok(pricing.includes('Web & App Standard unbegrenzt · 30 WhatsApp-Nachrichten / 30 Tage'));
+  assert.ok(pricing.includes('Web Standard unbegrenzt · 300 App · 300 WhatsApp gemeinsam / 30 Tage'));
+  for (const obsolete of ['50 App-Dialoge · 20 WhatsApp-Dialoge','100 App-Dialoge','180 App-Dialoge','400 App-Dialoge','750 App-Dialoge','1.200 App-Dialoge']) {
+    assert.equal(pricing.includes(obsolete), false, `obsolete tariff copy: ${obsolete}`);
+  }
 });
 
 test('homepage Safety copy is bound to configured escalation behavior', () => {
