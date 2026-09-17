@@ -14,7 +14,13 @@ assert.ok(p.includes('runtimeNote.hidden = true'));
 assert.ok(p.includes('badge.hidden = true'));
 assert.ok(p.includes('AbortController'));
 assert.equal(p.includes('email.send'), false);
-for (const provider of ['google','microsoft','yahoo','icloud','gmx','webde','telekom','fastmail','zoho','ionos','strato']) {
-  assert.ok(p.includes(`id: "${provider}"`));
+for (const provider of ['google','microsoft','yahoo','icloud','gmx','webde','telekom','fastmail','zoho','ionos','strato','mailcom','freenet','mailboxorg','vodafone','arcor','kabeldeutschland','unitymedia','migadu','proton','tuta']) {
+  assert.ok(p.includes(`id: "${provider}"`), provider);
 }
+for (const provider of ['mailcom','freenet','mailboxorg','vodafone','arcor','kabeldeutschland','unitymedia','migadu']) {
+  assert.match(p, new RegExp(`id: "${provider}"[\\s\\S]*?mode: "manual"`), provider);
+}
+assert.match(p, /id: "proton"[\s\S]*?mode: "unsupported"/);
+assert.match(p, /id: "tuta"[\s\S]*?mode: "unsupported"/);
+assert.ok(p.includes('Keine direkte Verbindung'));
 console.log('EMAIL_PROVIDER_BUTTON_FREEZE_CONTRACT=GREEN');
