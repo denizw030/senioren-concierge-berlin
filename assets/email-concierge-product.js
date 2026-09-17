@@ -26,6 +26,7 @@
     EMAIL_CONNECTION_NOT_CONNECTED: "Gmail ist nicht verbunden.",
     EMAIL_PROVIDER_UNAVAILABLE: "Der E-Mail-Concierge ist gerade nicht erreichbar.",
     EMAIL_QUERY_INVALID: "Diese Anfrage konnte nicht verarbeitet werden.",
+    EMAIL_CLASSIFICATION_INVALID: "Diese Sortierung konnte nicht gespeichert werden.",
     MESSAGE_ID_REQUIRED: "Diese E-Mail konnte nicht geöffnet werden.",
     APPROVAL_BINDING_REQUIRED: "Für diesen Entwurf fehlt eine gültige Versandfreigabe.",
     APPROVAL_BINDING_MISMATCH: "Die Versandfreigabe passt nicht mehr zu diesem Entwurf. Bitte aktualisiere die Ansicht."
@@ -57,19 +58,54 @@
       channels: data.channels && typeof data.channels === "object" ? data.channels : {}
     };
   }
+  function normalizeClassification(data) {
+    if (data?.ok !== true) return null;
+    const counts = data.counts && typeof data.counts === "object" ? data.counts : {}, buckets = data.buckets && typeof data.buckets === "object" ? data.buckets : {};
+    return {
+      total: number(data.total), sorted_count: number(data.sorted_count), complete: data.complete === true, limit: number(data.limit),
+      counts: { IMPORTANT: number(counts.IMPORTANT), UNIMPORTANT: number(counts.UNIMPORTANT), MARKETING: number(counts.MARKETING) },
+      buckets: { IMPORTANT: list(buckets.IMPORTANT), UNIMPORTANT: list(buckets.UNIMPORTANT), MARKETING: list(buckets.MARKETING) }
+    };
+  }
   function errorCode(data, fallback = "EMAIL_PROVIDER_UNAVAILABLE") {
     return String(data?.error?.code || data?.error || fallback);
   }
-  globalThis.NAHWERKEmailConciergeProductTestHooks = Object.freeze({ BASE, SETTINGS, QUICK, normalizeDashboard, errorCode });
+  globalThis.NAHWERKEmailConciergeProductTestHooks = Object.freeze({ BASE, SETTINGS, QUICK, normalizeDashboard, normalizeClassification, errorCode });
 
   if (typeof document === "undefined") return;
   let connected = false;
   let host = null;
   let dashboard = null;
+  let classification = null;
+  let classificationBucket = "UNIMPORTANT";
   let busy = false;
   let chatMessages = [];
   let activityExpanded = false;
 
+  function ensureClassificationStyles() {
+    if (document.getElementById("nahwerkEmailClassificationStyles")) return;
+    const style = document.createElement("style"); style.id = "nahwerkEmailClassificationStyles";
+    style.textContent = `
+      .ecp-summary{grid-template-columns:repeat(6,minmax(0,1fr))!important}
+      .ecp-stat-button{appearance:none;color:inherit;font:inherit;text-align:left;cursor:pointer;width:100%;transition:transform .16s ease,background .16s ease,border-color .16s ease}
+      .ecp-stat-button:hover{background:rgba(127,127,127,.09);border-color:rgba(127,127,127,.34)}
+      .ecp-stat-button:active{transform:scale(.985)}
+      .ecp-mail-side{display:grid;justify-items:end;gap:8px;min-width:max-content}
+      .ecp-class-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px}
+      .ecp-class-btn{appearance:none;border:1px solid rgba(127,127,127,.24);background:transparent;color:inherit;border-radius:999px;padding:5px 8px;font:inherit;font-size:.68rem;cursor:pointer;white-space:nowrap}
+      .ecp-class-btn:hover{background:rgba(127,127,127,.1)}
+      .ecp-class-btn[aria-pressed="true"]{border-color:rgba(47,125,255,.45);background:rgba(47,125,255,.12);font-weight:650}
+      .ecp-sort-tabs{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 12px}
+      .ecp-sort-tab{appearance:none;border:1px solid rgba(127,127,127,.24);background:transparent;color:inherit;border-radius:999px;padding:8px 11px;font:inherit;font-size:.78rem;cursor:pointer}
+      .ecp-sort-tab[aria-pressed="true"]{border-color:rgba(47,125,255,.45);background:rgba(47,125,255,.12);font-weight:650}
+      .ecp-class-reason{margin:7px 0 0;font-size:.72rem;line-height:1.4;opacity:.55}
+      .ecp-sort-scope{margin:12px 0 0;font-size:.74rem;line-height:1.45;opacity:.58}
+      .ecp-detail .ecp-class-actions{justify-content:flex-start;margin-top:12px}
+      @media(max-width:980px){.ecp-summary{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+      @media(max-width:640px){.ecp-summary{grid-template-columns:repeat(2,minmax(0,1fr))!important}.ecp-mail-side{justify-items:start;min-width:0}.ecp-class-actions{justify-content:flex-start}}
+    `;
+    document.head.append(style);
+  }
   function el(tag, className = "", value = "") {
     const node = document.createElement(tag);
     if (className) node.className = className;
@@ -123,8 +159,10 @@
     host.prepend(box);
     setTimeout(() => box.remove(), 7000);
   }
-  function stat(value, label) {
-    const box = el("div", "ecp-stat"); box.append(el("strong", "", String(value)), el("span", "", label)); return box;
+  function stat(value, label, onClick = null) {
+    const box = el(onClick ? "button" : "div", "ecp-stat" + (onClick ? " ecp-stat-button" : ""));
+    if (onClick) { box.type = "button"; box.addEventListener("click", onClick); }
+    box.append(el("strong", "", String(value)), el("span", "", label)); return box;
   }
   function sectionCard(title, intro = "") {
     const card = el("section", "ecp-card");
@@ -133,22 +171,47 @@
     return { card, head };
   }
   function badge(label, warning = false) { return el("span", "ecp-badge" + (warning ? " ecp-badge-warning" : ""), label); }
-  function messageCard(message, allowOpen = true) {
+  function classificationLabel(value) { return value === "IMPORTANT" ? "Wichtig" : value === "UNIMPORTANT" ? "Unwichtig" : value === "MARKETING" ? "Werbung / Spam" : ""; }
+  function classificationMessages() { return classification ? [...classification.buckets.IMPORTANT, ...classification.buckets.UNIMPORTANT, ...classification.buckets.MARKETING] : []; }
+  function classificationMessageById(id) { return classificationMessages().find((row) => String(row?.id || "") === String(id || "")) || null; }
+  function classificationControls(message) {
+    const wrap = el("div", "ecp-class-actions");
+    [["IMPORTANT", "Wichtig"], ["UNIMPORTANT", "Unwichtig"], ["MARKETING", "Werbung / Spam"]].forEach(([value, label]) => {
+      const b = button(label, "ecp-class-btn"); b.setAttribute("aria-pressed", String(message?.classification === value)); b.title = message?.classification === value ? `${label} – aktuelle Einstufung` : `Als ${label} markieren`;
+      b.addEventListener("click", (event) => { event.stopPropagation(); void setMessageClassification(message, value); }); wrap.append(b);
+    });
+    return wrap;
+  }
+  async function setMessageClassification(message, value) {
+    if (busy || !message?.id || message.classification === value) return;
+    setBusy(true);
+    try {
+      await request("/email/concierge/classification/override", { method: "POST", body: { message_id: message.id, thread_id: message.thread_id || null, classification: value } });
+      classification = normalizeClassification(await request("/email/concierge/classification/summary"));
+    } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
+    finally { setBusy(false); render(); }
+  }
+  function messageCard(message, allowOpen = true, allowClassify = false) {
     const row = el("article", "ecp-mail"), main = el("div", "ecp-mail-main");
     main.append(el("span", "ecp-mail-title", text(message.subject, 300) || "(kein Betreff)"));
     main.append(el("span", "ecp-mail-meta", [text(message.from, 220), fmtDate(message.date)].filter(Boolean).join(" · ")));
     if (message.snippet) main.append(el("p", "ecp-mail-snippet", text(message.snippet, 500)));
     const badges = el("div", "ecp-badges");
+    if (message.classification) badges.append(badge(classificationLabel(message.classification)));
     if (message.unread) badges.append(badge("Ungelesen"));
     if (message.needs_reply) badges.append(badge("Antwort empfohlen"));
     if (message.amount) badges.append(badge(String(message.amount)));
     if (message.risk?.level && message.risk.level !== "low") badges.append(badge("Auffällig", true));
     list(message.categories).slice(0, 3).forEach((category) => badges.append(badge(String(category).replaceAll("_", " ").toLowerCase())));
     if (badges.childElementCount) main.append(badges);
+    if (message.classification_reason) main.append(el("p", "ecp-class-reason", text(message.classification_reason, 500)));
     row.append(main);
+    const side = el("div", "ecp-mail-side");
     if (allowOpen && message.id) {
-      const open = button("Öffnen", "ecp-open"); open.dataset.messageId = String(message.id); open.addEventListener("click", () => openMessage(String(message.id), row)); row.append(open);
+      const open = button("Öffnen", "ecp-open"); open.dataset.messageId = String(message.id); open.addEventListener("click", () => openMessage(String(message.id), row)); side.append(open);
     }
+    if (allowClassify && message.id) side.append(classificationControls(message));
+    if (side.childElementCount) row.append(side);
     return row;
   }
   async function openMessage(messageId, afterNode) {
@@ -161,6 +224,7 @@
       left.append(el("strong", "", text(data.message?.subject, 300) || "(kein Betreff)"), el("div", "ecp-mail-meta", text(data.message?.from, 300)));
       const close = button("Schließen", "ecp-open"); close.addEventListener("click", () => detail.remove()); head.append(left, close); detail.append(head);
       detail.append(el("div", "ecp-detail-body", text(data.message?.body_text, 12000) || "Kein Textinhalt verfügbar."));
+      const sorted = classificationMessageById(messageId); if (sorted) detail.append(classificationControls(sorted));
       const attachments = list(data.message?.attachments); if (attachments.length) detail.append(el("p", "ecp-footer-note", `${attachments.length} Anhang${attachments.length === 1 ? "" : "e"} erkannt. Gefährliche Dateitypen werden nicht automatisch geöffnet.`));
       afterNode.insertAdjacentElement("afterend", detail);
     } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
@@ -210,9 +274,27 @@
     rows.forEach((row) => { const box = el("article", "ecp-hint" + (row.kind === "WARNING" ? " ecp-hint-warning" : "")); box.append(el("strong", "", text(row.title, 200)), el("p", "", text(row.text, 800))); listNode.append(box); }); card.append(listNode);
   }
   function renderHighlights(card) {
-    const rows = list(dashboard.highlights);
+    const rows = classification ? classification.buckets.IMPORTANT : list(dashboard.highlights);
     if (!rows.length) { card.append(el("div", "ecp-section-empty", "Keine wichtigen Nachrichten in der aktuellen Übersicht.")); return; }
-    const listNode = el("div", "ecp-list"); rows.forEach((row) => listNode.append(messageCard(row))); card.append(listNode);
+    const listNode = el("div", "ecp-list"); rows.slice(0, 10).forEach((row) => listNode.append(messageCard(row, true, Boolean(classification)))); card.append(listNode);
+    if (classification && rows.length > 10) card.append(el("p", "ecp-sort-scope", `${rows.length - 10} weitere wichtige E-Mails findest du unten unter „Sortierung prüfen“.`));
+  }
+  function focusClassification(bucket) {
+    classificationBucket = bucket; render();
+    setTimeout(() => document.getElementById("emailClassificationReview")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
+  }
+  function renderClassificationReview(card) {
+    card.id = "emailClassificationReview";
+    if (!classification) { card.append(el("div", "ecp-section-empty", "Die Sortierung wird gerade geladen.")); return; }
+    const tabs = el("div", "ecp-sort-tabs");
+    [["IMPORTANT", `Wichtig (${classification.counts.IMPORTANT})`], ["UNIMPORTANT", `Unwichtig (${classification.counts.UNIMPORTANT})`], ["MARKETING", `Werbung / Spam (${classification.counts.MARKETING})`]].forEach(([value, label]) => {
+      const tab = button(label, "ecp-sort-tab"); tab.setAttribute("aria-pressed", String(classificationBucket === value)); tab.addEventListener("click", () => { classificationBucket = value; render(); }); tabs.append(tab);
+    }); card.append(tabs);
+    const rows = list(classification.buckets[classificationBucket]);
+    if (!rows.length) card.append(el("div", "ecp-section-empty", classificationBucket === "UNIMPORTANT" ? "Aktuell wurde nichts als unwichtig einsortiert." : classificationBucket === "MARKETING" ? "Aktuell wurde keine Werbung oder Spam einsortiert." : "Aktuell gibt es keine wichtigen E-Mails in der Sortierübersicht."));
+    else { const listNode = el("div", "ecp-list"); rows.forEach((row) => listNode.append(messageCard(row, true, true))); card.append(listNode); }
+    const scope = classification.complete ? `Alle ${classification.sorted_count} aktuellen Inbox-Konversationen sind in dieser Sortierübersicht berücksichtigt.` : `Zur Performance werden die ${classification.sorted_count} neuesten von insgesamt ${classification.total} Inbox-Konversationen sortiert angezeigt. Ältere E-Mails bleiben in Gmail unverändert erhalten.`;
+    card.append(el("p", "ecp-sort-scope", scope));
   }
   function renderDrafts(card) {
     const rows = list(dashboard.drafts);
@@ -304,30 +386,42 @@
     });
     card.append(el("p", "ecp-footer-note", "Diese Einstellungen steuern, was dein E-Mail-Concierge hervorhebt und protokolliert. Nachrichten werden nicht allein wegen Spam- oder Betrugsverdacht gelöscht. E-Mails werden nur nach deiner ausdrücklichen Freigabe gesendet."));
   }
+  function classificationDigest(s) {
+    if (!classification) return s.text;
+    const c = classification.counts;
+    if (classification.complete) return `${classification.total} E-Mails insgesamt im Posteingang. NAHWERK hat sie in dieser Übersicht in ${c.IMPORTANT} wichtig, ${c.UNIMPORTANT} unwichtig und ${c.MARKETING} Werbung / Spam eingeordnet. ${s.unread} sind ungelesen, ${s.today} heute eingegangen.`;
+    return `${classification.total} E-Mails insgesamt im Posteingang. Von den ${classification.sorted_count} neuesten hat NAHWERK ${c.IMPORTANT} als wichtig, ${c.UNIMPORTANT} als unwichtig und ${c.MARKETING} als Werbung / Spam eingeordnet. ${s.unread} sind ungelesen, ${s.today} heute eingegangen.`;
+  }
   function render() {
     const root = ensureHost(); if (!root) return;
+    ensureClassificationStyles();
     root.hidden = !connected; if (!connected) { root.replaceChildren(); return; }
     root.replaceChildren();
     if (!dashboard) { root.append(el("div", "ecp-loading", "Dein E-Mail-Concierge wird geladen …")); return; }
     const head = el("div", "ecp-head"), copy = el("div"); copy.append(el("p", "ecp-eyebrow", "E-Mail-Concierge"), el("h2", "ecp-title", "Deine E-Mails. Von NAHWERK im Blick behalten."), el("p", "ecp-subtitle", "Suchen, verstehen, schützen und Antworten vorbereiten – direkt in deinem Kundenkonto. Du entscheidest, was aktiv ist und was gesendet wird.")); head.append(copy, el("div", "ecp-status", "Aktiv")); root.append(head);
-    const s = dashboard.summary, summary = el("div", "ecp-summary"); summary.append(stat(s.important, "Wichtig"), stat(s.unread, "Ungelesen"), stat(s.today, "Heute"), stat(s.needs_reply, "Antwort empfohlen"), stat(s.invoices, "Rechnungen")); root.append(summary);
-    if (s.text) root.append(el("p", "ecp-digest", s.text));
+    const s = dashboard.summary, summary = el("div", "ecp-summary"), c = classification?.counts || { IMPORTANT: s.important, UNIMPORTANT: 0, MARKETING: s.spam_likely }, total = classification?.total ?? s.recent;
+    summary.append(stat(total, "Gesamt"), stat(c.IMPORTANT, "Wichtig", classification ? () => focusClassification("IMPORTANT") : null), stat(s.unread, "Ungelesen"), stat(s.today, "Heute"), stat(c.UNIMPORTANT, "Unwichtig", classification ? () => focusClassification("UNIMPORTANT") : null), stat(c.MARKETING, "Werbung / Spam", classification ? () => focusClassification("MARKETING") : null)); root.append(summary);
+    const digest = classificationDigest(s); if (digest) root.append(el("p", "ecp-digest", digest));
     const layout = el("div", "ecp-layout"), main = el("div", "ecp-stack"), side = el("div", "ecp-stack");
-    let c = sectionCard("Mein E-Mail-Concierge", "Frag einfach, was du über deine E-Mails wissen oder vorbereiten möchtest."); renderChat(c.card); main.append(c.card);
-    c = sectionCard("Wichtige E-Mails", "Keine vollständige Mailbox – nur das, was wahrscheinlich relevant ist."); renderHighlights(c.card); main.append(c.card);
-    c = sectionCard("Von NAHWERK vorbereitet", "Entwürfe werden niemals ohne deine ausdrückliche Freigabe gesendet."); renderDrafts(c.card); main.append(c.card);
-    c = sectionCard("Spam- & Betrugsschutz", "Ruhiger Schutz im Hintergrund – ohne automatisches Löschen."); renderProtection(c.card); side.append(c.card);
-    c = sectionCard("Hinweise", "Nur Dinge, bei denen sich ein Blick wahrscheinlich lohnt."); renderHints(c.card); side.append(c.card);
-    c = sectionCard("Was dein E-Mail-Concierge erledigt hat", "Kompakt statt einer technischen Ereignisliste."); renderActivities(c.card, c.head); side.append(c.card);
-    c = sectionCard("Deine Kanäle", "Der E-Mail-Concierge funktioniert eigenständig im Web. Weitere Zugänge sind optional."); renderChannels(c.card); side.append(c.card);
-    c = sectionCard("Automatik & Schutz", "Du bestimmst, was NAHWERK für dich hervorhebt."); renderSettings(c.card); side.append(c.card);
+    let section = sectionCard("Mein E-Mail-Concierge", "Frag einfach, was du über deine E-Mails wissen oder vorbereiten möchtest."); renderChat(section.card); main.append(section.card);
+    section = sectionCard("Wichtige E-Mails", "Direkt sichtbar, weil NAHWERK sie als relevant erkannt hat. Du kannst jede Einstufung korrigieren."); section.card.id = "emailImportantMessages"; renderHighlights(section.card); main.append(section.card);
+    section = sectionCard("Sortierung prüfen", "Unwichtige Nachrichten und Werbung bleiben aus dem Weg, sind aber jederzeit einsehbar und korrigierbar."); renderClassificationReview(section.card); main.append(section.card);
+    section = sectionCard("Von NAHWERK vorbereitet", "Entwürfe werden niemals ohne deine ausdrückliche Freigabe gesendet."); renderDrafts(section.card); main.append(section.card);
+    section = sectionCard("Spam- & Betrugsschutz", "Ruhiger Schutz im Hintergrund – ohne automatisches Löschen."); renderProtection(section.card); side.append(section.card);
+    section = sectionCard("Hinweise", "Nur Dinge, bei denen sich ein Blick wahrscheinlich lohnt."); renderHints(section.card); side.append(section.card);
+    section = sectionCard("Was dein E-Mail-Concierge erledigt hat", "Kompakt statt einer technischen Ereignisliste."); renderActivities(section.card, section.head); side.append(section.card);
+    section = sectionCard("Deine Kanäle", "Der E-Mail-Concierge funktioniert eigenständig im Web. Weitere Zugänge sind optional."); renderChannels(section.card); side.append(section.card);
+    section = sectionCard("Automatik & Schutz", "Du bestimmst, was NAHWERK für dich hervorhebt."); renderSettings(section.card); side.append(section.card);
     layout.append(main, side); root.append(layout);
   }
   async function loadDashboard(showLoading = true) {
     if (!connected || busy) return;
-    if (showLoading) { dashboard = null; render(); }
-    try { dashboard = normalizeDashboard(await request("/email/concierge/dashboard")); if (!dashboard) throw new Error("EMAIL_PROVIDER_UNAVAILABLE"); }
-    catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
+    if (showLoading) { dashboard = null; classification = null; render(); }
+    try {
+      const [dashboardData, classificationData] = await Promise.all([request("/email/concierge/dashboard"), request("/email/concierge/classification/summary")]);
+      dashboard = normalizeDashboard(dashboardData); classification = normalizeClassification(classificationData);
+      if (!dashboard || !classification) throw new Error("EMAIL_PROVIDER_UNAVAILABLE");
+    } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
     render();
   }
   function canonicalGoogleConnection(rows = globalThis.__nahwerkEmailConnections) {
@@ -338,7 +432,7 @@
     const canonical = canonicalGoogleConnection();
     connected = canonical === null ? isConnected === true : canonical;
     ensureHost();
-    if (!connected) { dashboard = null; chatMessages = []; render(); return; }
+    if (!connected) { dashboard = null; classification = null; chatMessages = []; render(); return; }
     await loadDashboard();
   }
   window.addEventListener("nahwerk:email-connections-updated", (event) => {
