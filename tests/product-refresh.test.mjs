@@ -50,46 +50,36 @@ test("senior page keeps real-world examples while personal page follows the froz
   assert.match(visibleText(prime), /Welche Telefonfunktionen verfügbar sind, richtet sich nach dem eingerichteten Produkt und Zugang/);
 });
 
-test("current launch tariff matrix is consistent while FREE entitlement stays central", () => {
+test("current launch tariff matrix follows the central authority", () => {
   const publicTariffValues = [
-    "50 App-Dialoge",
-    "20 WhatsApp-Dialoge",
+    "0 € / Monat",
     "5,99 € / Monat",
-    "100 App-Dialoge",
-    "30 WhatsApp-Dialoge",
     "10,99 € / Monat",
-    "180 App-Dialoge",
-    "50 WhatsApp-Dialoge",
     "19,99 € / Monat",
-    "400 App-Dialoge",
-    "100 WhatsApp-Dialoge",
     "34,99 € / Monat",
-    "750 App-Dialoge",
-    "160 WhatsApp-Dialoge",
     "59,66 € / Monat",
-    "1.200 App-Dialoge",
-    "300 WhatsApp-Dialoge"
+    "Web & App Standard unbegrenzt",
+    "30 WhatsApp-Nachrichten / 30 Tage",
+    "Web Standard unbegrenzt",
+    "300 App · 300 WhatsApp gemeinsam / 30 Tage"
   ];
   for (const value of publicTariffValues)
     assert.equal(visibleText(packages).includes(value), true, `${value} is shown on package page`);
 
   for (const value of [
     "5,99 € / Monat",
-    "100 App-Dialoge",
-    "30 WhatsApp-Dialoge",
     "10,99 € / Monat",
-    "180 App-Dialoge",
-    "50 WhatsApp-Dialoge",
     "19,99 € / Monat",
-    "400 App-Dialoge",
-    "100 WhatsApp-Dialoge",
     "34,99 € / Monat",
-    "750 App-Dialoge",
-    "160 WhatsApp-Dialoge",
     "59,66 € / Monat",
-    "1.200 App-Dialoge",
-    "300 WhatsApp-Dialoge"
-  ]) assert.equal(onboarding.includes(value), true, `${value} is used in paid registration preview`);
+    "Web & App Standard unbegrenzt",
+    "30 WhatsApp-Nachrichten / 30 Tage",
+    "Web Standard unbegrenzt",
+    "300 App · 300 WhatsApp gemeinsam / 30 Tage"
+  ]) assert.equal(onboarding.includes(value), true, `${value} is used in registration preview`);
+
+  for (const obsolete of ["50 App-Dialoge","100 App-Dialoge","180 App-Dialoge","400 App-Dialoge","750 App-Dialoge","1.200 App-Dialoge","20 WhatsApp-Dialoge","50 WhatsApp-Dialoge","100 WhatsApp-Dialoge","160 WhatsApp-Dialoge"])
+    assert.equal(visibleText(packages).includes(obsolete) || onboarding.includes(obsolete), false, `${obsolete} is obsolete`);
 
   assert.match(onboarding, /code: "FREE"[\s\S]*price: "0 € \/ Monat"[\s\S]*Zentrales FREE-Kontingent · nach Login live sichtbar/);
   assert.match(onboarding, /FREE wird ohne Zahlungsdaten angelegt/);
