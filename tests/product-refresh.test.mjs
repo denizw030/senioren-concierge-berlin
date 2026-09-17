@@ -50,8 +50,8 @@ test("senior page keeps real-world examples while personal page follows the froz
   assert.match(visibleText(prime), /Welche Telefonfunktionen verfügbar sind, richtet sich nach dem eingerichteten Produkt und Zugang/);
 });
 
-test("current launch tariff matrix is consistent in packages and registration", () => {
-  for (const value of [
+test("current launch tariff matrix is consistent while FREE entitlement stays central", () => {
+  const publicTariffValues = [
     "50 App-Dialoge",
     "20 WhatsApp-Dialoge",
     "5,99 € / Monat",
@@ -69,10 +69,30 @@ test("current launch tariff matrix is consistent in packages and registration", 
     "59,66 € / Monat",
     "1.200 App-Dialoge",
     "300 WhatsApp-Dialoge"
-  ]) {
+  ];
+  for (const value of publicTariffValues)
     assert.equal(visibleText(packages).includes(value), true, `${value} is shown on package page`);
-    assert.equal(onboarding.includes(value), true, `${value} is used in registration`);
-  }
+
+  for (const value of [
+    "5,99 € / Monat",
+    "100 App-Dialoge",
+    "30 WhatsApp-Dialoge",
+    "10,99 € / Monat",
+    "180 App-Dialoge",
+    "50 WhatsApp-Dialoge",
+    "19,99 € / Monat",
+    "400 App-Dialoge",
+    "100 WhatsApp-Dialoge",
+    "34,99 € / Monat",
+    "750 App-Dialoge",
+    "160 WhatsApp-Dialoge",
+    "59,66 € / Monat",
+    "1.200 App-Dialoge",
+    "300 WhatsApp-Dialoge"
+  ]) assert.equal(onboarding.includes(value), true, `${value} is used in paid registration preview`);
+
+  assert.match(onboarding, /code: "FREE"[\s\S]*price: "0 € \/ Monat"[\s\S]*Zentrales FREE-Kontingent · nach Login live sichtbar/);
+  assert.match(onboarding, /FREE wird ohne Zahlungsdaten angelegt/);
   assert.match(onboarding, /bookable: false/);
   assert.match(visibleText(packages), /Vor einer kostenpflichtigen Bestellung werden Preis, Laufzeit, Widerruf und Zahlung ausdrücklich bestätigt/);
 });

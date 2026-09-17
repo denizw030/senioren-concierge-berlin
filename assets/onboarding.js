@@ -22,13 +22,13 @@
       code: "FREE",
       title: "FREE · 0 € / MONAT",
       price: "0 € / Monat",
-      usage: "50 App-Dialoge · 20 WhatsApp-Dialoge",
+      usage: "Zentrales FREE-Kontingent · nach Login live sichtbar",
       state: "Verfügbar",
       bookable: true,
       benefits: [
         "Dauerhaft kostenlos",
-        "50 App-Dialoge pro Monat",
-        "20 WhatsApp-Dialoge pro Monat",
+        "Zentrale FREE-Berechtigungen für App und WhatsApp",
+        "Verbrauch und verbleibendes Kontingent nach Login live sichtbar",
         "Direkt in WhatsApp",
         "Text- und Sprachnachrichten",
         "Keine Zahlungsdaten und keine automatische kostenpflichtige Umwandlung"
@@ -147,7 +147,7 @@
     });
 
     if (plan.bookable) {
-      $("planSelectionNote").innerHTML = "<strong>Direkt registrierbar.</strong><br>Für FREE werden keine Zahlungsdaten benötigt.";
+      $("planSelectionNote").innerHTML = "<strong>Direkt registrierbar.</strong><br>FREE wird ohne Zahlungsdaten angelegt. Berechtigungen und Kontingente kommen aus dem zentralen NAHWERK-Konto und werden nach Login unter Nutzung angezeigt.";
       submit.disabled = false;
       submit.removeAttribute("aria-disabled");
       submit.textContent = "Kostenlosen Zugang registrieren";
