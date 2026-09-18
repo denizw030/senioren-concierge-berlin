@@ -11,20 +11,20 @@ const packageText = packages.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
 const freeRegistrationPlan = onboarding.match(/free:\s*\{([\s\S]*?)\n    \},\n    standard:/)?.[1] || "";
 
 const packageMatrix = [
-  ["FREE", "0 € / Monat", "50 App-Dialoge", "20 WhatsApp-Dialoge"],
-  ["STANDARD", "5,99 € / Monat", "100 App-Dialoge", "30 WhatsApp-Dialoge"],
-  ["PLUS", "10,99 € / Monat", "180 App-Dialoge", "50 WhatsApp-Dialoge"],
-  ["PREMIUM", "19,99 € / Monat", "400 App-Dialoge", "100 WhatsApp-Dialoge"],
-  ["PREMIUM PLUS", "34,99 € / Monat", "750 App-Dialoge", "160 WhatsApp-Dialoge"],
-  ["FAMILIE", "59,66 € / Monat", "1.200 App-Dialoge", "300 WhatsApp-Dialoge"]
+  ["FREE", "0 € / Monat", "App unbegrenzt · Web unbegrenzt · 20 WhatsApp-Kundennachrichten"],
+  ["STANDARD", "5,99 € / Monat", "App unbegrenzt · Web unbegrenzt · 30 WhatsApp-Kundennachrichten"],
+  ["PLUS", "10,99 € / Monat", "App unbegrenzt · Web unbegrenzt · 50 WhatsApp-Kundennachrichten"],
+  ["PREMIUM", "19,99 € / Monat", "App unbegrenzt · Web unbegrenzt · 100 WhatsApp-Kundennachrichten"],
+  ["PREMIUM PLUS", "34,99 € / Monat", "App unbegrenzt · Web unbegrenzt · 160 WhatsApp-Kundennachrichten"],
+  ["FAMILIE", "59,66 € / Monat", "App unbegrenzt · Web unbegrenzt · 300 WhatsApp-Kundennachrichten"]
 ];
 
 const paidRegistrationMatrix = [
-  ["STANDARD", "5,99 € / Monat", "100 App-Dialoge", "30 WhatsApp-Dialoge"],
-  ["PLUS", "10,99 € / Monat", "180 App-Dialoge", "50 WhatsApp-Dialoge"],
-  ["PREMIUM", "19,99 € / Monat", "400 App-Dialoge", "100 WhatsApp-Dialoge"],
-  ["PREMIUM PLUS", "34,99 € / Monat", "750 App-Dialoge", "160 WhatsApp-Dialoge"],
-  ["FAMILIE", "59,66 € / Monat", "1.200 App-Dialoge", "300 WhatsApp-Dialoge"]
+  ["STANDARD", "5,99 € / Monat", "App unbegrenzt · 30 WhatsApp-Dialoge"],
+  ["PLUS", "10,99 € / Monat", "App unbegrenzt · 50 WhatsApp-Dialoge"],
+  ["PREMIUM", "19,99 € / Monat", "App unbegrenzt · 100 WhatsApp-Dialoge"],
+  ["PREMIUM PLUS", "34,99 € / Monat", "App unbegrenzt · 160 WhatsApp-Dialoge"],
+  ["FAMILIE", "59,66 € / Monat", "App unbegrenzt · 300 WhatsApp-Dialoge"]
 ];
 
 test("FREE registration uses the central account entitlement contract", () => {
@@ -39,7 +39,7 @@ test("FREE registration uses the central account entitlement contract", () => {
   assert.doesNotMatch(freeRegistrationPlan, /\b20 WhatsApp-Dialoge\b/, "FREE WhatsApp quota is not maintained in the active registration plan");
 });
 
-test("public package overview and paid registration choices remain unchanged", () => {
+test("public package overview and paid registration choices match the central account authority", () => {
   for (const values of packageMatrix) {
     for (const value of values) assert.equal(packageText.includes(value), true, `${value} is shown on packages`);
   }
@@ -72,6 +72,6 @@ test("account usage comes from the central customer profile and never invents ze
 });
 
 test("authenticated customer portal exposes the required customer areas", () => {
-  for (const label of ["Übersicht", "Concierge", "E-Mail", "Sicherheit", "Nutzung", "Persönliche Daten"])
+  for (const label of ["Übersicht", "Concierge", "E-Mail", "Safety", "Nutzung", "Account"])
     assert.equal(account.includes(label), true, `${label} remains available after login`);
 });
