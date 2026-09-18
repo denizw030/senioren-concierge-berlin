@@ -41,7 +41,7 @@ final class VoiceMemoRecorder: ObservableObject {
             try session.setCategory(
                 .playAndRecord,
                 mode: .spokenAudio,
-                options: [.defaultToSpeaker, .allowBluetoothHFP]
+                options: [.defaultToSpeaker, .allowBluetooth]
             )
             try session.setActive(true)
 
