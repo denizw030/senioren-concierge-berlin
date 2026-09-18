@@ -1800,12 +1800,24 @@ body.account-premium-ui.nw-portal-dark .account-actions[data-account-panel="over
   border-color:#6e592e!important;
 }
 </style><style id="fraud-protection-ui">
-.fraud-protection-card,.safety-card{cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
-.fraud-protection-card:hover,.fraud-protection-card:focus-visible,.safety-card:hover{transform:translateY(-2px);border-color:rgba(173,139,74,.48);box-shadow:0 12px 32px rgba(0,0,0,.08)}
+.safety-hub{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.safety-hub[hidden]{display:none!important}
+.safety-hub-card{width:100%;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;text-align:left;padding:22px;border:1px solid var(--line);border-radius:18px;background:var(--paper,#fff);color:inherit;cursor:pointer;font:inherit;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.safety-hub-card:hover,.safety-hub-card:focus-visible{transform:translateY(-3px);border-color:rgba(173,139,74,.62);box-shadow:0 16px 38px rgba(0,0,0,.11);outline:none}
+.safety-hub-card strong{display:block;font-size:18px;margin-bottom:5px}
+.safety-hub-card small{display:block;color:var(--muted);font-size:13px;line-height:1.5}
+.safety-hub-icon{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(173,139,74,.35);font-size:20px}
+.safety-hub-arrow{font-size:28px;color:var(--muted)}
+[data-safety-detail][hidden]{display:none!important}
+.safety-detail-top{display:flex;justify-content:flex-start;margin-bottom:18px}
+.fraud-protection-card,.safety-card{grid-column:1/-1}
 .fraud-protection-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}
 .fraud-protection-grid>div{display:flex;flex-direction:column;gap:5px;padding:16px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.45)}
+.fraud-protection-grid>div.fraud-featured{grid-column:1/-1;padding:22px;border-color:rgba(173,139,74,.44)}
+.fraud-protection-grid>div.fraud-featured strong{font-size:18px}
 .fraud-protection-grid span{font-size:13px;line-height:1.5;color:var(--muted)}
-@media(max-width:720px){.fraud-protection-grid{grid-template-columns:1fr}}
+.account-password-card{grid-column:1/-1}
+@media(max-width:720px){.safety-hub,.fraud-protection-grid{grid-template-columns:1fr}.fraud-protection-grid>div.fraud-featured{grid-column:auto}}
 </style></head>
   <body class="account-premium-ui">
     <script>
@@ -1827,7 +1839,7 @@ body.account-premium-ui.nw-portal-dark .account-actions[data-account-panel="over
           <div class="eyebrow">Mein Bereich</div>
           <h1>Dein persönlicher Bereich.</h1>
           <p>
-            Verwalte persönliche Daten, deinen Concierge, Nutzung und Sicherheit übersichtlich an einem Ort.
+            Verwalte deinen Account, deinen Concierge, Nutzung und Safety übersichtlich an einem Ort.
           </p>
         </div>
       </section>
@@ -1866,7 +1878,7 @@ body.account-premium-ui.nw-portal-dark .account-actions[data-account-panel="over
             </nav>
           </div>
           <div class="warning account-session-note" id="modeNotice" data-account-panel="overview" role="tabpanel" aria-labelledby="accountTabOverview">
-            <strong>Sicher verbunden.</strong> Persönliche Daten und Sicherheitseinstellungen werden über deine serverseitig geprüfte Sitzung geladen. Nicht verfügbare Nutzungswerte werden nicht geschätzt.
+            <strong>Sicher verbunden.</strong> Accountdaten und Einstellungen werden über deine serverseitig geprüfte Sitzung geladen. Nicht verfügbare Nutzungswerte werden nicht geschätzt.
           </div>
           <div class="dash">
             <article class="card wide profile-card" id="personalDataCard" data-account-panel="personal" role="tabpanel" aria-labelledby="accountTabPersonal" hidden>
@@ -2144,10 +2156,34 @@ body.account-premium-ui.nw-portal-dark .account-actions[data-account-panel="over
               </p>
             </article>
             <div class="account-panel-heading" data-account-panel="safety" hidden><div class="eyebrow">Safety</div><h2>Safety und Betrugsschutz.</h2><p>Schutz und Unterstützung für dich und deine Familie.</p></div>
+            <div class="safety-hub" id="safetyHub" data-account-panel="safety" hidden>
+              <button class="safety-hub-card" type="button" id="openSafetyView">
+                <span class="safety-hub-icon" aria-hidden="true">◇</span>
+                <span><strong>Safety</strong><small>Persönliche Sicherheitsabfragen, Vertrauenskontakte und Eskalation verwalten.</small></span>
+                <span class="safety-hub-arrow" aria-hidden="true">›</span>
+              </button>
+              <button class="safety-hub-card" type="button" id="openFraudProtectionView">
+                <span class="safety-hub-icon" aria-hidden="true">⌁</span>
+                <span><strong>Betrugsschutz</strong><small>Alle Schutzmöglichkeiten gegen Telefon-, Nachrichten-, Zahlungs- und Online-Betrug ansehen.</small></span>
+                <span class="safety-hub-arrow" aria-hidden="true">›</span>
+              </button>
+            </div>
+            <article class="card wide account-password-card" id="passwordChangeCard" data-account-panel="personal" hidden>
+              <div class="safety-card-head">
+                <div>
+                  <div class="eyebrow">Account</div>
+                  <h3 style="margin:4px 0 8px">Passwort ändern</h3>
+                  <p class="muted">Ändere dein Login-Passwort über einen sicheren Link an deine hinterlegte E-Mail-Adresse.</p>
+                </div>
+                <button class="btn light" type="button" id="passwordChangeButton">Passwort ändern</button>
+              </div>
+              <div class="mfa-feedback" id="passwordChangeFeedback" aria-live="polite"></div>
+            </article>
             <article class="card wide mfa-panel" id="mfaCard" data-account-panel="personal" hidden>
               <div class="safety-card-head">
                 <div>
-                  <div class="eyebrow">Kontoschutz</div>
+                  <div class="eyebrow">Account</div>
+                  <h3 style="margin:4px 0 8px">2-Faktor-Verifizierung</h3>
                   <div class="value" id="mfaStatus">Wird geladen …</div>
                   <p class="muted" id="mfaMeta">Der Status der Zwei-Faktor-Authentifizierung wird sicher aus deinem Konto geladen.</p>
                 </div>
@@ -2387,11 +2423,12 @@ body.account-premium-ui.nw-portal-dark .account-actions[data-account-panel="over
               <p class="muted" style="margin:16px 0 0">Deine E-Mail-Adresse bleibt für die bestehende Passwort-Wiederherstellung verfügbar. Sie wird nicht als gleichwertiger zweiter Faktor dargestellt.</p>
               <div class="mfa-feedback" id="mfaFeedback" aria-live="polite"></div>
             </article>
-            <article class="card wide fraud-protection-card" data-account-panel="safety" hidden tabindex="0">
+            <article class="card wide fraud-protection-card" id="fraudProtectionView" data-safety-detail hidden>
+  <div class="safety-detail-top"><button class="btn light safety-back-button" type="button" data-safety-back>← Zurück</button></div>
   <div class="eyebrow">Betrugsschutz</div><h3>Betrugsschutz</h3>
   <p class="muted">NAHWERK schützt und unterstützt dich bei verdächtigen Kontakten, Forderungen und Nachrichten.</p>
   <div class="fraud-protection-grid">
-    <div><strong>Telefonannahme</strong><span>NAHWERK kann eingehende Anrufe für dich annehmen, nach dem Anliegen fragen und verdächtige Situationen erkennen.</span></div>
+    <div class="fraud-featured"><strong>Telefonannahme</strong><span>NAHWERK kann eingehende Anrufe für dich annehmen. Der Concierge fragt nach dem Anliegen, ordnet den Kontakt ein und kann verdächtige Situationen erkennen, bevor du selbst mit einem unbekannten Anrufer sprechen musst.</span></div>
     <div><strong>Betrugswarnungen</strong><span>Auffällige Anrufe, Nachrichten und Forderungen werden verständlich eingeordnet.</span></div>
     <div><strong>Anrufer-Prüfung</strong><span>Angaben zu Anrufern, Unternehmen und Anliegen können geprüft werden.</span></div>
     <div><strong>Enkeltrick- & Schockanruf-Schutz</strong><span>Besonderer Schutz bei angeblichen Notfällen, Polizei, Krankenhaus, Verwandten und dringenden Geldforderungen.</span></div>
@@ -2407,10 +2444,11 @@ body.account-premium-ui.nw-portal-dark .account-actions[data-account-panel="over
     <div><strong>Persönlicher Betrugsschutz</strong><span>Der Concierge berücksichtigt persönliche Einstellungen und bekannte Kontakte.</span></div>
   </div>
 </article>
-<article class="card wide safety-card safety-panel" id="safetyCard" data-account-panel="safety" role="tabpanel" aria-labelledby="accountTabSafety" hidden aria-expanded="false">
+<article class="card wide safety-card safety-panel" id="safetyCard" data-safety-detail hidden aria-expanded="false">
+              <div class="safety-detail-top"><button class="btn light safety-back-button" type="button" data-safety-back>← Zurück</button></div>
               <div class="safety-card-head">
                 <div>
-                  <div class="eyebrow">Sicherheit</div>
+                  <div class="eyebrow">Safety</div>
                   <div class="safety-status-accessible" id="safetyStatus" aria-live="polite">Wird geladen …</div>
                   <p class="safety-status-accessible" id="safetyMeta">Die aktuellen Sicherheitseinstellungen werden aus deinem NAHWERK-Konto geladen.</p>
                   <p class="safety-status-accessible" id="safetyNext"></p>
@@ -2695,6 +2733,43 @@ body.account-premium-ui.nw-portal-dark .account-actions[data-account-panel="over
             return false;
           }
         }
+        function showSafetyHub() {
+          document.querySelectorAll("[data-safety-detail]").forEach((view) => { view.hidden = true; });
+          if (safetyHeadingPanel) safetyHeadingPanel.hidden = false;
+          if (safetyHub) safetyHub.hidden = false;
+        }
+        function openSafetySubview(name) {
+          if (safetyHeadingPanel) safetyHeadingPanel.hidden = true;
+          if (safetyHub) safetyHub.hidden = true;
+          document.querySelectorAll("[data-safety-detail]").forEach((view) => { view.hidden = true; });
+          if (name === "fraud" && fraudProtectionView) fraudProtectionView.hidden = false;
+          if (name === "safety" && safetyCard) {
+            safetyCard.hidden = false;
+            ensureSafetyLoaded();
+          }
+        }
+        openSafetyViewButton?.addEventListener("click", () => openSafetySubview("safety"));
+        openFraudProtectionViewButton?.addEventListener("click", () => openSafetySubview("fraud"));
+        document.querySelectorAll("[data-safety-back]").forEach((button) => button.addEventListener("click", showSafetyHub));
+
+        passwordChangeButton?.addEventListener("click", async () => {
+          const email = String(document.getElementById("profileEmail")?.value || "").trim();
+          if (!email) {
+            if (passwordChangeFeedback) passwordChangeFeedback.textContent = "Die hinterlegte E-Mail-Adresse konnte nicht geladen werden.";
+            return;
+          }
+          passwordChangeButton.disabled = true;
+          if (passwordChangeFeedback) passwordChangeFeedback.textContent = "Sicherer Link wird angefordert …";
+          try {
+            await fetch(PASSWORD_RESET_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
+            if (passwordChangeFeedback) passwordChangeFeedback.textContent = "Prüfe dein E-Mail-Postfach. Dort findest du den sicheren Link zum Ändern deines Passworts.";
+          } catch (_) {
+            if (passwordChangeFeedback) passwordChangeFeedback.textContent = "Der Link konnte gerade nicht angefordert werden. Bitte versuche es erneut.";
+          } finally {
+            passwordChangeButton.disabled = false;
+          }
+        });
+
         function setAccountTab(name, focus = false) {
           if (isManagedAccountContext() && ["concierge", "email", "personal", "access"].includes(name)) name = "overview";
           if (isManagedAccountContext() && name === "safety" && !managedSafetyAuthorized) name = "overview";
@@ -2709,11 +2784,12 @@ body.account-premium-ui.nw-portal-dark .account-actions[data-account-panel="over
           accountPanels.forEach((panel) => {
             panel.hidden = panel.dataset.accountPanel !== validName;
           });
-          if (validName !== "safety") setSafetyFormOpen(false);
-          if (validName === "safety") {
-            ensureSafetyLoaded();
-            if (!isManagedAccountContext()) ensureMfaLoaded();
+          if (validName !== "safety") {
+            setSafetyFormOpen(false);
+            document.querySelectorAll("[data-safety-detail]").forEach((view) => { view.hidden = true; });
           }
+          if (validName === "safety") showSafetyHub();
+          if (validName === "personal" && !isManagedAccountContext()) ensureMfaLoaded();
           if (validName === "concierge") ensureReceptionLoaded();
           if (validName === "email") window.NAHWERKEmailAccount?.activate?.();
           if (validName === "access") ensureFamilyPermissionsLoaded();
@@ -2875,12 +2951,20 @@ body.account-premium-ui.nw-portal-dark .account-actions[data-account-panel="over
 
         const PROFILE_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-profile";
         const PROFILE_CACHE_KEY = "nw_account_profile_cache_v1";
+        const PASSWORD_RESET_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-password-recovery-request-secure";
         const MFA_STATUS_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-mfa-status";
         const MFA_MANAGE_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-mfa-manage";
         const SAFETY_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/safety";
         const SAFETY_CONTACTS_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-safety-contacts";
         const MANAGED_SAFETY_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-managed-safety-context";
         let managedSafetyAuthorized = false;
+        const safetyHub = document.getElementById("safetyHub");
+        const safetyHeadingPanel = document.querySelector('.account-panel-heading[data-account-panel="safety"]');
+        const fraudProtectionView = document.getElementById("fraudProtectionView");
+        const openSafetyViewButton = document.getElementById("openSafetyView");
+        const openFraudProtectionViewButton = document.getElementById("openFraudProtectionView");
+        const passwordChangeButton = document.getElementById("passwordChangeButton");
+        const passwordChangeFeedback = document.getElementById("passwordChangeFeedback");
         const safetyCard = document.getElementById("safetyCard");
         const safetyForm = document.getElementById("safetyForm");
         const safetyStatus = document.getElementById("safetyStatus");
@@ -3516,7 +3600,7 @@ body.account-premium-ui.nw-portal-dark .account-actions[data-account-panel="over
 
         function openSecuritySetupFromNudge(method) {
           hideSecurityNudge();
-          setAccountTab("safety");
+          setAccountTab("personal");
           setTimeout(() => {
             document.getElementById("mfaCard")?.scrollIntoView({ behavior: "smooth", block: "center" });
             beginMfaMethod(method);
