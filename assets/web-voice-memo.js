@@ -298,6 +298,7 @@
       reset();
       if (!(e.input instanceof HTMLTextAreaElement)) throw new Error("composer_unavailable");
       e.input.value = transcript;
+      window.dispatchEvent(new CustomEvent("nahwerk:voice-memo-sent",{detail:{transcript}}));
       e.input.dispatchEvent(new Event("input", { bubbles: true }));
       if (e.send instanceof HTMLButtonElement && !e.send.disabled) {
         e.send.click();
