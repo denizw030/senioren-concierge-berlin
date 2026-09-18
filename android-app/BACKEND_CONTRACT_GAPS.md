@@ -1,99 +1,61 @@
 # NAHWERK Android – Remaining PROD Launch Gaps
 
-This file records only remaining blockers for the currently approved Android customer launch path. It does not define or mutate shared backend behavior.
+This file records only remaining blockers for the approved Android customer launch path. Android remains a thin client and does not redefine Core, CAO, Billing, Wallet, Safety, Family, WhatsApp or Voice.
 
-## Customer contracts already available in PROD
+## Canonical APP transport — GREEN
 
-Android is bound to the active server contracts for:
+Fresh PROD verification on 18 September 2026 confirms:
 
-- registration and verification
-- secure PROD customer login/session, including MFA
-- customer profile, plan and usage read; approved name edits
-- PAYG activation/status, wallet, quotes, explicit quote approval/cancellation, costs and usage
-- Stripe Live readiness through `web-payg-readiness`
-- payment-method read plus server-owned Stripe Checkout setup/sync
-- Safety configuration/status
-- Family permissions, managed people and invitations
-- MFA enrollment/management
+- `nahwerk-app-gateway` is ACTIVE in PROD.
+- `adapter_core_route_app.enabled = true`.
+- `adapter_core_route_app.rollout_percent = 100`.
+- channel = `APP`.
+- contract = `core-v1`.
+- mode = `authoritative`.
+- `authoritative_delivery = true`.
+- fail-safe = `fail_closed`.
+- `central_orchestrator_authoritative` is enabled at 100% and includes APP.
+- CAO metadata proves `authoritative_mutation = true`.
 
-The customer launcher now uses the PROD customer session directly. Account/PAYG/Safety/Family no longer depend on historical mobile STAGING auth.
+The former `shadow_only / rollout_percent=0` blocker is obsolete and must not be used as launch status.
 
-No replacement billing, wallet, Safety, Family or Core truth is created locally.
+## Customer contracts available in PROD
 
-## Exact remaining shared transport blocker
+Android is bound to active server contracts for:
 
-Fresh read-only PROD verification shows the canonical Core already knows channel `APP`:
+- registration and verification;
+- secure customer login/session and MFA;
+- customer profile, plan and usage;
+- authoritative APP/core-v1 Concierge transport;
+- PAYG, wallet, quotes, costs and usage;
+- Stripe readiness and server-owned Checkout;
+- reminders;
+- Safety;
+- Family permissions and managed people;
+- MFA enrollment/management.
 
-`adapter_core_route_app`
-
-Current PROD state:
-
-- `enabled = false`
-- `rollout_percent = 0`
-- `metadata.mode = shadow_only`
-- `metadata.contract = core-v1`
-
-No published customer-facing APP gateway is currently authoritative for normal customer traffic.
-
-Therefore the Android customer launcher must not:
-
-- call the Core directly with service credentials;
-- reuse the WEB gateway/session identity as APP;
-- use the Vercel CAO OIDC gateway, which is service-to-service only;
-- fall back to historical STAGING mobile auth/gateway functions;
-- invent person/account/task/action authority client-side.
-
-NAHWERK MASTER/shared backend must publish and activate the canonical customer APP gateway/identity contract before Home/Concierge/Reminders can be live for normal customers.
+No replacement authority is created client-side.
 
 ## Stripe Live gate
 
-Android can now independently read `web-payg-readiness` and treats payment setup as available only when the response proves all required live/provider/webhook conditions and `payment_ready = true`.
-
-If the readiness call fails, is partial, reports test mode, reports missing webhook configuration or returns `payment_ready != true`, Checkout remains disabled. No success state is inferred from `setup_available` alone.
-
-The app-side gate is complete. The current fresh runtime value of `payment_ready` still has to be observed from the authoritative PROD readiness endpoint before customer E2E.
+The app-side payment gate is complete. The durable CI workflow `Android PROD Readiness` now verifies the live `web-payg-readiness` response and requires `payment_ready = true` together with live Stripe API/webhook proof. CI never creates a real charge.
 
 ## Release boundary
 
-- canonical product base URL is fixed to PROD HTTPS;
-- debug has no hard-coded STAGING Auth/Gateway fallback;
-- release Auth/Gateway values are optional only while live transport is unpublished and must be configured together when used;
-- visible STAGING release values are rejected;
-- signing material remains environment-only;
-- PR CI produces an unsigned production-inert candidate by design;
-- the signed customer package requires the protected production release environment and explicit release dispatch.
+- PROD HTTPS endpoints only.
+- No STAGING fallback in a customer release.
+- Signing material remains environment-only.
+- Main builds an unsigned production-inert candidate.
+- Signed customer packaging requires protected Android release secrets and explicit release authorization.
+- Store publication is separate from package readiness.
 
-## Prepared customer E2E
+## Remaining launch work
 
-When the Shared APP route is authoritative and the signed customer build exists, execute exactly one bounded Owner-as-normal-customer E2E:
+After all main-branch CI gates are GREEN, only these release/customer actions remain:
 
-1. install/open app;
-2. register/login and complete MFA if required;
-3. verify real account/profile/plan/usage;
-4. enable/open PAYG and confirm price/readiness information;
-5. confirm/add payment method only after explicit Owner authorization;
-6. submit one Concierge task;
-7. inspect the exact quote/price;
-8. approve that exact quote explicitly;
-9. trigger no payment/provider side effect until separately authorized;
-10. verify Safety;
-11. verify Family;
-12. verify Home/Reminders authoritative state;
-13. after authorized execution, verify exactly one completed action and its exact cost/usage record.
+1. build the signed package using the protected release environment;
+2. install the signed customer build;
+3. run one explicitly authorized real-customer E2E;
+4. publish through the relevant app store only after store credentials/account are available.
 
-## Gates
-
-`APP_ISOLATED_PROD_READINESS = YES`
-
-only after the final Android-only head has GREEN build, unit tests, lint, emulator/instrumentation and unsigned release-candidate verification.
-
-`READY_FOR_REAL_CUSTOMER_APP_E2E = NO`
-
-until all of the following are true:
-
-1. authoritative customer APP/core-v1 gateway published and enabled in PROD;
-2. signed customer release built with its exact PROD configuration;
-3. fresh `web-payg-readiness.payment_ready == true` confirmed;
-4. release installed and ready for the explicitly authorized real-customer E2E.
-
-CI never performs a real charge, Concierge provider action, WhatsApp send, Family provider send or phone call.
+`APP_AUTHORITATIVE_TRANSPORT = GREEN`
