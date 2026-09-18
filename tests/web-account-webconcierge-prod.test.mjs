@@ -6,6 +6,7 @@ const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf
 const page = read("web-concierge.html");
 const cleanPage = read("web-concierge/index.html");
 const client = read("assets/web-customer-concierge.js");
+const threadScope = read("assets/web-customer-concierge-thread-scope.js");
 const shadow = read("assets/web-core-shadow.js");
 const legacyUi = read("assets/web-concierge-chat.js");
 const siteUi = read("assets/site-ui.js");
@@ -84,14 +85,16 @@ test("persisted chat history is authenticated, paginated and reuses the canonica
   assert.doesNotMatch(client, /nahwerk-web-chat-history/);
 });
 
-test("open Web Concierge refreshes shared Web and WhatsApp history automatically", () => {
+test("Web Concierge keeps the normal Web/App chat separate from WhatsApp", () => {
   assert.match(client, /SYNC_INTERVAL_MS = 3000/);
   assert.match(client, /setInterval\(\(\)=>\{void syncHistory\(\);\},SYNC_INTERVAL_MS\)/);
-  assert.match(client, /document\.hidden/);
-  assert.match(client, /visibilitychange/);
-  assert.match(client, /threadCache\.some\(\(thread\)=>thread\.thread_id===selectedBefore\)/);
-  assert.match(client, /refreshThread\(selectedBefore\)/);
-  assert.match(client, /historySignature\(messages\)/);
+  assert.match(threadScope, /NORMAL_CHANNELS=new Set\(\["WEB","APP"\]\)/);
+  assert.match(threadScope, /title:"WhatsApp"/);
+  assert.match(threadScope, /channel_view:"WHATSAPP"/);
+  assert.match(threadScope, /messageMatchesView\(message,view\)/);
+  assert.match(threadScope, /channel==="WHATSAPP"/);
+  assert.match(threadScope, /return NORMAL_CHANNELS\.has\(channel\)/);
+  assert.doesNotMatch(threadScope, /title:"Hauptchat"|Web · App · WhatsApp/);
 });
 
 test("account Concierge entry opens the real main customer chat without a Web Chat layer", () => {
@@ -130,12 +133,14 @@ test("Concierge avatar and name open central Concierge settings", () => {
   assert.match(client, /avatar\.onkeydown/);
 });
 
-test("WhatsApp messages in shared history are visibly identified", () => {
-  assert.match(client, /normalizedChannel==="WHATSAPP"/);
-  assert.match(client, /badge\.textContent="WhatsApp"/);
-  assert.match(client, /aria-label","Nachricht über WhatsApp"/);
-  assert.match(client, /m\.channel\|\|"WEB"/);
-  assert.match(client, /m\?\.channel/);
+test("WhatsApp is a separate channel chat and cannot accidentally send as Web", () => {
+  assert.match(threadScope, /VIRTUAL_WHATSAPP_THREAD_ID/);
+  assert.match(threadScope, /channel_view:"WHATSAPP"/);
+  assert.match(threadScope, /channel_view_read_only/);
+  assert.match(threadScope, /nahwerk:chat-channel-view/);
+  assert.match(client, /channelViewReadOnly/);
+  assert.match(client, /WhatsApp-Verlauf – antworte in WhatsApp/);
+  assert.match(client, /sending\|\|channelViewReadOnly/);
 });
 
 test("legacy Shadow transport remains inert", () => {
@@ -162,7 +167,8 @@ test("legacy and clean routes expose the same end-customer messenger", () => {
     assert.match(surface, /Neuer Chat/);
     assert.match(surface, /Deine Chats/);
     assert.match(surface, /aria-label="Chatverlauf"/);
-    assert.match(surface, /assets\/web-customer-concierge\.js\?v=10/);
+    assert.match(surface, /assets\/web-customer-concierge\.js\?v=17/);
+    assert.match(surface, /assets\/web-customer-concierge-thread-scope\.js\?v=2/);
     assert.doesNotMatch(surface, /PROD|autoritativ|Core-v1|web-gateway-v1|Fail-closed|Shadow-Antworten|kanonische Kundenidentität/i);
   }
 });

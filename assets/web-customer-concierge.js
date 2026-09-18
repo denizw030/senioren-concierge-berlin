@@ -281,9 +281,23 @@
 
   function setComposerReady(ready) {
     const input=document.getElementById("webConciergeInput"),send=document.getElementById("webConciergeSend");
-    if(input){input.disabled=!ready;input.setAttribute("aria-disabled",ready?"false":"true");}
-    if(send)send.disabled=!ready||sending;
+    const usable=ready&&!channelViewReadOnly;
+    if(input){
+      input.disabled=!usable;
+      input.setAttribute("aria-disabled",usable?"false":"true");
+      input.placeholder=channelViewReadOnly
+        ? (channelView==="WHATSAPP"?"WhatsApp-Verlauf – antworte in WhatsApp":channelView==="TELEGRAM"?"Telegram-Verlauf – antworte in Telegram":"Nachricht schreiben …")
+        : "Nachricht schreiben …";
+    }
+    if(send)send.disabled=!usable||sending;
   }
+
+  window.addEventListener("nahwerk:chat-channel-view",(event)=>{
+    const next=String(event?.detail?.channel||"CHAT").toUpperCase();
+    channelView=next;
+    channelViewReadOnly=event?.detail?.readOnly===true||next==="WHATSAPP"||next==="TELEGRAM";
+    setComposerReady(gatewayReady);
+  });
   function resizeInput(){const input=document.getElementById("webConciergeInput");if(!(input instanceof HTMLTextAreaElement))return;input.style.height="auto";input.style.height=`${Math.min(input.scrollHeight,132)}px`;}
   function sidebarDate(value){const d=new Date(value||Date.now()),now=new Date();if(Number.isNaN(d.getTime()))return "";if(dateKey(d)===dateKey(now))return timeLabel(d);return new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"2-digit"}).format(d);}
   function renderThreads() {
@@ -383,7 +397,7 @@
   }
 
   async function sendTurn() {
-    const input=document.getElementById("webConciergeInput");if(!(input instanceof HTMLTextAreaElement)||!gatewayReady||sending)return;
+    const input=document.getElementById("webConciergeInput");if(!(input instanceof HTMLTextAreaElement)||!gatewayReady||sending||channelViewReadOnly)return;
     const content=input.value.trim();if(!content||content.length>4000)return;if(!activeThreadId)activeThreadId=crypto.randomUUID();
     const sourceMessageId=crypto.randomUUID(),clientId=`local:${sourceMessageId}`,now=new Date().toISOString();
     appendMessage("user",content,now,clientId,"WEB");input.value="";resizeInput();sending=true;setComposerReady(true);showTyping();
