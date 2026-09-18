@@ -1,0 +1,60 @@
+name: Android PROD Readiness
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'android-app/**'
+      - '.github/workflows/android-prod-readiness.yml'
+      - '.github/workflows/android-qa.yml'
+      - '.github/workflows/android-distribution-package.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prod-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify authoritative APP gateway and Stripe Live readiness
+        shell: bash
+        env:
+          APP_HEALTH_URL: https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-app-gateway/health
+          PAYG_READINESS_URL: https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-payg-readiness
+        run: |
+          set -euo pipefail
+          app="$(curl -fsS --retry 3 --retry-delay 2 --max-time 20 "$APP_HEALTH_URL")"
+          payg="$(curl -fsS --retry 3 --retry-delay 2 --max-time 20 "$PAYG_READINESS_URL")"
+          APP="$app" PAYG="$payg" python - <<'PY'
+          import json, os
+          a=json.loads(os.environ["APP"])
+          p=json.loads(os.environ["PAYG"])
+          checks={
+            "app_ok": a.get("ok") is True,
+            "app_production": a.get("production") is True,
+            "app_staging_false": a.get("staging") is False,
+            "app_route_authoritative": a.get("app_route_authoritative") is True,
+            "cao_app_authoritative": a.get("cao_app_authoritative") is True,
+            "app_fail_closed": a.get("fail_safe") == "closed",
+            "payg_ok": p.get("ok") is True,
+            "payg_production": p.get("production") is True,
+            "payg_provider": p.get("provider") == "stripe",
+            "stripe_live_key": p.get("key_mode") == "live",
+            "stripe_api_reachable": p.get("api_reachable") is True,
+            "stripe_livemode": p.get("api_livemode") is True,
+            "stripe_live_confirmed": p.get("live_confirmed") is True,
+            "stripe_webhook_secret": p.get("webhook_secret_configured") is True,
+            "stripe_webhook_endpoint": p.get("webhook_endpoint_configured") is True,
+            "stripe_webhook_enabled": p.get("webhook_endpoint_enabled") is True,
+            "stripe_webhook_events": p.get("webhook_required_events_complete") is True,
+            "payment_ready": p.get("payment_ready") is True,
+            "no_real_charge": p.get("real_charge_performed") is False,
+          }
+          failed=[k for k,v in checks.items() if not v]
+          print(json.dumps(checks,indent=2,sort_keys=True))
+          if failed:
+              raise SystemExit("ANDROID_PROD_READINESS_FAILED="+",".join(failed))
+          print("ANDROID_PROD_RUNTIME_READINESS=GREEN")
+          PY
