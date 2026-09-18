@@ -319,3 +319,16 @@ body.senior-product .nw-carousel-select>span,
   filter:none!important;
   text-shadow:none!important;
 }
+
+/* MOBILE_CAROUSEL_ARROW_PLACEMENT_V2_20260918 */
+@media(max-width:760px){
+ .concierge-portal-settings .nw-carousel-stage{overflow:hidden!important}
+ .concierge-portal-settings .nw-carousel-arrow{
+   top:45%!important;bottom:auto!important;margin-top:-22px!important;
+   width:44px!important;height:44px!important;z-index:90!important
+ }
+ .concierge-portal-settings .nw-carousel-arrow.prev{left:8px!important}
+ .concierge-portal-settings .nw-carousel-arrow.next{right:8px!important}
+ .concierge-portal-settings .nw-carousel-info{position:relative!important;z-index:10!important}
+ .concierge-portal-settings .nw-carousel-actions{position:relative!important;z-index:12!important}
+}
