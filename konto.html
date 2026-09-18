@@ -1799,6 +1799,13 @@ body.account-premium-ui.nw-portal-dark .account-actions[data-account-panel="over
   color:#e8dfcb!important;
   border-color:#6e592e!important;
 }
+</style><style id="fraud-protection-ui">
+.fraud-protection-card,.safety-card{cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.fraud-protection-card:hover,.fraud-protection-card:focus-visible,.safety-card:hover{transform:translateY(-2px);border-color:rgba(173,139,74,.48);box-shadow:0 12px 32px rgba(0,0,0,.08)}
+.fraud-protection-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}
+.fraud-protection-grid>div{display:flex;flex-direction:column;gap:5px;padding:16px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.45)}
+.fraud-protection-grid span{font-size:13px;line-height:1.5;color:var(--muted)}
+@media(max-width:720px){.fraud-protection-grid{grid-template-columns:1fr}}
 </style></head>
   <body class="account-premium-ui">
     <script>
@@ -1852,9 +1859,9 @@ body.account-premium-ui.nw-portal-dark .account-actions[data-account-panel="over
               <button class="account-tab" type="button" role="tab" id="accountTabOverview" aria-controls="accountPanelOverview" aria-selected="true" data-account-tab="overview"><span class="account-tab-icon" aria-hidden="true">⌂</span><span>Übersicht</span></button>
               <button class="account-tab" type="button" role="tab" id="accountTabConcierge" aria-controls="accountPanelConcierge" aria-selected="false" data-account-tab="concierge"><span class="account-tab-icon" aria-hidden="true">✦</span><span>Concierge</span></button>
               <button class="account-tab" type="button" role="tab" id="accountTabEmail" aria-controls="accountEmailCard" aria-selected="false" data-account-tab="email"><span class="account-tab-icon" aria-hidden="true">✉</span><span>E-Mail</span></button>
-              <button class="account-tab" type="button" role="tab" id="accountTabSafety" aria-controls="accountPanelSafety" aria-selected="false" data-account-tab="safety"><span class="account-tab-icon" aria-hidden="true">◇</span><span>Sicherheit</span></button>
+              <button class="account-tab" type="button" role="tab" id="accountTabSafety" aria-controls="accountPanelSafety" aria-selected="false" data-account-tab="safety"><span class="account-tab-icon" aria-hidden="true">◇</span><span>Safety</span></button>
               <button class="account-tab" type="button" role="tab" id="accountTabUsage" aria-controls="accountPanelUsage" aria-selected="false" data-account-tab="usage"><span class="account-tab-icon" aria-hidden="true">◔</span><span>Nutzung</span></button>
-              <button class="account-tab" type="button" role="tab" id="accountTabPersonal" aria-controls="accountPanelPersonal" aria-selected="false" data-account-tab="personal"><span class="account-tab-icon" aria-hidden="true">○</span><span>Persönliche Daten</span></button>
+              <button class="account-tab" type="button" role="tab" id="accountTabPersonal" aria-controls="accountPanelPersonal" aria-selected="false" data-account-tab="personal"><span class="account-tab-icon" aria-hidden="true">○</span><span>Account</span></button>
               <button class="account-tab" type="button" role="tab" id="accountTabAccess" aria-controls="accountPanelAccess" aria-selected="false" data-account-tab="access"><span class="account-tab-icon" aria-hidden="true">⇄</span><span>Zugänge</span></button>
             </nav>
           </div>
@@ -1866,7 +1873,7 @@ body.account-premium-ui.nw-portal-dark .account-actions[data-account-panel="over
               <div class="profile-head">
                 <div class="profile-head-copy">
                   <div class="eyebrow">Mein Konto</div>
-                  <h3>Persönliche Daten</h3>
+                  <h3>Account</h3>
                   <p class="muted">Vor- und Nachname kannst du hier direkt aktualisieren. E-Mail und WhatsApp bleiben aus Sicherheitsgründen geschützt.</p>
                 </div>
                 <span class="profile-status" id="profileStatusBadge">Sicher verbunden</span>
@@ -2136,8 +2143,8 @@ body.account-premium-ui.nw-portal-dark .account-actions[data-account-panel="over
                 WhatsApp-Gesprächs.
               </p>
             </article>
-            <div class="account-panel-heading" data-account-panel="safety" hidden><div class="eyebrow">Sicherheit</div><h2>Sicherheit und Vertrauenskontakt.</h2><p>Deine wichtigsten Sicherheitseinstellungen auf einen Blick. Details öffnest du erst über „Bearbeiten“.</p></div>
-            <article class="card wide mfa-panel" id="mfaCard" data-account-panel="safety" hidden>
+            <div class="account-panel-heading" data-account-panel="safety" hidden><div class="eyebrow">Safety</div><h2>Safety und Betrugsschutz.</h2><p>Schutz und Unterstützung für dich und deine Familie.</p></div>
+            <article class="card wide mfa-panel" id="mfaCard" data-account-panel="personal" hidden>
               <div class="safety-card-head">
                 <div>
                   <div class="eyebrow">Kontoschutz</div>
@@ -2380,7 +2387,27 @@ body.account-premium-ui.nw-portal-dark .account-actions[data-account-panel="over
               <p class="muted" style="margin:16px 0 0">Deine E-Mail-Adresse bleibt für die bestehende Passwort-Wiederherstellung verfügbar. Sie wird nicht als gleichwertiger zweiter Faktor dargestellt.</p>
               <div class="mfa-feedback" id="mfaFeedback" aria-live="polite"></div>
             </article>
-            <article class="card wide safety-card safety-panel" id="safetyCard" data-account-panel="safety" role="tabpanel" aria-labelledby="accountTabSafety" hidden aria-expanded="false">
+            <article class="card wide fraud-protection-card" data-account-panel="safety" hidden tabindex="0">
+  <div class="eyebrow">Betrugsschutz</div><h3>Betrugsschutz</h3>
+  <p class="muted">NAHWERK schützt und unterstützt dich bei verdächtigen Kontakten, Forderungen und Nachrichten.</p>
+  <div class="fraud-protection-grid">
+    <div><strong>Telefonannahme</strong><span>NAHWERK kann eingehende Anrufe für dich annehmen, nach dem Anliegen fragen und verdächtige Situationen erkennen.</span></div>
+    <div><strong>Betrugswarnungen</strong><span>Auffällige Anrufe, Nachrichten und Forderungen werden verständlich eingeordnet.</span></div>
+    <div><strong>Anrufer-Prüfung</strong><span>Angaben zu Anrufern, Unternehmen und Anliegen können geprüft werden.</span></div>
+    <div><strong>Enkeltrick- & Schockanruf-Schutz</strong><span>Besonderer Schutz bei angeblichen Notfällen, Polizei, Krankenhaus, Verwandten und dringenden Geldforderungen.</span></div>
+    <div><strong>Bank- & Zahlungsbetrug</strong><span>Schutz bei verdächtigen Überweisungen, Gutscheinkarten, Kryptowährungen und Bankdaten.</span></div>
+    <div><strong>Falsche Polizei & Behörden</strong><span>Verdächtige Kontaktversuche angeblicher Behörden oder Polizeistellen können geprüft werden.</span></div>
+    <div><strong>Vertrags- & Abo-Fallen</strong><span>Unterstützung bei Haustürgeschäften, Abonnements, Vertragsangeboten und unerwarteten Rechnungen.</span></div>
+    <div><strong>SMS-, WhatsApp- & Nachrichtenbetrug</strong><span>Verdächtige Nachrichten, Links und Kontaktversuche können dem Concierge zur Prüfung gegeben werden.</span></div>
+    <div><strong>E-Mail-Betrug & Phishing</strong><span>Verdächtige E-Mails können analysiert und verständlich erklärt werden.</span></div>
+    <div><strong>Link- & Webseitenprüfung</strong><span>Verdächtige Links und Webseiten können vor einer Reaktion geprüft werden.</span></div>
+    <div><strong>Rechnungsprüfung</strong><span>Rechnungen, Mahnungen und Zahlungsaufforderungen können auf Betrugsmerkmale geprüft werden.</span></div>
+    <div><strong>Sicherer Rückruf</strong><span>Bei Zweifeln hilft NAHWERK, einen unabhängig ermittelten offiziellen Kontakt zu verwenden.</span></div>
+    <div><strong>Vertrauensperson</strong><span>Eine hinterlegte Vertrauensperson kann bei kritischen Situationen nach den persönlichen Einstellungen einbezogen werden.</span></div>
+    <div><strong>Persönlicher Betrugsschutz</strong><span>Der Concierge berücksichtigt persönliche Einstellungen und bekannte Kontakte.</span></div>
+  </div>
+</article>
+<article class="card wide safety-card safety-panel" id="safetyCard" data-account-panel="safety" role="tabpanel" aria-labelledby="accountTabSafety" hidden aria-expanded="false">
               <div class="safety-card-head">
                 <div>
                   <div class="eyebrow">Sicherheit</div>
