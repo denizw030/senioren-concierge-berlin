@@ -25,7 +25,8 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: NAHWERK
         INFOPLIST_KEY_UILaunchStoryboardName: LaunchScreen
-        INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES\n        INFOPLIST_KEY_NSMicrophoneUsageDescription: "NAHWERK benötigt das Mikrofon, damit du deinem Concierge eine Sprachmemo senden kannst."
+        INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
+        INFOPLIST_KEY_NSMicrophoneUsageDescription: "NAHWERK benötigt das Mikrofon, damit du deinem Concierge eine Sprachmemo senden kannst."
         TARGETED_DEVICE_FAMILY: "1"
         SUPPORTS_MACCATALYST: NO
         ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: NO
