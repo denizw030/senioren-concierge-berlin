@@ -411,6 +411,23 @@
 
   async function boot() {
     initMobileDrawer();
+// IOS_VISUAL_VIEWPORT_COMPOSER_V1_20260918
+function syncIosVisualViewport(){
+  if(!isMobile())return;
+  const vv=window.visualViewport;
+  const workspace=document.querySelector(".web-concierge-workspace");
+  if(!workspace)return;
+  if(!vv){workspace.style.removeProperty("--nw-vv-height");workspace.style.removeProperty("--nw-vv-top");return;}
+  workspace.style.setProperty("--nw-vv-height",Math.round(vv.height)+"px");
+  workspace.style.setProperty("--nw-vv-top",Math.round(vv.offsetTop)+"px");
+  requestAnimationFrame(()=>{log.scrollTop=log.scrollHeight;});
+}
+window.visualViewport?.addEventListener("resize",syncIosVisualViewport,{passive:true});
+window.visualViewport?.addEventListener("scroll",syncIosVisualViewport,{passive:true});
+input.addEventListener("focus",()=>{syncIosVisualViewport();setTimeout(syncIosVisualViewport,80);setTimeout(syncIosVisualViewport,260);});
+input.addEventListener("blur",()=>setTimeout(syncIosVisualViewport,120));
+syncIosVisualViewport();
+
     const valid=window.SCBAuth?.validateSession?await window.SCBAuth.validateSession().catch(()=>false):false;if(!valid){location.replace("/anmelden");return;}
     applyPersona(null);
     const status=document.getElementById("webConciergeStatus");setComposerReady(false);const ready=await checkReadiness();
