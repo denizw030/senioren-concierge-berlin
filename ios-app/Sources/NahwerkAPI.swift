@@ -93,6 +93,7 @@ final class NahwerkAPI {
         return try await request(url: gatewayBase.appendingPathComponent("mobile/me"), method: "GET", bearer: token)
     }
 
+    @MainActor
     private func applyLogin(_ json: [String: Any], store: SessionStore) throws -> LoginResult {
         guard (json["ok"] as? Bool) == true else {
             throw NahwerkAPIError.server((json["status"] as? String) ?? "Anmeldung fehlgeschlagen.")
