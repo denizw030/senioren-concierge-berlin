@@ -1817,6 +1817,29 @@ body.account-premium-ui.nw-portal-dark .account-actions[data-account-panel="over
 .fraud-protection-grid>div.fraud-featured strong{font-size:18px}
 .fraud-protection-grid span{font-size:13px;line-height:1.5;color:var(--muted)}
 .account-password-card{grid-column:1/-1}
+.fraud-situation-check,.fraud-channel-section,.fraud-final-note{margin-top:18px;padding:20px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.025)}
+.fraud-situation-check h4,.fraud-channel-section h4{margin:4px 0 10px;font-size:20px}
+.fraud-situation-check p,.fraud-channel-section p{margin:8px 0;line-height:1.6}
+.fraud-example{display:flex;flex-direction:column;gap:7px;margin-top:15px;padding:16px;border:1px solid rgba(173,139,74,.32);border-radius:14px;background:rgba(173,139,74,.055)}
+.fraud-example span,.fraud-check-note,.fraud-final-note span{font-size:13px;line-height:1.6;color:var(--muted)}
+.fraud-channel-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:15px}
+.fraud-channel-item{display:flex;flex-direction:column;gap:6px;padding:14px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.025)}
+.fraud-channel-item span{font-size:12.5px;line-height:1.5;color:var(--muted)}
+.fraud-channel-phone{border-color:rgba(173,139,74,.38)}
+.fraud-section-title{margin:26px 0 -5px;padding-top:4px}
+.fraud-section-title span{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.fraud-final-note{display:flex;flex-direction:column;gap:7px;margin-top:24px}
+body.account-premium-ui.nw-portal-dark .fraud-situation-check,
+body.account-premium-ui.nw-portal-dark .fraud-channel-section,
+body.account-premium-ui.nw-portal-dark .fraud-final-note,
+body.account-premium-ui.nw-portal-dark .fraud-channel-item{background:rgba(9,13,18,.70);border-color:rgba(169,187,211,.11)}
+body.account-premium-ui.nw-portal-dark .fraud-example{background:rgba(214,182,107,.045);border-color:rgba(214,182,107,.22)}
+body.account-premium-ui.nw-portal-light .fraud-situation-check,
+body.account-premium-ui.nw-portal-light .fraud-channel-section,
+body.account-premium-ui.nw-portal-light .fraud-final-note,
+body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,255,255,.72);border-color:rgba(112,87,39,.14)}
+@media(max-width:1100px){.fraud-channel-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.fraud-channel-phone{grid-column:1/-1}}
+@media(max-width:720px){.fraud-channel-grid{grid-template-columns:1fr}.fraud-channel-phone{grid-column:auto}}
 @media(max-width:720px){.safety-hub,.fraud-protection-grid{grid-template-columns:1fr}.fraud-protection-grid>div.fraud-featured{grid-column:auto}}
 </style></head>
   <body class="account-premium-ui">
@@ -2426,23 +2449,87 @@ body.account-premium-ui.nw-portal-dark .account-actions[data-account-panel="over
             <article class="card wide fraud-protection-card" id="fraudProtectionView" data-safety-detail hidden>
   <div class="safety-detail-top"><button class="btn light safety-back-button" type="button" data-safety-back>← Zurück</button></div>
   <div class="eyebrow">Betrugsschutz</div><h3>Betrugsschutz</h3>
-  <p class="muted">NAHWERK schützt und unterstützt dich bei verdächtigen Kontakten, Forderungen und Nachrichten.</p>
+  <p class="muted">Wenn dir etwas komisch vorkommt, kannst du den gesamten Vorgang von NAHWERK prüfen lassen – bevor du zahlst, unterschreibst, zurückrufst, einen Link öffnest oder persönliche Daten herausgibst.</p>
+
+  <section class="fraud-situation-check" aria-labelledby="fraudSituationHeading">
+    <div class="eyebrow">Vorgang prüfen lassen</div>
+    <h4 id="fraudSituationHeading">Erst prüfen. Dann handeln.</h4>
+    <p>Für junge Menschen genauso wie für ältere: Erzähl deinem Concierge einfach, was passiert ist. Du kannst Nachrichten, E-Mails, Screenshots, Rechnungen, Dokumente, Links oder ganze Abläufe schildern. NAHWERK prüft, ob das Vorgehen plausibel wirkt, welche Warnzeichen es gibt und was du zuerst unabhängig bestätigen solltest.</p>
+    <div class="fraud-example">
+      <strong>Beispiel Wohnungssuche</strong>
+      <span>Du findest über Kleinanzeigen eine Wohnung. Jemand behauptet, von GEWOBAG zu sein, möchte sich mit dir treffen und verlangt eine Kaution, damit die Wohnung „reserviert“ wird. NAHWERK würde dich vor einer Zahlung darauf hinweisen, den Vorgang über offizielle Kontaktdaten und den regulären Vermietungsprozess zu verifizieren und ungewöhnliche Vorauszahlungen besonders kritisch zu behandeln.</span>
+    </div>
+    <p class="fraud-check-note"><strong>Du musst den Betrug nicht selbst erkennen.</strong> Es reicht, dass dir etwas seltsam vorkommt. NAHWERK hilft dir bei der Zweitmeinung.</p>
+  </section>
+
+  <section class="fraud-channel-section" aria-labelledby="fraudChannelsHeading">
+    <div class="eyebrow">Überall erreichbar</div>
+    <h4 id="fraudChannelsHeading">Betrugsschutz über alle NAHWERK-Kanäle</h4>
+    <p class="muted">Du kannst denselben Betrugsschutz dort nutzen, wo der verdächtige Vorgang gerade auftaucht.</p>
+    <div class="fraud-channel-grid">
+      <div class="fraud-channel-item"><strong>Webchat</strong><span>Situation schildern, Links einfügen sowie Screenshots oder Dokumente zur Prüfung geben.</span></div>
+      <div class="fraud-channel-item"><strong>App</strong><span>Unterwegs direkt nachfragen und verdächtige Vorgänge, Bilder oder Nachrichten prüfen lassen.</span></div>
+      <div class="fraud-channel-item"><strong>WhatsApp</strong><span>Verdächtige Nachrichten, Kontakte, Links oder Screenshots direkt an deinen Concierge weitergeben.</span></div>
+      <div class="fraud-channel-item"><strong>E-Mail</strong><span>Verdächtige E-Mails, Absender, Anhänge, Rechnungen und Zahlungsaufforderungen prüfen lassen.</span></div>
+      <div class="fraud-channel-item fraud-channel-phone"><strong>Telefon · 0800 6249375</strong><span>Ruf NAHWERK an und schildere den Vorgang persönlich. Der Concierge kann dich durch die Prüfung führen.</span></div>
+    </div>
+  </section>
+
+  <div class="fraud-section-title"><span>Telefon & persönliche Kontakte</span></div>
   <div class="fraud-protection-grid">
     <div class="fraud-featured"><strong>Telefonannahme</strong><span>NAHWERK kann eingehende Anrufe für dich annehmen. Der Concierge fragt nach dem Anliegen, ordnet den Kontakt ein und kann verdächtige Situationen erkennen, bevor du selbst mit einem unbekannten Anrufer sprechen musst.</span></div>
     <div><strong>Betrugswarnungen</strong><span>Auffällige Anrufe, Nachrichten und Forderungen werden verständlich eingeordnet.</span></div>
-    <div><strong>Anrufer-Prüfung</strong><span>Angaben zu Anrufern, Unternehmen und Anliegen können geprüft werden.</span></div>
+    <div><strong>Anrufer-Prüfung</strong><span>Angaben zu Anrufern, Unternehmen und Anliegen können auf Plausibilität geprüft werden.</span></div>
+    <div><strong>Verdächtige Telefonnummern</strong><span>Unbekannte Nummern, Rückrufaufforderungen und angebliche Servicenummern können vor einem Rückruf geprüft werden.</span></div>
     <div><strong>Enkeltrick- & Schockanruf-Schutz</strong><span>Besonderer Schutz bei angeblichen Notfällen, Polizei, Krankenhaus, Verwandten und dringenden Geldforderungen.</span></div>
-    <div><strong>Bank- & Zahlungsbetrug</strong><span>Schutz bei verdächtigen Überweisungen, Gutscheinkarten, Kryptowährungen und Bankdaten.</span></div>
-    <div><strong>Falsche Polizei & Behörden</strong><span>Verdächtige Kontaktversuche angeblicher Behörden oder Polizeistellen können geprüft werden.</span></div>
-    <div><strong>Vertrags- & Abo-Fallen</strong><span>Unterstützung bei Haustürgeschäften, Abonnements, Vertragsangeboten und unerwarteten Rechnungen.</span></div>
-    <div><strong>SMS-, WhatsApp- & Nachrichtenbetrug</strong><span>Verdächtige Nachrichten, Links und Kontaktversuche können dem Concierge zur Prüfung gegeben werden.</span></div>
-    <div><strong>E-Mail-Betrug & Phishing</strong><span>Verdächtige E-Mails können analysiert und verständlich erklärt werden.</span></div>
-    <div><strong>Link- & Webseitenprüfung</strong><span>Verdächtige Links und Webseiten können vor einer Reaktion geprüft werden.</span></div>
-    <div><strong>Rechnungsprüfung</strong><span>Rechnungen, Mahnungen und Zahlungsaufforderungen können auf Betrugsmerkmale geprüft werden.</span></div>
-    <div><strong>Sicherer Rückruf</strong><span>Bei Zweifeln hilft NAHWERK, einen unabhängig ermittelten offiziellen Kontakt zu verwenden.</span></div>
-    <div><strong>Vertrauensperson</strong><span>Eine hinterlegte Vertrauensperson kann bei kritischen Situationen nach den persönlichen Einstellungen einbezogen werden.</span></div>
-    <div><strong>Persönlicher Betrugsschutz</strong><span>Der Concierge berücksichtigt persönliche Einstellungen und bekannte Kontakte.</span></div>
+    <div><strong>Falsche Polizei & Behörden</strong><span>Kontaktversuche angeblicher Polizei-, Behörden-, Gerichts- oder Inkassostellen können kritisch geprüft werden.</span></div>
+    <div><strong>Fernwartungs- & Supportbetrug</strong><span>Warnung, wenn angebliche Bank-, Microsoft-, Apple- oder Support-Mitarbeiter Zugriff auf Geräte, Bildschirm oder Fernwartungssoftware verlangen.</span></div>
+    <div><strong>Stimmen- & Deepfake-Betrug</strong><span>Ungewöhnliche Hilferufe oder Geldforderungen angeblicher Angehöriger werden besonders kritisch behandelt und sollen unabhängig bestätigt werden.</span></div>
   </div>
+
+  <div class="fraud-section-title"><span>Nachrichten, E-Mail & Online</span></div>
+  <div class="fraud-protection-grid">
+    <div><strong>SMS-, WhatsApp- & Nachrichtenbetrug</strong><span>Verdächtige Nachrichten, Links und Kontaktversuche können dem Concierge zur Prüfung gegeben werden.</span></div>
+    <div><strong>E-Mail-Schutz & Phishing</strong><span>Absender, Inhalte, Login-Warnungen, Zahlungsaufforderungen und typische Phishing-Muster können geprüft werden.</span></div>
+    <div><strong>Anhänge & Dokumente prüfen</strong><span>PDFs, Briefe, Rechnungen, Mahnungen, Verträge und Screenshots können auf Auffälligkeiten untersucht werden.</span></div>
+    <div><strong>Link- & Webseitenprüfung</strong><span>Verdächtige Links, Domains, Webseiten und Impressumsangaben können vor dem Öffnen oder Bezahlen geprüft werden.</span></div>
+    <div><strong>QR-Code-Prüfung</strong><span>QR-Codes und das dahinterliegende Ziel können vor einer weiteren Aktion kritisch eingeordnet werden.</span></div>
+    <div><strong>Fake-Shop-Schutz</strong><span>Onlineshops, Preise, Zahlungsarten, Impressum und typische Warnzeichen können vor einer Bestellung geprüft werden.</span></div>
+    <div><strong>Paket- & Lieferbetrug</strong><span>Angebliche Paket-, Zoll- oder Nachzahlungsnachrichten und die zugehörigen Links können geprüft werden.</span></div>
+    <div><strong>Foto- & Screenshot-Prüfung</strong><span>Ein Screenshot von E-Mail, SMS, WhatsApp, Rechnung, Anzeige oder Webseite reicht aus, um den Vorgang gemeinsam zu prüfen.</span></div>
+  </div>
+
+  <div class="fraud-section-title"><span>Geld, Verträge & Käufe</span></div>
+  <div class="fraud-protection-grid">
+    <div><strong>Bank- & Zahlungsbetrug</strong><span>Schutz bei ungewöhnlichen Überweisungen, Gutscheinkarten, Kryptowährungen, TANs oder der Herausgabe von Bankdaten.</span></div>
+    <div><strong>Zahlungsempfänger prüfen</strong><span>Empfängername, IBAN, Zahlungsziel und der Anlass einer Zahlung können vor einer Überweisung auf Plausibilität geprüft werden.</span></div>
+    <div><strong>Rechnungsprüfung</strong><span>Rechnungen, Mahnungen und Zahlungsaufforderungen können auf typische Betrugsmerkmale geprüft werden.</span></div>
+    <div><strong>Vertrags- & Abo-Fallen</strong><span>Unterstützung bei Haustürgeschäften, Abonnements, Vertragsangeboten und unerwarteten Rechnungen.</span></div>
+    <div><strong>Kleinanzeigen- & Verkaufsbetrug</strong><span>Käufer, Verkäufer, Zahlungslinks, Versandforderungen, Treuhandangebote und ungewöhnliche Übergaben können geprüft werden.</span></div>
+    <div><strong>Wohnungs- & Mietbetrug</strong><span>Vermieter, Reservierungsgebühren, Kautionen vor Vertragsabschluss, Besichtigungen und ungewöhnliche Zahlungsabläufe können geprüft werden.</span></div>
+    <div><strong>Gebrauchtwagen- & Kaufprüfung</strong><span>Ungewöhnliche Anzahlungen, Vermittler, Transportkosten oder Zahlungsabläufe bei größeren Käufen können eingeordnet werden.</span></div>
+    <div><strong>Investment- & Kryptobetrug</strong><span>Anlageangebote, Trading-Plattformen, Renditeversprechen und Zahlungsaufforderungen können kritisch geprüft werden.</span></div>
+    <div><strong>Gewinnspiel- & Lotteriebetrug</strong><span>Angebliche Gewinne, Gebühren, Steuern oder Vorauszahlungen vor einer Auszahlung können als Warnsignal geprüft werden.</span></div>
+    <div><strong>Spendenbetrug</strong><span>Organisationen, Zahlungswege und dringliche Spendenaufforderungen können vor einer Zahlung geprüft werden.</span></div>
+  </div>
+
+  <div class="fraud-section-title"><span>Identität, Alltag & persönliche Sicherheit</span></div>
+  <div class="fraud-protection-grid">
+    <div><strong>Identitätsdiebstahl</strong><span>Warnung, wenn Ausweise, Kontodaten, Zugangsdaten oder andere persönliche Informationen ungewöhnlich angefordert werden.</span></div>
+    <div><strong>Account-Übernahme</strong><span>Auffällige Login-, Passwort-, Sicherheits- und Verifizierungsanfragen können geprüft werden.</span></div>
+    <div><strong>Code- & TAN-Schutz</strong><span>Wenn jemand SMS-Codes, TANs, Passwörter oder Bestätigungscodes verlangt, hilft NAHWERK, die Situation vor einer Weitergabe zu prüfen.</span></div>
+    <div><strong>Job- & Nebenverdienstbetrug</strong><span>Stellenangebote, Vorauszahlungen, ungewöhnliche Konto-Nutzung und angebliche einfache Verdienste können geprüft werden.</span></div>
+    <div><strong>Romance- & Kontaktbetrug</strong><span>Online-Bekanntschaften mit Notfällen, Geldforderungen oder ungewöhnlichen finanziellen Bitten können eingeordnet werden.</span></div>
+    <div><strong>Reise- & Buchungsbetrug</strong><span>Ferienwohnungen, Hotels, Tickets, Buchungslinks und ungewöhnliche Zahlungsanforderungen können geprüft werden.</span></div>
+    <div><strong>Versicherungs- & Gesundheitsbetrug</strong><span>Verdächtige Versicherungs-, Pflege-, Gesundheits- oder Hilfsmittelangebote können kritisch geprüft werden.</span></div>
+    <div><strong>Chef- & Mitarbeiterbetrug</strong><span>Ungewöhnliche interne Zahlungsanweisungen oder Nachrichten angeblicher Vorgesetzter können vor einer Ausführung geprüft werden.</span></div>
+    <div><strong>Sicherer Rückruf</strong><span>Bei Zweifeln hilft NAHWERK, eine Organisation über unabhängig ermittelte offizielle Kontaktdaten zu erreichen, statt eine vom Anrufer genannte Nummer zu verwenden.</span></div>
+    <div><strong>Vertrauensperson</strong><span>Eine hinterlegte Vertrauensperson kann bei kritischen Situationen nach den persönlichen Einstellungen einbezogen werden.</span></div>
+    <div><strong>Persönliche Sperrliste</strong><span>Bekannte problematische Nummern, Absender, Domains oder Kontakte können als persönliche Warnhinweise berücksichtigt werden.</span></div>
+    <div><strong>Persönlicher Betrugsschutz</strong><span>Der Concierge berücksichtigt deine Einstellungen, bekannten Kontakte und den konkreten Kontext des Vorgangs.</span></div>
+  </div>
+
+  <div class="fraud-final-note"><strong>Bevor du zahlst, klickst, unterschreibst, zurückrufst oder Daten weitergibst: frag NAHWERK.</strong><span>Du kannst den Vorgang im Webchat, in der App, über WhatsApp, per E-Mail oder telefonisch unter 0800 6249375 prüfen lassen.</span></div>
 </article>
 <article class="card wide safety-card safety-panel" id="safetyCard" data-safety-detail hidden aria-expanded="false">
               <div class="safety-detail-top"><button class="btn light safety-back-button" type="button" data-safety-back>← Zurück</button></div>
