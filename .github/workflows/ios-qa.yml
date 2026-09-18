@@ -1,0 +1,55 @@
+name: iOS QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ios-app/**'
+      - '.github/workflows/ios-qa.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'ios-app/**'
+      - '.github/workflows/ios-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  simulator-build:
+    runs-on: macos-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        working-directory: ios-app
+        run: xcodegen generate
+      - name: Verify PROD-only contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -R -F 'djicahhmnnamtjuqedqd.supabase.co' ios-app/Sources >/dev/null
+          ! grep -R -F 'btqklftjmwtqqqdmwlnk' ios-app >/dev/null
+          ! grep -R -E '(sk_live_|rk_live_|SUPABASE_SERVICE_ROLE)' ios-app/Sources >/dev/null
+      - name: Build iPhone Simulator app without signing
+        working-directory: ios-app
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project Nahwerk.xcodeproj \
+            -scheme Nahwerk \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            build | xcpretty
+      - name: Verify built app
+        shell: bash
+        run: |
+          APP="$(find "$HOME/Library/Developer/Xcode/DerivedData" -path '*/Build/Products/Debug-iphonesimulator/NAHWERK.app' -print -quit)"
+          test -n "$APP"
+          test -f "$APP/Info.plist"
+          echo IOS_SIMULATOR_BUILD=GREEN
