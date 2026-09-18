@@ -2748,17 +2748,30 @@ body.account-premium-ui.nw-portal-dark .account-actions[data-account-panel="over
             ensureSafetyLoaded();
           }
         }
-        openSafetyViewButton?.addEventListener("click", () => openSafetySubview("safety"));
-        openFraudProtectionViewButton?.addEventListener("click", () => openSafetySubview("fraud"));
-        document.querySelectorAll("[data-safety-back]").forEach((button) => button.addEventListener("click", showSafetyHub));
+        document.addEventListener("click", async (event) => {
+          const safetyButton = event.target.closest?.("#openSafetyView");
+          if (safetyButton) {
+            openSafetySubview("safety");
+            return;
+          }
+          const fraudButton = event.target.closest?.("#openFraudProtectionView");
+          if (fraudButton) {
+            openSafetySubview("fraud");
+            return;
+          }
+          if (event.target.closest?.("[data-safety-back]")) {
+            showSafetyHub();
+            return;
+          }
+          const passwordButton = event.target.closest?.("#passwordChangeButton");
+          if (!passwordButton) return;
 
-        passwordChangeButton?.addEventListener("click", async () => {
           const email = String(document.getElementById("profileEmail")?.value || "").trim();
           if (!email) {
             if (passwordChangeFeedback) passwordChangeFeedback.textContent = "Die hinterlegte E-Mail-Adresse konnte nicht geladen werden.";
             return;
           }
-          passwordChangeButton.disabled = true;
+          passwordButton.disabled = true;
           if (passwordChangeFeedback) passwordChangeFeedback.textContent = "Sicherer Link wird angefordert …";
           try {
             await fetch(PASSWORD_RESET_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
@@ -2766,7 +2779,7 @@ body.account-premium-ui.nw-portal-dark .account-actions[data-account-panel="over
           } catch (_) {
             if (passwordChangeFeedback) passwordChangeFeedback.textContent = "Der Link konnte gerade nicht angefordert werden. Bitte versuche es erneut.";
           } finally {
-            passwordChangeButton.disabled = false;
+            passwordButton.disabled = false;
           }
         });
 
