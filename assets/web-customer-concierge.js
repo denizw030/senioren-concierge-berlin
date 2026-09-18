@@ -11,6 +11,7 @@
   const SYNC_INTERVAL_MS = 3000;
   const PERSONA_SYNC_INTERVAL_MS = 30000;
   const SETTINGS_URL = "/concierge-anpassen";
+  const isMobile=()=>window.matchMedia("(max-width:820px)").matches;
   const RESPONSE_STATES = new Set(["ANSWER","QUESTION","ACTION_STARTED","ACTION_PENDING","ACTION_RESULT","ERROR_RESPONSE","HANDOFF","SAFE_TERMINATION"]);
 
   let gatewayReady = false;
