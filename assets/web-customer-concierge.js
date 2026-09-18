@@ -4,7 +4,8 @@
   const SESSION_KEY = "scb_web_session";
   const CORE_CONTRACT_VERSION = "core-v1";
   const GATEWAY_CONTRACT_VERSION = "web-gateway-v1";
-  const GATEWAY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway";\n  let lastInputWasVoiceMemo=false;
+  const GATEWAY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway";
+  let lastInputWasVoiceMemo=false;
   const HISTORY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway/web/history";
   const HISTORY_CONTRACT_VERSION = "canonical-core-receipts-v1";
   const HISTORY_PAGE_SIZE = 60;
