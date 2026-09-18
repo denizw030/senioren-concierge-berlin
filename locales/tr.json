@@ -165,7 +165,6 @@
   "Kostenlos damit starten": "Bununla ücretsiz başla",
   "Leistungen prüfen": "Hizmetleri keşfet",
   "Was NAHWERK dabei tut": "NAHWERK ne yapar",
-  "Was NAHWERK dabei tut": "NAHWERK ne yapar",
   "Der Concierge strukturiert Informationen und bereitet nächste Schritte vor. Externe Aktionen benötigen weiterhin die dafür vorgesehenen Freigaben.": "Concierge bilgileri yapılandırır ve sonraki adımları hazırlar. Dışarıda sonuç doğuran işlemler yine gerekli onayları ister.",
   "NAHWERK ist KI-gestützt. Antworten können Fehler enthalten und ersetzen keine geeignete Fachberatung.": "NAHWERK yapay zekâ desteklidir. Yanıtlar hata içerebilir ve uygun profesyonel danışmanlığın yerine geçmez.",
   "Ohne unnötige Hürden": "Gereksiz engeller olmadan",
@@ -180,5 +179,7 @@
   "Technik Schritt für Schritt erklären lassen.": "Teknolojiyi adım adım açıklat.",
   "Beschreibe das Gerät oder die Funktion. NAHWERK erklärt ohne unnötige Fachsprache und kann einzelne Schritte wiederholen.": "Cihazı veya işlevi anlat. NAHWERK gereksiz teknik terimler olmadan açıklar ve adımları gerektiğinde tekrarlar.",
   "„Erkläre mir Schritt für Schritt, wie ich diese Funktion auf meinem Smartphone finde.“": "“Bu özelliği akıllı telefonumda nasıl bulacağımı adım adım açıkla.”",
-  "Der Concierge unterstützt beim Verstehen und Bedienen. Sicherheitskritische Zugangsdaten, PINs oder Einmalcodes sollten nicht weitergegeben werden.": "Concierge anlamaya ve kullanmaya yardımcı olur. Güvenlik açısından hassas giriş bilgileri, PIN'ler veya tek kullanımlık kodlar paylaşılmamalıdır."
+  "Der Concierge unterstützt beim Verstehen und Bedienen. Sicherheitskritische Zugangsdaten, PINs oder Einmalcodes sollten nicht weitergegeben werden.": "Concierge anlamaya ve kullanmaya yardımcı olur. Güvenlik açısından hassas giriş bilgileri, PIN'ler veya tek kullanımlık kodlar paylaşılmamalıdır.",
+  "App unbegrenzt · Web unbegrenzt · 30 WhatsApp-Kundennachrichten": "Uygulama sınırsız · Web sınırsız · 30 WhatsApp müşteri mesajı",
+  "300 App-Dialoge · Web unbegrenzt · 300 WhatsApp-Kundennachrichten": "300 uygulama diyaloğu · Web sınırsız · 300 WhatsApp müşteri mesajı"
 }
