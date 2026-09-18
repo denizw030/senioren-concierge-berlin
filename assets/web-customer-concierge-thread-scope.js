@@ -174,12 +174,12 @@
         if(preview&&/^web\s*·\s*app\s*·\s*whatsapp$/i.test(preview.textContent||""))preview.textContent="";
         button.setAttribute("aria-label","Chat");
       }else if(channel==="WHATSAPP"){
-        if(title)title.textContent="WhatsApp";
-        if(preview)preview.textContent="";
+        if(title&&title.textContent!=="WhatsApp")title.textContent="WhatsApp";
+        if(preview&&preview.textContent!=="")preview.textContent="";
         button.setAttribute("aria-label","WhatsApp");
       }else if(channel==="TELEGRAM"){
-        if(title)title.textContent="Telegram";
-        if(preview)preview.textContent="";
+        if(title&&title.textContent!=="Telegram")title.textContent="Telegram";
+        if(preview&&preview.textContent!=="")preview.textContent="";
         button.setAttribute("aria-label","Telegram");
       }
       if(button.style.border)button.style.border="";
