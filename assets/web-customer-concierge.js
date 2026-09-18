@@ -273,7 +273,7 @@
       const title=document.createElement("span");title.className="web-concierge-thread-title";title.textContent=thread.title||"Chat";
       const preview=document.createElement("span");preview.className="web-concierge-thread-preview";preview.textContent=thread.preview||"";
       const date=document.createElement("span");date.className="web-concierge-thread-date";date.textContent=thread.draft?"":sidebarDate(thread.updated_at);
-      b.append(title,preview,date);b.addEventListener("click",()=>selectThread(thread.thread_id));box.appendChild(b);
+      b.append(title,preview,date);b.addEventListener("click",()=>{setMobileDrawer(false);selectThread(thread.thread_id);});box.appendChild(b);
     }
   }
   function historySignature(messages) {
@@ -387,7 +387,29 @@
     }catch{gatewayReady=false;applyPersona(null);return false;}
   }
 
+  // MOBILE_CHAT_DRAWER_V1_20260918
+  let mobileDrawerReady=false;
+  function setMobileDrawer(open){
+    const workspace=document.querySelector(".web-concierge-workspace");
+    const button=workspace?.querySelector(".web-concierge-mobile-chats");
+    workspace?.classList.toggle("is-mobile-sidebar-open",Boolean(open));
+    button?.setAttribute("aria-expanded",open?"true":"false");
+  }
+  function initMobileDrawer(){
+    if(mobileDrawerReady)return;
+    const workspace=document.querySelector(".web-concierge-workspace");if(!workspace)return;
+    mobileDrawerReady=true;
+    const topbar=document.createElement("div");topbar.className="web-concierge-mobile-topbar";
+    topbar.innerHTML='<button type="button" class="web-concierge-mobile-chats" aria-label="Chats öffnen" aria-expanded="false">☰</button><div class="web-concierge-mobile-topbar-title">NAHWERK Concierge</div><button type="button" class="web-concierge-mobile-new" aria-label="Neuer Chat">＋</button>';
+    const backdrop=document.createElement("button");backdrop.type="button";backdrop.className="web-concierge-mobile-backdrop";backdrop.setAttribute("aria-label","Chatliste schließen");
+    workspace.prepend(topbar);workspace.appendChild(backdrop);
+    topbar.querySelector(".web-concierge-mobile-chats")?.addEventListener("click",()=>setMobileDrawer(!workspace.classList.contains("is-mobile-sidebar-open")));
+    topbar.querySelector(".web-concierge-mobile-new")?.addEventListener("click",()=>{setMobileDrawer(false);newChat();});
+    backdrop.addEventListener("click",()=>setMobileDrawer(false));
+  }
+
   async function boot() {
+    initMobileDrawer();
     const valid=window.SCBAuth?.validateSession?await window.SCBAuth.validateSession().catch(()=>false):false;if(!valid){location.replace("/anmelden");return;}
     applyPersona(null);
     const status=document.getElementById("webConciergeStatus");setComposerReady(false);const ready=await checkReadiness();
