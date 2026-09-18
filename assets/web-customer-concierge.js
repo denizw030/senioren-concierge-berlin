@@ -9,7 +9,7 @@
   const HISTORY_CONTRACT_VERSION = "canonical-core-receipts-v1";
   const HISTORY_PAGE_SIZE = 60;
   const SYNC_INTERVAL_MS = 3000;
-  const PERSONA_SYNC_INTERVAL_MS = 30000;
+  const PERSONA_SYNC_INTERVAL_MS = 3000;
   const CLIENT_FETCH_TIMEOUT_MS = 12000;
   const SETTINGS_URL = "/concierge-anpassen";
   const isMobile=()=>window.matchMedia("(max-width:820px)").matches;
@@ -377,7 +377,7 @@
     try{
       const response=await gatewayRequest("/web/chat",{method:"POST",body:{message:content,source_message_id:sourceMessageId,thread_id:activeThreadId}});
       if(response?.ok!==true||response?.environment!=="PROD"||response?.authoritative!==true||(response?.thread_id&&response?.thread_id!==activeThreadId))throw new Error("gateway_response_not_authoritative");
-      if(!renderCoreV1Response(response.core))throw new Error("core_response_not_authoritative");
+      if(!renderCoreV1Response(response.core))throw new Error("core_response_not_authoritative");\n      await refreshPersona(true).catch(()=>{});
       const canonicalThreadId=String(response?.core?.conversation_id||"");if(validUuid(canonicalThreadId))activeThreadId=canonicalThreadId;
       await loadThreads();
       if(validUuid(activeThreadId))await refreshThread(activeThreadId,{force:true});
