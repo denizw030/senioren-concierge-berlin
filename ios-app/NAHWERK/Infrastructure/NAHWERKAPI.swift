@@ -72,6 +72,15 @@ struct AppChatResponse: Codable {
     let environment: String?
     let authoritative: Bool?
     let core: CoreEnvelope?
+    let guestToken: String?
+
+    enum CodingKeys: String, CodingKey {
+        case ok
+        case environment
+        case authoritative
+        case core
+        case guestToken = "guest_token"
+    }
 }
 
 struct SessionCheckResponse: Codable {
@@ -403,8 +412,53 @@ actor NAHWERKAPI {
     }
 
     func sendGuestChat(message: String) async throws -> AppChatResponse {
-        _ = message
-        throw NAHWERKAPIError.guestRuntimeUnavailable
+        let cleanMessage = message.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !cleanMessage.isEmpty else {
+            throw NAHWERKAPIError.invalidResponse
+        }
+
+        let installationID = GuestCredentialStore.installationID()
+        let existingToken = GuestCredentialStore.guestToken()
+
+        func request(guestToken: String?) async throws -> AppChatResponse {
+            var body: [String: Any] = [
+                "message": cleanMessage,
+                "installation_id": installationID,
+                "source_message_id": UUID().uuidString.lowercased(),
+                "correlation_id": "ios-guest-\(UUID().uuidString.lowercased())"
+            ]
+            if let guestToken, !guestToken.isEmpty {
+                body["guest_token"] = guestToken
+            }
+
+            return try await perform(
+                path: "nahwerk-app-gateway/mobile/guest-chat",
+                method: "POST",
+                json: body
+            )
+        }
+
+        func persist(_ response: AppChatResponse) -> AppChatResponse {
+            if let token = response.guestToken, !token.isEmpty {
+                GuestCredentialStore.setGuestToken(token)
+            }
+            return response
+        }
+
+        do {
+            return persist(try await request(guestToken: existingToken))
+        } catch NAHWERKAPIError.sessionRequired where existingToken != nil {
+            GuestCredentialStore.clearGuestToken()
+            return persist(try await request(guestToken: nil))
+        } catch let error as NAHWERKAPIError {
+            if existingToken != nil,
+               case .server(let code) = error,
+               ["GUEST_SESSION_INVALID", "GUEST_SESSION_EXPIRED"].contains(code) {
+                GuestCredentialStore.clearGuestToken()
+                return persist(try await request(guestToken: nil))
+            }
+            throw error
+        }
     }
 
     func historyThreads(token: String) async throws -> [HistoryThread] {
@@ -483,6 +537,79 @@ actor NAHWERKAPI {
         } catch {
             throw NAHWERKAPIError.invalidResponse
         }
+    }
+}
+
+
+enum GuestCredentialStore {
+    private static let service = "NAHWERK_GUEST_V1"
+    private static let installationAccount = "installation"
+    private static let tokenAccount = "guest-token"
+
+    static func installationID() -> String {
+        if let existing = read(account: installationAccount), !existing.isEmpty {
+            return existing
+        }
+        let created = UUID().uuidString.lowercased()
+        write(created, account: installationAccount)
+        return created
+    }
+
+    static func guestToken() -> String? {
+        read(account: tokenAccount)
+    }
+
+    static func setGuestToken(_ token: String) {
+        guard !token.isEmpty else { return }
+        write(token, account: tokenAccount)
+    }
+
+    static func clearGuestToken() {
+        delete(account: tokenAccount)
+    }
+
+    private static func read(account: String) -> String? {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: account,
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]
+        var item: CFTypeRef?
+        guard SecItemCopyMatching(query as CFDictionary, &item) == errSecSuccess,
+              let data = item as? Data else {
+            return nil
+        }
+        return String(data: data, encoding: .utf8)
+    }
+
+    private static func write(_ value: String, account: String) {
+        guard let data = value.data(using: .utf8) else { return }
+        let key: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: account
+        ]
+        let attrs: [String: Any] = [
+            kSecValueData as String: data,
+            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+        ]
+        let status = SecItemUpdate(key as CFDictionary, attrs as CFDictionary)
+        if status == errSecItemNotFound {
+            var insert = key
+            attrs.forEach { insert[$0.key] = $0.value }
+            SecItemAdd(insert as CFDictionary, nil)
+        }
+    }
+
+    private static func delete(account: String) {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: account
+        ]
+        SecItemDelete(query as CFDictionary)
     }
 }
 
