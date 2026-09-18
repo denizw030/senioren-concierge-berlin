@@ -1606,7 +1606,36 @@
         body.senior-product .account-tab[aria-selected="true"],body[data-product="senioren"] .account-tab[aria-selected="true"]{background:#fff!important;box-shadow:0 5px 18px rgba(70,55,25,.08),inset 0 0 0 1px rgba(126,94,37,.10)!important}
       }
 </style>    <link rel="stylesheet" href="assets/acquisition-v1.css?v=1" />
-  </head>
+  <style id="account-mobile-tabs-final-v3">
+@media(max-width:760px){
+ html,body{max-width:100%!important;overflow-x:hidden!important}
+ .account-tabs-shell{
+   width:100%!important;max-width:100%!important;box-sizing:border-box!important;
+   overflow:hidden!important;padding:7px!important;border-radius:20px!important
+ }
+ .account-tabs{
+   width:100%!important;max-width:100%!important;display:grid!important;
+   grid-template-columns:repeat(8,minmax(0,1fr))!important;
+   gap:5px!important;overflow:visible!important;scroll-snap-type:none!important;
+   padding:0!important;margin:0!important
+ }
+ .account-tabs .account-tab{
+   grid-column:span 2!important;width:100%!important;min-width:0!important;max-width:none!important;
+   min-height:43px!important;margin:0!important;padding:5px 3px!important;
+   display:flex!important;align-items:center!important;justify-content:center!important;
+   white-space:normal!important;text-align:center!important;font-size:10.8px!important;
+   line-height:1.08!important;letter-spacing:-.01em!important;border-radius:13px!important;
+   transform:none!important
+ }
+ .account-tabs .account-tab:nth-child(5){grid-column:2/span 2!important}
+ .account-tabs .account-tab:nth-child(6){grid-column:4/span 2!important}
+ .account-tabs .account-tab:nth-child(7){grid-column:6/span 2!important}
+ body.senior-product .account-tabs .account-tab[aria-selected="true"],
+ body[data-product="senioren"] .account-tabs .account-tab[aria-selected="true"]{
+   background:#fff!important;box-shadow:0 5px 18px rgba(70,55,25,.08),inset 0 0 0 1px rgba(126,94,37,.10)!important
+ }
+}
+</style></head>
   <body class="account-premium-ui">
     <script>
       (() => {
