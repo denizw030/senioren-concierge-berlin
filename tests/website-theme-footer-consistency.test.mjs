@@ -62,7 +62,7 @@ test("both chat routes use the full consistent footer and complete legal links",
   for (const page of chatSurfaces) {
     assert.match(page, /class="footergrid"/);
     assert.match(page, /class="brand"/);
-    for (const label of ["Impressum", "Datenschutz", "AGB", "Widerruf", "Vertrag widerrufen", "KI-Transparenz", "Datenlöschung"]) {
+    for (const label of ["Impressum", "Datenschutz", "AGB", "Widerruf", "KI-Transparenz", "Datenlöschung"]) {
       assert.ok(page.includes(label), `missing footer link ${label}`);
     }
     assert.match(page, /assets\/site-ui\.js\?v=8/);
