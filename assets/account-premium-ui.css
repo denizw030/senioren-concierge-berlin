@@ -169,6 +169,18 @@ html body.account-premium-ui.account-premium-ui.nw-portal-light .footergrid a:ho
 }
 
 
+/* Portal header menu visibility follows the selected portal theme. */
+html[data-nw-portal-theme="light"] body.account-premium-ui.account-premium-ui .top .nav .nav-toggle span,
+html body.account-premium-ui.account-premium-ui.nw-portal-light .top .nav .nav-toggle span{
+  background:#111!important;
+  background-color:#111!important;
+}
+html[data-nw-portal-theme="dark"] body.account-premium-ui.account-premium-ui .top .nav .nav-toggle span,
+html body.account-premium-ui.account-premium-ui.nw-portal-dark .top .nav .nav-toggle span{
+  background:#f5f3ee!important;
+  background-color:#f5f3ee!important;
+}
+
 /* Safety + Betrugsschutz — dark mode follows the canonical account card world. */
 html[data-nw-portal-theme="dark"] body.account-premium-ui.account-premium-ui .safety-hub-card,
 html body.account-premium-ui.account-premium-ui.nw-portal-dark .safety-hub-card{
