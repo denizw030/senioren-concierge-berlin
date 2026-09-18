@@ -2005,9 +2005,9 @@ body.account-premium-ui.nw-portal-dark .account-actions[data-account-panel="over
                 <span>Ansprache, Stimme und persönliche Einstellungen öffnen.</span>
               </button>
               <button class="account-overview-link" type="button" data-open-account-tab="safety">
-                <span class="eyebrow">Sicherheit</span>
-                <strong id="overviewSafety">Wird geladen …</strong>
-                <span id="overviewSafetyMeta">Sicherheitsfunktion und Vertrauenskontakt anzeigen.</span>
+                <span class="eyebrow">Safety</span>
+                <strong id="overviewSafety">Safety & Betrugsschutz</strong>
+                <span id="overviewSafetyMeta">Schutzfunktionen und Einstellungen öffnen.</span>
               </button>
               <button class="account-overview-link" type="button" data-open-account-tab="usage">
                 <span class="eyebrow">Nutzung</span>
@@ -3225,7 +3225,8 @@ body.account-premium-ui.nw-portal-dark .account-actions[data-account-panel="over
                 "Content-Type": "application/json",
                 Authorization: "Bearer " + token
               },
-              body: JSON.stringify({ customer_account_id: customerAccountId })
+              body: JSON.stringify({ customer_account_id: customerAccountId }),
+              signal: AbortSignal.timeout(9000)
             });
             const body = await response.json().catch(() => ({}));
             if (!response.ok || body?.ok !== true || body?.status !== "account_selected") return false;
@@ -3242,7 +3243,8 @@ body.account-premium-ui.nw-portal-dark .account-actions[data-account-panel="over
           try {
             const response = await fetch(ACCOUNT_CONTEXT_URL, {
               method: "GET",
-              headers: { Authorization: "Bearer " + token }
+              headers: { Authorization: "Bearer " + token },
+              signal: AbortSignal.timeout(9000)
             });
             const body = await response.json().catch(() => ({}));
             const accounts = Array.isArray(body?.accounts) ? body.accounts : [];
@@ -4414,7 +4416,8 @@ body.account-premium-ui.nw-portal-dark .account-actions[data-account-panel="over
           try {
             const response = await fetch(PROFILE_URL, {
               method: "GET",
-              headers: { Authorization: "Bearer " + token }
+              headers: { Authorization: "Bearer " + token },
+              signal: AbortSignal.timeout(9000)
             });
             const body = await response.json().catch(() => ({}));
             if (!response.ok || body?.ok !== true) throw new Error("profile_load_failed");
@@ -5135,12 +5138,9 @@ body.account-premium-ui.nw-portal-dark .account-actions[data-account-panel="over
           });
         }
         function scheduleOverviewBackground() {
-          const run = () => ensureSafetyLoaded();
-          if ("requestIdleCallback" in window) {
-            window.requestIdleCallback(run, { timeout: 1200 });
-          } else {
-            window.setTimeout(run, 700);
-          }
+          // Safety is intentionally loaded only after the customer opens Safety.
+          // The overview remains a stable navigation surface and must never show
+          // a backend availability error for Safety.
         }
 
         setAccountTab("overview");
@@ -5151,16 +5151,19 @@ body.account-premium-ui.nw-portal-dark .account-actions[data-account-panel="over
             const valid = await auth.validateSession().catch(() => false);
             if (!valid) return;
           }
+
+          // Render the signed-in customer's own account immediately.
+          // Managed-account context is an enhancement and may never block the overview.
+          const profileLoaded = await loadProfile().catch(() => false);
           const contextLoaded = await loadAccountContexts().catch(() => false);
-          if (!contextLoaded) {
+
+          if (!profileLoaded && !contextLoaded) {
             const prefetched = auth?.getValidatedProfile?.();
             if (prefetched?.ok === true) {
               renderProfilePayload(prefetched);
               storeProfileCache(prefetched);
               profileStatusBadge.textContent = "Sicher verbunden";
               showProfileStatus("");
-            } else {
-              await loadProfile();
             }
           } else {
             profileStatusBadge.textContent = "Sicher verbunden";
