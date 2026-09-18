@@ -4,7 +4,7 @@
 
 **CUSTOMER PROD LAUNCH – FINAL RELEASE / E2E PROOF**
 
-`READY_FOR_REAL_CUSTOMER_APP_E2E = NO`
+`APP_AUTHORITATIVE_TRANSPORT = GREEN`
 
 Android remains a pure client. It does not own or redefine Core, CAO, PAYG, Billing, Wallet, Safety, Family, WhatsApp, Voice or shared database contracts.
 
@@ -59,12 +59,14 @@ E-mail and WhatsApp are displayed from PROD but remain read-only because the cur
 
 ## Remaining path to launch gate
 
-The only remaining launch work is proof and release finalization:
+The former APP transport blocker is resolved. PROD now exposes an authoritative `APP/core-v1` gateway at 100% rollout with CAO authoritative mutation.
 
-- exact final CI + emulator/instrumentation GREEN
-- safe merge to `main`
-- confirmed production release Auth/Gateway configuration and signing path
-- Stripe Live availability confirmed by the authoritative PROD PAYG state
-- explicitly authorized real-customer PROD E2E
+The remaining launch work is release proof and external distribution:
+
+- current main-branch CI + emulator/instrumentation GREEN;
+- Android PROD Readiness GREEN, including Stripe `payment_ready`;
+- protected signing secrets available for the signed customer package;
+- explicitly authorized real-customer PROD E2E;
+- store publication credentials/account when distribution is requested.
 
 Optional future surfaces such as subscription management, device notifications, Voice handoff, WhatsApp continuity, canonical conversation history and detailed task-state UI remain fail-closed and do not block the current customer path.
