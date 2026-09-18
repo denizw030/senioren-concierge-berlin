@@ -10,6 +10,7 @@
   const HISTORY_PAGE_SIZE = 60;
   const SYNC_INTERVAL_MS = 3000;
   const PERSONA_SYNC_INTERVAL_MS = 30000;
+  const CLIENT_FETCH_TIMEOUT_MS = 12000;
   const SETTINGS_URL = "/concierge-anpassen";
   const isMobile=()=>window.matchMedia("(max-width:820px)").matches;
   const RESPONSE_STATES = new Set(["ANSWER","QUESTION","ACTION_STARTED","ACTION_PENDING","ACTION_RESULT","ERROR_RESPONSE","HANDOFF","SAFE_TERMINATION"]);
@@ -233,18 +234,24 @@
     return true;
   }
 
+  function fetchWithTimeout(url,options={},timeoutMs=CLIENT_FETCH_TIMEOUT_MS) {
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),timeoutMs);
+    return fetch(url,{...options,signal:controller.signal}).finally(()=>clearTimeout(timer));
+  }
+
   async function gatewayRequest(path,{method="GET",body=null,auth=true}={}) {
     const endpoint=configuredEndpoint();if(!endpoint)throw new Error("gateway_not_configured");const headers={};
     if(auth){const token=sessionToken();if(!token)throw new Error("session_required");headers.Authorization=`Bearer ${token}`;}
     if(body!==null)headers["Content-Type"]="application/json";
-    const response=await fetch(`${endpoint}${path}`,{method,headers,body:body===null?undefined:JSON.stringify(body),cache:"no-store",credentials:"omit"});
+    const response=await fetchWithTimeout(`${endpoint}${path}`,{method,headers,body:body===null?undefined:JSON.stringify(body),cache:"no-store",credentials:"omit"});
     const payload=await response.json().catch(()=>({}));if(!response.ok||payload?.ok===false)throw new Error(String(payload?.error||`http_${response.status}`));return payload;
   }
   async function historyRequest(threadId=null,{before=null,limit=HISTORY_PAGE_SIZE}={}) {
     const endpoint=configuredHistoryEndpoint(),token=sessionToken();if(!endpoint||!token)throw new Error("history_unavailable");
     const url=new URL(endpoint);
     if(threadId){url.searchParams.set("thread_id",threadId);url.searchParams.set("limit",String(limit));if(before)url.searchParams.set("before",before);}
-    const response=await fetch(url.href,{headers:{Authorization:`Bearer ${token}`},cache:"no-store",credentials:"omit"});
+    const response=await fetchWithTimeout(url.href,{headers:{Authorization:`Bearer ${token}`},cache:"no-store",credentials:"omit"});
     const payload=await response.json().catch(()=>({}));if(!response.ok||payload?.ok!==true||payload?.history_contract!==HISTORY_CONTRACT_VERSION)throw new Error("history_unavailable");return payload;
   }
 
@@ -431,9 +438,20 @@ composerInput?.addEventListener("focus",()=>{syncIosVisualViewport();setTimeout(
 composerInput?.addEventListener("blur",()=>setTimeout(syncIosVisualViewport,120));
 syncIosVisualViewport();
 
-    const valid=window.SCBAuth?.validateSession?await window.SCBAuth.validateSession().catch(()=>false):false;if(!valid){location.replace("/anmelden");return;}
+    if(!sessionToken()){
+      const valid=window.SCBAuth?.validateSession
+        ? await Promise.race([
+            window.SCBAuth.validateSession().catch(()=>false),
+            new Promise((resolve)=>setTimeout(()=>resolve(false),CLIENT_FETCH_TIMEOUT_MS))
+          ])
+        : false;
+      if(!valid){location.replace("/anmelden");return;}
+    }
     applyPersona(null);
-    const status=document.getElementById("webConciergeStatus");setComposerReady(false);const ready=await checkReadiness();
+    const status=document.getElementById("webConciergeStatus");
+    setComposerReady(false);
+    if(status){status.textContent="Verbindung wird hergestellt …";status.classList.remove("is-online");}
+    const ready=await checkReadiness();
     if(status){status.textContent=ready?"Online":"Verbindung momentan nicht möglich";status.classList.toggle("is-online",ready);}
     setComposerReady(ready);if(ready){const loaded=await loadThreads({selectFirst:true});if(activeThreadId)await selectThread(activeThreadId);else{newChat();if(!loaded)renderThreads();}startLiveSync();}
     document.getElementById("webConciergeNewChat")?.addEventListener("click",newChat);
