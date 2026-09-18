@@ -2,7 +2,8 @@
   "use strict";
 
   const SESSION_KEY = "scb_web_session";
-  const ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-audio-input";
+  const ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway/web/audio-transcribe";
+  const HEALTH_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway/health";
   const MAX_DURATION_MS = 120000;
   const HEALTH_TIMEOUT_MS = 5000;
   const TRANSCRIBE_TIMEOUT_MS = 50000;
@@ -351,9 +352,9 @@
 
   async function backendReady() {
     try {
-      const response = await fetchTimeout(ENDPOINT, { method: "GET", cache: "no-store", credentials: "omit" }, HEALTH_TIMEOUT_MS);
+      const response = await fetchTimeout(HEALTH_ENDPOINT, { method: "GET", cache: "no-store", credentials: "omit" }, HEALTH_TIMEOUT_MS);
       const payload = await response.json().catch(() => ({}));
-      return response.ok && payload?.ok === true && payload?.contract_version === "audio-input-v1";
+      return response.ok && payload?.ok === true && payload?.audio_input_v1 === true;
     } catch {
       return false;
     }
