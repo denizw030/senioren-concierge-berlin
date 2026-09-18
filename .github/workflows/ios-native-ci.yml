@@ -1,0 +1,102 @@
+name: iOS Native CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "feat/ios-*"
+    paths:
+      - "ios-app/**"
+      - ".github/workflows/ios-native-ci.yml"
+      - "android-app/app/src/main/splash-reference/**"
+  pull_request:
+    paths:
+      - "ios-app/**"
+      - ".github/workflows/ios-native-ci.yml"
+      - "android-app/app/src/main/splash-reference/**"
+
+permissions:
+  contents: read
+
+jobs:
+  source-and-project:
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify canonical coin reference
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE_DIR="android-app/app/src/main/splash-reference"
+          EXPECTED="40d81ef0f53c31a48cc9ca2ec2ca8dfca2ead41c897aa0c1a673ddac43a980a3"
+          cat "$SOURCE_DIR"/nahwerk_brand_coin.b64.part* | tr -d '\n\r ' | /usr/bin/base64 -D > /tmp/nahwerk_brand_coin.webp
+          ACTUAL="$(/usr/bin/shasum -a 256 /tmp/nahwerk_brand_coin.webp | /usr/bin/awk '{print $1}')"
+          test "$ACTUAL" = "$EXPECTED"
+
+      - name: Typecheck native Swift source
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDK="$(xcrun --sdk iphonesimulator --show-sdk-path)"
+          SOURCES="$(find ios-app/NAHWERK -name '*.swift' -print | sort)"
+          test -n "$SOURCES"
+          xcrun swiftc \
+            -typecheck \
+            -module-name NAHWERK \
+            -sdk "$SDK" \
+            -target arm64-apple-ios17.0-simulator \
+            $SOURCES
+
+      - name: Install XcodeGen
+        shell: bash
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd ios-app
+          xcodegen generate
+          xcodebuild -list -project NAHWERK.xcodeproj
+
+      - name: Unsigned simulator build
+        if: ${{ vars.NAHWERK_IOS_BUNDLE_ID != '' }}
+        env:
+          NAHWERK_IOS_BUNDLE_ID: ${{ vars.NAHWERK_IOS_BUNDLE_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -project ios-app/NAHWERK.xcodeproj \
+            -scheme NAHWERK \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            NAHWERK_IOS_BUNDLE_ID="$NAHWERK_IOS_BUNDLE_ID" \
+            build
+
+      - name: Explain build gate
+        if: ${{ vars.NAHWERK_IOS_BUNDLE_ID == '' }}
+        run: |
+          echo "Simulator app build is intentionally gated: canonical Apple Bundle ID has not been verified in repository variables."
+
+      - name: iPhone 13 Pro simulator tests
+        if: ${{ vars.NAHWERK_IOS_BUNDLE_ID != '' }}
+        env:
+          NAHWERK_IOS_BUNDLE_ID: ${{ vars.NAHWERK_IOS_BUNDLE_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! xcrun simctl list devices available | grep -q "iPhone 13 Pro"; then
+            echo "iPhone 13 Pro simulator runtime is not installed on this runner."
+            exit 0
+          fi
+          xcodebuild \
+            -project ios-app/NAHWERK.xcodeproj \
+            -scheme NAHWERK \
+            -destination 'platform=iOS Simulator,name=iPhone 13 Pro' \
+            CODE_SIGNING_ALLOWED=NO \
+            NAHWERK_IOS_BUNDLE_ID="$NAHWERK_IOS_BUNDLE_ID" \
+            test
