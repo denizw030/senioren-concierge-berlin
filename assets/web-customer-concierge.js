@@ -4,7 +4,7 @@
   const SESSION_KEY = "scb_web_session";
   const CORE_CONTRACT_VERSION = "core-v1";
   const GATEWAY_CONTRACT_VERSION = "web-gateway-v1";
-  const GATEWAY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway";
+  const GATEWAY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway";\n  let lastInputWasVoiceMemo=false;
   const HISTORY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway/web/history";
   const HISTORY_CONTRACT_VERSION = "canonical-core-receipts-v1";
   const HISTORY_PAGE_SIZE = 60;
@@ -228,11 +228,23 @@
   function renderCoreV1Response(raw) {
     const response=normalizeCoreV1Response(raw);if(!response||!response.authoritative)return false;
     removeTyping();const now=new Date().toISOString();
-    for(const message of response.messages)appendMessage("assistant",message.text,now,`a:${response.turn_id}`,"WEB");
+    for(const message of response.messages){appendMessage("assistant",message.text,now,`a:${response.turn_id}`,"WEB");if(lastInputWasVoiceMemo)void playAssistantAudio(message.text);}lastInputWasVoiceMemo=false;
     if(response.pending_approval)renderApproval(response.pending_approval);
     if(response.error)addRuntimeCard("Das hat noch nicht geklappt",String(response.error.customer_safe_message||"Bitte versuche es noch einmal."),"is-error");
     return true;
   }
+
+  async function playAssistantAudio(text){
+    try{
+      const token=sessionToken();if(!token||!text)return;
+      const response=await fetchWithTimeout(`${GATEWAY_ENDPOINT}/web/audio-reply`,{method:"POST",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},body:JSON.stringify({text}),cache:"no-store",credentials:"omit"},50000);
+      if(!response.ok)return;
+      const blob=await response.blob(),url=URL.createObjectURL(blob),audio=new Audio(url);
+      audio.addEventListener("ended",()=>URL.revokeObjectURL(url),{once:true});
+      await audio.play();
+    }catch{}
+  }
+  window.addEventListener("nahwerk:voice-memo-sent",()=>{lastInputWasVoiceMemo=true;});
 
   function fetchWithTimeout(url,options={},timeoutMs=CLIENT_FETCH_TIMEOUT_MS) {
     const controller=new AbortController();
