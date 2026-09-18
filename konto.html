@@ -1755,6 +1755,37 @@
   body.account-premium-ui .account-tabs.account-tabs-modern .account-tab:nth-child(6){grid-column:4/6!important;grid-row:2!important}
   body.account-premium-ui .account-tabs.account-tabs-modern .account-tab:nth-child(7){grid-column:6/8!important;grid-row:2!important}
 }
+</style><style id="account-mobile-scroll-unlock-v6">
+/* Preserve the current symmetric selector exactly; restore normal iPhone page scrolling. */
+@media(max-width:760px){
+  html{
+    height:auto!important;
+    min-height:100%!important;
+    overflow-x:clip!important;
+    overflow-y:visible!important;
+  }
+  body.account-premium-ui{
+    height:auto!important;
+    min-height:100vh!important;
+    overflow-x:clip!important;
+    overflow-y:visible!important;
+    position:relative!important;
+    touch-action:pan-y!important;
+    -webkit-overflow-scrolling:touch;
+  }
+  body.account-premium-ui main,
+  body.account-premium-ui .account-section,
+  body.account-premium-ui .account-section>.wrap{
+    height:auto!important;
+    max-height:none!important;
+    overflow:visible!important;
+  }
+  body.account-premium-ui .account-tabs-shell{
+    position:relative!important;
+    top:auto!important;
+    inset:auto!important;
+  }
+}
 </style></head>
   <body class="account-premium-ui">
     <script>
