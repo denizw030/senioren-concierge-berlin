@@ -3,6 +3,7 @@ name: Android QA
 on:
   push:
     branches:
+      - main
       - codex/nahwerk-android-foundation
       - codex/nahwerk-android-finalization-20260910
       - staging/nw-android-real-concierge-memory-01
