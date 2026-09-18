@@ -151,7 +151,7 @@ test("legacy Shadow transport remains inert", () => {
 });
 
 test("customer PROD guard covers account PAYG and Web Concierge", () => {
-  assert.ok(siteUi.includes(String.raw`(?:konto|payg|web-concierge)(?:\.html)?\/?$`));
+  assert.ok(siteUi.includes(String.raw`(?:konto|payg|web-concierge|concierge-anpassen)(?:\.html)?\/?$`));
   assert.match(siteUi, /PROD web guard blocked a non-PROD endpoint/);
   assert.match(siteUi, /accountWebConciergeEntry/);
   assert.match(siteUi, /web-concierge/);
