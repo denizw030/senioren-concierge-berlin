@@ -167,3 +167,68 @@ html body.account-premium-ui.account-premium-ui.nw-portal-light .footergrid a:ho
   html body.account-premium-ui.account-premium-ui .customer-number-summary[data-account-panel="overview"],
   html body.account-premium-ui.account-premium-ui .plan-summary[data-account-panel="overview"]{grid-column:1/-1!important}
 }
+
+
+/* Safety + Betrugsschutz — dark mode follows the canonical account card world. */
+html[data-nw-portal-theme="dark"] body.account-premium-ui.account-premium-ui .safety-hub-card,
+html body.account-premium-ui.account-premium-ui.nw-portal-dark .safety-hub-card{
+  border:1px solid var(--account-line)!important;
+  background:
+    radial-gradient(500px 230px at 100% 0%,rgba(43,64,99,.075),transparent 68%),
+    linear-gradient(145deg,rgba(13,18,25,.96),rgba(7,10,14,.98))!important;
+  color:#f5f3ee!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 20px 54px rgba(0,0,0,.20)!important;
+}
+html[data-nw-portal-theme="dark"] body.account-premium-ui.account-premium-ui .safety-hub-card:hover,
+html[data-nw-portal-theme="dark"] body.account-premium-ui.account-premium-ui .safety-hub-card:focus-visible,
+html body.account-premium-ui.account-premium-ui.nw-portal-dark .safety-hub-card:hover,
+html body.account-premium-ui.account-premium-ui.nw-portal-dark .safety-hub-card:focus-visible{
+  border-color:rgba(198,211,230,.19)!important;
+  background:
+    radial-gradient(500px 230px at 100% 0%,rgba(49,74,114,.11),transparent 68%),
+    linear-gradient(145deg,rgba(16,22,31,.98),rgba(8,12,17,.99))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 22px 58px rgba(0,0,0,.26)!important;
+}
+html[data-nw-portal-theme="dark"] body.account-premium-ui.account-premium-ui .safety-hub-card strong,
+html body.account-premium-ui.account-premium-ui.nw-portal-dark .safety-hub-card strong{
+  color:#f5f3ee!important;
+}
+html[data-nw-portal-theme="dark"] body.account-premium-ui.account-premium-ui .safety-hub-card small,
+html body.account-premium-ui.account-premium-ui.nw-portal-dark .safety-hub-card small{
+  color:var(--account-muted)!important;
+}
+html[data-nw-portal-theme="dark"] body.account-premium-ui.account-premium-ui .safety-hub-icon,
+html body.account-premium-ui.account-premium-ui.nw-portal-dark .safety-hub-icon{
+  border-color:rgba(214,182,107,.22)!important;
+  background:rgba(214,182,107,.045)!important;
+  color:#d6b66b!important;
+}
+html[data-nw-portal-theme="dark"] body.account-premium-ui.account-premium-ui .safety-hub-arrow,
+html body.account-premium-ui.account-premium-ui.nw-portal-dark .safety-hub-arrow{
+  color:#9da4af!important;
+}
+html[data-nw-portal-theme="dark"] body.account-premium-ui.account-premium-ui :is(.fraud-protection-card,.safety-card),
+html body.account-premium-ui.account-premium-ui.nw-portal-dark :is(.fraud-protection-card,.safety-card){
+  border:1px solid var(--account-line)!important;
+  background:
+    radial-gradient(500px 230px at 100% 0%,rgba(43,64,99,.075),transparent 68%),
+    linear-gradient(145deg,rgba(13,18,25,.96),rgba(7,10,14,.98))!important;
+  color:#f5f3ee!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 20px 54px rgba(0,0,0,.20)!important;
+}
+html[data-nw-portal-theme="dark"] body.account-premium-ui.account-premium-ui .fraud-protection-grid>div,
+html body.account-premium-ui.account-premium-ui.nw-portal-dark .fraud-protection-grid>div{
+  border-color:var(--account-line)!important;
+  background:rgba(9,13,18,.70)!important;
+  color:#f5f3ee!important;
+}
+html[data-nw-portal-theme="dark"] body.account-premium-ui.account-premium-ui .fraud-protection-grid span,
+html body.account-premium-ui.account-premium-ui.nw-portal-dark .fraud-protection-grid span{
+  color:var(--account-muted)!important;
+}
+html[data-nw-portal-theme="dark"] body.account-premium-ui.account-premium-ui .safety-detail-top .btn,
+html body.account-premium-ui.account-premium-ui.nw-portal-dark .safety-detail-top .btn{
+  border-color:var(--account-line)!important;
+  background:rgba(9,13,18,.70)!important;
+  color:#e9e7e2!important;
+}
