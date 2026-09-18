@@ -3,6 +3,7 @@ name: Android Distribution Package
 on:
   push:
     branches:
+      - main
       - codex/nahwerk-android-finalization-20260910
       - release/android-prod-v0.2.2
     paths:
