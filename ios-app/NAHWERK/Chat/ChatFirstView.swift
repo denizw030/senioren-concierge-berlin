@@ -70,6 +70,44 @@ final class ChatViewModel: ObservableObject {
         }
     }
 
+    func sendVoiceMemo(_ fileURL: URL, token: String?) async -> Bool {
+        guard let token, !busy else {
+            error = "Für eine Sprachmemo musst du angemeldet sein."
+            return false
+        }
+
+        error = nil
+        busy = true
+
+        do {
+            let transcript = try await api.transcribeVoiceMemo(token: token, fileURL: fileURL)
+            messages.append(LocalChatMessage(role: .user, text: transcript))
+
+            let response = try await api.sendAuthenticatedChat(token: token, message: transcript)
+            guard response.environment == "PROD",
+                  response.authoritative != false,
+                  let core = response.core,
+                  !core.customerText.isEmpty else {
+                throw NAHWERKAPIError.invalidResponse
+            }
+
+            messages.append(
+                LocalChatMessage(
+                    role: .assistant,
+                    text: core.customerText,
+                    actions: core.allowedActions
+                )
+            )
+            busy = false
+            await refreshIdentity(token: token)
+            return true
+        } catch {
+            busy = false
+            self.error = (error as? LocalizedError)?.errorDescription ?? "Die Sprachmemo konnte gerade nicht gesendet werden."
+            return false
+        }
+    }
+
     func refreshIdentity(token: String) async {
         do {
             let response = try await api.loadMe(token: token)
@@ -166,6 +204,7 @@ struct ChatFirstView: View {
     @State private var showMenu = false
     @State private var authMode: AuthMode?
     @State private var destination: CustomerDestination?
+    @StateObject private var voiceMemo = VoiceMemoRecorder()
 
     var body: some View {
         NavigationStack {
@@ -327,38 +366,87 @@ struct ChatFirstView: View {
                     .accessibilityIdentifier("chat_error")
             }
 
-            HStack(alignment: .bottom, spacing: 10) {
-                TextField("Nachricht an NAHWERK", text: $draft, axis: .vertical)
-                    .lineLimit(1...5)
-                    .textFieldStyle(.plain)
-                    .font(.body)
-                    .foregroundStyle(NahwerkDesign.primaryText)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 12)
-                    .background(NahwerkDesign.surface, in: RoundedRectangle(cornerRadius: 22))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 22)
-                            .stroke(NahwerkDesign.divider, lineWidth: 1)
-                    )
-                    .accessibilityIdentifier("guest_chat_input")
+            if let error = voiceMemo.errorMessage {
+                Text(error)
+                    .font(.footnote)
+                    .foregroundStyle(NahwerkDesign.error)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
 
-                Button {
-                    let text = draft
-                    draft = ""
-                    Task {
-                        await model.send(text, token: session.validToken)
+            if voiceMemo.phase == .idle {
+                HStack(alignment: .bottom, spacing: 10) {
+                    if session.isAuthenticated {
+                        Button {
+                            Task { await voiceMemo.start() }
+                        } label: {
+                            Image(systemName: "mic")
+                                .font(.body.weight(.semibold))
+                                .foregroundStyle(NahwerkDesign.gold)
+                                .frame(width: 44, height: 44)
+                                .background(NahwerkDesign.surface, in: Circle())
+                                .overlay(
+                                    Circle()
+                                        .stroke(NahwerkDesign.divider, lineWidth: 1)
+                                )
+                        }
+                        .disabled(model.busy)
+                        .accessibilityLabel("Sprachmemo aufnehmen")
+                        .accessibilityIdentifier("voice_memo_record")
                     }
-                } label: {
-                    Image(systemName: "arrow.up")
-                        .font(.body.weight(.bold))
-                        .foregroundStyle(Color.black)
-                        .frame(width: 44, height: 44)
-                        .background(NahwerkDesign.gold, in: Circle())
+
+                    TextField("Nachricht an NAHWERK", text: $draft, axis: .vertical)
+                        .lineLimit(1...5)
+                        .textFieldStyle(.plain)
+                        .font(.body)
+                        .foregroundStyle(NahwerkDesign.primaryText)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 12)
+                        .background(NahwerkDesign.surface, in: RoundedRectangle(cornerRadius: 22))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 22)
+                                .stroke(NahwerkDesign.divider, lineWidth: 1)
+                        )
+                        .accessibilityIdentifier("guest_chat_input")
+
+                    Button {
+                        let text = draft
+                        draft = ""
+                        Task {
+                            await model.send(text, token: session.validToken)
+                        }
+                    } label: {
+                        Image(systemName: "arrow.up")
+                            .font(.body.weight(.bold))
+                            .foregroundStyle(Color.black)
+                            .frame(width: 44, height: 44)
+                            .background(NahwerkDesign.gold, in: Circle())
+                    }
+                    .disabled(draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || model.busy)
+                    .opacity(draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.45 : 1)
+                    .accessibilityLabel("Senden")
+                    .accessibilityIdentifier("guest_chat_send")
                 }
-                .disabled(draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || model.busy)
-                .opacity(draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.45 : 1)
-                .accessibilityLabel("Senden")
-                .accessibilityIdentifier("guest_chat_send")
+            } else {
+                VoiceMemoComposerBar(
+                    recorder: voiceMemo,
+                    onSend: {
+                        guard let token = session.validToken,
+                              let url = voiceMemo.recordingURL else {
+                            voiceMemo.restoreReady(message: "Bitte melde dich erneut an.")
+                            return
+                        }
+
+                        voiceMemo.markProcessing()
+                        Task {
+                            let sent = await model.sendVoiceMemo(url, token: token)
+                            if sent {
+                                voiceMemo.finishSending()
+                            } else {
+                                voiceMemo.restoreReady(message: "Die Sprachmemo konnte gerade nicht gesendet werden.")
+                            }
+                        }
+                    }
+                )
             }
         }
         .padding(.horizontal, 12)
@@ -527,6 +615,104 @@ private struct MessageRow: View {
         }
         .padding(.horizontal, 16)
         .frame(maxWidth: .infinity)
+    }
+}
+
+private struct VoiceMemoComposerBar: View {
+    @ObservedObject var recorder: VoiceMemoRecorder
+    let onSend: () -> Void
+
+    private var statusText: String {
+        switch recorder.phase {
+        case .recording: "Aufnahme läuft"
+        case .ready: "Sprachmemo bereit"
+        case .processing: "Wird verarbeitet …"
+        case .idle: ""
+        }
+    }
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Button {
+                recorder.cancel()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.body.weight(.semibold))
+                    .frame(width: 40, height: 40)
+            }
+            .foregroundStyle(NahwerkDesign.secondaryText)
+            .disabled(recorder.phase == .processing)
+            .accessibilityLabel("Sprachmemo löschen")
+
+            if recorder.phase == .ready {
+                Button {
+                    recorder.togglePreview()
+                } label: {
+                    Image(systemName: recorder.isPlaying ? "pause.fill" : "play.fill")
+                        .font(.caption.weight(.bold))
+                        .frame(width: 40, height: 40)
+                        .background(NahwerkDesign.softSurface, in: Circle())
+                }
+                .foregroundStyle(NahwerkDesign.gold)
+                .accessibilityLabel(recorder.isPlaying ? "Wiedergabe pausieren" : "Sprachmemo anhören")
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(statusText)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(NahwerkDesign.primaryText)
+                Text(recorder.durationText)
+                    .font(.caption2.monospacedDigit())
+                    .foregroundStyle(NahwerkDesign.secondaryText)
+            }
+
+            HStack(spacing: 3) {
+                ForEach(0..<9, id: \.self) { index in
+                    Capsule()
+                        .fill(NahwerkDesign.gold.opacity(recorder.phase == .recording ? 0.78 : 0.46))
+                        .frame(width: 3, height: CGFloat(8 + (index % 3) * 6))
+                }
+            }
+            .frame(maxWidth: .infinity)
+
+            switch recorder.phase {
+            case .recording:
+                Button {
+                    recorder.stop()
+                } label: {
+                    Image(systemName: "stop.fill")
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(Color.black)
+                        .frame(width: 44, height: 44)
+                        .background(NahwerkDesign.gold, in: Circle())
+                }
+                .accessibilityLabel("Aufnahme stoppen")
+                .accessibilityIdentifier("voice_memo_stop")
+            case .ready:
+                Button(action: onSend) {
+                    Image(systemName: "arrow.up")
+                        .font(.body.weight(.bold))
+                        .foregroundStyle(Color.black)
+                        .frame(width: 44, height: 44)
+                        .background(NahwerkDesign.gold, in: Circle())
+                }
+                .accessibilityLabel("Sprachmemo senden")
+                .accessibilityIdentifier("voice_memo_send")
+            case .processing:
+                ProgressView()
+                    .tint(NahwerkDesign.gold)
+                    .frame(width: 44, height: 44)
+            case .idle:
+                EmptyView()
+            }
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
+        .background(NahwerkDesign.surface, in: RoundedRectangle(cornerRadius: 24))
+        .overlay(
+            RoundedRectangle(cornerRadius: 24)
+                .stroke(NahwerkDesign.divider, lineWidth: 1)
+        )
     }
 }
 
