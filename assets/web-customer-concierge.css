@@ -255,3 +255,18 @@ html[data-nw-portal-theme="dark"] @media(max-width:820px){}
 @media(max-width:820px) and (orientation:portrait){
  .web-concierge-form{padding-inline:10px!important}
 }
+
+/* MOBILE_CHAT_EXIT_V1_20260918 */
+@media(max-width:820px){
+ .web-concierge-mobile-topbar{
+   display:grid!important;
+   grid-template-columns:44px 44px minmax(0,1fr) 44px!important;
+   gap:4px!important;align-items:center!important
+ }
+ .web-concierge-mobile-exit{
+   width:44px!important;height:44px!important;border:0!important;background:transparent!important;
+   font-size:38px!important;line-height:1!important;font-family:Arial,sans-serif!important;
+   display:grid!important;place-items:center!important;padding:0!important;cursor:pointer!important
+ }
+ .web-concierge-mobile-topbar-title{min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+}
