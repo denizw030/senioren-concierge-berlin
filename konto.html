@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="assets/email-account-integration.css?v=2" />
     <link rel="stylesheet" href="assets/email-provider-logo-connect-v3.css?v=20260916-1" />
     <link rel="stylesheet" href="assets/family-owner-sponsored-access.css?v=1" />
-    <link rel="stylesheet" href="assets/account-premium-ui.css?v=3" />
+    <link rel="stylesheet" href="assets/account-premium-ui.css?v=4" />
     <style>
       .dash {
         display: grid;
@@ -4499,7 +4499,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
           profileFirstName.value = profile?.first_name || "";
           profileLastName.value = profile?.last_name || "";
           profileEmail.value = profile?.email || "";
-          profileWhatsapp.value = profile?.whatsapp_number || "";
+          profileWhatsapp.value = String(profile?.whatsapp_number || "").replace(/^whatsapp:/i, "");
         }
         function renderActorOwnerName(actor = null) {
           const owner = document.getElementById("ownerName");
