@@ -4816,42 +4816,59 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
           const token = sessionToken();
           if (!token) return;
           try {
-            if (isManagedAccountContext()) {
-              const accountId = activeAccountContext?.selected?.customer_account_id;
-              if (!accountId || !managedSafetyAuthorized) throw new Error("managed_safety_not_authorized");
-              const response = await fetch(MANAGED_SAFETY_URL + "?customer_account_id=" + encodeURIComponent(accountId), {
-                method: "GET",
-                headers: { Authorization: "Bearer " + token }
-              });
-              const body = await response.json().catch(() => ({}));
-              if (!response.ok || body?.ok !== true) {
-                setManagedSafetyAvailable(false);
-                throw new Error(String(body?.status || "managed_safety_load_failed"));
-              }
-              const managedSafety = body.safety || {};
-              const contacts = Array.isArray(managedSafety.contacts) ? managedSafety.contacts : [];
-              lastSafetyContacts = contacts;
-              renderSafety({
-                safety_enabled: managedSafety.enabled === true,
-                checkin_times: Array.isArray(managedSafety.checkin_times) ? managedSafety.checkin_times : [],
-                next_checkin_at: managedSafety.next_checkin_at || null,
-                backend_active: managedSafety.enabled === true
-              }, contacts);
-              safetyCustomerDelay.disabled = true;
-              safetyEmergencyDelay.disabled = true;
-              return;
+            const managedContext = isManagedAccountContext();
+            const accountId = managedContext ? activeAccountContext?.selected?.customer_account_id : "";
+            if (managedContext && (!accountId || !managedSafetyAuthorized)) {
+              throw new Error("managed_safety_not_authorized");
             }
-            const [safetyResponse, contacts] = await Promise.all([
-              fetch(SAFETY_URL, {
-                method: "GET",
-                headers: { Authorization: "Bearer " + token }
-              }),
-              loadSafetyContacts(token)
-            ]);
-            const body = await safetyResponse.json().catch(() => ({}));
-            if (!safetyResponse.ok) throw new Error("safety_load_failed");
+
+            const contextUrl = accountId
+              ? MANAGED_SAFETY_URL + "?customer_account_id=" + encodeURIComponent(accountId)
+              : MANAGED_SAFETY_URL;
+            const response = await fetch(contextUrl, {
+              method: "GET",
+              headers: { Authorization: "Bearer " + token },
+              signal: AbortSignal.timeout(7000)
+            });
+            const body = await response.json().catch(() => ({}));
+            if (!response.ok || body?.ok !== true) {
+              if (managedContext && response.status === 403) setManagedSafetyAvailable(false);
+              throw new Error(String(body?.status || "safety_context_load_failed"));
+            }
+
+            const safety = body.safety || {};
+            const contacts = Array.isArray(safety.contacts) ? safety.contacts : [];
+            const renderPayload = {
+              safety_enabled: safety.enabled === true,
+              checkin_times: Array.isArray(safety.checkin_times) ? safety.checkin_times : [],
+              next_checkin_at: safety.next_checkin_at || null,
+              backend_active: safety.enabled === true
+            };
+
+            // Legacy n8n is no longer the availability authority. If reachable, it may
+            // still supply the two detailed escalation-delay values for the self view.
+            if (!managedContext) {
+              try {
+                const legacyResponse = await fetch(SAFETY_URL, {
+                  method: "GET",
+                  headers: { Authorization: "Bearer " + token },
+                  signal: AbortSignal.timeout(2500)
+                });
+                const legacyBody = await legacyResponse.json().catch(() => ({}));
+                if (legacyResponse.ok) {
+                  const legacy = legacyBody?.data || legacyBody?.safety || legacyBody || {};
+                  const customerDelay = Number(legacy.customer_call_delay_minutes ?? legacy.safety_escalation_minutes);
+                  const emergencyDelay = Number(legacy.emergency_contact_delay_minutes);
+                  if (Number.isFinite(customerDelay)) renderPayload.customer_call_delay_minutes = customerDelay;
+                  if (Number.isFinite(emergencyDelay)) renderPayload.emergency_contact_delay_minutes = emergencyDelay;
+                }
+              } catch (_) {}
+            }
+
             lastSafetyContacts = contacts;
-            renderSafety(body, contacts);
+            renderSafety(renderPayload, contacts);
+            safetyCustomerDelay.disabled = managedContext;
+            safetyEmergencyDelay.disabled = managedContext;
           } catch (_) {
             safetyStatus.textContent = "Nicht verfügbar";
             safetyMeta.textContent = "Die Sicherheitseinstellungen konnten gerade nicht geladen werden.";
