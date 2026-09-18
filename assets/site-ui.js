@@ -667,3 +667,23 @@
   }
   addEventListener('pageshow', stabilizeAccount, { once:true });
 })();
+
+// PACKAGE_CANONICAL_SYNC_V1_20260918
+(() => {
+  if (!document.querySelector(".package-card")) return;
+  const endpoint="https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-customer-service-core/public/product-facts";
+  const codeByTitle={"FREE":"FREE","STANDARD":"STANDARD","PLUS":"PLUS","PREMIUM":"PREMIUM","PREMIUM PLUS":"PREMIUM_PLUS","FAMILIE":"FAMILIE"};
+  const qty=(p,code)=>{const e=(Array.isArray(p?.entitlements)?p.entitlements:[]).find(x=>String(x?.feature_code||"")===code);return !e?"—":(e.included_quantity==null||e.included_quantity===""?"unbegrenzt":String(e.included_quantity));};
+  const euro=(c)=>new Intl.NumberFormat(document.documentElement.lang||"de-DE",{style:"currency",currency:"EUR",minimumFractionDigits:Number(c||0)%100===0?0:2,maximumFractionDigits:2}).format(Number(c||0)/100);
+  fetch(endpoint,{cache:"no-store",credentials:"omit"}).then(r=>r.ok?r.json():null).then(facts=>{
+    if(facts?.ok!==true)return;
+    const plans=new Map((facts.plans||[]).map(p=>[String(p.code||"").toUpperCase(),p]));
+    document.querySelectorAll(".package-card").forEach(card=>{
+      const code=codeByTitle[String(card.querySelector("h3")?.textContent||"").trim().toUpperCase()],p=plans.get(code);if(!p)return;
+      const price=card.querySelector(".package-price");if(price)price.innerHTML=`${euro(p.monthly_price_cents)} <small>/ Monat</small>`;
+      const usage=card.querySelector(".package-usage");if(usage)usage.textContent=`App ${qty(p,"app_dialog")} · Web ${qty(p,"web_standard_dialog")} · WhatsApp ${qty(p,"whatsapp_dialog")}`;
+      card.dataset.planAuthority="live";
+    });
+    document.documentElement.dataset.nwPlanFacts="live";
+  }).catch(()=>{});
+})();
