@@ -138,6 +138,12 @@ test("channel view state is initialized before boot", () => {
   assert.match(client, /let channelViewReadOnly = false;/);
 });
 
+test("channel decoration does not self-trigger the chat-list MutationObserver", () => {
+  assert.match(threadScope, /title&&title\.textContent!=="WhatsApp"/);
+  assert.match(threadScope, /title&&title\.textContent!=="Telegram"/);
+  assert.match(threadScope, /preview&&preview\.textContent!==""/);
+});
+
 test("WhatsApp is a separate channel chat and cannot accidentally send as Web", () => {
   assert.match(threadScope, /VIRTUAL_WHATSAPP_THREAD_ID/);
   assert.match(threadScope, /channel_view:"WHATSAPP"/);
@@ -173,7 +179,7 @@ test("legacy and clean routes expose the same end-customer messenger", () => {
     assert.match(surface, /Deine Chats/);
     assert.match(surface, /aria-label="Chatverlauf"/);
     assert.match(surface, /assets\/web-customer-concierge\.js\?v=18/);
-    assert.match(surface, /assets\/web-customer-concierge-thread-scope\.js\?v=2/);
+    assert.match(surface, /assets\/web-customer-concierge-thread-scope\.js\?v=3/);
     assert.doesNotMatch(surface, /PROD|autoritativ|Core-v1|web-gateway-v1|Fail-closed|Shadow-Antworten|kanonische Kundenidentität/i);
   }
 });
