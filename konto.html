@@ -3622,7 +3622,7 @@ body.account-premium-ui.nw-portal-dark .account-actions[data-account-panel="over
           securityNudgeLater.hidden = required;
           securityNudgeSms.hidden = body?.mfa?.methods?.sms?.available !== true;
           securityNudgeTotp.hidden = body?.mfa?.methods?.totp?.available === false;
-          if (required) setAccountTab("safety");
+          if (required) setAccountTab("personal");
           securityNudge.hidden = false;
           if (!required) mfaManage("nudge_seen").catch(() => {});
         }
