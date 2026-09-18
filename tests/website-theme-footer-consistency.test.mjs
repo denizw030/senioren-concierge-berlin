@@ -68,7 +68,7 @@ test("both chat routes use the full consistent footer and complete legal links",
     assert.match(page, /assets\/site-ui\.js\?v=8/);
     assert.match(page, /assets\/web-customer-concierge\.js\?v=18/);
   }
-  assert.match(cleanChat, /assets\/web-customer-concierge-thread-scope\.js\?v=2/);
+  assert.match(cleanChat, /assets\/web-customer-concierge-thread-scope\.js\?v=3/);
 });
 
 test("theme work does not introduce a second chat transport or WhatsApp delivery path", () => {
