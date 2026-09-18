@@ -95,6 +95,13 @@ def rewrite_assets(html: str) -> str:
 def rewrite_links(html: str, lang: str) -> str:
     def repl(match: re.Match[str]) -> str:
         quote, target = match.group(1), match.group(2)
+        # I18N_AUTH_LINK_FIX_V1_20260918: auth entry points stay on the selected locale.
+        if target.startswith(("/anmelden", "/registrieren")):
+            separator = "&" if "?" in target else "?"
+            if re.search(r"(?:[?&])lang=", target):
+                target = re.sub(r"([?&]lang=)[^&#]*", rf"\\g<1>{lang}", target, count=1)
+                return f'href={quote}{target}{quote}'
+            return f'href={quote}{target}{separator}lang={lang}{quote}'
         if target.startswith(("#", "/", "http://", "https://", "mailto:", "tel:", "javascript:")):
             return match.group(0)
         base = re.split(r"[?#]", target, maxsplit=1)[0]
