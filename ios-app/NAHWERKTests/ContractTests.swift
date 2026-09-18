@@ -24,15 +24,32 @@ final class ContractTests: XCTestCase {
         XCTAssertEqual(envelope.allowedActions, [safe])
     }
 
-    func testGuestRuntimeFailsClosedUntilCentralGuestTurnExists() async {
-        do {
-            _ = try await NAHWERKAPI.production.sendGuestChat(message: "Was kannst du?")
-            XCTFail("Guest chat must not fake a response locally.")
-        } catch let error as NAHWERKAPIError {
-            XCTAssertEqual(error, .guestRuntimeUnavailable)
-        } catch {
-            XCTFail("Unexpected error: \(error)")
+    func testGuestResponseDecodesTokenAndApprovedNativeActions() throws {
+        let data = """
+        {
+          "ok": true,
+          "environment": "PROD",
+          "authoritative": true,
+          "guest_token": "guest-test-token",
+          "core": {
+            "response_state": "ANSWER",
+            "messages": [
+              { "type": "text", "text": "Hallo", "semantic_role": "CUSTOMER_VISIBLE" }
+            ],
+            "ui_actions": [
+              { "id": "sign-in", "type": "SIGN_IN", "label": "Anmelden" },
+              { "id": "unsafe", "type": "OPEN_URL", "label": "Öffnen" }
+            ]
+          }
         }
+        """.data(using: .utf8)!
+
+        let response = try JSONDecoder().decode(AppChatResponse.self, from: data)
+        XCTAssertEqual(response.environment, "PROD")
+        XCTAssertEqual(response.guestToken, "guest-test-token")
+        XCTAssertEqual(response.core?.customerText, "Hallo")
+        XCTAssertEqual(response.core?.allowedActions.count, 1)
+        XCTAssertEqual(response.core?.allowedActions.first?.allowedType, .signIn)
     }
 
     func testCanonicalCoinChecksumIsFrozen() {
