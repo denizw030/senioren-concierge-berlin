@@ -421,12 +421,14 @@ function syncIosVisualViewport(){
   if(!vv){workspace.style.removeProperty("--nw-vv-height");workspace.style.removeProperty("--nw-vv-top");return;}
   workspace.style.setProperty("--nw-vv-height",Math.round(vv.height)+"px");
   workspace.style.setProperty("--nw-vv-top",Math.round(vv.offsetTop)+"px");
-  requestAnimationFrame(()=>{log.scrollTop=log.scrollHeight;});
+  const currentLog=logNode();
+  if(currentLog)requestAnimationFrame(()=>{currentLog.scrollTop=currentLog.scrollHeight;});
 }
 window.visualViewport?.addEventListener("resize",syncIosVisualViewport,{passive:true});
 window.visualViewport?.addEventListener("scroll",syncIosVisualViewport,{passive:true});
-input.addEventListener("focus",()=>{syncIosVisualViewport();setTimeout(syncIosVisualViewport,80);setTimeout(syncIosVisualViewport,260);});
-input.addEventListener("blur",()=>setTimeout(syncIosVisualViewport,120));
+const composerInput=document.getElementById("webConciergeInput");
+composerInput?.addEventListener("focus",()=>{syncIosVisualViewport();setTimeout(syncIosVisualViewport,80);setTimeout(syncIosVisualViewport,260);});
+composerInput?.addEventListener("blur",()=>setTimeout(syncIosVisualViewport,120));
 syncIosVisualViewport();
 
     const valid=window.SCBAuth?.validateSession?await window.SCBAuth.validateSession().catch(()=>false):false;if(!valid){location.replace("/anmelden");return;}
