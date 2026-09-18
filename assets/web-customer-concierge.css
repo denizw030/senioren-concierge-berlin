@@ -285,3 +285,20 @@ html[data-nw-portal-theme="dark"] @media(max-width:820px){}
  .web-concierge-chat-head{position:relative!important;z-index:1!important;padding-right:14px!important}
  .web-concierge-chat-identity{padding-right:0!important;max-width:calc(100% - 58px)!important}
 }
+
+/* IOS_VISUAL_VIEWPORT_COMPOSER_V1_20260918 */
+@media(max-width:820px){
+ .web-concierge-workspace{
+   height:var(--nw-vv-height,100dvh)!important;
+   top:var(--nw-vv-top,0px)!important;
+   bottom:auto!important;
+   max-height:var(--nw-vv-height,100dvh)!important;
+ }
+ .web-concierge-chat-panel{height:calc(var(--nw-vv-height,100dvh) - env(safe-area-inset-top) - 56px)!important;bottom:auto!important}
+ .web-concierge-form{
+   position:absolute!important;left:0!important;right:0!important;bottom:0!important;
+   padding-bottom:max(8px,env(safe-area-inset-bottom))!important;
+   z-index:90!important;background:inherit!important
+ }
+ .web-concierge-log{padding-bottom:92px!important}
+}
