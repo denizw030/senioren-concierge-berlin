@@ -408,6 +408,67 @@ actor NAHWERKAPI {
         )
     }
 
+    func transcribeVoiceMemo(token: String, fileURL: URL) async throws -> String {
+        let audio = try Data(contentsOf: fileURL)
+        guard !audio.isEmpty, audio.count <= 8 * 1024 * 1024 else {
+            throw NAHWERKAPIError.server("AUDIO_SIZE_INVALID")
+        }
+
+        let url = functionsBaseURL.appendingPathComponent("nahwerk-audio-input")
+        guard url.scheme == "https", url.host == "djicahhmnnamtjuqedqd.supabase.co" else {
+            throw NAHWERKAPIError.invalidResponse
+        }
+
+        let boundary = "nahwerk-voice-\(UUID().uuidString.lowercased())"
+        var body = Data()
+
+        func append(_ value: String) {
+            if let data = value.data(using: .utf8) {
+                body.append(data)
+            }
+        }
+
+        append("--\(boundary)\r\n")
+        append("Content-Disposition: form-data; name=\"audio\"; filename=\"voice-memo.m4a\"\r\n")
+        append("Content-Type: audio/mp4\r\n\r\n")
+        body.append(audio)
+        append("\r\n--\(boundary)--\r\n")
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.timeoutInterval = 55
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue("no-store", forHTTPHeaderField: "Cache-Control")
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        request.httpBody = body
+
+        let (data, response) = try await session.data(for: request)
+        guard let http = response as? HTTPURLResponse else {
+            throw NAHWERKAPIError.invalidResponse
+        }
+        if http.statusCode == 401 {
+            throw NAHWERKAPIError.sessionRequired
+        }
+        guard (200..<300).contains(http.statusCode) else {
+            let object = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
+            let code = (object?["error"] as? String) ?? "HTTP_\(http.statusCode)"
+            throw NAHWERKAPIError.server(code)
+        }
+
+        guard let object = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
+              object["ok"] as? Bool == true,
+              let transcript = object["transcript"] as? String else {
+            throw NAHWERKAPIError.invalidResponse
+        }
+
+        let clean = transcript.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !clean.isEmpty else {
+            throw NAHWERKAPIError.invalidResponse
+        }
+        return clean
+    }
+
     func sendGuestChat(message: String) async throws -> AppChatResponse {
         let cleanMessage = message.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !cleanMessage.isEmpty else {
