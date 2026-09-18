@@ -29,6 +29,8 @@
   let loadingOlder = false;
   let syncTimer = null;
   let lastPersonaSyncAt = 0;
+  let channelView = "CHAT";
+  let channelViewReadOnly = false;
 
   function sessionToken() {
     try { return String(JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null")?.session_token || ""); }
