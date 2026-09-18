@@ -414,7 +414,7 @@ actor NAHWERKAPI {
             throw NAHWERKAPIError.server("AUDIO_SIZE_INVALID")
         }
 
-        let url = functionsBaseURL.appendingPathComponent("nahwerk-audio-input")
+        let url = functionsBaseURL.appendingPathComponent("nahwerk-app-gateway/mobile/audio-transcribe")
         guard url.scheme == "https", url.host == "djicahhmnnamtjuqedqd.supabase.co" else {
             throw NAHWERKAPIError.invalidResponse
         }
