@@ -244,3 +244,34 @@ html body.account-premium-ui.account-premium-ui.nw-portal-dark .safety-detail-to
   background:rgba(9,13,18,.70)!important;
   color:#e9e7e2!important;
 }
+
+
+/* Account tab icons: optical size equals label text and inherits the same color. */
+html body.account-premium-ui.account-premium-ui .account-tab{
+  gap:.34em!important;
+}
+html body.account-premium-ui.account-premium-ui .account-tab-icon{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:1em!important;
+  height:1em!important;
+  flex:0 0 1em!important;
+  font-size:1em!important;
+  line-height:1!important;
+  color:inherit!important;
+}
+html body.account-premium-ui.account-premium-ui .account-tab-person-icon svg{
+  width:1em!important;
+  height:1em!important;
+  fill:none!important;
+  stroke:currentColor!important;
+  stroke-width:1.7!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+}
+html body.account-premium-ui.account-premium-ui .account-tab-concierge-logo{
+  background-color:currentColor!important;
+  -webkit-mask:url("/logos/NAHWERK-Goldmann-Logo.svg") center/contain no-repeat;
+  mask:url("/logos/NAHWERK-Goldmann-Logo.svg") center/contain no-repeat;
+}
