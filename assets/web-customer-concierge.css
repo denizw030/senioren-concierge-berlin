@@ -270,3 +270,18 @@ html[data-nw-portal-theme="dark"] @media(max-width:820px){}
  }
  .web-concierge-mobile-topbar-title{min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
 }
+
+/* MOBILE_CHAT_HEADER_FINAL_V4_20260918 */
+@media(max-width:820px){
+ .web-concierge-mobile-topbar{
+   display:grid!important;grid-template-columns:40px 40px minmax(0,1fr) 40px!important;
+   column-gap:2px!important;padding:0 8px!important;overflow:hidden!important
+ }
+ .web-concierge-mobile-topbar>button{position:relative!important;inset:auto!important;width:40px!important;height:40px!important;z-index:2!important}
+ .web-concierge-mobile-topbar-title{
+   position:static!important;inset:auto!important;width:auto!important;min-width:0!important;
+   padding:0 4px!important;text-align:center!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important
+ }
+ .web-concierge-chat-head{position:relative!important;z-index:1!important;padding-right:14px!important}
+ .web-concierge-chat-identity{padding-right:0!important;max-width:calc(100% - 58px)!important}
+}
