@@ -111,6 +111,7 @@ final class ChatViewModel: ObservableObject {
         if isAuthenticated {
             error = NAHWERKAPIError.canonicalNewChatUnavailable.errorDescription
         } else {
+            GuestCredentialStore.clearGuestToken()
             error = nil
             messages = []
         }
