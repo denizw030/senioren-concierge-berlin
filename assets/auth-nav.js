@@ -299,47 +299,11 @@
     }
 
     try {
-      if (page() === "konto.html") {
-        const profileResponse = await fetch(PROFILE_URL, {
-          method: "GET",
-          headers: { Authorization: "Bearer " + session.session_token }
-        });
-        const profileBody = await profileResponse.json().catch(() => ({}));
-        if (profileResponse.ok && profileBody?.ok === true && profileBody?.customer_account_id) {
-          const product_context = profileBody?.brand === "senioren_concierge"
-            ? "senioren"
-            : profileBody?.brand
-              ? "prime"
-              : session.product_context || null;
-          const first_name = safeFirstName(profileBody?.profile?.first_name || session.first_name);
-          validatedSession = {
-            ...session,
-            customer_account_id: profileBody.customer_account_id,
-            person_id: profileBody.person_id || session.person_id,
-            first_name,
-            product_context
-          };
-          sessionValidated = true;
-          lastValidatedProfile = profileBody;
-          if (product_context === "senioren" || product_context === "prime") {
-            sessionStorage.setItem(PRODUCT_KEY, product_context);
-          }
-          sessionStorage.setItem(SESSION_KEY, JSON.stringify(validatedSession));
-          return true;
-        }
-        if (profileResponse.status === 401 || profileResponse.status === 403) {
-          clearLocalAuth();
-          return false;
-        }
-        sessionValidated = false;
-        validatedSession = null;
-        return false;
-      }
-
       const response = await fetch(CHECK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.session_token}` },
-        body: "{}"
+        body: "{}",
+        signal: AbortSignal.timeout(12000)
       });
       const body = await response.json().catch(() => ({}));
       if (response.ok && body.ok && body.status === "session_valid") {
