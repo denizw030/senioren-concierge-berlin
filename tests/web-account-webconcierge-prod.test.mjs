@@ -6,6 +6,7 @@ const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf
 const page = read("web-concierge.html");
 const cleanPage = read("web-concierge/index.html");
 const client = read("assets/web-customer-concierge.js");
+const threadScope = read("assets/web-customer-concierge-thread-scope.js");
 const shadow = read("assets/web-core-shadow.js");
 const legacyUi = read("assets/web-concierge-chat.js");
 const siteUi = read("assets/site-ui.js");
