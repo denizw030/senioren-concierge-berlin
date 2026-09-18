@@ -247,7 +247,6 @@ enum NAHWERKAPIError: LocalizedError, Equatable {
     case invalidResponse
     case server(String)
     case sessionRequired
-    case guestRuntimeUnavailable
     case canonicalNewChatUnavailable
 
     var errorDescription: String? {
@@ -258,8 +257,6 @@ enum NAHWERKAPIError: LocalizedError, Equatable {
             return "Die Anfrage konnte gerade nicht abgeschlossen werden (\(code))."
         case .sessionRequired:
             return "Bitte melde dich erneut an."
-        case .guestRuntimeUnavailable:
-            return "Der Gast-Chat ist im zentralen Concierge noch nicht freigeschaltet."
         case .canonicalNewChatUnavailable:
             return "Ein neuer gespeicherter Chat kann erst gestartet werden, wenn der zentrale Conversation-Endpunkt freigegeben ist."
         }
