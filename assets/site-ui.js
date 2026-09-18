@@ -1,6 +1,6 @@
 (() => {
   const isCustomerAccount = /(?:^|\/)konto(?:\.html)?\/?$/.test(location.pathname);
-  const isProdCustomerSurface = /(?:^|\/)(?:konto|payg|web-concierge)(?:\.html)?\/?$/.test(location.pathname);
+  const isProdCustomerSurface = /(?:^|\/)(?:konto|payg|web-concierge|concierge-anpassen)(?:\.html)?\/?$/.test(location.pathname);
   const isPublicSeniorSurface = /(?:^|\/)(?:senioren-concierge|angehoerige)(?:\.html)?\/?$/.test(location.pathname) || Boolean(document.body?.classList?.contains('senior-product'));
   const isThemeAwareSurface = isProdCustomerSurface || isPublicSeniorSurface;
   const PORTAL_THEME_KEY = 'nw_portal_theme_v1';
