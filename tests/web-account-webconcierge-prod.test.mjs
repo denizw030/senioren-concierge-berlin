@@ -133,6 +133,11 @@ test("Concierge avatar and name open central Concierge settings", () => {
   assert.match(client, /avatar\.onkeydown/);
 });
 
+test("channel view state is initialized before boot", () => {
+  assert.match(client, /let channelView = "CHAT";/);
+  assert.match(client, /let channelViewReadOnly = false;/);
+});
+
 test("WhatsApp is a separate channel chat and cannot accidentally send as Web", () => {
   assert.match(threadScope, /VIRTUAL_WHATSAPP_THREAD_ID/);
   assert.match(threadScope, /channel_view:"WHATSAPP"/);
