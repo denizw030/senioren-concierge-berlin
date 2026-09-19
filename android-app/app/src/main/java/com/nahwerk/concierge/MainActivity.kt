@@ -120,6 +120,7 @@ internal fun NahwerkApp(viewModel: NahwerkAppViewModel = viewModel()) {
                 sending = state.chatSending,
                 error = state.chatError,
                 pendingRequest = state.pendingRequest,
+                liveSessionToken = viewModel.liveSessionToken(),
                 onDraftChange = viewModel::updateDraft,
                 onSend = viewModel::sendChat,
                 onRetry = viewModel::retryPending,
@@ -434,15 +435,25 @@ internal fun ChatScreen(
     sending: Boolean,
     error: String?,
     pendingRequest: PendingChatRequest?,
+    liveSessionToken: String?,
     onDraftChange: (String) -> Unit,
     onSend: () -> Unit,
     onRetry: () -> Unit,
     onDiscard: () -> Unit,
     onBack: () -> Unit
 ) {
+    var liveOpen by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
     LaunchedEffect(messages.size, pendingRequest?.sourceMessageId, error) {
         if (messages.isNotEmpty()) listState.animateScrollToItem(messages.lastIndex)
+    }
+
+    if (liveOpen && !liveSessionToken.isNullOrBlank()) {
+        LiveConciergeAndroidSurface(
+            sessionToken = liveSessionToken,
+            onClose = { liveOpen = false }
+        )
+        return
     }
 
     Scaffold(
@@ -481,6 +492,7 @@ internal fun ChatScreen(
                 locked = pendingRequest != null,
                 onDraftChange = onDraftChange,
                 onSend = onSend,
+                onLive = if (!liveSessionToken.isNullOrBlank()) ({ liveOpen = true }) else null,
                 modifier = Modifier.padding(horizontal = NahwerkSpacing.Lg)
             )
             Text(
@@ -616,6 +628,7 @@ private fun ChatComposer(
     locked: Boolean,
     onDraftChange: (String) -> Unit,
     onSend: () -> Unit,
+    onLive: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(NahwerkSpacing.Sm)) {
@@ -656,6 +669,20 @@ private fun ChatComposer(
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) { Text("↑", style = MaterialTheme.typography.titleLarge) }
+            if (onLive != null) {
+                Button(
+                    onClick = onLive,
+                    enabled = !sending && !locked,
+                    modifier = Modifier.size(NahwerkSizes.ComposerButton).testTag("chat_live")
+                        .semantics { contentDescription = "Live mit deinem Concierge sprechen" },
+                    shape = RoundedCornerShape(NahwerkRadii.Pill),
+                    contentPadding = PaddingValues(0.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF246BFF),
+                        contentColor = Color.White
+                    )
+                ) { Text("◉", style = MaterialTheme.typography.titleLarge) }
+            }
         }
     }
 }
