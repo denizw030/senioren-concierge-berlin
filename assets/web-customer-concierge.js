@@ -306,6 +306,14 @@
     return true;
   }
 
+  window.addEventListener("nahwerk:live-ended",()=>{
+    void (async()=>{
+      await new Promise((resolve)=>setTimeout(resolve,180));
+      await loadThreads();
+      if(validUuid(activeThreadId))await refreshThread(activeThreadId,{force:true,reset:true});
+    })();
+  });
+
   window.addEventListener("nahwerk:voice-memo-sent",(event)=>{
     const payload=event?.detail?.payload;
     const canonical=String(payload?.canonical_thread_id||payload?.core?.conversation_id||"");
