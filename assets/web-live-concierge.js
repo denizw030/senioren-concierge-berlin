@@ -1,5 +1,5 @@
 // WEB_CONCIERGE_LIVE_BOOT_V1_20260919
-import { mountNahwerkLiveConcierge } from "./nahwerk-live-concierge.js?v=6";
+import { mountNahwerkLiveConcierge } from "./nahwerk-live-concierge.js?v=7";
 
 const GATEWAY="https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway";
 
