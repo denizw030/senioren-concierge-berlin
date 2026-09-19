@@ -435,7 +435,7 @@ internal fun ChatScreen(
     sending: Boolean,
     error: String?,
     pendingRequest: PendingChatRequest?,
-    liveSessionToken: String?,
+    liveSessionToken: String? = null,
     onDraftChange: (String) -> Unit,
     onSend: () -> Unit,
     onRetry: () -> Unit,
