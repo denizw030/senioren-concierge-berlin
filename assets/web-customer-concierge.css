@@ -572,6 +572,12 @@ body.web-concierge-page>.footer{display:none!important}
   margin-right:7px;
   opacity:.72;
 }
+.web-concierge-thread[data-chat-channel="EMAIL"] .web-concierge-thread-title::before{
+  content:"✉";
+  display:inline-block;
+  margin-right:7px;
+  opacity:.72;
+}
 .web-concierge-thread[data-chat-channel="WHATSAPP"] .web-concierge-thread-title::before{
   content:"●";
   display:inline-block;

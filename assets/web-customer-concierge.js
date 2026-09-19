@@ -34,12 +34,14 @@
   let primaryChatThreadId = null;
   const VIRTUAL_WHATSAPP_THREAD_ID="00000000-0000-4000-8000-0000000000a1";
   const VIRTUAL_PHONE_THREAD_ID="00000000-0000-4000-8000-0000000000a3";
+  const VIRTUAL_EMAIL_THREAD_ID="00000000-0000-4000-8000-0000000000a4";
   const NORMAL_CHAT_CHANNELS=new Set(["WEB","APP"]);
 
   function channelForThreadId(threadId){
     const id=String(threadId||"");
     if(id===VIRTUAL_WHATSAPP_THREAD_ID)return "WHATSAPP";
     if(id===VIRTUAL_PHONE_THREAD_ID)return "PHONE";
+    if(id===VIRTUAL_EMAIL_THREAD_ID)return "EMAIL";
     return "CHAT";
   }
   function isNormalThread(thread){
@@ -298,6 +300,9 @@
     if(channel==="PHONE"){
       strong.textContent="Telefonprotokoll";
       span.textContent="Für frühere Telefonate liegt kein vollständiges Gesprächstranskript vor. Neue Telefonate werden hier automatisch als Chat dokumentiert.";
+    }else if(channel==="EMAIL"){
+      strong.textContent="E-Mail-Protokoll";
+      span.textContent="Hier erscheint dein E-Mail-Verlauf mit dem Concierge. Dieser Bereich ist nur lesbar; E-Mail-Antworten werden über den E-Mail-Concierge versendet.";
     }else{
       strong.textContent="WhatsApp-Protokoll";
       span.textContent="Hier erscheint dein WhatsApp-Verlauf. Schreiben ist ausschließlich in WhatsApp möglich.";
@@ -515,6 +520,15 @@
           });
         }
       }catch{}
+      try{
+        const email=await channelHistoryRequest("EMAIL",{summary:true});
+        if(email?.has_email===true){
+          next.push({
+            thread_id:VIRTUAL_EMAIL_THREAD_ID,title:"E-Mail-Protokoll",preview:String(email?.email_address||""),updated_at:null,
+            channels:["EMAIL"],channel_view:"EMAIL",virtual_channel_thread:true
+          });
+        }
+      }catch{}
       threadCache=next;
       if(selectFirst&&(!activeThreadId||!threadCache.some((thread)=>thread.thread_id===activeThreadId))){
         activeThreadId=primaryChatThreadId;
@@ -588,7 +602,7 @@
     window.dispatchEvent(new CustomEvent("nahwerk:chat-channel-view",{detail:{channel:view,readOnly:channelViewReadOnly}}));
     resetHistoryState();renderThreads();emptyChat();
     if(view==="CHAT"&&validUuid(threadId))await refreshThread(threadId,{force:true,reset:true});
-    else if(view==="WHATSAPP"||view==="PHONE")await refreshChannelView(view);
+    else if(view==="WHATSAPP"||view==="PHONE"||view==="EMAIL")await refreshChannelView(view);
     document.getElementById("webConciergeInput")?.focus();
   }
   function newChat() { if(sending)return;activeThreadId=crypto.randomUUID();resetHistoryState();emptyChat();renderThreads();document.getElementById("webConciergeInput")?.focus(); }

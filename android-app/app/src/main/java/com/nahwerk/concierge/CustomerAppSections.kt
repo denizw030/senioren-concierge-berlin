@@ -230,6 +230,7 @@ private fun CustomerConciergeSurface(
     var error by remember { mutableStateOf<String?>(null) }
     var chatChannel by rememberSaveable { mutableStateOf("CHAT") }
     var phoneAvailable by remember { mutableStateOf(false) }
+    var emailAvailable by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         appApi.loadHome().onSuccess { home = it }.onFailure {
@@ -242,6 +243,10 @@ private fun CustomerConciergeSurface(
             phoneAvailable = it.hasCalls
             if (!phoneAvailable && chatChannel == "PHONE") chatChannel = "CHAT"
         }
+        historyApi.loadChannel("EMAIL", summaryOnly = true).onSuccess {
+            emailAvailable = it.hasEmail
+            if (!emailAvailable && chatChannel == "EMAIL") chatChannel = "CHAT"
+        }
     }
 
     ConciergeIdentityCard(home?.persona, onOpenConciergeSettings)
@@ -250,7 +255,7 @@ private fun CustomerConciergeSurface(
     val appUsed = profile?.appDialoguesUsed
     val appLimitReached = appLimit != null && appUsed != null && appLimit >= 0 && appUsed >= appLimit
 
-    CustomerSectionCard("CHAT-KANÄLE", "Chat · WhatsApp · Anrufprotokoll") {
+    CustomerSectionCard("CHAT-KANÄLE", "Chat · WhatsApp · Anrufprotokoll · E-Mail") {
         Row(
             Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(NahwerkSpacing.Sm)
@@ -270,6 +275,13 @@ private fun CustomerConciergeSurface(
                     Button(onClick = { chatChannel = "PHONE" }) { Text("Anrufprotokoll") }
                 } else {
                     OutlinedButton(onClick = { chatChannel = "PHONE" }) { Text("Anrufprotokoll") }
+                }
+            }
+            if (emailAvailable) {
+                if (chatChannel == "EMAIL") {
+                    Button(onClick = { chatChannel = "EMAIL" }) { Text("E-Mail") }
+                } else {
+                    OutlinedButton(onClick = { chatChannel = "EMAIL" }) { Text("E-Mail") }
                 }
             }
         }
@@ -323,10 +335,11 @@ private fun CustomerConciergeSurface(
     } else {
         CustomerMessageCard(
             title = "Nur Protokoll",
-            body = if (chatChannel == "WHATSAPP")
-                "Hier wird dein WhatsApp-Verlauf angezeigt. Antworten sind nur direkt in WhatsApp möglich."
-            else
-                "Hier wird das Gespräch mit deinem Concierge dokumentiert. In diesem Protokoll kann nicht geschrieben werden."
+            body = when (chatChannel) {
+                "WHATSAPP" -> "Hier wird dein WhatsApp-Verlauf angezeigt. Antworten sind nur direkt in WhatsApp möglich."
+                "EMAIL" -> "Hier wird dein E-Mail-Verlauf mit dem Concierge angezeigt. E-Mail-Antworten werden über den E-Mail-Concierge versendet."
+                else -> "Hier wird das Gespräch mit deinem Concierge dokumentiert. In diesem Protokoll kann nicht geschrieben werden."
+            }
         )
     }
 

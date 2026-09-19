@@ -29,6 +29,7 @@ internal data class CustomerHistoryThread(
 
 internal data class CustomerChannelHistory(
     val hasCalls: Boolean,
+    val hasEmail: Boolean,
     val messages: List<CustomerHistoryMessage>
 )
 
@@ -98,7 +99,7 @@ internal class CustomerHistoryApi(context: Context) {
 
     suspend fun loadChannel(channel: String, summaryOnly: Boolean = false): Result<CustomerChannelHistory> = withContext(Dispatchers.IO) {
         val normalized = channel.trim().uppercase()
-        if (normalized != "WHATSAPP" && normalized != "PHONE") {
+        if (normalized != "WHATSAPP" && normalized != "PHONE" && normalized != "EMAIL") {
             return@withContext Result.failure(IllegalArgumentException("Dieser Chat-Kanal ist nicht verfügbar."))
         }
         val suffix = buildString {
@@ -126,6 +127,7 @@ internal class CustomerHistoryApi(context: Context) {
             }
             CustomerChannelHistory(
                 hasCalls = body.optBoolean("has_calls", false),
+                hasEmail = body.optBoolean("has_email", false),
                 messages = messages
             )
         }

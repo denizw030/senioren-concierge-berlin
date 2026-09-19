@@ -145,6 +145,14 @@ test("channel rendering is native and no MutationObserver shim is loaded", () =>
   assert.doesNotMatch(client, /new MutationObserver/);
 });
 
+test("E-Mail is a separate read-only protocol below phone history", () => {
+  assert.match(client, /VIRTUAL_EMAIL_THREAD_ID/);
+  assert.match(client, /title:"E-Mail-Protokoll"/);
+  assert.match(client, /channel_view:"EMAIL"/);
+  assert.match(client, /channelHistoryRequest\("EMAIL",\{summary:true\}\)/);
+  assert.match(client, /view==="WHATSAPP"\|\|view==="PHONE"\|\|view==="EMAIL"/);
+});
+
 test("WhatsApp is a separate read-only protocol and cannot accidentally send as Web", () => {
   assert.match(client, /VIRTUAL_WHATSAPP_THREAD_ID/);
   assert.match(client, /channel_view:"WHATSAPP"/);

@@ -41,6 +41,7 @@ struct ChatHistoryThread {
 
 struct ChannelHistoryResult {
     let hasCalls: Bool
+    let hasEmail: Bool
     let messages: [ChatHistoryMessage]
 }
 
@@ -146,6 +147,7 @@ final class NahwerkAPI {
         let json = try await request(url: url, method: "GET", bearer: token)
         return ChannelHistoryResult(
             hasCalls: (json["has_calls"] as? Bool) == true,
+            hasEmail: (json["has_email"] as? Bool) == true,
             messages: parseHistoryMessages(json["messages"])
         )
     }

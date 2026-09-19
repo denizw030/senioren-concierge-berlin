@@ -67,7 +67,7 @@ internal fun CustomerSharedHistorySurface(
                         else error = it.message ?: "Chat konnte nicht geladen werden."
                     }
             }
-            "WHATSAPP", "PHONE" -> {
+            "WHATSAPP", "PHONE", "EMAIL" -> {
                 api.loadChannel(normalized)
                     .onSuccess {
                         messages = it.messages
@@ -108,6 +108,7 @@ internal fun CustomerSharedHistorySurface(
                 when (channel.uppercase()) {
                     "WHATSAPP" -> "WHATSAPP-PROTOKOLL"
                     "PHONE" -> "ANRUFPROTOKOLL"
+                    "EMAIL" -> "E-MAIL-PROTOKOLL"
                     else -> "CHAT"
                 },
                 color = NahwerkPalette.Gold,
@@ -117,6 +118,7 @@ internal fun CustomerSharedHistorySurface(
                 when (channel.uppercase()) {
                     "WHATSAPP" -> "Nur lesen · Antworten direkt in WhatsApp"
                     "PHONE" -> "Nur lesen · Gespräche mit deinem Concierge"
+                    "EMAIL" -> "Nur lesen · E-Mail-Antworten über den E-Mail-Concierge"
                     else -> "Web · App"
                 },
                 style = MaterialTheme.typography.titleMedium
@@ -134,6 +136,7 @@ internal fun CustomerSharedHistorySurface(
                         when (channel.uppercase()) {
                             "WHATSAPP" -> "Noch keine WhatsApp-Nachrichten."
                             "PHONE" -> "Noch kein Gesprächstranskript verfügbar."
+                            "EMAIL" -> "Noch keine E-Mail-Nachrichten."
                             else -> "Noch keine Nachrichten."
                         },
                         color = NahwerkPalette.SecondaryText

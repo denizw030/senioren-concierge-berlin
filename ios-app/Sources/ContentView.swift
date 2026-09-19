@@ -371,6 +371,7 @@ private enum CustomerChatChannel: String, CaseIterable, Identifiable {
     case chat
     case whatsapp
     case phone
+    case email
 
     var id: String { rawValue }
     var title: String {
@@ -378,6 +379,7 @@ private enum CustomerChatChannel: String, CaseIterable, Identifiable {
         case .chat: return "Chat"
         case .whatsapp: return "WhatsApp"
         case .phone: return "Anrufprotokoll"
+        case .email: return "E-Mail"
         }
     }
 }
@@ -389,6 +391,7 @@ private struct CustomerChatView: View {
     @State private var mainThreadID: String?
     @State private var selectedChannel: CustomerChatChannel = .chat
     @State private var phoneAvailable = false
+    @State private var emailAvailable = false
     @State private var busy = false
     @State private var loading = true
     @State private var error: String?
@@ -480,6 +483,7 @@ private struct CustomerChatView: View {
             channelButton(.chat)
             channelButton(.whatsapp)
             if phoneAvailable { channelButton(.phone) }
+            if emailAvailable { channelButton(.email) }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -504,6 +508,7 @@ private struct CustomerChatView: View {
         case .chat: return "Wie kann ich dir helfen?"
         case .whatsapp: return "WhatsApp-Protokoll"
         case .phone: return "Anrufprotokoll"
+        case .email: return "E-Mail-Protokoll"
         }
     }
 
@@ -512,13 +517,16 @@ private struct CustomerChatView: View {
         case .chat: return "Dieser Chat ist derselbe Verlauf wie im Web."
         case .whatsapp: return "Hier erscheint dein WhatsApp-Verlauf. Schreiben ist nur in WhatsApp möglich."
         case .phone: return "Neue Concierge-Telefonate werden hier als Gespräch dokumentiert."
+        case .email: return "Hier erscheint dein E-Mail-Verlauf mit dem Concierge. Der Bereich ist nur lesbar."
         }
     }
 
     private var readOnlyHint: String {
-        selectedChannel == .whatsapp
-            ? "Nur Protokoll · Antworten bitte direkt in WhatsApp."
-            : "Nur Protokoll · Hier kann nicht geschrieben werden."
+        switch selectedChannel {
+        case .whatsapp: return "Nur Protokoll · Antworten bitte direkt in WhatsApp."
+        case .email: return "Nur Protokoll · E-Mail-Antworten werden über den E-Mail-Concierge versendet."
+        default: return "Nur Protokoll · Hier kann nicht geschrieben werden."
+        }
     }
 
     private func refreshChannelsAndHistory() async {
@@ -532,7 +540,10 @@ private struct CustomerChatView: View {
 
             let phone = try await NahwerkAPI.shared.loadChannelHistory(channel: "PHONE", store: session, summaryOnly: true)
             phoneAvailable = phone.hasCalls
+            let email = try await NahwerkAPI.shared.loadChannelHistory(channel: "EMAIL", store: session, summaryOnly: true)
+            emailAvailable = email.hasEmail
             if selectedChannel == .phone && !phoneAvailable { selectedChannel = .chat }
+            if selectedChannel == .email && !emailAvailable { selectedChannel = .chat }
             await loadSelectedChannel()
         } catch {
             await MainActor.run {
@@ -565,6 +576,8 @@ private struct CustomerChatView: View {
                 loaded = try await NahwerkAPI.shared.loadChannelHistory(channel: "WHATSAPP", store: session).messages
             case .phone:
                 loaded = try await NahwerkAPI.shared.loadChannelHistory(channel: "PHONE", store: session).messages
+            case .email:
+                loaded = try await NahwerkAPI.shared.loadChannelHistory(channel: "EMAIL", store: session).messages
             }
             await MainActor.run {
                 messages = loaded
