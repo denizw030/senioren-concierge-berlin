@@ -2,7 +2,7 @@
   "use strict";
 
   const SESSION_KEY = "scb_web_session";
-  const ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway/web/audio-transcribe";
+  const ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway/web/audio-message";
   const HEALTH_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway/health";
   const MAX_DURATION_MS = 120000;
   const HEALTH_TIMEOUT_MS = 5000;
@@ -19,6 +19,7 @@
   let previewUrl = "";
   let cancelled = false;
   let processing = false;
+  let durationMs = 0;
 
   function token() {
     try {
@@ -126,6 +127,7 @@
     startedAt = 0;
     cancelled = false;
     processing = false;
+    durationMs = 0;
     const e = els();
     if (e.time) e.time.textContent = "0:00";
     if (e.play) e.play.textContent = "▶";
@@ -196,8 +198,9 @@
           if (e.play) e.play.textContent = "▶";
         });
 
+        durationMs = Math.max(0, Date.now() - startedAt);
         const e = els();
-        if (e.time) e.time.textContent = clock(Date.now() - startedAt);
+        if (e.time) e.time.textContent = clock(durationMs);
         setMode("ready");
       }, { once: true });
 
@@ -263,12 +266,22 @@
     return "webm";
   }
 
-  async function transcribe(audio, type) {
+  async function sendVoiceMemo(audio, type) {
+    if (window.SCBAuth?.validateSession) {
+      const valid = await window.SCBAuth.validateSession(true).catch(() => false);
+      if (!valid) throw new Error("session_invalid");
+    }
     const session = token();
     if (!session) throw new Error("session_required");
+    const threadID = window.NAHWERKWebCustomerConciergeLiveBridge?.threadId?.();
+    if (!threadID) throw new Error("thread_required");
 
+    const sourceMessageID = crypto.randomUUID?.() || Math.random().toString(36).slice(2);
     const form = new FormData();
     form.append("audio", audio, `voice-memo.${extensionFor(type)}`);
+    form.append("thread_id", threadID);
+    form.append("source_message_id", sourceMessageID);
+    form.append("duration_ms", String(Math.max(0, Math.round(durationMs))));
 
     const response = await fetchTimeout(
       ENDPOINT,
@@ -279,13 +292,13 @@
         cache: "no-store",
         credentials: "omit"
       },
-      TRANSCRIBE_TIMEOUT_MS
+      90000
     );
     const payload = await response.json().catch(() => ({}));
-    if (!response.ok || payload?.ok !== true || typeof payload?.transcript !== "string" || !payload.transcript.trim()) {
-      throw new Error(String(payload?.error || "voice_transcription_failed"));
+    if (!response.ok || payload?.ok !== true || payload?.contract_version !== "audio-message-v1") {
+      throw new Error(String(payload?.error || "voice_message_failed"));
     }
-    return payload.transcript.trim();
+    return payload;
   }
 
   async function submit() {
@@ -293,21 +306,13 @@
     processing = true;
     setMode("processing");
     try {
-      const transcript = await transcribe(blob, mime);
-      const e = els();
+      const payload = await sendVoiceMemo(blob, mime);
       reset();
-      if (!(e.input instanceof HTMLTextAreaElement)) throw new Error("composer_unavailable");
-      e.input.value = transcript;
-      window.dispatchEvent(new CustomEvent("nahwerk:voice-memo-sent",{detail:{transcript}}));
-      e.input.dispatchEvent(new Event("input", { bubbles: true }));
-      if (e.send instanceof HTMLButtonElement && !e.send.disabled) {
-        e.send.click();
-      } else {
-        e.input.focus();
-      }
-    } catch {
+      window.dispatchEvent(new CustomEvent("nahwerk:voice-memo-sent",{detail:{payload}}));
+    } catch (error) {
       processing = false;
-      setMode("ready", "Sprachmemo konnte nicht verarbeitet werden");
+      setMode("ready", "Sprachmemo konnte nicht gesendet werden");
+      window.dispatchEvent(new CustomEvent("nahwerk:voice-memo-error",{detail:{error:String(error?.message||"voice_message_failed")}}));
     }
   }
 
