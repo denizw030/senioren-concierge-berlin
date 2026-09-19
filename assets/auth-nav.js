@@ -340,7 +340,8 @@
     return false;
   }
 
-  function validateSession() {
+  function validateSession(force = false) {
+    if (force) validationPromise = null;
     if (!validationPromise) validationPromise = performSessionValidation();
     return validationPromise;
   }
