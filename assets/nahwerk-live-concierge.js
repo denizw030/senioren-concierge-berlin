@@ -171,8 +171,13 @@ export function mountNahwerkLiveConcierge({
     return token;
   };
   const reportClientDiagnostic=(code)=>{
-    const root=apiBase.replace(/\/live\/?$/,"");
-    fetch(root+"/client-diagnostic",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({source:"LIVE_CLIENT",code:String(code||"LIVE_CLIENT_ERROR").slice(0,180)}),cache:"no-store",credentials:"omit"}).catch(()=>{});
+    try{
+      const root=apiBase.replace(/\/live\/?$/,"");
+      const u=new URL(root+"/client-diagnostic");
+      u.searchParams.set("source","LIVE_CLIENT");
+      u.searchParams.set("code",String(code||"LIVE_CLIENT_ERROR").slice(0,180));
+      fetch(u.href,{method:"GET",cache:"no-store",credentials:"omit"}).catch(()=>{});
+    }catch{}
   };
   const post=async(path,body)=>{
     const token=await auth();
@@ -317,7 +322,7 @@ export function mountNahwerkLiveConcierge({
           ?"Kein Mikrofon gefunden."
           : code==="MICROPHONE_BUSY_OR_UNAVAILABLE"
             ?"Das Mikrofon ist gerade nicht verfügbar."
-            :"Live-Gespräch konnte nicht gestartet werden.";
+            :`Live-Fehler: ${code.slice(0,80)}`;
       setStatus(message);
       await stop({notifyBackend:Boolean(sessionId),keepVisible:true});
     }
