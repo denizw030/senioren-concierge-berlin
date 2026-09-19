@@ -302,7 +302,7 @@
       span.textContent="Für frühere Telefonate liegt kein vollständiges Gesprächstranskript vor. Neue Telefonate werden hier automatisch als Chat dokumentiert.";
     }else if(channel==="EMAIL"){
       strong.textContent="E-Mail-Protokoll";
-      span.textContent="Hier erscheint dein E-Mail-Verlauf mit dem Concierge. Dieser Bereich ist nur lesbar; E-Mail-Antworten werden über den E-Mail-Concierge versendet.";
+      span.textContent="Hier erscheint dein E-Mail-Austausch mit deinem persönlichen Concierge. Schreiben und Antworten erfolgen per E-Mail an core@nahwerkconcierge.com.";
     }else{
       strong.textContent="WhatsApp-Protokoll";
       span.textContent="Hier erscheint dein WhatsApp-Verlauf. Schreiben ist ausschließlich in WhatsApp möglich.";

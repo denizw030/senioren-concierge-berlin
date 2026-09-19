@@ -118,7 +118,7 @@ internal fun CustomerSharedHistorySurface(
                 when (channel.uppercase()) {
                     "WHATSAPP" -> "Nur lesen · Antworten direkt in WhatsApp"
                     "PHONE" -> "Nur lesen · Gespräche mit deinem Concierge"
-                    "EMAIL" -> "Nur lesen · E-Mail-Antworten über den E-Mail-Concierge"
+                    "EMAIL" -> "Nur lesen · E-Mail-Austausch mit deinem persönlichen Concierge"
                     else -> "Web · App"
                 },
                 style = MaterialTheme.typography.titleMedium

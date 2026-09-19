@@ -517,14 +517,14 @@ private struct CustomerChatView: View {
         case .chat: return "Dieser Chat ist derselbe Verlauf wie im Web."
         case .whatsapp: return "Hier erscheint dein WhatsApp-Verlauf. Schreiben ist nur in WhatsApp möglich."
         case .phone: return "Neue Concierge-Telefonate werden hier als Gespräch dokumentiert."
-        case .email: return "Hier erscheint dein E-Mail-Verlauf mit dem Concierge. Der Bereich ist nur lesbar."
+        case .email: return "Hier erscheint dein E-Mail-Austausch mit deinem persönlichen Concierge. Schreiben und Antworten erfolgen per E-Mail an core@nahwerkconcierge.com."
         }
     }
 
     private var readOnlyHint: String {
         switch selectedChannel {
         case .whatsapp: return "Nur Protokoll · Antworten bitte direkt in WhatsApp."
-        case .email: return "Nur Protokoll · E-Mail-Antworten werden über den E-Mail-Concierge versendet."
+        case .email: return "Nur Protokoll · Antworten erfolgen per E-Mail an core@nahwerkconcierge.com."
         default: return "Nur Protokoll · Hier kann nicht geschrieben werden."
         }
     }

@@ -337,7 +337,7 @@ private fun CustomerConciergeSurface(
             title = "Nur Protokoll",
             body = when (chatChannel) {
                 "WHATSAPP" -> "Hier wird dein WhatsApp-Verlauf angezeigt. Antworten sind nur direkt in WhatsApp möglich."
-                "EMAIL" -> "Hier wird dein E-Mail-Verlauf mit dem Concierge angezeigt. E-Mail-Antworten werden über den E-Mail-Concierge versendet."
+                "EMAIL" -> "Hier wird dein E-Mail-Austausch mit deinem persönlichen Concierge angezeigt. Schreiben und Antworten erfolgen per E-Mail an core@nahwerkconcierge.com."
                 else -> "Hier wird das Gespräch mit deinem Concierge dokumentiert. In diesem Protokoll kann nicht geschrieben werden."
             }
         )
