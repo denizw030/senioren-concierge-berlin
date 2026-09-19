@@ -51,6 +51,7 @@ test("Live visual surface has reactive blue portrait orb",()=>{
 test("web chat exposes only current authenticated thread bridge to Live",()=>{
   const chat=read("assets/web-customer-concierge.js");
   assert.doesNotThrow(()=>new Function(chat),"customer chat client must remain valid JavaScript");
+  assert.ok(chat.includes('const timeoutMs=path==="/health"?8000'),"gateway health timeout block must stay parse-safe");
   assert.match(chat,/NAHWERKWebCustomerConciergeLiveBridge/);
   assert.match(chat,/sessionToken/);
   assert.match(chat,/threadId/);
