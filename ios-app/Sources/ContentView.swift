@@ -367,11 +367,30 @@ private struct CustomerHomeView: View {
     }
 }
 
+private enum CustomerChatChannel: String, CaseIterable, Identifiable {
+    case chat
+    case whatsapp
+    case phone
+
+    var id: String { rawValue }
+    var title: String {
+        switch self {
+        case .chat: return "Chat"
+        case .whatsapp: return "WhatsApp"
+        case .phone: return "Anrufprotokoll"
+        }
+    }
+}
+
 private struct CustomerChatView: View {
     @EnvironmentObject private var session: SessionStore
     @State private var draft = ""
-    @State private var messages: [(Bool, String)] = []
+    @State private var messages: [ChatHistoryMessage] = []
+    @State private var mainThreadID: String?
+    @State private var selectedChannel: CustomerChatChannel = .chat
+    @State private var phoneAvailable = false
     @State private var busy = false
+    @State private var loading = true
     @State private var error: String?
     @State private var showLive = false
 
@@ -380,33 +399,70 @@ private struct CustomerChatView: View {
             ZStack {
                 NahwerkColors.background.ignoresSafeArea()
                 VStack(spacing: 0) {
-                    if messages.isEmpty {
+                    channelPicker
+                        .padding(.horizontal, 16)
+                        .padding(.top, 12)
+
+                    if loading && messages.isEmpty {
                         Spacer()
-                        Text("Wie kann ich dir helfen?")
-                            .font(.title.weight(.semibold))
-                            .foregroundStyle(NahwerkColors.primary)
+                        ProgressView()
+                        Spacer()
+                    } else if messages.isEmpty {
+                        Spacer()
+                        VStack(spacing: 10) {
+                            Text(emptyTitle)
+                                .font(.title3.weight(.semibold))
+                                .foregroundStyle(NahwerkColors.primary)
+                            Text(emptySubtitle)
+                                .font(.subheadline)
+                                .multilineTextAlignment(.center)
+                                .foregroundStyle(NahwerkColors.secondary)
+                                .padding(.horizontal, 28)
+                        }
                         Spacer()
                     } else {
                         ScrollView {
                             LazyVStack(spacing: 12) {
-                                ForEach(Array(messages.enumerated()), id: \.offset) { _, item in
-                                    MessageBubble(text: item.1, isUser: item.0)
+                                ForEach(messages) { item in
+                                    MessageBubble(text: item.text, isUser: item.role == "user")
                                 }
-                            }.padding(20)
+                            }
+                            .padding(20)
                         }
                     }
-                    if let error { Text(error).font(.footnote).foregroundStyle(NahwerkColors.error) }
-                    ChatComposer(
-                        text: $draft,
-                        busy: busy,
-                        send: send,
-                        live: { showLive = true }
-                    )
-                    .padding(20)
+
+                    if let error {
+                        Text(error)
+                            .font(.footnote)
+                            .foregroundStyle(NahwerkColors.error)
+                            .padding(.horizontal, 20)
+                    }
+
+                    if selectedChannel == .chat {
+                        ChatComposer(
+                            text: $draft,
+                            busy: busy,
+                            send: send,
+                            live: { showLive = true }
+                        )
+                        .padding(20)
+                    } else {
+                        Text(readOnlyHint)
+                            .font(.footnote)
+                            .foregroundStyle(NahwerkColors.secondary)
+                            .frame(maxWidth: .infinity)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 16)
+                            .background(NahwerkColors.background)
+                    }
                 }
             }
             .navigationTitle("Concierge")
             .navigationBarTitleDisplayMode(.inline)
+            .task { await refreshChannelsAndHistory() }
+            .onChange(of: selectedChannel) { _, _ in
+                Task { await loadSelectedChannel() }
+            }
             .fullScreenCover(isPresented: $showLive) {
                 if let token = session.sessionToken, !token.isEmpty {
                     LiveConciergeWebView(
@@ -419,16 +475,143 @@ private struct CustomerChatView: View {
         }
     }
 
+    private var channelPicker: some View {
+        HStack(spacing: 8) {
+            channelButton(.chat)
+            channelButton(.whatsapp)
+            if phoneAvailable { channelButton(.phone) }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func channelButton(_ channel: CustomerChatChannel) -> some View {
+        Button {
+            selectedChannel = channel
+        } label: {
+            Text(channel.title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(selectedChannel == channel ? Color.black : NahwerkColors.primary)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 9)
+                .background(selectedChannel == channel ? NahwerkColors.gold : NahwerkColors.elevated)
+                .clipShape(Capsule())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var emptyTitle: String {
+        switch selectedChannel {
+        case .chat: return "Wie kann ich dir helfen?"
+        case .whatsapp: return "WhatsApp-Protokoll"
+        case .phone: return "Anrufprotokoll"
+        }
+    }
+
+    private var emptySubtitle: String {
+        switch selectedChannel {
+        case .chat: return "Dieser Chat ist derselbe Verlauf wie im Web."
+        case .whatsapp: return "Hier erscheint dein WhatsApp-Verlauf. Schreiben ist nur in WhatsApp möglich."
+        case .phone: return "Neue Concierge-Telefonate werden hier als Gespräch dokumentiert."
+        }
+    }
+
+    private var readOnlyHint: String {
+        selectedChannel == .whatsapp
+            ? "Nur Protokoll · Antworten bitte direkt in WhatsApp."
+            : "Nur Protokoll · Hier kann nicht geschrieben werden."
+    }
+
+    private func refreshChannelsAndHistory() async {
+        loading = true
+        error = nil
+        do {
+            let threads = try await NahwerkAPI.shared.loadHistoryThreads(store: session)
+            mainThreadID = threads.first(where: { thread in
+                thread.channels.contains("WEB") || thread.channels.contains("APP")
+            })?.id
+
+            let phone = try await NahwerkAPI.shared.loadChannelHistory(channel: "PHONE", store: session, summaryOnly: true)
+            phoneAvailable = phone.hasCalls
+            if selectedChannel == .phone && !phoneAvailable { selectedChannel = .chat }
+            await loadSelectedChannel()
+        } catch {
+            await MainActor.run {
+                self.error = error.localizedDescription
+                self.loading = false
+            }
+        }
+    }
+
+    private func loadSelectedChannel() async {
+        loading = true
+        error = nil
+        do {
+            let loaded: [ChatHistoryMessage]
+            switch selectedChannel {
+            case .chat:
+                if mainThreadID == nil {
+                    let threads = try await NahwerkAPI.shared.loadHistoryThreads(store: session)
+                    mainThreadID = threads.first(where: { thread in
+                        thread.channels.contains("WEB") || thread.channels.contains("APP")
+                    })?.id
+                }
+                if let threadID = mainThreadID {
+                    loaded = try await NahwerkAPI.shared.loadHistoryMessages(threadId: threadID, store: session)
+                        .filter { $0.channel == "WEB" || $0.channel == "APP" }
+                } else {
+                    loaded = []
+                }
+            case .whatsapp:
+                loaded = try await NahwerkAPI.shared.loadChannelHistory(channel: "WHATSAPP", store: session).messages
+            case .phone:
+                loaded = try await NahwerkAPI.shared.loadChannelHistory(channel: "PHONE", store: session).messages
+            }
+            await MainActor.run {
+                messages = loaded
+                loading = false
+            }
+        } catch {
+            await MainActor.run {
+                self.error = error.localizedDescription
+                self.loading = false
+            }
+        }
+    }
+
     private func send() {
+        guard selectedChannel == .chat else { return }
         let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty, !busy else { return }
-        draft = ""; messages.append((true, text)); busy = true; error = nil
+        draft = ""
+        messages.append(ChatHistoryMessage(
+            id: "local-user-" + UUID().uuidString.lowercased(),
+            role: "user",
+            text: text,
+            channel: "APP",
+            at: ISO8601DateFormatter().string(from: Date())
+        ))
+        busy = true
+        error = nil
         Task {
             do {
                 let reply = try await NahwerkAPI.shared.chat(message: text, store: session)
-                await MainActor.run { messages.append((false, reply.text)); busy = false }
+                await MainActor.run {
+                    messages.append(ChatHistoryMessage(
+                        id: "local-assistant-" + UUID().uuidString.lowercased(),
+                        role: "assistant",
+                        text: reply.text,
+                        channel: "APP",
+                        at: ISO8601DateFormatter().string(from: Date())
+                    ))
+                    busy = false
+                }
+                try? await Task.sleep(nanoseconds: 350_000_000)
+                await loadSelectedChannel()
             } catch {
-                await MainActor.run { self.error = error.localizedDescription; busy = false }
+                await MainActor.run {
+                    self.error = error.localizedDescription
+                    busy = false
+                }
             }
         }
     }
