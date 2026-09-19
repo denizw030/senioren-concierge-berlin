@@ -90,9 +90,18 @@ test("channel chats are grouped after normal chats and delete-all uses the share
   const scope=read("assets/web-customer-concierge-thread-scope.js");
   const chat=read("assets/web-customer-concierge.js");
   assert.match(scope,/payload\.threads=\[\.\.\.projected,\.\.\.extras,\.\.\.channelThreads\]/);
-  assert.match(scope,/channels\.has\("WHATSAPP"\)/);
+  assert.doesNotMatch(scope,/channels\.has\("WHATSAPP"\)/);
   assert.match(scope,/chatChannelFirst/);
   assert.match(chat,/\/web\/chats\/reset/);
   assert.match(chat,/Alle Chats aus Web und App entfernen/);
   assert.match(read("assets/web-customer-concierge.css"),/content:"CHAT KANÄLE"/);
+});
+
+
+test("WhatsApp channel stays visible under Chat Kanäle even without a current WhatsApp turn",()=>{
+  const scope=read("assets/web-customer-concierge-thread-scope.js");
+  const css=read("assets/web-customer-concierge.css");
+  assert.match(scope,/channelThreads\.push\(\{[\s\S]*title:"WhatsApp"/);
+  assert.doesNotMatch(scope,/if\(channels\.has\("WHATSAPP"\)\)/);
+  assert.match(css,/content:"CHAT KANÄLE"/);
 });
