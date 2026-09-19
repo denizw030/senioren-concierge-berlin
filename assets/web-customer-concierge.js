@@ -36,12 +36,9 @@
     catch { return ""; }
   }
   async function refreshSessionForWrite(){
-    if(window.SCBAuth?.validateSession){
-      const valid=await window.SCBAuth.validateSession(true).catch(()=>false);
-      if(!valid)throw new Error("SESSION_INVALID");
-    }
     const token=sessionToken();
     if(!token)throw new Error("SESSION_REQUIRED");
+    void window.SCBAuth?.validateSession?.().catch(()=>false);
     return token;
   }
 
