@@ -47,22 +47,35 @@
 </style>
 
 <style id="concierge-settings-final-v6">
-html,html body.concierge-portal-settings{
-  background:#f7f3e9!important;
-  background-image:none!important;
+html,
+html body.concierge-portal-settings{
+  background:#f7f3ea!important;
   color:#171714!important;
   color-scheme:light!important;
 }
-body.concierge-portal-settings main,
-body.concierge-portal-settings .concierge-settings-section,
-body.concierge-portal-settings .concierge-settings-section>.wrap{
-  background:#f7f3e9!important;
-  background-image:none!important;
+html body.concierge-portal-settings:not(.senior-product):not([data-product="senioren"]) main,
+html body.concierge-portal-settings:not(.senior-product):not([data-product="senioren"]) main>.section.concierge-settings-section,
+html[data-nw-portal-theme="light"] body.concierge-portal-settings main,
+html[data-nw-portal-theme="light"] body.concierge-portal-settings main>.section.concierge-settings-section{
+  background:
+    radial-gradient(900px 520px at 92% 2%,rgba(196,157,79,.12),transparent 68%),
+    radial-gradient(720px 460px at 8% 58%,rgba(255,255,255,.56),transparent 72%),
+    linear-gradient(180deg,#fbf8f1 0%,#f7f3ea 54%,#f2ebdf 100%)!important;
   color:#171714!important;
 }
-body.concierge-portal-settings .concierge-settings-section{
+html body.concierge-portal-settings .concierge-settings-section{
   min-height:calc(100vh - 110px);
-  padding:18px 0 48px!important;
+  padding:22px 0 48px!important;
+}
+html body.concierge-portal-settings .concierge-settings-section>.wrap{
+  background:#fffdf8!important;
+  background-image:none!important;
+  border:1px solid rgba(112,87,39,.12)!important;
+  border-radius:24px!important;
+  box-shadow:0 22px 58px rgba(82,63,30,.10)!important;
+  padding:22px!important;
+  overflow:hidden!important;
+  color:#171714!important;
 }
 body.concierge-portal-settings .concierge-settings-grid{
   display:grid!important;
@@ -166,8 +179,13 @@ body.concierge-portal-settings [data-concierge-carousel][data-switching="1"]{
 }
 @media(max-width:760px){
   body.concierge-portal-settings>.top{display:none!important}
-  body.concierge-portal-settings .concierge-settings-section{
+  html body.concierge-portal-settings .concierge-settings-section{
     padding:calc(10px + env(safe-area-inset-top)) 0 28px!important;
+  }
+  html body.concierge-portal-settings .concierge-settings-section>.wrap{
+    width:min(100% - 24px,var(--nw-content))!important;
+    padding:12px!important;
+    border-radius:18px!important;
   }
   body.concierge-portal-settings .concierge-settings-grid{
     display:flex!important;
