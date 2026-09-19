@@ -406,8 +406,12 @@
   }
 
   function setComposerReady(ready) {
-    const input=document.getElementById("webConciergeInput"),send=document.getElementById("webConciergeSend");
+    const input=document.getElementById("webConciergeInput"),send=document.getElementById("webConciergeSend"),form=document.querySelector(".web-concierge-form");
     const usable=ready&&!channelViewReadOnly;
+    if(form instanceof HTMLElement){
+      form.hidden=channelViewReadOnly;
+      form.setAttribute("aria-hidden",channelViewReadOnly?"true":"false");
+    }
     if(input){
       input.disabled=!usable;
       input.setAttribute("aria-disabled",usable?"false":"true");
@@ -535,9 +539,10 @@
     if(!validUuid(threadId)||channelForThreadId(threadId)!=="CHAT")return false;
     try{
       const data=await historyRequest(threadId,{limit:HISTORY_PAGE_SIZE});if(activeThreadId!==threadId)return false;
-      if(reset){historyMessages=mergeHistory([],data.messages);historyHasMore=data.has_more===true;historyNextBefore=data.next_before||null;historyLoadedOlder=false;}
+      const normalMessages=(Array.isArray(data.messages)?data.messages:[]).filter((message)=>NORMAL_CHAT_CHANNELS.has(String(message?.channel||"WEB").toUpperCase()));
+      if(reset){historyMessages=mergeHistory([],normalMessages);historyHasMore=data.has_more===true;historyNextBefore=data.next_before||null;historyLoadedOlder=false;}
       else{
-        historyMessages=mergeHistory(historyMessages,data.messages);
+        historyMessages=mergeHistory(historyMessages,normalMessages);
         if(!historyLoadedOlder){historyHasMore=data.has_more===true;historyNextBefore=data.next_before||null;}
       }
       renderHistory(historyMessages,{force,scrollToBottom:reset||force});return true;
@@ -564,7 +569,8 @@
       const threadId=activeThreadId;
       const data=await historyRequest(threadId,{before:historyNextBefore,limit:HISTORY_PAGE_SIZE});
       if(activeThreadId!==threadId)return false;
-      historyMessages=mergeHistory(data.messages,historyMessages);
+      const normalMessages=(Array.isArray(data.messages)?data.messages:[]).filter((message)=>NORMAL_CHAT_CHANNELS.has(String(message?.channel||"WEB").toUpperCase()));
+      historyMessages=mergeHistory(normalMessages,historyMessages);
       historyHasMore=data.has_more===true;
       historyNextBefore=data.next_before||null;
       historyLoadedOlder=true;
