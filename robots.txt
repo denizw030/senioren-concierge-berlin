@@ -11,7 +11,7 @@ Disallow: /passwort-zuruecksetzen
 Disallow: /zugang-uebertragen
 Disallow: /concierge-anpassen
 Disallow: /martin-anpassen
-Disallow: /voice-audition.html
+Disallow: /voice-audition
 Disallow: /vertrag-widerrufen
 Disallow: /erster-schritt
 
