@@ -66,6 +66,7 @@ private struct ChatComposer: View {
     @Binding var text: String
     let busy: Bool
     let send: () -> Void
+    var live: (() -> Void)? = nil
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 10) {
@@ -85,6 +86,19 @@ private struct ChatComposer: View {
             }
             .disabled(busy || text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             .opacity((busy || text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) ? 0.45 : 1)
+
+            if let live {
+                Button(action: live) {
+                    Image(systemName: "waveform.circle.fill")
+                        .font(.system(size: 24, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .frame(width: 44, height: 44)
+                        .background(Color(red: 0.13, green: 0.42, blue: 0.95))
+                        .clipShape(Circle())
+                }
+                .disabled(busy)
+                .accessibilityLabel("Live mit deinem Concierge sprechen")
+            }
         }
     }
 }
@@ -359,6 +373,7 @@ private struct CustomerChatView: View {
     @State private var messages: [(Bool, String)] = []
     @State private var busy = false
     @State private var error: String?
+    @State private var showLive = false
 
     var body: some View {
         NavigationStack {
@@ -381,11 +396,26 @@ private struct CustomerChatView: View {
                         }
                     }
                     if let error { Text(error).font(.footnote).foregroundStyle(NahwerkColors.error) }
-                    ChatComposer(text: $draft, busy: busy, send: send).padding(20)
+                    ChatComposer(
+                        text: $draft,
+                        busy: busy,
+                        send: send,
+                        live: { showLive = true }
+                    )
+                    .padding(20)
                 }
             }
             .navigationTitle("Concierge")
             .navigationBarTitleDisplayMode(.inline)
+            .fullScreenCover(isPresented: $showLive) {
+                if let token = session.sessionToken, !token.isEmpty {
+                    LiveConciergeWebView(
+                        sessionToken: token,
+                        onClose: { showLive = false }
+                    )
+                    .ignoresSafeArea()
+                }
+            }
         }
     }
 
