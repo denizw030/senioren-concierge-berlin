@@ -73,7 +73,7 @@ test("web and WhatsApp stay separate with normal chat first",()=>{
   assert.match(scope,/title:"WhatsApp"/);
   assert.match(scope,/channels:\["WEB","APP"\]/);
   assert.match(scope,/channels:\["WHATSAPP"\]/);
-  assert.match(scope,/payload\.threads=\[\.\.\.projected,\.\.\.extras\]/);
+  assert.match(scope,/payload\.threads=\[\.\.\.projected,\.\.\.extras,\.\.\.channelThreads\]/);
   assert.match(scope,/readOnly:next==="WHATSAPP"\|\|next==="TELEGRAM"/);
 });
 
