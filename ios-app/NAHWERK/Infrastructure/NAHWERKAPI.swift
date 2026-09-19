@@ -186,20 +186,48 @@ struct HistoryThread: Codable, Identifiable, Equatable {
     let title: String?
     let preview: String?
     let updatedAt: String?
+    let channels: [String]?
 
     var id: String { threadID }
+
+    var normalizedChannels: Set<String> {
+        Set((channels ?? []).map { $0.uppercased() })
+    }
+
+    var belongsToNormalChat: Bool {
+        normalizedChannels.isEmpty || !normalizedChannels.isDisjoint(with: ["WEB", "APP"])
+    }
+
+    var containsWhatsApp: Bool {
+        normalizedChannels.contains("WHATSAPP")
+    }
 
     enum CodingKeys: String, CodingKey {
         case threadID = "thread_id"
         case title
         case preview
         case updatedAt = "updated_at"
+        case channels
     }
 }
 
 struct HistoryThreadsResponse: Codable {
     let ok: Bool?
     let threads: [HistoryThread]?
+}
+
+struct ChatResetResponse: Codable {
+    let ok: Bool?
+    let environment: String?
+    let hiddenBefore: String?
+    let preservesExternalChannels: Bool?
+
+    enum CodingKeys: String, CodingKey {
+        case ok
+        case environment
+        case hiddenBefore = "hidden_before"
+        case preservesExternalChannels = "preserves_external_channels"
+    }
 }
 
 struct HistoryMessage: Codable, Identifiable, Equatable {
@@ -536,6 +564,20 @@ actor NAHWERKAPI {
             query: [URLQueryItem(name: "thread_id", value: threadID)]
         )
         return response.messages ?? []
+    }
+
+    func resetChatHistory(token: String) async throws {
+        let response: ChatResetResponse = try await perform(
+            path: "nahwerk-app-gateway/mobile/chats/reset",
+            method: "POST",
+            token: token,
+            json: ["scope": "ALL"]
+        )
+        guard response.ok == true,
+              response.environment == "PROD",
+              response.preservesExternalChannels == true else {
+            throw NAHWERKAPIError.invalidResponse
+        }
     }
 
     func perform<T: Decodable>(
