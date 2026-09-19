@@ -31,6 +31,20 @@
   let lastPersonaSyncAt = 0;
   let channelView = "CHAT";
   let channelViewReadOnly = false;
+  const VIRTUAL_WHATSAPP_THREAD_ID="00000000-0000-4000-8000-0000000000a1";
+  const VIRTUAL_PHONE_THREAD_ID="00000000-0000-4000-8000-0000000000a3";
+  const NORMAL_CHAT_CHANNELS=new Set(["WEB","APP"]);
+
+  function channelForThreadId(threadId){
+    const id=String(threadId||"");
+    if(id===VIRTUAL_WHATSAPP_THREAD_ID)return "WHATSAPP";
+    if(id===VIRTUAL_PHONE_THREAD_ID)return "PHONE";
+    return "CHAT";
+  }
+  function isNormalThread(thread){
+    const channels=Array.isArray(thread?.channels)?thread.channels.map((v)=>String(v||"").toUpperCase()):[];
+    return channels.some((channel)=>NORMAL_CHAT_CHANNELS.has(channel));
+  }
 
   function sessionToken() {
     try { return String(JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null")?.session_token || ""); }
@@ -354,6 +368,15 @@
     const response=await fetchWithTimeout(url.href,{headers:{Authorization:`Bearer ${token}`},cache:"no-store",credentials:"omit"});
     const payload=await response.json().catch(()=>({}));if(!response.ok||payload?.ok!==true||payload?.history_contract!==HISTORY_CONTRACT_VERSION)throw new Error("history_unavailable");return payload;
   }
+  async function channelHistoryRequest(channel){
+    const endpoint=configuredEndpoint(),token=sessionToken();if(!endpoint||!token)throw new Error("history_unavailable");
+    const url=new URL(endpoint+"/web/channel-history");
+    url.searchParams.set("channel",String(channel||"").toUpperCase());
+    const response=await fetchWithTimeout(url.href,{headers:{Authorization:`Bearer ${token}`},cache:"no-store",credentials:"omit"},10000);
+    const payload=await response.json().catch(()=>({}));
+    if(!response.ok||payload?.ok!==true||payload?.history_contract!==HISTORY_CONTRACT_VERSION)throw new Error("history_unavailable");
+    return payload;
+  }
 
   async function refreshPersona(force=false) {
     const now=Date.now();
@@ -373,7 +396,7 @@
       input.disabled=!usable;
       input.setAttribute("aria-disabled",usable?"false":"true");
       input.placeholder=channelViewReadOnly
-        ? (channelView==="WHATSAPP"?"WhatsApp-Verlauf – antworte in WhatsApp":channelView==="TELEGRAM"?"Telegram-Verlauf – antworte in Telegram":"Nachricht schreiben …")
+        ? (channelView==="WHATSAPP"?"WhatsApp-Verlauf – antworte in WhatsApp":channelView==="PHONE"?"Telefonprotokoll – nur lesen":"Nachricht schreiben …")
         : "Nachricht schreiben …";
     }
     if(send)send.disabled=!usable||sending;
@@ -382,21 +405,31 @@
   window.addEventListener("nahwerk:chat-channel-view",(event)=>{
     const next=String(event?.detail?.channel||"CHAT").toUpperCase();
     channelView=next;
-    channelViewReadOnly=event?.detail?.readOnly===true||next==="WHATSAPP"||next==="TELEGRAM";
+    channelViewReadOnly=event?.detail?.readOnly===true||next==="WHATSAPP"||next==="PHONE";
     setComposerReady(gatewayReady);
   });
   function resizeInput(){const input=document.getElementById("webConciergeInput");if(!(input instanceof HTMLTextAreaElement))return;input.style.height="auto";input.style.height=`${Math.min(input.scrollHeight,132)}px`;}
   function sidebarDate(value){const d=new Date(value||Date.now()),now=new Date();if(Number.isNaN(d.getTime()))return "";if(dateKey(d)===dateKey(now))return timeLabel(d);return new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"2-digit"}).format(d);}
   function renderThreads() {
     const box=document.getElementById("webConciergeThreads");if(!box)return;clearNode(box);
-    const list=[...threadCache];if(activeThreadId&&!list.some((t)=>t.thread_id===activeThreadId))list.unshift({thread_id:activeThreadId,title:"Neuer Chat",preview:"",updated_at:new Date().toISOString(),draft:true});
+    const list=[...threadCache];
     if(!list.length){const e=document.createElement("div");e.className="web-concierge-threads-empty";e.textContent="Noch keine gespeicherten Chats.";box.appendChild(e);return;}
-    for(const thread of list){const b=document.createElement("button");b.type="button";b.className=`web-concierge-thread${thread.thread_id===activeThreadId?" is-active":""}`;b.dataset.threadId=thread.thread_id;
+    for(const thread of list){
+      const b=document.createElement("button");
+      b.type="button";
+      b.className=`web-concierge-thread${thread.thread_id===activeThreadId?" is-active":""}`;
+      b.dataset.threadId=thread.thread_id;
+      b.dataset.chatChannel=String(thread.channel_view||channelForThreadId(thread.thread_id));
+      if(b.dataset.chatChannel!=="CHAT")b.dataset.chatScope="CHANNEL";
       const title=document.createElement("span");title.className="web-concierge-thread-title";title.textContent=thread.title||"Chat";
       const preview=document.createElement("span");preview.className="web-concierge-thread-preview";preview.textContent=thread.preview||"";
-      const date=document.createElement("span");date.className="web-concierge-thread-date";date.textContent=thread.draft?"":sidebarDate(thread.updated_at);
-      b.append(title,preview,date);b.addEventListener("click",()=>{setMobileDrawer(false);selectThread(thread.thread_id);});box.appendChild(b);
+      const date=document.createElement("span");date.className="web-concierge-thread-date";date.textContent=thread.updated_at?sidebarDate(thread.updated_at):"";
+      b.append(title,preview,date);
+      b.addEventListener("click",()=>{setMobileDrawer(false);void selectThread(thread.thread_id);});
+      box.appendChild(b);
     }
+    const firstChannel=[...box.querySelectorAll(".web-concierge-thread")].find((button)=>button.dataset.chatScope==="CHANNEL");
+    if(firstChannel)firstChannel.dataset.chatChannelFirst="true";
   }
   function historySignature(messages) {
     return `${historyHasMore?"more":"end"}\n`+(Array.isArray(messages)?messages:[]).map((m)=>`${m?.id||""}|${m?.at||""}|${m?.role||""}|${m?.channel||""}|${m?.kind||"TEXT"}|${m?.audio_message_id||""}|${m?.text||""}`).join("\n");
@@ -436,10 +469,39 @@
     return true;
   }
   async function loadThreads({selectFirst=false}={}) {
-    try{const data=await historyRequest();threadCache=Array.isArray(data.threads)?data.threads:[];if(selectFirst&&!activeThreadId&&threadCache[0])activeThreadId=threadCache[0].thread_id;renderThreads();return true;}catch{renderThreads();return false;}
+    try{
+      const data=await historyRequest();
+      const source=Array.isArray(data.threads)?data.threads:[];
+      const normal=source.find(isNormalThread)||source.find((thread)=>validUuid(thread?.thread_id))||null;
+      const next=[];
+      if(normal)next.push({...normal,title:"Chat",channels:["WEB","APP"],channel_view:"CHAT"});
+      next.push({
+        thread_id:VIRTUAL_WHATSAPP_THREAD_ID,title:"WhatsApp",preview:"",updated_at:null,
+        channels:["WHATSAPP"],channel_view:"WHATSAPP",virtual_channel_thread:true
+      });
+      try{
+        const phone=await channelHistoryRequest("PHONE");
+        if(phone?.has_calls===true){
+          next.push({
+            thread_id:VIRTUAL_PHONE_THREAD_ID,title:"Telefonprotokoll",preview:"",updated_at:null,
+            channels:["PHONE"],channel_view:"PHONE",virtual_channel_thread:true
+          });
+        }
+      }catch{}
+      threadCache=next;
+      if(selectFirst&&(!activeThreadId||!threadCache.some((thread)=>thread.thread_id===activeThreadId))){
+        activeThreadId=normal?.thread_id||VIRTUAL_WHATSAPP_THREAD_ID;
+      }
+      renderThreads();
+      return true;
+    }catch{
+      threadCache=[];
+      renderThreads();
+      return false;
+    }
   }
   async function refreshThread(threadId,{force=false,reset=false}={}) {
-    if(!validUuid(threadId))return false;
+    if(!validUuid(threadId)||channelForThreadId(threadId)!=="CHAT")return false;
     try{
       const data=await historyRequest(threadId,{limit:HISTORY_PAGE_SIZE});if(activeThreadId!==threadId)return false;
       if(reset){historyMessages=mergeHistory([],data.messages);historyHasMore=data.has_more===true;historyNextBefore=data.next_before||null;historyLoadedOlder=false;}
@@ -450,8 +512,21 @@
       renderHistory(historyMessages,{force,scrollToBottom:reset||force});return true;
     } catch { return false; }
   }
+  async function refreshChannelView(channel){
+    try{
+      const data=await channelHistoryRequest(channel);
+      historyMessages=mergeHistory([],data.messages);
+      historyHasMore=false;historyNextBefore=null;historyLoadedOlder=false;
+      renderHistory(historyMessages,{force:true,scrollToBottom:true});
+      return true;
+    }catch{
+      historyMessages=[];historyHasMore=false;historyNextBefore=null;historyLoadedOlder=false;
+      renderHistory([],{force:true,scrollToBottom:true});
+      return false;
+    }
+  }
   async function loadOlderMessages() {
-    if(loadingOlder||!activeThreadId||!historyHasMore||!historyNextBefore)return false;
+    if(loadingOlder||!activeThreadId||channelForThreadId(activeThreadId)!=="CHAT"||!historyHasMore||!historyNextBefore)return false;
     loadingOlder=true;renderHistory(historyMessages,{force:true,scrollToBottom:false,preserveScroll:true});
     try{
       const threadId=activeThreadId;
@@ -466,8 +541,15 @@
     finally { loadingOlder=false;renderHistory(historyMessages,{force:true,scrollToBottom:false,preserveScroll:true}); }
   }
   async function selectThread(threadId) {
-    if(sending)return;activeThreadId=threadId;resetHistoryState();renderThreads();emptyChat();
-    if(validUuid(threadId))await refreshThread(threadId,{force:true,reset:true});
+    if(sending)return;
+    activeThreadId=threadId;
+    const view=channelForThreadId(threadId);
+    channelView=view;
+    channelViewReadOnly=view!=="CHAT";
+    setComposerReady(gatewayReady);
+    resetHistoryState();renderThreads();emptyChat();
+    if(view==="CHAT"&&validUuid(threadId))await refreshThread(threadId,{force:true,reset:true});
+    else if(view==="WHATSAPP"||view==="PHONE")await refreshChannelView(view);
     document.getElementById("webConciergeInput")?.focus();
   }
   function newChat() { if(sending)return;activeThreadId=crypto.randomUUID();resetHistoryState();emptyChat();renderThreads();document.getElementById("webConciergeInput")?.focus(); }
@@ -509,10 +591,16 @@
     if(!gatewayReady||sending||document.hidden)return false;
     const selectedBefore=activeThreadId;
     const loaded=await loadThreads();if(!loaded)return false;
-    const serverHasSelected=selectedBefore&&threadCache.some((thread)=>thread.thread_id===selectedBefore);
     if(Date.now()-lastPersonaSyncAt>=PERSONA_SYNC_INTERVAL_MS){try{await refreshPersona();}catch{}}
-    if(serverHasSelected)return refreshThread(selectedBefore);
-    if(!selectedBefore&&threadCache[0]){activeThreadId=threadCache[0].thread_id;renderThreads();return refreshThread(activeThreadId,{force:true,reset:true});}
+    if(selectedBefore&&threadCache.some((thread)=>thread.thread_id===selectedBefore)){
+      const view=channelForThreadId(selectedBefore);
+      if(view==="CHAT")return refreshThread(selectedBefore);
+      return refreshChannelView(view);
+    }
+    if(threadCache[0]){
+      activeThreadId=threadCache[0].thread_id;
+      return selectThread(activeThreadId);
+    }
     return true;
   }
   function startLiveSync() {
