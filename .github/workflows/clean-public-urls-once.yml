@@ -12,7 +12,13 @@ on:
       - 'assets/auth-i18n.js'
       - 'robots.txt'
       - 'sitemap.xml'
+      - 'tests/seo-indexing.test.mjs'
+      - 'tests/i18n-link-flow.test.mjs'
       - '.github/workflows/clean-public-urls-once.yml'
+
+concurrency:
+  group: clean-public-urls-20260919
+  cancel-in-progress: true
 
 permissions:
   contents: write
