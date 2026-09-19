@@ -8,8 +8,8 @@ test("web chat mounts Live Concierge on the right without replacing voice memo",
   for(const page of ["web-concierge.html","web-concierge/index.html"]){
     const html=read(page);
     assert.match(html,/assets\/web-voice-memo\.js\?v=2/);
-    assert.match(html,/assets\/web-customer-concierge\.js\?v=22/);
-    assert.match(html,/assets\/web-live-concierge\.js\?v=2/);
+    assert.match(html,/assets\/web-customer-concierge\.js\?v=23/);
+    assert.match(html,/assets\/web-live-concierge\.js\?v=3/);
     assert.match(html,/assets\/nahwerk-live-concierge\.css\?v=2/);
   }
   const boot=read("assets/web-live-concierge.js");
@@ -75,4 +75,23 @@ test("web and WhatsApp stay separate with normal chat first",()=>{
   assert.match(scope,/channels:\["WHATSAPP"\]/);
   assert.match(scope,/payload\.threads=\[\.\.\.projected,\.\.\.extras\]/);
   assert.match(scope,/readOnly:next==="WHATSAPP"\|\|next==="TELEGRAM"/);
+});
+
+
+test("Live preloads the active concierge portrait and reports safe client failures",()=>{
+  const client=read("assets/nahwerk-live-concierge.js");
+  assert.match(client,/currentPersonaFromPage/);
+  assert.match(client,/setPersona\(currentPersonaFromPage\(\)\)/);
+  assert.match(client,/MIC_PERMISSION_DENIED/);
+  assert.match(client,/\/client-error/);
+});
+
+test("channel chats are grouped after normal chats and delete-all uses the shared reset endpoint",()=>{
+  const scope=read("assets/web-customer-concierge-thread-scope.js");
+  const chat=read("assets/web-customer-concierge.js");
+  assert.match(scope,/payload\.threads=\[\.\.\.projected,\.\.\.extras,\.\.\.channelThreads\]/);
+  assert.match(scope,/channels\.has\("WHATSAPP"\)/);
+  assert.match(scope,/chatChannelFirst/);
+  assert.match(chat,/\/web\/chats\/reset/);
+  assert.match(chat,/Alle Chats aus Web und App entfernen/);
 });
