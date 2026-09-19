@@ -22,6 +22,11 @@ function waitForIce(pc){
     onChange();
   });
 }
+function normalizedRemoteSdp(value){
+  const raw=String(value??"");
+  if(!raw)return "";
+  return raw.replace(/\r?\n/g,"\r\n").replace(/[\r\n]+$/,"")+"\r\n";
+}
 function rms(analyser){
   if(!analyser)return 0;
   const data=new Uint8Array(analyser.fftSize);
@@ -306,7 +311,19 @@ export function mountNahwerkLiveConcierge({
       const live=await post("/session",{channel:ch,sdp:localSdp,initial_sdp:initialSdp,thread_id:threadId});
       sessionId=live.session_id;
       setPersona(live.persona);
-      await pc.setRemoteDescription({type:"answer",sdp:live.sdp});
+      const remoteSdp=String(live?.sdp||"");
+      if(!/^v=0(?:\r?\n)/.test(remoteSdp)||!/(?:^|\r?\n)m=audio\s/.test(remoteSdp))throw new Error("REMOTE_SDP_INVALID");
+      try{
+        await pc.setRemoteDescription({type:"answer",sdp:remoteSdp});
+      }catch(remoteError){
+        const repaired=normalizedRemoteSdp(remoteSdp);
+        if(repaired===remoteSdp)throw remoteError;
+        try{
+          await pc.setRemoteDescription({type:"answer",sdp:repaired});
+        }catch{
+          throw remoteError;
+        }
+      }
       setStatus("Verbindet …");
       cancelAnimationFrame(raf);animate();
     }catch(e){
