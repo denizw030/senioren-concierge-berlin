@@ -290,6 +290,20 @@
     const strong=document.createElement("strong");strong.textContent="Wie kann ich dir helfen?";
     const span=document.createElement("span");span.textContent="Schreib mir einfach, was du brauchst.";empty.append(strong,span);log.appendChild(empty);
   }
+  function emptyChannelView(channel) {
+    const log=logNode();if(!log)return;clearNode(log);lastDateKey="";historyFingerprint="";
+    const empty=document.createElement("div");empty.className="web-concierge-empty";
+    const strong=document.createElement("strong");
+    const span=document.createElement("span");
+    if(channel==="PHONE"){
+      strong.textContent="Telefonprotokoll";
+      span.textContent="Für frühere Telefonate liegt kein vollständiges Gesprächstranskript vor. Neue Telefonate werden hier automatisch als Chat dokumentiert.";
+    }else{
+      strong.textContent="WhatsApp-Protokoll";
+      span.textContent="Hier erscheint dein WhatsApp-Verlauf. Schreiben ist ausschließlich in WhatsApp möglich.";
+    }
+    empty.append(strong,span);log.appendChild(empty);
+  }
   function showTyping() {
     const log=logNode(); if(!log)return;removeTyping();
     const row=document.createElement("div");row.className="web-concierge-message-row is-assistant";row.id="webConciergeTyping";
@@ -369,10 +383,11 @@
     const response=await fetchWithTimeout(url.href,{headers:{Authorization:`Bearer ${token}`},cache:"no-store",credentials:"omit"});
     const payload=await response.json().catch(()=>({}));if(!response.ok||payload?.ok!==true||payload?.history_contract!==HISTORY_CONTRACT_VERSION)throw new Error("history_unavailable");return payload;
   }
-  async function channelHistoryRequest(channel){
+  async function channelHistoryRequest(channel,{summary=false}={}){
     const endpoint=configuredEndpoint(),token=sessionToken();if(!endpoint||!token)throw new Error("history_unavailable");
     const url=new URL(endpoint+"/web/channel-history");
     url.searchParams.set("channel",String(channel||"").toUpperCase());
+    if(summary)url.searchParams.set("summary","1");
     const response=await fetchWithTimeout(url.href,{headers:{Authorization:`Bearer ${token}`},cache:"no-store",credentials:"omit"},10000);
     const payload=await response.json().catch(()=>({}));
     if(!response.ok||payload?.ok!==true||payload?.history_contract!==HISTORY_CONTRACT_VERSION)throw new Error("history_unavailable");
@@ -488,7 +503,7 @@
         channels:["WHATSAPP"],channel_view:"WHATSAPP",virtual_channel_thread:true
       }];
       try{
-        const phone=await channelHistoryRequest("PHONE");
+        const phone=await channelHistoryRequest("PHONE",{summary:true});
         if(phone?.has_calls===true){
           next.push({
             thread_id:VIRTUAL_PHONE_THREAD_ID,title:"Telefonprotokoll",preview:"",updated_at:null,
@@ -533,11 +548,12 @@
       const data=await channelHistoryRequest(channel);
       historyMessages=mergeHistory([],data.messages);
       historyHasMore=false;historyNextBefore=null;historyLoadedOlder=false;
-      renderHistory(historyMessages,{force:true,scrollToBottom:true});
+      if(historyMessages.length)renderHistory(historyMessages,{force:true,scrollToBottom:true});
+      else emptyChannelView(channel);
       return true;
     }catch{
       historyMessages=[];historyHasMore=false;historyNextBefore=null;historyLoadedOlder=false;
-      renderHistory([],{force:true,scrollToBottom:true});
+      emptyChannelView(channel);
       return false;
     }
   }
