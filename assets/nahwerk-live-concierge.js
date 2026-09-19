@@ -259,16 +259,31 @@ export function mountNahwerkLiveConcierge({
     }
     if(e.type==="session.input_transcript.delta"){
       const delta=String(e.delta??"");
+      const start=Number.isFinite(Number(e.start_ms))?Number(e.start_ms):null;
+      const end=Number.isFinite(Number(e.end_ms))?Number(e.end_ms):null;
+      if(inputEndMs!==null&&start!==null&&start-inputEndMs>1600){
+        lastUserTurnText=inputTranscript.trim()||lastUserTurnText;
+        inputTranscript="";
+        inputStartMs=null;
+      }
       inputTranscript=(inputTranscript+delta).slice(-12000);
-      if(inputStartMs===null&&Number.isFinite(Number(e.start_ms)))inputStartMs=Number(e.start_ms);
-      if(Number.isFinite(Number(e.end_ms)))inputEndMs=Number(e.end_ms);
+      if(inputStartMs===null&&start!==null)inputStartMs=start;
+      if(end!==null)inputEndMs=end;
+      void persistTranscript("USER",delta,start,end,`delta:user:${String(e.event_id||uid())}`);
       return;
     }
     if(e.type==="session.output_transcript.delta"){
       const delta=String(e.delta??"");
+      const start=Number.isFinite(Number(e.start_ms))?Number(e.start_ms):null;
+      const end=Number.isFinite(Number(e.end_ms))?Number(e.end_ms):null;
+      if(outputEndMs!==null&&start!==null&&start-outputEndMs>1600){
+        outputTranscript="";
+        outputStartMs=null;
+      }
       outputTranscript=(outputTranscript+delta).slice(-12000);
-      if(outputStartMs===null&&Number.isFinite(Number(e.start_ms)))outputStartMs=Number(e.start_ms);
-      if(Number.isFinite(Number(e.end_ms)))outputEndMs=Number(e.end_ms);
+      if(outputStartMs===null&&start!==null)outputStartMs=start;
+      if(end!==null)outputEndMs=end;
+      void persistTranscript("ASSISTANT",delta,start,end,`delta:assistant:${String(e.event_id||uid())}`);
       setStatus((name.textContent||"Concierge")+" spricht …");return;
     }
     if(e.type==="input_audio_buffer.speech_stopped"){
@@ -281,7 +296,16 @@ export function mountNahwerkLiveConcierge({
       outputFlushTimer=setTimeout(()=>{void flushAssistantTranscript();},250);
       return;
     }
-    if(e.type==="session.delegation.created"){await handleDelegation(e);return;}
+    if(e.type==="response.event"&&e.event){
+      const nested=e.event;
+      if(nested.type==="response.done"){
+        outputTranscript="";
+        outputStartMs=null;
+        outputEndMs=null;
+      }
+      return;
+    }
+        if(e.type==="session.delegation.created"){await handleDelegation(e);return;}
     if(e.type==="session.closed"){await flushUserTranscript();await flushAssistantTranscript();await stop({notifyBackend:false});return;}
     if(e.type==="error"){state("error",{error:e?.error?.code||"LIVE_SESSION_ERROR"});}
   };
