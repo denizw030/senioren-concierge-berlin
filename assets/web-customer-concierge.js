@@ -490,6 +490,11 @@ syncIosVisualViewport();
     document.getElementById("webConciergeInput")?.addEventListener("keydown",(event)=>{if(event.key==="Enter"&&!event.shiftKey){event.preventDefault();sendTurn();}});
   }
 
+  window.NAHWERKWebCustomerConciergeLiveBridge=Object.freeze({
+    sessionToken,
+    threadId:()=>{if(!activeThreadId)activeThreadId=crypto.randomUUID();return activeThreadId;},
+    isAllowed:()=>gatewayReady&&!channelViewReadOnly&&channelView==="CHAT"
+  });
   window.NAHWERKWebCustomerConciergeTestHooks=Object.freeze({configuredEndpoint,configuredHistoryEndpoint,sessionToken,normalizeGatewayReadiness,normalizeCoreV1Response,normalizePersona,applyPersona,renderCoreV1Response,gatewayRequest,historyRequest,refreshPersona,syncHistory,loadOlderMessages,mergeHistory,CORE_CONTRACT_VERSION,GATEWAY_CONTRACT_VERSION,HISTORY_CONTRACT_VERSION,HISTORY_PAGE_SIZE,SYNC_INTERVAL_MS,PERSONA_SYNC_INTERVAL_MS,GATEWAY_ENDPOINT,HISTORY_ENDPOINT});
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();
