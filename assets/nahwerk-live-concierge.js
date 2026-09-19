@@ -198,13 +198,13 @@ export function mountNahwerkLiveConcierge({
   const sendEvent=(event)=>{
     if(dc?.readyState==="open")dc.send(JSON.stringify(event));
   };
-  const persistTranscript=async(role,text,startMs,endMs)=>{
-    const value=String(text||"").trim();
-    if(!sessionId||!value)return;
+  const persistTranscript=async(role,text,startMs,endMs,eventKey="")=>{
+    const value=String(text??"");
+    if(!sessionId||!value.trim())return;
     transcriptSeq+=1;
     await post("/transcript",{
       session_id:sessionId,
-      event_key:`${String(role||"").toLowerCase()}:${transcriptSeq}:${uid()}`,
+      event_key:String(eventKey||`${String(role||"").toLowerCase()}:${transcriptSeq}:${uid()}`).slice(0,300),
       role,
       text:value,
       start_ms:Number.isFinite(Number(startMs))?Number(startMs):null,
@@ -216,17 +216,13 @@ export function mountNahwerkLiveConcierge({
     const text=inputTranscript.trim();
     if(!text)return "";
     lastUserTurnText=text;
-    const start=inputStartMs,end=inputEndMs;
     inputTranscript="";inputStartMs=null;inputEndMs=null;
-    await persistTranscript("USER",text,start,end);
     return text;
   };
   const flushAssistantTranscript=async()=>{
     const text=outputTranscript.trim();
     if(!text)return "";
-    const start=outputStartMs,end=outputEndMs;
     outputTranscript="";outputStartMs=null;outputEndMs=null;
-    await persistTranscript("ASSISTANT",text,start,end);
     return text;
   };
   const handleDelegation=async(event)=>{
@@ -253,15 +249,19 @@ export function mountNahwerkLiveConcierge({
       started=true;setStatus("Hört zu …");state("connected",{session_id:sessionId});return;
     }
     if(e.type==="session.input_transcript.delta"){
-      inputTranscript=(inputTranscript+String(e.delta||"")).slice(-12000);
+      const delta=String(e.delta??"");
+      inputTranscript=(inputTranscript+delta).slice(-12000);
       if(inputStartMs===null&&Number.isFinite(Number(e.start_ms)))inputStartMs=Number(e.start_ms);
       if(Number.isFinite(Number(e.end_ms)))inputEndMs=Number(e.end_ms);
+      void persistTranscript("USER",delta,e.start_ms,e.end_ms,`user:${String(e.event_id||uid())}`);
       return;
     }
     if(e.type==="session.output_transcript.delta"){
-      outputTranscript=(outputTranscript+String(e.delta||"")).slice(-12000);
+      const delta=String(e.delta??"");
+      outputTranscript=(outputTranscript+delta).slice(-12000);
       if(outputStartMs===null&&Number.isFinite(Number(e.start_ms)))outputStartMs=Number(e.start_ms);
       if(Number.isFinite(Number(e.end_ms)))outputEndMs=Number(e.end_ms);
+      void persistTranscript("ASSISTANT",delta,e.start_ms,e.end_ms,`assistant:${String(e.event_id||uid())}`);
       setStatus((name.textContent||"Concierge")+" spricht …");return;
     }
     if(e.type==="input_audio_buffer.speech_stopped"){
@@ -269,7 +269,6 @@ export function mountNahwerkLiveConcierge({
       inputFlushTimer=setTimeout(()=>{void flushUserTranscript();},650);
       return;
     }
-    if(e.type==="response.done"){await flushAssistantTranscript();return;}
     if(e.type==="session.delegation.created"){await handleDelegation(e);return;}
     if(e.type==="session.closed"){await flushUserTranscript();await flushAssistantTranscript();await stop({notifyBackend:false});return;}
     if(e.type==="error"){state("error",{error:e?.error?.code||"LIVE_SESSION_ERROR"});}
