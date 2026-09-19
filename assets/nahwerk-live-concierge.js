@@ -277,9 +277,9 @@ export function mountNahwerkLiveConcierge({
     setPersona(currentPersonaFromPage());
     setStatus("Mikrofon wird aktiviert …");state("connecting");
     try{
-      micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false});
+      micStream=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
       pc=new RTCPeerConnection();
-      micStream.getTracks().forEach(track=>pc.addTrack(track,micStream));
+      micStream.getAudioTracks().forEach(track=>pc.addTrack(track,micStream));
       micMeter=audioMeter(micStream);
 
       pc.ontrack=(ev)=>{
@@ -293,15 +293,17 @@ export function mountNahwerkLiveConcierge({
       dc.addEventListener("close",()=>{if(!ending)state("disconnected");});
 
       const offer=await pc.createOffer();
+      const initialSdp=offer?.sdp||"";
       await pc.setLocalDescription(offer);
       await waitForIce(pc);
-      const localSdp=pc.localDescription?.sdp;
+      const localSdp=pc.localDescription?.sdp||"";
       if(!localSdp)throw new Error("LOCAL_SDP_MISSING");
+      if(!/^v=0\r?\n/.test(localSdp)||!/(?:^|\r?\n)m=audio\s/.test(localSdp))throw new Error("LOCAL_SDP_INCOMPLETE");
 
       const threadId=ch==="WEB"?await getThreadId():null;
       if(ch==="WEB"&&!threadId)throw new Error("THREAD_ID_REQUIRED");
 
-      const live=await post("/session",{channel:ch,sdp:localSdp,thread_id:threadId});
+      const live=await post("/session",{channel:ch,sdp:localSdp,initial_sdp:initialSdp,thread_id:threadId});
       sessionId=live.session_id;
       setPersona(live.persona);
       await pc.setRemoteDescription({type:"answer",sdp:live.sdp});
