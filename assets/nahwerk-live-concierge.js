@@ -120,7 +120,7 @@ export function mountNahwerkLiveConcierge({
   const image=q(".nw-live-image"),initials=q(".nw-live-initials"),remoteAudio=q(".nw-live-audio");
   const muteBtn=q(".nw-live-mute"),endBtn=q(".nw-live-end"),closeBtn=q(".nw-live-close");
 
-  let pc=null,dc=null,micStream=null,micMeter=null,outMeter=null,raf=0,inputFlushTimer=0,transcriptSeq=0;
+  let pc=null,dc=null,micStream=null,micMeter=null,outMeter=null,raf=0,inputFlushTimer=0,outputFlushTimer=0,transcriptSeq=0,userTurnSeq=0,assistantTurnSeq=0;
   let sessionId="",inputTranscript="",outputTranscript="",lastUserTurnText="",started=false,muted=false,ending=false;
   let inputStartMs=null,inputEndMs=null,outputStartMs=null,outputEndMs=null;
 
@@ -216,13 +216,20 @@ export function mountNahwerkLiveConcierge({
     const text=inputTranscript.trim();
     if(!text)return "";
     lastUserTurnText=text;
+    const start=inputStartMs,end=inputEndMs;
     inputTranscript="";inputStartMs=null;inputEndMs=null;
+    userTurnSeq+=1;
+    await persistTranscript("USER",text,start,end,`turn:user:${userTurnSeq}`);
     return text;
   };
   const flushAssistantTranscript=async()=>{
+    if(outputFlushTimer){clearTimeout(outputFlushTimer);outputFlushTimer=0;}
     const text=outputTranscript.trim();
     if(!text)return "";
+    const start=outputStartMs,end=outputEndMs;
     outputTranscript="";outputStartMs=null;outputEndMs=null;
+    assistantTurnSeq+=1;
+    await persistTranscript("ASSISTANT",text,start,end,`turn:assistant:${assistantTurnSeq}`);
     return text;
   };
   const handleDelegation=async(event)=>{
@@ -253,7 +260,6 @@ export function mountNahwerkLiveConcierge({
       inputTranscript=(inputTranscript+delta).slice(-12000);
       if(inputStartMs===null&&Number.isFinite(Number(e.start_ms)))inputStartMs=Number(e.start_ms);
       if(Number.isFinite(Number(e.end_ms)))inputEndMs=Number(e.end_ms);
-      void persistTranscript("USER",delta,e.start_ms,e.end_ms,`user:${String(e.event_id||uid())}`);
       return;
     }
     if(e.type==="session.output_transcript.delta"){
@@ -261,12 +267,16 @@ export function mountNahwerkLiveConcierge({
       outputTranscript=(outputTranscript+delta).slice(-12000);
       if(outputStartMs===null&&Number.isFinite(Number(e.start_ms)))outputStartMs=Number(e.start_ms);
       if(Number.isFinite(Number(e.end_ms)))outputEndMs=Number(e.end_ms);
-      void persistTranscript("ASSISTANT",delta,e.start_ms,e.end_ms,`assistant:${String(e.event_id||uid())}`);
       setStatus((name.textContent||"Concierge")+" spricht …");return;
     }
     if(e.type==="input_audio_buffer.speech_stopped"){
       if(inputFlushTimer)clearTimeout(inputFlushTimer);
-      inputFlushTimer=setTimeout(()=>{void flushUserTranscript();},650);
+      inputFlushTimer=setTimeout(()=>{void flushUserTranscript();},800);
+      return;
+    }
+    if(e.type==="response.done"){
+      if(outputFlushTimer)clearTimeout(outputFlushTimer);
+      outputFlushTimer=setTimeout(()=>{void flushAssistantTranscript();},250);
       return;
     }
     if(e.type==="session.delegation.created"){await handleDelegation(e);return;}
@@ -276,7 +286,7 @@ export function mountNahwerkLiveConcierge({
 
   async function start(){
     if(pc)return;
-    ending=false;started=false;inputTranscript="";outputTranscript="";lastUserTurnText="";inputStartMs=null;inputEndMs=null;outputStartMs=null;outputEndMs=null;transcriptSeq=0;
+    ending=false;started=false;inputTranscript="";outputTranscript="";lastUserTurnText="";inputStartMs=null;inputEndMs=null;outputStartMs=null;outputEndMs=null;transcriptSeq=0;userTurnSeq=0;assistantTurnSeq=0;
     ui.hidden=false;document.documentElement.classList.add("nw-live-open");
     setPersona(currentPersonaFromPage());
     setStatus("Mikrofon wird aktiviert …");state("connecting");
@@ -349,6 +359,7 @@ export function mountNahwerkLiveConcierge({
   async function stop({notifyBackend=true,keepVisible=false}={}){
     if(ending)return; ending=true;
     if(inputFlushTimer){clearTimeout(inputFlushTimer);inputFlushTimer=0;}
+    if(outputFlushTimer){clearTimeout(outputFlushTimer);outputFlushTimer=0;}
     await flushUserTranscript();
     await flushAssistantTranscript();
     cancelAnimationFrame(raf);
