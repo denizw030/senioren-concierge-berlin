@@ -66,7 +66,7 @@ test("both chat routes use the full consistent footer and complete legal links",
       assert.ok(page.includes(label), `missing footer link ${label}`);
     }
     assert.match(page, /assets\/site-ui\.js\?v=8/);
-    assert.match(page, /assets\/web-customer-concierge\.js\?v=25/);
+    assert.match(page, /assets\/web-customer-concierge\.js\?v=27/);
   }
   assert.match(cleanChat, /assets\/web-customer-concierge-thread-scope\.js\?v=5/);
 });
@@ -74,8 +74,16 @@ test("both chat routes use the full consistent footer and complete legal links",
 test("theme work does not introduce a second chat transport or WhatsApp delivery path", () => {
   for (const page of chatSurfaces) {
     const scripts = [...page.matchAll(/<script\s+src="([^"]+)"/g)].map((match) => match[1]);
-    assert.ok(scripts.some((src) => src.includes("web-customer-concierge.js?v=25")));
+    assert.ok(scripts.some((src) => src.includes("web-customer-concierge.js?v=27")));
     assert.ok(!scripts.some((src) => /whatsapp|delivery|email/i.test(src)), `unexpected delivery script: ${scripts.join(", ")}`);
   }
   assert.doesNotMatch(siteUi, /\/web\/chat|\/web\/history|customer_delivery|sendWhatsApp|sendWhatsapp/);
+});
+
+
+test("web chat exposes the canonical portal theme control in its header area",()=>{
+  for(const page of chatSurfaces){
+    assert.match(page,/id="webConciergeThemeToggle"/);
+    assert.match(page,/class="web-concierge-page-actions"/);
+  }
 });
