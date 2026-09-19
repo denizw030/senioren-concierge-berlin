@@ -25,6 +25,25 @@ struct ChatReply {
     let responseState: String
 }
 
+struct ChatHistoryMessage: Identifiable {
+    let id: String
+    let role: String
+    let text: String
+    let channel: String
+    let at: String
+}
+
+struct ChatHistoryThread {
+    let id: String
+    let title: String
+    let channels: [String]
+}
+
+struct ChannelHistoryResult {
+    let hasCalls: Bool
+    let messages: [ChatHistoryMessage]
+}
+
 final class NahwerkAPI {
     static let shared = NahwerkAPI()
 
@@ -91,6 +110,62 @@ final class NahwerkAPI {
     func loadHome(store: SessionStore) async throws -> [String: Any] {
         guard let token = await MainActor.run(body: { store.sessionToken }) else { throw NahwerkAPIError.unauthorized }
         return try await request(url: gatewayBase.appendingPathComponent("mobile/me"), method: "GET", bearer: token)
+    }
+
+    func loadHistoryThreads(store: SessionStore) async throws -> [ChatHistoryThread] {
+        guard let token = await MainActor.run(body: { store.sessionToken }) else { throw NahwerkAPIError.unauthorized }
+        let json = try await request(url: gatewayBase.appendingPathComponent("mobile/history"), method: "GET", bearer: token)
+        let rows = json["threads"] as? [[String: Any]] ?? []
+        return rows.compactMap { row in
+            guard let id = row["thread_id"] as? String, !id.isEmpty else { return nil }
+            let channels = row["channels"] as? [String] ?? []
+            return ChatHistoryThread(
+                id: id,
+                title: (row["title"] as? String) ?? "Chat",
+                channels: channels.map { $0.uppercased() }
+            )
+        }
+    }
+
+    func loadHistoryMessages(threadId: String, store: SessionStore) async throws -> [ChatHistoryMessage] {
+        guard let token = await MainActor.run(body: { store.sessionToken }) else { throw NahwerkAPIError.unauthorized }
+        var components = URLComponents(url: gatewayBase.appendingPathComponent("mobile/history"), resolvingAgainstBaseURL: false)!
+        components.queryItems = [URLQueryItem(name: "thread_id", value: threadId)]
+        guard let url = components.url else { throw NahwerkAPIError.invalidResponse }
+        let json = try await request(url: url, method: "GET", bearer: token)
+        return parseHistoryMessages(json["messages"])
+    }
+
+    func loadChannelHistory(channel: String, store: SessionStore, summaryOnly: Bool = false) async throws -> ChannelHistoryResult {
+        guard let token = await MainActor.run(body: { store.sessionToken }) else { throw NahwerkAPIError.unauthorized }
+        var components = URLComponents(url: gatewayBase.appendingPathComponent("mobile/channel-history"), resolvingAgainstBaseURL: false)!
+        var items = [URLQueryItem(name: "channel", value: channel.uppercased())]
+        if summaryOnly { items.append(URLQueryItem(name: "summary", value: "1")) }
+        components.queryItems = items
+        guard let url = components.url else { throw NahwerkAPIError.invalidResponse }
+        let json = try await request(url: url, method: "GET", bearer: token)
+        return ChannelHistoryResult(
+            hasCalls: (json["has_calls"] as? Bool) == true,
+            messages: parseHistoryMessages(json["messages"])
+        )
+    }
+
+    private func parseHistoryMessages(_ value: Any?) -> [ChatHistoryMessage] {
+        let rows = value as? [[String: Any]] ?? []
+        return rows.compactMap { row in
+            guard
+                let role = row["role"] as? String,
+                let text = row["text"] as? String,
+                !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            else { return nil }
+            return ChatHistoryMessage(
+                id: (row["id"] as? String) ?? UUID().uuidString.lowercased(),
+                role: role.lowercased(),
+                text: text,
+                channel: ((row["channel"] as? String) ?? "").uppercased(),
+                at: (row["at"] as? String) ?? ""
+            )
+        }
     }
 
     @MainActor
