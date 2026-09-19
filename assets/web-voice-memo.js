@@ -161,6 +161,7 @@
 
   async function start() {
     if (recorder || processing) return;
+    if (!window.NAHWERKWebCustomerConciergeLiveBridge?.isAllowed?.()) return;
     try {
       cancelled = false;
       chunks = [];
