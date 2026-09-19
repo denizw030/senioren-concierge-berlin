@@ -197,6 +197,16 @@ test("remote SDP answer is preserved and retried with CRLF framing only after pa
   assert.match(client,/REMOTE_SDP_INVALID/);
 });
 
+test("Live pricing is quoted before microphone/provider start and acknowledged by version",()=>{
+  const client=read("assets/nahwerk-live-concierge.js");
+  assert.match(client,/VOICE_DYNAMIC_PRICE_CLIENT_V1_20260920/);
+  assert.match(client,/post\("\\/quote"/);
+  assert.match(client,/price_acknowledged/);
+  assert.match(client,/price_version/);
+  assert.match(client,/sekundengenau/);
+  assert.match(client,/max_seconds/);
+});
+
 
 test("GPT-Live transcript deltas persist immediately and chat refreshes after Live ends",()=>{
   const client=read("assets/nahwerk-live-concierge.js");

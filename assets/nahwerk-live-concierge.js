@@ -123,7 +123,9 @@ export function mountNahwerkLiveConcierge({
   const image=q(".nw-live-image"),initials=q(".nw-live-initials"),remoteAudio=q(".nw-live-audio");
   const muteBtn=q(".nw-live-mute"),endBtn=q(".nw-live-end"),closeBtn=q(".nw-live-close");
 
-  let pc=null,dc=null,micStream=null,micMeter=null,outMeter=null,raf=0,inputFlushTimer=0,outputFlushTimer=0,transcriptSeq=0,userTurnSeq=0,assistantTurnSeq=0;
+  let pc=null,dc=null,micStream=null,micMeter=null,outMeter=null,raf=0,inputFlushTimer=0,outputFlushTimer=0,transcriptSeq=0,userTurnSeq=0,assistantTurnSeq=0,maxSessionTimer=0;
+  // VOICE_DYNAMIC_PRICE_CLIENT_V1_20260920
+  let currentQuote=null;
   let sessionId="",inputTranscript="",outputTranscript="",lastUserTurnText="",started=false,muted=false,ending=false;
   let inputStartMs=null,inputEndMs=null,outputStartMs=null,outputEndMs=null,callStartedAt=0,callTimer=0;
 
@@ -332,8 +334,26 @@ export function mountNahwerkLiveConcierge({
     stopCallTimer();if(duration){duration.textContent="0:00";duration.hidden=true;}
     ui.hidden=false;document.documentElement.classList.add("nw-live-open");
     setPersona(currentPersonaFromPage());
-    setStatus("Mikrofon wird aktiviert …");state("connecting");
+    setStatus("Preis wird geprüft …");state("quoting");
     try{
+      currentQuote=null;
+      try{
+        currentQuote=await post("/quote",{channel:ch});
+      }catch(quoteError){
+        const qcode=String(quoteError?.message||"");
+        if(!/NOT_FOUND|LIVE_HTTP_404/.test(qcode))throw quoteError;
+      }
+      if(currentQuote?.customer_charge===true&&currentQuote?.billing_exempt!==true){
+        const cents=Number(currentQuote.unit_price_cents||0);
+        const price=(cents/100).toFixed(2).replace(".",",");
+        const approved=window.confirm(`Live Concierge kostet aktuell ${price} € pro Minute. Abgerechnet wird sekundengenau; der Preis bleibt für dieses Gespräch fest. Live-Gespräch starten?`);
+        if(!approved){
+          ui.hidden=true;document.documentElement.classList.remove("nw-live-open");
+          state("price_declined",{pricing:currentQuote});
+          return;
+        }
+      }
+      setStatus("Mikrofon wird aktiviert …");state("connecting",{pricing:currentQuote});
       micStream=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
       pc=new RTCPeerConnection();
       micStream.getAudioTracks().forEach(track=>pc.addTrack(track,micStream));
@@ -360,7 +380,7 @@ export function mountNahwerkLiveConcierge({
       const threadId=ch==="WEB"?await getThreadId():null;
       if(ch==="WEB"&&!threadId)throw new Error("THREAD_ID_REQUIRED");
 
-      const live=await post("/session",{channel:ch,sdp:localSdp,initial_sdp:initialSdp,thread_id:threadId});
+      const live=await post("/session",{channel:ch,sdp:localSdp,initial_sdp:initialSdp,thread_id:threadId,price_acknowledged:Boolean(currentQuote&&currentQuote.customer_charge===true&&currentQuote.billing_exempt!==true),price_version:String(currentQuote?.price_version||"")});
       sessionId=live.session_id;
       setPersona(live.persona);
       const remoteSdp=String(live?.sdp||"");
@@ -377,6 +397,12 @@ export function mountNahwerkLiveConcierge({
         }
       }
       setStatus("Verbindet …");
+      const maxSeconds=Number(live?.pricing?.max_seconds||0);
+      if(maxSessionTimer)clearTimeout(maxSessionTimer);
+      if(maxSeconds>0){
+        maxSessionTimer=setTimeout(()=>{void stop({notifyBackend:true});},Math.max(1,maxSeconds)*1000);
+      }
+      state("pricing_locked",{pricing:live?.pricing||currentQuote||null});
       cancelAnimationFrame(raf);animate();
     }catch(e){
       const raw=String(e?.message||e?.name||"LIVE_START_FAILED");
@@ -406,6 +432,8 @@ export function mountNahwerkLiveConcierge({
     await flushUserTranscript();
     await flushAssistantTranscript();
     stopCallTimer();
+    if(maxSessionTimer)clearTimeout(maxSessionTimer);maxSessionTimer=0;
+    currentQuote=null;
     cancelAnimationFrame(raf);
     if(notifyBackend&&sessionId)post("/end",{session_id:sessionId}).catch(()=>{});
     try{dc?.close();}catch{}
