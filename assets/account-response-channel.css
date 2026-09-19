@@ -1,0 +1,25 @@
+.response-channel-panel{padding:28px!important}
+.response-channel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:22px}
+.response-channel-head h3{margin:5px 0 8px;font-size:clamp(1.45rem,2vw,1.9rem);letter-spacing:-.03em}
+.response-channel-head .muted{max-width:720px;margin:0}
+.response-channel-status{flex:0 0 auto;display:inline-flex;align-items:center;min-height:34px;padding:7px 11px;border-radius:999px;font-size:11.5px;font-weight:750}
+.response-channel-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:22px}
+.response-channel-option{display:flex;align-items:flex-start;gap:12px;min-height:86px;padding:16px;border:1px solid rgba(128,149,176,.14);border-radius:15px;background:rgba(5,11,17,.42);cursor:pointer;transition:border-color .18s ease,background .18s ease}
+.response-channel-option:hover{border-color:rgba(190,158,86,.32)}
+.response-channel-option:has(input:checked){border-color:rgba(215,169,52,.62);background:rgba(215,169,52,.075);box-shadow:0 0 0 2px rgba(215,169,52,.07)}
+.response-channel-option input{margin-top:3px;accent-color:#d7a934}
+.response-channel-option span{display:flex;flex-direction:column;gap:5px;min-width:0}
+.response-channel-option strong{font-size:14px}
+.response-channel-option small{font-size:12px;line-height:1.45;color:var(--muted)}
+.response-channel-option.is-disabled,.response-channel-option:has(input:disabled){opacity:.46;cursor:not-allowed}
+.response-channel-footer{margin-top:18px;padding-top:18px;border-top:1px solid rgba(135,154,180,.12)}
+.response-channel-footer>.muted{margin:0 0 14px}
+.response-channel-footer .actions{margin:0}
+.response-channel-save-status{display:block;min-height:18px;margin-top:10px;font-size:12px;color:var(--muted)}
+.response-channel-save-status.is-success{color:#d9c482}
+.response-channel-save-status.is-error{color:#e7a5a5}
+body.account-premium-ui.nw-portal-dark .response-channel-status{border:1px solid rgba(137,156,181,.15);background:rgba(255,255,255,.025);color:#c9c6bd}
+body.account-premium-ui.nw-portal-light .response-channel-option{background:rgba(255,255,255,.6);border-color:rgba(112,87,39,.14)}
+body.account-premium-ui.nw-portal-light .response-channel-option:has(input:checked){border-color:rgba(173,132,54,.5);background:rgba(202,155,57,.09)}
+body.account-premium-ui.nw-portal-light .response-channel-status{border:1px solid rgba(112,87,39,.16);background:rgba(255,255,255,.62);color:#5f584e}
+@media(max-width:720px){.response-channel-head{flex-direction:column}.response-channel-options{grid-template-columns:1fr}.response-channel-status{align-self:flex-start}}
