@@ -5,7 +5,6 @@
   const CORE_CONTRACT_VERSION = "core-v1";
   const GATEWAY_CONTRACT_VERSION = "web-gateway-v1";
   const GATEWAY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway";
-  let lastInputWasVoiceMemo=false;
   const HISTORY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway/web/history";
   const HISTORY_CONTRACT_VERSION = "canonical-core-receipts-v1";
   const HISTORY_PAGE_SIZE = 60;
@@ -35,6 +34,15 @@
   function sessionToken() {
     try { return String(JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null")?.session_token || ""); }
     catch { return ""; }
+  }
+  async function refreshSessionForWrite(){
+    if(window.SCBAuth?.validateSession){
+      const valid=await window.SCBAuth.validateSession(true).catch(()=>false);
+      if(!valid)throw new Error("SESSION_INVALID");
+    }
+    const token=sessionToken();
+    if(!token)throw new Error("SESSION_REQUIRED");
+    return token;
   }
 
   function configuredEndpoint() {
@@ -192,6 +200,37 @@
     meta.appendChild(time);
     bubble.append(body,meta);row.appendChild(bubble);log.appendChild(row);if(scroll)scrollBottom();return row;
   }
+  async function playStoredAudio(messageId,button){
+    if(!validUuid(messageId))return;
+    try{
+      const token=await refreshSessionForWrite();
+      button?.classList.add("is-loading");
+      const response=await fetchWithTimeout(`${GATEWAY_ENDPOINT}/web/audio-message?id=${encodeURIComponent(messageId)}`,{headers:{Authorization:`Bearer ${token}`},cache:"no-store",credentials:"omit"},45000);
+      if(!response.ok)throw new Error("audio_fetch_failed");
+      const blob=await response.blob(),url=URL.createObjectURL(blob),audio=new Audio(url);
+      if(button)button.textContent="❚❚";
+      audio.addEventListener("ended",()=>{URL.revokeObjectURL(url);if(button){button.textContent="▶";button.classList.remove("is-loading");}},{once:true});
+      audio.addEventListener("error",()=>{URL.revokeObjectURL(url);if(button){button.textContent="▶";button.classList.remove("is-loading");}},{once:true});
+      await audio.play();
+    }catch{
+      if(button){button.textContent="▶";button.classList.remove("is-loading");}
+    }
+  }
+  function appendAudioMessage(role,message,at=new Date().toISOString(),id="",channel="WEB",{scroll=true}={}){
+    const log=logNode();if(!log||!validUuid(message?.audio_message_id))return null;
+    log.querySelector(".web-concierge-empty")?.remove();appendDateIfNeeded(at);
+    const row=document.createElement("div");row.className=`web-concierge-message-row is-${role}`;row.dataset.channel=String(channel||"WEB").toUpperCase();if(id)row.dataset.messageId=id;
+    const bubble=document.createElement("div");bubble.className=`web-concierge-message web-concierge-message-${role} web-concierge-audio-message`;
+    const player=document.createElement("div");player.className="web-concierge-audio-player";
+    const play=document.createElement("button");play.type="button";play.className="web-concierge-audio-play";play.textContent="▶";play.setAttribute("aria-label","Sprachmemo abspielen");
+    const wave=document.createElement("span");wave.className="web-concierge-audio-wave";wave.innerHTML="<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>";
+    const duration=document.createElement("span");duration.className="web-concierge-audio-duration";
+    const seconds=Math.max(0,Math.round(Number(message?.duration_ms||0)/1000));duration.textContent=seconds?`${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,"0")}`:"Sprachmemo";
+    play.addEventListener("click",()=>{void playStoredAudio(String(message.audio_message_id),play);});
+    player.append(play,wave,duration);
+    const time=document.createElement("span");time.className="web-concierge-message-time";time.textContent=timeLabel(at);
+    bubble.append(player,time);row.appendChild(bubble);log.appendChild(row);if(scroll)scrollBottom();return row;
+  }
   function resetHistoryState() {
     historyMessages=[];
     historyHasMore=false;
@@ -231,23 +270,21 @@
   function renderCoreV1Response(raw) {
     const response=normalizeCoreV1Response(raw);if(!response||!response.authoritative)return false;
     removeTyping();const now=new Date().toISOString();
-    for(const message of response.messages){appendMessage("assistant",message.text,now,`a:${response.turn_id}`,"WEB");if(lastInputWasVoiceMemo)void playAssistantAudio(message.text);}lastInputWasVoiceMemo=false;
+    for(const message of response.messages)appendMessage("assistant",message.text,now,`a:${response.turn_id}`,"WEB");
     if(response.pending_approval)renderApproval(response.pending_approval);
     if(response.error)addRuntimeCard("Das hat noch nicht geklappt",String(response.error.customer_safe_message||"Bitte versuche es noch einmal."),"is-error");
     return true;
   }
 
-  async function playAssistantAudio(text){
-    try{
-      const token=sessionToken();if(!token||!text)return;
-      const response=await fetchWithTimeout(`${GATEWAY_ENDPOINT}/web/audio-reply`,{method:"POST",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},body:JSON.stringify({text}),cache:"no-store",credentials:"omit"},50000);
-      if(!response.ok)return;
-      const blob=await response.blob(),url=URL.createObjectURL(blob),audio=new Audio(url);
-      audio.addEventListener("ended",()=>URL.revokeObjectURL(url),{once:true});
-      await audio.play();
-    }catch{}
-  }
-  window.addEventListener("nahwerk:voice-memo-sent",()=>{lastInputWasVoiceMemo=true;});
+  window.addEventListener("nahwerk:voice-memo-sent",(event)=>{
+    const payload=event?.detail?.payload;
+    const canonical=String(payload?.canonical_thread_id||payload?.core?.conversation_id||"");
+    if(validUuid(canonical))activeThreadId=canonical;
+    void (async()=>{
+      await loadThreads();
+      if(validUuid(activeThreadId))await refreshThread(activeThreadId,{force:true,reset:true});
+    })();
+  });
 
   function fetchWithTimeout(url,options={},timeoutMs=CLIENT_FETCH_TIMEOUT_MS) {
     const controller=new AbortController();
@@ -315,13 +352,15 @@
     }
   }
   function historySignature(messages) {
-    return `${historyHasMore?"more":"end"}\n`+(Array.isArray(messages)?messages:[]).map((m)=>`${m?.id||""}|${m?.at||""}|${m?.role||""}|${m?.channel||""}|${m?.text||""}`).join("\n");
+    return `${historyHasMore?"more":"end"}\n`+(Array.isArray(messages)?messages:[]).map((m)=>`${m?.id||""}|${m?.at||""}|${m?.role||""}|${m?.channel||""}|${m?.kind||"TEXT"}|${m?.audio_message_id||""}|${m?.text||""}`).join("\n");
   }
   function mergeHistory(existing,incoming) {
     const byId=new Map();
     for(const item of [...(Array.isArray(existing)?existing:[]),...(Array.isArray(incoming)?incoming:[])]){
-      if(!item||!item.text||(item.role!=="user"&&item.role!=="assistant"))continue;
-      const key=String(item.id||`${item.role}:${item.channel||"WEB"}:${item.at||""}:${item.text}`);
+      if(!item||(item.role!=="user"&&item.role!=="assistant"))continue;
+      if(String(item.kind||"TEXT").toUpperCase()==="AUDIO"&&!validUuid(item.audio_message_id))continue;
+      if(String(item.kind||"TEXT").toUpperCase()!=="AUDIO"&&!item.text)continue;
+      const key=String(item.id||`${item.role}:${item.channel||"WEB"}:${item.at||""}:${item.audio_message_id||item.text||""}`);
       byId.set(key,item);
     }
     return [...byId.values()].sort((a,b)=>Date.parse(String(a.at||0))-Date.parse(String(b.at||0))||String(a.id||"").localeCompare(String(b.id||"")));
@@ -333,12 +372,15 @@
     button.addEventListener("click",()=>{void loadOlderMessages();});wrap.appendChild(button);log.appendChild(wrap);
   }
   function renderHistory(messages,{force=false,scrollToBottom=true,preserveScroll=false}={}) {
-    const list=Array.isArray(messages)?messages.filter((m)=>(m?.role==="user"||m?.role==="assistant")&&m?.text):[];
+    const list=Array.isArray(messages)?messages.filter((m)=>(m?.role==="user"||m?.role==="assistant")&&(String(m?.kind||"TEXT").toUpperCase()==="AUDIO"?validUuid(m?.audio_message_id):Boolean(m?.text))):[];
     const signature=historySignature(list);if(!force&&signature===historyFingerprint)return false;
     const log=logNode();if(!log)return false;const previousHeight=log.scrollHeight,previousTop=log.scrollTop;clearNode(log);lastDateKey="";removeTyping();
     if(!list.length){emptyChat();return true;}
     renderOlderControl();
-    for(const m of list)appendMessage(m.role,m.text,m.at,m.id,m.channel||"WEB",{scroll:false});
+    for(const m of list){
+      if(String(m?.kind||"TEXT").toUpperCase()==="AUDIO")appendAudioMessage(m.role,m,m.at,m.id,m.channel||"WEB",{scroll:false});
+      else appendMessage(m.role,m.text,m.at,m.id,m.channel||"WEB",{scroll:false});
+    }
     historyFingerprint=signature;
     requestAnimationFrame(()=>{
       if(preserveScroll)log.scrollTop=Math.max(0,log.scrollHeight-previousHeight+previousTop);
@@ -435,6 +477,7 @@
   async function sendTurn() {
     const input=document.getElementById("webConciergeInput");if(!(input instanceof HTMLTextAreaElement)||!gatewayReady||sending||channelViewReadOnly)return;
     const content=input.value.trim();if(!content||content.length>4000)return;if(!activeThreadId)activeThreadId=crypto.randomUUID();
+    try{await refreshSessionForWrite();}catch{window.SCBAuth?.clearLocalAuth?.();location.replace("/anmelden");return;}
     const sourceMessageId=crypto.randomUUID(),clientId=`local:${sourceMessageId}`,now=new Date().toISOString();
     appendMessage("user",content,now,clientId,"WEB");input.value="";resizeInput();sending=true;setComposerReady(true);showTyping();
     try{
