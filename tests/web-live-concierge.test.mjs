@@ -139,3 +139,15 @@ test("GPT-Live transcript is persisted into the active chat",()=>{
   assert.match(client,/flushAssistantTranscript/);
   assert.match(client,/ICE_GATHERING_TIMEOUT/);
 });
+
+
+test("force-refreshes the browser session before text, voice memo and Live writes",()=>{
+  const auth=read("assets/auth-nav.js");
+  const chat=read("assets/web-customer-concierge.js");
+  const memo=read("assets/web-voice-memo.js");
+  const live=read("assets/web-live-concierge.js");
+  assert.match(auth,/validateSession\(force = false\)/);
+  assert.match(chat,/validateSession\(true\)/);
+  assert.match(memo,/validateSession\(true\)/);
+  assert.match(live,/validateSession\(true\)/);
+});
