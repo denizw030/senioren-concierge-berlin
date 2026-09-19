@@ -20,6 +20,7 @@
   let cancelled = false;
   let processing = false;
   let durationMs = 0;
+  let sendWhenStopped = false;
 
   function token() {
     try {
@@ -128,6 +129,7 @@
     cancelled = false;
     processing = false;
     durationMs = 0;
+    sendWhenStopped = false;
     const e = els();
     if (e.time) e.time.textContent = "0:00";
     if (e.play) e.play.textContent = "▶";
@@ -202,6 +204,10 @@
         const e = els();
         if (e.time) e.time.textContent = clock(durationMs);
         setMode("ready");
+        if (sendWhenStopped) {
+          sendWhenStopped = false;
+          void submit();
+        }
       }, { once: true });
 
       startedAt = Date.now();
@@ -213,7 +219,7 @@
         const elapsed = Date.now() - startedAt;
         const current = els();
         if (current.time) current.time.textContent = clock(elapsed);
-        if (elapsed >= MAX_DURATION_MS && recorder?.state === "recording") recorder.stop();
+        if (elapsed >= MAX_DURATION_MS && recorder?.state === "recording") { sendWhenStopped = true; recorder.stop(); }
       }, 250);
 
       recorder.start(250);
@@ -232,8 +238,10 @@
     }
   }
 
-  function stop() {
-    if (recorder?.state === "recording") recorder.stop();
+  function stopAndSend() {
+    if (recorder?.state !== "recording") return;
+    sendWhenStopped = true;
+    recorder.stop();
   }
 
   function cancel() {
@@ -335,12 +343,12 @@
     panel.className = "web-concierge-voice-recorder";
     panel.hidden = true;
     panel.dataset.mode = "idle";
-    panel.innerHTML = '<button type="button" class="web-concierge-voice-icon is-cancel" id="webConciergeVoiceCancel" aria-label="Sprachmemo löschen">×</button><button type="button" class="web-concierge-voice-icon is-play" id="webConciergeVoicePlay" aria-label="Sprachmemo anhören" hidden>▶</button><div class="web-concierge-voice-meta"><span id="webConciergeVoiceStatus">Aufnahme läuft</span><span id="webConciergeVoiceTime">0:00</span></div><div class="web-concierge-voice-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><button type="button" class="web-concierge-voice-icon is-stop" id="webConciergeVoiceStop" aria-label="Aufnahme stoppen">■</button><button type="button" class="web-concierge-voice-icon is-send" id="webConciergeVoiceSend" aria-label="Sprachmemo senden" hidden>↑</button>';
+    panel.innerHTML = '<button type="button" class="web-concierge-voice-icon is-cancel" id="webConciergeVoiceCancel" aria-label="Sprachmemo löschen">×</button><button type="button" class="web-concierge-voice-icon is-play" id="webConciergeVoicePlay" aria-label="Sprachmemo anhören" hidden>▶</button><div class="web-concierge-voice-meta"><span id="webConciergeVoiceStatus">Aufnahme läuft</span><span id="webConciergeVoiceTime">0:00</span></div><div class="web-concierge-voice-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><button type="button" class="web-concierge-voice-icon is-stop" id="webConciergeVoiceStop" aria-label="Sprachmemo senden"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17V7M7.8 11.2 12 7l4.2 4.2"/></svg></button><button type="button" class="web-concierge-voice-icon is-send" id="webConciergeVoiceSend" aria-label="Sprachmemo senden" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17V7M7.8 11.2 12 7l4.2 4.2"/></svg></button>';
     form.appendChild(panel);
 
     trigger.addEventListener("click", () => { void start(); });
     document.getElementById("webConciergeVoiceCancel")?.addEventListener("click", cancel);
-    document.getElementById("webConciergeVoiceStop")?.addEventListener("click", stop);
+    document.getElementById("webConciergeVoiceStop")?.addEventListener("click", stopAndSend);
     document.getElementById("webConciergeVoicePlay")?.addEventListener("click", togglePreview);
     document.getElementById("webConciergeVoiceSend")?.addEventListener("click", () => { void submit(); });
 
