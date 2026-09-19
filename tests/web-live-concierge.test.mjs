@@ -8,10 +8,10 @@ const read=(p)=>readFileSync(new URL("../"+p,import.meta.url),"utf8");
 test("web chat mounts Live Concierge on the right without replacing voice memo",()=>{
   for(const page of ["web-concierge.html","web-concierge/index.html"]){
     const html=read(page);
-    assert.match(html,/assets\/web-voice-memo\.js\?v=5/);
-    assert.match(html,/assets\/web-customer-concierge\.js\?v=25/);
-    assert.match(html,/assets\/web-live-concierge\.js\?v=5/);
-    assert.match(html,/assets\/nahwerk-live-concierge\.css\?v=2/);
+    assert.match(html,/assets\/web-voice-memo\.js\?v=7/);
+    assert.match(html,/assets\/web-customer-concierge\.js\?v=27/);
+    assert.match(html,/assets\/web-live-concierge\.js\?v=8/);
+    assert.match(html,/assets\/nahwerk-live-concierge\.css\?v=3/);
   }
   const boot=read("assets/web-live-concierge.js");
   assert.match(boot,/send\.after\(button\)/);
@@ -163,4 +163,27 @@ test("voice recording uses the send arrow directly instead of a stop square",()=
   assert.doesNotMatch(memo,/>■<\/button>/);
   assert.match(memo,/aria-label="Sprachmemo senden"/);
   assert.match(css,/background:#2f7df6/);
+});
+
+
+test("theme switch is bound to the canonical portal theme and Live honors light mode",()=>{
+  const html=read("web-concierge/index.html");
+  const chat=read("assets/web-customer-concierge.js");
+  const css=read("assets/web-customer-concierge.css");
+  const liveCss=read("assets/nahwerk-live-concierge.css");
+  assert.match(html,/id="webConciergeThemeToggle"/);
+  assert.match(chat,/PORTAL_THEME_KEY = "nw_portal_theme_v1"/);
+  assert.match(chat,/initThemeToggle\(\)/);
+  assert.match(chat,/dataset\.nwPortalTheme=normalized/);
+  assert.match(css,/WEB_CHAT_PORTAL_THEME_HEADER_V1/);
+  assert.match(liveCss,/LIVE_PORTAL_THEME_SYNC_V1/);
+});
+
+test("Live offer is audio-only, ICE-complete and keeps an initial SDP fallback",()=>{
+  const client=read("assets/nahwerk-live-concierge.js");
+  assert.match(client,/getUserMedia\(\{audio:true,video:false\}\)/);
+  assert.match(client,/getAudioTracks\(\)/);
+  assert.match(client,/await waitForIce\(pc\)/);
+  assert.match(client,/initial_sdp:initialSdp/);
+  assert.match(client,/LOCAL_SDP_INCOMPLETE/);
 });
