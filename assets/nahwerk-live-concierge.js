@@ -72,7 +72,10 @@ function ensureOverlay(){
             <span class="nw-live-initials">N</span>
           </div>
         </div>
-        <div class="nw-live-status">Verbindet …</div>
+        <div class="nw-live-copy">
+          <div class="nw-live-status">Verbindet …</div>
+          <div class="nw-live-duration" aria-label="Gesprächsdauer" hidden>0:00</div>
+        </div>
       </div>
       <div class="nw-live-controls">
         <button class="nw-live-mute" type="button" aria-label="Mikrofon stummschalten">${svgMic()}</button>
@@ -116,16 +119,35 @@ export function mountNahwerkLiveConcierge({
 
   const ui=ensureOverlay();
   const q=(s)=>ui.querySelector(s);
-  const orb=q(".nw-live-orb"),status=q(".nw-live-status"),name=q(".nw-live-name");
+  const orb=q(".nw-live-orb"),status=q(".nw-live-status"),duration=q(".nw-live-duration"),name=q(".nw-live-name");
   const image=q(".nw-live-image"),initials=q(".nw-live-initials"),remoteAudio=q(".nw-live-audio");
   const muteBtn=q(".nw-live-mute"),endBtn=q(".nw-live-end"),closeBtn=q(".nw-live-close");
 
   let pc=null,dc=null,micStream=null,micMeter=null,outMeter=null,raf=0,inputFlushTimer=0,outputFlushTimer=0,transcriptSeq=0,userTurnSeq=0,assistantTurnSeq=0;
   let sessionId="",inputTranscript="",outputTranscript="",lastUserTurnText="",started=false,muted=false,ending=false;
-  let inputStartMs=null,inputEndMs=null,outputStartMs=null,outputEndMs=null;
+  let inputStartMs=null,inputEndMs=null,outputStartMs=null,outputEndMs=null,callStartedAt=0,callTimer=0;
 
   const state=(value,detail={})=>{onStateChange({state:value,...detail});};
   const setStatus=(text)=>{status.textContent=text;};
+  const callClock=(ms)=>{
+    const total=Math.max(0,Math.floor(Number(ms||0)/1000));
+    const hours=Math.floor(total/3600);
+    const minutes=Math.floor((total%3600)/60);
+    const seconds=total%60;
+    return hours>0?`${hours}:${String(minutes).padStart(2,"0")}:${String(seconds).padStart(2,"0")}`:`${minutes}:${String(seconds).padStart(2,"0")}`;
+  };
+  const stopCallTimer=()=>{
+    if(callTimer)clearInterval(callTimer);
+    callTimer=0;callStartedAt=0;
+  };
+  const startCallTimer=()=>{
+    stopCallTimer();
+    callStartedAt=Date.now();
+    if(duration){duration.hidden=false;duration.textContent="0:00";}
+    const tick=()=>{if(duration&&callStartedAt)duration.textContent=callClock(Date.now()-callStartedAt);};
+    callTimer=setInterval(tick,250);
+    tick();
+  };
   const currentPersonaFromPage=()=>{
     const title=document.getElementById("webConciergeTitle");
     const avatar=document.querySelector(".web-concierge-avatar");
@@ -249,7 +271,7 @@ export function mountNahwerkLiveConcierge({
   const handleEvent=async(raw)=>{
     let e; try{e=JSON.parse(raw.data);}catch{return;}
     if(e.type==="session.started"){
-      started=true;setStatus("Hört zu …");state("connected",{session_id:sessionId});return;
+      started=true;startCallTimer();setStatus("Hört zu …");state("connected",{session_id:sessionId});return;
     }
     if(e.type==="session.input_transcript.delta"){
       const delta=String(e.delta??"");
@@ -307,6 +329,7 @@ export function mountNahwerkLiveConcierge({
   async function start(){
     if(pc)return;
     ending=false;started=false;inputTranscript="";outputTranscript="";lastUserTurnText="";inputStartMs=null;inputEndMs=null;outputStartMs=null;outputEndMs=null;transcriptSeq=0;userTurnSeq=0;assistantTurnSeq=0;
+    stopCallTimer();if(duration){duration.textContent="0:00";duration.hidden=true;}
     ui.hidden=false;document.documentElement.classList.add("nw-live-open");
     setPersona(currentPersonaFromPage());
     setStatus("Mikrofon wird aktiviert …");state("connecting");
@@ -382,6 +405,7 @@ export function mountNahwerkLiveConcierge({
     if(outputFlushTimer){clearTimeout(outputFlushTimer);outputFlushTimer=0;}
     await flushUserTranscript();
     await flushAssistantTranscript();
+    stopCallTimer();
     cancelAnimationFrame(raf);
     if(notifyBackend&&sessionId)post("/end",{session_id:sessionId}).catch(()=>{});
     try{dc?.close();}catch{}
