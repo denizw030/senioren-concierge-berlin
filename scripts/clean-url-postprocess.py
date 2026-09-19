@@ -85,9 +85,21 @@ for name in ("sitemap.xml", "robots.txt"):
             path.write_text(updated, encoding="utf-8")
             changed.append(name)
 
-# Hard guard: the sitemap must never advertise .html URLs again.
+# Hard guards: public discovery and customer navigation must not advertise .html URLs.
 sitemap = (ROOT / "sitemap.xml").read_text(encoding="utf-8")
 if ".html" in sitemap:
     raise SystemExit("sitemap.xml still contains .html URLs")
+
+robots = (ROOT / "robots.txt").read_text(encoding="utf-8")
+if re.search(r"^Disallow:\s+\S+\.html(?:$|[?#])", robots, flags=re.M | re.I):
+    raise SystemExit("robots.txt still contains .html route blocks")
+
+url_attr = re.compile(r"""\b(?:href|action)\s*=\s*["'][^"']*\.html(?:[?#][^"']*)?["']""", re.I)
+for path in public_html_files():
+    if path.name == "404.html":
+        continue
+    html = path.read_text(encoding="utf-8")
+    if url_attr.search(html):
+        raise SystemExit(f"{path.relative_to(ROOT)} still contains a .html customer URL")
 
 print(f"clean-url postprocess: {len(changed)} files updated")
