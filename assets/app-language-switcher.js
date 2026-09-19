@@ -8,7 +8,8 @@
   };
   const PAGES = new Set(['registrieren.html','anmelden.html','erster-schritt.html','passwort-zuruecksetzen.html','impressum.html','datenschutz.html','agb.html','widerruf.html','ki-transparenz.html','datenloeschung.html','vertrag-widerrufen.html']);
 
-  const page = location.pathname.split('/').filter(Boolean).pop() || 'index.html';
+  const rawPage = location.pathname.split('/').filter(Boolean).pop() || 'index';
+  const page = rawPage === 'index' ? 'index.html' : (rawPage.endsWith('.html') ? rawPage : `${rawPage}.html`);
   if (!PAGES.has(page)) return;
 
   const storedLang = () => {
