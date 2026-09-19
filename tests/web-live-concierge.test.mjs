@@ -7,9 +7,9 @@ const read=(p)=>readFileSync(new URL("../"+p,import.meta.url),"utf8");
 test("web chat mounts Live Concierge on the right without replacing voice memo",()=>{
   for(const page of ["web-concierge.html","web-concierge/index.html"]){
     const html=read(page);
-    assert.match(html,/assets\/web-voice-memo\.js\?v=2/);
-    assert.match(html,/assets\/web-customer-concierge\.js\?v=23/);
-    assert.match(html,/assets\/web-live-concierge\.js\?v=3/);
+    assert.match(html,/assets\/web-voice-memo\.js\?v=3/);
+    assert.match(html,/assets\/web-customer-concierge\.js\?v=24/);
+    assert.match(html,/assets\/web-live-concierge\.js\?v=4/);
     assert.match(html,/assets\/nahwerk-live-concierge\.css\?v=2/);
   }
   const boot=read("assets/web-live-concierge.js");
@@ -106,4 +106,36 @@ test("WhatsApp channel stays visible under Chat Kanäle even without a current W
   assert.doesNotMatch(scope,/if\(channels\.has\("WHATSAPP"\)\)/);
   assert.match(css,/content:"CHAT KANÄLE"/);
   assert.match(read("web-concierge/index.html"),/web-customer-concierge-thread-scope\.js\?v=5/);
+});
+
+
+test("composer uses one blue GPT-style action button for Live or send",()=>{
+  const boot=read("assets/web-live-concierge.js");
+  const css=read("assets/web-customer-concierge.css");
+  assert.match(boot,/send\.hidden=true/);
+  assert.match(boot,/is-send-mode/);
+  assert.match(boot,/Nachricht senden/);
+  assert.match(boot,/bindTrigger:false/);
+  assert.match(css,/#webConciergeSend\[hidden\]\{display:none!important\}/);
+});
+
+test("voice memo remains audio in history and receives an audio reply",()=>{
+  const memo=read("assets/web-voice-memo.js");
+  const chat=read("assets/web-customer-concierge.js");
+  assert.match(memo,/\/web\/audio-message/);
+  assert.match(memo,/form\.append\("audio"/);
+  assert.match(memo,/thread_id/);
+  assert.doesNotMatch(memo,/e\.input\.value = transcript/);
+  assert.match(chat,/appendAudioMessage/);
+  assert.match(chat,/audio_message_id/);
+});
+
+test("GPT-Live transcript is persisted into the active chat",()=>{
+  const client=read("assets/nahwerk-live-concierge.js");
+  assert.match(client,/\/transcript/);
+  assert.match(client,/session\.input_transcript\.delta/);
+  assert.match(client,/session\.output_transcript\.delta/);
+  assert.match(client,/flushUserTranscript/);
+  assert.match(client,/flushAssistantTranscript/);
+  assert.match(client,/ICE_GATHERING_TIMEOUT/);
 });
