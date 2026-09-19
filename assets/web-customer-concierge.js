@@ -283,6 +283,15 @@
     })();
   });
 
+  function reportClientDiagnostic(code){
+    try{
+      const u=new URL(GATEWAY_ENDPOINT+"/client-diagnostic");
+      u.searchParams.set("source","TEXT_CHAT_CLIENT");
+      u.searchParams.set("code",String(code||"TEXT_CHAT_CLIENT_ERROR").slice(0,180));
+      fetch(u.href,{method:"GET",cache:"no-store",credentials:"omit"}).catch(()=>{});
+    }catch{}
+  }
+
   function fetchWithTimeout(url,options={},timeoutMs=CLIENT_FETCH_TIMEOUT_MS) {
     const controller=new AbortController();
     const timer=setTimeout(()=>controller.abort(),timeoutMs);
@@ -486,14 +495,15 @@
       await loadThreads();
       if(validUuid(activeThreadId))await refreshThread(activeThreadId,{force:true});
     }catch(error){
-      const reason=String(error?.message||"");
-      if(/SESSION_(?:REQUIRED|INVALID)|http_401|http_403/i.test(reason)){
+      const reason=String(error?.message||error?.name||"TEXT_CHAT_FAILED");
+      reportClientDiagnostic(reason);
+      if(/session_(?:required|invalid)|http_401|http_403/i.test(reason)){
         window.SCBAuth?.clearLocalAuth?.();
         location.replace("/anmelden");
         return;
       }
       removeTyping();const row=document.querySelector(`[data-message-id="${CSS.escape(clientId)}"]`);row?.classList.add("is-failed");
-      if(row){const state=document.createElement("span");state.className="web-concierge-message-state";state.textContent="Nicht gesendet – bitte noch einmal versuchen.";row.appendChild(state);}
+      if(row){const state=document.createElement("span");state.className="web-concierge-message-state";state.textContent=`Nicht gesendet – Fehler: ${reason.slice(0,80)}`;row.appendChild(state);}
     }finally{sending=false;setComposerReady(gatewayReady);input.focus();}
   }
 
