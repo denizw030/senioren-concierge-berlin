@@ -1,5 +1,5 @@
 // WEB_CONCIERGE_LIVE_BOOT_V1_20260919
-import { mountNahwerkLiveConcierge } from "./nahwerk-live-concierge.js?v=3";
+import { mountNahwerkLiveConcierge } from "./nahwerk-live-concierge.js?v=4";
 
 const GATEWAY="https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway";
 
@@ -26,26 +26,54 @@ async function boot(){
   button.hidden=true;
   button.setAttribute("aria-label","Live mit deinem Concierge sprechen");
   button.title="Live sprechen";
+  send.hidden=true;
+  send.setAttribute("aria-hidden","true");
+  send.tabIndex=-1;
   send.after(button);
 
   const controller=mountNahwerkLiveConcierge({
     button,
     input,
     channel:"WEB",
-    getAuthToken:()=>bridge()?.sessionToken?.()||"",
+    bindTrigger:false,
+    getAuthToken:async()=>{
+      if(window.SCBAuth?.validateSession){
+        const valid=await window.SCBAuth.validateSession(true).catch(()=>false);
+        if(!valid)return "";
+      }
+      return bridge()?.sessionToken?.()||"";
+    },
     getThreadId:()=>bridge()?.threadId?.()||null,
     onStateChange:(state)=>{
       window.dispatchEvent(new CustomEvent("nahwerk:live-state",{detail:state}));
     }
   });
 
+  const wave='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none"><path d="M4.5 10.25v3.5M8 7.25v9.5M11.5 5.25v13.5M15 7.25v9.5M18.5 10.25v3.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>';
+  const arrow='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none"><path d="M12 17V7M7.8 11.2 12 7l4.2 4.2" stroke="currentColor" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   const backendReady=await ready();
   const sync=()=>{
     const b=bridge();
     const usable=backendReady&&Boolean(b?.isAllowed?.());
+    const hasText=Boolean(input.value.trim());
     button.hidden=!usable;
     button.disabled=!usable;
+    button.classList.toggle("is-send-mode",hasText);
+    button.innerHTML=hasText?arrow:wave;
+    button.setAttribute("aria-label",hasText?"Nachricht senden":"Live mit deinem Concierge sprechen");
+    button.title=hasText?"Senden":"Live sprechen";
   };
+  button.addEventListener("click",()=>{
+    if(button.disabled)return;
+    if(input.value.trim()){
+      send.click();
+      setTimeout(sync,0);
+      setTimeout(sync,120);
+    }else{
+      void controller.start();
+    }
+  });
+  input.addEventListener("input",sync);
   sync();
   const timer=setInterval(sync,1000);
   window.addEventListener("nahwerk:chat-channel-view",sync);
