@@ -7,6 +7,28 @@ ROOT = Path(__file__).resolve().parents[1]
 DOMAIN = "https://nahwerkconcierge.com"
 EXCLUDED_TOP = {".git", ".github", "android-app", "api", "docs", "tests"}
 SCRIPT_TAG = '<script src="/assets/clean-url.js?v=1"></script>'
+CLEAN_SCRIPT_RE = re.compile(
+    r'''\s*<script\s+src=["']/assets/clean-url\.js\?v=1["'][^>]*></script>\s*''',
+    re.I,
+)
+LOCALE_RUNTIME_RE = re.compile(
+    r'''<script\s+src=["']/assets/locale-runtime\.js\?v=\d+["'][^>]*></script>''',
+    re.I,
+)
+LANGUAGE_SWITCHER_RE = re.compile(
+    r'''<script\s+src=["']/assets/language-switcher\.js\?v=\d+["'][^>]*></script>''',
+    re.I,
+)
+
+def ensure_clean_url_script(text: str) -> str:
+    # Always normalize placement so DE/EN/TR keep an identical script stack.
+    text = CLEAN_SCRIPT_RE.sub("\n", text)
+    anchor = LOCALE_RUNTIME_RE.search(text) or LANGUAGE_SWITCHER_RE.search(text)
+    if anchor:
+        return text[:anchor.end()] + "\n    " + SCRIPT_TAG + text[anchor.end():]
+    if "</head>" in text:
+        return text.replace("</head>", f"  {SCRIPT_TAG}\n</head>", 1)
+    return SCRIPT_TAG + "\n" + text
 
 def public_html_files():
     for path in ROOT.rglob("*.html"):
@@ -67,11 +89,8 @@ changed = []
 for path in public_html_files():
     original = path.read_text(encoding="utf-8")
     updated = clean_text(original, path)
-    if path.name != "404.html" and "assets/clean-url.js" not in updated:
-        if "</head>" in updated:
-            updated = updated.replace("</head>", f"  {SCRIPT_TAG}\n</head>", 1)
-        else:
-            updated = SCRIPT_TAG + "\n" + updated
+    if path.name != "404.html":
+        updated = ensure_clean_url_script(updated)
     if updated != original:
         path.write_text(updated, encoding="utf-8")
         changed.append(path.relative_to(ROOT).as_posix())
