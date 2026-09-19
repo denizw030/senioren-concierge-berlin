@@ -36,11 +36,8 @@ async function boot(){
     input,
     channel:"WEB",
     bindTrigger:false,
-    getAuthToken:async()=>{
-      if(window.SCBAuth?.validateSession){
-        const valid=await window.SCBAuth.validateSession(true).catch(()=>false);
-        if(!valid)return "";
-      }
+    getAuthToken:()=>{
+      void window.SCBAuth?.validateSession?.().catch(()=>false);
       return bridge()?.sessionToken?.()||"";
     },
     getThreadId:()=>bridge()?.threadId?.()||null,
