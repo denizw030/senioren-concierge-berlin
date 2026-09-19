@@ -55,3 +55,20 @@ test("web chat exposes only current authenticated thread bridge to Live",()=>{
   assert.match(chat,/threadId/);
   assert.match(chat,/channelView==="CHAT"/);
 });
+
+
+test("web chat validates the canonical session before gateway readiness",()=>{
+  const chat=read("assets/web-customer-concierge.js");
+  assert.match(chat,/SCBAuth\?\.validateSession/);
+  assert.match(chat,/validSession\|\|!sessionToken\(\)/);
+  assert.match(chat,/ready=await checkReadiness\(\)/);
+});
+
+test("web and WhatsApp stay separate with normal chat first",()=>{
+  const scope=read("assets/web-customer-concierge-thread-scope.js");
+  assert.match(scope,/title:"WhatsApp"/);
+  assert.match(scope,/channels:\["WEB","APP"\]/);
+  assert.match(scope,/channels:\["WHATSAPP"\]/);
+  assert.match(scope,/payload\.threads=\[\.\.\.projected,\.\.\.extras\]/);
+  assert.match(scope,/readOnly:next==="WHATSAPP"\|\|next==="TELEGRAM"/);
+});
