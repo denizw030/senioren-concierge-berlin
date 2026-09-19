@@ -18,6 +18,7 @@ internal class ProdCustomerApi(context: Context) {
     private data class HttpJson(val code: Int, val body: JSONObject)
 
     fun hasSession(): Boolean = sessions.hasValidSession()
+    fun liveSessionToken(): String? = sessions.sessionToken()?.takeIf { sessions.hasValidSession() }
     fun hasPendingMfa(): Boolean = sessions.hasPendingMfa()
     fun enrollmentRequired(): Boolean = sessions.enrollmentRequired()
     fun pendingAuthState(): ProductAuthState = ProductAuthState(
