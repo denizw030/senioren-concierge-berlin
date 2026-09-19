@@ -7,9 +7,9 @@ const read=(p)=>readFileSync(new URL("../"+p,import.meta.url),"utf8");
 test("web chat mounts Live Concierge on the right without replacing voice memo",()=>{
   for(const page of ["web-concierge.html","web-concierge/index.html"]){
     const html=read(page);
-    assert.match(html,/assets\/web-voice-memo\.js\?v=4/);
-    assert.match(html,/assets\/web-customer-concierge\.js\?v=24/);
-    assert.match(html,/assets\/web-live-concierge\.js\?v=4/);
+    assert.match(html,/assets\/web-voice-memo\.js\?v=5/);
+    assert.match(html,/assets\/web-customer-concierge\.js\?v=25/);
+    assert.match(html,/assets\/web-live-concierge\.js\?v=5/);
     assert.match(html,/assets\/nahwerk-live-concierge\.css\?v=2/);
   }
   const boot=read("assets/web-live-concierge.js");
@@ -141,15 +141,16 @@ test("GPT-Live transcript is persisted into the active chat",()=>{
 });
 
 
-test("force-refreshes the browser session before text, voice memo and Live writes",()=>{
-  const auth=read("assets/auth-nav.js");
+test("chat voice and Live do not block on duplicate browser session preflight",()=>{
   const chat=read("assets/web-customer-concierge.js");
   const memo=read("assets/web-voice-memo.js");
   const live=read("assets/web-live-concierge.js");
-  assert.match(auth,/validateSession\(force = false\)/);
-  assert.match(chat,/validateSession\(true\)/);
-  assert.match(memo,/validateSession\(true\)/);
-  assert.match(live,/validateSession\(true\)/);
+  assert.doesNotMatch(chat,/validateSession\(true\)/);
+  assert.doesNotMatch(memo,/validateSession\(true\)/);
+  assert.doesNotMatch(live,/validateSession\(true\)/);
+  assert.match(chat,/sessionToken\(\)/);
+  assert.match(memo,/const session = token\(\)/);
+  assert.match(live,/bridge\(\)\?\.sessionToken/);
 });
 
 
