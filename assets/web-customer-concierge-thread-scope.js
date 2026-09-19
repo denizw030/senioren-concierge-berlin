@@ -140,16 +140,16 @@
       const title=button.querySelector(".web-concierge-thread-title");
       const preview=button.querySelector(".web-concierge-thread-preview");
       if(channel==="CHAT"){
-        if(title)title.textContent="Chat";
-        button.setAttribute("aria-label","Chat");
+        if(title&&title.textContent!=="Chat")title.textContent="Chat";
+        if(button.getAttribute("aria-label")!=="Chat")button.setAttribute("aria-label","Chat");
       }else if(channel==="WHATSAPP"){
-        if(title)title.textContent="WhatsApp";
-        if(preview)preview.textContent="";
-        button.setAttribute("aria-label","WhatsApp");
+        if(title&&title.textContent!=="WhatsApp")title.textContent="WhatsApp";
+        if(preview&&preview.textContent!=="")preview.textContent="";
+        if(button.getAttribute("aria-label")!=="WhatsApp")button.setAttribute("aria-label","WhatsApp");
       }else if(channel==="PHONE"){
-        if(title)title.textContent="Telefonprotokoll";
-        if(preview)preview.textContent="";
-        button.setAttribute("aria-label","Telefonprotokoll");
+        if(title&&title.textContent!=="Telefonprotokoll")title.textContent="Telefonprotokoll";
+        if(preview&&preview.textContent!=="")preview.textContent="";
+        if(button.getAttribute("aria-label")!=="Telefonprotokoll")button.setAttribute("aria-label","Telefonprotokoll");
       }
       delete button.dataset.chatChannelFirst;
     }
@@ -158,7 +158,16 @@
     publishActiveView(box);
   }
 
-  const observer=new MutationObserver(()=>decorateSidebar());
+  let decorateQueued=false;
+  const scheduleDecorate=()=>{
+    if(decorateQueued)return;
+    decorateQueued=true;
+    queueMicrotask(()=>{
+      decorateQueued=false;
+      decorateSidebar();
+    });
+  };
+  const observer=new MutationObserver(()=>scheduleDecorate());
   const startObserver=()=>{
     const box=document.getElementById("webConciergeThreads");
     if(box){
