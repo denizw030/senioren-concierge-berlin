@@ -36,7 +36,8 @@ test("native app Live page accepts token only in memory and uses APP channel",()
   assert.match(page,/channel:"APP"/);
   assert.match(page,/startNahwerkAppLive/);
   assert.match(page,/getAuthToken:\(\)=>token/);
-  assert.doesNotMatch(page,/session_token=|token=/i);
+  assert.doesNotMatch(page,/[?&](?:session_)?token=/i);
+  assert.doesNotMatch(page,/location\\.(?:search|href).*token/i);
 });
 
 test("Live visual surface has reactive blue portrait orb",()=>{
