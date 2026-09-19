@@ -316,8 +316,8 @@
 
   window.addEventListener("nahwerk:voice-memo-sent",(event)=>{
     const payload=event?.detail?.payload;
-    const canonical=String(payload?.canonical_thread_id||payload?.core?.conversation_id||"");
-    if(validUuid(canonical))activeThreadId=canonical;
+    const visibleThread=String(payload?.thread_id||payload?.canonical_thread_id||payload?.core?.conversation_id||"");
+    if(validUuid(visibleThread))activeThreadId=visibleThread;
     void (async()=>{
       await loadThreads();
       if(validUuid(activeThreadId))await refreshThread(activeThreadId,{force:true,reset:true});
@@ -532,7 +532,7 @@
       if(response?.ok!==true||response?.environment!=="PROD"||response?.authoritative!==true||(response?.thread_id&&response?.thread_id!==activeThreadId))throw new Error("gateway_response_not_authoritative");
       if(!renderCoreV1Response(response.core))throw new Error("core_response_not_authoritative");
       await refreshPersona(true).catch(()=>{});
-      const canonicalThreadId=String(response?.core?.conversation_id||"");if(validUuid(canonicalThreadId))activeThreadId=canonicalThreadId;
+      const returnedThreadId=String(response?.thread_id||"");if(validUuid(returnedThreadId))activeThreadId=returnedThreadId;
       await loadThreads();
       if(validUuid(activeThreadId))await refreshThread(activeThreadId,{force:true});
     }catch(error){
