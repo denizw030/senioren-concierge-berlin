@@ -11,7 +11,7 @@ test("web chat mounts Live Concierge on the right without replacing voice memo",
     const html=read(page);
     assert.match(html,/assets\/web-voice-memo\.js\?v=7/);
     assert.match(html,/assets\/web-customer-concierge\.js\?v=27/);
-    assert.match(html,/assets\/web-live-concierge\.js\?v=8/);
+    assert.match(html,/assets\/web-live-concierge\.js\?v=9/);
     assert.match(html,/assets\/nahwerk-live-concierge\.css\?v=3/);
   }
   const boot=read("assets/web-live-concierge.js");
@@ -187,4 +187,13 @@ test("Live offer is audio-only, ICE-complete and keeps an initial SDP fallback",
   assert.match(client,/await waitForIce\(pc\)/);
   assert.match(client,/initial_sdp:initialSdp/);
   assert.match(client,/LOCAL_SDP_INCOMPLETE/);
+});
+
+
+test("remote SDP answer is preserved and retried with CRLF framing only after parse failure",()=>{
+  const client=read("assets/nahwerk-live-concierge.js");
+  assert.match(client,/function normalizedRemoteSdp/);
+  assert.match(client,/setRemoteDescription\(\{type:"answer",sdp:remoteSdp\}\)/);
+  assert.match(client,/setRemoteDescription\(\{type:"answer",sdp:repaired\}\)/);
+  assert.match(client,/REMOTE_SDP_INVALID/);
 });
