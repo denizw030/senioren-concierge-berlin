@@ -1,5 +1,8 @@
 // NAHWERK LIVE CONCIERGE WEB CLIENT V1
 const DEFAULT_API="https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway/live";
+// LIVE_PUBLIC_PRICE_REST_V1_20260920
+const LIVE_PRICE_URL="https://djicahhmnnamtjuqedqd.supabase.co/rest/v1/live_voice_public_price_v1?select=currency,unit,unit_price_cents,max_session_minutes,price_version,pricing_basis,price_frozen_per_session&limit=1";
+const LIVE_PRICE_KEY="sb_publishable_Zr4L9Lk-zOnjTc5bE_ChNA_SybjXxZx";
 
 const wait=(ms)=>new Promise(r=>setTimeout(r,ms));
 const uid=()=>crypto.randomUUID?.()||Math.random().toString(36).slice(2);
@@ -219,6 +222,13 @@ export function mountNahwerkLiveConcierge({
     if(!r.ok||d?.ok!==true)throw new Error(d?.error||("LIVE_HTTP_"+r.status));
     return d;
   };
+  const publicLivePrice=async()=>{
+    const r=await fetch(LIVE_PRICE_URL,{method:"GET",headers:{apikey:LIVE_PRICE_KEY},cache:"no-store",credentials:"omit"});
+    const rows=await r.json().catch(()=>null);
+    const q=Array.isArray(rows)?rows[0]:null;
+    if(!r.ok||!q||!Number.isFinite(Number(q.unit_price_cents))||!String(q.price_version||""))throw new Error("LIVE_PRICE_UNAVAILABLE");
+    return {...q,customer_charge:true,billing_exempt:false,max_seconds:Number(q.max_session_minutes||0)*60};
+  };
   const sendEvent=(event)=>{
     if(dc?.readyState==="open")dc.send(JSON.stringify(event));
   };
@@ -324,7 +334,7 @@ export function mountNahwerkLiveConcierge({
       return;
     }
         if(e.type==="session.delegation.created"){await handleDelegation(e);return;}
-    if(e.type==="session.closed"){await flushUserTranscript();await flushAssistantTranscript();await stop({notifyBackend:false});return;}
+    if(e.type==="session.closed"){await flushUserTranscript();await flushAssistantTranscript();await stop({notifyBackend:true});return;}
     if(e.type==="error"){state("error",{error:e?.error?.code||"LIVE_SESSION_ERROR"});}
   };
 
@@ -336,13 +346,7 @@ export function mountNahwerkLiveConcierge({
     setPersona(currentPersonaFromPage());
     setStatus("Preis wird geprüft …");state("quoting");
     try{
-      currentQuote=null;
-      try{
-        currentQuote=await post("/quote",{channel:ch});
-      }catch(quoteError){
-        const qcode=String(quoteError?.message||"");
-        if(!/NOT_FOUND|LIVE_HTTP_404/.test(qcode))throw quoteError;
-      }
+      currentQuote=await publicLivePrice();
       if(currentQuote?.customer_charge===true&&currentQuote?.billing_exempt!==true){
         const cents=Number(currentQuote.unit_price_cents||0);
         const price=(cents/100).toFixed(2).replace(".",",");
@@ -397,7 +401,7 @@ export function mountNahwerkLiveConcierge({
         }
       }
       setStatus("Verbindet …");
-      const maxSeconds=Number(live?.pricing?.max_seconds||0);
+      const maxSeconds=Number(live?.pricing?.max_seconds||currentQuote?.max_seconds||0);
       if(maxSessionTimer)clearTimeout(maxSessionTimer);
       if(maxSeconds>0){
         maxSessionTimer=setTimeout(()=>{void stop({notifyBackend:true});},Math.max(1,maxSeconds)*1000);
