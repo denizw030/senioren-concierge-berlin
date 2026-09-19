@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 const read=(p)=>readFileSync(new URL("../"+p,import.meta.url),"utf8");
+// NONBLOCKING_AUTH_FINAL_V25
 
 test("web chat mounts Live Concierge on the right without replacing voice memo",()=>{
   for(const page of ["web-concierge.html","web-concierge/index.html"]){
