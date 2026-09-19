@@ -83,19 +83,17 @@
         channel_view:"CHAT"
       });
 
-      if(channels.has("WHATSAPP")){
-        channelThreads.push({
-          ...base,
-          thread_id:VIRTUAL_WHATSAPP_THREAD_ID,
-          title:"WhatsApp",
-          preview:"",
-          channels:["WHATSAPP"],
-          is_main:false,
-          thread_scope:"CHANNEL",
-          channel_view:"WHATSAPP",
-          virtual_channel_thread:true
-        });
-      }
+      channelThreads.push({
+        ...base,
+        thread_id:VIRTUAL_WHATSAPP_THREAD_ID,
+        title:"WhatsApp",
+        preview:"",
+        channels:["WHATSAPP"],
+        is_main:false,
+        thread_scope:"CHANNEL",
+        channel_view:"WHATSAPP",
+        virtual_channel_thread:true
+      });
 
       if(channels.has("TELEGRAM")){
         channelThreads.push({
