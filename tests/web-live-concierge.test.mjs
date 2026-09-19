@@ -10,9 +10,9 @@ const read=(p)=>readFileSync(new URL("../"+p,import.meta.url),"utf8");
 test("web chat mounts Live Concierge on the right without replacing voice memo",()=>{
   for(const page of ["web-concierge.html","web-concierge/index.html"]){
     const html=read(page);
-    assert.match(html,/assets\/web-voice-memo\.js\?v=7/);
+    assert.match(html,/assets\/web-voice-memo\.js\?v=8/);
     assert.match(html,/assets\/web-customer-concierge\.js\?v=29/);
-    assert.match(html,/assets\/web-live-concierge\.js\?v=12/);
+    assert.match(html,/assets\/web-live-concierge\.js\?v=14/);
     assert.match(html,/assets\/nahwerk-live-concierge\.css\?v=3/);
   }
   const boot=read("assets/web-live-concierge.js");
@@ -200,16 +200,17 @@ test("remote SDP answer is preserved and retried with CRLF framing only after pa
 });
 
 
-test("GPT-Live transcript deltas are accumulated into full chat turns and refreshed after Live ends",()=>{
+test("GPT-Live transcript deltas persist immediately and chat refreshes after Live ends",()=>{
   const client=read("assets/nahwerk-live-concierge.js");
   const boot=read("assets/web-live-concierge.js");
   const chat=read("assets/web-customer-concierge.js");
   assert.match(client,/session\.input_transcript\.delta/);
   assert.match(client,/session\.output_transcript\.delta/);
-  assert.match(client,/turn:user:/);
-  assert.match(client,/turn:assistant:/);
-  assert.match(client,/input_audio_buffer\.speech_stopped/);
-  assert.match(client,/e\.type==="response\.done"/);
+  assert.match(client,/persistTranscript\("USER",delta,start,end/);
+  assert.match(client,/persistTranscript\("ASSISTANT",delta,start,end/);
+  assert.match(client,/delta:user:/);
+  assert.match(client,/delta:assistant:/);
+  assert.match(client,/response\.event/);
   assert.match(client,/TRANSCRIPT_WRITE_/);
   assert.match(boot,/nahwerk:live-ended/);
   assert.match(chat,/nahwerk:live-ended/);
