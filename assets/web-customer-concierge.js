@@ -383,6 +383,39 @@
   }
   function newChat() { if(sending)return;activeThreadId=crypto.randomUUID();resetHistoryState();emptyChat();renderThreads();document.getElementById("webConciergeInput")?.focus(); }
 
+  async function resetAllChats(){
+    if(sending)return;
+    const confirmed=window.confirm("Alle Chats aus Web und App entfernen? Dein WhatsApp-Verlauf auf dem Handy bleibt unverändert.");
+    if(!confirmed)return;
+    const button=document.getElementById("webConciergeDeleteChats");
+    if(button instanceof HTMLButtonElement)button.disabled=true;
+    try{
+      const result=await gatewayRequest("/web/chats/reset",{method:"POST",body:{scope:"ALL"}});
+      if(result?.ok!==true)throw new Error("CHAT_RESET_FAILED");
+      activeThreadId=null;threadCache=[];resetHistoryState();emptyChat();renderThreads();
+      const loaded=await loadThreads({selectFirst:true});
+      if(activeThreadId)await selectThread(activeThreadId);
+      else{newChat();if(!loaded)renderThreads();}
+    }catch{
+      window.alert("Die Chats konnten gerade nicht entfernt werden. Bitte versuche es erneut.");
+    }finally{
+      if(button instanceof HTMLButtonElement)button.disabled=false;
+    }
+  }
+
+  function initDeleteAllChats(){
+    const newButton=document.getElementById("webConciergeNewChat");
+    if(!(newButton instanceof HTMLButtonElement)||document.getElementById("webConciergeDeleteChats"))return;
+    const button=document.createElement("button");
+    button.type="button";
+    button.id="webConciergeDeleteChats";
+    button.className="web-concierge-delete-chats";
+    button.textContent="Alle Chats löschen";
+    button.setAttribute("aria-label","Alle Chats aus Web und App entfernen");
+    button.addEventListener("click",()=>{void resetAllChats();});
+    newButton.insertAdjacentElement("afterend",button);
+  }
+
   async function syncHistory() {
     if(!gatewayReady||sending||document.hidden)return false;
     const selectedBefore=activeThreadId;
@@ -457,6 +490,7 @@
 
   async function boot() {
     initMobileDrawer();
+    initDeleteAllChats();
 // IOS_VISUAL_VIEWPORT_COMPOSER_V1_20260918
 function syncIosVisualViewport(){
   if(!isMobile())return;
