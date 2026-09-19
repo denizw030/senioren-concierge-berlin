@@ -8,8 +8,8 @@ test("web chat mounts Live Concierge on the right without replacing voice memo",
   for(const page of ["web-concierge.html","web-concierge/index.html"]){
     const html=read(page);
     assert.match(html,/assets\/web-voice-memo\.js\?v=2/);
-    assert.match(html,/assets\\/web-live-concierge\\.js\\?v=2/);
-    assert.match(html,/assets\\/nahwerk-live-concierge\\.css\\?v=2/);
+    assert.match(html,/assets\/web-live-concierge\.js\?v=2/);
+    assert.match(html,/assets\/nahwerk-live-concierge\.css\?v=2/);
   }
   const boot=read("assets/web-live-concierge.js");
   assert.match(boot,/send\.after\(button\)/);
@@ -50,6 +50,7 @@ test("Live visual surface has reactive blue portrait orb",()=>{
 
 test("web chat exposes only current authenticated thread bridge to Live",()=>{
   const chat=read("assets/web-customer-concierge.js");
+  assert.doesNotThrow(()=>new Function(chat),"customer chat client must remain valid JavaScript");
   assert.match(chat,/NAHWERKWebCustomerConciergeLiveBridge/);
   assert.match(chat,/sessionToken/);
   assert.match(chat,/threadId/);
