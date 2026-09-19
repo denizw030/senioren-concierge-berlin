@@ -9,11 +9,11 @@ const read = (path) => readFileSync(resolve(root, path), 'utf8');
 const DOMAIN = 'https://nahwerkconcierge.com';
 
 const blocked = [
-  '/anmelden.html', '/registrieren.html', '/konto.html', '/payg.html',
-  '/web-concierge.html', '/passwort-zuruecksetzen.html',
-  '/zugang-uebertragen.html', '/concierge-anpassen.html',
-  '/martin-anpassen.html', '/voice-audition.html',
-  '/vertrag-widerrufen.html', '/erster-schritt.html'
+  '/anmelden', '/registrieren', '/konto', '/payg',
+  '/web-concierge', '/passwort-zuruecksetzen',
+  '/zugang-uebertragen', '/concierge-anpassen',
+  '/martin-anpassen', '/voice-audition',
+  '/vertrag-widerrufen', '/erster-schritt'
 ];
 
 const extractLocs = (xml) => [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
@@ -40,6 +40,7 @@ test('sitemap contains only existing canonical public pages', () => {
   assert.equal(urls.length, new Set(urls).size, 'duplicate sitemap URL');
   assert.ok(urls.includes(`${DOMAIN}/de/`), 'German homepage /de/ missing from sitemap');
   assert.ok(!urls.includes(`${DOMAIN}/`), 'redirect-only root homepage must not be indexed');
+  assert.ok(urls.every((url) => !/\.html(?:$|[?#])/i.test(url)), 'sitemap must contain no .html URLs');
   for (const path of blocked) assert.ok(!urls.includes(`${DOMAIN}${path}`), `blocked path in sitemap: ${path}`);
 
   for (const url of urls) {
