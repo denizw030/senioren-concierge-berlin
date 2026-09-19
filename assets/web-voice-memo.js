@@ -287,7 +287,9 @@
     void window.SCBAuth?.validateSession?.().catch(() => false);
     const session = token();
     if (!session) throw new Error("session_required");
-    const threadID = window.NAHWERKWebCustomerConciergeLiveBridge?.threadId?.();
+    const bridge = window.NAHWERKWebCustomerConciergeLiveBridge;
+    if (!bridge?.isAllowed?.()) throw new Error("channel_read_only");
+    const threadID = bridge?.threadId?.();
     if (!threadID) throw new Error("thread_required");
 
     const sourceMessageID = crypto.randomUUID?.() || Math.random().toString(36).slice(2);
@@ -387,7 +389,16 @@
     const trigger = document.getElementById("webConciergeVoice");
     if (!trigger) return;
     const ready = await backendReady();
-    trigger.hidden = !ready;
+    const syncAvailability=()=>{
+      const allowed=Boolean(window.NAHWERKWebCustomerConciergeLiveBridge?.isAllowed?.());
+      trigger.hidden=!(ready&&allowed);
+      trigger.disabled=!(ready&&allowed);
+      if(!allowed&&recorder)reset();
+    };
+    syncAvailability();
+    window.addEventListener("nahwerk:chat-channel-view",syncAvailability);
+    const availabilityTimer=setInterval(syncAvailability,1000);
+    window.addEventListener("pagehide",()=>clearInterval(availabilityTimer),{once:true});
   }
 
   if (document.readyState === "loading") {
