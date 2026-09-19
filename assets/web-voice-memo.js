@@ -30,6 +30,16 @@
     }
   }
 
+  function reportClientDiagnostic(code) {
+    fetch("https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway/client-diagnostic",{
+      method:"POST",
+      headers:{"content-type":"application/json"},
+      body:JSON.stringify({source:"VOICE_MEMO_CLIENT",code:String(code||"VOICE_MEMO_CLIENT_ERROR").slice(0,180)}),
+      cache:"no-store",
+      credentials:"omit"
+    }).catch(()=>{});
+  }
+
   function fetchTimeout(url, options, timeoutMs) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
@@ -315,9 +325,11 @@
       reset();
       window.dispatchEvent(new CustomEvent("nahwerk:voice-memo-sent",{detail:{payload}}));
     } catch (error) {
+      const code=String(error?.message||error?.name||"voice_message_failed");
+      reportClientDiagnostic(code);
       processing = false;
       setMode("ready", "Sprachmemo konnte nicht gesendet werden");
-      window.dispatchEvent(new CustomEvent("nahwerk:voice-memo-error",{detail:{error:String(error?.message||"voice_message_failed")}}));
+      window.dispatchEvent(new CustomEvent("nahwerk:voice-memo-error",{detail:{error:code}}));
     }
   }
 
