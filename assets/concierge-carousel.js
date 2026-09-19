@@ -105,7 +105,7 @@
       selectButton.addEventListener("click",event=>{
         if(moved){event.preventDefault();return;}
         if(registerUrl)return;
-        select(index,true);
+        select(index,true,"select");
       });
       track.appendChild(card);
       return card;
@@ -162,43 +162,43 @@
       if(control) voiceHost.appendChild(control);
     }
 
-    function updateInfo(emit=false){
+    function updateInfo(emit=false,interaction="programmatic"){
       const profile=profiles[active]; name.textContent=profile.name; description.textContent=profile.description;
       const provisional=profile.voiceStatus!=="approved";
       voiceNote.hidden=!provisional;
       voiceNote.textContent=provisional?"Die Hörprobe ist noch nicht final freigegeben.":"";
       status.hidden=variant!=="selection"&&!registerUrl;
-      status.textContent=registerUrl?"Registrieren":"Ausgewählt";
-      status.disabled=!registerUrl;
+      status.textContent=registerUrl?"Registrieren":variant==="selection"?"Concierge auswählen":"Ausgewählt";
+      status.disabled=!registerUrl&&variant!=="selection";
       renderVoice(profile);
       if(input&&input.value!==profile.key){input.value=profile.key;if(emit){input.dispatchEvent(new Event("input",{bubbles:true}));input.dispatchEvent(new Event("change",{bubbles:true}));}}
-      if(emit) root.dispatchEvent(new CustomEvent("conciergechange",{bubbles:true,detail:profile}));
+      if(emit) root.dispatchEvent(new CustomEvent("conciergechange",{bubbles:true,detail:{...profile,interaction}}));
     }
 
-    function select(target,emit=false){
+    function select(target,emit=false,interaction="programmatic"){
       const numeric=typeof target==="number",index=numeric?target:profiles.indexOf(byKey[target]);
       if(!numeric&&index<0)return;
       const next=mod(index);
-      if(next===active&&dragX===0)return;
+      if(next===active&&dragX===0){if(emit)updateInfo(true,interaction);return;}
       window.NAHWERKVoicePreview?.stopAll();
-      active=next; dragX=0; warmWindow(active); positionCards(); updateInfo(emit);
+      active=next; dragX=0; warmWindow(active); positionCards(); updateInfo(emit,interaction);
     }
 
-    const move=(direction,emit=false)=>select(active+direction,emit);
-    root.querySelector(".prev").addEventListener("click",()=>move(-1,true));
-    root.querySelector(".next").addEventListener("click",()=>move(1,true));
-    status.addEventListener("click",()=>goToRegistration());
-    stage.addEventListener("keydown",event=>{if(event.key==="ArrowLeft"){event.preventDefault();move(-1,true);}if(event.key==="ArrowRight"){event.preventDefault();move(1,true);}if(event.key==="Home"){event.preventDefault();select(0,true);}if(event.key==="End"){event.preventDefault();select(profiles.length-1,true);}});
+    const move=(direction,emit=false,interaction="browse")=>select(active+direction,emit,interaction);
+    root.querySelector(".prev").addEventListener("click",()=>move(-1,false,"browse"));
+    root.querySelector(".next").addEventListener("click",()=>move(1,false,"browse"));
+    status.addEventListener("click",()=>{if(registerUrl)goToRegistration();else if(variant==="selection")select(active,true,"select");});
+    stage.addEventListener("keydown",event=>{if(event.key==="ArrowLeft"){event.preventDefault();move(-1,false,"browse");}if(event.key==="ArrowRight"){event.preventDefault();move(1,false,"browse");}if(event.key==="Home"){event.preventDefault();select(0,false,"browse");}if(event.key==="End"){event.preventDefault();select(profiles.length-1,false,"browse");}});
     stage.addEventListener("pointerdown",event=>{if(event.target.closest(".nw-voice-preview-control"))return;dragging=true;moved=false;pointerStart=event.clientX;dragX=0;stage.classList.add("is-dragging");if(!event.target.closest("a.nw-carousel-select"))stage.setPointerCapture?.(event.pointerId);});
     stage.addEventListener("pointermove",event=>{if(!dragging)return;dragX=event.clientX-pointerStart;moved||=Math.abs(dragX)>6;positionCards();});
-    const finishDrag=()=>{if(!dragging)return;dragging=false;stage.classList.remove("is-dragging");const steps=Math.round(-dragX/Math.max(1,cardSpacing));if(steps)select(active+steps,true);else{dragX=0;positionCards();}setTimeout(()=>{moved=false;},0);};
+    const finishDrag=()=>{if(!dragging)return;dragging=false;stage.classList.remove("is-dragging");const steps=Math.round(-dragX/Math.max(1,cardSpacing));if(steps)select(active+steps,false,"browse");else{dragX=0;positionCards();}setTimeout(()=>{moved=false;},0);};
     stage.addEventListener("pointerup",finishDrag); stage.addEventListener("pointercancel",finishDrag);
-    stage.addEventListener("wheel",event=>{if(Math.abs(event.deltaX)<=Math.abs(event.deltaY)||wheelLock)return;event.preventDefault();wheelLock=true;move(event.deltaX>0?1:-1,true);setTimeout(()=>{wheelLock=false;},280);},{passive:false});
+    stage.addEventListener("wheel",event=>{if(Math.abs(event.deltaX)<=Math.abs(event.deltaY)||wheelLock)return;event.preventDefault();wheelLock=true;move(event.deltaX>0?1:-1,false,"browse");setTimeout(()=>{wheelLock=false;},280);},{passive:false});
 
     let resizeFrame=0;
     addEventListener("resize",()=>{cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(()=>{cardSpacing=measureSpacing();positionCards();});},{passive:true});
 
-    const api={select:key=>{if(byKey[key])select(key,true);},get selected(){return profiles[active];}};
+    const api={select:key=>{if(byKey[key])select(key,false,"programmatic");},get selected(){return profiles[active];}};
     root._nahwerkCarousel=api;
     warmWindow(active);
     positionCards();
