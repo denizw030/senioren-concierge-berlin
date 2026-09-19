@@ -10,7 +10,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,43 +26,69 @@ import com.nahwerk.concierge.data.CustomerHistorySessionExpiredException
 import kotlinx.coroutines.delay
 
 @Composable
-internal fun CustomerSharedHistorySurface(onSessionExpired: () -> Unit) {
+internal fun CustomerSharedHistorySurface(
+    onSessionExpired: () -> Unit,
+    channel: String
+) {
     val context = LocalContext.current
     val api = remember { CustomerHistoryApi(context) }
-    var messages by remember { mutableStateOf<List<CustomerHistoryMessage>>(emptyList()) }
-    var loading by remember { mutableStateOf(true) }
-    var error by remember { mutableStateOf<String?>(null) }
+    var messages by remember(channel) { mutableStateOf<List<CustomerHistoryMessage>>(emptyList()) }
+    var loading by remember(channel) { mutableStateOf(true) }
+    var error by remember(channel) { mutableStateOf<String?>(null) }
 
     suspend fun refresh() {
-        api.loadThreads()
-            .onSuccess { threads ->
-                val thread = threads.firstOrNull()
-                if (thread == null) {
-                    messages = emptyList()
-                    error = null
-                    loading = false
-                    return@onSuccess
-                }
-                api.loadMessages(thread.id)
+        val normalized = channel.uppercase()
+        when (normalized) {
+            "CHAT" -> {
+                api.loadThreads()
+                    .onSuccess { threads ->
+                        val thread = threads.firstOrNull { it.channels.any { ch -> ch == "WEB" || ch == "APP" } }
+                        if (thread == null) {
+                            messages = emptyList()
+                            error = null
+                            loading = false
+                            return@onSuccess
+                        }
+                        api.loadMessages(thread.id)
+                            .onSuccess {
+                                messages = it.filter { item -> item.channel == "WEB" || item.channel == "APP" }
+                                error = null
+                                loading = false
+                            }
+                            .onFailure {
+                                loading = false
+                                if (it is CustomerHistorySessionExpiredException) onSessionExpired()
+                                else error = it.message ?: "Chat konnte nicht geladen werden."
+                            }
+                    }
+                    .onFailure {
+                        loading = false
+                        if (it is CustomerHistorySessionExpiredException) onSessionExpired()
+                        else error = it.message ?: "Chat konnte nicht geladen werden."
+                    }
+            }
+            "WHATSAPP", "PHONE" -> {
+                api.loadChannel(normalized)
                     .onSuccess {
-                        messages = it
+                        messages = it.messages
                         error = null
                         loading = false
                     }
                     .onFailure {
                         loading = false
                         if (it is CustomerHistorySessionExpiredException) onSessionExpired()
-                        else error = it.message ?: "Hauptverlauf konnte nicht geladen werden."
+                        else error = it.message ?: "Protokoll konnte nicht geladen werden."
                     }
             }
-            .onFailure {
+            else -> {
+                messages = emptyList()
+                error = "Dieser Chat-Kanal ist nicht verfügbar."
                 loading = false
-                if (it is CustomerHistorySessionExpiredException) onSessionExpired()
-                else error = it.message ?: "Hauptverlauf konnte nicht geladen werden."
             }
+        }
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(channel) {
         while (true) {
             refresh()
             delay(5_000)
@@ -79,12 +104,22 @@ internal fun CustomerSharedHistorySurface(onSessionExpired: () -> Unit) {
             Modifier.fillMaxWidth().padding(NahwerkSpacing.Lg),
             verticalArrangement = Arrangement.spacedBy(NahwerkSpacing.Md)
         ) {
-            Text("HAUPT-CHAT", color = NahwerkPalette.Gold, style = MaterialTheme.typography.labelSmall)
-            Text("Web · App · WhatsApp", style = MaterialTheme.typography.titleMedium)
             Text(
-                "WhatsApp-Unterhaltungen erscheinen hier automatisch. Nachrichten aus der App oder dem Web werden nicht zusätzlich an WhatsApp versendet.",
-                color = NahwerkPalette.SecondaryText,
-                style = MaterialTheme.typography.bodySmall
+                when (channel.uppercase()) {
+                    "WHATSAPP" -> "WHATSAPP-PROTOKOLL"
+                    "PHONE" -> "ANRUFPROTOKOLL"
+                    else -> "CHAT"
+                },
+                color = NahwerkPalette.Gold,
+                style = MaterialTheme.typography.labelSmall
+            )
+            Text(
+                when (channel.uppercase()) {
+                    "WHATSAPP" -> "Nur lesen · Antworten direkt in WhatsApp"
+                    "PHONE" -> "Nur lesen · Gespräche mit deinem Concierge"
+                    else -> "Web · App"
+                },
+                style = MaterialTheme.typography.titleMedium
             )
 
             when {
@@ -92,16 +127,19 @@ internal fun CustomerSharedHistorySurface(onSessionExpired: () -> Unit) {
                     CircularProgressIndicator(strokeWidth = 2.dp)
                     Text("Verlauf wird geladen.", color = NahwerkPalette.SecondaryText)
                 }
-                error != null && messages.isEmpty() -> Text(requireNotNull(error), color = NahwerkPalette.Error, style = MaterialTheme.typography.bodySmall)
-                messages.isEmpty() -> Text("Noch keine Nachrichten im gemeinsamen Verlauf.", color = NahwerkPalette.SecondaryText)
-                else -> messages.takeLast(40).forEach { item ->
-                    val channel = when (item.channel) {
-                        "WHATSAPP" -> "WhatsApp"
-                        "WEB" -> "Web"
-                        "APP" -> "App"
-                        else -> item.channel.ifBlank { "Concierge" }
-                    }
-                    val sender = if (item.role == "assistant") "NAHWERK · $channel" else "Du · $channel"
+                error != null && messages.isEmpty() ->
+                    Text(requireNotNull(error), color = NahwerkPalette.Error, style = MaterialTheme.typography.bodySmall)
+                messages.isEmpty() ->
+                    Text(
+                        when (channel.uppercase()) {
+                            "WHATSAPP" -> "Noch keine WhatsApp-Nachrichten."
+                            "PHONE" -> "Noch kein Gesprächstranskript verfügbar."
+                            else -> "Noch keine Nachrichten."
+                        },
+                        color = NahwerkPalette.SecondaryText
+                    )
+                else -> messages.takeLast(60).forEach { item ->
+                    val sender = if (item.role == "assistant") "NAHWERK" else "Du"
                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         Text(sender, color = NahwerkPalette.Gold, style = MaterialTheme.typography.labelSmall)
                         Text(item.text, style = MaterialTheme.typography.bodyMedium)
@@ -112,7 +150,6 @@ internal fun CustomerSharedHistorySurface(onSessionExpired: () -> Unit) {
             if (error != null && messages.isNotEmpty()) {
                 Text(requireNotNull(error), color = NahwerkPalette.Error, style = MaterialTheme.typography.bodySmall)
             }
-            OutlinedButton(onClick = { loading = true }) { Text("Automatische Aktualisierung aktiv") }
         }
     }
 }
