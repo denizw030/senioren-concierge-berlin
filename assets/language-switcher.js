@@ -18,13 +18,15 @@
     const parts = pathname.split('/').filter(Boolean);
     let lang = 'de';
     if (parts[0] === 'en' || parts[0] === 'tr') lang = parts.shift();
-    const page = parts.length ? parts[parts.length - 1] : 'index.html';
-    return { lang, page: page.endsWith('.html') ? page : 'index.html' };
+    const rawPage = parts.length ? parts[parts.length - 1] : 'index.html';
+    const page = rawPage === 'index' ? 'index.html' : (rawPage.endsWith('.html') ? rawPage : `${rawPage}.html`);
+    return { lang, page };
   };
 
   const localeHref = (lang, page) => {
-    if (lang === 'de') return page === 'index.html' ? '/' : `/${page}`;
-    return page === 'index.html' ? `/${lang}/` : `/${lang}/${page}`;
+    const cleanPage = page === 'index.html' ? '' : page.replace(/\.html$/i, '');
+    if (lang === 'de') return cleanPage ? `/${cleanPage}` : '/de/';
+    return cleanPage ? `/${lang}/${cleanPage}` : `/${lang}/`;
   };
 
   const injectStyles = () => {
@@ -224,12 +226,15 @@
       path = path.replace(/^\//, '');
       const base = path.split(/[?#]/)[0];
       const suffix = path.slice(base.length);
-      if (base === '' || base === 'index.html') {
+      if (base === '' || base === 'index' || base === 'index.html') {
         link.setAttribute('href', localeHref(lang, 'index.html') + suffix);
-      } else if (LOCALIZED_PAGES.has(base)) {
-        link.setAttribute('href', localeHref(lang, base) + suffix);
-      } else if (base.endsWith('.html')) {
-        link.setAttribute('href', `/${path}`);
+      } else {
+        const pageKey = base.endsWith('.html') ? base : `${base}.html`;
+        if (LOCALIZED_PAGES.has(pageKey)) {
+          link.setAttribute('href', localeHref(lang, pageKey) + suffix);
+        } else if (base.endsWith('.html')) {
+          link.setAttribute('href', `/${base.replace(/\.html$/i, '')}${suffix}`);
+        }
       }
     });
   };
@@ -328,8 +333,9 @@
       const active = root?.querySelector('.nw-carousel-card.is-active .nw-carousel-select[href]');
       if (active) {
         const target = new URL(active.getAttribute('href'), location.href);
-        if (/^\/(?:en|tr)\/registrieren\.html$/i.test(target.pathname)) target.pathname = '/registrieren.html';
-        if (target.pathname === '/registrieren.html') {
+        if (/^\/(?:en|tr)\/registrieren(?:\.html)?$/i.test(target.pathname)) target.pathname = '/registrieren';
+        if (/^\/registrieren(?:\.html)?$/i.test(target.pathname)) {
+          target.pathname = '/registrieren';
           event.preventDefault();
           event.stopImmediatePropagation();
           location.href = `${target.pathname}${target.search}${target.hash}`;

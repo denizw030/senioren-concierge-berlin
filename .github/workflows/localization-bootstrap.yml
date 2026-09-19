@@ -11,7 +11,9 @@ on:
       - 'scripts/i18n-mirror.py'
       - 'scripts/i18n-home-routing.py'
       - 'scripts/auth-locale-bootstrap.py'
+      - 'scripts/clean-url-postprocess.py'
       - 'assets/language-switcher.js'
+      - 'assets/clean-url.js'
       - 'assets/app-language-switcher.js'
       - 'assets/auth-i18n.js'
       - 'assets/auth-slider-i18n.js'
@@ -52,6 +54,8 @@ jobs:
         run: python scripts/i18n-home-routing.py restore-root
       - name: Preserve language through registration and login
         run: python scripts/auth-locale-bootstrap.py
+      - name: Normalize public URLs
+        run: python scripts/clean-url-postprocess.py
       - name: Validate SEO, visual parity, link flow and complete EN/TR localization
         run: node --test tests/seo-indexing.test.mjs tests/i18n-design-parity.test.mjs tests/i18n-link-flow.test.mjs tests/i18n-completeness.test.mjs
       - name: Validate clean diff
@@ -64,6 +68,6 @@ jobs:
           fi
           git config user.name 'nahwerk-prod-bot'
           git config user.email 'actions@users.noreply.github.com'
-          git add de en tr sitemap.xml tests/seo-indexing.test.mjs *.html assets/onboarding.js
+          git add -A
           git commit -m 'i18n: publish exact-design DE EN and TR pages'
           git push origin HEAD:main

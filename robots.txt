@@ -2,18 +2,18 @@ User-agent: *
 Allow: /
 
 # Customer, authentication and post-registration surfaces are not search landing pages.
-Disallow: /anmelden.html
-Disallow: /registrieren.html
-Disallow: /konto.html
-Disallow: /payg.html
-Disallow: /web-concierge.html
-Disallow: /passwort-zuruecksetzen.html
-Disallow: /zugang-uebertragen.html
-Disallow: /concierge-anpassen.html
-Disallow: /martin-anpassen.html
-Disallow: /voice-audition.html
-Disallow: /vertrag-widerrufen.html
-Disallow: /erster-schritt.html
+Disallow: /anmelden
+Disallow: /registrieren
+Disallow: /konto
+Disallow: /payg
+Disallow: /web-concierge
+Disallow: /passwort-zuruecksetzen
+Disallow: /zugang-uebertragen
+Disallow: /concierge-anpassen
+Disallow: /martin-anpassen
+Disallow: /voice-audition
+Disallow: /vertrag-widerrufen
+Disallow: /erster-schritt
 
 # Engineering/runtime material published from the repository must not enter the search index.
 Disallow: /.github/

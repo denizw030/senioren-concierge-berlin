@@ -12,12 +12,14 @@ on:
       - 'sitemap.xml'
       - 'assets/site-ui.js'
       - 'assets/language-switcher.js'
+      - 'assets/clean-url.js'
       - 'locales/*.json'
       - 'tests/seo-indexing.test.mjs'
       - 'tests/i18n-design-parity.test.mjs'
       - 'scripts/localization-bootstrap.py'
       - 'scripts/i18n-mirror.py'
       - 'scripts/i18n-home-routing.py'
+      - 'scripts/clean-url-postprocess.py'
       - '.github/workflows/seo-indexing.yml'
   pull_request:
     paths:
@@ -29,12 +31,14 @@ on:
       - 'sitemap.xml'
       - 'assets/site-ui.js'
       - 'assets/language-switcher.js'
+      - 'assets/clean-url.js'
       - 'locales/*.json'
       - 'tests/seo-indexing.test.mjs'
       - 'tests/i18n-design-parity.test.mjs'
       - 'scripts/localization-bootstrap.py'
       - 'scripts/i18n-mirror.py'
       - 'scripts/i18n-home-routing.py'
+      - 'scripts/clean-url-postprocess.py'
       - '.github/workflows/seo-indexing.yml'
 
 permissions:

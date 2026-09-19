@@ -15,7 +15,11 @@
   ]);
   const SUPPORTED = new Set(['de','en','tr']);
 
-  const basename = (pathname = location.pathname) => pathname.split('/').filter(Boolean).pop() || 'index.html';
+  const basename = (pathname = location.pathname) => {
+    const raw = pathname.split('/').filter(Boolean).pop() || 'index';
+    if (raw === 'de' || raw === 'en' || raw === 'tr' || raw === 'index') return 'index.html';
+    return raw.endsWith('.html') ? raw : `${raw}.html`;
+  };
   const referrerLang = () => {
     try {
       const url = new URL(document.referrer);
@@ -68,14 +72,16 @@
   let scheduled = false;
 
   const publicHref = (targetLang, page, suffix = '') => {
-    if (targetLang === 'de') return page === 'index.html' ? `/${suffix}` : `/${page}${suffix}`;
-    return page === 'index.html' ? `/${targetLang}/${suffix}` : `/${targetLang}/${page}${suffix}`;
+    const cleanPage = page === 'index.html' ? '' : page.replace(/\.html$/i, '');
+    if (targetLang === 'de') return cleanPage ? `/${cleanPage}${suffix}` : `/de/${suffix}`;
+    return cleanPage ? `/${targetLang}/${cleanPage}${suffix}` : `/${targetLang}/${suffix}`;
   };
 
   const appHref = (targetLang, raw) => {
     const url = new URL(raw, location.origin + '/');
     const page = basename(url.pathname);
-    url.pathname = `/${page}`;
+    const cleanPage = page.replace(/\.html$/i, '');
+    url.pathname = `/${cleanPage}`;
     if (targetLang === 'de') url.searchParams.delete('lang');
     else url.searchParams.set('lang', targetLang);
     return `${url.pathname}${url.search}${url.hash}`;
