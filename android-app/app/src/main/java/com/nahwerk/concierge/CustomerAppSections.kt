@@ -43,6 +43,7 @@ import com.nahwerk.concierge.data.AppGatewaySessionExpiredException
 import com.nahwerk.concierge.data.AppHomeSnapshot
 import com.nahwerk.concierge.data.AppPersonaSnapshot
 import com.nahwerk.concierge.data.CustomerProfile
+import com.nahwerk.concierge.data.CustomerHistoryApi
 import com.nahwerk.concierge.data.ProdCustomerApi
 import com.nahwerk.concierge.data.SafetySnapshot
 import kotlinx.coroutines.launch
@@ -219,6 +220,7 @@ private fun CustomerConciergeSurface(
     val context = LocalContext.current
     val appApi = remember { AppGatewayApi(context) }
     val productApi = remember { ProdCustomerApi(context) }
+    val historyApi = remember { CustomerHistoryApi(context) }
     val scope = rememberCoroutineScope()
     var home by remember { mutableStateOf<AppHomeSnapshot?>(null) }
     var profile by remember { mutableStateOf<CustomerProfile?>(null) }
@@ -226,6 +228,8 @@ private fun CustomerConciergeSurface(
     var reply by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
+    var chatChannel by rememberSaveable { mutableStateOf("CHAT") }
+    var phoneAvailable by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         appApi.loadHome().onSuccess { home = it }.onFailure {
@@ -233,6 +237,10 @@ private fun CustomerConciergeSurface(
         }
         productApi.loadProfile().onSuccess { profile = it }.onFailure {
             if (!productApi.hasSession()) onSessionExpired()
+        }
+        historyApi.loadChannel("PHONE", summaryOnly = true).onSuccess {
+            phoneAvailable = it.hasCalls
+            if (!phoneAvailable && chatChannel == "PHONE") chatChannel = "CHAT"
         }
     }
 
@@ -242,52 +250,87 @@ private fun CustomerConciergeSurface(
     val appUsed = profile?.appDialoguesUsed
     val appLimitReached = appLimit != null && appUsed != null && appLimit >= 0 && appUsed >= appLimit
 
-    if (appLimitReached) {
-        CustomerMessageCard(
-            title = "Dein App-Kontingent ist aufgebraucht",
-            body = "Für den aktuellen Abrechnungszeitraum sind keine weiteren App-Nachrichten verfügbar. Unter Nutzung siehst du dein Kontingent und mögliche nächste Schritte.",
-            warning = true
-        )
-        Button(onClick = onOpenUsage, modifier = Modifier.fillMaxWidth()) { Text("Nutzung & Upgrade ansehen") }
-    } else {
-        CustomerSectionCard("CONCIERGE", "Was soll ich für dich tun?") {
-            OutlinedTextField(
-                value = draft,
-                onValueChange = { draft = it.take(5000) },
-                label = { Text("Nachricht") },
-                minLines = 3,
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !busy
-            )
-            Button(
-                onClick = {
-                    busy = true
-                    reply = null
-                    error = null
-                    scope.launch {
-                        appApi.sendConcierge(draft)
-                            .onSuccess {
-                                reply = it.message
-                                draft = ""
-                            }
-                            .onFailure {
-                                if (it is AppGatewaySessionExpiredException) onSessionExpired()
-                                else error = customerSafeError(it)
-                            }
-                        busy = false
-                    }
-                },
-                enabled = !busy && draft.isNotBlank(),
-                modifier = Modifier.fillMaxWidth().heightIn(min = NahwerkSizes.PrimaryTouch).testTag("concierge_send")
-            ) {
-                if (busy) CircularProgressIndicator(strokeWidth = 2.dp) else Text("Senden")
+    CustomerSectionCard("CHAT-KANÄLE", "Chat · WhatsApp · Anrufprotokoll") {
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(NahwerkSpacing.Sm)
+        ) {
+            if (chatChannel == "CHAT") {
+                Button(onClick = { chatChannel = "CHAT" }) { Text("Chat") }
+            } else {
+                OutlinedButton(onClick = { chatChannel = "CHAT" }) { Text("Chat") }
             }
-            reply?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
-            error?.let { Text(it, color = NahwerkPalette.Error, style = MaterialTheme.typography.bodySmall) }
+            if (chatChannel == "WHATSAPP") {
+                Button(onClick = { chatChannel = "WHATSAPP" }) { Text("WhatsApp") }
+            } else {
+                OutlinedButton(onClick = { chatChannel = "WHATSAPP" }) { Text("WhatsApp") }
+            }
+            if (phoneAvailable) {
+                if (chatChannel == "PHONE") {
+                    Button(onClick = { chatChannel = "PHONE" }) { Text("Anrufprotokoll") }
+                } else {
+                    OutlinedButton(onClick = { chatChannel = "PHONE" }) { Text("Anrufprotokoll") }
+                }
+            }
         }
     }
 
-    CustomerSharedHistorySurface(onSessionExpired = onSessionExpired)
+    if (chatChannel == "CHAT") {
+        if (appLimitReached) {
+            CustomerMessageCard(
+                title = "Dein App-Kontingent ist aufgebraucht",
+                body = "Für den aktuellen Abrechnungszeitraum sind keine weiteren App-Nachrichten verfügbar. Unter Nutzung siehst du dein Kontingent und mögliche nächste Schritte.",
+                warning = true
+            )
+            Button(onClick = onOpenUsage, modifier = Modifier.fillMaxWidth()) { Text("Nutzung & Upgrade ansehen") }
+        } else {
+            CustomerSectionCard("CONCIERGE", "Was soll ich für dich tun?") {
+                OutlinedTextField(
+                    value = draft,
+                    onValueChange = { draft = it.take(5000) },
+                    label = { Text("Nachricht") },
+                    minLines = 3,
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !busy
+                )
+                Button(
+                    onClick = {
+                        busy = true
+                        reply = null
+                        error = null
+                        scope.launch {
+                            appApi.sendConcierge(draft)
+                                .onSuccess {
+                                    reply = it.message
+                                    draft = ""
+                                }
+                                .onFailure {
+                                    if (it is AppGatewaySessionExpiredException) onSessionExpired()
+                                    else error = customerSafeError(it)
+                                }
+                            busy = false
+                        }
+                    },
+                    enabled = !busy && draft.isNotBlank(),
+                    modifier = Modifier.fillMaxWidth().heightIn(min = NahwerkSizes.PrimaryTouch).testTag("concierge_send")
+                ) {
+                    if (busy) CircularProgressIndicator(strokeWidth = 2.dp) else Text("Senden")
+                }
+                reply?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
+                error?.let { Text(it, color = NahwerkPalette.Error, style = MaterialTheme.typography.bodySmall) }
+            }
+        }
+    } else {
+        CustomerMessageCard(
+            title = "Nur Protokoll",
+            body = if (chatChannel == "WHATSAPP")
+                "Hier wird dein WhatsApp-Verlauf angezeigt. Antworten sind nur direkt in WhatsApp möglich."
+            else
+                "Hier wird das Gespräch mit deinem Concierge dokumentiert. In diesem Protokoll kann nicht geschrieben werden."
+        )
+    }
+
+    CustomerSharedHistorySurface(onSessionExpired = onSessionExpired, channel = chatChannel)
 }
 
 @Composable
