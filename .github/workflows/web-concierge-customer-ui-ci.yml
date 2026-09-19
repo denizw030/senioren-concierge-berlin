@@ -1,6 +1,18 @@
 name: Web Concierge Customer UI CI
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'web-concierge.html'
+      - 'web-concierge/**'
+      - 'app-live.html'
+      - 'assets/nahwerk-live-concierge.js'
+      - 'assets/nahwerk-live-concierge.css'
+      - 'assets/web-live-concierge.js'
+      - 'assets/web-customer-concierge.js'
+      - 'tests/web-live-concierge.test.mjs'
+      - '.github/workflows/web-concierge-customer-ui-ci.yml'
   pull_request:
     paths:
       - 'web-concierge.html'
@@ -29,4 +41,4 @@ jobs:
         with:
           node-version: '22'
       - name: Run Web Concierge customer UI contract
-        run: node --test tests/web-account-webconcierge-prod.test.mjs tests/website-theme-footer-consistency.test.mjs
+        run: node --test tests/web-live-concierge.test.mjs tests/web-account-webconcierge-prod.test.mjs tests/website-theme-footer-consistency.test.mjs
