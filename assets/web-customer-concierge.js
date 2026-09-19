@@ -411,7 +411,13 @@
       const canonicalThreadId=String(response?.core?.conversation_id||"");if(validUuid(canonicalThreadId))activeThreadId=canonicalThreadId;
       await loadThreads();
       if(validUuid(activeThreadId))await refreshThread(activeThreadId,{force:true});
-    }catch{
+    }catch(error){
+      const reason=String(error?.message||"");
+      if(/SESSION_(?:REQUIRED|INVALID)|http_401|http_403/i.test(reason)){
+        window.SCBAuth?.clearLocalAuth?.();
+        location.replace("/anmelden");
+        return;
+      }
       removeTyping();const row=document.querySelector(`[data-message-id="${CSS.escape(clientId)}"]`);row?.classList.add("is-failed");
       if(row){const state=document.createElement("span");state.className="web-concierge-message-state";state.textContent="Nicht gesendet – bitte noch einmal versuchen.";row.appendChild(state);}
     }finally{sending=false;setComposerReady(gatewayReady);input.focus();}
@@ -469,13 +475,11 @@ composerInput?.addEventListener("focus",()=>{syncIosVisualViewport();setTimeout(
 composerInput?.addEventListener("blur",()=>setTimeout(syncIosVisualViewport,120));
 syncIosVisualViewport();
 
-    const validSession=window.SCBAuth?.validateSession
-      ? await Promise.race([
-          window.SCBAuth.validateSession().catch(()=>false),
-          new Promise((resolve)=>setTimeout(()=>resolve(false),CLIENT_FETCH_TIMEOUT_MS))
-        ])
-      : Boolean(sessionToken());
-    if(!validSession||!sessionToken()){location.replace("/anmelden");return;}
+    const token=sessionToken();
+    if(!token){location.replace("/anmelden");return;}
+    // Do not block the chat UI on a duplicate client-side session preflight.
+    // Every authenticated gateway request validates the bearer session server-side again.
+    void window.SCBAuth?.validateSession?.().catch(()=>false);
     applyPersona(null);
     const status=document.getElementById("webConciergeStatus");
     setComposerReady(false);
