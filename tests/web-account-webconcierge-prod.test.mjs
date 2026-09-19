@@ -6,7 +6,6 @@ const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf
 const page = read("web-concierge.html");
 const cleanPage = read("web-concierge/index.html");
 const client = read("assets/web-customer-concierge.js");
-const threadScope = read("assets/web-customer-concierge-thread-scope.js");
 const shadow = read("assets/web-core-shadow.js");
 const legacyUi = read("assets/web-concierge-chat.js");
 const siteUi = read("assets/site-ui.js");
@@ -88,13 +87,14 @@ test("persisted chat history is authenticated, paginated and reuses the canonica
 test("Web Concierge keeps the normal Web/App chat separate from WhatsApp", () => {
   assert.match(client, /SYNC_INTERVAL_MS = 3000/);
   assert.match(client, /setInterval\(\(\)=>\{void syncHistory\(\);\},SYNC_INTERVAL_MS\)/);
-  assert.match(threadScope, /NORMAL_CHANNELS=new Set\(\["WEB","APP"\]\)/);
-  assert.match(threadScope, /title:"WhatsApp"/);
-  assert.match(threadScope, /channel_view:"WHATSAPP"/);
-  assert.match(threadScope, /messageMatchesView\(message,view\)/);
-  assert.match(threadScope, /channel==="WHATSAPP"/);
-  assert.match(threadScope, /return NORMAL_CHANNELS\.has\(channel\)/);
-  assert.doesNotMatch(threadScope, /title:"Hauptchat"|Web · App · WhatsApp/);
+  assert.match(client, /NORMAL_CHAT_CHANNELS=new Set\(\["WEB","APP"\]\)/);
+  assert.match(client, /VIRTUAL_WHATSAPP_THREAD_ID/);
+  assert.match(client, /title:"WhatsApp"/);
+  assert.match(client, /channel_view:"WHATSAPP"/);
+  assert.match(client, /primaryChatThreadId/);
+  assert.match(client, /source\.find\(isNormalThread\)\|\|null/);
+  assert.doesNotMatch(page, /web-customer-concierge-thread-scope\.js/);
+  assert.doesNotMatch(cleanPage, /web-customer-concierge-thread-scope\.js/);
 });
 
 test("account Concierge entry opens the real main customer chat without a Web Chat layer", () => {
@@ -139,20 +139,20 @@ test("channel view state is initialized before boot", () => {
   assert.match(client, /let channelViewReadOnly = false;/);
 });
 
-test("channel decoration does not self-trigger the chat-list MutationObserver", () => {
-  assert.match(threadScope, /title&&title\.textContent!=="WhatsApp"/);
-  assert.match(threadScope, /title&&title\.textContent!=="Telegram"/);
-  assert.match(threadScope, /preview&&preview\.textContent!==""/);
+test("channel rendering is native and no MutationObserver shim is loaded", () => {
+  assert.doesNotMatch(page, /web-customer-concierge-thread-scope\.js/);
+  assert.doesNotMatch(cleanPage, /web-customer-concierge-thread-scope\.js/);
+  assert.doesNotMatch(client, /new MutationObserver/);
 });
 
-test("WhatsApp is a separate channel chat and cannot accidentally send as Web", () => {
-  assert.match(threadScope, /VIRTUAL_WHATSAPP_THREAD_ID/);
-  assert.match(threadScope, /channel_view:"WHATSAPP"/);
-  assert.match(threadScope, /channel_view_read_only/);
-  assert.match(threadScope, /nahwerk:chat-channel-view/);
-  assert.match(client, /channelViewReadOnly/);
+test("WhatsApp is a separate read-only protocol and cannot accidentally send as Web", () => {
+  assert.match(client, /VIRTUAL_WHATSAPP_THREAD_ID/);
+  assert.match(client, /channel_view:"WHATSAPP"/);
+  assert.match(client, /channelViewReadOnly=view!=="CHAT"/);
+  assert.match(client, /nahwerk:chat-channel-view/);
   assert.match(client, /WhatsApp-Verlauf – antworte in WhatsApp/);
   assert.match(client, /sending\|\|channelViewReadOnly/);
+  assert.match(client, /channelHistoryRequest\("PHONE",\{summary:true\}\)/);
 });
 
 test("legacy Shadow transport remains inert", () => {
