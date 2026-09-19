@@ -61,7 +61,7 @@ test("customer message appears immediately and browser sends only message plus c
   assert.match(client, /message:content,source_message_id:sourceMessageId,thread_id:activeThreadId/);
   assert.match(client, /response\?\.thread_id&&response\?\.thread_id!==activeThreadId/);
   assert.match(client, /renderCoreV1Response\(response\.core\)/);
-  assert.match(client, /response\?\.core\?\.conversation_id/);
+  assert.match(client, /const returnedThreadId=String\(response\?\.thread_id\|\|""\)/);
   assert.doesNotMatch(client, /customer_account_id\s*:/);
   assert.doesNotMatch(client, /customer_member_id\s*:/);
   assert.doesNotMatch(client, /person_id\s*:/);
@@ -187,7 +187,7 @@ test("legacy and clean routes expose the same end-customer messenger", () => {
     assert.match(surface, /Neuer Chat/);
     assert.match(surface, /Deine Chats/);
     assert.match(surface, /aria-label="Chatverlauf"/);
-    assert.match(surface, /assets\/web-customer-concierge\.js\?v=34/);
+    assert.match(surface, /assets\/web-customer-concierge\.js\?v=35/);
     assert.doesNotMatch(surface, /web-customer-concierge-thread-scope\.js/);
     assert.doesNotMatch(surface, /PROD|autoritativ|Core-v1|web-gateway-v1|Fail-closed|Shadow-Antworten|kanonische Kundenidentität/i);
   }

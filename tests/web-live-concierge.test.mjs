@@ -10,10 +10,10 @@ const read=(p)=>readFileSync(new URL("../"+p,import.meta.url),"utf8");
 test("web chat mounts Live Concierge on the right without replacing voice memo",()=>{
   for(const page of ["web-concierge.html","web-concierge/index.html"]){
     const html=read(page);
-    assert.match(html,/assets\/web-voice-memo\.js\?v=8/);
-    assert.match(html,/assets\/web-customer-concierge\.js\?v=29/);
-    assert.match(html,/assets\/web-live-concierge\.js\?v=14/);
-    assert.match(html,/assets\/nahwerk-live-concierge\.css\?v=3/);
+    assert.match(html,/assets\/web-voice-memo\.js\?v=10/);
+    assert.match(html,/assets\/web-customer-concierge\.js\?v=35/);
+    assert.match(html,/assets\/web-live-concierge\.js\?v=15/);
+    assert.match(html,/assets\/nahwerk-live-concierge\.css\?v=4/);
   }
   const boot=read("assets/web-live-concierge.js");
   assert.match(boot,/send\.after\(button\)/);
@@ -71,13 +71,15 @@ test("web chat keeps session validation nonblocking while gateway validates ever
   assert.match(chat,/headers\.Authorization=\`Bearer \$\{token\}\`/);
 });
 
-test("web and WhatsApp stay separate with normal chat first",()=>{
-  const scope=read("assets/web-customer-concierge-thread-scope.js");
-  assert.match(scope,/title:"WhatsApp"/);
-  assert.match(scope,/channels:\["WEB","APP"\]/);
-  assert.match(scope,/channels:\["WHATSAPP"\]/);
-  assert.match(scope,/payload\.threads=\[\.\.\.projected,\.\.\.extras,\.\.\.channelThreads\]/);
-  assert.match(scope,/readOnly:next==="WHATSAPP"\|\|next==="TELEGRAM"/);
+test("web, WhatsApp, phone and E-Mail stay separate with normal chat first",()=>{
+  const chat=read("assets/web-customer-concierge.js");
+  assert.match(chat,/const next=\[chatThread,\{/);
+  assert.match(chat,/title:"WhatsApp"/);
+  assert.match(chat,/channels:\["WEB","APP"\]/);
+  assert.match(chat,/channels:\["WHATSAPP"\]/);
+  assert.match(chat,/title:"Telefonprotokoll"/);
+  assert.match(chat,/title:"E-Mail-Protokoll"/);
+  assert.match(chat,/channelViewReadOnly=view!=="CHAT"/);
 });
 
 
@@ -89,26 +91,22 @@ test("Live preloads the active concierge portrait and reports safe client failur
   assert.match(client,/\/client-error/);
 });
 
-test("channel chats are grouped after normal chats and delete-all uses the shared reset endpoint",()=>{
-  const scope=read("assets/web-customer-concierge-thread-scope.js");
+test("channel chats are grouped after normal chat and delete-all uses the shared reset endpoint",()=>{
   const chat=read("assets/web-customer-concierge.js");
-  assert.match(scope,/payload\.threads=\[\.\.\.projected,\.\.\.extras,\.\.\.channelThreads\]/);
-  assert.doesNotMatch(scope,/channels\.has\("WHATSAPP"\)/);
-  assert.match(scope,/chatChannelFirst/);
+  assert.match(chat,/const next=\[chatThread,\{/);
+  assert.match(chat,/next\.push\(\{[\s\S]*VIRTUAL_PHONE_THREAD_ID/);
+  assert.match(chat,/next\.push\(\{[\s\S]*VIRTUAL_EMAIL_THREAD_ID/);
   assert.match(chat,/\/web\/chats\/reset/);
   assert.match(chat,/Alle Chats aus Web und App entfernen/);
-  assert.match(read("assets/web-customer-concierge.css"),/content:"CHAT KANÄLE"/);
 });
 
 
 // PERSISTENT_CHANNEL_SECTION_V1
-test("WhatsApp channel stays visible under Chat Kanäle even without a current WhatsApp turn",()=>{
-  const scope=read("assets/web-customer-concierge-thread-scope.js");
-  const css=read("assets/web-customer-concierge.css");
-  assert.match(scope,/channelThreads\.push\(\{[\s\S]*title:"WhatsApp"/);
-  assert.doesNotMatch(scope,/if\(channels\.has\("WHATSAPP"\)\)/);
-  assert.match(css,/content:"CHAT KANÄLE"/);
-  assert.match(read("web-concierge/index.html"),/web-customer-concierge-thread-scope\.js\?v=5/);
+test("WhatsApp channel stays visible without a current WhatsApp turn",()=>{
+  const chat=read("assets/web-customer-concierge.js");
+  assert.match(chat,/thread_id:VIRTUAL_WHATSAPP_THREAD_ID,title:"WhatsApp"/);
+  assert.doesNotMatch(chat,/if\([^\n]*WHATSAPP[^\n]*\)\{\s*next\.push/);
+  assert.doesNotMatch(read("web-concierge/index.html"),/web-customer-concierge-thread-scope\.js/);
 });
 
 
