@@ -31,6 +31,7 @@
   let lastPersonaSyncAt = 0;
   let channelView = "CHAT";
   let channelViewReadOnly = false;
+  let primaryChatThreadId = null;
   const VIRTUAL_WHATSAPP_THREAD_ID="00000000-0000-4000-8000-0000000000a1";
   const VIRTUAL_PHONE_THREAD_ID="00000000-0000-4000-8000-0000000000a3";
   const NORMAL_CHAT_CHANNELS=new Set(["WEB","APP"]);
@@ -472,13 +473,20 @@
     try{
       const data=await historyRequest();
       const source=Array.isArray(data.threads)?data.threads:[];
-      const normal=source.find(isNormalThread)||source.find((thread)=>validUuid(thread?.thread_id))||null;
-      const next=[];
-      if(normal)next.push({...normal,title:"Chat",channels:["WEB","APP"],channel_view:"CHAT"});
-      next.push({
+      const normal=source.find(isNormalThread)||null;
+      if(validUuid(normal?.thread_id))primaryChatThreadId=String(normal.thread_id);
+      if(!validUuid(primaryChatThreadId)){
+        const currentNormal=activeThreadId&&channelForThreadId(activeThreadId)==="CHAT"&&validUuid(activeThreadId)?activeThreadId:null;
+        primaryChatThreadId=currentNormal||crypto.randomUUID();
+      }
+      const chatThread=normal&&validUuid(normal?.thread_id)
+        ? {...normal,thread_id:primaryChatThreadId,title:"Chat",channels:["WEB","APP"],channel_view:"CHAT"}
+        : {thread_id:primaryChatThreadId,title:"Chat",preview:"",updated_at:null,created_at:null,turn_count:0,channels:["WEB","APP"],channel_view:"CHAT",draft:true};
+
+      const next=[chatThread,{
         thread_id:VIRTUAL_WHATSAPP_THREAD_ID,title:"WhatsApp",preview:"",updated_at:null,
         channels:["WHATSAPP"],channel_view:"WHATSAPP",virtual_channel_thread:true
-      });
+      }];
       try{
         const phone=await channelHistoryRequest("PHONE");
         if(phone?.has_calls===true){
@@ -490,12 +498,20 @@
       }catch{}
       threadCache=next;
       if(selectFirst&&(!activeThreadId||!threadCache.some((thread)=>thread.thread_id===activeThreadId))){
-        activeThreadId=normal?.thread_id||VIRTUAL_WHATSAPP_THREAD_ID;
+        activeThreadId=primaryChatThreadId;
       }
       renderThreads();
       return true;
     }catch{
-      threadCache=[];
+      if(!validUuid(primaryChatThreadId))primaryChatThreadId=crypto.randomUUID();
+      threadCache=[{
+        thread_id:primaryChatThreadId,title:"Chat",preview:"",updated_at:null,
+        created_at:null,turn_count:0,channels:["WEB","APP"],channel_view:"CHAT",draft:true
+      },{
+        thread_id:VIRTUAL_WHATSAPP_THREAD_ID,title:"WhatsApp",preview:"",updated_at:null,
+        channels:["WHATSAPP"],channel_view:"WHATSAPP",virtual_channel_thread:true
+      }];
+      if(selectFirst&&!activeThreadId)activeThreadId=primaryChatThreadId;
       renderThreads();
       return false;
     }
@@ -547,6 +563,7 @@
     channelView=view;
     channelViewReadOnly=view!=="CHAT";
     setComposerReady(gatewayReady);
+    window.dispatchEvent(new CustomEvent("nahwerk:chat-channel-view",{detail:{channel:view,readOnly:channelViewReadOnly}}));
     resetHistoryState();renderThreads();emptyChat();
     if(view==="CHAT"&&validUuid(threadId))await refreshThread(threadId,{force:true,reset:true});
     else if(view==="WHATSAPP"||view==="PHONE")await refreshChannelView(view);
@@ -719,7 +736,12 @@ syncIosVisualViewport();
 
   window.NAHWERKWebCustomerConciergeLiveBridge=Object.freeze({
     sessionToken,
-    threadId:()=>{if(!activeThreadId)activeThreadId=crypto.randomUUID();return activeThreadId;},
+    threadId:()=>{
+      if(channelView!=="CHAT"||channelViewReadOnly)return null;
+      if(!validUuid(primaryChatThreadId))primaryChatThreadId=validUuid(activeThreadId)?activeThreadId:crypto.randomUUID();
+      if(!validUuid(activeThreadId)||channelForThreadId(activeThreadId)!=="CHAT")activeThreadId=primaryChatThreadId;
+      return activeThreadId;
+    },
     isAllowed:()=>gatewayReady&&!channelViewReadOnly&&channelView==="CHAT"
   });
   window.NAHWERKWebCustomerConciergeTestHooks=Object.freeze({configuredEndpoint,configuredHistoryEndpoint,sessionToken,normalizeGatewayReadiness,normalizeCoreV1Response,normalizePersona,applyPersona,renderCoreV1Response,gatewayRequest,historyRequest,refreshPersona,syncHistory,loadOlderMessages,mergeHistory,CORE_CONTRACT_VERSION,GATEWAY_CONTRACT_VERSION,HISTORY_CONTRACT_VERSION,HISTORY_PAGE_SIZE,SYNC_INTERVAL_MS,PERSONA_SYNC_INTERVAL_MS,GATEWAY_ENDPOINT,HISTORY_ENDPOINT});
