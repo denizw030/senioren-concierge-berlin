@@ -343,3 +343,52 @@ html[data-nw-portal-theme="light"] .web-concierge-delete-chats{color:#7b7368}
   .web-concierge-delete-chats{margin:8px 2px 12px;padding:8px 10px}
   .web-concierge-thread[data-chat-channel-first="true"]{margin-top:34px!important}
 }
+
+/* GPT_STYLE_COMPOSER_AND_AUDIO_MESSAGES_V1_20260919 */
+#webConciergeSend[hidden]{display:none!important}
+#webConciergeLive.nw-live-trigger{
+  width:46px;height:46px;min-width:46px;border-radius:50%;
+  background:#2f7df6;color:#fff;border:0;
+  display:inline-grid;place-items:center;
+  box-shadow:0 8px 24px rgba(47,125,246,.30);
+}
+#webConciergeLive.nw-live-trigger svg{width:22px;height:22px}
+#webConciergeLive.nw-live-trigger.is-send-mode{
+  background:#2f7df6;color:#fff;
+}
+.web-concierge-audio-message{
+  min-width:210px;
+  max-width:min(330px,78vw);
+}
+.web-concierge-audio-player{
+  display:flex;align-items:center;gap:10px;
+  min-height:42px;
+}
+.web-concierge-audio-play{
+  width:34px;height:34px;min-width:34px;border-radius:50%;
+  border:0;background:rgba(255,255,255,.12);color:inherit;
+  display:grid;place-items:center;cursor:pointer;font-size:.85rem;
+}
+.web-concierge-message-user .web-concierge-audio-play{background:rgba(0,0,0,.18)}
+.web-concierge-audio-play.is-loading{opacity:.65;cursor:wait}
+.web-concierge-audio-wave{
+  flex:1;display:flex;align-items:center;gap:2px;height:24px;overflow:hidden;
+}
+.web-concierge-audio-wave i{
+  display:block;width:3px;border-radius:999px;background:currentColor;opacity:.72;
+}
+.web-concierge-audio-wave i:nth-child(1){height:7px}
+.web-concierge-audio-wave i:nth-child(2){height:14px}
+.web-concierge-audio-wave i:nth-child(3){height:20px}
+.web-concierge-audio-wave i:nth-child(4){height:11px}
+.web-concierge-audio-wave i:nth-child(5){height:18px}
+.web-concierge-audio-wave i:nth-child(6){height:22px}
+.web-concierge-audio-wave i:nth-child(7){height:12px}
+.web-concierge-audio-wave i:nth-child(8){height:17px}
+.web-concierge-audio-wave i:nth-child(9){height:8px}
+.web-concierge-audio-duration{
+  font-size:.72rem;opacity:.72;white-space:nowrap;
+}
+.web-concierge-audio-message>.web-concierge-message-time{
+  display:block;text-align:right;margin-top:4px;
+}
