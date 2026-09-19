@@ -325,6 +325,56 @@
     const card=document.createElement("div");card.className=`web-concierge-runtime-card${className?` ${className}`:""}`;
     const title=document.createElement("strong");title.textContent=titleText;const text=document.createElement("span");text.textContent=bodyText;card.append(title,text);log.appendChild(card);scrollBottom();return card;
   }
+  async function connectProvider(provider,button){
+    const providerKey=String(provider?.provider_key||"").trim();
+    const family=String(provider?.connection_family||"").trim();
+    if(!providerKey&&!family)return;
+    const original=button?.textContent||"Verbinden";
+    try{
+      if(button){button.disabled=true;button.textContent="Verbindung wird vorbereitet …";}
+      const out=await gatewayRequest("/web/integrations/connect",{method:"POST",body:{provider_key:providerKey,connection_family:family}});
+      if(out?.authorization_url){location.assign(String(out.authorization_url));return;}
+      if(out?.state==="SETUP_REQUIRED"){
+        addRuntimeCard("Noch nicht direkt verbindbar",String(out.next_action||"Der Anbieterzugang muss zuerst eingerichtet werden."));
+        return;
+      }
+      throw new Error(String(out?.error||"integration_connect_failed"));
+    }catch(error){
+      reportClientDiagnostic("INTEGRATION_CONNECT_"+String(error?.message||"failed").slice(0,80));
+      addRuntimeCard("Verbindung nicht möglich","Der Dienst konnte gerade nicht verbunden werden. Bitte versuche es später erneut.","is-error");
+    }finally{
+      if(button&&document.contains(button)){button.disabled=false;button.textContent=original;}
+    }
+  }
+  function renderConnectionOffer(offer){
+    const providers=Array.isArray(offer?.providers)?offer.providers.filter(Boolean):[];
+    if(!providers.length)return null;
+    const title=String(offer?.title||"Dienst verbinden");
+    const card=addRuntimeCard(title,"Damit ich das direkt für dich erledigen kann, kannst du den passenden Dienst verbinden.","is-connection");
+    if(!card)return null;
+    const actions=document.createElement("div");actions.className="web-concierge-connection-actions";
+    for(const provider of providers){
+      const button=document.createElement("button");button.type="button";
+      button.className="web-concierge-connect-provider";
+      const label=String(provider?.display_name||provider?.provider_key||"Dienst").trim();
+      button.textContent=label+" verbinden";
+      button.addEventListener("click",()=>{void connectProvider(provider,button);});
+      actions.appendChild(button);
+    }
+    card.appendChild(actions);scrollBottom();return card;
+  }
+  function renderIntegrationReturnNotice(){
+    const url=new URL(location.href);
+    if(url.searchParams.get("integration")!=="connected")return false;
+    const provider=String(url.searchParams.get("provider")||"").toLowerCase();
+    const label=provider==="google"?"Google":provider==="microsoft"?"Microsoft 365":"Der Dienst";
+    addRuntimeCard("Verbunden",label+" ist jetzt mit NAHWERK verbunden.","is-connection is-connected");
+    url.searchParams.delete("integration");url.searchParams.delete("provider");
+    const query=url.searchParams.toString();
+    history.replaceState(history.state,"",url.pathname+(query?"?"+query:"")+url.hash);
+    return true;
+  }
+
   function paygQuoteIdOf(pending) { return [pending?.payg_quote_id,pending?.metadata?.payg_quote_id].map((v)=>String(v||"")).find(validUuid)||null; }
   function renderApproval(pending) {
     const approvalId=String(pending?.approval_id||"");
@@ -719,7 +769,10 @@
         if(validUuid(String(response?.core?.turn_id||"")))routedTurnIds.add(String(response.core.turn_id));
         routedTurnsLoadedAt=Date.now();
         renderRoutedDelivery(routed.target_channel);
-      }else if(!renderCoreV1Response(response.core))throw new Error("core_response_not_authoritative");
+      }else{
+        if(!renderCoreV1Response(response.core))throw new Error("core_response_not_authoritative");
+        if(response?.connection_offer)renderConnectionOffer(response.connection_offer);
+      }
       await refreshPersona(true).catch(()=>{});
       const returnedThreadId=String(response?.thread_id||"");if(validUuid(returnedThreadId))activeThreadId=returnedThreadId;
       await loadThreads();
@@ -809,6 +862,7 @@ syncIosVisualViewport();
     setComposerReady(ready);if(ready){
       const loaded=await loadThreads({selectFirst:true});
       if(activeThreadId)await selectThread(activeThreadId);else{newChat();if(!loaded)renderThreads();}
+      renderIntegrationReturnNotice();
       void refreshPersona(true).then(async()=>{await loadThreads();renderThreads();}).catch(()=>{});
       startLiveSync();
     }
@@ -828,6 +882,6 @@ syncIosVisualViewport();
     },
     isAllowed:()=>gatewayReady&&!channelViewReadOnly&&channelView==="CHAT"
   });
-  window.NAHWERKWebCustomerConciergeTestHooks=Object.freeze({configuredEndpoint,configuredHistoryEndpoint,sessionToken,normalizeGatewayReadiness,normalizeCoreV1Response,normalizePersona,applyPersona,renderCoreV1Response,gatewayRequest,historyRequest,refreshPersona,syncHistory,loadOlderMessages,mergeHistory,CORE_CONTRACT_VERSION,GATEWAY_CONTRACT_VERSION,HISTORY_CONTRACT_VERSION,HISTORY_PAGE_SIZE,SYNC_INTERVAL_MS,PERSONA_SYNC_INTERVAL_MS,GATEWAY_ENDPOINT,HISTORY_ENDPOINT});
+  window.NAHWERKWebCustomerConciergeTestHooks=Object.freeze({configuredEndpoint,configuredHistoryEndpoint,sessionToken,normalizeGatewayReadiness,normalizeCoreV1Response,normalizePersona,applyPersona,renderCoreV1Response,renderConnectionOffer,renderIntegrationReturnNotice,gatewayRequest,historyRequest,refreshPersona,syncHistory,loadOlderMessages,mergeHistory,CORE_CONTRACT_VERSION,GATEWAY_CONTRACT_VERSION,HISTORY_CONTRACT_VERSION,HISTORY_PAGE_SIZE,SYNC_INTERVAL_MS,PERSONA_SYNC_INTERVAL_MS,GATEWAY_ENDPOINT,HISTORY_ENDPOINT});
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();

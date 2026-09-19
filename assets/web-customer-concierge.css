@@ -593,3 +593,51 @@ body.web-concierge-page>.footer{display:none!important}
 #webConciergeInput:disabled{
   cursor:not-allowed!important;
 }
+
+
+/* WEB_CHAT_CONNECTION_OFFER_V1_20260919 */
+.web-concierge-runtime-card.is-connection{
+  gap:9px;
+  border-color:rgba(205,168,78,.20);
+  background:linear-gradient(145deg,rgba(205,168,78,.075),rgba(21,27,34,.98) 58%);
+}
+.web-concierge-runtime-card.is-connection.is-connected{
+  border-color:rgba(94,173,116,.28);
+  background:linear-gradient(145deg,rgba(70,143,91,.10),rgba(21,27,34,.98) 62%);
+}
+.web-concierge-connection-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:2px;
+}
+.web-concierge-connect-provider{
+  min-height:38px;
+  padding:0 13px;
+  border:1px solid rgba(205,168,78,.30);
+  border-radius:11px;
+  background:#d6bd7b;
+  color:#17130b;
+  font:inherit;
+  font-size:.74rem;
+  font-weight:820;
+  cursor:pointer;
+  transition:filter .15s ease,transform .15s ease,opacity .15s ease;
+}
+.web-concierge-connect-provider:hover{filter:brightness(1.05)}
+.web-concierge-connect-provider:active{transform:scale(.985)}
+.web-concierge-connect-provider:disabled{opacity:.55;cursor:wait}
+html[data-nw-portal-theme="light"] body .web-concierge-runtime-card.is-connection,
+body.nw-portal-light .web-concierge-runtime-card.is-connection{
+  background:#fffdf8;
+  color:#171714;
+  border-color:rgba(112,87,39,.16);
+  box-shadow:0 10px 28px rgba(82,63,30,.07);
+}
+html[data-nw-portal-theme="light"] body .web-concierge-runtime-card.is-connection span,
+body.nw-portal-light .web-concierge-runtime-card.is-connection span{color:#68645c}
+@media(max-width:520px){
+  .web-concierge-runtime-card.is-connection{max-width:94%}
+  .web-concierge-connection-actions{display:grid;grid-template-columns:1fr;width:100%}
+  .web-concierge-connect-provider{width:100%}
+}

@@ -203,3 +203,12 @@ test("messenger is tall, responsive and uses compact user/assistant bubbles", ()
   assert.match(css, /web-concierge-approval-actions/);
   assert.doesNotMatch(page, /erfolgreich gesendet|Auftrag ausgeführt|Nachricht gesendet/i);
 });
+
+
+test("chat can render contextual connection offers without introducing a second transport", () => {
+  assert.match(client, /function renderConnectionOffer/);
+  assert.match(client, /\/web\/integrations\/connect/);
+  assert.match(client, /connection_offer/);
+  assert.match(client, /Google|Microsoft|display_name/);
+  assert.match(client, /renderIntegrationReturnNotice/);
+});
