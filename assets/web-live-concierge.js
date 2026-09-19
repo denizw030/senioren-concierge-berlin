@@ -1,5 +1,5 @@
 // WEB_CONCIERGE_LIVE_BOOT_V1_20260919
-import { mountNahwerkLiveConcierge } from "./nahwerk-live-concierge.js?v=9";
+import { mountNahwerkLiveConcierge } from "./nahwerk-live-concierge.js?v=10";
 
 const GATEWAY="https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway";
 
@@ -43,6 +43,10 @@ async function boot(){
     getThreadId:()=>bridge()?.threadId?.()||null,
     onStateChange:(state)=>{
       window.dispatchEvent(new CustomEvent("nahwerk:live-state",{detail:state}));
+      if(state?.state==="ended")window.dispatchEvent(new CustomEvent("nahwerk:live-ended"));
+    },
+    onClose:()=>{
+      window.dispatchEvent(new CustomEvent("nahwerk:live-ended"));
     }
   });
 
