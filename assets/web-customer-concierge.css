@@ -558,3 +558,11 @@ body.web-concierge-page>.footer{display:none!important}
   font-size:.62em;
   opacity:.72;
 }
+
+/* CHANNEL_READ_ONLY_V1_20260919 */
+.web-concierge-form:has(#webConciergeInput:disabled){
+  opacity:.78;
+}
+#webConciergeInput:disabled{
+  cursor:not-allowed!important;
+}
