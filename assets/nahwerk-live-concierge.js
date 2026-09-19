@@ -6,15 +6,20 @@ const uid=()=>crypto.randomUUID?.()||Math.random().toString(36).slice(2);
 
 function waitForIce(pc){
   if(pc.iceGatheringState==="complete")return Promise.resolve();
-  return new Promise((resolve)=>{
+  return new Promise((resolve,reject)=>{
+    const timer=setTimeout(()=>{
+      pc.removeEventListener("icegatheringstatechange",onChange);
+      reject(new Error("ICE_GATHERING_TIMEOUT"));
+    },10000);
     const onChange=()=>{
       if(pc.iceGatheringState==="complete"){
+        clearTimeout(timer);
         pc.removeEventListener("icegatheringstatechange",onChange);
         resolve();
       }
     };
     pc.addEventListener("icegatheringstatechange",onChange);
-    setTimeout(resolve,3500);
+    onChange();
   });
 }
 function rms(analyser){
