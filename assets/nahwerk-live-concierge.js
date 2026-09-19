@@ -38,6 +38,9 @@ function audioMeter(stream){
 function svgMic(){
   return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14.5a4 4 0 0 0 4-4v-4a4 4 0 1 0-8 0v4a4 4 0 0 0 4 4Zm-7-4a1 1 0 1 1 2 0 5 5 0 0 0 10 0 1 1 0 1 1 2 0 7 7 0 0 1-6 6.93V20h3a1 1 0 1 1 0 2H8a1 1 0 1 1 0-2h3v-2.57A7 7 0 0 1 5 10.5Z"/></svg>';
 }
+function svgLiveWave(){
+  return '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none"><path d="M4.5 10.25v3.5M8 7.25v9.5M11.5 5.25v13.5M15 7.25v9.5M18.5 10.25v3.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>';
+}
 function ensureOverlay(){
   let root=document.querySelector(".nw-live");
   if(root)return root;
@@ -93,11 +96,11 @@ export function mountNahwerkLiveConcierge({
     trigger.type="button";
     trigger.className="nw-live-trigger";
     trigger.setAttribute("aria-label","Live mit Concierge sprechen");
-    trigger.innerHTML=svgMic();
+    trigger.innerHTML=svgLiveWave();
     inputEl.parentElement.appendChild(trigger);
   }else{
     trigger.classList.add("nw-live-trigger");
-    if(!trigger.innerHTML.trim())trigger.innerHTML=svgMic();
+    if(!trigger.innerHTML.trim())trigger.innerHTML=svgLiveWave();
   }
 
   const ui=ensureOverlay();
