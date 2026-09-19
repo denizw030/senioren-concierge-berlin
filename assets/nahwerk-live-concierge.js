@@ -209,7 +209,9 @@ export function mountNahwerkLiveConcierge({
       text:value,
       start_ms:Number.isFinite(Number(startMs))?Number(startMs):null,
       end_ms:Number.isFinite(Number(endMs))?Number(endMs):null
-    }).catch(()=>{});
+    }).catch((error)=>{
+      reportClientDiagnostic("TRANSCRIPT_WRITE_"+String(error?.message||error?.name||"FAILED"));
+    });
   };
   const flushUserTranscript=async()=>{
     if(inputFlushTimer){clearTimeout(inputFlushTimer);inputFlushTimer=0;}
