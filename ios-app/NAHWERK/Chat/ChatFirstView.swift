@@ -128,20 +128,46 @@ final class ChatViewModel: ObservableObject {
         }
     }
 
-    func openHistory(_ thread: HistoryThread, token: String) async {
+    var normalHistoryThreads: [HistoryThread] {
+        historyThreads.filter(\.belongsToNormalChat)
+    }
+
+    var whatsAppHistoryThread: HistoryThread? {
+        historyThreads.first(where: \.containsWhatsApp)
+    }
+
+    func openHistory(_ thread: HistoryThread, token: String, channelFilter: Set<String>? = nil) async {
         do {
             let items = try await api.historyMessages(token: token, threadID: thread.threadID)
-            let mapped = items.compactMap { item -> LocalChatMessage? in
+            let visible = items.filter { item in
+                guard let channelFilter else { return true }
+                return channelFilter.contains((item.channel ?? "WEB").uppercased())
+            }
+            let mapped = visible.compactMap { item -> LocalChatMessage? in
                 let text = item.customerText
                 guard !text.isEmpty else { return nil }
                 let role: LocalChatMessage.Role = (item.role ?? "").lowercased().contains("assistant") ? .assistant : .user
                 return LocalChatMessage(role: role, text: text)
             }
-            if !mapped.isEmpty {
-                messages = mapped
-            }
+            messages = mapped
         } catch {
             self.error = (error as? LocalizedError)?.errorDescription
+        }
+    }
+
+    func deleteAllChats(token: String) async -> Bool {
+        guard !busy else { return false }
+        busy = true
+        error = nil
+        defer { busy = false }
+        do {
+            try await api.resetChatHistory(token: token)
+            historyThreads = []
+            messages = []
+            return true
+        } catch {
+            self.error = (error as? LocalizedError)?.errorDescription ?? "Die Chats konnten gerade nicht gelöscht werden."
+            return false
         }
     }
 
@@ -204,6 +230,7 @@ struct ChatFirstView: View {
     @State private var showMenu = false
     @State private var authMode: AuthMode?
     @State private var destination: CustomerDestination?
+    @State private var showDeleteChatsConfirmation = false
     @StateObject private var voiceMemo = VoiceMemoRecorder()
 
     var body: some View {
@@ -266,6 +293,23 @@ struct ChatFirstView: View {
                 await model.refreshIdentity(token: token)
                 await model.refreshHistory(token: token)
             }
+        }
+        .confirmationDialog(
+            "Alle Chats löschen?",
+            isPresented: $showDeleteChatsConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Alle Chats löschen", role: .destructive) {
+                guard let token = session.validToken else { return }
+                Task {
+                    if await model.deleteAllChats(token: token) {
+                        showMenu = false
+                    }
+                }
+            }
+            Button("Abbrechen", role: .cancel) {}
+        } message: {
+            Text("Die Chats werden aus Web und App entfernt. Dein WhatsApp-Verlauf auf dem Handy bleibt unverändert. Neue WhatsApp-Nachrichten lassen den Kanal wieder erscheinen.")
         }
     }
 
@@ -468,20 +512,20 @@ struct ChatFirstView: View {
                 }
 
                 if session.isAuthenticated {
-                    Section("Gesprächsverlauf") {
-                        if model.historyThreads.isEmpty {
+                    Section("Deine Chats") {
+                        if model.normalHistoryThreads.isEmpty {
                             Text("Noch kein gespeicherter Verlauf verfügbar.")
                                 .foregroundStyle(NahwerkDesign.secondaryText)
                         } else {
-                            ForEach(model.historyThreads) { thread in
+                            ForEach(model.normalHistoryThreads) { thread in
                                 Button {
                                     showMenu = false
                                     if let token = session.validToken {
-                                        Task { await model.openHistory(thread, token: token) }
+                                        Task { await model.openHistory(thread, token: token, channelFilter: ["WEB", "APP"]) }
                                     }
                                 } label: {
                                     VStack(alignment: .leading, spacing: 3) {
-                                        Text(thread.title ?? "NAHWERK Concierge")
+                                        Text(thread.title ?? "Chat")
                                             .foregroundStyle(NahwerkDesign.primaryText)
                                         if let preview = thread.preview, !preview.isEmpty {
                                             Text(preview)
@@ -494,8 +538,29 @@ struct ChatFirstView: View {
                             }
                         }
                     }
+
+                    if let whatsapp = model.whatsAppHistoryThread {
+                        Section("Chat Kanäle") {
+                            Button {
+                                showMenu = false
+                                if let token = session.validToken {
+                                    Task { await model.openHistory(whatsapp, token: token, channelFilter: ["WHATSAPP"]) }
+                                }
+                            } label: {
+                                Label("WhatsApp", systemImage: "message.fill")
+                                    .foregroundStyle(NahwerkDesign.primaryText)
+                            }
+                        }
+                    }
+
+                    Section {
+                        Button("Alle Chats löschen", role: .destructive) {
+                            showDeleteChatsConfirmation = true
+                        }
+                        .disabled(model.busy)
+                    }
                 } else {
-                    Section("Gesprächsverlauf") {
+                    Section("Deine Chats") {
                         Text("Gespeicherte Chats erscheinen nach der Anmeldung.")
                             .foregroundStyle(NahwerkDesign.secondaryText)
                     }
