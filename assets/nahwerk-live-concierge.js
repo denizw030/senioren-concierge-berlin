@@ -218,20 +218,14 @@ export function mountNahwerkLiveConcierge({
     const text=inputTranscript.trim();
     if(!text)return "";
     lastUserTurnText=text;
-    const start=inputStartMs,end=inputEndMs;
     inputTranscript="";inputStartMs=null;inputEndMs=null;
-    userTurnSeq+=1;
-    await persistTranscript("USER",text,start,end,`turn:user:${userTurnSeq}`);
     return text;
   };
   const flushAssistantTranscript=async()=>{
     if(outputFlushTimer){clearTimeout(outputFlushTimer);outputFlushTimer=0;}
     const text=outputTranscript.trim();
     if(!text)return "";
-    const start=outputStartMs,end=outputEndMs;
     outputTranscript="";outputStartMs=null;outputEndMs=null;
-    assistantTurnSeq+=1;
-    await persistTranscript("ASSISTANT",text,start,end,`turn:assistant:${assistantTurnSeq}`);
     return text;
   };
   const handleDelegation=async(event)=>{
