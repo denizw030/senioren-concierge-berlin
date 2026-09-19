@@ -94,4 +94,5 @@ test("channel chats are grouped after normal chats and delete-all uses the share
   assert.match(scope,/chatChannelFirst/);
   assert.match(chat,/\/web\/chats\/reset/);
   assert.match(chat,/Alle Chats aus Web und App entfernen/);
+  assert.match(read("assets/web-customer-concierge.css"),/content:"CHAT KANÄLE"/);
 });
