@@ -68,17 +68,21 @@
   background:transparent;
   color:#766d61;
 }
-.web-concierge-voice-icon.is-stop{
-  background:#4c3d22;
-  border-color:#4c3d22;
-  color:#fffaf0;
-  font-size:11px;
-}
+.web-concierge-voice-icon.is-stop,
 .web-concierge-voice-icon.is-send{
-  background:#d9b96d;
-  border-color:#d9b96d;
-  color:#17130c;
-  font-size:21px;
+  background:#2f7df6;
+  border-color:#2f7df6;
+  color:#fff;
+}
+.web-concierge-voice-icon.is-stop svg,
+.web-concierge-voice-icon.is-send svg{
+  width:22px;
+  height:22px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:2.15;
+  stroke-linecap:round;
+  stroke-linejoin:round;
 }
 .web-concierge-voice-icon.is-play{
   background:#eee5d4;
@@ -151,15 +155,11 @@ html[data-nw-portal-theme="dark"] .web-concierge-voice-icon.is-cancel{
   border-color:transparent;
   color:#b8b3aa;
 }
-html[data-nw-portal-theme="dark"] .web-concierge-voice-icon.is-stop{
-  background:#d9b96d;
-  border-color:#d9b96d;
-  color:#17130c;
-}
+html[data-nw-portal-theme="dark"] .web-concierge-voice-icon.is-stop,
 html[data-nw-portal-theme="dark"] .web-concierge-voice-icon.is-send{
-  background:#d9b96d;
-  border-color:#d9b96d;
-  color:#17130c;
+  background:#2f7df6;
+  border-color:#2f7df6;
+  color:#fff;
 }
 html[data-nw-portal-theme="dark"] .web-concierge-voice-meta>span:first-child{color:#ece7df}
 html[data-nw-portal-theme="dark"] .web-concierge-voice-meta>span:last-child{color:#a7a29a}
