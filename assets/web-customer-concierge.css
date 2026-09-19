@@ -477,3 +477,84 @@ html[data-nw-portal-theme="dark"] .web-concierge-theme-label.is-dark{color:#f3f0
 @media(min-width:821px){
   .web-concierge-pagebar{padding-right:0!important}
 }
+
+
+/* CHANNEL_SIDEBAR_AND_DESKTOP_LAYOUT_FIX_V1_20260919 */
+#webConciergeNewChat{display:none!important}
+.web-concierge-sidebar-title{padding-top:8px!important}
+body.web-concierge-page>.footer{display:none!important}
+
+@media(min-width:821px){
+  body.web-concierge-page .web-concierge-shell{
+    max-width:1600px!important;
+    padding:16px 18px 24px!important;
+  }
+  .web-concierge-pagebar{
+    min-height:44px!important;
+    margin-bottom:10px!important;
+    align-items:center!important;
+  }
+  .web-concierge-pagebar>div:first-child{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    min-width:0;
+  }
+  .web-concierge-pagebar .eyebrow{
+    margin:0!important;
+    font-size:.64rem!important;
+    line-height:1!important;
+  }
+  .web-concierge-pagebar h1{
+    margin:0!important;
+    font-size:1.55rem!important;
+    line-height:1.05!important;
+    letter-spacing:-.035em!important;
+  }
+  .web-concierge-workspace{
+    height:calc(100vh - 170px)!important;
+    min-height:560px!important;
+    max-height:none!important;
+    grid-template-columns:240px minmax(0,1fr)!important;
+    border-radius:18px!important;
+  }
+  .web-concierge-sidebar{padding:14px 10px!important}
+}
+
+@media(min-width:821px) and (max-width:1100px){
+  body.web-concierge-page .web-concierge-shell{
+    padding:10px 12px 18px!important;
+  }
+  .web-concierge-pagebar{
+    justify-content:flex-end!important;
+    min-height:40px!important;
+    margin-bottom:8px!important;
+  }
+  .web-concierge-pagebar>div:first-child{display:none!important}
+  .web-concierge-workspace{
+    height:calc(100vh - 126px)!important;
+    min-height:540px!important;
+    grid-template-columns:220px minmax(0,1fr)!important;
+    border-radius:16px!important;
+  }
+  .web-concierge-page-actions .btn{
+    min-height:36px!important;
+    padding:0 12px!important;
+    font-size:.72rem!important;
+  }
+  .web-concierge-theme-toggle{min-height:36px!important}
+}
+
+.web-concierge-thread[data-chat-channel="PHONE"] .web-concierge-thread-title::before{
+  content:"☎";
+  display:inline-block;
+  margin-right:7px;
+  opacity:.72;
+}
+.web-concierge-thread[data-chat-channel="WHATSAPP"] .web-concierge-thread-title::before{
+  content:"●";
+  display:inline-block;
+  margin-right:7px;
+  font-size:.62em;
+  opacity:.72;
+}
