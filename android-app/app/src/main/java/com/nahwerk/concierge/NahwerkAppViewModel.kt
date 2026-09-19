@@ -171,7 +171,7 @@ internal class NahwerkAppViewModel(
         persistScreen(AppScreen.HOME)
     }
 
-    fun updateDraft(value: String) {
+    fun liveSessionToken(): String? = productApi.liveSessionToken()\n\n    fun updateDraft(value: String) {
         if (value.length > 4000) return
         _uiState.value = _uiState.value.copy(chatDraft = value)
         persistChatState()
