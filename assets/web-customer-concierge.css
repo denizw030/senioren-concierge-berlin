@@ -480,7 +480,7 @@ html[data-nw-portal-theme="dark"] .web-concierge-theme-label.is-dark{color:#f3f0
 
 
 /* CHANNEL_SIDEBAR_AND_DESKTOP_LAYOUT_FIX_V1_20260919 */
-#webConciergeNewChat{display:none!important}
+#webConciergeNewChat{display:none!important}\n.web-concierge-delete-chats{display:none!important}
 .web-concierge-sidebar-title{padding-top:8px!important}
 body.web-concierge-page>.footer{display:none!important}
 
