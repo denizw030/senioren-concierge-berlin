@@ -424,7 +424,7 @@
     const row = el("div", "ecp-rule"), copy = el("div");
     copy.append(el("strong", "", text(rule.title, 220) || "Persönliche Regel"), el("small", "", (rule.classification_label || "") + " · " + (rule.action_label || "")));
     if (rule.matcher_label) copy.append(el("small", "ecp-rule-match", rule.matcher_label));
-    if (rule.last_applied_at) copy.append(el("small", "ecp-rule-meta", "Zuletzt angewandt: " + fmtDate(rule.last_applied_at) + (number(rule.hit_count) ? " · " + number(rule.hit_count) + " Treffer" : ""));
+    if (rule.last_applied_at) copy.append(el("small", "ecp-rule-meta", "Zuletzt angewandt: " + fmtDate(rule.last_applied_at) + (number(rule.hit_count) ? " · " + number(rule.hit_count) + " Treffer" : "")));
     const controls = el("div", "ecp-rule-controls");
     const select = el("select", "ecp-rule-select"); select.setAttribute("aria-label", "Aktion für " + text(rule.title, 160));
     ruleActionChoices(rule).forEach(([value, label]) => { const option = el("option", "", label); option.value = value; option.selected = rule.action === value; select.append(option); });
