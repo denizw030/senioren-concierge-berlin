@@ -22,6 +22,7 @@ targets:
         INFOPLIST_KEY_CFBundleDisplayName: NAHWERK
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
+        INFOPLIST_KEY_NSMicrophoneUsageDescription: "NAHWERK benötigt das Mikrofon für dein Live-Gespräch mit deinem Concierge."
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait
         TARGETED_DEVICE_FAMILY: "1"
         ASSETCATALOG_COMPILER_APPICON_NAME: ""
