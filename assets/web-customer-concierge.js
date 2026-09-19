@@ -12,6 +12,7 @@
   const PERSONA_SYNC_INTERVAL_MS = 3000;
   const CLIENT_FETCH_TIMEOUT_MS = 40000;
   const SETTINGS_URL = "/concierge-anpassen";
+  const PORTAL_THEME_KEY = "nw_portal_theme_v1";
   const isMobile=()=>window.matchMedia("(max-width:820px)").matches;
   const RESPONSE_STATES = new Set(["ANSWER","QUESTION","ACTION_STARTED","ACTION_PENDING","ACTION_RESULT","ERROR_RESPONSE","HANDOFF","SAFE_TERMINATION"]);
 
@@ -119,6 +120,38 @@
   }
 
   function openConciergeSettings() { location.href = SETTINGS_URL; }
+
+  function applyChatTheme(theme){
+    const normalized=theme==="light"?"light":"dark";
+    document.documentElement.dataset.nwPortalTheme=normalized;
+    document.body?.classList.toggle("nw-portal-light",normalized==="light");
+    document.body?.classList.toggle("nw-portal-dark",normalized==="dark");
+  }
+  function readChatTheme(){
+    try{
+      const value=localStorage.getItem(PORTAL_THEME_KEY);
+      if(value==="light"||value==="dark")return value;
+    }catch{}
+    return document.documentElement.dataset.nwPortalTheme==="light"?"light":"dark";
+  }
+  function initThemeToggle(){
+    const toggle=document.getElementById("webConciergeThemeToggle");
+    if(!(toggle instanceof HTMLInputElement))return;
+    const sync=()=>{
+      const theme=readChatTheme();
+      applyChatTheme(theme);
+      toggle.checked=theme==="dark";
+      toggle.setAttribute("aria-checked",String(toggle.checked));
+    };
+    sync();
+    toggle.addEventListener("change",()=>{
+      const next=toggle.checked?"dark":"light";
+      try{localStorage.setItem(PORTAL_THEME_KEY,next);}catch{}
+      applyChatTheme(next);
+      toggle.setAttribute("aria-checked",String(toggle.checked));
+    });
+    window.addEventListener("storage",(event)=>{if(event.key===PORTAL_THEME_KEY)sync();});
+  }
 
   function applyPersona(raw) {
     const persona = normalizePersona(raw);
@@ -539,6 +572,7 @@
   }
 
   async function boot() {
+    initThemeToggle();
     initMobileDrawer();
     initDeleteAllChats();
 // IOS_VISUAL_VIEWPORT_COMPOSER_V1_20260918
