@@ -7,7 +7,7 @@ const read=(p)=>readFileSync(new URL("../"+p,import.meta.url),"utf8");
 test("web chat mounts Live Concierge on the right without replacing voice memo",()=>{
   for(const page of ["web-concierge.html","web-concierge/index.html"]){
     const html=read(page);
-    assert.match(html,/assets\/web-voice-memo\.js\?v=3/);
+    assert.match(html,/assets\/web-voice-memo\.js\?v=4/);
     assert.match(html,/assets\/web-customer-concierge\.js\?v=24/);
     assert.match(html,/assets\/web-live-concierge\.js\?v=4/);
     assert.match(html,/assets\/nahwerk-live-concierge\.css\?v=2/);
@@ -150,4 +150,15 @@ test("force-refreshes the browser session before text, voice memo and Live write
   assert.match(chat,/validateSession\(true\)/);
   assert.match(memo,/validateSession\(true\)/);
   assert.match(live,/validateSession\(true\)/);
+});
+
+
+test("voice recording uses the send arrow directly instead of a stop square",()=>{
+  const memo=read("assets/web-voice-memo.js");
+  const css=read("assets/web-voice-memo.css");
+  assert.match(memo,/function stopAndSend\(\)/);
+  assert.match(memo,/sendWhenStopped = true/);
+  assert.doesNotMatch(memo,/>■<\/button>/);
+  assert.match(memo,/aria-label="Sprachmemo senden"/);
+  assert.match(css,/background:#2f7df6/);
 });
