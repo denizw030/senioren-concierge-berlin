@@ -114,6 +114,16 @@ export function mountNahwerkLiveConcierge({
 
   const state=(value,detail={})=>{onStateChange({state:value,...detail});};
   const setStatus=(text)=>{status.textContent=text;};
+  const currentPersonaFromPage=()=>{
+    const title=document.getElementById("webConciergeTitle");
+    const avatar=document.querySelector(".web-concierge-avatar");
+    const display=String(title?.textContent||"NAHWERK Concierge").trim();
+    let portrait="";
+    const inline=String(avatar?.style?.backgroundImage||"");
+    const match=inline.match(/url\(["']?(.*?)["']?\)/i);
+    if(match?.[1])portrait=match[1];
+    return {display_name:display,portrait_url:portrait};
+  };
   const setPersona=(p)=>{
     const display=p?.display_name||"NAHWERK Concierge";
     name.textContent=display;
@@ -206,6 +216,7 @@ export function mountNahwerkLiveConcierge({
     if(pc)return;
     ending=false;started=false;inputTranscript="";outputTranscript="";
     ui.hidden=false;document.documentElement.classList.add("nw-live-open");
+    setPersona(currentPersonaFromPage());
     setStatus("Mikrofon wird aktiviert …");state("connecting");
     try{
       micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false});
@@ -239,8 +250,21 @@ export function mountNahwerkLiveConcierge({
       setStatus("Verbindet …");
       cancelAnimationFrame(raf);animate();
     }catch(e){
-      state("error",{error:e?.message||"LIVE_START_FAILED"});
-      setStatus("Live-Gespräch konnte nicht gestartet werden.");
+      const raw=String(e?.message||e?.name||"LIVE_START_FAILED");
+      const code=e?.name==="NotAllowedError"?"MIC_PERMISSION_DENIED":
+        e?.name==="NotFoundError"?"MICROPHONE_NOT_FOUND":
+        e?.name==="NotReadableError"?"MICROPHONE_BUSY_OR_UNAVAILABLE":
+        raw;
+      state("error",{error:code});
+      post("/client-error",{error:code}).catch(()=>{});
+      const message=code==="MIC_PERMISSION_DENIED"
+        ?"Mikrofonzugriff ist nicht erlaubt. Bitte erlaube nahwerkconcierge.com den Mikrofonzugriff."
+        : code==="MICROPHONE_NOT_FOUND"
+          ?"Kein Mikrofon gefunden."
+          : code==="MICROPHONE_BUSY_OR_UNAVAILABLE"
+            ?"Das Mikrofon ist gerade nicht verfügbar."
+            :"Live-Gespräch konnte nicht gestartet werden.";
+      setStatus(message);
       await stop({notifyBackend:Boolean(sessionId),keepVisible:true});
     }
   }
