@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 
 const read=(p)=>readFileSync(new URL("../"+p,import.meta.url),"utf8");
 // FINAL_THEME_LIVE_SDP_V31_GREEN
+// LIVE_TRANSCRIPT_HISTORY_V1_FINAL
 // NONBLOCKING_AUTH_FINAL_V25
 
 test("web chat mounts Live Concierge on the right without replacing voice memo",()=>{
