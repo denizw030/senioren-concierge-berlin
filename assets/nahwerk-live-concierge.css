@@ -43,7 +43,9 @@ html.nw-live-open,html.nw-live-open body{overflow:hidden}
 }
 .nw-live-image{width:100%;height:100%;object-fit:cover;display:block}
 .nw-live-initials{font-size:clamp(52px,13vw,92px);font-weight:600;letter-spacing:-.06em;color:#e8f5ff}
+.nw-live-copy{display:grid;justify-items:center;gap:5px;text-align:center}
 .nw-live-status{min-height:28px;font-size:17px;color:rgba(255,255,255,.72);letter-spacing:-.01em}
+.nw-live-duration{font-size:15px;font-variant-numeric:tabular-nums;color:rgba(255,255,255,.58);letter-spacing:.02em}
 .nw-live-controls{width:min(420px,100%);display:flex;align-items:center;justify-content:center;gap:14px}
 .nw-live-mute{width:56px;height:56px;border:0;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.1);color:#fff;cursor:pointer}
 .nw-live-mute.is-muted{background:rgba(255,255,255,.95);color:#101218}
@@ -108,6 +110,7 @@ html[data-nw-portal-theme="light"] .nw-live-close{
   background:rgba(71,59,38,.08);color:#2b261e;
 }
 html[data-nw-portal-theme="light"] .nw-live-status{color:#655d52}
+html[data-nw-portal-theme="light"] .nw-live-duration{color:#81776a}
 html[data-nw-portal-theme="light"] .nw-live-avatar{
   border-color:rgba(112,87,39,.16);
   box-shadow:0 24px 70px rgba(89,66,27,.16);
