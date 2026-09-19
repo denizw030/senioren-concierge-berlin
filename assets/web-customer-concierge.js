@@ -259,7 +259,8 @@
     const endpoint=configuredEndpoint();if(!endpoint)throw new Error("gateway_not_configured");const headers={};
     if(auth){const token=sessionToken();if(!token)throw new Error("session_required");headers.Authorization=`Bearer ${token}`;}
     if(body!==null)headers["Content-Type"]="application/json";
-    const timeoutMs=path==="/health"?8000:path==="/web/me"?20000:path==="/web/chat"?45000:CLIENT_FETCH_TIMEOUT_MS;\n    const response=await fetchWithTimeout(`${endpoint}${path}`,{method,headers,body:body===null?undefined:JSON.stringify(body),cache:"no-store",credentials:"omit"},timeoutMs);
+    const timeoutMs=path==="/health"?8000:path==="/web/me"?20000:path==="/web/chat"?45000:CLIENT_FETCH_TIMEOUT_MS;
+    const response=await fetchWithTimeout(`${endpoint}${path}`,{method,headers,body:body===null?undefined:JSON.stringify(body),cache:"no-store",credentials:"omit"},timeoutMs);
     const payload=await response.json().catch(()=>({}));if(!response.ok||payload?.ok===false)throw new Error(String(payload?.error||`http_${response.status}`));return payload;
   }
   async function historyRequest(threadId=null,{before=null,limit=HISTORY_PAGE_SIZE}={}) {
