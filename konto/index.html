@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="assets/family-owner-sponsored-access.css?v=1" />
     <link rel="stylesheet" href="assets/account-premium-ui.css?v=5" />
     <link rel="stylesheet" href="assets/account-response-channel.css?v=3" />
+    <link rel="stylesheet" href="assets/owner-product-gaps.css?v=1" />
     <style>
       .dash {
         display: grid;
@@ -2689,6 +2690,19 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
                 Noch keine Geräte oder weiteren Informationen hinterlegt.
               </div>
             </article>
+            <article class="card wide info-panel owner-product-gap-shortcut" data-account-panel="overview" data-owner-product-gap>
+              <div class="owner-product-gap-shortcut-head">
+                <div>
+                  <div class="eyebrow">Produktentwicklung</div>
+                  <h3>Kundenwünsche & Produktlücken</h3>
+                </div>
+                <span class="owner-product-gap-badge" id="ownerProductGapBadge">0 neu</span>
+              </div>
+              <p class="muted" id="ownerProductGapSummary">Noch keine neuen Produktlücken erfasst.</p>
+              <div class="actions owner-product-gap-shortcut-actions">
+                <a class="btn light" href="/produktluecken">Produktlücken öffnen</a>
+              </div>
+            </article>
             <article class="card wide info-panel" data-account-panel="overview">
               <h3>Offene Anliegen</h3>
               <div class="empty">Aktuell keine offenen Anliegen.</div>
@@ -2757,6 +2771,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
       </div>
     </div>
     <script src="assets/auth-nav.js?v=41"></script>
+    <script src="assets/owner-product-gaps.js?v=1"></script>
     <script src="assets/nahwerk-analytics.js?v=1"></script>
     <script src="assets/acquisition-v1.js?v=2"></script>
     <script>

@@ -1,0 +1,27 @@
+name: Owner Product Gaps UI
+
+on:
+  push:
+    paths:
+      - "konto.html"
+      - "konto/index.html"
+      - "produktluecken.html"
+      - "produktluecken/index.html"
+      - "assets/owner-product-gaps.css"
+      - "assets/owner-product-gaps.js"
+      - "tests/owner-product-gaps-ui.test.mjs"
+      - ".github/workflows/owner-product-gaps-ui.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node --test tests/owner-product-gaps-ui.test.mjs
