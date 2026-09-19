@@ -462,3 +462,18 @@ html[data-nw-portal-theme="dark"] .web-concierge-theme-label.is-dark{color:#f3f0
   .web-concierge-page-actions .btn{display:none}
   .web-concierge-theme-toggle{margin-right:2px}
 }
+
+
+/* WEB_CHAT_THEME_RIGHT_EDGE_V2_20260919 */
+.web-concierge-page-actions{
+  margin-left:auto!important;
+  margin-right:0!important;
+  justify-content:flex-end!important;
+}
+.web-concierge-theme-toggle{
+  margin-right:0!important;
+  flex:0 0 auto;
+}
+@media(min-width:821px){
+  .web-concierge-pagebar{padding-right:0!important}
+}
