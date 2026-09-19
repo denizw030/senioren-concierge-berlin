@@ -275,10 +275,7 @@
   }
 
   async function sendVoiceMemo(audio, type) {
-    if (window.SCBAuth?.validateSession) {
-      const valid = await window.SCBAuth.validateSession(true).catch(() => false);
-      if (!valid) throw new Error("session_invalid");
-    }
+    void window.SCBAuth?.validateSession?.().catch(() => false);
     const session = token();
     if (!session) throw new Error("session_required");
     const threadID = window.NAHWERKWebCustomerConciergeLiveBridge?.threadId?.();
