@@ -396,10 +396,10 @@ html[data-nw-portal-theme="light"] .web-concierge-delete-chats{color:#7b7368}
 
 /* WEB_CHAT_BACK_NAV_V1_20260919 */
 .web-concierge-back{
-  position:fixed;
-  left:max(14px,env(safe-area-inset-left));
-  top:138px;
-  z-index:1300;
+  position:static;
+  left:auto;
+  top:auto;
+  z-index:auto;
   display:inline-flex;
   align-items:center;
   gap:0;
@@ -417,6 +417,7 @@ html[data-nw-portal-theme="light"] .web-concierge-delete-chats{color:#7b7368}
   backdrop-filter:blur(14px);
   -webkit-backdrop-filter:blur(14px);
   transform:none;
+  margin:0 0 10px 0;
   transition:background .16s ease,border-color .16s ease,transform .16s ease;
 }
 .web-concierge-back:hover{
