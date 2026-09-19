@@ -57,6 +57,7 @@
     if(!mainThreadId&&validUuid(main?.thread_id))mainThreadId=String(main.thread_id);
 
     const projected=[];
+    const channelThreads=[];
     if(mainThreadId){
       const base=main||{
         thread_id:mainThreadId,
@@ -82,20 +83,22 @@
         channel_view:"CHAT"
       });
 
-      projected.push({
-        ...base,
-        thread_id:VIRTUAL_WHATSAPP_THREAD_ID,
-        title:"WhatsApp",
-        preview:"",
-        channels:["WHATSAPP"],
-        is_main:false,
-        thread_scope:"CHANNEL",
-        channel_view:"WHATSAPP",
-        virtual_channel_thread:true
-      });
+      if(channels.has("WHATSAPP")){
+        channelThreads.push({
+          ...base,
+          thread_id:VIRTUAL_WHATSAPP_THREAD_ID,
+          title:"WhatsApp",
+          preview:"",
+          channels:["WHATSAPP"],
+          is_main:false,
+          thread_scope:"CHANNEL",
+          channel_view:"WHATSAPP",
+          virtual_channel_thread:true
+        });
+      }
 
       if(channels.has("TELEGRAM")){
-        projected.push({
+        channelThreads.push({
           ...base,
           thread_id:VIRTUAL_TELEGRAM_THREAD_ID,
           title:"Telegram",
@@ -119,7 +122,7 @@
         channels:Array.isArray(thread?.channels)&&thread.channels.length?thread.channels:["WEB","APP"]
       }));
 
-    payload.threads=[...projected,...extras];
+    payload.threads=[...projected,...extras,...channelThreads];
     return payload;
   }
 
@@ -184,7 +187,10 @@
       }
       if(button.style.border)button.style.border="";
       if(button.style.background)button.style.background="";
+      delete button.dataset.chatChannelFirst;
     }
+    const firstChannel=[...box.querySelectorAll(".web-concierge-thread")].find((button)=>button.dataset.chatScope==="CHANNEL");
+    if(firstChannel)firstChannel.dataset.chatChannelFirst="true";
     publishActiveView(box);
   }
 
