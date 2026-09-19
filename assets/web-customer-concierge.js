@@ -468,20 +468,22 @@ composerInput?.addEventListener("focus",()=>{syncIosVisualViewport();setTimeout(
 composerInput?.addEventListener("blur",()=>setTimeout(syncIosVisualViewport,120));
 syncIosVisualViewport();
 
-    if(!sessionToken()){
-      const valid=window.SCBAuth?.validateSession
-        ? await Promise.race([
-            window.SCBAuth.validateSession().catch(()=>false),
-            new Promise((resolve)=>setTimeout(()=>resolve(false),CLIENT_FETCH_TIMEOUT_MS))
-          ])
-        : false;
-      if(!valid){location.replace("/anmelden");return;}
-    }
+    const validSession=window.SCBAuth?.validateSession
+      ? await Promise.race([
+          window.SCBAuth.validateSession().catch(()=>false),
+          new Promise((resolve)=>setTimeout(()=>resolve(false),CLIENT_FETCH_TIMEOUT_MS))
+        ])
+      : Boolean(sessionToken());
+    if(!validSession||!sessionToken()){location.replace("/anmelden");return;}
     applyPersona(null);
     const status=document.getElementById("webConciergeStatus");
     setComposerReady(false);
     if(status){status.textContent="Verbindung wird hergestellt …";status.classList.remove("is-online");}
-    const ready=await checkReadiness();
+    let ready=await checkReadiness();
+    if(!ready){
+      await new Promise((resolve)=>setTimeout(resolve,650));
+      ready=await checkReadiness();
+    }
     if(status){status.textContent=ready?"Online":"Verbindung momentan nicht möglich";status.classList.toggle("is-online",ready);}
     setComposerReady(ready);if(ready){const loaded=await loadThreads({selectFirst:true});if(activeThreadId)await selectThread(activeThreadId);else{newChat();if(!loaded)renderThreads();}startLiveSync();}
     document.getElementById("webConciergeNewChat")?.addEventListener("click",newChat);
