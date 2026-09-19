@@ -122,7 +122,7 @@ test("chat header displays only the authoritative central Concierge persona", ()
   assert.match(client, /webConciergeTitle/);
   assert.match(client, /assets\/concierges\/large/);
   assert.doesNotMatch(client, /\bNilo\b|"nilo"|'nilo'/i);
-  const personaClient = client.slice(client.indexOf("function normalizePersona"), client.indexOf("function dateKey"));
+  const personaClient = client.slice(client.indexOf("function normalizePersona"), client.indexOf("function openConciergeSettings"));
   assert.doesNotMatch(personaClient, /localStorage\.(setItem|getItem)|localStorage\[/);
 });
 
