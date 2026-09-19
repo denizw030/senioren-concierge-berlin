@@ -98,6 +98,7 @@
   function openMainConcierge(event) {
     const target = event.target instanceof Element ? event.target.closest(selector) : null;
     if (!target) return;
+    if (target.id === "accountTabConcierge" && document.getElementById("conciergeQuickMenu")) return;
     event.preventDefault();
     event.stopImmediatePropagation();
     location.href = CHAT_URL;

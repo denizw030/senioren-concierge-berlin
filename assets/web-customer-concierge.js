@@ -6,6 +6,7 @@
   const GATEWAY_CONTRACT_VERSION = "web-gateway-v1";
   const GATEWAY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway";
   const HISTORY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway/web/history";
+  const RESPONSE_DELIVERY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-email-runtime";
   const HISTORY_CONTRACT_VERSION = "canonical-core-receipts-v1";
   const HISTORY_PAGE_SIZE = 60;
   const SYNC_INTERVAL_MS = 3000;
@@ -32,6 +33,8 @@
   let channelView = "CHAT";
   let channelViewReadOnly = false;
   let primaryChatThreadId = null;
+  let routedTurnIds = new Set();
+  let routedTurnsLoadedAt = 0;
   const VIRTUAL_WHATSAPP_THREAD_ID="00000000-0000-4000-8000-0000000000a1";
   const VIRTUAL_PHONE_THREAD_ID="00000000-0000-4000-8000-0000000000a3";
   const VIRTUAL_EMAIL_THREAD_ID="00000000-0000-4000-8000-0000000000a4";
@@ -381,6 +384,44 @@
     const response=await fetchWithTimeout(`${endpoint}${path}`,{method,headers,body:body===null?undefined:JSON.stringify(body),cache:"no-store",credentials:"omit"},timeoutMs);
     const payload=await response.json().catch(()=>({}));if(!response.ok||payload?.ok===false)throw new Error(String(payload?.error||`http_${response.status}`));return payload;
   }
+  async function responseDeliveryRequest(path,{method="GET",body=null}={}){
+    const token=sessionToken();if(!token)throw new Error("session_required");
+    const headers={Authorization:`Bearer ${token}`};if(body!==null)headers["Content-Type"]="application/json";
+    const response=await fetchWithTimeout(RESPONSE_DELIVERY_ENDPOINT+path,{method,headers,body:body===null?undefined:JSON.stringify(body),cache:"no-store",credentials:"omit"},12000);
+    const payload=await response.json().catch(()=>({}));
+    if(!response.ok||payload?.ok!==true)throw new Error(String(payload?.error||`response_delivery_http_${response.status}`));
+    return payload;
+  }
+  async function refreshRoutedTurns(force=false){
+    const now=Date.now();if(!force&&now-routedTurnsLoadedAt<3000)return routedTurnIds;
+    const payload=await responseDeliveryRequest("/response-delivery/web-routed");
+    routedTurnIds=new Set((Array.isArray(payload?.routed_turn_ids)?payload.routed_turn_ids:[]).filter(validUuid));
+    routedTurnsLoadedAt=now;return routedTurnIds;
+  }
+  function filterRoutedWebAnswers(messages){
+    return (Array.isArray(messages)?messages:[]).filter((message)=>{
+      if(String(message?.role||"").toLowerCase()!=="assistant"||String(message?.channel||"WEB").toUpperCase()!=="WEB")return true;
+      const match=String(message?.id||"").match(/^a:WEB:([0-9a-f-]{36})(?::|$)/i);
+      return !match||!routedTurnIds.has(match[1]);
+    });
+  }
+  async function dispatchWebResponse(turnId,sourceMessageId){
+    if(!validUuid(turnId)||!sourceMessageId)return null;
+    let lastError=null;
+    for(let attempt=0;attempt<2;attempt++){
+      try{return await responseDeliveryRequest("/response-delivery/web",{method:"POST",body:{turn_id:turnId,source_message_id:sourceMessageId}})}
+      catch(error){lastError=error;if(attempt===0)await new Promise((resolve)=>setTimeout(resolve,250))}
+    }
+    if(lastError)reportClientDiagnostic("RESPONSE_DELIVERY_FALLBACK_"+String(lastError?.message||"failed").slice(0,80));
+    return null;
+  }
+  function renderRoutedDelivery(target){
+    removeTyping();
+    const key=String(target||"").toUpperCase();
+    const text=key==="EMAIL"?"Die Antwort wurde per E-Mail gesendet.":key==="WHATSAPP"?"Die Antwort wurde über WhatsApp gesendet.":key==="CALL"?"Der Rückruf ist vorbereitet. Dein Concierge meldet sich telefonisch.":"Die Antwort wurde über deinen gewählten Antwortkanal zugestellt.";
+    addRuntimeCard("Antwort weitergeleitet",text);
+  }
+
   async function historyRequest(threadId=null,{before=null,limit=HISTORY_PAGE_SIZE}={}) {
     const endpoint=configuredHistoryEndpoint(),token=sessionToken();if(!endpoint||!token)throw new Error("history_unavailable");
     const url=new URL(endpoint);
@@ -553,7 +594,8 @@
     if(!validUuid(threadId)||channelForThreadId(threadId)!=="CHAT")return false;
     try{
       const data=await historyRequest(threadId,{limit:HISTORY_PAGE_SIZE});if(activeThreadId!==threadId)return false;
-      const normalMessages=(Array.isArray(data.messages)?data.messages:[]).filter((message)=>NORMAL_CHAT_CHANNELS.has(String(message?.channel||"WEB").toUpperCase()));
+      await refreshRoutedTurns().catch(()=>routedTurnIds);
+      const normalMessages=filterRoutedWebAnswers((Array.isArray(data.messages)?data.messages:[]).filter((message)=>NORMAL_CHAT_CHANNELS.has(String(message?.channel||"WEB").toUpperCase())));
       if(reset){historyMessages=mergeHistory([],normalMessages);historyHasMore=data.has_more===true;historyNextBefore=data.next_before||null;historyLoadedOlder=false;}
       else{
         historyMessages=mergeHistory(historyMessages,normalMessages);
@@ -583,7 +625,8 @@
       const threadId=activeThreadId;
       const data=await historyRequest(threadId,{before:historyNextBefore,limit:HISTORY_PAGE_SIZE});
       if(activeThreadId!==threadId)return false;
-      const normalMessages=(Array.isArray(data.messages)?data.messages:[]).filter((message)=>NORMAL_CHAT_CHANNELS.has(String(message?.channel||"WEB").toUpperCase()));
+      await refreshRoutedTurns().catch(()=>routedTurnIds);
+      const normalMessages=filterRoutedWebAnswers((Array.isArray(data.messages)?data.messages:[]).filter((message)=>NORMAL_CHAT_CHANNELS.has(String(message?.channel||"WEB").toUpperCase())));
       historyMessages=mergeHistory(normalMessages,historyMessages);
       historyHasMore=data.has_more===true;
       historyNextBefore=data.next_before||null;
@@ -671,7 +714,12 @@
     try{
       const response=await gatewayRequest("/web/chat",{method:"POST",body:{message:content,source_message_id:sourceMessageId,thread_id:activeThreadId}});
       if(response?.ok!==true||response?.environment!=="PROD"||response?.authoritative!==true||(response?.thread_id&&response?.thread_id!==activeThreadId))throw new Error("gateway_response_not_authoritative");
-      if(!renderCoreV1Response(response.core))throw new Error("core_response_not_authoritative");
+      const routed=await dispatchWebResponse(String(response?.core?.turn_id||""),sourceMessageId);
+      if(routed?.handled===true){
+        if(validUuid(String(response?.core?.turn_id||"")))routedTurnIds.add(String(response.core.turn_id));
+        routedTurnsLoadedAt=Date.now();
+        renderRoutedDelivery(routed.target_channel);
+      }else if(!renderCoreV1Response(response.core))throw new Error("core_response_not_authoritative");
       await refreshPersona(true).catch(()=>{});
       const returnedThreadId=String(response?.thread_id||"");if(validUuid(returnedThreadId))activeThreadId=returnedThreadId;
       await loadThreads();
