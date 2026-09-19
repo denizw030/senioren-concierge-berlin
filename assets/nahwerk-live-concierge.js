@@ -170,6 +170,10 @@ export function mountNahwerkLiveConcierge({
     if(!token)throw new Error("SESSION_REQUIRED");
     return token;
   };
+  const reportClientDiagnostic=(code)=>{
+    const root=apiBase.replace(/\/live\/?$/,"");
+    fetch(root+"/client-diagnostic",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({source:"LIVE_CLIENT",code:String(code||"LIVE_CLIENT_ERROR").slice(0,180)}),cache:"no-store",credentials:"omit"}).catch(()=>{});
+  };
   const post=async(path,body)=>{
     const token=await auth();
     const r=await fetch(apiBase+path,{
@@ -305,6 +309,7 @@ export function mountNahwerkLiveConcierge({
         e?.name==="NotReadableError"?"MICROPHONE_BUSY_OR_UNAVAILABLE":
         raw;
       state("error",{error:code});
+      reportClientDiagnostic(code);
       post("/client-error",{error:code}).catch(()=>{});
       const message=code==="MIC_PERMISSION_DENIED"
         ?"Mikrofonzugriff ist nicht erlaubt. Bitte erlaube nahwerkconcierge.com den Mikrofonzugriff."
