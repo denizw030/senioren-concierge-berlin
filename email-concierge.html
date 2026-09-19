@@ -21,13 +21,13 @@
   <script>
     (()=>{
       const p=new URLSearchParams(location.search);
-      const connected=p.get("email")==="connected";
+      const connected=p.get("email")==="connected"||p.get("integration")==="connected";
       const provider=String(p.get("provider")||"GOOGLE").toUpperCase();
       const flow=String(p.get("flow")||"CONNECT").toUpperCase();
       const safeProvider=provider==="GOOGLE"?"GOOGLE":"GOOGLE";
       const safeFlow=flow==="REAUTH"?"REAUTH":"CONNECT";
       if(connected){
-        location.replace(`/konto?email_oauth=complete&provider=${safeProvider}&flow=${safeFlow}#email`);
+        location.replace(`/konto?email_oauth=complete&provider=${safeProvider}&flow=${safeFlow}&integration=connected#email`);
         return;
       }
       document.getElementById("title").textContent="E-Mail-Verbindung nicht abgeschlossen";
