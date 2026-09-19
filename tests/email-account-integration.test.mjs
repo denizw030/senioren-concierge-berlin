@@ -45,8 +45,8 @@ test("provider availability remains server authoritative",()=>{
 });
 
 test("connection accepts exact states and only masked account hints",()=>{
-  const good=hooks.normalizeConnection({ok:true,provider:"GOOGLE",state:"CONNECTED",capabilities:allCaps,account_display_hint:"d•••@gmail.com"});
-  assert.equal(good.state,"CONNECTED");assert.equal(good.account_display_hint,"d•••@gmail.com");
+  const good=hooks.normalizeConnection({ok:true,provider:"GOOGLE",state:"CONNECTED",capabilities:allCaps,account_display_hint:"d•••@gmail.com",scope_required:true,google_services:{gmail:"CONNECTED",calendar:"PERMISSION_REQUIRED",contacts:"PERMISSION_REQUIRED"}});
+  assert.equal(good.state,"CONNECTED");assert.equal(good.account_display_hint,"d•••@gmail.com");assert.equal(good.scope_required,true);assert.equal(good.google_services.gmail,"CONNECTED");assert.equal(good.google_services.calendar,"PERMISSION_REQUIRED");
   assert.equal(hooks.normalizeConnection({ok:true,provider:"GOOGLE",state:"ACTIVE",capabilities:[]}),null);
   assert.equal(hooks.normalizeConnection({ok:true,provider:"GOOGLE",state:"CONNECTED",capabilities:[],account_display_hint:"deniz@gmail.com"}).account_display_hint,null);
 });
@@ -77,7 +77,7 @@ test("browser can request Google only and carries no tenant or provider secret a
   for(const key of ["person_id","customer_account_id","customer_member_id","connection_id","access_token","refresh_token","client_secret"])assert.equal(Object.hasOwn(body,key),false);
 });
 
-test("connect action stays neutral and is disabled until Gmail is selected",()=>{
+test("connect action stays neutral and is disabled until Google is selected",()=>{
   assert.equal(hooks.connectPathForState("DISCONNECTED"),"/email/connect");
   assert.equal(hooks.connectPathForState("ERROR"),"/email/connect");
   assert.equal(hooks.connectPathForState("REAUTH_REQUIRED"),"/email/reauth");
@@ -85,9 +85,9 @@ test("connect action stays neutral and is disabled until Gmail is selected",()=>
   assert.match(js,/obsoleteReauthButton\?\.remove\(\)/);
   assert.match(js,/obsoleteRetryButton\?\.remove\(\)/);
   assert.match(js,/connectButton\.textContent = "Verbinden"/);
-  assert.match(js,/googleLabel\.textContent = "Google Gmail"/);
+  assert.match(js,/googleLabel\.textContent = "Google"/);
   assert.match(js,/connectButton\.disabled = !sessionToken\(\) \|\| selectedProvider !== "GOOGLE"/);
-  assert.match(js,/Wähle oben Google Gmail aus/);
+  assert.match(js,/Wähle oben Google aus/);
   assert.equal((js.match(/disconnectButton\.hidden = false/g)||[]).length,1);
 });
 
@@ -117,3 +117,18 @@ test("customer-facing Gmail copy keeps approval semantics without internal archi
 });
 
 test("email UI remains responsive",()=>{assert.match(css,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);assert.match(css,/@media\(max-width:720px\)/)});
+
+test("central Google connection shows Gmail Calendar and Contacts without disabling existing Gmail",()=>{
+  assert.match(js,/Gmail/);
+  assert.match(js,/Kalender/);
+  assert.match(js,/Kontakte/);
+  assert.match(js,/Berechtigungen aktualisieren/);
+  assert.match(js,/connection\?\.scope_required/);
+  assert.match(js,/syncProduct\(state === "CONNECTED"\)/);
+  assert.match(js,/emailGoogleServiceStyles/);
+});
+
+test("workspace OAuth completion is accepted by the email callback surface",()=>{
+  assert.match(callback,/p\.get\("integration"\)==="connected"/);
+  assert.match(callback,/integration=connected/);
+});
