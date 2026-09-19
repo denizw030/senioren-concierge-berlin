@@ -103,4 +103,6 @@ test("WhatsApp channel stays visible under Chat Kanäle even without a current W
   const css=read("assets/web-customer-concierge.css");
   assert.match(scope,/channelThreads\.push\(\{[\s\S]*title:"WhatsApp"/);
   assert.doesNotMatch(scope,/if\(channels\.has\("WHATSAPP"\)\)/);
-  assert.match(css,/content:"CHAT KANÄLE"/);\n  assert.match(read("web-concierge/index.html"),/web-customer-concierge-thread-scope\\.js\\?v=5/);\n});
+  assert.match(css,/content:"CHAT KANÄLE"/);
+  assert.match(read("web-concierge/index.html"),/web-customer-concierge-thread-scope\.js\?v=5/);
+});
