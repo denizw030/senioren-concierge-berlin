@@ -398,13 +398,13 @@ html[data-nw-portal-theme="light"] .web-concierge-delete-chats{color:#7b7368}
 .web-concierge-back{
   position:fixed;
   left:max(14px,env(safe-area-inset-left));
-  top:48px;
+  top:138px;
   z-index:1300;
   display:inline-flex;
   align-items:center;
-  gap:6px;
+  gap:0;
   min-height:42px;
-  padding:0 12px 0 8px;
+  padding:0 14px;
   border:1px solid rgba(255,255,255,.10);
   border-radius:999px;
   background:rgba(8,13,19,.82);
@@ -425,14 +425,7 @@ html[data-nw-portal-theme="light"] .web-concierge-delete-chats{color:#7b7368}
   transform:translateX(2px);
 }
 .web-concierge-back-arrow{
-  display:inline-grid;
-  place-items:center;
-  width:22px;
-  height:22px;
-  font-size:28px;
-  line-height:1;
-  font-weight:350;
-  margin-top:-1px;
+  display:none!important;
 }
 html[data-nw-portal-theme="light"] .web-concierge-back{
   background:rgba(255,253,248,.90);
