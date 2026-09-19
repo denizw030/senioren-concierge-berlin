@@ -56,7 +56,7 @@
     const registerUrl=options.registerUrl||root.dataset.registerUrl||"";
     const requested=options.selected||root.dataset.selected||"nilo";
     let active=Math.max(0,profiles.findIndex(profile=>profile.key===requested));
-    let dragX=0,pointerStart=0,dragging=false,moved=false,wheelLock=false;
+    let dragX=0,pointerStart=0,dragging=false,moved=false;
     const loaded = new Set();
     root.dataset.variant=variant;
     root.classList.add("nw-carousel","nw-carousel-master");
@@ -105,7 +105,7 @@
       selectButton.addEventListener("click",event=>{
         if(moved){event.preventDefault();return;}
         if(registerUrl)return;
-        select(index,true,"select");
+        select(index,false,"browse");
       });
       track.appendChild(card);
       return card;
@@ -193,12 +193,20 @@
     stage.addEventListener("pointermove",event=>{if(!dragging)return;dragX=event.clientX-pointerStart;moved||=Math.abs(dragX)>6;positionCards();});
     const finishDrag=()=>{if(!dragging)return;dragging=false;stage.classList.remove("is-dragging");const steps=Math.round(-dragX/Math.max(1,cardSpacing));if(steps)select(active+steps,false,"browse");else{dragX=0;positionCards();}setTimeout(()=>{moved=false;},0);};
     stage.addEventListener("pointerup",finishDrag); stage.addEventListener("pointercancel",finishDrag);
-    stage.addEventListener("wheel",event=>{if(Math.abs(event.deltaX)<=Math.abs(event.deltaY)||wheelLock)return;event.preventDefault();wheelLock=true;move(event.deltaX>0?1:-1,false,"browse");setTimeout(()=>{wheelLock=false;},280);},{passive:false});
 
     let resizeFrame=0;
     addEventListener("resize",()=>{cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(()=>{cardSpacing=measureSpacing();positionCards();});},{passive:true});
 
-    const api={select:key=>{if(byKey[key])select(key,false,"programmatic");},get selected(){return profiles[active];}};
+    const api={
+      select:key=>{if(byKey[key])select(key,false,"programmatic");},
+      setBusy:value=>{
+        const busy=value===true;
+        root.dataset.switching=busy?"1":"0";
+        root.querySelectorAll(".nw-carousel-arrow,.nw-carousel-select").forEach(el=>{el.disabled=busy;});
+        if(status)status.disabled=busy||(!registerUrl&&variant!=="selection");
+      },
+      get selected(){return profiles[active];}
+    };
     root._nahwerkCarousel=api;
     warmWindow(active);
     positionCards();
