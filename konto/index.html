@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="assets/email-provider-logo-connect-v3.css?v=20260916-1" />
     <link rel="stylesheet" href="assets/family-owner-sponsored-access.css?v=1" />
     <link rel="stylesheet" href="assets/account-premium-ui.css?v=5" />
-    <link rel="stylesheet" href="assets/account-response-channel.css?v=1" />
+    <link rel="stylesheet" href="assets/account-response-channel.css?v=2" />
     <style>
       .dash {
         display: grid;
@@ -1902,6 +1902,10 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
               <button class="account-tab" type="button" role="tab" id="accountTabPersonal" aria-controls="accountPanelPersonal" aria-selected="false" data-account-tab="personal"><span class="account-tab-icon account-tab-person-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"></circle><path d="M5.5 19c.7-4 3-6 6.5-6s5.8 2 6.5 6"></path></svg></span><span>Account</span></button>
               <button class="account-tab" type="button" role="tab" id="accountTabAccess" aria-controls="accountPanelAccess" aria-selected="false" data-account-tab="access"><span class="account-tab-icon" aria-hidden="true">⇄</span><span>Zugänge</span></button>
             </nav>
+            <div class="concierge-quick-menu" id="conciergeQuickMenu" role="menu" aria-label="Concierge Schnellzugriff" data-open="false">
+              <a class="concierge-quick-item" href="/web-concierge" role="menuitem"><span>Chat</span><span aria-hidden="true">›</span></a>
+              <button class="concierge-quick-item" type="button" id="responseChannelQuickOpen" role="menuitem"><span>Antwortkanal</span><span aria-hidden="true">›</span></button>
+            </div>
           </div>
           <div class="warning account-session-note" id="modeNotice" data-account-panel="overview" role="tabpanel" aria-labelledby="accountTabOverview">
             <strong>Sicher verbunden.</strong> Accountdaten und Einstellungen werden über deine serverseitig geprüfte Sitzung geladen. Nicht verfügbare Nutzungswerte werden nicht geschätzt.
@@ -5376,6 +5380,6 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
   <script src="assets/email-provider-logo-connect-v3.js?v=20260916-1"></script>
   <script src="assets/web-core-shadow.js?v=1"></script>
   <script src="assets/web-concierge-chat.js?v=1"></script>
-  <script src="assets/account-response-channel.js?v=1"></script>
+  <script src="assets/account-response-channel.js?v=2"></script>
   <script src="assets/site-ui.js?v=5"></script></body>
 </html>

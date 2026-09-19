@@ -2,6 +2,40 @@
   const ENDPOINT="https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway/web/account/response-channel";
   const card=document.getElementById("responseChannelCard");
   if(!card)return;
+  const conciergeTab=document.getElementById("accountTabConcierge");
+  const quickMenu=document.getElementById("conciergeQuickMenu");
+  const quickResponse=document.getElementById("responseChannelQuickOpen");
+  let quickHideTimer=0;
+  function positionQuickMenu(){
+    if(!conciergeTab||!quickMenu||window.matchMedia("(max-width:760px)").matches)return;
+    const shell=conciergeTab.closest(".account-tabs-shell");
+    if(!shell)return;
+    const tabRect=conciergeTab.getBoundingClientRect(),shellRect=shell.getBoundingClientRect(),menuWidth=quickMenu.offsetWidth||220;
+    const left=Math.max(0,Math.min(shellRect.width-menuWidth,tabRect.left-shellRect.left+(tabRect.width-menuWidth)/2));
+    quickMenu.style.left=Math.round(left)+"px";
+    quickMenu.style.top=Math.round(tabRect.bottom-shellRect.top+7)+"px";
+  }
+  function openQuickMenu(){
+    if(!quickMenu||window.matchMedia("(max-width:760px)").matches)return;
+    window.clearTimeout(quickHideTimer);positionQuickMenu();quickMenu.dataset.open="true";conciergeTab?.setAttribute("aria-expanded","true");
+  }
+  function closeQuickMenu(delay=120){
+    window.clearTimeout(quickHideTimer);
+    quickHideTimer=window.setTimeout(()=>{if(quickMenu)quickMenu.dataset.open="false";conciergeTab?.setAttribute("aria-expanded","false")},delay);
+  }
+  if(conciergeTab&&quickMenu){
+    conciergeTab.setAttribute("aria-haspopup","menu");
+    conciergeTab.setAttribute("aria-expanded","false");
+    conciergeTab.addEventListener("mouseenter",openQuickMenu);
+    conciergeTab.addEventListener("mouseleave",()=>closeQuickMenu(170));
+    conciergeTab.addEventListener("focus",openQuickMenu);
+    quickMenu.addEventListener("mouseenter",openQuickMenu);
+    quickMenu.addEventListener("mouseleave",()=>closeQuickMenu(130));
+    quickMenu.addEventListener("focusin",openQuickMenu);
+    quickMenu.addEventListener("focusout",(event)=>{if(!quickMenu.contains(event.relatedTarget))closeQuickMenu(0)});
+    window.addEventListener("resize",()=>{if(quickMenu.dataset.open==="true")positionQuickMenu()},{passive:true});
+    document.addEventListener("keydown",(event)=>{if(event.key==="Escape")closeQuickMenu(0)});
+  }
   const status=document.getElementById("responseChannelStatus");
   const save=document.getElementById("responseChannelSave");
   const feedback=document.getElementById("responseChannelSaveStatus");
@@ -52,6 +86,18 @@
   });
   document.addEventListener("click",(event)=>{
     if(event.target?.closest?.('[data-account-tab="concierge"],[data-open-account-tab="concierge"]'))setTimeout(load,0);
+  });
+  quickResponse?.addEventListener("click",()=>{
+    closeQuickMenu(0);
+    if(conciergeTab?.getAttribute("aria-selected")!=="true")conciergeTab?.click();
+    setTimeout(()=>{
+      load();
+      card.scrollIntoView({behavior:"smooth",block:"start"});
+      card.classList.remove("response-channel-focus");
+      void card.offsetWidth;
+      card.classList.add("response-channel-focus");
+      setTimeout(()=>card.classList.remove("response-channel-focus"),900);
+    },70);
   });
   load();
 })();

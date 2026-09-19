@@ -23,3 +23,67 @@ body.account-premium-ui.nw-portal-light .response-channel-option{background:rgba
 body.account-premium-ui.nw-portal-light .response-channel-option:has(input:checked){border-color:rgba(173,132,54,.5);background:rgba(202,155,57,.09)}
 body.account-premium-ui.nw-portal-light .response-channel-status{border:1px solid rgba(112,87,39,.16);background:rgba(255,255,255,.62);color:#5f584e}
 @media(max-width:720px){.response-channel-head{flex-direction:column}.response-channel-options{grid-template-columns:1fr}.response-channel-status{align-self:flex-start}}
+
+
+/* Concierge hover quick menu v1 */
+@media(min-width:761px){
+  body.account-premium-ui .account-tabs-shell{position:relative!important;overflow:visible!important}
+  .concierge-quick-menu{
+    position:absolute;
+    z-index:120;
+    min-width:220px;
+    padding:7px;
+    border:1px solid rgba(163,143,103,.24);
+    border-radius:15px;
+    background:rgba(8,12,18,.985);
+    box-shadow:0 18px 46px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.035);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transform:translateY(-5px);
+    transition:opacity .14s ease,transform .14s ease,visibility .14s ease;
+  }
+  .concierge-quick-menu[data-open="true"]{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+    transform:translateY(0);
+  }
+  .concierge-quick-item{
+    width:100%;
+    min-height:42px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:18px;
+    padding:0 12px;
+    border:0;
+    border-radius:10px;
+    background:transparent;
+    color:#f2eee5;
+    font:inherit;
+    font-size:13px;
+    font-weight:700;
+    text-decoration:none;
+    cursor:pointer;
+    text-align:left;
+  }
+  .concierge-quick-item:hover,.concierge-quick-item:focus-visible{
+    outline:none;
+    background:rgba(215,169,52,.09);
+    color:#efd27f;
+  }
+  body.account-premium-ui.nw-portal-light .concierge-quick-menu{
+    background:rgba(255,252,246,.985);
+    border-color:rgba(112,87,39,.18);
+    box-shadow:0 18px 42px rgba(76,59,30,.13),inset 0 1px 0 rgba(255,255,255,.8);
+  }
+  body.account-premium-ui.nw-portal-light .concierge-quick-item{color:#28231c}
+  body.account-premium-ui.nw-portal-light .concierge-quick-item:hover,
+  body.account-premium-ui.nw-portal-light .concierge-quick-item:focus-visible{background:rgba(184,140,54,.10);color:#6f5422}
+}
+@media(max-width:760px){.concierge-quick-menu{display:none!important}}
+.response-channel-panel.response-channel-focus{animation:responseChannelFocus .8s ease}
+@keyframes responseChannelFocus{0%{box-shadow:0 0 0 0 rgba(215,169,52,.34)}45%{box-shadow:0 0 0 3px rgba(215,169,52,.20)}100%{box-shadow:inherit}}
