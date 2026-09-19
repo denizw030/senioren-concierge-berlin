@@ -27,16 +27,19 @@ internal data class CustomerHistoryThread(
     val channels: List<String>
 )
 
+internal data class CustomerChannelHistory(
+    val hasCalls: Boolean,
+    val messages: List<CustomerHistoryMessage>
+)
+
 internal class CustomerHistoryApi(context: Context) {
     companion object {
         private const val PROD_HOST = "djicahhmnnamtjuqedqd.supabase.co"
-        // PROD runtime alias: the project function quota is currently full, so the canonical
-        // nahwerk-customer-history implementation runs in a retired 410/GONE slot.
-        private const val HISTORY_SLUG = "account-security-auth-cleanup-temp"
+        private const val APP_GATEWAY_SLUG = "nahwerk-app-gateway"
     }
 
     private val sessions = SecureProductSessionStore(context.applicationContext)
-    private val baseUrl = "${BuildConfig.CUSTOMER_PRODUCT_BASE_URL.trimEnd('/')}/$HISTORY_SLUG"
+    private val baseUrl = "${BuildConfig.CUSTOMER_PRODUCT_BASE_URL.trimEnd('/')}/$APP_GATEWAY_SLUG"
 
     init {
         val uri = runCatching { URI(baseUrl) }.getOrNull()
@@ -46,7 +49,7 @@ internal class CustomerHistoryApi(context: Context) {
     }
 
     suspend fun loadThreads(): Result<List<CustomerHistoryThread>> = withContext(Dispatchers.IO) {
-        request("text/threads").mapCatching { body ->
+        request("mobile/history").mapCatching { body ->
             val rows = body.optJSONArray("threads") ?: return@mapCatching emptyList()
             buildList {
                 for (index in 0 until rows.length()) {
@@ -72,7 +75,7 @@ internal class CustomerHistoryApi(context: Context) {
 
     suspend fun loadMessages(threadId: String): Result<List<CustomerHistoryMessage>> = withContext(Dispatchers.IO) {
         if (threadId.isBlank()) return@withContext Result.success(emptyList())
-        request("text/messages?thread_id=${java.net.URLEncoder.encode(threadId, Charsets.UTF_8.name())}").mapCatching { body ->
+        request("mobile/history?thread_id=${java.net.URLEncoder.encode(threadId, Charsets.UTF_8.name())}").mapCatching { body ->
             val rows = body.optJSONArray("messages") ?: return@mapCatching emptyList()
             buildList {
                 for (index in 0 until rows.length()) {
@@ -90,6 +93,41 @@ internal class CustomerHistoryApi(context: Context) {
                     )
                 }
             }
+        }
+    }
+
+    suspend fun loadChannel(channel: String, summaryOnly: Boolean = false): Result<CustomerChannelHistory> = withContext(Dispatchers.IO) {
+        val normalized = channel.trim().uppercase()
+        if (normalized != "WHATSAPP" && normalized != "PHONE") {
+            return@withContext Result.failure(IllegalArgumentException("Dieser Chat-Kanal ist nicht verfügbar."))
+        }
+        val suffix = buildString {
+            append("mobile/channel-history?channel=")
+            append(java.net.URLEncoder.encode(normalized, Charsets.UTF_8.name()))
+            if (summaryOnly) append("&summary=1")
+        }
+        request(suffix).mapCatching { body ->
+            val rows = body.optJSONArray("messages")
+            val messages = buildList {
+                if (rows != null) for (index in 0 until rows.length()) {
+                    val row = rows.optJSONObject(index) ?: continue
+                    val text = row.optString("text").trim()
+                    if (text.isBlank()) continue
+                    add(
+                        CustomerHistoryMessage(
+                            id = row.optString("id", "channel-$index"),
+                            role = row.optString("role"),
+                            text = text,
+                            channel = row.optString("channel").uppercase(),
+                            at = row.optString("at")
+                        )
+                    )
+                }
+            }
+            CustomerChannelHistory(
+                hasCalls = body.optBoolean("has_calls", false),
+                messages = messages
+            )
         }
     }
 
