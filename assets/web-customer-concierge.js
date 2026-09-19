@@ -11,7 +11,7 @@
   const HISTORY_PAGE_SIZE = 60;
   const SYNC_INTERVAL_MS = 3000;
   const PERSONA_SYNC_INTERVAL_MS = 3000;
-  const CLIENT_FETCH_TIMEOUT_MS = 12000;
+  const CLIENT_FETCH_TIMEOUT_MS = 40000;
   const SETTINGS_URL = "/concierge-anpassen";
   const isMobile=()=>window.matchMedia("(max-width:820px)").matches;
   const RESPONSE_STATES = new Set(["ANSWER","QUESTION","ACTION_STARTED","ACTION_PENDING","ACTION_RESULT","ERROR_RESPONSE","HANDOFF","SAFE_TERMINATION"]);
@@ -259,7 +259,7 @@
     const endpoint=configuredEndpoint();if(!endpoint)throw new Error("gateway_not_configured");const headers={};
     if(auth){const token=sessionToken();if(!token)throw new Error("session_required");headers.Authorization=`Bearer ${token}`;}
     if(body!==null)headers["Content-Type"]="application/json";
-    const response=await fetchWithTimeout(`${endpoint}${path}`,{method,headers,body:body===null?undefined:JSON.stringify(body),cache:"no-store",credentials:"omit"});
+    const timeoutMs=path==="/health"?8000:path==="/web/me"?20000:path==="/web/chat"?45000:CLIENT_FETCH_TIMEOUT_MS;\n    const response=await fetchWithTimeout(`${endpoint}${path}`,{method,headers,body:body===null?undefined:JSON.stringify(body),cache:"no-store",credentials:"omit"},timeoutMs);
     const payload=await response.json().catch(()=>({}));if(!response.ok||payload?.ok===false)throw new Error(String(payload?.error||`http_${response.status}`));return payload;
   }
   async function historyRequest(threadId=null,{before=null,limit=HISTORY_PAGE_SIZE}={}) {
@@ -420,8 +420,9 @@
   async function checkReadiness() {
     try{
       const readiness=normalizeGatewayReadiness(await gatewayRequest("/health",{auth:false}));if(readiness?.ready!==true)throw new Error("gateway_not_authoritative");
-      await refreshPersona(true);
-      gatewayReady=true;return true;
+      gatewayReady=true;
+      void refreshPersona(true).catch(()=>{});
+      return true;
     }catch{gatewayReady=false;applyPersona(null);return false;}
   }
 
@@ -485,7 +486,12 @@ syncIosVisualViewport();
       ready=await checkReadiness();
     }
     if(status){status.textContent=ready?"Online":"Verbindung momentan nicht möglich";status.classList.toggle("is-online",ready);}
-    setComposerReady(ready);if(ready){const loaded=await loadThreads({selectFirst:true});if(activeThreadId)await selectThread(activeThreadId);else{newChat();if(!loaded)renderThreads();}startLiveSync();}
+    setComposerReady(ready);if(ready){
+      const loaded=await loadThreads({selectFirst:true});
+      if(activeThreadId)await selectThread(activeThreadId);else{newChat();if(!loaded)renderThreads();}
+      void refreshPersona(true).then(async()=>{await loadThreads();renderThreads();}).catch(()=>{});
+      startLiveSync();
+    }
     document.getElementById("webConciergeNewChat")?.addEventListener("click",newChat);
     document.getElementById("webConciergeSend")?.addEventListener("click",sendTurn);
     document.getElementById("webConciergeInput")?.addEventListener("input",resizeInput);
