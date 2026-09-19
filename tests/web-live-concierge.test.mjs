@@ -98,6 +98,7 @@ test("channel chats are grouped after normal chats and delete-all uses the share
 });
 
 
+// PERSISTENT_CHANNEL_SECTION_V1
 test("WhatsApp channel stays visible under Chat Kanäle even without a current WhatsApp turn",()=>{
   const scope=read("assets/web-customer-concierge-thread-scope.js");
   const css=read("assets/web-customer-concierge.css");
