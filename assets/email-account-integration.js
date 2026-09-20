@@ -320,9 +320,8 @@
 
   function showConnectButton() {
     connectButton.hidden = false;
-    const googleReady = selectedProvider === "GOOGLE" || connection?.provider === "GOOGLE" || googleSelectable();
-    if (googleReady) selectedProvider = "GOOGLE";
-    connectButton.disabled = !sessionToken() || !googleReady;
+    selectedProvider = "GOOGLE";
+    connectButton.disabled = !sessionToken();
   }
 
   function renderGoogleServices() {
@@ -476,7 +475,14 @@
     }
     selectedProvider = "GOOGLE";
     const body = connectPayload("GOOGLE", selectedCapabilities());
-    if (!body || !sessionToken()) return;
+    if (!body) {
+      renderError(new Error("EMAIL_REQUEST_INVALID"));
+      return;
+    }
+    if (!sessionToken()) {
+      renderError(new Error("UNAUTHENTICATED"));
+      return;
+    }
     setBusy(true);
     connectButton.textContent = "Verbindung wird gestartet …";
     try {
@@ -519,6 +525,7 @@
 
   capabilityInputs.forEach((input) => input.addEventListener("change", () => savePreferences(input)));
 
+  connectButton.dataset.emailConnectBound = "true";
   connectButton.addEventListener("click", () => begin());
   disconnectButton.addEventListener("click", async () => {
     setBusy(true);
@@ -562,6 +569,9 @@
     refresh() {
       loaded = false;
       return load(true);
+    },
+    connect() {
+      return begin();
     }
   });
 
