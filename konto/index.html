@@ -2029,26 +2029,29 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
     }
     .concierge-chat-card{
       display:flex;
-      flex-direction:column;
-      justify-content:space-between;
+      align-items:stretch;
+      justify-content:center;
       overflow:hidden;
-      padding:28px!important;
+      padding:30px 32px!important;
       color:inherit!important;
       border-color:rgba(126,148,178,.14)!important;
       background:
-        radial-gradient(circle at 100% 0%,rgba(34,72,144,.11),transparent 44%),
+        radial-gradient(circle at 100% 0%,rgba(34,72,144,.09),transparent 46%),
         linear-gradient(145deg,#0b1119,#080d14)!important;
-      transition:border-color .18s ease,box-shadow .18s ease!important;
+      transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease!important;
     }
     .concierge-chat-card:hover{
+      transform:translateY(-1px);
       border-color:rgba(212,175,55,.28)!important;
       box-shadow:0 18px 46px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.025)!important;
     }
     .concierge-chat-primary{
-      display:flex;
-      align-items:center;
-      gap:20px;
+      width:100%;
       min-width:0;
+      display:grid;
+      grid-template-columns:104px minmax(0,1fr);
+      align-items:center;
+      gap:24px;
     }
     .concierge-chat-portrait{
       width:104px;
@@ -2064,18 +2067,21 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
       display:flex;
       flex-direction:column;
       align-items:flex-start;
+      justify-content:center;
     }
     .concierge-chat-name{
-      margin:6px 0 8px;
+      margin:7px 0 8px;
+      max-width:360px;
       font-size:clamp(1.45rem,2.2vw,2rem);
-      line-height:1.02;
-      font-weight:820;
-      letter-spacing:-.04em;
+      line-height:1.04;
+      font-weight:800;
+      letter-spacing:-.035em;
       color:#f7f5ef;
+      text-wrap:balance;
     }
     .concierge-chat-copy p{
-      max-width:340px;
-      margin:0 0 16px;
+      max-width:360px;
+      margin:0 0 18px;
       color:#aaa69d;
       font-size:12.5px;
       line-height:1.5;
@@ -2085,74 +2091,28 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
       align-items:center;
       justify-content:center;
       gap:12px;
-      min-height:42px;
-      padding:0 15px;
-      border:1px solid rgba(212,175,55,.34);
-      border-radius:12px;
-      background:rgba(212,175,55,.07);
+      min-height:44px;
+      padding:0 17px;
+      border:1px solid rgba(212,175,55,.32);
+      border-radius:13px;
+      background:rgba(212,175,55,.065);
       color:#f2e2ae!important;
       font-size:12px;
-      font-weight:780;
+      font-weight:760;
       letter-spacing:-.01em;
       text-decoration:none!important;
-      transition:border-color .18s ease,background .18s ease;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+      transition:border-color .18s ease,background .18s ease,transform .18s ease;
     }
     .concierge-chat-action:hover{
-      border-color:rgba(218,187,112,.56);
-      background:rgba(212,175,55,.11);
+      transform:translateY(-1px);
+      border-color:rgba(218,187,112,.52);
+      background:rgba(212,175,55,.10);
     }
     .concierge-chat-action>span{
       font-size:21px;
       font-weight:300;
       line-height:1;
-    }
-    .concierge-channel-quick-actions{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:9px;
-      margin-top:22px;
-      padding-top:18px;
-      border-top:1px solid rgba(126,148,178,.12);
-    }
-    .concierge-channel-quick{
-      width:100%;
-      min-height:44px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:0 16px;
-      border:1px solid rgba(212,175,55,.28);
-      border-radius:12px;
-      background:rgba(212,175,55,.045);
-      color:#f2e2ae;
-      font:inherit;
-      font-size:12px;
-      font-weight:780;
-      letter-spacing:-.01em;
-      cursor:pointer;
-      transition:border-color .18s ease,background .18s ease,transform .18s ease;
-    }
-    .concierge-channel-quick:hover:not(:disabled){
-      transform:translateY(-1px);
-      border-color:rgba(218,187,112,.52);
-      background:rgba(212,175,55,.09);
-    }
-    .concierge-channel-quick.is-selected{
-      border-color:rgba(215,169,52,.62);
-      background:rgba(215,169,52,.12);
-      color:#f6e8bb;
-    }
-    .concierge-channel-quick:disabled{
-      opacity:.45;
-      cursor:not-allowed;
-      transform:none;
-    }
-    .concierge-channel-quick-status{
-      min-height:16px;
-      color:#aaa69d;
-      font-size:10.5px;
-      line-height:1.35;
-      text-align:center;
     }
     body.account-premium-ui.nw-portal-light .concierge-chat-card,
     html[data-nw-portal-theme="light"] body.account-premium-ui .concierge-chat-card{
@@ -2163,32 +2123,17 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
     body.account-premium-ui.nw-portal-light .concierge-chat-name,
     html[data-nw-portal-theme="light"] body.account-premium-ui .concierge-chat-name{color:#27231d}
     body.account-premium-ui.nw-portal-light .concierge-chat-copy p,
-    body.account-premium-ui.nw-portal-light .concierge-channel-quick-status,
-    html[data-nw-portal-theme="light"] body.account-premium-ui .concierge-chat-copy p,
-    html[data-nw-portal-theme="light"] body.account-premium-ui .concierge-channel-quick-status{color:#6f695f}
-    body.account-premium-ui.nw-portal-light .concierge-channel-quick,
-    html[data-nw-portal-theme="light"] body.account-premium-ui .concierge-channel-quick{
-      color:#6f5422;
-      border-color:rgba(173,132,54,.24);
-      background:rgba(202,155,57,.045);
-    }
-    body.account-premium-ui.nw-portal-light .concierge-channel-quick.is-selected,
-    html[data-nw-portal-theme="light"] body.account-premium-ui .concierge-channel-quick.is-selected{
-      border-color:rgba(173,132,54,.5);
-      background:rgba(202,155,57,.1);
-    }
+    html[data-nw-portal-theme="light"] body.account-premium-ui .concierge-chat-copy p{color:#6f695f}
     @media(max-width:900px){
       .concierge-panel,.concierge-chat-card{grid-column:1/-1!important}
       .concierge-chat-card{min-height:300px!important}
     }
     @media(max-width:620px){
-      .concierge-chat-card{min-height:auto!important;padding:20px!important}
-      .concierge-chat-primary{align-items:flex-start;gap:15px}
+      .concierge-chat-card{min-height:auto!important;padding:22px!important}
+      .concierge-chat-primary{grid-template-columns:76px minmax(0,1fr);align-items:center;gap:16px}
       .concierge-chat-portrait{width:76px;height:76px;flex-basis:76px}
       .concierge-chat-copy p{font-size:11.5px;margin-bottom:14px}
-      .concierge-chat-action{min-height:40px;padding:0 13px}
-      .concierge-channel-quick-actions{margin-top:18px;padding-top:15px}
-      .concierge-channel-quick{min-height:42px}
+      .concierge-chat-action{min-height:40px;padding:0 14px}
     }
   </style>
 </head>
@@ -2422,11 +2367,6 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
                   <p>Sprich direkt mit deinem ausgewählten Concierge.</p>
                   <a class="concierge-chat-action" href="/web-concierge">Chat öffnen <span aria-hidden="true">›</span></a>
                 </div>
-              </div>
-              <div class="concierge-channel-quick-actions" aria-label="WhatsApp-Antwortweg schnell festlegen">
-                <button class="concierge-channel-quick" type="button" data-response-channel-quick="EMAIL">WhatsApp → via E-Mail</button>
-                <button class="concierge-channel-quick" type="button" data-response-channel-quick="CALL">WhatsApp → via Telefon</button>
-                <span class="concierge-channel-quick-status" id="conciergeQuickChannelStatus" aria-live="polite"></span>
               </div>
             </article>
             <article class="card wide response-channel-panel" id="responseChannelCard" data-account-panel="concierge" role="tabpanel" aria-labelledby="accountTabConcierge" hidden>
@@ -5793,7 +5733,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
     </script>
   <script src="assets/concierge-carousel.js?v=20"></script>
   <script src="assets/family-owner-sponsored-access.js?v=2"></script>
-  <script src="assets/email-account-integration.js?v=8"></script>
+  <script src="assets/email-account-integration.js?v=9"></script>
   <script>
     (() => {
       const BASE = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-email-runtime";
