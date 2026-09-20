@@ -19,6 +19,9 @@ test("guest advice has no account CTA until backend marks a real execution reque
   assert.doesNotMatch(chat,/type==="SIGN_UP"/);
   assert.doesNotMatch(chat,/type==="SIGN_IN"/);
   assert.match(chat,/Konto für die Ausführung erforderlich/);
+  assert.match(chat,/purpose:String\(item\.purpose\|\|""\)\.toUpperCase\(\)/);
+  assert.match(chat,/purpose==="ACCOUNT_REQUEST"/);
+  assert.match(chat,/NAHWERK Konto erstellen/);
 });
 
 test("guest execution handoff preserves the request locally and only allows PAYG as post-auth target",()=>{
@@ -55,4 +58,12 @@ test("guest flow loads the refreshed assets only on the touched product surfaces
   assert.match(registration,/assets\/onboarding\.js\?v=25/);
   assert.match(payg,/assets\/payg-account-shell\.js\?v=2/);
   assert.match(payg,/assets\/payg-account-shell\.css\?v=2/);
+});
+
+
+test("explicit account creation CTA does not fake an execution or PAYG resume",()=>{
+  assert.match(chat,/accountOnly=purpose==="ACCOUNT_REQUEST"/);
+  assert.match(chat,/accountOnly\?"\/registrieren\?source=web_guest_chat"/);
+  assert.match(chat,/if\(!accountOnly\)link\.addEventListener\("click"/);
+  assert.match(chat,/Die Registrierung öffnet sich über den Button unten/);
 });

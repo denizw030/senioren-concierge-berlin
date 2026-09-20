@@ -157,7 +157,7 @@
       active_task_id:raw.active_task_id ? String(raw.active_task_id) : null, response_state:responseState, messages,
       pending_approval:raw.pending_approval && typeof raw.pending_approval === "object" ? raw.pending_approval : null,
       action_refs:Array.isArray(raw.action_refs) ? raw.action_refs : [], error:raw.error && typeof raw.error === "object" ? raw.error : null,
-      ui_actions:Array.isArray(raw.ui_actions) ? raw.ui_actions.filter((item)=>["CREATE_ACCOUNT"].includes(String(item?.type||"").toUpperCase())).map((item)=>({type:String(item.type).toUpperCase(),label:String(item.label||"").trim(),href:String(item.href||""),post_auth_target:String(item.post_auth_target||"")})) : [],
+      ui_actions:Array.isArray(raw.ui_actions) ? raw.ui_actions.filter((item)=>["CREATE_ACCOUNT"].includes(String(item?.type||"").toUpperCase())).map((item)=>({type:String(item.type).toUpperCase(),purpose:String(item.purpose||"").toUpperCase(),label:String(item.label||"").trim(),href:String(item.href||""),post_auth_target:String(item.post_auth_target||"")})) : [],
       state_version:Number(raw.state_version || 0), correlation_id:String(raw.correlation_id || ""), authoritative
     };
   }
@@ -449,16 +449,22 @@
     if(!guestMode||!Array.isArray(actions)||!actions.length)return;
     const allowed=actions.filter((action)=>String(action?.type||"").toUpperCase()==="CREATE_ACCOUNT");
     if(!allowed.length)return;
-    const card=addRuntimeCard("Konto für die Ausführung erforderlich","Damit ich die Aufgabe wirklich für dich ausführen kann, brauchst du zuerst ein NAHWERK Konto. Danach kannst du PAYG-Guthaben ab 5 € aufladen; vor einer kostenpflichtigen Ausführung siehst du den Preis.","is-guest-account");
+    const action=allowed[0];
+    const purpose=String(action?.purpose||"EXECUTION").toUpperCase();
+    const accountOnly=purpose==="ACCOUNT_REQUEST";
+    const title=accountOnly?"NAHWERK Konto erstellen":"Konto für die Ausführung erforderlich";
+    const body=accountOnly
+      ?"Hier kannst du dein NAHWERK Konto direkt erstellen. Die Registrierung öffnet sich über den Button unten."
+      :"Damit ich die Aufgabe wirklich für dich ausführen kann, brauchst du zuerst ein NAHWERK Konto. Danach kannst du PAYG-Guthaben ab 5 € aufladen; vor einer kostenpflichtigen Ausführung siehst du den Preis.";
+    const card=addRuntimeCard(title,body,"is-guest-account");
     if(!card)return;
     const wrap=document.createElement("div");wrap.className="web-concierge-guest-actions";
-    const action=allowed[0];
     const link=document.createElement("a");
     link.className="btn red";
     const candidate=String(action?.href||"");
-    link.href=candidate.startsWith("/registrieren?")?candidate:"/registrieren?source=web_guest_chat&next=%2Fpayg";
+    link.href=candidate.startsWith("/registrieren?")?candidate:(accountOnly?"/registrieren?source=web_guest_chat":"/registrieren?source=web_guest_chat&next=%2Fpayg");
     link.textContent=String(action?.label||"").trim()||"Konto erstellen";
-    link.addEventListener("click",()=>{
+    if(!accountOnly)link.addEventListener("click",()=>{
       try{
         localStorage.setItem(GUEST_RESUME_KEY,JSON.stringify({
           request:String(lastGuestUserMessage||"").slice(0,4000),
