@@ -83,7 +83,7 @@ test("product layout is responsive across desktop and mobile",()=>{
   assert.match(js,/ecp-rule-title-row/);
   assert.match(js,/\.ecp-rule-controls\{display:grid;grid-template-columns:minmax\(0,1fr\) auto/);
   assert.match(integration,/email-concierge-product\.css\?v=20260920-10/);
-  assert.match(integration,/email-concierge-product\.js\?v=20260920-13/);
+  assert.match(integration,/email-concierge-product\.js\?v=20260920-14/);
 });
 
 
@@ -148,7 +148,7 @@ test("every visible mail can be marked Wichtig or Unwichtig",()=>{
   assert.match(js,/messageCard\(mail, true, true\)/);
   assert.match(js,/messageCard\(row, true, true\)/);
   assert.match(js,/const classifiable = sorted \|\| \(data\.message\?\.id/);
-  assert.match(js,/syncVisibleClassification\(message\.id, value\)/);
+  assert.match(js,/syncVisibleClassification\(messageId, value\)/);
 });
 
 test("concierge chat renders classification views locally without another Gmail search",()=>{
@@ -254,7 +254,7 @@ test("mailbox refresh failure preserves the last successful message list",()=>{
 test("classification updates immediately without reloading the full classification snapshot",()=>{
   assert.match(js,/function applyLocalClassification\(messageId, value\)/);
   assert.match(js,/message\.classification = value/);
-  assert.match(js,/applyLocalClassification\(message\.id, value\)/);
+  assert.match(js,/applyLocalClassification\(messageId, value\)/);
   const block=js.slice(js.indexOf("async function setMessageClassification"),js.indexOf("function messageCard"));
   assert.doesNotMatch(block,/classification\/summary/);
 });
@@ -322,4 +322,36 @@ test("NAHWERK Mail uses a high-contrast white SVG envelope",()=>{
   assert.match(js,/document\.createElementNS\(svgNs,"svg"\)/);
   assert.match(css,/\.ecp-tb-brandmark svg/);
   assert.match(css,/stroke:#fff/);
+});
+
+
+test("chat rerenders preserve the current scroll position instead of jumping to top",()=>{
+  assert.match(js,/chatScrollTop/);
+  assert.match(js,/chatLog\.scrollTop=chatAutoScrollNext\?chatLog\.scrollHeight:chatScrollTop/);
+  assert.match(js,/captureTransientUiState/);
+  assert.match(js,/restoreTransientUiState/);
+});
+
+test("typed concierge text survives background mailbox refreshes",()=>{
+  assert.match(js,/let chatDraft = ""/);
+  assert.match(js,/input\.value=chatDraft/);
+  assert.match(js,/input\.addEventListener\("input"/);
+  assert.match(js,/if\(!force && transient\.chatFocused\)/);
+  assert.match(js,/pendingBackgroundRender=true/);
+  assert.match(js,/input\.focus\(\{preventScroll:true\}\)/);
+});
+
+test("spacebar typing cannot become page scrolling because focus is restored",()=>{
+  assert.match(js,/chatSelectionStart/);
+  assert.match(js,/input\.setSelectionRange/);
+  assert.match(js,/flushPendingBackgroundRender/);
+  assert.match(js,/:focus-within/);
+});
+
+test("Wichtig Unwichtig persistence does not globally disable the concierge composer",()=>{
+  const block=js.slice(js.indexOf("async function setMessageClassification"),js.indexOf("function messageCard"));
+  assert.match(block,/classificationSavingIds/);
+  assert.doesNotMatch(block,/setBusy\(true\)/);
+  assert.doesNotMatch(block,/setBusy\(false\)/);
+  assert.match(block,/render\(true\)/);
 });
