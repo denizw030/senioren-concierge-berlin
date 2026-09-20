@@ -359,13 +359,13 @@
     });
   }
   // NAHWERK CLEAN ROUTES + FLOATING CONCIERGE 2026-09-16
-  const FLOATING_CONCIERGE_EXCLUDE = new Set(["web-concierge.html", "anmelden.html", "registrieren.html", "passwort-zuruecksetzen.html"]);
+  const FLOATING_CONCIERGE_EXCLUDE = new Set(["web-concierge.html"]);
   function removeFloatingConcierge() {
     document.getElementById("nwFloatingConcierge")?.remove();
   }
   function ensureFloatingConcierge() {
     removeFloatingConcierge();
-    if (!isLoggedIn() || FLOATING_CONCIERGE_EXCLUDE.has(page())) return;
+    if (FLOATING_CONCIERGE_EXCLUDE.has(page())) return;
     const link = document.createElement("a");
     link.id = "nwFloatingConcierge";
     link.className = "nw-floating-concierge";
@@ -385,6 +385,7 @@
       }));
     }).observe(document.body, { childList: true, subtree: true });
     normalizeShell();
+    ensureFloatingConcierge();
     const current = page();
     const valid = await validateSession();
     if (valid) {
@@ -392,7 +393,7 @@
       ensureFloatingConcierge();
       if (current === "anmelden.html" || current === "registrieren.html") location.replace("/konto");
     } else {
-      removeFloatingConcierge();
+      ensureFloatingConcierge();
       normalizeShell();
       if (PROTECTED.has(current)) location.replace("/anmelden");
     }

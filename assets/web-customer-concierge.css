@@ -674,3 +674,38 @@ body.nw-portal-light .web-concierge-runtime-card.is-connection span{color:#68645
   outline-offset:2px;
   border-radius:3px;
 }
+
+
+/* PUBLIC_WEB_GUEST_CONCIERGE_V1_20260920 */
+body.web-concierge-guest .web-concierge-workspace{
+  grid-template-columns:minmax(0,1fr)!important;
+}
+body.web-concierge-guest .web-concierge-sidebar,
+body.web-concierge-guest .web-concierge-delete-chats,
+body.web-concierge-guest #webConciergeVoice,
+body.web-concierge-guest #webConciergeVoiceRecorder,
+body.web-concierge-guest #webConciergeLive{
+  display:none!important;
+}
+body.web-concierge-guest .web-concierge-mobile-chats{
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+.web-concierge-runtime-card.is-guest-account{
+  gap:10px;
+}
+.web-concierge-guest-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:2px;
+}
+.web-concierge-guest-actions .btn{
+  min-height:38px;
+  padding:0 14px;
+  font-size:.74rem;
+}
+@media(max-width:820px){
+  body.web-concierge-guest .web-concierge-sidebar{display:none!important}
+  body.web-concierge-guest .web-concierge-workspace.is-mobile-sidebar-open .web-concierge-sidebar{display:none!important}
+}
