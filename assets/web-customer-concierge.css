@@ -566,24 +566,38 @@ body.web-concierge-page>.footer{display:none!important}
   .web-concierge-theme-toggle{min-height:36px!important}
 }
 
-.web-concierge-thread[data-chat-channel="PHONE"] .web-concierge-thread-title::before{
-  content:"☎";
-  display:inline-block;
-  margin-right:7px;
+.web-concierge-thread[data-chat-scope="CHANNEL"] .web-concierge-thread-title{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  min-width:0;
+}
+.web-concierge-thread[data-chat-scope="CHANNEL"] .web-concierge-thread-title::before{
+  content:none!important;
+  display:none!important;
+}
+.web-concierge-channel-icon{
+  width:13px;
+  height:13px;
+  flex:0 0 13px;
+  display:inline-grid;
+  place-items:center;
+  color:currentColor;
   opacity:.72;
 }
-.web-concierge-thread[data-chat-channel="EMAIL"] .web-concierge-thread-title::before{
-  content:"✉";
-  display:inline-block;
-  margin-right:7px;
-  opacity:.72;
+.web-concierge-channel-icon svg{
+  display:block;
+  width:13px;
+  height:13px;
 }
-.web-concierge-thread[data-chat-channel="WHATSAPP"] .web-concierge-thread-title::before{
-  content:"●";
-  display:inline-block;
-  margin-right:7px;
-  font-size:.62em;
-  opacity:.72;
+.web-concierge-thread-title-text{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.web-concierge-thread[data-chat-scope="CHANNEL"] .web-concierge-thread-preview{
+  padding-left:20px;
 }
 
 /* CHANNEL_READ_ONLY_V1_20260919 */
