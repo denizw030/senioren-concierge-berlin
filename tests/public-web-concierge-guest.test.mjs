@@ -42,6 +42,14 @@ test("guest chat offers account actions but keeps authenticated tools out of gue
 
 test("web concierge clean route stays mirrored and loads refreshed guest assets", () => {
   assert.match(chatPage, /assets\/web-customer-concierge\.css\?v=27/);
-  assert.match(chatPage, /assets\/web-customer-concierge\.js\?v=44/);
+  assert.match(chatPage, /assets\/web-customer-concierge\.js\?v=45/);
   assert.equal(chatPage, chatClean.replace("<head><base href=\"/\">","<head>"));
+});
+
+
+test("guest account CTA renders the backend purpose instead of claiming a hidden button", () => {
+  assert.match(chat, /purpose:String\(item\.purpose\|\|""\)\.toUpperCase\(\)/);
+  assert.match(chat, /NAHWERK Konto erstellen/);
+  assert.match(chat, /Konto für die Ausführung erforderlich/);
+  assert.match(chat, /renderGuestAccountActions\(response\.ui_actions\)/);
 });
