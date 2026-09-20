@@ -954,7 +954,10 @@
     const side = el("aside", "ecp-tb-sidebar");
     const brand = el("div", "ecp-tb-brand"), mark = el("span", "ecp-tb-brandmark"), brandCopy = el("div");
     mark.setAttribute("aria-hidden","true");
-    mark.innerHTML='<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><rect x="3.25" y="5.25" width="17.5" height="13.5" rx="2.25"></rect><path d="M4.5 7.25 12 13l7.5-5.75"></path></svg>';
+    const svgNs="http://www.w3.org/2000/svg",mailSvg=document.createElementNS(svgNs,"svg"),mailRect=document.createElementNS(svgNs,"rect"),mailPath=document.createElementNS(svgNs,"path");
+    mailSvg.setAttribute("viewBox","0 0 24 24");mailSvg.setAttribute("focusable","false");mailSvg.setAttribute("aria-hidden","true");
+    mailRect.setAttribute("x","3.25");mailRect.setAttribute("y","5.25");mailRect.setAttribute("width","17.5");mailRect.setAttribute("height","13.5");mailRect.setAttribute("rx","2.25");
+    mailPath.setAttribute("d","M4.5 7.25 12 13l7.5-5.75");mailSvg.append(mailRect,mailPath);mark.append(mailSvg);
     brandCopy.append(el("strong", "", "NAHWERK Mail"), el("span", "", emailConnections.length === 1 ? "1 Postfach verbunden" : `${emailConnections.length} Postfächer verbunden`)); brand.append(mark, brandCopy); side.append(brand);
     const nav = el("nav", "ecp-tb-nav"); nav.setAttribute("aria-label", "E-Mail-Bereiche");
     const appendNav = (label, icon, active, count, onClick, extraClass="") => {
