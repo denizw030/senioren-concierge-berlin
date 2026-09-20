@@ -5,6 +5,7 @@ import test from "node:test";
 const html = readFileSync(new URL("../registrieren.html", import.meta.url), "utf8");
 const onboarding = readFileSync(new URL("../assets/onboarding.js", import.meta.url), "utf8");
 const voicePreviewCss = readFileSync(new URL("../assets/concierge-voice-preview.css", import.meta.url), "utf8");
+const carouselCss = readFileSync(new URL("../assets/concierge-carousel.css", import.meta.url), "utf8");
 
 test("hidden registration rows cannot be forced visible by component CSS", () => {
   assert.match(html, /#signupForm \[hidden\]\s*{\s*display:\s*none\s*!important;/);
@@ -93,4 +94,13 @@ test("removed registration copy cannot return in light or dark registration", ()
     assert.equal(html.includes(removed), false, removed);
     assert.equal(onboarding.includes(removed), false, removed);
   }
+});
+
+
+test("mobile registration carousel arrows stay beside the photo stage", () => {
+  assert.match(carouselCss, /REGISTRATION_MOBILE_CAROUSEL_ARROWS_V1_20260920/);
+  assert.match(carouselCss, /body\.registration-page \.nw-carousel-master\[data-variant="selection"\] \.nw-carousel-arrow\{[\s\S]*top:min\(57vw,235px\)!important;[\s\S]*bottom:auto!important;/);
+  assert.match(carouselCss, /\.nw-carousel-arrow\.prev\{\s*left:8px!important;/);
+  assert.match(carouselCss, /\.nw-carousel-arrow\.next\{\s*right:8px!important;/);
+  assert.match(html, /assets\/concierge-carousel\.css\?v=13/);
 });
