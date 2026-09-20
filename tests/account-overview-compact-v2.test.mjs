@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 
 const account=fs.readFileSync("konto.html","utf8");
+const portalNav=fs.readFileSync("assets/account-portal-text-nav-v1.css","utf8");
 
 test("account hero is compact and contains only the personal-area title",()=>{
   const start=account.indexOf('<section class="hero account-hero">');
@@ -33,18 +34,18 @@ test("overview remains responsive without sacrificing the compact desktop hierar
 
 
 test("final portal navigation is text-first, borderless and vertically compact",()=>{
-  assert.match(account,/id="account-text-navigation-v6"/);
-  assert.match(account,/body\.account-premium-ui \.account-hero\{\s*min-height:64px!important;/);
-  assert.match(account,/body\.account-premium-ui \.account-section\{\s*padding-top:12px!important;/);
-  assert.match(account,/body\.account-premium-ui \.account-tabs-shell\{[^}]*border:0!important;[^}]*background:transparent!important;[^}]*box-shadow:none!important;/s);
-  assert.match(account,/body\.account-premium-ui \.account-tabs-modern \.account-tab\{[^}]*border:0!important;[^}]*border-radius:0!important;[^}]*background:transparent!important;[^}]*box-shadow:none!important;/s);
-  assert.match(account,/body\.account-premium-ui \.account-tabs-modern \.account-tab-icon\{\s*display:none!important;/);
-  assert.match(account,/\.account-tab\[aria-selected="true"\]::after\{\s*opacity:1!important;/);
+  assert.match(account,/assets\/account-portal-text-nav-v1\.css\?v=1/);
+  assert.match(portalNav,/body\.account-premium-ui \.account-hero\{\s*min-height:64px!important;/);
+  assert.match(portalNav,/body\.account-premium-ui \.account-section\{\s*padding-top:12px!important;/);
+  assert.match(portalNav,/body\.account-premium-ui \.account-tabs-shell\{[^}]*border:0!important;[^}]*background:transparent!important;[^}]*box-shadow:none!important;/s);
+  assert.match(portalNav,/body\.account-premium-ui \.account-tabs-modern \.account-tab\{[^}]*border:0!important;[^}]*border-radius:0!important;[^}]*background:transparent!important;[^}]*box-shadow:none!important;/s);
+  assert.match(portalNav,/body\.account-premium-ui \.account-tabs-modern \.account-tab-icon\{\s*display:none!important;/);
+  assert.match(portalNav,/\.account-tab\[aria-selected="true"\]::after\{\s*opacity:1!important;/);
 });
 
 test("mobile portal navigation keeps all seven text destinations visible in a symmetric 4 plus 3 layout",()=>{
-  assert.match(account,/@media\(max-width:760px\)[\s\S]*?grid-template-columns:repeat\(8,minmax\(0,1fr\)\)!important;/);
-  assert.match(account,/\.account-tab:nth-child\(5\)\{\s*grid-column:2\/span 2!important;/);
-  assert.match(account,/\.account-tab:nth-child\(6\)\{\s*grid-column:4\/span 2!important;/);
-  assert.match(account,/\.account-tab:nth-child\(7\)\{\s*grid-column:6\/span 2!important;/);
+  assert.match(portalNav,/@media\(max-width:760px\)[\s\S]*?grid-template-columns:repeat\(8,minmax\(0,1fr\)\)!important;/);
+  assert.match(portalNav,/\.account-tab:nth-child\(5\)\{\s*grid-column:2\/span 2!important;/);
+  assert.match(portalNav,/\.account-tab:nth-child\(6\)\{\s*grid-column:4\/span 2!important;/);
+  assert.match(portalNav,/\.account-tab:nth-child\(7\)\{\s*grid-column:6\/span 2!important;/);
 });
