@@ -266,7 +266,7 @@ body.concierge-portal-settings [data-concierge-carousel][data-switching="1"]{
       </div>
     </footer><script src="assets/concierge-voice-preview.js?v=8"></script>
 <script src="/assets/concierge-locale-defaults.js?v=1"></script>
-    <script src="assets/concierge-carousel.js?v=23"></script>
+    <script src="assets/concierge-carousel.js?v=24"></script>
 <script src="assets/auth-nav.js?v=40"></script>
 <script>
 (() => {
@@ -323,14 +323,6 @@ body.concierge-portal-settings [data-concierge-carousel][data-switching="1"]{
   }
   function apply(x) {
     if (!x) return;
-    if (x.conciergeChoice && !canonicalPersonaKey) {
-      const carousel = f.querySelector("[data-concierge-carousel]");
-      if (carousel) {
-        carousel.dataset.selected = x.conciergeChoice;
-        carousel._nahwerkCarousel?.select(x.conciergeChoice);
-        carousel.dataset.authoritativePersona = "1";
-      }
-    }
     ids.forEach((id) => {
       const el = document.getElementById(id);
       if (!el || !(id in x)) return;
@@ -357,8 +349,10 @@ body.concierge-portal-settings [data-concierge-carousel][data-switching="1"]{
     const carousel=f.querySelector("[data-concierge-carousel]");
     if(carousel&&canonicalPersonaKey){
       carousel.dataset.selected=canonicalPersonaKey;
-      carousel._nahwerkCarousel?.select(canonicalPersonaKey);
+      const carouselApi=carousel._nahwerkCarousel || window.NAHWERKCarousel?.mount?.(carousel,{selected:canonicalPersonaKey});
+      carouselApi?.select?.(canonicalPersonaKey);
       carousel.dataset.authoritativePersona="1";
+      delete carousel.dataset.awaitingPersona;
     }
     syncPersonaCopy();
     return true;

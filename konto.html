@@ -5694,8 +5694,10 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
             localStorage.getItem("scb_onboarding") || "null",
           );
           if (d) {
+            // Legacy onboarding data is never authoritative for an authenticated account.
+            // A named Concierge may be rendered from onboarding data only before authentication.
             const selected = d.concierge_choice || d.conciergeChoice;
-            if (selected) {
+            if (selected && !sessionToken()) {
               const conciergeNames = { nilo: "Nilo", mira: "Mira", lena: "Lena", lukas: "Lukas", zuri: "Zuri", jabari: "Jabari", sofia: "Sofia" };
               const key = String(selected).toLowerCase();
               const conciergeName = conciergeNames[key] || String(selected).trim().replace(/[-_]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
