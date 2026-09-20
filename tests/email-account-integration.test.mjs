@@ -146,3 +146,10 @@ test("connect button does not silently block after a Google disconnect",()=>{
   assert.match(js,/const hasGoogleSelection = selectedProvider === "GOOGLE" \|\| connection\?\.provider === "GOOGLE"/);
   assert.match(js,/if \(googleReady\) selectedProvider = "GOOGLE"/);
 });
+
+test("direct email tab reload auto-activates account runtime",()=>{
+  assert.match(js,/const emailTabAlreadyActive =/);
+  assert.match(js,/root\.hidden === false/);
+  assert.match(js,/accountTabEmail/);
+  assert.match(js,/queueMicrotask\(\(\) => load\(false\)\)/);
+});
