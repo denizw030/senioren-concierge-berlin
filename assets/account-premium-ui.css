@@ -246,9 +246,10 @@ html body.account-premium-ui.account-premium-ui.nw-portal-dark .safety-detail-to
 }
 
 
-/* Account tab icons: one fixed optical box for every tab. */
+/* Account tab icons: Concierge is the optical reference; every icon uses the same geometry. */
 html body.account-premium-ui.account-premium-ui .account-tab{
   gap:7px!important;
+  align-items:center!important;
 }
 html body.account-premium-ui.account-premium-ui .account-tab-icon{
   display:inline-flex!important;
@@ -259,24 +260,27 @@ html body.account-premium-ui.account-premium-ui .account-tab-icon{
   min-width:14px!important;
   min-height:14px!important;
   flex:0 0 14px!important;
-  font-size:14px!important;
-  line-height:14px!important;
-  color:inherit!important;
   margin:0!important;
   padding:0!important;
   box-sizing:border-box!important;
-  transform-origin:center!important;
+  line-height:14px!important;
+  color:inherit!important;
+  transform:translateY(-1px)!important;
+  transform-origin:center center!important;
 }
-
-html body.account-premium-ui.account-premium-ui .account-tab-person-icon svg{
+html body.account-premium-ui.account-premium-ui .account-tab-icon svg{
   display:block!important;
   width:14px!important;
   height:14px!important;
+  min-width:14px!important;
+  min-height:14px!important;
+  overflow:visible!important;
   fill:none!important;
   stroke:currentColor!important;
-  stroke-width:1.7!important;
+  stroke-width:1.8!important;
   stroke-linecap:round!important;
   stroke-linejoin:round!important;
+  vector-effect:non-scaling-stroke!important;
 }
 html body.account-premium-ui.account-premium-ui .account-tab-concierge-logo{
   background-color:transparent!important;
@@ -288,7 +292,6 @@ html body.account-premium-ui.account-premium-ui .account-tab-concierge-logo{
   mask:none!important;
   color:transparent!important;
   font-size:0!important;
-  transform:translateY(-1px)!important;
 }
 
 
@@ -322,19 +325,4 @@ html body.account-premium-ui.account-premium-ui.nw-portal-dark footer.footer::af
   background-image:none!important;
   box-shadow:none!important;
   filter:none!important;
-}
-
-
-/* ACCOUNT_OVERVIEW_EMAIL_ICON_PARITY_V1_20260921 */
-html body.account-premium-ui.account-premium-ui .account-tab[data-account-tab="overview"]>.account-tab-icon,
-html body.account-premium-ui.account-premium-ui .account-tab[data-account-tab="email"]>.account-tab-icon{
-  width:14px!important;
-  height:14px!important;
-  min-width:14px!important;
-  min-height:14px!important;
-  flex:0 0 14px!important;
-  font-size:16px!important;
-  line-height:14px!important;
-  transform:scale(1.16)!important;
-  transform-origin:center center!important;
 }

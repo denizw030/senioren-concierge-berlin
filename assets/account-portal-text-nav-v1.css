@@ -257,9 +257,8 @@
   }
 }
 
-
-/* ACCOUNT_NAV_ICON_PARITY_V1_20260921
-   Konto-Navigation only: equal icon boxes; glossy Goldmann mark for Concierge. */
+/* ACCOUNT_NAV_ICON_PARITY_V2_20260921
+   Final account-nav cascade: every symbol shares the Concierge 14×14 geometry and text centerline. */
 body.account-premium-ui .account-tabs.account-tabs-modern .account-tab{
   display:inline-flex!important;
   align-items:center!important;
@@ -268,24 +267,21 @@ body.account-premium-ui .account-tabs.account-tabs-modern .account-tab{
 }
 body.account-premium-ui .account-tabs.account-tabs-modern .account-tab>.account-tab-icon{
   display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
   width:14px!important;
   height:14px!important;
   min-width:14px!important;
   min-height:14px!important;
   flex:0 0 14px!important;
-  align-items:center!important;
-  justify-content:center!important;
   margin:0!important;
   padding:0!important;
   box-sizing:border-box!important;
-  font-family:Arial,Helvetica,sans-serif!important;
-  font-size:12px!important;
-  font-weight:700!important;
   line-height:14px!important;
-  color:currentColor!important;
-  text-align:center!important;
   vertical-align:middle!important;
-  overflow:visible!important;
+  color:currentColor!important;
+  transform:translateY(-1px)!important;
+  transform-origin:center center!important;
 }
 body.account-premium-ui .account-tabs.account-tabs-modern .account-tab>.account-tab-icon svg{
   display:block!important;
@@ -294,16 +290,21 @@ body.account-premium-ui .account-tabs.account-tabs-modern .account-tab>.account-
   min-width:14px!important;
   min-height:14px!important;
   margin:0!important;
+  overflow:visible!important;
   fill:none!important;
   stroke:currentColor!important;
-  stroke-width:1.75!important;
+  stroke-width:1.8!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
   vector-effect:non-scaling-stroke!important;
 }
 body.account-premium-ui .account-tabs.account-tabs-modern .account-tab>.account-tab-concierge-logo{
   background-image:url("/assets/logos/NAHWERK-Goldmann-nav.webp?v=2")!important;
   background-repeat:no-repeat!important;
-  background-position:center center!important;
+  background-position:center!important;
   background-size:14px 14px!important;
+  -webkit-mask:none!important;
+  mask:none!important;
   color:transparent!important;
   font-size:0!important;
 }
