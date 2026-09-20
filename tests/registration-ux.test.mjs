@@ -53,8 +53,8 @@ test("registration starts with the Concierge photo slider and no generated headl
   assert.doesNotMatch(html, /id="registrationTitle"/);
   const formStart = html.indexOf('id="signupForm"');
   const slider = html.indexOf('data-concierge-carousel', formStart);
-  const progress = html.indexOf('class="nw-registration-progress"', formStart);
-  assert.ok(slider > formStart && slider < progress);
+  const setupChoice = html.indexOf('name="setupFor"', formStart);
+  assert.ok(slider > formStart && slider < setupChoice);
 });
 
 test("Lena is the default Concierge for registration", () => {
@@ -79,4 +79,18 @@ test("registration language selection keeps the chosen language label centered",
   assert.match(voicePreviewCss, /body\.registration-page \.nw-carousel\[data-variant="selection"\] \.nw-voice-preview-language-select/);
   assert.match(voicePreviewCss, /text-align:center!important/);
   assert.match(voicePreviewCss, /text-align-last:center!important/);
+});
+
+
+test("removed registration copy cannot return in light or dark registration", () => {
+  for (const removed of [
+    "Die Auswahl gilt für diesen Zugang und kann später in den Concierge-Einstellungen geändert werden.",
+    "1. Zugang anlegen",
+    "WhatsApp bestätigen",
+    "3. Erste Aufgabe senden",
+    "FREE ist vorausgewählt. Sicherheitsoptionen bleiben freiwillig; kostenpflichtige Tarife werden ohne freigegebenen Checkout nicht bestellt."
+  ]) {
+    assert.equal(html.includes(removed), false, removed);
+    assert.equal(onboarding.includes(removed), false, removed);
+  }
 });
