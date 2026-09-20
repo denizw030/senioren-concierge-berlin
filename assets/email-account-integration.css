@@ -41,3 +41,139 @@ html body.account-premium-ui.nw-portal-light .account-section{
     linear-gradient(180deg,#fbf8f1 0%,#f7f3ea 54%,#f2ebdf 100%)!important;
   color:#1c1a16!important;
 }
+
+/* NAHWERK Email top controls v20260920-4 */
+.account-panel-heading[data-account-panel="email"]{
+  position:relative;
+  padding-right:245px;
+  margin-bottom:12px!important;
+}
+.email-page-actions{
+  position:absolute;
+  top:0;
+  right:0;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+}
+.email-page-action{
+  appearance:none;
+  min-height:38px;
+  padding:0 15px;
+  border:1px solid rgba(133,154,182,.28);
+  border-radius:10px;
+  background:rgba(255,255,255,.055);
+  color:inherit;
+  font:inherit;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+  transition:background .16s ease,border-color .16s ease,transform .16s ease;
+}
+.email-page-action:hover{background:rgba(255,255,255,.10);border-color:rgba(133,154,182,.46)}
+.email-page-action:active{transform:scale(.985)}
+.email-page-action--primary{
+  border-color:rgba(47,125,255,.68);
+  background:linear-gradient(180deg,#2f7dff,#1765e8);
+  color:#fff;
+  box-shadow:0 8px 20px rgba(23,101,232,.18);
+}
+.email-page-action--primary:hover{background:linear-gradient(180deg,#3a84ff,#1c6bea)}
+.email-account-overlay{
+  position:fixed;
+  inset:0;
+  z-index:10050;
+  display:grid;
+  place-items:center;
+  padding:24px;
+  background:rgba(2,5,9,.64);
+  -webkit-backdrop-filter:blur(18px);
+  backdrop-filter:blur(18px);
+}
+.email-account-overlay[hidden]{display:none!important}
+.email-account-overlay-panel{
+  width:min(860px,calc(100vw - 32px));
+  max-height:min(760px,calc(100dvh - 48px));
+  overflow:auto;
+  border:1px solid rgba(133,154,182,.24);
+  border-radius:24px;
+  background:linear-gradient(180deg,#12171f,#0b1017);
+  color:#f4f5f7;
+  box-shadow:0 30px 100px rgba(0,0,0,.5);
+}
+.email-account-overlay-head{
+  position:sticky;
+  top:0;
+  z-index:2;
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:18px;
+  padding:20px 22px 16px;
+  border-bottom:1px solid rgba(133,154,182,.17);
+  background:rgba(16,21,29,.94);
+  -webkit-backdrop-filter:blur(16px);
+  backdrop-filter:blur(16px);
+}
+.email-account-overlay-head h3{margin:3px 0 5px;font-size:20px;line-height:1.2}
+.email-account-overlay-head p{margin:0;color:#aeb7c2;font-size:12px;line-height:1.5}
+.email-account-overlay-close{
+  appearance:none;
+  width:34px;
+  height:34px;
+  flex:0 0 34px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(133,154,182,.23);
+  border-radius:50%;
+  background:rgba(255,255,255,.05);
+  color:#f2f4f7;
+  font:inherit;
+  font-size:20px;
+  line-height:1;
+  cursor:pointer;
+}
+.email-account-overlay-body{display:grid;gap:18px;padding:20px 22px 24px}
+.email-account-overlay-body>.email-logo-connect-shell{margin:0!important}
+.email-account-overlay-body>.email-continuity-note{margin:0!important}
+.email-account-overlay-body .email-capabilities{grid-template-columns:repeat(2,minmax(0,1fr))}
+.email-account-overlay-body .email-provider-note{display:none!important}
+#accountEmailCard>.email-account-head,
+#accountEmailCard>.email-continuity-note{display:none!important}
+@media(max-width:760px){
+  .account-panel-heading[data-account-panel="email"]{padding-right:0;padding-top:92px}
+  .email-page-actions{top:0;left:0;right:auto}
+  .email-account-overlay{padding:10px}
+  .email-account-overlay-panel{width:100%;max-height:calc(100dvh - 20px);border-radius:18px}
+  .email-account-overlay-head{padding:16px}
+  .email-account-overlay-body{padding:16px}
+  .email-account-overlay-body .email-capabilities{grid-template-columns:1fr}
+}
+html[data-nw-portal-theme="light"] .email-page-action,
+body.account-premium-ui.nw-portal-light .email-page-action{
+  border-color:rgba(65,58,46,.18);
+  background:rgba(255,255,255,.72);
+  color:#1c1a16;
+}
+html[data-nw-portal-theme="light"] .email-page-action--primary,
+body.account-premium-ui.nw-portal-light .email-page-action--primary{color:#fff;background:linear-gradient(180deg,#2f7dff,#1765e8)}
+html[data-nw-portal-theme="light"] .email-account-overlay-panel,
+body.account-premium-ui.nw-portal-light .email-account-overlay-panel{
+  border-color:rgba(65,58,46,.16);
+  background:linear-gradient(180deg,#fffdf8,#f7f2e8);
+  color:#1c1a16;
+}
+html[data-nw-portal-theme="light"] .email-account-overlay-head,
+body.account-premium-ui.nw-portal-light .email-account-overlay-head{
+  border-color:rgba(65,58,46,.12);
+  background:rgba(255,253,248,.94);
+}
+html[data-nw-portal-theme="light"] .email-account-overlay-head p,
+body.account-premium-ui.nw-portal-light .email-account-overlay-head p{color:#6e675d}
+html[data-nw-portal-theme="light"] .email-account-overlay-close,
+body.account-premium-ui.nw-portal-light .email-account-overlay-close{
+  border-color:rgba(65,58,46,.16);
+  background:rgba(0,0,0,.035);
+  color:#1c1a16;
+}
