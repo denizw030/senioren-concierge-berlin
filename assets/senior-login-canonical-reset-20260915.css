@@ -51,7 +51,7 @@ html body.login-image-page[data-product="senioren"] main::after{
   display:block!important;
   border:0!important;
   border-radius:0!important;
-  background:#ddd4c8 url("/assets/lifestyle/senior-woman-overview.webp?v=6") 68% 50%/cover no-repeat!important;
+  background:#ddd4c8 url("/assets/lifestyle/senior-woman-overview.webp?v=6") 100% 58%/cover no-repeat!important;
   box-shadow:none!important;
   pointer-events:none!important;
 }
@@ -496,7 +496,7 @@ html body.login-image-page[data-product="senioren"] main>.senior-login-visual{
   overflow:hidden!important;
   border:1px solid rgba(78,60,31,.10)!important;
   border-radius:34px!important;
-  background:#ddd4c8 url("/assets/lifestyle/senior-woman-overview.webp?v=6") 68% 50%/cover no-repeat!important;
+  background:#ddd4c8 url("/assets/lifestyle/senior-woman-overview.webp?v=6") 100% 58%/cover no-repeat!important;
   box-shadow:0 28px 76px rgba(61,46,23,.14)!important;
   pointer-events:none!important;
 }
@@ -679,7 +679,7 @@ html body.login-image-page[data-product="senioren"] main::after{
   padding:0!important;
   border:1px solid rgba(78,60,31,.10)!important;
   border-radius:34px!important;
-  background:#ddd4c8 url("/assets/lifestyle/senior-woman-overview.webp?v=6") 68% 50%/cover no-repeat!important;
+  background:#ddd4c8 url("/assets/lifestyle/senior-woman-overview.webp?v=6") 100% 58%/cover no-repeat!important;
   box-shadow:0 28px 76px rgba(61,46,23,.14)!important;
   pointer-events:none!important;
 }
