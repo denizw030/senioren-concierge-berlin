@@ -9,7 +9,7 @@ const css=base+"\n"+theme;
 const family=fs.readFileSync("assets/family-owner-sponsored-access.js","utf8");
 
 test("premium account stylesheet is page-scoped and uses only the pinned local layout base",()=>{
-  assert.match(konto,/assets\/account-premium-ui\.css\?v=2/);
+  assert.match(konto,/assets\/account-premium-ui\.css\?v=6/);
   assert.match(konto,/<body class="account-premium-ui">/);
   assert.match(theme,/^@import url\("\/assets\/account-premium-ui-base-v2\.css\?v=1"\);/);
   assert.match(css,/body\.account-premium-ui/);
