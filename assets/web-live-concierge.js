@@ -26,9 +26,9 @@ async function boot(){
   button.hidden=true;
   button.setAttribute("aria-label","Live mit deinem Concierge sprechen");
   button.title="Live sprechen";
-  send.hidden=true;
-  send.setAttribute("aria-hidden","true");
-  send.tabIndex=-1;
+  send.hidden=false;
+  send.removeAttribute("aria-hidden");
+  send.removeAttribute("tabindex");
   send.after(button);
 
   const controller=mountNahwerkLiveConcierge({
@@ -57,6 +57,14 @@ async function boot(){
     const b=bridge();
     const usable=backendReady&&Boolean(b?.isAllowed?.());
     const hasText=Boolean(input.value.trim());
+    send.hidden=usable;
+    if(usable){
+      send.setAttribute("aria-hidden","true");
+      send.tabIndex=-1;
+    }else{
+      send.removeAttribute("aria-hidden");
+      send.removeAttribute("tabindex");
+    }
     button.hidden=!usable;
     button.disabled=!usable;
     button.classList.toggle("is-send-mode",hasText);

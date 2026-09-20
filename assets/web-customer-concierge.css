@@ -687,9 +687,15 @@ body.web-concierge-guest #webConciergeVoiceRecorder,
 body.web-concierge-guest #webConciergeLive{
   display:none!important;
 }
-body.web-concierge-guest .web-concierge-mobile-chats{
+body.web-concierge-guest .web-concierge-mobile-chats,
+body.web-concierge-guest .web-concierge-mobile-new{
   visibility:hidden!important;
   pointer-events:none!important;
+}
+body.web-concierge-guest #webConciergeSend[hidden]{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
 }
 .web-concierge-runtime-card.is-guest-account{
   gap:10px;
