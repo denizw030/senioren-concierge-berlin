@@ -954,7 +954,7 @@
       if (!next) throw new Error("EMAIL_PROVIDER_UNAVAILABLE");
       classification = next;
       classificationRetryCount = 0;
-      if (!selectedMessageId) { const first = mailboxAllMessages()[0]; if (first?.id) setTimeout(()=>void openMailboxMessage(String(first.id)),0); }
+      if (!selectedMessageId) { const first = mailboxAllMessages()[0]; if (first?.id) setTimeout(()=>void openMailboxMessage(first),0); }
     } catch (error) {
       classification = null;
       classificationError = error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE";
