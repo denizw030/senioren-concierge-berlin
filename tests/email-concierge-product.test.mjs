@@ -82,8 +82,8 @@ test("product layout is responsive across desktop and mobile",()=>{
   assert.match(js,/ecp-rule ecp-rule-personal/);
   assert.match(js,/ecp-rule-title-row/);
   assert.match(js,/\.ecp-rule-controls\{display:grid;grid-template-columns:minmax\(0,1fr\) auto/);
-  assert.match(integration,/email-concierge-product\.css\?v=20260920-9/);
-  assert.match(integration,/email-concierge-product\.js\?v=20260920-12/);
+  assert.match(integration,/email-concierge-product\.css\?v=20260920-10/);
+  assert.match(integration,/email-concierge-product\.js\?v=20260920-13/);
 });
 
 
@@ -295,4 +295,31 @@ test("bulk trash of unwichtig keeps the virtual Unwichtig view instead of erasin
 
 test("classification location badge is styled",()=>{
   assert.match(css,/\.ecp-tb-location-flag/);
+});
+
+
+test("mailbox streams every Gmail page instead of stopping after 30",()=>{
+  assert.match(js,/page_token: pageToken \|\| null/);
+  assert.match(js,/page===0\?30:100/);
+  assert.match(js,/while\(pageToken && serial===mailboxLoadSerial && page<100\)/);
+  assert.match(js,/mergeMailboxRows/);
+  assert.match(js,/weitere werden geladen/);
+});
+
+test("Wichtig Unwichtig opens immediately from cached or current classification",()=>{
+  assert.match(js,/classificationFolderCache/);
+  assert.match(js,/const instant=cached\.length\?cached:list\(classification\?\.buckets\?\.\[folder\]\)/);
+  assert.match(js,/void loadDashboard\(false, true\)/);
+  assert.match(js,/void loadMailboxFolder\(\)/);
+});
+
+test("manual classification sends visible message metadata to avoid a Gmail reread",()=>{
+  assert.match(js,/message_snapshot/);
+  assert.match(js,/snippet: message\.snippet \|\| ""/);
+});
+
+test("NAHWERK Mail uses a high-contrast white SVG envelope",()=>{
+  assert.match(js,/mark\.innerHTML='<svg/);
+  assert.match(css,/\.ecp-tb-brandmark svg/);
+  assert.match(css,/stroke:#fff/);
 });
