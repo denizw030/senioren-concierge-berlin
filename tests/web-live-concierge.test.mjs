@@ -11,7 +11,7 @@ test("web chat mounts Live Concierge on the right without replacing voice memo",
   for(const page of ["web-concierge.html","web-concierge/index.html"]){
     const html=read(page);
     assert.match(html,/assets\/web-voice-memo\.js\?v=10/);
-    assert.match(html,/assets\/web-customer-concierge\.js\?v=41/);
+    assert.match(html,/assets\/web-customer-concierge\.js\?v=42/);
     assert.match(html,/assets\/web-live-concierge\.js\?v=18/);
     assert.match(html,/assets\/nahwerk-live-concierge\.css\?v=4/);
   }
@@ -93,9 +93,10 @@ test("Live preloads the active concierge portrait and reports safe client failur
 
 test("channel chats are grouped after normal chat and delete-all uses the shared reset endpoint",()=>{
   const chat=read("assets/web-customer-concierge.js");
-  assert.match(chat,/const next=\[chatThread,\{/);
-  assert.match(chat,/next\.push\(\{[\s\S]*VIRTUAL_PHONE_THREAD_ID/);
-  assert.match(chat,/next\.push\(\{[\s\S]*VIRTUAL_EMAIL_THREAD_ID/);
+  assert.match(chat,/const phoneThread=\{/);
+  assert.match(chat,/const emailThread=\{/);
+  assert.match(chat,/threadCache=\[chatThread,whatsappThread,phoneThread,emailThread\]/);
+  assert.match(chat,/const next=\[chatThread,\{\.\.\.whatsappThread\},\{\.\.\.phoneThread\},\{\.\.\.emailThread\}\]/);
   assert.match(chat,/\/web\/chats\/reset/);
   assert.match(chat,/Alle Chats aus Web und App entfernen/);
 });

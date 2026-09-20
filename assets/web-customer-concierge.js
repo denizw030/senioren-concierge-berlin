@@ -633,11 +633,21 @@
       const chatThread=normal&&validUuid(normal?.thread_id)
         ? {...normal,thread_id:primaryChatThreadId,title:"Chat",channels:["WEB","APP"],channel_view:"CHAT"}
         : {thread_id:primaryChatThreadId,title:"Chat",preview:"",updated_at:null,created_at:null,turn_count:0,channels:["WEB","APP"],channel_view:"CHAT",draft:true};
+      const existingWhatsApp=threadCache.find((thread)=>String(thread?.thread_id||"")===VIRTUAL_WHATSAPP_THREAD_ID)||null;
+      const existingEmail=threadCache.find((thread)=>String(thread?.thread_id||"")===VIRTUAL_EMAIL_THREAD_ID)||null;
       const whatsappThread={
-        thread_id:VIRTUAL_WHATSAPP_THREAD_ID,title:"WhatsApp",preview:"",updated_at:null,
+        thread_id:VIRTUAL_WHATSAPP_THREAD_ID,title:"WhatsApp",preview:String(existingWhatsApp?.preview||""),updated_at:null,
         channels:["WHATSAPP"],channel_view:"WHATSAPP",virtual_channel_thread:true
       };
-      threadCache=[chatThread,whatsappThread];
+      const phoneThread={
+        thread_id:VIRTUAL_PHONE_THREAD_ID,title:"Telefonprotokoll",preview:"",updated_at:null,
+        channels:["PHONE"],channel_view:"PHONE",virtual_channel_thread:true
+      };
+      const emailThread={
+        thread_id:VIRTUAL_EMAIL_THREAD_ID,title:"E-Mail-Protokoll",preview:String(existingEmail?.preview||""),updated_at:null,
+        channels:["EMAIL"],channel_view:"EMAIL",virtual_channel_thread:true
+      };
+      threadCache=[chatThread,whatsappThread,phoneThread,emailThread];
       if(selectFirst&&(!activeThreadId||!threadCache.some((thread)=>thread.thread_id===activeThreadId))){
         activeThreadId=primaryChatThreadId;
       }
@@ -650,21 +660,15 @@
           channelHistoryRequest("EMAIL",{summary:true})
         ]);
         if(generation!==threadsLoadGeneration)return;
-        const next=[chatThread,{...whatsappThread}];
+        const next=[chatThread,{...whatsappThread},{...phoneThread},{...emailThread}];
         if(whatsappResult.status==="fulfilled"){
-          next[1].preview=String(whatsappResult.value?.whatsapp_number||"").trim();
+          next[1].preview=String(whatsappResult.value?.whatsapp_number||next[1].preview||"").trim();
         }
-        if(phoneResult.status==="fulfilled"&&phoneResult.value?.has_calls===true){
-          next.push({
-            thread_id:VIRTUAL_PHONE_THREAD_ID,title:"Telefonprotokoll",preview:"",updated_at:null,
-            channels:["PHONE"],channel_view:"PHONE",virtual_channel_thread:true
-          });
+        if(phoneResult.status==="fulfilled"&&phoneResult.value?.has_calls!==true){
+          next[2].preview="";
         }
-        if(emailResult.status==="fulfilled"&&emailResult.value?.has_email===true){
-          next.push({
-            thread_id:VIRTUAL_EMAIL_THREAD_ID,title:"E-Mail-Protokoll",preview:String(emailResult.value?.email_address||""),updated_at:null,
-            channels:["EMAIL"],channel_view:"EMAIL",virtual_channel_thread:true
-          });
+        if(emailResult.status==="fulfilled"){
+          next[3].preview=String(emailResult.value?.email_address||next[3].preview||"").trim();
         }
         threadCache=next;
         renderThreads();
@@ -679,6 +683,12 @@
       },{
         thread_id:VIRTUAL_WHATSAPP_THREAD_ID,title:"WhatsApp",preview:"",updated_at:null,
         channels:["WHATSAPP"],channel_view:"WHATSAPP",virtual_channel_thread:true
+      },{
+        thread_id:VIRTUAL_PHONE_THREAD_ID,title:"Telefonprotokoll",preview:"",updated_at:null,
+        channels:["PHONE"],channel_view:"PHONE",virtual_channel_thread:true
+      },{
+        thread_id:VIRTUAL_EMAIL_THREAD_ID,title:"E-Mail-Protokoll",preview:"",updated_at:null,
+        channels:["EMAIL"],channel_view:"EMAIL",virtual_channel_thread:true
       }];
       if(selectFirst&&!activeThreadId)activeThreadId=primaryChatThreadId;
       renderThreads();

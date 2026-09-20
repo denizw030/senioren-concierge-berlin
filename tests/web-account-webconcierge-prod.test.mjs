@@ -188,6 +188,13 @@ test("WhatsApp is a separate read-only protocol and cannot accidentally send as 
   assert.match(client, /channelHistoryRequest\("PHONE",\{summary:true\}\)/);
 });
 
+test("phone and email protocol entries stay mounted during every sidebar refresh", () => {
+  assert.match(client, /threadCache=\[chatThread,whatsappThread,phoneThread,emailThread\]/);
+  assert.match(client, /const next=\[chatThread,\{\.\.\.whatsappThread\},\{\.\.\.phoneThread\},\{\.\.\.emailThread\}\]/);
+  assert.match(client, /thread_id:VIRTUAL_PHONE_THREAD_ID,title:"Telefonprotokoll"/);
+  assert.match(client, /thread_id:VIRTUAL_EMAIL_THREAD_ID,title:"E-Mail-Protokoll"/);
+});
+
 test("legacy Shadow transport remains inert", () => {
   assert.doesNotMatch(shadow, /\bfetch\s*\(/);
   assert.doesNotMatch(shadow, /https?:\/\//);
@@ -212,7 +219,7 @@ test("legacy and clean routes expose the same end-customer messenger", () => {
     assert.match(surface, /Neuer Chat/);
     assert.match(surface, /Deine Chats/);
     assert.match(surface, /aria-label="Chatverlauf"/);
-    assert.match(surface, /assets\/web-customer-concierge\.js\?v=41/);
+    assert.match(surface, /assets\/web-customer-concierge\.js\?v=42/);
     assert.doesNotMatch(surface, /web-customer-concierge-thread-scope\.js/);
     assert.doesNotMatch(surface, /PROD|autoritativ|Core-v1|web-gateway-v1|Fail-closed|Shadow-Antworten|kanonische Kundenidentität/i);
   }
