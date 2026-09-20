@@ -259,12 +259,16 @@ html body.account-premium-ui.account-premium-ui .account-tab-icon{
   min-width:14px!important;
   min-height:14px!important;
   flex:0 0 14px!important;
-  font-size:12px!important;
+  font-size:14px!important;
   line-height:14px!important;
   color:inherit!important;
   margin:0!important;
   padding:0!important;
   box-sizing:border-box!important;
+  transform-origin:center!important;
+}
+html body.account-premium-ui.account-premium-ui .account-tab-icon:not(.account-tab-concierge-logo):not(.account-tab-person-icon){
+  transform:scale(1.08)!important;
 }
 html body.account-premium-ui.account-premium-ui .account-tab-person-icon svg{
   display:block!important;
