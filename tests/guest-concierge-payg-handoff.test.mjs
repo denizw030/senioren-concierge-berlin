@@ -21,7 +21,10 @@ test("guest advice has no account CTA until backend marks a real execution reque
   assert.match(chat,/Konto für die Ausführung erforderlich/);
   assert.match(chat,/purpose:String\(item\.purpose\|\|""\)\.toUpperCase\(\)/);
   assert.match(chat,/purpose==="ACCOUNT_REQUEST"/);
-  assert.match(chat,/NAHWERK Konto erstellen/);
+  assert.match(chat,/Anmelden oder Konto erstellen/);
+  assert.match(chat,/signIn\.href="\/anmelden\?source=web_guest_chat"/);
+  assert.match(chat,/create\.textContent="Konto erstellen"/);
+  assert.match(chat,/isExplicitGuestAccountIntent/);
 });
 
 test("guest execution handoff preserves the request locally and only allows PAYG as post-auth target",()=>{
@@ -65,5 +68,6 @@ test("explicit account creation CTA does not fake an execution or PAYG resume",(
   assert.match(chat,/accountOnly=purpose==="ACCOUNT_REQUEST"/);
   assert.match(chat,/accountOnly\?"\/registrieren\?source=web_guest_chat"/);
   assert.match(chat,/if\(!accountOnly\)link\.addEventListener\("click"/);
-  assert.match(chat,/Die Registrierung öffnet sich über den Button unten/);
+  assert.match(chat,/Wenn du bereits ein NAHWERK Konto hast/);
+  assert.match(chat,/renderGuestAccountActions\(\[\{type:"CREATE_ACCOUNT",purpose:"ACCOUNT_REQUEST"/);
 });

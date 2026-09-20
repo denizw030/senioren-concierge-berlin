@@ -33,6 +33,9 @@ test("signed-out web concierge uses the safe guest endpoint instead of redirecti
 
 test("guest chat offers account actions but keeps authenticated tools out of guest mode", () => {
   assert.match(chat, /CREATE_ACCOUNT/);
+  assert.match(chat, /isExplicitGuestAccountIntent/);
+  assert.match(chat, /signIn\.textContent="Anmelden"/);
+  assert.match(chat, /create\.textContent="Konto erstellen"/);
   assert.doesNotMatch(chat, /ui_actions:[^\n]*SIGN_IN/);
   assert.doesNotMatch(chat, /ui_actions:[^\n]*SIGN_UP/);
   assert.match(chat, /isAllowed:\(\)=>gatewayReady&&!guestMode/);
@@ -42,7 +45,7 @@ test("guest chat offers account actions but keeps authenticated tools out of gue
 
 test("web concierge clean route stays mirrored and loads refreshed guest assets", () => {
   assert.match(chatPage, /assets\/web-customer-concierge\.css\?v=27/);
-  assert.match(chatPage, /assets\/web-customer-concierge\.js\?v=45/);
+  assert.match(chatPage, /assets\/web-customer-concierge\.js\?v=46/);
   assert.equal(chatPage, chatClean.replace("<head><base href=\"/\">","<head>"));
 });
 
