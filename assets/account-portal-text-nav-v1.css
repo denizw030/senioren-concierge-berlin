@@ -256,3 +256,59 @@
     box-sizing:border-box!important;
   }
 }
+
+
+/* ACCOUNT_NAV_ICON_PARITY_V1_20260921
+   Konto-Navigation only: equal icon boxes; glossy Goldmann mark for Concierge. */
+body.account-premium-ui .account-tabs.account-tabs-modern .account-tab{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:7px!important;
+}
+body.account-premium-ui .account-tabs.account-tabs-modern .account-tab>.account-tab-icon{
+  display:inline-flex!important;
+  width:14px!important;
+  height:14px!important;
+  min-width:14px!important;
+  min-height:14px!important;
+  flex:0 0 14px!important;
+  align-items:center!important;
+  justify-content:center!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  font-family:Arial,Helvetica,sans-serif!important;
+  font-size:12px!important;
+  font-weight:700!important;
+  line-height:14px!important;
+  color:currentColor!important;
+  text-align:center!important;
+  vertical-align:middle!important;
+  overflow:visible!important;
+}
+body.account-premium-ui .account-tabs.account-tabs-modern .account-tab>.account-tab-icon svg{
+  display:block!important;
+  width:14px!important;
+  height:14px!important;
+  min-width:14px!important;
+  min-height:14px!important;
+  margin:0!important;
+  fill:none!important;
+  stroke:currentColor!important;
+  stroke-width:1.75!important;
+  vector-effect:non-scaling-stroke!important;
+}
+body.account-premium-ui .account-tabs.account-tabs-modern .account-tab>.account-tab-concierge-logo{
+  background-image:url("/assets/logos/NAHWERK-Goldmann-Transparent.webp")!important;
+  background-repeat:no-repeat!important;
+  background-position:center center!important;
+  background-size:14px 14px!important;
+  color:transparent!important;
+  font-size:0!important;
+}
+@media(max-width:760px){
+  body.account-premium-ui .account-tabs.account-tabs-modern .account-tab{
+    gap:5px!important;
+  }
+}
