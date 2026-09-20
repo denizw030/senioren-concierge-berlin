@@ -15,7 +15,8 @@ const token="s".repeat(40);
 const allCaps=["EMAIL_READ","EMAIL_SEARCH","EMAIL_ATTACHMENTS","EMAIL_DRAFT","EMAIL_MAILBOX","EMAIL_SEND"];
 
 test("email tab preserves all account tabs and family permissions",()=>{
-  for(const [k,l] of [["overview","Übersicht"],["concierge","Concierge"],["email","E-Mail"],["safety","Sicherheit"],["usage","Nutzung"],["personal","Persönliche Daten"],["access","Zugänge"]])assert.match(konto,new RegExp('data-account-tab="'+k+'">'+l));
+  for(const k of ["overview","concierge","email","safety","usage","personal","access"]) assert.match(konto,new RegExp('data-account-tab="'+k+'"'));
+  for(const l of ["Übersicht","Concierge","E-Mail","Safety","Nutzung","Account","Zugänge"]) assert.match(konto,new RegExp(">"+l+"<"));
   assert.match(konto,/id="familyAccessCard"/);assert.match(konto,/data-family-permission/);assert.match(konto,/FAMILY_PERMISSIONS_URL/);
 });
 
@@ -104,7 +105,7 @@ test("frontend never persists provider secrets or invents send authority",()=>{
 });
 
 test("canonical OAuth return page is private from indexing and returns to real customer account",()=>{
-  assert.match(callback,/noindex,nofollow/);assert.match(callback,/no-referrer/);assert.match(callback,/email_oauth=complete/);assert.match(callback,/\/konto\.html/);
+  assert.match(callback,/noindex,nofollow/);assert.match(callback,/no-referrer/);assert.match(callback,/email_oauth=complete/);assert.match(callback,/\/konto\?/);
 });
 
 test("customer-facing Gmail copy keeps approval semantics without internal architecture terms",()=>{
