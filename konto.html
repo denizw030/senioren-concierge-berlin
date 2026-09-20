@@ -2145,6 +2145,245 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
       .concierge-chat-action{min-height:40px;padding:0 14px}
     }
   </style>
+  <style id="account-text-navigation-v6">
+    /* Final account navigation: compact text-first hierarchy, scoped to the customer portal only. */
+    body.account-premium-ui{
+      --account-nav-muted:#969bA3;
+      --account-nav-active:#f5f2eb;
+      --account-nav-line:rgba(151,165,184,.16);
+      --account-nav-accent:#cfad67;
+    }
+    body.account-premium-ui.nw-portal-light,
+    body.account-premium-ui.senior-product,
+    body.account-premium-ui[data-product="senioren"],
+    html[data-nw-portal-theme="light"] body.account-premium-ui{
+      --account-nav-muted:#77736c;
+      --account-nav-active:#1d1d1f;
+      --account-nav-line:rgba(29,29,31,.13);
+      --account-nav-accent:#9a7631;
+    }
+
+    body.account-premium-ui .account-hero{
+      min-height:64px!important;
+      padding:10px 0 8px!important;
+      align-items:center!important;
+    }
+    body.account-premium-ui .account-hero>.wrap{
+      min-height:44px!important;
+      align-items:center!important;
+    }
+    body.account-premium-ui .account-hero h1{
+      margin:0!important;
+      max-width:none!important;
+      font-size:clamp(1.82rem,2.55vw,2.42rem)!important;
+      line-height:1!important;
+      letter-spacing:-.042em!important;
+    }
+    body.account-premium-ui .account-section{
+      padding-top:12px!important;
+    }
+
+    body.account-premium-ui .account-setup-by{
+      display:grid!important;
+      grid-template-columns:auto auto minmax(0,1fr)!important;
+      align-items:center!important;
+      gap:10px!important;
+      min-height:0!important;
+      margin:0!important;
+      padding:0 2px 10px!important;
+      border:0!important;
+      border-bottom:1px solid var(--account-nav-line)!important;
+      border-radius:0!important;
+      background:transparent!important;
+      box-shadow:none!important;
+      text-align:left!important;
+    }
+    body.account-premium-ui .account-setup-by .eyebrow{
+      margin:0!important;
+      font-size:9.5px!important;
+      letter-spacing:.11em!important;
+      color:var(--account-nav-muted)!important;
+    }
+    body.account-premium-ui .account-setup-name{
+      justify-self:start!important;
+      margin:0!important;
+      text-align:left!important;
+      font-size:13px!important;
+      font-weight:700!important;
+      line-height:1.2!important;
+      color:var(--account-nav-active)!important;
+    }
+    body.account-premium-ui .account-setup-context-label{
+      justify-self:end!important;
+      margin:0!important;
+      padding:0!important;
+      border:0!important;
+      border-radius:0!important;
+      background:transparent!important;
+      box-shadow:none!important;
+      font-size:10.5px!important;
+      font-weight:600!important;
+      color:var(--account-nav-muted)!important;
+    }
+
+    body.account-premium-ui .account-tabs-shell{
+      position:relative!important;
+      top:auto!important;
+      z-index:auto!important;
+      width:100%!important;
+      max-width:none!important;
+      margin:0 0 14px!important;
+      padding:0!important;
+      border:0!important;
+      border-radius:0!important;
+      background:transparent!important;
+      box-shadow:none!important;
+      backdrop-filter:none!important;
+      -webkit-backdrop-filter:none!important;
+      overflow:visible!important;
+    }
+    body.account-premium-ui .account-tabs.account-tabs-modern{
+      display:flex!important;
+      align-items:flex-end!important;
+      justify-content:space-between!important;
+      gap:clamp(16px,2.2vw,34px)!important;
+      width:100%!important;
+      max-width:none!important;
+      margin:0!important;
+      padding:0 2px!important;
+      border-bottom:1px solid var(--account-nav-line)!important;
+      overflow:visible!important;
+      scroll-snap-type:none!important;
+    }
+    body.account-premium-ui .account-tabs-modern .account-tab{
+      position:relative!important;
+      flex:0 0 auto!important;
+      width:auto!important;
+      min-width:0!important;
+      max-width:none!important;
+      min-height:38px!important;
+      height:auto!important;
+      margin:0!important;
+      padding:0 0 11px!important;
+      border:0!important;
+      border-radius:0!important;
+      background:transparent!important;
+      box-shadow:none!important;
+      color:var(--account-nav-muted)!important;
+      font-size:12.75px!important;
+      font-weight:620!important;
+      line-height:1!important;
+      letter-spacing:-.01em!important;
+      white-space:nowrap!important;
+      text-align:center!important;
+      transform:none!important;
+      transition:color .18s ease,opacity .18s ease!important;
+    }
+    body.account-premium-ui .account-tabs-modern .account-tab:hover,
+    body.account-premium-ui .account-tabs-modern .account-tab:focus-visible{
+      background:transparent!important;
+      box-shadow:none!important;
+      color:var(--account-nav-active)!important;
+      outline:none!important;
+    }
+    body.account-premium-ui .account-tabs-modern .account-tab[aria-selected="true"]{
+      background:transparent!important;
+      border-color:transparent!important;
+      box-shadow:none!important;
+      color:var(--account-nav-active)!important;
+      font-weight:720!important;
+    }
+    body.account-premium-ui .account-tabs-modern .account-tab::after{
+      content:""!important;
+      position:absolute!important;
+      left:0!important;
+      right:0!important;
+      bottom:-1px!important;
+      height:2px!important;
+      border-radius:999px!important;
+      background:var(--account-nav-accent)!important;
+      opacity:0!important;
+      transform:scaleX(.35)!important;
+      transform-origin:center!important;
+      transition:opacity .18s ease,transform .18s ease!important;
+    }
+    body.account-premium-ui .account-tabs-modern .account-tab[aria-selected="true"]::after{
+      opacity:1!important;
+      transform:scaleX(1)!important;
+    }
+    body.account-premium-ui .account-tabs-modern .account-tab-icon{
+      display:none!important;
+    }
+
+    @media(max-width:760px){
+      body.account-premium-ui .account-hero{
+        min-height:52px!important;
+        padding:7px 0 5px!important;
+      }
+      body.account-premium-ui .account-hero>.wrap{
+        min-height:40px!important;
+      }
+      body.account-premium-ui .account-hero h1{
+        font-size:1.58rem!important;
+      }
+      body.account-premium-ui .account-section{
+        padding-top:9px!important;
+      }
+      body.account-premium-ui .account-setup-by{
+        grid-template-columns:1fr auto!important;
+        gap:2px 12px!important;
+        padding:0 1px 8px!important;
+      }
+      body.account-premium-ui .account-setup-by .eyebrow{
+        grid-column:1!important;
+        grid-row:1!important;
+      }
+      body.account-premium-ui .account-setup-name{
+        grid-column:1!important;
+        grid-row:2!important;
+        font-size:12.5px!important;
+      }
+      body.account-premium-ui .account-setup-context-label{
+        grid-column:2!important;
+        grid-row:1/3!important;
+        align-self:center!important;
+        font-size:9.75px!important;
+      }
+      body.account-premium-ui .account-tabs-shell{
+        margin-bottom:11px!important;
+      }
+      body.account-premium-ui .account-tabs.account-tabs-modern{
+        display:grid!important;
+        grid-template-columns:repeat(8,minmax(0,1fr))!important;
+        column-gap:6px!important;
+        row-gap:0!important;
+        padding:0!important;
+        border-bottom:0!important;
+      }
+      body.account-premium-ui .account-tabs-modern .account-tab{
+        grid-column:span 2!important;
+        width:100%!important;
+        min-height:32px!important;
+        padding:8px 0 9px!important;
+        font-size:11.1px!important;
+        white-space:nowrap!important;
+      }
+      body.account-premium-ui .account-tabs-modern .account-tab:nth-child(5){
+        grid-column:2/span 2!important;
+      }
+      body.account-premium-ui .account-tabs-modern .account-tab:nth-child(6){
+        grid-column:4/span 2!important;
+      }
+      body.account-premium-ui .account-tabs-modern .account-tab:nth-child(7){
+        grid-column:6/span 2!important;
+      }
+      body.account-premium-ui .account-tabs-modern .account-tab::after{
+        left:18%!important;
+        right:18%!important;
+        bottom:4px!important;
+      }
+    }
+  </style>
 </head>
   <body class="account-premium-ui">
     <script>
