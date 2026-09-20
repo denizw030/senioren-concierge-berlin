@@ -14,11 +14,13 @@ test('auth recognizes clean and legacy customer routes',()=>{
   assert.match(auth,/const PROTECTED = new Set\(\[\"konto\.html\", \"concierge-anpassen\.html\"\]\)/);
 });
 
-test('floating concierge is fail-closed behind server validation',()=>{
+test('floating concierge is public while protected account routes remain fail-closed',()=>{
   assert.match(auth,/const valid = await validateSession\(\)/);
-  assert.match(auth,/if \(valid\) \{[\s\S]*ensureFloatingConcierge\(\)/);
-  assert.match(auth,/if \(!isLoggedIn\(\) \|\| FLOATING_CONCIERGE_EXCLUDE/);
-  assert.match(auth,/href = \"\/web-concierge\"/);
+  assert.match(auth,/normalizeShell\(\);[\s\S]*ensureFloatingConcierge\(\);[\s\S]*const current = page\(\)/);
+  assert.match(auth,/if \(FLOATING_CONCIERGE_EXCLUDE\.has\(page\(\)\)\) return/);
+  assert.doesNotMatch(auth,/if \(!isLoggedIn\(\) \|\| FLOATING_CONCIERGE_EXCLUDE/);
+  assert.match(auth,/if \(PROTECTED\.has\(current\)\) location\.replace\("\/anmelden"\)/);
+  assert.match(auth,/href = "\/web-concierge"/);
   assert.doesNotMatch(auth,/web-concierge-chat\.js/);
 });
 
