@@ -132,3 +132,113 @@ body.account-premium-ui:has(#accountEmailCard:not([hidden])) .nw-floating-concie
 }
 @media(max-width:640px){
   .ecp-thunderbird{border-radius:12px}.ecp-tb-toolbar{grid-template-columns:1fr auto;padding:8px}.ecp-tb-shell{display:block}.ecp-tb-sidebar{border-right:0;border-bottom:1px solid var(--ecp-tb-border)}.ecp-tb-brand{display:none}.ecp-tb-nav{display:flex;overflow:auto;gap:4px}.ecp-tb-nav-item{min-width:max-content;grid-template-columns:18px auto auto}.ecp-tb-nav-separator,.ecp-tb-sidebar-foot{display:none}.ecp-tb-list-pane{border-right:0}.ecp-tb-message-list{height:420px}.ecp-tb-reader{height:auto;min-height:380px}.ecp-tb-reader-body{padding:16px}.ecp-tb-reader-message-head{padding:16px}}
+
+
+/* NAHWERK Email desktop density v20260920-11 */
+@media (min-width:901px){
+  #accountEmailCard{
+    padding:0!important;
+    gap:0!important;
+    border:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+  #accountEmailCard>.email-concierge-product{
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+  }
+  .ecp-thunderbird{
+    height:clamp(520px,calc(100dvh - 245px),700px)!important;
+    min-height:0!important;
+    max-height:700px!important;
+    border-radius:14px!important;
+  }
+  .ecp-tb-toolbar{
+    min-height:42px!important;
+    height:42px!important;
+    grid-template-columns:minmax(125px,190px) minmax(220px,1fr) auto!important;
+    gap:10px!important;
+    padding:5px 9px!important;
+  }
+  .ecp-tb-toolbar-title strong{font-size:.82rem!important}
+  .ecp-tb-toolbar-title span{font-size:.62rem!important}
+  .ecp-tb-search{padding:0 9px!important}
+  .ecp-tb-search input{height:30px!important;font-size:.74rem!important}
+  .ecp-tb-live{padding:4px 7px!important;font-size:.62rem!important}
+  .ecp-tb-shell{
+    height:calc(100% - 42px)!important;
+    min-height:0!important;
+    grid-template-columns:220px minmax(300px,350px) minmax(0,1fr)!important;
+  }
+  .ecp-tb-sidebar,
+  .ecp-tb-list-pane,
+  .ecp-tb-reader{height:100%!important;min-height:0!important}
+  .ecp-tb-sidebar{overflow:hidden!important}
+  .ecp-tb-nav{min-height:0!important;overflow:auto!important;gap:1px!important;padding:6px 6px!important}
+  .ecp-tb-brand{padding:8px 10px!important;gap:8px!important}
+  .ecp-tb-brandmark{width:28px!important;height:28px!important;flex-basis:28px!important;border-radius:7px!important}
+  .ecp-tb-brandmark svg{width:16px!important;height:16px!important}
+  .ecp-tb-brand strong{font-size:.74rem!important}
+  .ecp-tb-brand span:not(.ecp-tb-brandmark){font-size:.6rem!important}
+  .ecp-tb-nav-item{
+    min-height:29px!important;
+    grid-template-columns:18px minmax(0,1fr) auto!important;
+    gap:5px!important;
+    padding:4px 6px!important;
+    font-size:.7rem!important;
+  }
+  .ecp-tb-nav-icon{width:16px!important}
+  .ecp-tb-nav-count{font-size:.61rem!important}
+  .ecp-tb-nav-separator{margin:5px 3px!important}
+  .ecp-tb-account{margin:6px 7px 2px!important;padding:4px 2px!important}
+  .ecp-tb-account strong{font-size:.63rem!important}
+  .ecp-tb-nav-subitem{padding-left:11px!important}
+  .ecp-tb-sidebar-foot{padding:8px 10px!important;gap:2px!important;font-size:.61rem!important;line-height:1.25!important}
+  .ecp-tb-sidebar-foot small{font-size:.58rem!important}
+
+  /* Keine Kopfblöcke vor Nachrichten: Verlauf beginnt direkt oben. */
+  .ecp-tb-list-top,
+  .ecp-tb-reader-head,
+  .ecp-tb-reader-toolbar{display:none!important}
+
+  .ecp-tb-list-pane{display:block!important;overflow:hidden!important}
+  .ecp-tb-message-list{height:100%!important;max-height:none!important;overflow:auto!important}
+  .ecp-tb-message{
+    gap:2px!important;
+    padding:7px 8px 6px!important;
+  }
+  .ecp-tb-sender{font-size:.7rem!important}
+  .ecp-tb-date{font-size:.58rem!important}
+  .ecp-tb-subject{font-size:.71rem!important}
+  .ecp-tb-snippet{
+    font-size:.63rem!important;
+    line-height:1.22!important;
+    -webkit-line-clamp:1!important;
+  }
+  .ecp-tb-reply-flag,
+  .ecp-tb-location-flag{padding:2px 5px!important;font-size:.56rem!important}
+  .ecp-tb-class-actions{gap:4px!important;margin-top:2px!important}
+  .ecp-tb-class-actions .ecp-class-btn{
+    min-height:23px!important;
+    padding:3px 5px!important;
+    font-size:.59rem!important;
+  }
+
+  .ecp-tb-reader{overflow:auto!important}
+  .ecp-tb-reader-message-head{padding:12px 15px 9px!important}
+  .ecp-tb-reader-message-head h3{margin:0 0 6px!important;font-size:.9rem!important;line-height:1.22!important}
+  .ecp-tb-reader-from{font-size:.68rem!important}
+  .ecp-tb-reader-account,.ecp-tb-reader-date{font-size:.6rem!important}
+  .ecp-tb-reader-body{
+    padding:14px 15px 18px!important;
+    font-size:.7rem!important;
+    line-height:1.4!important;
+  }
+  .ecp-tb-attachments{margin:0 15px 15px!important;padding:7px 9px!important;font-size:.61rem!important}
+  .ecp-tb-embedded-card{margin:8px!important;padding:13px!important}
+  .ecp-tb-reader .ecp-chat-log{max-height:calc(100dvh - 430px)!important}
+}
+@media (min-width:901px) and (max-width:1120px){
+  .ecp-tb-shell{grid-template-columns:195px minmax(285px,330px) minmax(0,1fr)!important}
+}
