@@ -1,8 +1,6 @@
 // NAHWERK LIVE CONCIERGE WEB CLIENT V1
 const DEFAULT_API="https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway/live";
-// LIVE_PUBLIC_PRICE_REST_V1_20260920
-const LIVE_PRICE_URL="https://djicahhmnnamtjuqedqd.supabase.co/rest/v1/live_voice_public_price_v1?select=currency,unit,unit_price_cents,max_session_minutes,price_version,pricing_basis,price_frozen_per_session&limit=1";
-const LIVE_PRICE_KEY="sb_publishable_Zr4L9Lk-zOnjTc5bE_ChNA_SybjXxZx";
+// LIVE_AUTHENTICATED_PRICE_QUOTE_V2_20260920
 
 const wait=(ms)=>new Promise(r=>setTimeout(r,ms));
 const uid=()=>crypto.randomUUID?.()||Math.random().toString(36).slice(2);
@@ -222,13 +220,6 @@ export function mountNahwerkLiveConcierge({
     if(!r.ok||d?.ok!==true)throw new Error(d?.error||("LIVE_HTTP_"+r.status));
     return d;
   };
-  const publicLivePrice=async()=>{
-    const r=await fetch(LIVE_PRICE_URL,{method:"GET",headers:{apikey:LIVE_PRICE_KEY},cache:"no-store",credentials:"omit"});
-    const rows=await r.json().catch(()=>null);
-    const q=Array.isArray(rows)?rows[0]:null;
-    if(!r.ok||!q||!Number.isFinite(Number(q.unit_price_cents))||!String(q.price_version||""))throw new Error("LIVE_PRICE_UNAVAILABLE");
-    return {...q,customer_charge:true,billing_exempt:false,max_seconds:Number(q.max_session_minutes||0)*60};
-  };
   const sendEvent=(event)=>{
     if(dc?.readyState==="open")dc.send(JSON.stringify(event));
   };
@@ -346,7 +337,7 @@ export function mountNahwerkLiveConcierge({
     setPersona(currentPersonaFromPage());
     setStatus("Preis wird geprüft …");state("quoting");
     try{
-      currentQuote=await publicLivePrice();
+      currentQuote=await post("/quote",{channel:ch});
       if(currentQuote?.customer_charge===true&&currentQuote?.billing_exempt!==true){
         const cents=Number(currentQuote.unit_price_cents||0);
         const price=(cents/100).toFixed(2).replace(".",",");
@@ -423,7 +414,11 @@ export function mountNahwerkLiveConcierge({
           ?"Kein Mikrofon gefunden."
           : code==="MICROPHONE_BUSY_OR_UNAVAILABLE"
             ?"Das Mikrofon ist gerade nicht verfügbar."
-            :`Live-Fehler: ${code.slice(0,80)}`;
+            : code==="LIVE_PRICE_CHANGED"
+              ?"Der Live-Preis wurde gerade aktualisiert. Bitte starte das Gespräch noch einmal."
+              : code==="LIVE_PRICE_UNAVAILABLE"
+                ?"Der Live-Preis konnte gerade nicht sicher geladen werden. Bitte versuche es erneut."
+                :`Live-Fehler: ${code.slice(0,80)}`;
       setStatus(message);
       await stop({notifyBackend:Boolean(sessionId),keepVisible:true});
     }
