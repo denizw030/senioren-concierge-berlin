@@ -5364,22 +5364,27 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
               const overviewConcierge = document.getElementById("overviewConcierge");
               if (overviewConcierge) overviewConcierge.textContent = conciergeName;
             }
-            document.getElementById("recipientName").textContent =
-              d.recipient?.name || "–";
-            document.getElementById("recipientMeta").textContent = [
-              d.recipient?.relationship,
-              d.recipient?.phone,
-              d.recipient?.addressing === "du"
-                ? "Du-Ansprache"
-                : "Sie-Ansprache",
-            ]
-              .filter(Boolean)
-              .join(" · ");
-            document.getElementById("ownerName").textContent =
-              d.owner?.name || "–";
-            if (d.recipient?.note)
-              document.getElementById("profileInfo").textContent =
-                d.recipient.note;
+            // Legacy onboarding data is never authoritative for an authenticated account.
+            // Names, selected person context and "Eingerichtet von" come only from the
+            // server-validated profile/account-context payloads above.
+            if (!sessionToken()) {
+              document.getElementById("recipientName").textContent =
+                d.recipient?.name || "–";
+              document.getElementById("recipientMeta").textContent = [
+                d.recipient?.relationship,
+                d.recipient?.phone,
+                d.recipient?.addressing === "du"
+                  ? "Du-Ansprache"
+                  : "Sie-Ansprache",
+              ]
+                .filter(Boolean)
+                .join(" · ");
+              document.getElementById("ownerName").textContent =
+                d.owner?.name || "–";
+              if (d.recipient?.note)
+                document.getElementById("profileInfo").textContent =
+                  d.recipient.note;
+            }
           }
           prefSummary(
             JSON.parse(
