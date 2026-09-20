@@ -413,11 +413,11 @@
       }
       if (response.status === 409 && body.status === "web_access_exists") {
         resetVerificationUi();
-        return show('<strong>Für diese Person besteht bereits ein Web-Zugang.</strong><br><a href="${guestLoginHref}">Zur Anmeldung</a>', true);
+        return show(`<strong>Für diese Person besteht bereits ein Web-Zugang.</strong><br><a href="${guestLoginHref}">Zur Anmeldung</a>`, true);
       }
       if (response.status === 409 && body.status === "email_in_use") {
         resetVerificationUi();
-        return show('<strong>Für diese E-Mail-Adresse besteht bereits ein Konto.</strong><br><a href="${guestLoginHref}">Zur Anmeldung</a>', true);
+        return show(`<strong>Für diese E-Mail-Adresse besteht bereits ein Konto.</strong><br><a href="${guestLoginHref}">Zur Anmeldung</a>`, true);
       }
       if (response.status === 409 && body.status === "identity_link_failed") {
         resetVerificationUi();
@@ -558,7 +558,7 @@
         show("<strong>Der Zugang wurde angelegt.</strong><br>Bitte melden Sie sich jetzt an.", true);
         return setTimeout(() => { location.href = postAuthTarget ? guestLoginHref : (window.NAHWERKLocale?.href("anmelden.html") || "anmelden.html"); }, 1800);
       }
-      if (response.status === 409 && body.status === "email_in_use") return show('<strong>Für diese E-Mail-Adresse besteht bereits ein Konto.</strong><br><a href="${guestLoginHref}">Zur Anmeldung</a>', true);
+      if (response.status === 409 && body.status === "email_in_use") return show(`<strong>Für diese E-Mail-Adresse besteht bereits ein Konto.</strong><br><a href="${guestLoginHref}">Zur Anmeldung</a>`, true);
       if (response.status === 400 || body.status === "validation_error") return show("<strong>Bitte prüfen Sie Ihre Angaben.</strong>", true);
       throw new Error(`HTTP ${response.status}`);
     } catch (_) {
