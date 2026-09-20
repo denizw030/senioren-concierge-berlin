@@ -331,6 +331,9 @@
         if (!node.nodeValue.includes("WhatsApp")) return NodeFilter.FILTER_REJECT;
         const parent = node.parentElement;
         if (!parent || parent.closest("script,style,noscript,textarea,.whatsapp-label")) return NodeFilter.FILTER_REJECT;
+        // Chat-Kanäle besitzen bereits eigene, einheitliche monochrome Icons.
+        // Der globale WhatsApp-Decorator darf dort kein zweites grünes Markenlogo injizieren.
+        if (parent.closest(".web-concierge-thread,.web-concierge-thread-title,.web-concierge-thread-title-text,.web-concierge-channel-icon")) return NodeFilter.FILTER_REJECT;
         return NodeFilter.FILTER_ACCEPT;
       }
     });
