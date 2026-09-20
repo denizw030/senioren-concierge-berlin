@@ -164,7 +164,7 @@ test("email connect never fails silently",()=>{
 });
 
 test("account page contains a direct OAuth fallback if integration binding is missing",()=>{
-  assert.match(konto,/email-account-integration\.js\?v=6/);
+  assert.match(konto,/email-account-integration\.js\?v=7/);
   assert.match(konto,/emailFallbackToken/);
   assert.match(konto,/BASE \+ "\/email\/connect"/);
   assert.match(konto,/url\.hostname !== "accounts\.google\.com"/);
