@@ -66,7 +66,7 @@ jobs:
           assert 'Was dein E-Mail-Concierge erledigt hat' in product
           assert '.email-concierge-product' in css
           assert 'email_oauth=complete' in html
-          assert '/konto.html' in html
+          assert '/konto?' in html
           assert 'noindex,nofollow' in html
           print('GMAIL_PROD_ACCOUNT_AND_PRODUCT_UI=GREEN')
           PY

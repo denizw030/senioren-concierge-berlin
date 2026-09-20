@@ -17,6 +17,9 @@ test("standalone E-Mail-Concierge uses only the canonical PROD email runtime",()
   assert.match(js,/\/email\/concierge\/messages\/open/);
   assert.match(js,/\/email\/concierge\/activity\?limit=50/);
   assert.match(js,/\/email\/concierge\/settings/);
+  assert.match(js,/\/email\/concierge\/rules\/suggestion/);
+  assert.match(js,/\/email\/concierge\/rules\/update/);
+  assert.match(js,/\/email\/concierge\/rules\/delete/);
 });
 
 test("customer UI contains the complete standalone product areas",()=>{
@@ -31,8 +34,8 @@ test("spam fraud sorting and activity controls are customer configurable",()=>{
 
 test("dashboard normalization fails closed and keeps bounded arrays",()=>{
   assert.equal(api.normalizeDashboard({ok:false}),null);
-  const data=api.normalizeDashboard({ok:true,summary:{important:2,unread:3},highlights:[{id:"m1"}],drafts:[{id:"d1"}],activities:[],channels:{web:{state:"ACTIVE"}}});
-  assert.equal(data.summary.important,2);assert.equal(data.summary.unread,3);assert.equal(data.highlights.length,1);assert.equal(data.drafts.length,1);assert.equal(data.channels.web.state,"ACTIVE");
+  const data=api.normalizeDashboard({ok:true,summary:{important:2,unread:3},highlights:[{id:"m1"}],drafts:[{id:"d1"}],activities:[],rules:[{id:"r1"}],suggestions:[{candidate_id:"c1"}],channels:{web:{state:"ACTIVE"}}});
+  assert.equal(data.summary.important,2);assert.equal(data.summary.unread,3);assert.equal(data.highlights.length,1);assert.equal(data.drafts.length,1);assert.equal(data.rules.length,1);assert.equal(data.suggestions.length,1);assert.equal(data.channels.web.state,"ACTIVE");
 });
 
 test("message content is rendered through textContent helpers, not injected HTML",()=>{
@@ -86,4 +89,25 @@ test("connected account overview is topmost and follows canonical provider statu
   assert.match(multi,/emailConciergeProduct/);
   assert.match(multi,/accountRoot\.querySelector\("\.email-account-head"\)/);
   assert.doesNotMatch(multi,/emailLogoConnectShell/);
+});
+
+test("personal rule UI requires explicit customer confirmation and stays reversible",()=>{
+  assert.match(js,/Vorschläge deines Concierges/);
+  assert.match(js,/Nur unwichtig/);
+  assert.match(js,/Archivieren/);
+  assert.match(js,/Papierkorb/);
+  assert.match(js,/decision: "CONFIRM"/);
+  assert.match(js,/decision: "REJECT"/);
+  assert.match(js,/rule_id: rule\.id, active: input\.checked/);
+  assert.match(js,/rule_id: rule\.id, action: select\.value/);
+  assert.match(js,/persönliche E-Mail-Regel wirklich löschen/i);
+  assert.match(js,/Bereits vorhandene Nachrichten werden nie automatisch nachträglich verändert/);
+  assert.match(js,/endgültiges Löschen bleibt deaktiviert/);
+});
+
+test("important and unimportant controls remain directly visible on every classifiable mail",()=>{
+  assert.match(js,/\["IMPORTANT", "Wichtig"\]/);
+  assert.match(js,/\["UNIMPORTANT", "Unwichtig"\]/);
+  assert.match(js,/classification\/override/);
+  assert.match(js,/@media\(max-width:640px\).*ecp-class-actions/s);
 });

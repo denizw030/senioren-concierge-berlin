@@ -55,6 +55,7 @@
       settings: data.settings && typeof data.settings === "object" ? data.settings : {},
       highlights: list(data.highlights), warnings: list(data.warnings), hints: list(data.hints),
       drafts: list(data.drafts), activities: list(data.activities),
+      rules: list(data.rules), suggestions: list(data.suggestions),
       channels: data.channels && typeof data.channels === "object" ? data.channels : {}
     };
   }
@@ -102,6 +103,14 @@
       .ecp-class-reason{margin:7px 0 0;font-size:.72rem;line-height:1.4;opacity:.55}
       .ecp-sort-scope{margin:12px 0 0;font-size:.74rem;line-height:1.45;opacity:.58}
       .ecp-detail .ecp-class-actions{justify-content:flex-start;margin-top:12px}
+      .ecp-rule-heading{margin:14px 0 8px;font-size:.75rem;font-weight:700;letter-spacing:.03em;opacity:.7}
+      .ecp-rule{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0;border-top:1px solid rgba(127,127,127,.16)}
+      .ecp-rule>div:first-child{display:grid;gap:4px}.ecp-rule small{font-size:.72rem;line-height:1.35;opacity:.65}.ecp-rule-match{opacity:.5!important}
+      .ecp-rule-actions,.ecp-rule-controls{display:flex;flex-wrap:wrap;gap:7px;justify-content:flex-end;align-items:center}
+      .ecp-rule-select{max-width:190px;border:1px solid rgba(127,127,127,.24);border-radius:10px;background:transparent;color:inherit;padding:7px 8px;font:inherit;font-size:.72rem}
+      .ecp-rule-toggle{display:flex;gap:6px;align-items:center;font-size:.72rem}.ecp-rule-toggle input{accent-color:currentColor}
+      .ecp-settings-details{margin-top:14px;border-top:1px solid rgba(127,127,127,.16);padding-top:10px}.ecp-settings-details>summary{cursor:pointer;font-size:.76rem;font-weight:650}
+      @media(max-width:640px){.ecp-rule{grid-template-columns:1fr}.ecp-rule-actions,.ecp-rule-controls{justify-content:flex-start}.ecp-rule-select{max-width:100%;width:100%}}
       @media(max-width:980px){.ecp-summary{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
       @media(max-width:640px){.ecp-summary{grid-template-columns:repeat(2,minmax(0,1fr))!important}.ecp-mail-side{justify-items:start;min-width:0}.ecp-class-actions{justify-content:flex-start}}
     `;
@@ -187,8 +196,12 @@
     if (busy || !message?.id || message.classification === value) return;
     setBusy(true);
     try {
-      await request("/email/concierge/classification/override", { method: "POST", body: { message_id: message.id, thread_id: message.thread_id || null, classification: value } });
+      const saved = await request("/email/concierge/classification/override", { method: "POST", body: { message_id: message.id, thread_id: message.thread_id || null, classification: value } });
       classification = normalizeClassification(await request("/email/concierge/classification/summary"));
+      if (saved?.learning_suggestion_ready) {
+        const next = normalizeDashboard(await request("/email/concierge/dashboard"));
+        if (next) dashboard = next;
+      }
     } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
     finally { setBusy(false); render(); }
   }
@@ -372,8 +385,73 @@
       row.append(copy, right); card.append(row);
     });
   }
+  function ruleActionChoices(rule) {
+    return rule.classification === "IMPORTANT"
+      ? [["PRIORITIZE", "hervorheben"], ["CLASSIFY_ONLY", "nur als wichtig einstufen"]]
+      : [["CLASSIFY_ONLY", "nur als unwichtig einstufen"], ["ARCHIVE", "automatisch archivieren"], ["TRASH", "automatisch in den Papierkorb"]];
+  }
+  async function refreshRules() {
+    const next = normalizeDashboard(await request("/email/concierge/dashboard"));
+    if (next) dashboard = next;
+    classification = normalizeClassification(await request("/email/concierge/classification/summary"));
+    render();
+  }
+  function renderRuleSuggestion(card, suggestion) {
+    const box = el("div", "ecp-rule ecp-rule-suggestion"), copy = el("div");
+    copy.append(el("strong", "", text(suggestion.title, 220) || "Wiederkehrendes Muster"), el("small", "", text(suggestion.text, 700) || "Soll ich daraus eine persönliche Automatik machen?"));
+    if (suggestion.matcher_label) copy.append(el("small", "ecp-rule-match", suggestion.matcher_label));
+    const actions = el("div", "ecp-rule-actions");
+    const choices = suggestion.classification === "IMPORTANT"
+      ? [["PRIORITIZE", "Hervorheben"], ["CLASSIFY_ONLY", "Nur wichtig"]]
+      : [["CLASSIFY_ONLY", "Nur unwichtig"], ["ARCHIVE", "Archivieren"], ["TRASH", "Papierkorb"]];
+    choices.filter(([value]) => list(suggestion.suggested_actions).includes(value)).forEach(([value, label]) => {
+      const b = button(label, "ecp-action"); b.addEventListener("click", async () => {
+        if (busy) return; setBusy(true);
+        try { await request("/email/concierge/rules/suggestion", { method: "POST", body: { candidate_id: suggestion.candidate_id, decision: "CONFIRM", action: value } }); await refreshRules(); }
+        catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
+        finally { setBusy(false); }
+      }); actions.append(b);
+    });
+    const reject = button("Nein", "ecp-link-button"); reject.addEventListener("click", async () => {
+      if (busy) return; setBusy(true);
+      try { await request("/email/concierge/rules/suggestion", { method: "POST", body: { candidate_id: suggestion.candidate_id, decision: "REJECT" } }); await refreshRules(); }
+      catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
+      finally { setBusy(false); }
+    }); actions.append(reject);
+    box.append(copy, actions); card.append(box);
+  }
+  function renderPersonalRule(card, rule) {
+    const row = el("div", "ecp-rule"), copy = el("div");
+    copy.append(el("strong", "", text(rule.title, 220) || "Persönliche Regel"), el("small", "", (rule.classification_label || "") + " · " + (rule.action_label || "")));
+    if (rule.matcher_label) copy.append(el("small", "ecp-rule-match", rule.matcher_label));
+    if (rule.last_applied_at) copy.append(el("small", "ecp-rule-meta", "Zuletzt angewandt: " + fmtDate(rule.last_applied_at) + (number(rule.hit_count) ? " · " + number(rule.hit_count) + " Treffer" : "")));
+    const controls = el("div", "ecp-rule-controls");
+    const select = el("select", "ecp-rule-select"); select.setAttribute("aria-label", "Aktion für " + text(rule.title, 160));
+    ruleActionChoices(rule).forEach(([value, label]) => { const option = el("option", "", label); option.value = value; option.selected = rule.action === value; select.append(option); });
+    select.addEventListener("change", async () => { select.disabled = true; try { await request("/email/concierge/rules/update", { method: "POST", body: { rule_id: rule.id, action: select.value } }); await refreshRules(); } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); } finally { select.disabled = false; } });
+    const toggle = el("label", "ecp-rule-toggle"), input = el("input"); input.type = "checkbox"; input.checked = rule.active === true; input.setAttribute("aria-label", "Regel aktiv");
+    input.addEventListener("change", async () => { input.disabled = true; try { await request("/email/concierge/rules/update", { method: "POST", body: { rule_id: rule.id, active: input.checked } }); await refreshRules(); } catch (error) { input.checked = !input.checked; showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); } finally { input.disabled = false; } });
+    toggle.append(input, el("span", "", rule.active ? "Aktiv" : "Aus"));
+    const remove = button("Löschen", "ecp-link-button"); remove.addEventListener("click", async () => {
+      if (!confirm("Diese persönliche E-Mail-Regel wirklich löschen?")) return;
+      try { await request("/email/concierge/rules/delete", { method: "POST", body: { rule_id: rule.id } }); await refreshRules(); }
+      catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
+    });
+    controls.append(select, toggle, remove); row.append(copy, controls); card.append(row);
+  }
   function renderSettings(card) {
+    const suggestions = list(dashboard.suggestions), rules = list(dashboard.rules);
+    if (suggestions.length) {
+      card.append(el("p", "ecp-rule-heading", "Vorschläge deines Concierges"));
+      suggestions.forEach((suggestion) => renderRuleSuggestion(card, suggestion));
+    }
+    card.append(el("p", "ecp-rule-heading", "Deine persönlichen Regeln"));
+    if (!rules.length) card.append(el("div", "ecp-section-empty", "Noch keine Automatik aktiv. Du kannst E-Mails einfach als wichtig oder unwichtig markieren – dein Concierge lernt daraus."));
+    else rules.forEach((rule) => renderPersonalRule(card, rule));
+    card.append(el("p", "ecp-footer-note", "Neue Regeln gelten nur für zukünftige passende E-Mails. Bereits vorhandene Nachrichten werden nie automatisch nachträglich verändert. Papierkorb bedeutet Gmail-Papierkorb; endgültiges Löschen bleibt deaktiviert."));
     const current = dashboard.settings || {};
+    const details = el("details", "ecp-settings-details"), summary = el("summary", "", "Weitere E-Mail-Einstellungen");
+    details.append(summary);
     Object.entries(SETTINGS).forEach(([key, meta]) => {
       const row = el("label", "ecp-setting"), copy = el("span"); copy.append(el("strong", "", meta[0]), el("small", "", meta[1]));
       const toggle = el("span", "ecp-switch"), input = el("input"); input.type = "checkbox"; input.checked = current[key] === true; input.setAttribute("aria-label", meta[0]); toggle.append(input, el("span"));
@@ -383,9 +461,10 @@
         catch (error) { input.checked = !desired; showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
         finally { input.disabled = false; render(); }
       });
-      row.append(copy, toggle); card.append(row);
+      row.append(copy, toggle); details.append(row);
     });
-    card.append(el("p", "ecp-footer-note", "Diese Einstellungen steuern, was dein E-Mail-Concierge hervorhebt und protokolliert. Nachrichten werden nicht allein wegen Spam- oder Betrugsverdacht gelöscht. E-Mails werden nur nach deiner ausdrücklichen Freigabe gesendet."));
+    details.append(el("p", "ecp-footer-note", "E-Mails werden nur nach deiner ausdrücklichen Freigabe gesendet. Spam- oder Betrugsverdacht allein löscht keine Nachricht."));
+    card.append(details);
   }
   function classificationDigest(s) {
     if (!classification) return s.text;
@@ -412,7 +491,7 @@
     section = sectionCard("Hinweise", "Nur Dinge, bei denen sich ein Blick wahrscheinlich lohnt."); renderHints(section.card); side.append(section.card);
     section = sectionCard("Was dein E-Mail-Concierge erledigt hat", "Kompakt statt einer technischen Ereignisliste."); renderActivities(section.card, section.head); side.append(section.card);
     section = sectionCard("Deine Kanäle", "Der E-Mail-Concierge funktioniert eigenständig im Web. Weitere Zugänge sind optional."); renderChannels(section.card); side.append(section.card);
-    section = sectionCard("Automatik & Schutz", "Du bestimmst, was NAHWERK für dich hervorhebt."); renderSettings(section.card); side.append(section.card);
+    section = sectionCard("Automatik & Schutz", "Dein Concierge lernt aus deinen Entscheidungen. Automatik wird erst nach deiner Bestätigung aktiv."); renderSettings(section.card); side.append(section.card);
     layout.append(main, side); root.append(layout);
   }
   async function loadClassification() {
