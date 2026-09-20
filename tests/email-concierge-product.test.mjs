@@ -83,7 +83,7 @@ test("product layout is responsive across desktop and mobile",()=>{
   assert.match(js,/ecp-rule-title-row/);
   assert.match(js,/\.ecp-rule-controls\{display:grid;grid-template-columns:minmax\(0,1fr\) auto/);
   assert.match(integration,/email-concierge-product\.css\?v=20260920-5/);
-  assert.match(integration,/email-concierge-product\.js\?v=20260920-6/);
+  assert.match(integration,/email-concierge-product\.js\?v=20260920-7/);
 });
 
 
@@ -165,4 +165,18 @@ test("concierge chat explains that commands can control mail and automation",()=
   assert.match(js,/in den Papierkorb verschieben/);
   assert.match(js,/Regeln für ähnliche E-Mails anlegen/);
   assert.match(js,/GitHub-Mails sind unwichtig/);
+});
+
+
+test("mailbox loading failure is visible and automatically retried once",()=>{
+  assert.match(js,/classificationError/);
+  assert.match(js,/classificationRetryCount/);
+  assert.match(js,/E-Mails konnten gerade nicht geladen werden/);
+  assert.match(js,/Erneut laden/);
+  assert.match(js,/setTimeout\(\(\)=>\{ if \(connected && !classificationLoading\) void loadClassification\(\); \},1600\)/);
+});
+
+test("mailbox can show dashboard fallback rows while classification loads",()=>{
+  assert.match(js,/\.\.\.list\(dashboard\?\.highlights\), \.\.\.list\(dashboard\?\.warnings\)/);
+  assert.match(js,/!rows\.length && classificationLoading/);
 });
