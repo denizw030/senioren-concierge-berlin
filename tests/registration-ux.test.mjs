@@ -106,7 +106,7 @@ test("mobile registration carousel arrows stay inside the photo stage", () => {
   assert.match(carouselCss, /\.nw-carousel-stage>\.nw-carousel-arrow\.prev\{[\s\S]*left:8px!important;[\s\S]*right:auto!important;/);
   assert.match(carouselCss, /\.nw-carousel-stage>\.nw-carousel-arrow\.next\{[\s\S]*right:8px!important;[\s\S]*left:auto!important;/);
   assert.match(html, /assets\/concierge-carousel\.css\?v=16/);
-  assert.match(html, /assets\/concierge-carousel\.js\?v=21/);
+  assert.match(html, /assets\/concierge-carousel\.js\?v=22/);
 });
 
 
@@ -121,4 +121,12 @@ test("neighboring mobile registration cards keep their real rounded outer corner
   assert.match(carouselCss, /REGISTRATION_MOBILE_NEIGHBOR_CORNERS_V1_20260920/);
   assert.match(carouselCss, /body\.registration-page \.nw-carousel-master\[data-variant="selection"\]\{\s*--nw-carousel-space:calc\(50% - 107px\)!important;/);
   assert.match(html, /assets\/concierge-carousel\.css\?v=16/);
+});
+
+
+test("registration arrow buttons move the slider without starting a drag", () => {
+  assert.match(carouselJs, /prevArrow\.addEventListener\("click",event=>\{event\.preventDefault\(\);event\.stopPropagation\(\);move\(-1,false,"browse"\);\}\)/);
+  assert.match(carouselJs, /nextArrow\.addEventListener\("click",event=>\{event\.preventDefault\(\);event\.stopPropagation\(\);move\(1,false,"browse"\);\}\)/);
+  assert.match(carouselJs, /closest\("\.nw-voice-preview-control,\.nw-carousel-arrow"\)/);
+  assert.match(html, /assets\/concierge-carousel\.js\?v=22/);
 });
