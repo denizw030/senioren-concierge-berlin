@@ -10,6 +10,7 @@ const shadow = read("assets/web-core-shadow.js");
 const legacyUi = read("assets/web-concierge-chat.js");
 const siteUi = read("assets/site-ui.js");
 const css = read("assets/web-customer-concierge.css");
+const authNav = read("assets/auth-nav.js");
 
 test("authenticated Web Concierge is a customer messenger and remains fail closed internally", () => {
   assert.match(page, /Dein Concierge/);
@@ -82,6 +83,12 @@ test("persisted chat history is authenticated, paginated and reuses the canonica
   assert.match(client, /crypto\.randomUUID\(\)/);
   assert.match(client, /webConciergeThreads/);
   assert.doesNotMatch(client, /nahwerk-web-chat-history/);
+});
+
+test("global WhatsApp decorator never injects a second brand logo into channel titles", () => {
+  assert.match(authNav, /parent\.closest\("\.web-concierge-thread,\.web-concierge-thread-title,\.web-concierge-thread-title-text,\.web-concierge-channel-icon"\)/);
+  assert.match(client, /channelIcon\(b\.dataset\.chatChannel\)/);
+  assert.match(css, /\.web-concierge-thread\[data-chat-scope="CHANNEL"\] \.web-concierge-thread-title::before\{\s*content:none!important;\s*display:none!important;/);
 });
 
 test("Web Concierge keeps the normal Web/App chat separate from WhatsApp", () => {
