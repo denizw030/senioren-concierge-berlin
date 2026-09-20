@@ -564,14 +564,9 @@
   ensureAccountEmailChrome();
   const legacyActions = root.querySelector(".email-actions");
   if (legacyActions) {
-    const keepLegacyActionsRetired = () => {
-      legacyActions.hidden = true;
-      legacyActions.setAttribute("aria-hidden", "true");
-      legacyActions.style.setProperty("display", "none", "important");
-      legacyActions.querySelectorAll("button").forEach((button) => { button.hidden = true; button.tabIndex = -1; });
-    };
-    keepLegacyActionsRetired();
-    new MutationObserver(keepLegacyActionsRetired).observe(legacyActions, { attributes: true, subtree: true, attributeFilter: ["hidden", "style"] });
+    legacyActions.hidden = true;
+    legacyActions.setAttribute("aria-hidden", "true");
+    legacyActions.querySelectorAll("button").forEach((button) => { button.hidden = true; button.tabIndex = -1; });
   }
   renderGrid();
   void refresh().catch(() => { renderGrid(); });
