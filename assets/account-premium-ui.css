@@ -290,6 +290,7 @@ html body.account-premium-ui.account-premium-ui .account-tab-concierge-logo{
   mask:none!important;
   color:transparent!important;
   font-size:0!important;
+  transform:translateY(-1px)!important;
 }
 
 
