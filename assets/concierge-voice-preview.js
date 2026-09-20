@@ -21,9 +21,8 @@
     button.setAttribute("aria-pressed", state === "playing" ? "true" : "false");
     const langLabel = profile.previewLanguages?.find(item => item.code === entry.language)?.label || entry.language;
     const action = state === "playing" ? "stoppen" : "anhören";
-    const prefix = isProvisional(profile) ? "Teststimme" : "Stimme";
-    button.setAttribute("aria-label", `${prefix} von ${profile.name} auf ${langLabel} ${action}`);
-    button.title = `${prefix} von ${profile.name} auf ${langLabel} ${action}`;
+    button.setAttribute("aria-label", `Stimme von ${profile.name} auf ${langLabel} ${action}`);
+    button.title = `Stimme von ${profile.name} auf ${langLabel} ${action}`;
     copy.textContent = visibleCopy(entry, state);
   }
 
@@ -112,7 +111,6 @@
         <span class="icon-error">!</span>
       </span>
       <span class="nw-voice-preview-copy"></span>
-      ${provisional ? '<span class="nw-voice-preview-badge" aria-hidden="true">Test</span>' : ""}
     `;
     const copy = button.querySelector(".nw-voice-preview-copy");
 

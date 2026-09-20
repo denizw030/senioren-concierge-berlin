@@ -264,9 +264,9 @@ body.concierge-portal-settings [data-concierge-carousel][data-switching="1"]{
           <span>Persönlicher Concierge über WhatsApp</span>
         </div>
       </div>
-    </footer><script src="assets/concierge-voice-preview.js?v=7"></script>
+    </footer><script src="assets/concierge-voice-preview.js?v=8"></script>
 <script src="/assets/concierge-locale-defaults.js?v=1"></script>
-    <script src="assets/concierge-carousel.js?v=22"></script>
+    <script src="assets/concierge-carousel.js?v=23"></script>
 <script src="assets/auth-nav.js?v=40"></script>
 <script>
 (() => {
@@ -278,6 +278,7 @@ body.concierge-portal-settings [data-concierge-carousel][data-switching="1"]{
   const bannerTitle = document.getElementById("conciergeContextTitle");
   const bannerText = document.getElementById("conciergeContextText");
   const GATEWAY_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway";
+  let personaPrefetchPromise = null;
   let canonicalPersonaKey = "";
   let canonicalPersonaName = "";
   const ids = ["addressing","speechSpeed","detailLevel","questionStyle","noJargon","repeatSteps","oneStep","confirmSuccess","preferAudio","safetyCautious","customInstructions","helpfulContext"];
@@ -289,6 +290,20 @@ body.concierge-portal-settings [data-concierge-carousel][data-switching="1"]{
     try { return JSON.parse(sessionStorage.getItem("scb_web_session") || "null"); }
     catch (_) { return null; }
   }
+  function beginPersonaPrefetch() {
+    if (personaPrefetchPromise) return personaPrefetchPromise;
+    const s = session();
+    if (!s?.session_token) return null;
+    personaPrefetchPromise = fetch(GATEWAY_URL+"/web/me", {
+      headers:{Authorization:"Bearer "+s.session_token},
+      cache:"no-store",
+      credentials:"omit"
+    }).then(async response => ({response, body:await response.json().catch(()=>({}))}))
+      .catch(error => { personaPrefetchPromise=null; throw error; });
+    return personaPrefetchPromise;
+  }
+  beginPersonaPrefetch();
+
   function selectedContext() {
     const s = session();
     if (!s?.person_id) return null;
@@ -313,6 +328,7 @@ body.concierge-portal-settings [data-concierge-carousel][data-switching="1"]{
       if (carousel) {
         carousel.dataset.selected = x.conciergeChoice;
         carousel._nahwerkCarousel?.select(x.conciergeChoice);
+        carousel.dataset.authoritativePersona = "1";
       }
     }
     ids.forEach((id) => {
@@ -331,8 +347,9 @@ body.concierge-portal-settings [data-concierge-carousel][data-switching="1"]{
     document.querySelectorAll("[data-persona-copy]").forEach(el=>el.textContent=name);
   }
   async function loadCanonicalPersona(s){
-    const response=await fetch(GATEWAY_URL+"/web/me",{headers:{Authorization:"Bearer "+s.session_token},cache:"no-store",credentials:"omit"});
-    const body=await response.json().catch(()=>({}));
+    const prefetched=await (beginPersonaPrefetch() || Promise.resolve(null));
+    const response=prefetched?.response || await fetch(GATEWAY_URL+"/web/me",{headers:{Authorization:"Bearer "+s.session_token},cache:"no-store",credentials:"omit"});
+    const body=prefetched?.body || await response.json().catch(()=>({}));
     if(!response.ok||body?.ok!==true||body?.authoritative!==true)throw new Error("persona_not_authoritative");
     const raw=body.persona&&typeof body.persona==="object"?body.persona:{};
     canonicalPersonaKey=String(raw.persona_key||raw.key||raw.slug||raw.persona_id||"").trim().toLowerCase();
@@ -435,7 +452,7 @@ body.concierge-portal-settings [data-concierge-carousel][data-switching="1"]{
     const valid = auth?.validateSession ? await auth.validateSession().catch(() => false) : false;
     if (!valid) return;
     const s = session();
-    try { await loadCanonicalPersona(s); } catch (_) { const carousel=f.querySelector("[data-concierge-carousel]"); if(carousel) carousel.dataset.authoritativePersona="1"; }
+    try { await loadCanonicalPersona(s); } catch (_) { /* keep the slider hidden until a real saved persona is available */ }
     const ctx = selectedContext();
     activeAccountId = String(ctx?.customer_account_id || s?.customer_account_id || "");
     if (!s?.session_token || !activeAccountId) {
