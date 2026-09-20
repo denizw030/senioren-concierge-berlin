@@ -164,9 +164,17 @@ test("email connect never fails silently",()=>{
 });
 
 test("account page contains a direct OAuth fallback if integration binding is missing",()=>{
-  assert.match(konto,/email-account-integration\.js\?v=6/);
+  assert.match(konto,/email-account-integration\.js\?v=7/);
   assert.match(konto,/emailFallbackToken/);
   assert.match(konto,/BASE \+ "\/email\/connect"/);
   assert.match(konto,/url\.hostname !== "accounts\.google\.com"/);
   assert.match(konto,/Die Google-Verbindung konnte nicht gestartet werden/);
+});
+
+test("connect button is never inert in static HTML",()=>{
+  assert.match(konto,/id="emailConnectButton">Verbinden<\/button>/);
+  assert.doesNotMatch(konto,/id="emailConnectButton" disabled/);
+  assert.match(konto,/event\.stopImmediatePropagation\(\)/);
+  assert.doesNotMatch(konto,/button\.dataset\.emailConnectBound === "true"/);
+  assert.match(konto,/email-account-integration\.js\?v=7/);
 });
