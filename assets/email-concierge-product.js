@@ -96,6 +96,15 @@
   let busy = false;
   let chatMessages = [];
   let chatStarted = false;
+  let chatDraft = "";
+  let chatScrollTop = 0;
+  let mailboxListScrollTop = 0;
+  let readerScrollTop = 0;
+  let chatSelectionStart = 0;
+  let chatSelectionEnd = 0;
+  let chatAutoScrollNext = false;
+  let pendingBackgroundRender = false;
+  const classificationSavingIds = new Set();
   let activityExpanded = false;
   let emailConnections = [];
   let activeConnectionId = "";
@@ -224,6 +233,53 @@
       else accountRoot.prepend(host);
     }
     return host;
+  }
+  function captureTransientUiState(root) {
+    const chatLog=root?.querySelector?.("#emailConciergeChatLog");
+    if(chatLog) chatScrollTop=chatLog.scrollTop;
+    const listNode=root?.querySelector?.(".ecp-tb-message-list");
+    if(listNode) mailboxListScrollTop=listNode.scrollTop;
+    const reader=root?.querySelector?.(".ecp-tb-reader");
+    if(reader) readerScrollTop=reader.scrollTop;
+    const input=root?.querySelector?.(".ecp-chat-input");
+    const chatFocused=Boolean(input&&document.activeElement===input);
+    if(input){
+      chatDraft=input.value;
+      if(chatFocused){
+        chatSelectionStart=Number(input.selectionStart??input.value.length);
+        chatSelectionEnd=Number(input.selectionEnd??chatSelectionStart);
+      }
+    }
+    return {chatFocused};
+  }
+  function restoreTransientUiState(root,state={chatFocused:false}) {
+    const chatLog=root?.querySelector?.("#emailConciergeChatLog");
+    if(chatLog){
+      chatLog.scrollTop=chatAutoScrollNext?chatLog.scrollHeight:chatScrollTop;
+      chatAutoScrollNext=false;
+    }
+    const listNode=root?.querySelector?.(".ecp-tb-message-list");
+    if(listNode) listNode.scrollTop=mailboxListScrollTop;
+    const reader=root?.querySelector?.(".ecp-tb-reader");
+    if(reader) reader.scrollTop=readerScrollTop;
+    const input=root?.querySelector?.(".ecp-chat-input");
+    if(input){
+      input.value=chatDraft;
+      if(state.chatFocused){
+        try{input.focus({preventScroll:true});input.setSelectionRange(Math.min(chatSelectionStart,input.value.length),Math.min(chatSelectionEnd,input.value.length));}
+        catch{input.focus();}
+      }
+    }
+  }
+  function flushPendingBackgroundRender() {
+    if(!pendingBackgroundRender) return;
+    setTimeout(()=>{
+      if(!pendingBackgroundRender) return;
+      const form=host?.querySelector?.(".ecp-chat-form");
+      if(form?.matches?.(":focus-within")) return;
+      pendingBackgroundRender=false;
+      render(true);
+    },0);
   }
   function setBusy(value) {
     busy = value;
@@ -507,26 +563,30 @@
     }
   }
   async function setMessageClassification(message, value) {
-    if (busy || !message?.id || message.classification === value) return;
+    const messageId=String(message?.id||"");
+    if (busy || !messageId || message.classification === value || classificationSavingIds.has(messageId)) return;
     const previous = message.classification || null;
+    classificationSavingIds.add(messageId);
     message.classification = value;
-    syncVisibleClassification(message.id, value);
-    applyLocalClassification(message.id, value);
-    render();
-    setBusy(true);
+    syncVisibleClassification(messageId, value);
+    applyLocalClassification(messageId, value);
+    render(true);
     try {
       const connectionId = String(message?._connection_id || activeConnectionId || "");
-      const saved = await request("/email/concierge/classification/override", { method: "POST", body: { message_id: message.id, thread_id: message.thread_id || null, classification: value, message_snapshot: { thread_id: message.thread_id || null, from: message.from || "", subject: message.subject || "", snippet: message.snippet || "", date: message.date || null } }, connectionId });
+      const saved = await request("/email/concierge/classification/override", { method: "POST", body: { message_id: messageId, thread_id: message.thread_id || null, classification: value, message_snapshot: { thread_id: message.thread_id || null, from: message.from || "", subject: message.subject || "", snippet: message.snippet || "", date: message.date || null } }, connectionId });
       if (saved?.learning_suggestion_ready) {
         const next = normalizeDashboard(await request("/email/concierge/dashboard", { connectionId }));
         if (next) dashboard = next;
       }
     } catch (error) {
       message.classification = previous;
-      syncVisibleClassification(message.id, previous);
+      syncVisibleClassification(messageId, previous);
       if (classification) void loadClassification();
       showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE");
-    } finally { setBusy(false); render(); }
+      render(true);
+    } finally {
+      classificationSavingIds.delete(messageId);
+    }
   }
   function messageCard(message, allowOpen = true, allowClassify = true) {
     const row = el("article", "ecp-mail"), main = el("div", "ecp-mail-main");
@@ -585,8 +645,11 @@
       for (const mail of list(entry.messages)) log.append(messageCard(mail, true, true));
     }
     const form = el("form", "ecp-chat-form"), input = el("input", "ecp-chat-input"), send = button("Senden", "ecp-primary");
-    input.type = "text"; input.name = "emailConciergeQuery"; input.maxLength = 5000; input.autocomplete = "off"; input.placeholder = "z. B. GitHub-Mails sind unwichtig"; input.setAttribute("aria-label", "E-Mail-Concierge fragen"); send.type = "submit";
-    form.addEventListener("submit", (event) => { event.preventDefault(); const value = input.value.trim(); if (!value) return; input.value = ""; runQuery(value); });
+    input.type = "text"; input.name = "emailConciergeQuery"; input.maxLength = 5000; input.autocomplete = "off"; input.placeholder = "z. B. GitHub-Mails sind unwichtig"; input.setAttribute("aria-label", "E-Mail-Concierge fragen"); input.value=chatDraft; send.type = "submit";
+    input.addEventListener("input",()=>{chatDraft=input.value;chatSelectionStart=Number(input.selectionStart??input.value.length);chatSelectionEnd=Number(input.selectionEnd??chatSelectionStart);});
+    input.addEventListener("select",()=>{chatSelectionStart=Number(input.selectionStart??0);chatSelectionEnd=Number(input.selectionEnd??chatSelectionStart);});
+    input.addEventListener("blur",flushPendingBackgroundRender);
+    form.addEventListener("submit", (event) => { event.preventDefault(); const value = input.value.trim(); if (!value) return; chatDraft=""; input.value = ""; chatAutoScrollNext=true; runQuery(value); });
     form.append(input, send);
     card.append(log);
     if (!hasUserMessage) {
@@ -633,7 +696,7 @@
   async function runQuery(query) {
     if (busy || !query) return;
     chatStarted = true;
-    chatMessages.push({ role: "user", text: query }); render(); setBusy(true);
+    chatMessages.push({ role: "user", text: query }); chatAutoScrollNext=true; render(true); setBusy(true);
     try {
       const data = await request("/email/concierge/query", { method: "POST", body: { text: query, request_id: crypto.randomUUID() } });
       let resultMessages = list(data.messages);
@@ -642,13 +705,14 @@
       }
       chatMessages.push({ role: "assistant", text: text(data.message, 2500) || "Erledigt.", messages: resultMessages });
       applyQueryResultToMailbox(data);
-      render();
+      chatAutoScrollNext=true;
+      render(true);
       await loadDashboard(false, true);
       if (mailboxScope === "ALL" || mailboxScope === "ACCOUNT") await loadMailboxFolder();
     } catch (error) {
       const code = error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE";
       chatMessages.push({ role: "assistant", text: ERROR_COPY[code] || "Das konnte ich gerade nicht ausführen. Bitte versuche es erneut.", error: true });
-    } finally { setBusy(false); render(); }
+    } finally { setBusy(false); render(true); }
   }
   function renderProtection(card) {
     const grid = el("div", "ecp-protection-grid"), p = dashboard.protection || {};
@@ -1059,8 +1123,14 @@
     const attachments=list(detail.attachments);if(attachments.length)pane.append(el("div","ecp-tb-attachments",String(attachments.length)+" Anhang"+(attachments.length===1?"":"e")+" · gefährliche Dateitypen werden nicht automatisch geöffnet"));
     shell.append(pane);
   }
-  function render() {
+  function render(force = false) {
     const root = ensureHost(); if (!root) return;
+    const transient=captureTransientUiState(root);
+    if(!force && transient.chatFocused){
+      pendingBackgroundRender=true;
+      return;
+    }
+    pendingBackgroundRender=false;
     ensureClassificationStyles();
     root.hidden = !connected; if (!connected) { root.replaceChildren(); return; }
     root.replaceChildren();
@@ -1069,11 +1139,12 @@
     const toolbar = el("div","ecp-tb-toolbar"), left=el("div","ecp-tb-toolbar-title"), searchWrap=el("label","ecp-tb-search");
     left.append(el("strong","","E-Mail"),el("span","","NAHWERK Concierge"));
     const search=el("input","");search.type="search";search.value=mailboxSearch;search.placeholder="Suchen …";search.setAttribute("aria-label","E-Mails durchsuchen");
-    search.addEventListener("change",()=>{mailboxSearch=search.value;render();});
-    search.addEventListener("keydown",(ev)=>{if(ev.key==="Enter"){ev.preventDefault();mailboxSearch=search.value;render();}});
+    search.addEventListener("change",()=>{mailboxSearch=search.value;render(true);});
+    search.addEventListener("keydown",(ev)=>{if(ev.key==="Enter"){ev.preventDefault();mailboxSearch=search.value;render(true);}});
     searchWrap.append(el("span","","⌕"),search);
     const status=el("span","ecp-tb-live","Aktiv"); toolbar.append(left,searchWrap,status);workspace.append(toolbar);
     const shell=el("div","ecp-tb-shell");renderMailboxSidebar(shell);renderMailboxListPane(shell);renderMailboxReader(shell);workspace.append(shell);root.append(workspace);
+    restoreTransientUiState(root,transient);
   }
   async function loadClassification() {
     if (!connected || classificationLoading) return;
@@ -1128,7 +1199,7 @@
     if (!connected) {
       dashboard = null; dashboardLoadedAt = 0; classification = null; classificationError = ""; classificationRetryCount = 0;
       emailConnections = []; activeConnectionId = ""; mailboxScope = "ALL"; mailboxFolderRows = []; mailboxFolderCounts = {}; classificationKnownCounts = {}; classificationFolderCache = {}; mailboxLoadSerial++; allDrafts = [];
-      chatMessages = []; chatStarted = false; render(); return;
+      chatMessages = []; chatStarted = false; chatDraft=""; chatScrollTop=0; mailboxListScrollTop=0; readerScrollTop=0; pendingBackgroundRender=false; render(true); return;
     }
     try { await loadConnections(); } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
     if (!emailConnections.length) { connected = false; render(); return; }
