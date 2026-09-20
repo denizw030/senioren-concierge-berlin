@@ -361,3 +361,12 @@ body.senior-product .nw-carousel-select>span,
     border-radius:24px 24px 0 0!important;
   }
 }
+
+/* REGISTRATION_MOBILE_NEIGHBOR_CORNERS_V1_20260920
+   Keep the actual outer corners of the neighboring cards inside the stage,
+   so their rounded corners remain visible instead of being clipped square. */
+@media(max-width:760px){
+  body.registration-page .nw-carousel-master[data-variant="selection"]{
+    --nw-carousel-space:calc(50% - 107px)!important;
+  }
+}
