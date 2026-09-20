@@ -91,24 +91,26 @@
     html.nw-product-senior-first-paint body.login-image-page .top,
     body.login-image-page.senior-product .top,
     body.login-image-page[data-product="senioren"] .top{background:#f7f3ea!important;border-color:rgba(65,51,26,.13)!important;box-shadow:0 1px 0 rgba(65,51,26,.06)!important}
-    .senior-login-visual{display:none}
+    .senior-login-visual{display:none!important}
+    html.nw-product-senior-first-paint body.login-image-page main::before,
+    body.login-image-page.senior-product main::before,
+    body.login-image-page[data-product="senioren"] main::before{
+      content:none!important;display:none!important
+    }
     html.nw-product-senior-first-paint body.login-image-page main::after,
     body.login-image-page.senior-product main::after,
-    body.login-image-page[data-product="senioren"] main::after{content:none!important;display:none!important}
-    html.nw-product-senior-first-paint body.login-image-page main>.senior-login-visual,
-    body.login-image-page.senior-product main>.senior-login-visual,
-    body.login-image-page[data-product="senioren"] main>.senior-login-visual{
-      display:block!important;position:relative!important;inset:auto!important;z-index:1!important;
-      grid-column:2!important;grid-row:1 / span 2!important;width:100%!important;max-width:none!important;height:100%!important;min-height:650px!important;
+    body.login-image-page[data-product="senioren"] main::after{
+      content:""!important;display:block!important;position:relative!important;inset:auto!important;z-index:1!important;
+      grid-column:2!important;grid-row:1 / span 2!important;width:100%!important;height:100%!important;min-height:650px!important;
       margin:0!important;padding:0!important;border:0!important;border-radius:34px!important;box-shadow:none!important;pointer-events:none!important;
       background:#ddd4c8 url("/assets/lifestyle/senior-woman-overview.webp?v=6") 68% 50%/cover no-repeat!important
     }
-    @media(max-width:899px){
-      html.nw-product-senior-first-paint body.login-image-page main>.senior-login-visual,
-      body.login-image-page.senior-product main>.senior-login-visual,
-      body.login-image-page[data-product="senioren"] main>.senior-login-visual{
-        grid-column:1!important;grid-row:3!important;position:relative!important;inset:auto!important;display:block!important;width:100%!important;max-width:720px!important;
-        height:clamp(310px,66vw,500px)!important;min-height:310px!important;margin:4px auto 0!important;border-radius:28px!important;background-position:68% 48%!important
+    @media(max-width:760px){
+      html.nw-product-senior-first-paint body.login-image-page main::after,
+      body.login-image-page.senior-product main::after,
+      body.login-image-page[data-product="senioren"] main::after{
+        grid-column:1!important;grid-row:2!important;width:100%!important;height:clamp(300px,68vw,460px)!important;min-height:300px!important;
+        margin:0!important;border-radius:28px!important;background-position:68% 48%!important
       }
     }
   `;
@@ -143,21 +145,7 @@
     if (!isSeniorLogin || !document.body) return;
     const main = document.querySelector('main');
     if (!main) return;
-
-    const visuals = Array.from(main.querySelectorAll(':scope > .senior-login-visual'));
-    let visual = visuals.shift() || null;
-
-    // Hard guarantee: never allow the senior login portrait to exist twice.
-    visuals.forEach((node) => node.remove());
-
-    if (!visual) {
-      visual = document.createElement('div');
-      visual.className = 'senior-login-visual';
-      visual.setAttribute('aria-hidden', 'true');
-      main.appendChild(visual);
-    }
-
-    visual.id = 'nw-senior-login-visual';
+    main.querySelectorAll(':scope > .senior-login-visual').forEach((node) => node.remove());
   };
 
   if (product && !applyProduct()) {
