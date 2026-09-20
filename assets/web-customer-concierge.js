@@ -2,6 +2,9 @@
   "use strict";
 
   const SESSION_KEY = "scb_web_session";
+  const GUEST_INSTALLATION_KEY = "nw_web_guest_installation_v1";
+  const GUEST_TOKEN_KEY = "nw_web_guest_token_v1";
+  const GUEST_THREAD_KEY = "nw_web_guest_thread_v1";
   const CORE_CONTRACT_VERSION = "core-v1";
   const GATEWAY_CONTRACT_VERSION = "web-gateway-v1";
   const GATEWAY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway";
@@ -18,6 +21,7 @@
   const RESPONSE_STATES = new Set(["ANSWER","QUESTION","ACTION_STARTED","ACTION_PENDING","ACTION_RESULT","ERROR_RESPONSE","HANDOFF","SAFE_TERMINATION"]);
 
   let gatewayReady = false;
+  let guestMode = false;
   let sending = false;
   let activeThreadId = null;
   let threadCache = [];
@@ -56,6 +60,43 @@
   function sessionToken() {
     try { return String(JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null")?.session_token || ""); }
     catch { return ""; }
+  }
+  function guestInstallationId() {
+    try {
+      let value=String(localStorage.getItem(GUEST_INSTALLATION_KEY)||"");
+      if(!/^[A-Za-z0-9._:-]{16,200}$/.test(value)){
+        value="web-guest-"+crypto.randomUUID();
+        localStorage.setItem(GUEST_INSTALLATION_KEY,value);
+      }
+      return value;
+    } catch {
+      return "web-guest-"+crypto.randomUUID();
+    }
+  }
+  function guestToken() {
+    try { return String(localStorage.getItem(GUEST_TOKEN_KEY)||""); }
+    catch { return ""; }
+  }
+  function saveGuestToken(value) {
+    const token=String(value||"");
+    if(!token)return;
+    try { localStorage.setItem(GUEST_TOKEN_KEY,token); } catch {}
+  }
+  function guestThreadId() {
+    try {
+      let value=String(sessionStorage.getItem(GUEST_THREAD_KEY)||"");
+      if(!validUuid(value)){
+        value=crypto.randomUUID();
+        sessionStorage.setItem(GUEST_THREAD_KEY,value);
+      }
+      return value;
+    } catch {
+      return crypto.randomUUID();
+    }
+  }
+  function setGuestThreadId(value) {
+    if(!validUuid(value))return;
+    try { sessionStorage.setItem(GUEST_THREAD_KEY,String(value)); } catch {}
   }
   async function refreshSessionForWrite(){
     const token=sessionToken();
@@ -114,6 +155,7 @@
       active_task_id:raw.active_task_id ? String(raw.active_task_id) : null, response_state:responseState, messages,
       pending_approval:raw.pending_approval && typeof raw.pending_approval === "object" ? raw.pending_approval : null,
       action_refs:Array.isArray(raw.action_refs) ? raw.action_refs : [], error:raw.error && typeof raw.error === "object" ? raw.error : null,
+      ui_actions:Array.isArray(raw.ui_actions) ? raw.ui_actions.filter((item)=>["SIGN_IN","SIGN_UP"].includes(String(item?.type||"").toUpperCase())).map((item)=>({type:String(item.type).toUpperCase(),label:String(item.label||"").trim()})) : [],
       state_version:Number(raw.state_version || 0), correlation_id:String(raw.correlation_id || ""), authoritative
     };
   }
@@ -401,12 +443,28 @@
     if(quoteId){const link=document.createElement("a");link.className="btn red";link.href=`/payg#quote-${encodeURIComponent(quoteId)}`;link.textContent="Preis prüfen und freigeben";actions.appendChild(link);}
     else{const hint=document.createElement("span");hint.textContent="Antworte einfach im Chat mit deiner Entscheidung.";actions.appendChild(hint);}card.appendChild(actions);
   }
+  function renderGuestAccountActions(actions) {
+    if(!guestMode||!Array.isArray(actions)||!actions.length)return;
+    const card=addRuntimeCard("Mit Konto weitermachen","Für persönliche Einstellungen und echte Ausführungen kannst du dich anmelden oder kostenlos ein Konto erstellen.","is-guest-account");
+    if(!card)return;
+    const wrap=document.createElement("div");wrap.className="web-concierge-guest-actions";
+    for(const action of actions){
+      const type=String(action?.type||"").toUpperCase();
+      const link=document.createElement("a");
+      link.className=type==="SIGN_UP"?"btn red":"btn light";
+      link.href=type==="SIGN_UP"?"/registrieren?produkt=prime&paket=free&source=web_guest_chat":"/anmelden?source=web_guest_chat";
+      link.textContent=String(action?.label||"").trim()||(type==="SIGN_UP"?"Konto erstellen":"Anmelden");
+      wrap.appendChild(link);
+    }
+    card.appendChild(wrap);scrollBottom();
+  }
   function renderCoreV1Response(raw) {
     const response=normalizeCoreV1Response(raw);if(!response||!response.authoritative)return false;
     removeTyping();const now=new Date().toISOString();
     for(const message of response.messages)appendMessage("assistant",message.text,now,`a:${response.turn_id}`,"WEB");
-    if(response.pending_approval)renderApproval(response.pending_approval);
+    if(response.pending_approval&&!guestMode)renderApproval(response.pending_approval);
     if(response.error)addRuntimeCard("Das hat noch nicht geklappt",String(response.error.customer_safe_message||"Bitte versuche es noch einmal."),"is-error");
+    renderGuestAccountActions(response.ui_actions);
     return true;
   }
 
@@ -820,11 +878,20 @@
 
   async function sendTurn() {
     const input=document.getElementById("webConciergeInput");if(!(input instanceof HTMLTextAreaElement)||!gatewayReady||sending||channelViewReadOnly)return;
-    const content=input.value.trim();if(!content||content.length>4000)return;if(!activeThreadId)activeThreadId=crypto.randomUUID();
-    try{await refreshSessionForWrite();}catch{window.SCBAuth?.clearLocalAuth?.();location.replace("/anmelden");return;}
+    const content=input.value.trim();if(!content||content.length>4000)return;
+    if(!activeThreadId)activeThreadId=guestMode?guestThreadId():crypto.randomUUID();
+    if(!guestMode){try{await refreshSessionForWrite();}catch{window.SCBAuth?.clearLocalAuth?.();location.replace("/anmelden");return;}}
     const sourceMessageId=crypto.randomUUID(),clientId=`local:${sourceMessageId}`,now=new Date().toISOString();
     appendMessage("user",content,now,clientId,"WEB");input.value="";resizeInput();sending=true;setComposerReady(true);showTyping();
     try{
+      if(guestMode){
+        const response=await gatewayRequest("/web/guest-chat",{method:"POST",auth:false,body:{message:content,source_message_id:sourceMessageId,thread_id:activeThreadId,installation_id:guestInstallationId(),guest_token:guestToken()}});
+        if(response?.ok!==true||response?.environment!=="PROD"||response?.authoritative!==true||response?.guest!==true)throw new Error("guest_gateway_response_not_authoritative");
+        saveGuestToken(response.guest_token);
+        const returnedThreadId=String(response?.thread_id||"");if(validUuid(returnedThreadId)){activeThreadId=returnedThreadId;setGuestThreadId(returnedThreadId);}
+        if(!renderCoreV1Response(response.core))throw new Error("guest_core_response_not_authoritative");
+        return;
+      }
       const response=await gatewayRequest("/web/chat",{method:"POST",body:{message:content,source_message_id:sourceMessageId,thread_id:activeThreadId}});
       if(response?.ok!==true||response?.environment!=="PROD"||response?.authoritative!==true||(response?.thread_id&&response?.thread_id!==activeThreadId))throw new Error("gateway_response_not_authoritative");
       const routed=await dispatchWebResponse(String(response?.core?.turn_id||""),sourceMessageId);
@@ -843,13 +910,13 @@
     }catch(error){
       const reason=String(error?.message||error?.name||"TEXT_CHAT_FAILED");
       reportClientDiagnostic(reason);
-      if(/session_(?:required|invalid)|http_401|http_403/i.test(reason)){
+      if(!guestMode&&/session_(?:required|invalid)|http_401|http_403/i.test(reason)){
         window.SCBAuth?.clearLocalAuth?.();
         location.replace("/anmelden");
         return;
       }
       removeTyping();const row=document.querySelector(`[data-message-id="${CSS.escape(clientId)}"]`);row?.classList.add("is-failed");
-      if(row){const state=document.createElement("span");state.className="web-concierge-message-state";state.textContent=`Nicht gesendet – Fehler: ${reason.slice(0,80)}`;row.appendChild(state);}
+      if(row){const state=document.createElement("span");state.className="web-concierge-message-state";state.textContent=guestMode&&/GUEST_(?:DAILY_MESSAGE_LIMIT|SESSION_CREATION_LIMIT)/i.test(reason)?"Kostenloses Gast-Limit erreicht – melde dich an, um weiterzumachen.":`Nicht gesendet – Fehler: ${reason.slice(0,80)}`;row.appendChild(state);}
     }finally{sending=false;setComposerReady(gatewayReady);input.focus();}
   }
 
@@ -908,32 +975,41 @@ composerInput?.addEventListener("blur",()=>setTimeout(syncIosVisualViewport,120)
 syncIosVisualViewport();
 
     const token=sessionToken();
-    if(!token){location.replace("/anmelden");return;}
-    // Do not block the chat UI on a duplicate client-side session preflight.
-    // Every authenticated gateway request validates the bearer session server-side again.
-    void window.SCBAuth?.validateSession?.().catch(()=>false);
+    guestMode=!token;
+    document.body.classList.toggle("web-concierge-guest",guestMode);
+    if(!guestMode){
+      // Do not block the chat UI on a duplicate client-side session preflight.
+      // Every authenticated gateway request validates the bearer session server-side again.
+      void window.SCBAuth?.validateSession?.().catch(()=>false);
+    }
     applyPersona(null);
     const status=document.getElementById("webConciergeStatus");
     setComposerReady(false);
-    if(status){status.textContent="Verbindung wird hergestellt …";status.classList.remove("is-online");}
-    const initialHistoryPromise=(async()=>{
-      const loaded=await loadThreads({selectFirst:true});
-      if(activeThreadId)await selectThread(activeThreadId,{preserveUntilLoaded:true});
-      else if(!loaded)newChat();
-      return loaded;
-    })();
+    if(status){status.textContent=guestMode?"Kostenloser Gast-Chat":"Verbindung wird hergestellt …";status.classList.remove("is-online");}
+    const initialHistoryPromise=guestMode
+      ? Promise.resolve((()=>{activeThreadId=guestThreadId();emptyChat();return true;})())
+      : (async()=>{
+          const loaded=await loadThreads({selectFirst:true});
+          if(activeThreadId)await selectThread(activeThreadId,{preserveUntilLoaded:true});
+          else if(!loaded)newChat();
+          return loaded;
+        })();
     let ready=await checkReadiness();
     if(!ready){
       await new Promise((resolve)=>setTimeout(resolve,650));
       ready=await checkReadiness();
     }
-    if(status){status.textContent=ready?"Online":"Verbindung momentan nicht möglich";status.classList.toggle("is-online",ready);}
+    if(status){status.textContent=ready?(guestMode?"Kostenlos chatten · keine Anmeldung nötig":"Online"):"Verbindung momentan nicht möglich";status.classList.toggle("is-online",ready);}
     setComposerReady(ready);
     await initialHistoryPromise.catch(()=>false);
     if(ready){
-      renderIntegrationReturnNotice();
-      void refreshPersona(true).then(async()=>{await loadThreads();renderThreads();}).catch(()=>{});
-      startLiveSync();
+      if(guestMode){
+        addRuntimeCard("Willkommen bei NAHWERK","Frag mich direkt, was NAHWERK kann oder wobei du Unterstützung brauchst. Chatten ist hier kostenlos. Für persönliche Ausführungen brauchst du erst ein Konto.","is-guest-welcome");
+      }else{
+        renderIntegrationReturnNotice();
+        void refreshPersona(true).then(async()=>{await loadThreads();renderThreads();}).catch(()=>{});
+        startLiveSync();
+      }
     }
     document.getElementById("webConciergeNewChat")?.addEventListener("click",newChat);
     document.getElementById("webConciergeSend")?.addEventListener("click",sendTurn);
@@ -949,8 +1025,8 @@ syncIosVisualViewport();
       if(!validUuid(activeThreadId)||channelForThreadId(activeThreadId)!=="CHAT")activeThreadId=primaryChatThreadId;
       return activeThreadId;
     },
-    isAllowed:()=>gatewayReady&&!channelViewReadOnly&&channelView==="CHAT"
+    isAllowed:()=>gatewayReady&&!guestMode&&!channelViewReadOnly&&channelView==="CHAT"
   });
-  window.NAHWERKWebCustomerConciergeTestHooks=Object.freeze({configuredEndpoint,configuredHistoryEndpoint,sessionToken,normalizeGatewayReadiness,normalizeCoreV1Response,normalizePersona,applyPersona,appendLinkifiedText,renderCoreV1Response,renderConnectionOffer,renderIntegrationReturnNotice,gatewayRequest,historyRequest,refreshPersona,syncHistory,loadOlderMessages,mergeHistory,CORE_CONTRACT_VERSION,GATEWAY_CONTRACT_VERSION,HISTORY_CONTRACT_VERSION,HISTORY_PAGE_SIZE,SYNC_INTERVAL_MS,PERSONA_SYNC_INTERVAL_MS,GATEWAY_ENDPOINT,HISTORY_ENDPOINT});
+  window.NAHWERKWebCustomerConciergeTestHooks=Object.freeze({configuredEndpoint,configuredHistoryEndpoint,sessionToken,guestInstallationId,guestToken,guestThreadId,normalizeGatewayReadiness,normalizeCoreV1Response,normalizePersona,applyPersona,appendLinkifiedText,renderCoreV1Response,renderConnectionOffer,renderIntegrationReturnNotice,gatewayRequest,historyRequest,refreshPersona,syncHistory,loadOlderMessages,mergeHistory,CORE_CONTRACT_VERSION,GATEWAY_CONTRACT_VERSION,HISTORY_CONTRACT_VERSION,HISTORY_PAGE_SIZE,SYNC_INTERVAL_MS,PERSONA_SYNC_INTERVAL_MS,GATEWAY_ENDPOINT,HISTORY_ENDPOINT});
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();
