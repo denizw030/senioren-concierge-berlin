@@ -297,9 +297,12 @@
       $("orderMeta").textContent = "Bei einem kostenpflichtigen Auftrag siehst du den Preis vor der Freigabe. Ohne Zustimmung wird nichts ausgeführt oder belastet.";
     }
 
-    $("paygContractNotice").innerHTML = provider.setup_available === true
-      ? "<strong>PROD aktiv:</strong> PAYG-Status, Wallet, Zahlungsmethode, Preise und Kosten werden ausschließlich aus dem autoritativen PROD-Vertrag geladen."
-      : "<strong>PAYG-Backend aktiv:</strong> Status, Wallet, Preise und Kosten kommen aus PROD. Für echte Zahlungen fehlt aktuell noch die Stripe-Live-Konfiguration der Server-Runtime.";
+    const contractNotice = $("paygContractNotice");
+    if (contractNotice) {
+      contractNotice.innerHTML = provider.setup_available === true
+        ? "<strong>PROD aktiv:</strong> PAYG-Status, Wallet, Zahlungsmethode, Preise und Kosten werden ausschließlich aus dem autoritativen PROD-Vertrag geladen."
+        : "<strong>PAYG-Backend aktiv:</strong> Status, Wallet, Preise und Kosten kommen aus PROD. Für echte Zahlungen fehlt aktuell noch die Stripe-Live-Konfiguration der Server-Runtime.";
+    }
 
     renderQuotes(data);
     renderActivity(data);
