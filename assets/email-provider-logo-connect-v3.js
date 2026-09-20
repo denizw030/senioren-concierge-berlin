@@ -334,7 +334,7 @@
   }
 
   async function startMicrosoft() {
-    const data = await api("/email/connect/microsoft/web", { method: "POST", body: "{}" });
+    const data = await api("/email/connect/microsoft/web", { method: "POST", body: JSON.stringify({ return_to: RETURN_TO }) });
     await redirectOAuth(data, (host) => host.endsWith("microsoftonline.com"), "MICROSOFT_OAUTH_FAILED");
   }
 
