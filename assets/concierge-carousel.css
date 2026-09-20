@@ -353,3 +353,11 @@ body.senior-product .nw-carousel-select>span,
     left:auto!important;
   }
 }
+
+/* REGISTRATION_MOBILE_IMAGE_RADIUS_V1_20260920
+   Preserve rounded photo corners on the active and neighboring cards. */
+@media(max-width:760px){
+  body.registration-page .nw-carousel-master[data-variant="selection"] .nw-carousel-card img{
+    border-radius:24px 24px 0 0!important;
+  }
+}
