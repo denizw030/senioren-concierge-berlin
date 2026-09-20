@@ -63,7 +63,7 @@ test("registration keeps the hardened passphrase policy and never persists the p
   assert.match(onboarding, /blockedPasswords = new Set/);
   assert.match(onboarding, /web_password: undefined/);
   assert.match(onboarding, /web_password_repeat: undefined/);
-  assert.match(registration, /assets\/onboarding\.js\?v=24/);
+  assert.match(registration, /assets\/onboarding\.js\?v=25/);
 });
 
 test("raw web session tokens are not persisted in localStorage", () => {

@@ -100,3 +100,25 @@ body.payg-account.nw-portal-light :is(.payg-card .btn,.payg-topup button,.payg-q
     padding-right:0;
   }
 }
+
+body.payg-account .payg-guest-handoff{
+  margin:0 0 22px;
+}
+body.payg-account .payg-guest-handoff .payg-guest-request{
+  margin:4px 0 16px;
+  padding:12px 14px;
+  border:1px solid rgba(133,154,182,.14);
+  border-radius:12px;
+  background:rgba(255,255,255,.025);
+  color:inherit;
+  line-height:1.55;
+}
+body.payg-account .payg-guest-handoff .payg-guest-resume{
+  width:auto;
+}
+html[data-nw-portal-theme="light"] body.payg-account .payg-guest-handoff .payg-guest-request,
+body.payg-account.nw-portal-light .payg-guest-handoff .payg-guest-request{
+  border-color:rgba(74,59,34,.14);
+  background:rgba(255,255,255,.55);
+  color:#4e473e;
+}
