@@ -1,0 +1,110 @@
+/* Account header concierge shortcut v1 */
+.nw-header-concierge[hidden]{display:none!important}
+.nw-header-concierge{display:none}
+
+@media(max-width:1280px) and (min-width:521px){
+  body.account-premium-ui .top .nav{position:relative}
+  .nw-header-concierge{
+    position:absolute;
+    z-index:62;
+    top:50%;
+    right:clamp(230px,33vw,360px);
+    transform:translateY(-50%);
+    display:inline-flex;
+    align-items:center;
+    gap:9px;
+    min-height:46px;
+    max-width:190px;
+    padding:5px 9px 5px 5px;
+    border:1px solid rgba(212,175,55,.22);
+    border-radius:999px;
+    background:rgba(10,13,18,.78);
+    color:#f5f3ee!important;
+    text-decoration:none!important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 10px 28px rgba(0,0,0,.16);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+    transition:border-color .18s ease,background .18s ease,transform .18s ease;
+  }
+  .nw-header-concierge:hover{
+    transform:translateY(calc(-50% - 1px));
+    border-color:rgba(218,187,112,.48);
+    background:rgba(15,18,23,.92);
+  }
+  .nw-header-concierge:focus-visible{
+    outline:2px solid rgba(218,187,112,.72);
+    outline-offset:3px;
+  }
+  .nw-header-concierge-avatar{
+    width:35px;
+    height:35px;
+    flex:0 0 35px;
+    border-radius:50%;
+    background-position:center top;
+    background-size:cover;
+    background-repeat:no-repeat;
+    border:1px solid rgba(218,187,112,.34);
+    box-shadow:0 5px 16px rgba(0,0,0,.24);
+  }
+  .nw-header-concierge-copy{
+    display:grid;
+    gap:1px;
+    min-width:0;
+  }
+  .nw-header-concierge-copy small{
+    color:#a7a49d;
+    font-size:9.5px;
+    line-height:1.1;
+    letter-spacing:.025em;
+  }
+  .nw-header-concierge-copy strong{
+    max-width:95px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    color:#f4f1e9;
+    font-size:12.5px;
+    line-height:1.2;
+    letter-spacing:-.012em;
+  }
+  .nw-header-concierge-chat{
+    display:grid;
+    place-items:center;
+    width:27px;
+    height:27px;
+    flex:0 0 27px;
+    border-radius:50%;
+    background:rgba(212,175,55,.1);
+    color:#dcc57f;
+  }
+  .nw-header-concierge-chat svg{
+    width:14px;
+    height:14px;
+    fill:none;
+    stroke:currentColor;
+    stroke-width:1.7;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+  }
+}
+
+@media(max-width:760px) and (min-width:521px){
+  .nw-header-concierge{
+    right:clamp(205px,31vw,250px);
+    max-width:145px;
+    min-height:42px;
+    gap:7px;
+  }
+  .nw-header-concierge-avatar{
+    width:31px;
+    height:31px;
+    flex-basis:31px;
+  }
+  .nw-header-concierge-copy small{display:none}
+  .nw-header-concierge-copy strong{max-width:62px;font-size:11.5px}
+  .nw-header-concierge-chat{width:24px;height:24px;flex-basis:24px}
+}
+
+@media(max-width:520px){
+  .nw-header-concierge{display:none!important}
+}

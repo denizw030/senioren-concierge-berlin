@@ -82,7 +82,7 @@
   save?.addEventListener("click",async()=>{
     const t=token(),selected=radios.find((r)=>r.checked&&!r.disabled)?.value;
     if(!t||!selected)return setFeedback("Bitte melde dich erneut an.","error");
-    save.disabled=true;save.textContent="Wird gespeichert …";setFeedback("WhatsApp-Antwortweg wird gespeichert …");
+    save.disabled=true;save.textContent="Wird gespeichert …";setFeedback("Wird gespeichert …");
     try{
       const r=await fetch(ENDPOINT,{method:"POST",headers:{Authorization:"Bearer "+t,"Content-Type":"application/json"},body:JSON.stringify({preferred_channel:selected}),signal:AbortSignal.timeout(10000)});
       const d=await r.json().catch(()=>({}));
@@ -91,7 +91,7 @@
     }catch(e){
       const code=String(e?.message||"");
       setFeedback(code.includes("UNAVAILABLE")?"Dieser Antwortkanal ist noch nicht verfügbar.":"Die Einstellung konnte gerade nicht gespeichert werden.","error");
-    }finally{save.disabled=false;save.textContent="WhatsApp-Antwortweg speichern"}
+    }finally{save.disabled=false;save.textContent="Speichern"}
   });
   document.addEventListener("click",(event)=>{
     if(event.target?.closest?.('[data-account-tab="concierge"],[data-open-account-tab="concierge"]'))setTimeout(load,0);

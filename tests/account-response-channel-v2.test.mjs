@@ -24,6 +24,15 @@ test("persistent selector is explicitly scoped to WhatsApp jobs",()=>{
   assert.match(js,/WhatsApp-Aufträge werden künftig per/);
 });
 
+test("WhatsApp option discloses the per-answer transmission fee clearly",()=>{
+  assert.match(account,/Für Unternehmensantworten über WhatsApp fallen Meta-Gebühren an/);
+  assert.match(account,/0,06 € pro Antwort/);
+  assert.match(account,/id="responseChannelSave">Speichern<\/button>/);
+  assert.doesNotMatch(account,/WhatsApp-Antwortweg speichern/);
+  assert.match(js,/save\.textContent="Speichern"/);
+  assert.match(css,/\.response-channel-fee-note/);
+});
+
 test("single answers can be delivered elsewhere without changing defaults",()=>{
   assert.match(account,/Einzelne Antwort anders zustellen/);
   assert.match(account,/Schick mir diese Übersicht per E-Mail/);
@@ -39,6 +48,6 @@ test("response channel layout is symmetric and responsive",()=>{
 });
 
 test("response channel assets are cache-busted together",()=>{
-  assert.match(account,/assets\/account-response-channel\.css\?v=4/);
-  assert.match(account,/assets\/account-response-channel\.js\?v=4/);
+  assert.match(account,/assets\/account-response-channel\.css\?v=5/);
+  assert.match(account,/assets\/account-response-channel\.js\?v=5/);
 });
