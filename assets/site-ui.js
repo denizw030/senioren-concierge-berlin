@@ -15,7 +15,10 @@
     }
   };
 
-  const readPortalTheme = () => readStoredPortalTheme() || (isPublicSeniorSurface && !isProdCustomerSurface ? 'light' : 'dark');
+  const readPortalTheme = () => {
+    if (isPublicSeniorSurface && !isProdCustomerSurface) return 'light';
+    return readStoredPortalTheme() || 'dark';
+  };
 
   const applyPortalTheme = (theme) => {
     if (!isThemeAwareSurface) return;
