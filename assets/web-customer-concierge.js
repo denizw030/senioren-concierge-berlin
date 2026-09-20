@@ -1049,7 +1049,7 @@ syncIosVisualViewport();
     await initialHistoryPromise.catch(()=>false);
     if(ready){
       if(guestMode){
-        appendMessage("assistant","Willkommen bei NAHWERK. Du kannst mich sofort kostenlos fragen, was NAHWERK kann oder wobei du Unterstützung brauchst. Für persönliche Ausführungen brauchst du erst ein Konto.",new Date().toISOString(),"guest:welcome","WEB");
+        appendMessage("assistant","Willkommen bei NAHWERK. Sag mir einfach, wobei du Unterstützung suchst. Ich kann dir zeigen, was NAHWERK für dich oder einen Angehörigen übernehmen kann, Funktionen und Preise erklären oder gemeinsam mit dir den passenden Einstieg finden. Fragen und Beratung sind hier kostenlos und ohne Anmeldung möglich. Ein Konto brauchst du erst, wenn ich wirklich etwas für dich ausführen soll.",new Date().toISOString(),"guest:welcome","WEB");
       }else{
         renderIntegrationReturnNotice();
         void refreshPersona(true).then(async()=>{await loadThreads();renderThreads();}).catch(()=>{});
