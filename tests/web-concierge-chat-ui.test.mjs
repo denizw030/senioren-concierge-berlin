@@ -6,7 +6,7 @@ const source = readFileSync(new URL("../assets/web-concierge-chat.js", import.me
 const konto = readFileSync(new URL("../konto.html", import.meta.url), "utf8");
 
 test("legacy compatibility asset may remain loaded for the account entry", () => {
-  assert.match(konto, /assets\/web-concierge-chat\.js\?v=1/);
+  assert.match(konto, /assets\/web-concierge-chat\.js\?v=2/);
 });
 
 test("legacy Shadow chat UI and transport remain permanently disabled", () => {
