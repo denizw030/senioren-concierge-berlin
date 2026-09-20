@@ -9,22 +9,22 @@
     { id: "google", name: "Gmail", mode: "google", logo: "gmail", secret: "", help: "Mit deinem Google-Konto anmelden und NAHWERK freigeben." },
     { id: "microsoft", name: "Outlook", mode: "microsoft", logo: "microsoft", secret: "", help: "Mit deinem Microsoft-Konto anmelden und NAHWERK freigeben." },
     { id: "yahoo", name: "Yahoo Mail", mode: "yahoo", logo: "yahoo", secret: "", help: "Mit deinem Yahoo-Konto anmelden und NAHWERK freigeben." },
-    { id: "icloud", name: "iCloud Mail", mode: "manual", logo: "icloud", secret: "App-spezifisches Passwort", help: "Apple nutzt für Mail-Apps ein app-spezifisches Passwort." },
-    { id: "gmx", name: "GMX", mode: "manual", logo: "gmx", secret: "App-Passwort", help: "Nutze das separate GMX App-Passwort für externe E-Mail-Programme." },
-    { id: "webde", name: "WEB.DE", mode: "manual", logo: "webde", secret: "App-Passwort", help: "Nutze das separate WEB.DE App-Passwort für externe E-Mail-Programme." },
-    { id: "telekom", name: "Telekom Mail", mode: "manual", logo: "telekom", secret: "Passwort für E-Mail-Programme", help: "Nutze das separate Passwort für E-Mail-Programme." },
-    { id: "fastmail", name: "Fastmail", mode: "manual", logo: "fastmail", secret: "App-Passwort", help: "Nutze ein Fastmail App-Passwort. IMAP/SMTP muss in deinem Tarif verfügbar sein." },
-    { id: "zoho", name: "Zoho Mail", mode: "manual", logo: "zoho", secret: "App- oder Mail-Passwort", help: "Wähle dein Zoho-Rechenzentrum. Bei aktivierter Zwei-Faktor-Authentifizierung nutzt du ein App-Passwort." },
-    { id: "ionos", name: "IONOS", mode: "manual", logo: "ionos", secret: "E-Mail-Passwort", help: "Nutze das Passwort deines IONOS-Postfachs." },
-    { id: "strato", name: "STRATO", mode: "manual", logo: "strato", secret: "E-Mail-Passwort", help: "Nutze das Passwort deines STRATO-Postfachs." },
-    { id: "mailcom", name: "mail.com", mode: "manual", logo: "mailcom", secret: "E-Mail-Passwort", help: "Direkter IMAP-Zugriff ist bei mail.com für Premium-Konten vorgesehen." },
-    { id: "freenet", name: "freenet", mode: "manual", logo: "freenet", secret: "E-Mail-Passwort", help: "Nutze dein freenet E-Mail-Passwort und stelle sicher, dass IMAP/SMTP im Postfach aktiviert ist." },
-    { id: "mailboxorg", name: "mailbox.org", mode: "manual", logo: "mailboxorg", secret: "Passwort / Mail-App-Passwort", help: "Bei aktivierter Zwei-Faktor-Authentifizierung nutzt du für Mail-Programme ein Mail-App-Passwort." },
-    { id: "vodafone", name: "Vodafone Mail", mode: "manual", logo: "vodafone", secret: "E-Mail-/IMAP-Passwort", help: "Nutze deine vollständige E-Mail-Adresse und das E-Mail-/IMAP-Passwort." },
-    { id: "arcor", name: "Arcor Mail", mode: "manual", logo: "arcor", secret: "E-Mail-/IMAP-Passwort", help: "Arcor-Postfächer verwenden die sichere Vodafone-Mail-Infrastruktur. Nutze deine vollständige E-Mail-Adresse und das E-Mail-/IMAP-Passwort." },
-    { id: "kabeldeutschland", name: "Kabel Deutschland Mail", mode: "manual", logo: "kabeldeutschland", secret: "E-Mail-/IMAP-Passwort", help: "Kabel-Deutschland-Postfächer verwenden die sichere Vodafone-Mail-Infrastruktur. Nutze deine vollständige E-Mail-Adresse und das E-Mail-/IMAP-Passwort." },
-    { id: "unitymedia", name: "Unitymedia Mail", mode: "manual", logo: "unitymedia", secret: "E-Mail-/IMAP-Passwort", help: "Unitymedia-Postfächer verwenden die sichere Vodafone-Mail-Infrastruktur. Nutze deine vollständige E-Mail-Adresse und das E-Mail-/IMAP-Passwort." },
-    { id: "migadu", name: "Migadu", mode: "manual", logo: "migadu", secret: "Mailbox-Passwort", help: "Nutze die vollständige Mailbox-Adresse und das zugehörige Migadu-Passwort." },
+    { id: "icloud", name: "iCloud Mail", mode: "manual", logo: "icloud", secret: "App-spezifisches Passwort", credentialKind: "app", help: "Apple nutzt für externe Mail-Dienste ein app-spezifisches Passwort.", helpUrl: "https://support.apple.com/de-de/102654", helpAction: "App-Passwort bei Apple erstellen" },
+    { id: "gmx", name: "GMX", mode: "manual", logo: "gmx", secret: "App-Passwort", credentialKind: "app", help: "Für NAHWERK verwendest du bei GMX ein separates App-Passwort – nicht dein normales Login-Passwort.", helpUrl: "https://hilfe.gmx.net/account/logindaten/app-passwort.html", helpAction: "App-Passwort bei GMX erstellen" },
+    { id: "webde", name: "WEB.DE", mode: "manual", logo: "webde", secret: "App-Passwort", credentialKind: "app", help: "Für NAHWERK verwendest du bei WEB.DE ein separates App-Passwort – nicht dein normales Login-Passwort.", helpUrl: "https://hilfe.web.de/account/logindaten/app-passwort.html", helpAction: "App-Passwort bei WEB.DE erstellen" },
+    { id: "telekom", name: "Telekom Mail", mode: "manual", logo: "telekom", secret: "Passwort für E-Mail-Programme", credentialKind: "mail_program", help: "Für NAHWERK brauchst du das separate „Passwort für E-Mail-Programme“ – nicht dein Telekom Login-Passwort.", helpUrl: "https://www.telekom.de/hilfe/apps-dienste/e-mail/programm-passwort-verwalten", helpAction: "Passwort bei Telekom einrichten" },
+    { id: "fastmail", name: "Fastmail", mode: "manual", logo: "fastmail", secret: "App-Passwort", credentialKind: "app", help: "Fastmail benötigt für externe Dienste ein eigenes App-Passwort. IMAP/SMTP muss in deinem Tarif verfügbar sein.", helpUrl: "https://www.fastmail.help/hc/en-us/articles/360058752854-App-passwords", helpAction: "App-Passwort bei Fastmail erstellen" },
+    { id: "zoho", name: "Zoho Mail", mode: "manual", logo: "zoho", secret: "App- oder Mail-Passwort", credentialKind: "conditional_app", help: "Bei aktivierter Zwei-Faktor-Authentifizierung nutzt du ein App-Passwort. NAHWERK übernimmt die technischen Mailserver-Einstellungen.", helpUrl: "https://www.zoho.com/de/mail/help/imap-access.html", helpAction: "Zoho-Anleitung öffnen" },
+    { id: "ionos", name: "IONOS", mode: "manual", logo: "ionos", secret: "E-Mail-Passwort", credentialKind: "mail", help: "Nutze das Passwort genau dieses IONOS-E-Mail-Postfachs. NAHWERK übernimmt IMAP, SMTP, Ports und Verschlüsselung automatisch.", helpUrl: "https://www.ionos.de/hilfe/e-mail/allgemeine-themen/serverinformationen-fuer-imap-pop3-und-smtp/", helpAction: "IONOS-Hilfe öffnen" },
+    { id: "strato", name: "STRATO", mode: "manual", logo: "strato", secret: "E-Mail-Passwort", credentialKind: "mail", help: "Nutze das Passwort genau dieses STRATO-E-Mail-Postfachs. NAHWERK übernimmt IMAP, SMTP, Ports und Verschlüsselung automatisch.", helpUrl: "https://www.strato.de/faq/mail/externes-e-mail-programm-mit-strato-e-mail-adresse-nutzen/", helpAction: "STRATO-Hilfe öffnen" },
+    { id: "mailcom", name: "mail.com", mode: "manual", logo: "mailcom", secret: "E-Mail-Passwort", credentialKind: "mail", help: "Nutze dein E-Mail-Passwort. Direkter IMAP-Zugriff ist bei mail.com für entsprechend freigeschaltete Konten vorgesehen." },
+    { id: "freenet", name: "freenet", mode: "manual", logo: "freenet", secret: "E-Mail-Passwort", credentialKind: "mail", help: "Nutze dein freenet E-Mail-Passwort. IMAP/SMTP muss im Postfach aktiviert sein; die technischen Daten setzt NAHWERK automatisch." },
+    { id: "mailboxorg", name: "mailbox.org", mode: "manual", logo: "mailboxorg", secret: "Passwort / Mail-App-Passwort", credentialKind: "conditional_app", help: "Bei aktivierter Zwei-Faktor-Authentifizierung nutzt du ein Mail-App-Passwort. NAHWERK übernimmt die technischen Einstellungen." },
+    { id: "vodafone", name: "Vodafone Mail", mode: "manual", logo: "vodafone", secret: "E-Mail-/IMAP-Passwort", credentialKind: "mail", help: "Nutze deine vollständige E-Mail-Adresse und das zugehörige E-Mail-/IMAP-Passwort. Server und Ports setzt NAHWERK automatisch." },
+    { id: "arcor", name: "Arcor Mail", mode: "manual", logo: "arcor", secret: "E-Mail-/IMAP-Passwort", credentialKind: "mail", help: "Nutze deine vollständige E-Mail-Adresse und das E-Mail-/IMAP-Passwort. NAHWERK erkennt die passende Vodafone-Mail-Infrastruktur automatisch." },
+    { id: "kabeldeutschland", name: "Kabel Deutschland Mail", mode: "manual", logo: "kabeldeutschland", secret: "E-Mail-/IMAP-Passwort", credentialKind: "mail", help: "Nutze deine vollständige E-Mail-Adresse und das E-Mail-/IMAP-Passwort. NAHWERK setzt die passenden Mailserver automatisch." },
+    { id: "unitymedia", name: "Unitymedia Mail", mode: "manual", logo: "unitymedia", secret: "E-Mail-/IMAP-Passwort", credentialKind: "mail", help: "Nutze deine vollständige E-Mail-Adresse und das E-Mail-/IMAP-Passwort. NAHWERK setzt die passenden Mailserver automatisch." },
+    { id: "migadu", name: "Migadu", mode: "manual", logo: "migadu", secret: "Mailbox-Passwort", credentialKind: "mail", help: "Nutze die vollständige Mailbox-Adresse und das zugehörige Migadu-Passwort. Die technischen Einstellungen übernimmt NAHWERK." },
     { id: "proton", name: "Proton Mail", mode: "unsupported", logo: "proton", secret: "", help: "Proton Mail benötigt Proton Bridge auf einem lokalen Gerät. Eine direkte serverseitige Verbindung zu NAHWERK wird derzeit nicht unterstützt." },
     { id: "tuta", name: "Tuta Mail", mode: "unsupported", logo: "tuta", secret: "", help: "Tuta bietet keinen normalen IMAP-Zugriff. Eine direkte Verbindung zu NAHWERK wird derzeit nicht unterstützt." }
   ]);
@@ -96,7 +96,7 @@
       const link = document.createElement("link");
       link.id = "emailMultiAccountStyles";
       link.rel = "stylesheet";
-      link.href = "/assets/email-multi-account-v1.css?v=20260920-3";
+      link.href = "/assets/email-multi-account-v1.css?v=20260920-4";
       document.head.appendChild(link);
     }
     if (!document.getElementById("emailMultiAccountConciergeRuntime")) {
@@ -183,7 +183,7 @@
     backdrop.id = "emailProviderConnectBackdrop";
     backdrop.className = "email-provider-connect-backdrop";
     backdrop.hidden = true;
-    backdrop.innerHTML = '<section class="email-provider-connect-modal" role="dialog" aria-modal="true" aria-labelledby="emailProviderConnectTitle"><div class="email-provider-connect-head"><div class="email-provider-connect-identity"><span id="emailProviderConnectLogo"></span><div><h3 id="emailProviderConnectTitle">E-Mail verbinden</h3><p id="emailProviderConnectSubtitle">Sicher mit NAHWERK verbinden</p></div></div><button class="email-provider-connect-close" id="emailProviderConnectClose" type="button" aria-label="Schließen">×</button></div><p class="email-provider-connect-copy" id="emailProviderConnectCopy"></p><div class="email-provider-account-list" id="emailProviderAccountList"></div><button class="email-provider-add-account" id="emailProviderAddAccount" type="button" hidden>+ Weiteres Konto verbinden</button><div id="emailProviderCredentialFields"><label class="email-provider-connect-field"><span>E-Mail-Adresse</span><input id="emailProviderConnectEmail" type="email" inputmode="email" autocomplete="email" maxlength="320"></label><label class="email-provider-connect-field"><span id="emailProviderConnectSecretLabel">Passwort</span><input id="emailProviderConnectSecret" type="password" autocomplete="new-password" maxlength="512"></label><div id="emailProviderZohoOptions" hidden><label class="email-provider-connect-field"><span>Zoho-Rechenzentrum</span><select id="emailProviderZohoDc"><option value="com">Global (.com)</option><option value="eu">Europa (.eu)</option><option value="in">Indien (.in)</option><option value="com.au">Australien (.com.au)</option><option value="jp">Japan (.jp)</option><option value="ca">Kanada (.ca)</option><option value="sa">Saudi-Arabien (.sa)</option></select></label><label class="email-provider-connect-field"><span><input id="emailProviderZohoOrganization" type="checkbox"> Organisations-/Business-Postfach</span></label></div><p class="email-provider-connect-help" id="emailProviderConnectHelp"></p></div><div class="email-provider-connect-message" id="emailProviderConnectMessage" aria-live="polite"></div><div class="email-provider-connect-actions"><button class="email-provider-connect-secondary" id="emailProviderCancelAdd" type="button" hidden>Abbrechen</button><button class="email-provider-connect-primary" id="emailProviderConnectSubmit" type="button">Verbinden</button></div></section>';
+    backdrop.innerHTML = '<section class="email-provider-connect-modal" role="dialog" aria-modal="true" aria-labelledby="emailProviderConnectTitle"><div class="email-provider-connect-head"><div class="email-provider-connect-identity"><span id="emailProviderConnectLogo"></span><div><h3 id="emailProviderConnectTitle">E-Mail verbinden</h3><p id="emailProviderConnectSubtitle">Sicher mit NAHWERK verbinden</p></div></div><button class="email-provider-connect-close" id="emailProviderConnectClose" type="button" aria-label="Schließen">×</button></div><p class="email-provider-connect-copy" id="emailProviderConnectCopy"></p><div class="email-provider-account-list" id="emailProviderAccountList"></div><button class="email-provider-add-account" id="emailProviderAddAccount" type="button" hidden>+ Weiteres Konto verbinden</button><div id="emailProviderCredentialFields"><label class="email-provider-connect-field"><span>E-Mail-Adresse</span><input id="emailProviderConnectEmail" type="email" inputmode="email" autocomplete="email" maxlength="320"></label><label class="email-provider-connect-field"><span id="emailProviderConnectSecretLabel">Passwort</span><input id="emailProviderConnectSecret" type="password" autocomplete="new-password" maxlength="512"></label><div id="emailProviderZohoOptions" hidden><label class="email-provider-connect-field"><span>Zoho-Rechenzentrum</span><select id="emailProviderZohoDc"><option value="com">Global (.com)</option><option value="eu">Europa (.eu)</option><option value="in">Indien (.in)</option><option value="com.au">Australien (.com.au)</option><option value="jp">Japan (.jp)</option><option value="ca">Kanada (.ca)</option><option value="sa">Saudi-Arabien (.sa)</option></select></label><label class="email-provider-connect-field"><span><input id="emailProviderZohoOrganization" type="checkbox"> Organisations-/Business-Postfach</span></label></div><div class="email-provider-credential-guide" id="emailProviderCredentialGuide" hidden><strong id="emailProviderCredentialGuideTitle"></strong><span id="emailProviderCredentialGuideText"></span><a id="emailProviderCredentialHelpLink" href="#" target="_blank" rel="noopener noreferrer" hidden></a></div><p class="email-provider-connect-help" id="emailProviderConnectHelp"></p><p class="email-provider-security-note">NAHWERK trägt Server, Ports und Verschlüsselung automatisch ein. Deine Zugangsdaten werden nicht im Browser dauerhaft gespeichert.</p></div><div class="email-provider-connect-message" id="emailProviderConnectMessage" aria-live="polite"></div><div class="email-provider-connect-actions"><button class="email-provider-connect-secondary" id="emailProviderCancelAdd" type="button" hidden>Abbrechen</button><button class="email-provider-connect-primary" id="emailProviderConnectSubmit" type="button">Verbinden</button></div></section>';
     document.body.appendChild(backdrop);
     backdrop.addEventListener("click", (event) => { if (event.target === backdrop) closeModal(); });
     document.getElementById("emailProviderConnectClose")?.addEventListener("click", closeModal);
@@ -223,6 +223,32 @@
     setText(document.getElementById("emailProviderConnectCopy"), rows.length ? "Wähle das Konto, das du trennen möchtest. Weitere Konten kannst du jederzeit zusätzlich verbinden." : "Gib nur deine E-Mail-Adresse und das für Mail-Apps vorgesehene Passwort ein. Server, Ports und technische Einstellungen übernimmt NAHWERK.");
     setText(document.getElementById("emailProviderConnectSecretLabel"), selected.secret || "Passwort");
     setText(document.getElementById("emailProviderConnectHelp"), selected.help);
+    const guide = document.getElementById("emailProviderCredentialGuide");
+    const guideTitle = document.getElementById("emailProviderCredentialGuideTitle");
+    const guideText = document.getElementById("emailProviderCredentialGuideText");
+    const helpLink = document.getElementById("emailProviderCredentialHelpLink");
+    if (selected.mode === "manual") {
+      const kind = String(selected.credentialKind || "mail");
+      const title = kind === "mail_program" ? "Welches Passwort?" : kind === "app" ? "App-Passwort verwenden" : kind === "conditional_app" ? "Passwort prüfen" : "E-Mail-Passwort verwenden";
+      const text = kind === "mail_program"
+        ? "Nicht dein normales Kundenkonto-Passwort. Verwende das separate Passwort für E-Mail-Programme."
+        : kind === "app"
+          ? "Nicht dein normales Login-Passwort. Erstelle beim Anbieter ein separates App-Passwort für NAHWERK."
+          : kind === "conditional_app"
+            ? "Wenn dein Anbieter Zwei-Faktor-Anmeldung nutzt, brauchst du meist ein separates App-Passwort."
+            : "Verwende das Passwort des E-Mail-Postfachs. Technische Serverdaten brauchst du nicht.";
+      if (guide) guide.hidden = false;
+      setText(guideTitle, title);
+      setText(guideText, text);
+      if (helpLink) {
+        const href = String(selected.helpUrl || "");
+        helpLink.hidden = !href;
+        helpLink.href = href || "#";
+        helpLink.textContent = String(selected.helpAction || "Hilfe beim Anbieter öffnen");
+      }
+    } else if (guide) {
+      guide.hidden = true;
+    }
     renderAccounts();
 
     const fields = document.getElementById("emailProviderCredentialFields");
