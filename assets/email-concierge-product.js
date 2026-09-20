@@ -79,6 +79,9 @@
   let connected = false;
   let host = null;
   let dashboard = null;
+  let dashboardLoadPromise = null;
+  let dashboardLoadedAt = 0;
+  const DASHBOARD_DEDUPE_MS = 10000;
   let classification = null;
   let classificationBucket = "UNIMPORTANT";
   let classificationLoading = false;
@@ -629,16 +632,23 @@
     } catch { classification = null; }
     finally { classificationLoading = false; render(); }
   }
-  async function loadDashboard(showLoading = true) {
+  async function loadDashboard(showLoading = true, force = false) {
     if (!connected) return;
-    if (showLoading) { dashboard = null; classification = null; render(); }
-    try {
-      const dashboardData = await request("/email/concierge/dashboard");
-      dashboard = normalizeDashboard(dashboardData);
-      if (!dashboard) throw new Error("EMAIL_PROVIDER_UNAVAILABLE");
-    } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
-    render();
-    if (dashboard) void loadClassification();
+    if (dashboardLoadPromise) return dashboardLoadPromise;
+    if (!force && dashboard && Date.now() - dashboardLoadedAt < DASHBOARD_DEDUPE_MS) { render(); return dashboard; }
+    dashboardLoadPromise = (async () => {
+      if (showLoading && !dashboard) { classification = null; render(); }
+      try {
+        const dashboardData = await request("/email/concierge/dashboard");
+        dashboard = normalizeDashboard(dashboardData);
+        if (!dashboard) throw new Error("EMAIL_PROVIDER_UNAVAILABLE");
+        dashboardLoadedAt = Date.now();
+      } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
+      render();
+      if (dashboard) void loadClassification();
+      return dashboard;
+    })().finally(() => { dashboardLoadPromise = null; });
+    return dashboardLoadPromise;
   }
   function canonicalGoogleConnection(rows = globalThis.__nahwerkEmailConnections) {
     if (!Array.isArray(rows)) return null;
@@ -648,7 +658,7 @@
     const canonical = canonicalGoogleConnection();
     connected = canonical === null ? isConnected === true : canonical;
     ensureHost();
-    if (!connected) { dashboard = null; classification = null; chatMessages = []; render(); return; }
+    if (!connected) { dashboard = null; dashboardLoadedAt = 0; classification = null; chatMessages = []; render(); return; }
     await loadDashboard();
   }
   window.addEventListener("nahwerk:email-connections-updated", (event) => {
@@ -658,7 +668,7 @@
   });
   globalThis.NAHWERKEmailConciergeProduct = Object.freeze({
     setConnectionState,
-    refresh() { return loadDashboard(false); }
+    refresh() { return loadDashboard(false, true); }
   });
   ensureHost();
   window.dispatchEvent(new CustomEvent("nahwerk:email-concierge-product-ready"));
