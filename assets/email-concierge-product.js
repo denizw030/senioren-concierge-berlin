@@ -105,15 +105,22 @@
       .ecp-class-reason{margin:7px 0 0;font-size:.72rem;line-height:1.4;opacity:.55}
       .ecp-sort-scope{margin:12px 0 0;font-size:.74rem;line-height:1.45;opacity:.58}
       .ecp-detail .ecp-class-actions{justify-content:flex-start;margin-top:12px}
-      .ecp-rule-heading{margin:14px 0 8px;font-size:.75rem;font-weight:700;letter-spacing:.03em;opacity:.7}
-      .ecp-rule{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0;border-top:1px solid rgba(127,127,127,.16)}
-      .ecp-rule>div:first-child{display:grid;gap:4px}.ecp-rule small{font-size:.72rem;line-height:1.35;opacity:.65}.ecp-rule-match{opacity:.5!important}
-      .ecp-rule-actions,.ecp-rule-controls{display:flex;flex-wrap:wrap;gap:7px;justify-content:flex-end;align-items:center}
-      .ecp-rule-select{max-width:190px;border:1px solid rgba(127,127,127,.24);border-radius:10px;background:transparent;color:inherit;padding:7px 8px;font:inherit;font-size:.72rem}
-      .ecp-rule-toggle{display:flex;gap:6px;align-items:center;font-size:.72rem}.ecp-rule-toggle input{accent-color:currentColor}
-      .ecp-settings-details{margin-top:14px;border-top:1px solid rgba(127,127,127,.16);padding-top:10px}.ecp-settings-details>summary{cursor:pointer;font-size:.76rem;font-weight:650}
-      @media(max-width:640px){.ecp-rule{grid-template-columns:1fr}.ecp-rule-actions,.ecp-rule-controls{justify-content:flex-start}.ecp-rule-select{max-width:100%;width:100%}}
-      @media(max-width:980px){.ecp-summary{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+      .ecp-rule-heading{margin:16px 0 9px;font-size:.75rem;font-weight:700;letter-spacing:.03em;opacity:.7}
+      .ecp-rule{min-width:0}
+      .ecp-rule-suggestion{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0;border-top:1px solid rgba(127,127,127,.16)}
+      .ecp-rule-personal{display:grid;grid-template-columns:1fr;gap:12px;margin:10px 0 0;padding:15px 16px;border:1px solid rgba(127,127,127,.16);border-radius:14px;background:rgba(127,127,127,.025)}
+      .ecp-rule-copy{display:grid;gap:4px;min-width:0}
+      .ecp-rule-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;min-width:0}
+      .ecp-rule-title-row>strong{min-width:0;font-size:.9rem;line-height:1.38;overflow-wrap:break-word;word-break:normal}
+      .ecp-rule small{display:block;font-size:.72rem;line-height:1.42;opacity:.65;overflow-wrap:break-word}.ecp-rule-match{opacity:.5!important}
+      .ecp-rule-actions{display:flex;flex-wrap:wrap;gap:7px;justify-content:flex-end;align-items:center}
+      .ecp-rule-controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;min-width:0}
+      .ecp-rule-select{width:100%;max-width:none;min-width:0;min-height:42px;border:1px solid rgba(127,127,127,.24);border-radius:11px;background:rgba(127,127,127,.025);color:inherit;padding:0 12px;font:inherit;font-size:.75rem}
+      .ecp-rule-toggle{display:inline-flex;flex:0 0 auto;gap:7px;align-items:center;min-height:28px;font-size:.73rem;white-space:nowrap}.ecp-rule-toggle input{accent-color:currentColor}
+      .ecp-rule-personal>.ecp-rule-controls>.ecp-link-button{justify-self:end;min-height:38px;padding:8px 14px}
+      .ecp-settings-details{margin-top:16px;border-top:1px solid rgba(127,127,127,.16);padding-top:12px}.ecp-settings-details>summary{cursor:pointer;font-size:.76rem;font-weight:650}
+      @media(max-width:1180px){.ecp-layout{grid-template-columns:1fr}.ecp-summary{grid-template-columns:repeat(3,minmax(0,1fr))!important}.ecp-rule-suggestion{grid-template-columns:1fr}.ecp-rule-actions{justify-content:flex-start}}
+      @media(max-width:640px){.ecp-rule-personal{padding:14px}.ecp-rule-title-row{gap:10px}.ecp-rule-controls{grid-template-columns:1fr}.ecp-rule-personal>.ecp-rule-controls>.ecp-link-button{justify-self:stretch;width:100%}.ecp-rule-actions{justify-content:flex-start}.ecp-rule-select{width:100%}}
       @media(max-width:640px){.ecp-summary{grid-template-columns:repeat(2,minmax(0,1fr))!important}.ecp-mail-side{justify-items:start;min-width:0}.ecp-class-actions{justify-content:flex-start}}
     `;
     document.head.append(style);
@@ -449,23 +456,24 @@
     box.append(copy, actions); card.append(box);
   }
   function renderPersonalRule(card, rule) {
-    const row = el("div", "ecp-rule"), copy = el("div");
-    copy.append(el("strong", "", text(rule.title, 220) || "Persönliche Regel"), el("small", "", (rule.classification_label || "") + " · " + (rule.action_label || "")));
+    const row = el("div", "ecp-rule ecp-rule-personal"), copy = el("div", "ecp-rule-copy"), titleRow = el("div", "ecp-rule-title-row");
+    const toggle = el("label", "ecp-rule-toggle"), input = el("input"); input.type = "checkbox"; input.checked = rule.active === true; input.setAttribute("aria-label", "Regel aktiv");
+    input.addEventListener("change", async () => { input.disabled = true; try { await request("/email/concierge/rules/update", { method: "POST", body: { rule_id: rule.id, active: input.checked } }); await refreshRules(); } catch (error) { input.checked = !input.checked; showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); } finally { input.disabled = false; } });
+    toggle.append(input, el("span", "", rule.active ? "Aktiv" : "Aus"));
+    titleRow.append(el("strong", "", text(rule.title, 220) || "Persönliche Regel"), toggle);
+    copy.append(titleRow, el("small", "", (rule.classification_label || "") + " · " + (rule.action_label || "")));
     if (rule.matcher_label) copy.append(el("small", "ecp-rule-match", rule.matcher_label));
     if (rule.last_applied_at) copy.append(el("small", "ecp-rule-meta", "Zuletzt angewandt: " + fmtDate(rule.last_applied_at) + (number(rule.hit_count) ? " · " + number(rule.hit_count) + " Treffer" : "")));
     const controls = el("div", "ecp-rule-controls");
     const select = el("select", "ecp-rule-select"); select.setAttribute("aria-label", "Aktion für " + text(rule.title, 160));
     ruleActionChoices(rule).forEach(([value, label]) => { const option = el("option", "", label); option.value = value; option.selected = rule.action === value; select.append(option); });
     select.addEventListener("change", async () => { select.disabled = true; try { await request("/email/concierge/rules/update", { method: "POST", body: { rule_id: rule.id, action: select.value } }); await refreshRules(); } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); } finally { select.disabled = false; } });
-    const toggle = el("label", "ecp-rule-toggle"), input = el("input"); input.type = "checkbox"; input.checked = rule.active === true; input.setAttribute("aria-label", "Regel aktiv");
-    input.addEventListener("change", async () => { input.disabled = true; try { await request("/email/concierge/rules/update", { method: "POST", body: { rule_id: rule.id, active: input.checked } }); await refreshRules(); } catch (error) { input.checked = !input.checked; showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); } finally { input.disabled = false; } });
-    toggle.append(input, el("span", "", rule.active ? "Aktiv" : "Aus"));
     const remove = button("Löschen", "ecp-link-button"); remove.addEventListener("click", async () => {
       if (!confirm("Diese persönliche E-Mail-Regel wirklich löschen?")) return;
       try { await request("/email/concierge/rules/delete", { method: "POST", body: { rule_id: rule.id } }); await refreshRules(); }
       catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
     });
-    controls.append(select, toggle, remove); row.append(copy, controls); card.append(row);
+    controls.append(select, remove); row.append(copy, controls); card.append(row);
   }
   function renderSettings(card) {
     const suggestions = list(dashboard.suggestions), rules = list(dashboard.rules);

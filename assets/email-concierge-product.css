@@ -10,3 +10,13 @@
 .ecp-layout>.ecp-stack:last-child>.ecp-card:nth-child(3){order:4}
 .ecp-layout>.ecp-stack:last-child>.ecp-card:nth-child(4){order:5}
 @media(max-width:640px){#accountEmailCard>.email-concierge-product{padding-bottom:22px;margin-bottom:22px}}
+
+/* Personal-rule readability: stack the E-Mail dashboard before cards become cramped. */
+@media(max-width:1180px){
+  .ecp-layout{grid-template-columns:1fr}
+}
+
+/* The account already exposes Concierge navigation; do not cover E-Mail controls with the floating shortcut. */
+body.account-premium-ui:has(#accountEmailCard:not([hidden])) .nw-floating-concierge{
+  display:none!important;
+}

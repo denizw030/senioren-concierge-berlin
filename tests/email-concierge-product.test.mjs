@@ -74,8 +74,14 @@ test("account integration loads product assets only from first-party paths and s
 
 test("product layout is responsive across desktop and mobile",()=>{
   assert.match(css,/grid-template-columns:minmax\(0,1\.45fr\) minmax\(280px,\.8fr\)/);
-  assert.match(css,/@media\(max-width:980px\)/);
+  assert.match(css,/@media\(max-width:1180px\)/);
   assert.match(css,/@media\(max-width:640px\)/);
+  assert.match(css,/body\.account-premium-ui:has\(#accountEmailCard:not\(\[hidden\]\)\) \.nw-floating-concierge/);
+  assert.match(js,/ecp-rule ecp-rule-personal/);
+  assert.match(js,/ecp-rule-title-row/);
+  assert.match(js,/\.ecp-rule-controls\{display:grid;grid-template-columns:minmax\(0,1fr\) auto/);
+  assert.match(integration,/email-concierge-product\.css\?v=20260920-3/);
+  assert.match(integration,/email-concierge-product\.js\?v=20260920-3/);
 });
 
 
