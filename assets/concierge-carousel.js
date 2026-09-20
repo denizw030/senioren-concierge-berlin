@@ -70,6 +70,11 @@
     root.setAttribute("aria-label",root.dataset.label||"KI-Concierge auswählen");
     root.innerHTML=`<button class="nw-carousel-arrow prev" type="button" aria-label="Vorherigen Concierge anzeigen">‹</button><div class="nw-carousel-stage" tabindex="0" aria-roledescription="Karussell"><div class="nw-carousel-track"></div></div><button class="nw-carousel-arrow next" type="button" aria-label="Nächsten Concierge anzeigen">›</button><div class="nw-carousel-info" aria-live="polite"><p class="nw-carousel-name"></p><p class="nw-carousel-description"></p><p class="nw-carousel-language-note">Die Hörprobe startet in der Herkunftssprache. Die Sprache können Sie direkt darunter wechseln.</p><div class="nw-carousel-actions"><span class="nw-carousel-voice-host"></span><button class="nw-carousel-status" type="button" hidden>Ausgewählt</button></div></div>${inputName?`<input type="hidden" name="${inputName}" value="${profiles[active].key}">`:""}`;
     const stage=root.querySelector(".nw-carousel-stage"),track=root.querySelector(".nw-carousel-track"),name=root.querySelector(".nw-carousel-name"),description=root.querySelector(".nw-carousel-description"),voiceHost=root.querySelector(".nw-carousel-voice-host"),status=root.querySelector(".nw-carousel-status"),input=inputName?root.querySelector(`[name="${inputName}"]`):null;
+    const prevArrow=root.querySelector(".nw-carousel-arrow.prev"),nextArrow=root.querySelector(".nw-carousel-arrow.next");
+    if(document.body?.classList.contains("registration-page")&&variant==="selection"&&stage&&prevArrow&&nextArrow){
+      stage.append(prevArrow,nextArrow);
+      root.dataset.registrationArrowsInStage="1";
+    }
 
     function goToRegistration(index=active){
       if(!registerUrl)return;
