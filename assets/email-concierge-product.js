@@ -25,9 +25,9 @@
   ];
   const ERROR_COPY = Object.freeze({
     UNAUTHENTICATED: "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.",
-    EMAIL_CONNECTION_NOT_CONNECTED: "Gmail ist nicht verbunden.",
-    EMAIL_PROVIDER_UNAVAILABLE: "Der E-Mail-Concierge ist gerade nicht erreichbar.",
-    EMAIL_PROVIDER_BUSY: "Gmail ist gerade kurz ausgelastet. Deine gespeicherten Sortierungen und Regeln bleiben verfügbar; versuche die Gmail-Aktion gleich noch einmal.",
+    EMAIL_CONNECTION_NOT_CONNECTED: "Das E-Mail-Konto ist nicht verbunden.",
+    EMAIL_PROVIDER_UNAVAILABLE: "Der E-Mail-Concierge ist gerade nicht vollständig erreichbar. Deine verbundenen Postfächer bleiben verfügbar.",
+    EMAIL_PROVIDER_BUSY: "Der E-Mail-Anbieter ist gerade kurz ausgelastet. Deine gespeicherten Sortierungen und Regeln bleiben verfügbar; versuche es gleich noch einmal.",
     EMAIL_QUERY_INVALID: "Diese Anfrage konnte nicht verarbeitet werden.",
     EMAIL_CLASSIFICATION_INVALID: "Diese Sortierung konnte nicht gespeichert werden.",
     MESSAGE_ID_REQUIRED: "Diese E-Mail konnte nicht geöffnet werden.",
@@ -72,6 +72,20 @@
         ? { enabled: data.notification_preference.enabled === true, target_channel: text(data.notification_preference.target_channel, 30) || "PORTAL" }
         : { enabled: false, target_channel: "PORTAL" },
       channels: data.channels && typeof data.channels === "object" ? data.channels : {}
+    };
+  }
+  function bootstrapDashboard() {
+    return {
+      product: { name: "E-Mail-Concierge", state: "ACTIVE" },
+      connection: {},
+      chat: { has_user_message: false },
+      summary: { recent:0,today:0,unread:0,important:0,needs_reply:0,invoices:0,appointments:0,travel:0,orders:0,support_contracts:0,spam_likely:0,suspicious:0,text:"" },
+      protection: {},
+      settings: {},
+      highlights: [], warnings: [], hints: [], drafts: [], activities: [], rules: [], suggestions: [],
+      classification_review: null,
+      notification_preference: { enabled:false, target_channel:"PORTAL" },
+      channels: {}
     };
   }
   function normalizeClassification(data) {
@@ -221,8 +235,12 @@
     }
     if (requestBody !== null) { headers["Content-Type"] = "application/json"; init.body = JSON.stringify(requestBody); }
     let response;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 18000);
+    init.signal = controller.signal;
     try { response = await fetch(BASE + requestPath, init); }
     catch { throw new Error("EMAIL_PROVIDER_UNAVAILABLE"); }
+    finally { clearTimeout(timeout); }
     const data = await response.json().catch(() => null);
     if (!response.ok || (!allowBare && data?.ok !== true)) throw new Error(errorCode(data));
     return data;
@@ -1229,6 +1247,13 @@
   }
   async function loadClassification() {
     if (!connected || classificationLoading) return;
+    const active = connectionById(activeConnectionId);
+    if (active && String(active.provider || "").toUpperCase() !== "GOOGLE") {
+      classification = null;
+      classificationError = "";
+      render();
+      return;
+    }
     classificationLoading = true;
     classificationError = "";
     render();
@@ -1253,12 +1278,21 @@
     dashboardLoadPromise = (async () => {
       if (showLoading && !dashboard) { classification = null; render(); }
       try {
-        const dashboardData = await request("/email/concierge/dashboard");
-        dashboard = normalizeDashboard(dashboardData);
-        if (!dashboard) throw new Error("EMAIL_PROVIDER_UNAVAILABLE");
-        chatStarted = chatStarted || dashboard.chat?.has_user_message === true;
+        const googleConnection = emailConnections.find((row) => String(row?.provider || "").toUpperCase() === "GOOGLE" && String(row?.state || "").toUpperCase() === "CONNECTED");
+        if (googleConnection) {
+          const dashboardData = await request("/email/concierge/dashboard", { connectionId: String(googleConnection.connection_id || "") });
+          dashboard = normalizeDashboard(dashboardData);
+          if (!dashboard) throw new Error("EMAIL_PROVIDER_UNAVAILABLE");
+          chatStarted = chatStarted || dashboard.chat?.has_user_message === true;
+        } else {
+          dashboard = bootstrapDashboard();
+        }
         dashboardLoadedAt = Date.now();
-      } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
+      } catch (error) {
+        dashboard = bootstrapDashboard();
+        dashboardLoadedAt = Date.now();
+        showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE");
+      }
       render();
       if (dashboard) {
         void loadClassification();
@@ -1268,12 +1302,12 @@
     })().finally(() => { dashboardLoadPromise = null; });
     return dashboardLoadPromise;
   }
-  function canonicalGoogleConnection(rows = globalThis.__nahwerkEmailConnections) {
+  function canonicalConnectedState(rows = globalThis.__nahwerkEmailConnections) {
     if (!Array.isArray(rows)) return null;
-    return rows.some((row) => String(row?.provider || "").toUpperCase() === "GOOGLE" && String(row?.state || row?.status || "").toUpperCase() === "CONNECTED");
+    return rows.some((row) => String(row?.state || row?.status || "").toUpperCase() === "CONNECTED");
   }
   async function setConnectionState(isConnected) {
-    const canonical = canonicalGoogleConnection();
+    const canonical = canonicalConnectedState();
     connected = canonical === null ? isConnected === true : canonical;
     ensureHost();
     if (!connected) {
@@ -1288,7 +1322,7 @@
   }
   window.addEventListener("nahwerk:email-connections-updated", (event) => {
     const rows = Array.isArray(event.detail?.connections) ? event.detail.connections : globalThis.__nahwerkEmailConnections;
-    const canonical = canonicalGoogleConnection(rows);
+    const canonical = canonicalConnectedState(rows);
     if (canonical !== null) void setConnectionState(canonical);
     else if (connected) void loadConnections().then(()=>loadMailboxFolder());
   });
