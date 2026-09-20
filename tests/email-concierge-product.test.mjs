@@ -82,8 +82,8 @@ test("product layout is responsive across desktop and mobile",()=>{
   assert.match(js,/ecp-rule ecp-rule-personal/);
   assert.match(js,/ecp-rule-title-row/);
   assert.match(js,/\.ecp-rule-controls\{display:grid;grid-template-columns:minmax\(0,1fr\) auto/);
-  assert.match(integration,/email-concierge-product\.css\?v=20260920-8/);
-  assert.match(integration,/email-concierge-product\.js\?v=20260920-11/);
+  assert.match(integration,/email-concierge-product\.css\?v=20260920-9/);
+  assert.match(integration,/email-concierge-product\.js\?v=20260920-12/);
 });
 
 
@@ -176,9 +176,9 @@ test("mailbox loading failure is visible and automatically retried once",()=>{
   assert.match(js,/setTimeout\(\(\)=>\{ if \(connected && !classificationLoading\) void loadClassification\(\); \},1600\)/);
 });
 
-test("mailbox keeps a visible loading state for both remote folders and classification views",()=>{
+test("mailbox keeps a visible loading state for both physical and virtual folder views",()=>{
   assert.match(js,/\.\.\.list\(dashboard\?\.highlights\), \.\.\.list\(dashboard\?\.warnings\)/);
-  assert.match(js,/const loading = remoteFolderMode\(\) \? mailboxFolderLoading : classificationLoading/);
+  assert.match(js,/const loading = folderBackedMode\(\) \? mailboxFolderLoading : classificationLoading/);
   assert.match(js,/!rows\.length && loading/);
 });
 
@@ -248,7 +248,7 @@ test("remote folder loading uses the authenticated concierge API",()=>{
 test("mailbox refresh failure preserves the last successful message list",()=>{
   assert.match(js,/const previousRows = mailboxFolderRows\.slice\(\)/);
   assert.match(js,/if \(previousRows\.length\) mailboxFolderRows = previousRows/);
-  assert.match(js,/searchRemoteFolder\(connection, mailboxFolder, 30\)/);
+  assert.match(js,/searchRemoteFolder\(connection,mailboxFolder,30\)/);
 });
 
 test("classification updates immediately without reloading the full classification snapshot",()=>{
@@ -263,4 +263,36 @@ test("mailbox error retry button is centered in a dedicated state",()=>{
   assert.match(js,/ecp-tb-empty ecp-tb-error-state/);
   assert.match(css,/\.ecp-tb-error-state\{min-height:220px;display:grid;align-content:center;justify-items:center/);
   assert.match(css,/\.ecp-tb-error-state \.ecp-tb-toolbar-button/);
+});
+
+
+test("classified messages remain visible after being moved out of Inbox",()=>{
+  assert.match(js,/classificationFolderMode/);
+  assert.match(js,/\/email\/concierge\/classification\/view/);
+  assert.match(js,/classificationKnownCounts/);
+  assert.match(js,/mailbox_location==="TRASH"/);
+  assert.match(js,/Papierkorb/);
+});
+
+test("physical mailbox counts use live Gmail folder metadata rather than classification totals",()=>{
+  assert.match(js,/mailboxFolderCounts/);
+  assert.match(js,/folder_meta/);
+  assert.match(js,/messages_unread/);
+  assert.doesNotMatch(js,/if \(folder === "INBOX"\) return classification\?\.total/);
+});
+
+test("mailbox refreshes every minute and when the tab becomes visible",()=>{
+  assert.match(js,/setInterval\(\(\)=>\{ void refreshLiveMailbox\(\); \},60000\)/);
+  assert.match(js,/visibilitychange/);
+  assert.match(js,/await loadConnections\(\); await loadMailboxFolder\(\)/);
+});
+
+test("bulk trash of unwichtig keeps the virtual Unwichtig view instead of erasing it",()=>{
+  assert.match(js,/movedUnimportantToTrash/);
+  assert.match(js,/row\.mailbox_location="TRASH"/);
+  assert.match(js,/await loadMailboxFolder\(\)/);
+});
+
+test("classification location badge is styled",()=>{
+  assert.match(css,/\.ecp-tb-location-flag/);
 });

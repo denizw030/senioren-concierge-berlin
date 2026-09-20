@@ -96,6 +96,7 @@ body.account-premium-ui:has(#accountEmailCard:not([hidden])) .nw-floating-concie
 .ecp-tb-subject{font-size:.78rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ecp-tb-snippet{font-size:.7rem;line-height:1.35;color:#aeb4bc;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 .ecp-tb-reply-flag{justify-self:start;padding:3px 6px;border-radius:4px;background:#513e13;color:#efd782;font-size:.61rem}
+.ecp-tb-location-flag{justify-self:start;padding:3px 6px;border:1px solid #3d4249;border-radius:4px;background:#24272c;color:#aeb5be;font-size:.61rem}
 .ecp-tb-class-actions{display:grid!important;grid-template-columns:1fr 1fr;gap:5px!important;margin-top:3px;justify-content:stretch!important}
 .ecp-tb-class-actions .ecp-class-btn{width:100%;min-height:28px;border-radius:5px!important;padding:5px 7px!important;background:#25282e!important;border-color:#3c4148!important;color:#d9dde3!important;font-size:.66rem!important}
 .ecp-tb-class-actions .ecp-class-btn:hover{background:#30343b!important}
