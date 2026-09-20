@@ -235,6 +235,9 @@
     });
     document.querySelectorAll("nav.links").forEach((nav) => syncMobileAccount(nav));
     ensureOdysxBar();
+    queueMicrotask(() => {
+      try { window.NWLanguageSwitcherRefresh?.(); } catch (_) {}
+    });
     document.querySelectorAll(".footbottom > span:first-child").forEach((element) => { element.textContent = "© 2026 Nahwerk Concierge"; });
     document.querySelectorAll('.footer a[href="anmelden.html"],.footer a[href="/anmelden"],.footer a[href="registrieren.html"],.footer a[href="/registrieren"]').forEach((link) => { if (hasRenderableSession()) link.remove(); });
   }
