@@ -332,3 +332,22 @@ body.senior-product .nw-carousel-select>span,
  .concierge-portal-settings .nw-carousel-info{position:relative!important;z-index:10!important}
  .concierge-portal-settings .nw-carousel-actions{position:relative!important;z-index:12!important}
 }
+
+/* REGISTRATION_MOBILE_CAROUSEL_ARROWS_V1_20260920
+   Keep navigation beside the photo stage, never over the select/status button. */
+@media(max-width:760px){
+  body.registration-page .nw-carousel-master[data-variant="selection"] .nw-carousel-arrow{
+    top:min(57vw,235px)!important;
+    bottom:auto!important;
+    margin-top:-24px!important;
+    width:48px!important;
+    height:48px!important;
+    z-index:90!important;
+  }
+  body.registration-page .nw-carousel-master[data-variant="selection"] .nw-carousel-arrow.prev{
+    left:8px!important;
+  }
+  body.registration-page .nw-carousel-master[data-variant="selection"] .nw-carousel-arrow.next{
+    right:8px!important;
+  }
+}
