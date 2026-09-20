@@ -300,11 +300,10 @@
     return ({INBOX:"in:inbox",SENT:"in:sent",SPAM:"in:spam",TRASH:"in:trash"})[folder] || "in:inbox";
   }
   async function searchRemoteFolder(connection, folder, maxResults = 50) {
-    const data = await request("/email/messages/search", {
+    const data = await request("/email/concierge/folder", {
       method: "POST",
-      body: { query: folderQuery(folder), max_results: maxResults, request_id: crypto.randomUUID() },
-      connectionId: String(connection.connection_id || ""),
-      allowBare: true
+      body: { folder, max_results: maxResults },
+      connectionId: String(connection.connection_id || "")
     });
     return list(data?.messages).map((message) => decorateRemoteMessage(message, connection));
   }
@@ -349,10 +348,13 @@
     } finally { draftsLoading = false; render(); }
   }
   async function selectMailboxFolder(connectionId, folder) {
-    activeConnectionId = String(connectionId || activeConnectionId || "");
+    const nextConnectionId = String(connectionId || activeConnectionId || "");
+    const switchingConnection = Boolean(activeConnectionId && nextConnectionId && activeConnectionId !== nextConnectionId);
+    activeConnectionId = nextConnectionId;
     mailboxScope = "ACCOUNT"; mailboxFolder = folder; readerMode = "MESSAGE";
     selectedMessageId = ""; selectedMessageConnectionId = ""; selectedMessageDetail = null;
-    mailboxFolderRows = []; classification = null; classificationError = "";
+    mailboxFolderRows = [];
+    if (switchingConnection) { classification = null; classificationError = ""; }
     render();
     await loadDashboard(false, true);
     await loadMailboxFolder();
@@ -845,8 +847,11 @@
     nav.append(el("div","ecp-tb-nav-separator"));
     const folders = [["INBOX","Posteingang","▣"],["IMPORTANT","Wichtig","★"],["UNIMPORTANT","Unwichtig","○"],["REPLY","Antwort nötig","↩"],["SENT","Gesendet","➤"],["SPAM","Spam","⚑"],["TRASH","Papierkorb","⌫"]];
     for (const account of emailConnections) {
-      const id=String(account.connection_id||""), accountTitle=el("div","ecp-tb-account");
+      const id=String(account.connection_id||""), accountTitle=button("","ecp-tb-account");
+      accountTitle.type="button";
+      accountTitle.setAttribute("aria-label",(text(account.account_email||account.account_display_hint||account.provider_label||"Postfach",320))+" öffnen");
       accountTitle.append(el("span","ecp-tb-account-dot",""),el("strong","",text(account.account_email||account.account_display_hint||account.provider_label||"Postfach",320)));
+      accountTitle.addEventListener("click",()=>void selectMailboxFolder(id,"INBOX"));
       nav.append(accountTitle);
       for (const [value,label,icon] of folders) {
         const active=mailboxScope==="ACCOUNT"&&activeConnectionId===id&&mailboxFolder===value&&readerMode==="MESSAGE";
@@ -873,7 +878,7 @@
       listNode.append(el("div","ecp-tb-empty","E-Mails werden geladen …"));
     } else if (!rows.length && loadError) {
       const errorBox=el("div","ecp-tb-empty");
-      errorBox.append(el("strong","","E-Mails konnten gerade nicht geladen werden."),el("span","","Die Google-Verbindung ist aktiv. Bitte lade die Übersicht erneut."));
+      errorBox.append(el("strong","","E-Mails konnten gerade nicht geladen werden."),el("span","","Das Postfach konnte nicht gelesen werden. Bitte versuche es erneut."));
       const retry=button("Erneut laden","ecp-tb-toolbar-button");retry.addEventListener("click",()=>{if(remoteFolderMode())void loadMailboxFolder();else{classificationRetryCount=0;void loadClassification();}});
       errorBox.append(retry);listNode.append(errorBox);
     } else if (!rows.length) {
