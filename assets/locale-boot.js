@@ -98,17 +98,17 @@
     html.nw-product-senior-first-paint body.login-image-page main>.senior-login-visual,
     body.login-image-page.senior-product main>.senior-login-visual,
     body.login-image-page[data-product="senioren"] main>.senior-login-visual{
-      display:block!important;position:absolute!important;inset:0 0 0 45%!important;z-index:1!important;
-      width:auto!important;max-width:none!important;height:auto!important;min-height:0!important;margin:0!important;padding:0!important;
-      border:0!important;border-radius:0!important;box-shadow:none!important;pointer-events:none!important;
+      display:block!important;position:relative!important;inset:auto!important;z-index:1!important;
+      grid-column:2!important;grid-row:1 / span 2!important;width:100%!important;max-width:none!important;height:100%!important;min-height:650px!important;
+      margin:0!important;padding:0!important;border:0!important;border-radius:34px!important;box-shadow:none!important;pointer-events:none!important;
       background:#ddd4c8 url("/assets/lifestyle/senior-woman-overview.webp?v=6") 68% 50%/cover no-repeat!important
     }
     @media(max-width:899px){
       html.nw-product-senior-first-paint body.login-image-page main>.senior-login-visual,
       body.login-image-page.senior-product main>.senior-login-visual,
       body.login-image-page[data-product="senioren"] main>.senior-login-visual{
-        position:relative!important;inset:auto!important;display:block!important;width:100%!important;max-width:100%!important;
-        height:clamp(360px,72vw,540px)!important;min-height:360px!important;margin:28px 0 0!important;background-position:68% 50%!important
+        grid-column:1!important;grid-row:3!important;position:relative!important;inset:auto!important;display:block!important;width:100%!important;max-width:720px!important;
+        height:clamp(310px,66vw,500px)!important;min-height:310px!important;margin:4px auto 0!important;border-radius:28px!important;background-position:68% 48%!important
       }
     }
   `;
