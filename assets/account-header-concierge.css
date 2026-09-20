@@ -132,3 +132,24 @@
     background:#fff!important;
   }
 }
+
+
+/* ACCOUNT_HEADER_LOGO_HEIGHT_PARITY_V1_20260921 */
+@media(max-width:1280px) and (min-width:761px){
+  body.account-premium-ui .top .brand{
+    width:46px!important;
+    height:46px!important;
+    min-width:46px!important;
+    flex:0 0 46px!important;
+    background-size:contain!important;
+  }
+}
+@media(max-width:760px) and (min-width:521px){
+  body.account-premium-ui .top .brand{
+    width:42px!important;
+    height:42px!important;
+    min-width:42px!important;
+    flex:0 0 42px!important;
+    background-size:contain!important;
+  }
+}
