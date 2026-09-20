@@ -612,3 +612,30 @@ html body.login-image-page[data-product="senioren"] .logincard{
     border-radius:24px!important;
   }
 }
+
+
+/* SINGLE SENIOREN LOGIN IMAGE GUARD v1 */
+html.nw-product-senior-first-paint body.login-image-page main::before,
+html.nw-product-senior-first-paint body.login-image-page main::after,
+html body.login-image-page.senior-product main::before,
+html body.login-image-page.senior-product main::after,
+html body.login-image-page[data-product="senioren"] main::before,
+html body.login-image-page[data-product="senioren"] main::after{
+  content:none!important;
+  display:none!important;
+  background:none!important;
+  background-image:none!important;
+}
+html.nw-product-senior-first-paint body.login-image-page main>.senior-login-visual~.senior-login-visual,
+html body.login-image-page.senior-product main>.senior-login-visual~.senior-login-visual,
+html body.login-image-page[data-product="senioren"] main>.senior-login-visual~.senior-login-visual{
+  display:none!important;
+  visibility:hidden!important;
+  opacity:0!important;
+  width:0!important;
+  height:0!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+}
