@@ -171,3 +171,92 @@ html body .nw-floating-concierge .nw-floating-concierge-icon svg {
 
 /* Compatibility selector retained for legacy route contract tests. */
 body:not(.nw-portal-light) .footer{background:#000!important}
+
+
+/* SENIOREN HERO RECOVERY v1 — keep the approved senior smartphone photo visible. */
+html body.senior-product .senior-image-hero .senior-hero-layout,
+html body[data-product="senioren"] .senior-image-hero .senior-hero-layout{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.03fr) minmax(380px,.97fr)!important;
+  gap:clamp(44px,7vw,96px)!important;
+  align-items:center!important;
+}
+html body.senior-product .senior-image-hero .senior-hero-copy,
+html body[data-product="senioren"] .senior-image-hero .senior-hero-copy{
+  grid-column:1!important;
+  grid-row:1!important;
+  position:relative!important;
+  z-index:2!important;
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+}
+html body.senior-product .senior-image-hero .senior-hero-photo,
+html body[data-product="senioren"] .senior-image-hero .senior-hero-photo{
+  grid-column:2!important;
+  grid-row:1!important;
+  position:relative!important;
+  z-index:2!important;
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  aspect-ratio:4/5!important;
+  overflow:hidden!important;
+  border:1px solid #dfc47e!important;
+  border-radius:34px!important;
+  background:#f4ead8 url("/assets/lifestyle/senior-man-phone.webp?v=4") center center/cover no-repeat!important;
+  box-shadow:0 34px 80px rgba(73,52,18,.16)!important;
+}
+html body.senior-product .senior-image-hero .senior-hero-photo img,
+html body[data-product="senioren"] .senior-image-hero .senior-hero-photo img{
+  position:relative!important;
+  z-index:1!important;
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  width:100%!important;
+  height:100%!important;
+  max-width:none!important;
+  object-fit:cover!important;
+  object-position:center center!important;
+  filter:none!important;
+}
+html body.senior-product .senior-image-hero h1,
+html body[data-product="senioren"] .senior-image-hero h1{
+  color:#211f1a!important;
+  text-shadow:none!important;
+}
+html body.senior-product .senior-image-hero .senior-hero-lead,
+html body[data-product="senioren"] .senior-image-hero .senior-hero-lead{
+  color:#625b50!important;
+  text-shadow:none!important;
+}
+@media(max-width:1000px){
+  html body.senior-product .senior-image-hero .senior-hero-layout,
+  html body[data-product="senioren"] .senior-image-hero .senior-hero-layout{
+    grid-template-columns:1fr!important;
+  }
+  html body.senior-product .senior-image-hero .senior-hero-copy,
+  html body[data-product="senioren"] .senior-image-hero .senior-hero-copy{
+    grid-column:1!important;
+    grid-row:1!important;
+  }
+  html body.senior-product .senior-image-hero .senior-hero-photo,
+  html body[data-product="senioren"] .senior-image-hero .senior-hero-photo{
+    grid-column:1!important;
+    grid-row:2!important;
+    width:100%!important;
+    max-width:760px!important;
+    aspect-ratio:16/10!important;
+  }
+}
+@media(max-width:700px){
+  html body.senior-product .senior-image-hero .senior-hero-photo,
+  html body[data-product="senioren"] .senior-image-hero .senior-hero-photo{
+    aspect-ratio:4/3!important;
+    border-radius:24px!important;
+  }
+}
