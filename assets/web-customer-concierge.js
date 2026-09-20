@@ -1003,14 +1003,17 @@ syncIosVisualViewport();
     const status=document.getElementById("webConciergeStatus");
     setComposerReady(false);
     if(status){status.textContent=guestMode?"Kostenloser Gast-Chat":"Verbindung wird hergestellt …";status.classList.remove("is-online");}
-    const initialHistoryPromise=guestMode
-      ? Promise.resolve((()=>{activeThreadId=guestThreadId();emptyChat();return true;})())
-      : (async()=>{
-          const loaded=await loadThreads({selectFirst:true});
-          if(activeThreadId)await selectThread(activeThreadId,{preserveUntilLoaded:true});
-          else if(!loaded)newChat();
-          return loaded;
-        })();
+    const initialHistoryPromise=(async()=>{
+      if(guestMode){
+        activeThreadId=guestThreadId();
+        emptyChat();
+        return true;
+      }
+      const loaded=await loadThreads({selectFirst:true});
+      if(activeThreadId)await selectThread(activeThreadId,{preserveUntilLoaded:true});
+      else if(!loaded)newChat();
+      return loaded;
+    })();
     let ready=await checkReadiness();
     if(!ready){
       await new Promise((resolve)=>setTimeout(resolve,650));
