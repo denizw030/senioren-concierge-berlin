@@ -108,3 +108,27 @@
 @media(max-width:520px){
   .nw-header-concierge{display:none!important}
 }
+
+
+/* Light account theme: header concierge shortcut only. */
+@media(max-width:1280px) and (min-width:521px){
+  body.account-premium-ui.nw-portal-light .nw-header-concierge{
+    background:#fffdf8!important;
+    color:#201d17!important;
+    border-color:rgba(167,125,45,.28)!important;
+    box-shadow:0 10px 28px rgba(74,57,27,.10)!important;
+  }
+  body.account-premium-ui.nw-portal-light .nw-header-concierge-copy small{
+    color:#7a7267!important;
+  }
+  body.account-premium-ui.nw-portal-light .nw-header-concierge-copy strong{
+    color:#201d17!important;
+  }
+  body.account-premium-ui.nw-portal-light .nw-header-concierge-chat{
+    background:rgba(167,125,45,.10)!important;
+    color:#8b6828!important;
+  }
+  body.account-premium-ui.nw-portal-light .nw-header-concierge:hover{
+    background:#fff!important;
+  }
+}
