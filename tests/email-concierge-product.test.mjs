@@ -80,8 +80,8 @@ test("product layout is responsive across desktop and mobile",()=>{
   assert.match(js,/ecp-rule ecp-rule-personal/);
   assert.match(js,/ecp-rule-title-row/);
   assert.match(js,/\.ecp-rule-controls\{display:grid;grid-template-columns:minmax\(0,1fr\) auto/);
-  assert.match(integration,/email-concierge-product\.css\?v=20260920-3/);
-  assert.match(integration,/email-concierge-product\.js\?v=20260920-3/);
+  assert.match(integration,/email-concierge-product\.css\?v=20260920-4/);
+  assert.match(integration,/email-concierge-product\.js\?v=20260920-4/);
 });
 
 
