@@ -54,8 +54,14 @@
     const variant=options.variant||root.dataset.variant||"presentation";
     const inputName=options.inputName||root.dataset.inputName||"";
     const registerUrl=options.registerUrl||root.dataset.registerUrl||"";
-    const requested=options.selected||root.dataset.selected||"nilo";
-    let active=Math.max(0,profiles.findIndex(profile=>profile.key===requested));
+    const requested=options.selected||root.dataset.selected||"";
+    if(variant==="selection"&&!requested){
+      root.dataset.awaitingPersona="1";
+      root.dataset.carouselReady="0";
+      return null;
+    }
+    const initialKey=requested||"nilo";
+    let active=Math.max(0,profiles.findIndex(profile=>profile.key===initialKey));
     let dragX=0,pointerStart=0,dragging=false,moved=false;
     const loaded = new Set();
     root.dataset.variant=variant;
