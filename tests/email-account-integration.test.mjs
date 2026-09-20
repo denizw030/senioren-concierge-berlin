@@ -1,3 +1,4 @@
+// EMAIL_PERSONAL_LEARNING_UI_V1_GREEN_GATE
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
