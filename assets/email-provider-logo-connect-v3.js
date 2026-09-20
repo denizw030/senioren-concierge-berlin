@@ -64,6 +64,7 @@
   let selected = null;
   let busy = false;
   let addMode = false;
+  const connectErrors = Object.create(null);
 
   const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
   const setText = (element, value) => { if (element && element.textContent !== String(value ?? "")) element.textContent = String(value ?? ""); };
@@ -147,7 +148,10 @@
       const connected = rows.length > 0;
       const ready = providerReady(provider);
       const unsupported = provider.mode === "unsupported";
-      const status = connected ? `${rows.length} Konto${rows.length === 1 ? "" : "en"} verbunden` : (unsupported ? "Derzeit nicht direkt unterstützt" : (!ready ? "Noch nicht verfügbar" : ""));
+      const connectError = String(connectErrors[provider.id] || "");
+      const status = connected
+        ? `${rows.length} Konto${rows.length === 1 ? "" : "en"} verbunden`
+        : connectError || (unsupported ? "Derzeit nicht direkt unterstützt" : (!ready ? "Noch nicht verfügbar" : ""));
       const primary = unsupported
         ? '<span class="email-logo-provider-status" aria-disabled="true">Keine direkte Verbindung</span>'
         : `<button class="email-provider-add-account email-provider-card-primary" type="button" data-provider-primary="${provider.id}"${!ready && !connected ? " disabled" : ""}>${connected ? "Trennen" : "Verbinden"}</button>`;
@@ -289,6 +293,20 @@
     await redirectOAuth(data, (host) => host === "accounts.google.com", "EMAIL_OAUTH_FAILED");
   }
 
+  function oauthConnectErrorMessage(provider, error) {
+    const code = String(error?.message || error || "EMAIL_REQUEST_FAILED");
+    if (error?.name === "AbortError") return "Die Verbindung hat zu lange gedauert. Bitte versuche es erneut.";
+    if (code === "UNAUTHENTICATED") return "Deine Sitzung ist abgelaufen. Bitte melde dich erneut bei NAHWERK an.";
+    if (code === "EMAIL_IDENTITY_BINDING_FAILED") return "Dein NAHWERK-Konto konnte nicht eindeutig zugeordnet werden. Bitte melde dich erneut an.";
+    if (code === "EMAIL_PROVIDER_UNAVAILABLE") return provider?.id === "google"
+      ? "Google konnte gerade nicht verbunden werden. Bitte versuche es erneut."
+      : "Dieser Anbieter konnte gerade nicht verbunden werden. Bitte versuche es erneut.";
+    if (code === "EMAIL_OAUTH_FAILED") return provider?.id === "google"
+      ? "Die sichere Google-Anmeldung konnte nicht gestartet werden. Bitte versuche es erneut."
+      : "Die sichere Anmeldung konnte nicht gestartet werden. Bitte versuche es erneut.";
+    return "Die Verbindung konnte nicht gestartet werden. Bitte versuche es erneut.";
+  }
+
   async function startMicrosoft() {
     const data = await api("/email/connect/microsoft/web", { method: "POST", body: "{}" });
     await redirectOAuth(data, (host) => host.endsWith("microsoftonline.com"), "MICROSOFT_OAUTH_FAILED");
@@ -302,13 +320,19 @@
   async function connectProvider(provider) {
     if (busy || provider.mode === "unsupported" || !providerReady(provider)) return;
     if (provider.mode === "manual") { openManual(provider, true); return; }
+    delete connectErrors[provider.id];
     busy = true;
     renderGrid();
     try {
       if (provider.mode === "google") await startGoogle();
       else if (provider.mode === "microsoft") await startMicrosoft();
       else if (provider.mode === "yahoo") await startYahoo();
-    } catch {
+    } catch (error) {
+      connectErrors[provider.id] = oauthConnectErrorMessage(provider, error);
+      window.dispatchEvent(new CustomEvent("nahwerk:email-provider-connect-error", {
+        detail: { provider: provider.id, code: String(error?.message || "EMAIL_REQUEST_FAILED") }
+      }));
+    } finally {
       busy = false;
       renderGrid();
     }
