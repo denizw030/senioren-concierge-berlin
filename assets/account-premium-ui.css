@@ -275,3 +275,36 @@ html body.account-premium-ui.account-premium-ui .account-tab-concierge-logo{
   -webkit-mask:url("/logos/NAHWERK-Goldmann-Logo.svg") center/contain no-repeat;
   mask:url("/logos/NAHWERK-Goldmann-Logo.svg") center/contain no-repeat;
 }
+
+
+/* Account dark footer contract v2 — loaded after site.css, so dark account tabs can never tint the footer. */
+html[data-nw-portal-theme="dark"] body.account-premium-ui.account-premium-ui .footer,
+html[data-nw-portal-theme="dark"] body.account-premium-ui.account-premium-ui footer.footer,
+html body.account-premium-ui.account-premium-ui.nw-portal-dark .footer,
+html body.account-premium-ui.account-premium-ui.nw-portal-dark footer.footer{
+  background:#000!important;
+  background-color:#000!important;
+  background-image:none!important;
+  box-shadow:none!important;
+  filter:none!important;
+}
+html[data-nw-portal-theme="dark"] body.account-premium-ui.account-premium-ui footer.footer > .wrap,
+html[data-nw-portal-theme="dark"] body.account-premium-ui.account-premium-ui footer.footer .footergrid,
+html[data-nw-portal-theme="dark"] body.account-premium-ui.account-premium-ui footer.footer .footbottom,
+html body.account-premium-ui.account-premium-ui.nw-portal-dark footer.footer > .wrap,
+html body.account-premium-ui.account-premium-ui.nw-portal-dark footer.footer .footergrid,
+html body.account-premium-ui.account-premium-ui.nw-portal-dark footer.footer .footbottom{
+  background:transparent!important;
+  background-color:transparent!important;
+  background-image:none!important;
+  box-shadow:none!important;
+}
+html[data-nw-portal-theme="dark"] body.account-premium-ui.account-premium-ui footer.footer::before,
+html[data-nw-portal-theme="dark"] body.account-premium-ui.account-premium-ui footer.footer::after,
+html body.account-premium-ui.account-premium-ui.nw-portal-dark footer.footer::before,
+html body.account-premium-ui.account-premium-ui.nw-portal-dark footer.footer::after{
+  background:none!important;
+  background-image:none!important;
+  box-shadow:none!important;
+  filter:none!important;
+}
