@@ -4,6 +4,7 @@ import test from "node:test";
 
 const html = readFileSync(new URL("../registrieren.html", import.meta.url), "utf8");
 const onboarding = readFileSync(new URL("../assets/onboarding.js", import.meta.url), "utf8");
+const voicePreviewCss = readFileSync(new URL("../assets/concierge-voice-preview.css", import.meta.url), "utf8");
 
 test("hidden registration rows cannot be forced visible by component CSS", () => {
   assert.match(html, /#signupForm \[hidden\]\s*{\s*display:\s*none\s*!important;/);
@@ -45,4 +46,37 @@ test("obsolete public pricing claims stay removed", () => {
   ]) {
     assert.equal(onboarding.includes(staleClaim), false, staleClaim);
   }
+});
+
+
+test("registration starts with the Concierge photo slider and no generated headline", () => {
+  assert.doesNotMatch(html, /id="registrationTitle"/);
+  const formStart = html.indexOf('id="signupForm"');
+  const slider = html.indexOf('data-concierge-carousel', formStart);
+  const progress = html.indexOf('class="nw-registration-progress"', formStart);
+  assert.ok(slider > formStart && slider < progress);
+});
+
+test("Lena is the default Concierge for registration", () => {
+  assert.match(html, /data-selected="lena"/);
+  assert.doesNotMatch(html, /data-selected="nilo"/);
+  assert.match(onboarding, /return conciergeProfiles\[value\] \? value : "lena"/);
+  assert.match(onboarding, /choice\.dataset\.selected \|\| "lena"/);
+});
+
+test("FREE remains the registration default and tariff appears below personal data", () => {
+  assert.match(onboarding, /params\.get\("paket"\) \|\| "free"/);
+  const ownerFirstName = html.indexOf('id="ownerFirstName"');
+  const plan = html.indexOf('id="selectedPlanBox"');
+  assert.ok(ownerFirstName >= 0 && plan > ownerFirstName);
+});
+
+test("telephone reception is completely absent from registration", () => {
+  assert.doesNotMatch(html, /Telefonannahme|telephoneReceptionRegistrationPath|\/telefonannahme/i);
+});
+
+test("registration language selection keeps the chosen language label centered", () => {
+  assert.match(voicePreviewCss, /body\.registration-page \.nw-carousel\[data-variant="selection"\] \.nw-voice-preview-language-select/);
+  assert.match(voicePreviewCss, /text-align:center!important/);
+  assert.match(voicePreviewCss, /text-align-last:center!important/);
 });
