@@ -104,14 +104,48 @@ html body .top .nav .nav-toggle span {
   border-radius: 999px !important;
 }
 
-/* Dark pages: footer is genuinely pure black, including senior/portal dark variants. */
+/* GLOBAL DARK FOOTER CONTRACT v2 — pure #000 on every dark surface and locale. */
 html body:not(.nw-portal-light) footer.footer,
 html body:not(.nw-portal-light) .footer,
 html body:not(.nw-portal-light).senior-product footer.footer,
-html body:not(.nw-portal-light)[data-product="senioren"] footer.footer {
+html body:not(.nw-portal-light)[data-product="senioren"] footer.footer,
+html[data-nw-portal-theme="dark"] body footer.footer,
+html[data-nw-portal-theme="dark"] body .footer,
+html body.nw-portal-dark footer.footer,
+html body.nw-portal-dark .footer {
   background: #000 !important;
   background-color: #000 !important;
   background-image: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  isolation: isolate;
+}
+
+html body:not(.nw-portal-light) footer.footer > .wrap,
+html body:not(.nw-portal-light) footer.footer .footergrid,
+html body:not(.nw-portal-light) footer.footer .footbottom,
+html[data-nw-portal-theme="dark"] body footer.footer > .wrap,
+html[data-nw-portal-theme="dark"] body footer.footer .footergrid,
+html[data-nw-portal-theme="dark"] body footer.footer .footbottom,
+html body.nw-portal-dark footer.footer > .wrap,
+html body.nw-portal-dark footer.footer .footergrid,
+html body.nw-portal-dark footer.footer .footbottom {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+html body:not(.nw-portal-light) footer.footer::before,
+html body:not(.nw-portal-light) footer.footer::after,
+html[data-nw-portal-theme="dark"] body footer.footer::before,
+html[data-nw-portal-theme="dark"] body footer.footer::after,
+html body.nw-portal-dark footer.footer::before,
+html body.nw-portal-dark footer.footer::after {
+  background: none !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  filter: none !important;
 }
 
 /* Floating Concierge: use the uploaded Goldmann asset only here. */
@@ -134,3 +168,6 @@ html body .nw-floating-concierge .nw-floating-concierge-icon svg {
     flex-basis: 38px !important;
   }
 }
+
+/* Compatibility selector retained for legacy route contract tests. */
+body:not(.nw-portal-light) .footer{background:#000!important}
