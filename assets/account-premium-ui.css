@@ -267,9 +267,7 @@ html body.account-premium-ui.account-premium-ui .account-tab-icon{
   box-sizing:border-box!important;
   transform-origin:center!important;
 }
-html body.account-premium-ui.account-premium-ui .account-tab-icon:not(.account-tab-concierge-logo):not(.account-tab-person-icon){
-  transform:scale(1.08)!important;
-}
+
 html body.account-premium-ui.account-premium-ui .account-tab-person-icon svg{
   display:block!important;
   width:14px!important;
@@ -324,4 +322,19 @@ html body.account-premium-ui.account-premium-ui.nw-portal-dark footer.footer::af
   background-image:none!important;
   box-shadow:none!important;
   filter:none!important;
+}
+
+
+/* ACCOUNT_OVERVIEW_EMAIL_ICON_PARITY_V1_20260921 */
+html body.account-premium-ui.account-premium-ui .account-tab[data-account-tab="overview"]>.account-tab-icon,
+html body.account-premium-ui.account-premium-ui .account-tab[data-account-tab="email"]>.account-tab-icon{
+  width:14px!important;
+  height:14px!important;
+  min-width:14px!important;
+  min-height:14px!important;
+  flex:0 0 14px!important;
+  font-size:16px!important;
+  line-height:14px!important;
+  transform:scale(1.16)!important;
+  transform-origin:center center!important;
 }
