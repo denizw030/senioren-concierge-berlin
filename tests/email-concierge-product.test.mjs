@@ -63,7 +63,7 @@ test("draft edit and discard never imply a send",()=>{
 
 test("mail workspace stays standalone and does not require WhatsApp",()=>{
   assert.match(js,/ecp-thunderbird/);
-  assert.match(js,/dashboard\.channels\?\.whatsapp\?\.state/);
+  assert.match(js,/channels\.whatsapp\?\.state/);
   assert.doesNotMatch(js,/if\s*\(\s*!dashboard\.channels\?\.whatsapp/);
 });
 
