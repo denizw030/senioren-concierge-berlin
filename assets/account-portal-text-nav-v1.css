@@ -235,3 +235,24 @@
         bottom:4px!important;
       }
     }
+
+
+/* ACCOUNT_OVERVIEW_SYMMETRY_V1_20260920
+   Desktop only: pair saved info + product gaps at equal height,
+   then use the full row for open issues. Mobile layout stays unchanged. */
+@media(min-width:701px){
+  body.account-premium-ui .dash>.overview-saved-info[data-account-panel="overview"],
+  body.account-premium-ui .dash>.owner-product-gap-shortcut[data-account-panel="overview"]{
+    grid-column:span 6!important;
+    align-self:stretch!important;
+    height:100%!important;
+    min-height:200px!important;
+    box-sizing:border-box!important;
+  }
+  body.account-premium-ui .dash>.overview-open-issues[data-account-panel="overview"]{
+    grid-column:1/-1!important;
+    align-self:stretch!important;
+    min-height:0!important;
+    box-sizing:border-box!important;
+  }
+}
