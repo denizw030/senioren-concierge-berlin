@@ -105,22 +105,37 @@
       .ecp-class-reason{margin:7px 0 0;font-size:.72rem;line-height:1.4;opacity:.55}
       .ecp-sort-scope{margin:12px 0 0;font-size:.74rem;line-height:1.45;opacity:.58}
       .ecp-detail .ecp-class-actions{justify-content:flex-start;margin-top:12px}
-      .ecp-rule-heading{margin:16px 0 9px;font-size:.75rem;font-weight:700;letter-spacing:.03em;opacity:.7}
+      .ecp-rule-heading{margin:18px 0 10px;font-size:.72rem;font-weight:750;letter-spacing:.06em;text-transform:uppercase;opacity:.62}
       .ecp-rule{min-width:0}
-      .ecp-rule-suggestion{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0;border-top:1px solid rgba(127,127,127,.16)}
-      .ecp-rule-personal{display:grid;grid-template-columns:1fr;gap:12px;margin:10px 0 0;padding:15px 16px;border:1px solid rgba(127,127,127,.16);border-radius:14px;background:rgba(127,127,127,.025)}
-      .ecp-rule-copy{display:grid;gap:4px;min-width:0}
-      .ecp-rule-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;min-width:0}
-      .ecp-rule-title-row>strong{min-width:0;font-size:.9rem;line-height:1.38;overflow-wrap:break-word;word-break:normal}
-      .ecp-rule small{display:block;font-size:.72rem;line-height:1.42;opacity:.65;overflow-wrap:break-word}.ecp-rule-match{opacity:.5!important}
+      .ecp-rule-suggestion{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:13px 0;border-top:1px solid rgba(127,127,127,.14)}
+      .ecp-rule-personal{display:grid;grid-template-columns:1fr;gap:14px;margin:10px 0 0;padding:17px;border:1px solid rgba(127,127,127,.15);border-radius:18px;background:linear-gradient(145deg,rgba(127,127,127,.035),rgba(127,127,127,.018));box-shadow:inset 0 1px 0 rgba(255,255,255,.018)}
+      .ecp-rule-copy{display:grid;gap:5px;min-width:0}
+      .ecp-rule-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;min-width:0}
+      .ecp-rule-title-row>strong{min-width:0;font-size:.92rem;line-height:1.35;letter-spacing:-.012em;overflow-wrap:break-word;word-break:normal}
+      .ecp-rule small{display:block;font-size:.7rem;line-height:1.4;opacity:.58;overflow-wrap:break-word}.ecp-rule-match{opacity:.48!important}
+      .ecp-rule-future{display:flex;align-items:center;gap:9px;min-width:0;margin-top:5px;padding:9px 11px;border-radius:12px;background:rgba(127,127,127,.045)}
+      .ecp-rule-future-label{flex:0 0 auto;padding:4px 7px;border-radius:999px;background:rgba(127,127,127,.09);font-size:.65rem;font-weight:750}
+      .ecp-rule-future strong{min-width:0;font-size:.73rem;line-height:1.35;font-weight:650}
       .ecp-rule-actions{display:flex;flex-wrap:wrap;gap:7px;justify-content:flex-end;align-items:center}
-      .ecp-rule-controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;min-width:0}
-      .ecp-rule-select{width:100%;max-width:none;min-width:0;min-height:42px;border:1px solid rgba(127,127,127,.24);border-radius:11px;background:rgba(127,127,127,.025);color:inherit;padding:0 12px;font:inherit;font-size:.75rem}
-      .ecp-rule-toggle{display:inline-flex;flex:0 0 auto;gap:7px;align-items:center;min-height:28px;font-size:.73rem;white-space:nowrap}.ecp-rule-toggle input{accent-color:currentColor}
-      .ecp-rule-personal>.ecp-rule-controls>.ecp-link-button{justify-self:end;min-height:38px;padding:8px 14px}
+      .ecp-rule-controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:end;min-width:0;padding-top:2px}
+      .ecp-rule-action-block{display:grid;gap:6px;min-width:0}
+      .ecp-rule-control-label{font-size:.66rem;font-weight:700;opacity:.55}
+      .ecp-rule-select{width:100%;max-width:none;min-width:0;min-height:44px;border:1px solid rgba(127,127,127,.22);border-radius:12px;background:rgba(127,127,127,.025);color:inherit;padding:0 12px;font:inherit;font-size:.75rem}
+      .ecp-rule-select:focus{outline:none;border-color:rgba(127,127,127,.5);box-shadow:0 0 0 3px rgba(127,127,127,.06)}
+      .ecp-rule-toggle{display:inline-flex;flex:0 0 auto;gap:7px;align-items:center;min-height:28px;padding:3px 0;font-size:.72rem;white-space:nowrap}.ecp-rule-toggle input{accent-color:currentColor}
+      .ecp-rule-delete{justify-self:end;min-height:40px;padding:8px 13px}
+      .ecp-rule-existing{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;align-items:center;padding-top:12px;border-top:1px solid rgba(127,127,127,.12)}
+      .ecp-rule-existing-copy{display:grid;gap:3px;min-width:0}
+      .ecp-rule-existing-copy strong{font-size:.75rem}
+      .ecp-rule-existing-copy span,.ecp-rule-existing-status{font-size:.68rem;line-height:1.4;opacity:.58}
+      .ecp-rule-existing-button{justify-self:end;white-space:nowrap}
+      .ecp-rule-existing-status{grid-column:1/-1;min-height:0}
+      .ecp-rule-existing-confirm{grid-column:1/-1;display:grid;gap:10px;padding:12px;border:1px solid rgba(215,169,52,.22);border-radius:13px;background:rgba(215,169,52,.045)}
+      .ecp-rule-existing-confirm p{margin:0;font-size:.73rem;line-height:1.45}
+      .ecp-rule-existing-confirm-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
       .ecp-settings-details{margin-top:16px;border-top:1px solid rgba(127,127,127,.16);padding-top:12px}.ecp-settings-details>summary{cursor:pointer;font-size:.76rem;font-weight:650}
       @media(max-width:1180px){.ecp-layout{grid-template-columns:1fr}.ecp-summary{grid-template-columns:repeat(3,minmax(0,1fr))!important}.ecp-rule-suggestion{grid-template-columns:1fr}.ecp-rule-actions{justify-content:flex-start}}
-      @media(max-width:640px){.ecp-rule-personal{padding:14px}.ecp-rule-title-row{gap:10px}.ecp-rule-controls{grid-template-columns:1fr}.ecp-rule-personal>.ecp-rule-controls>.ecp-link-button{justify-self:stretch;width:100%}.ecp-rule-actions{justify-content:flex-start}.ecp-rule-select{width:100%}}
+      @media(max-width:640px){.ecp-rule-personal{padding:14px}.ecp-rule-title-row{gap:10px}.ecp-rule-controls,.ecp-rule-existing{grid-template-columns:1fr}.ecp-rule-delete,.ecp-rule-existing-button{justify-self:stretch;width:100%}.ecp-rule-actions{justify-content:flex-start}.ecp-rule-select{width:100%}.ecp-rule-future{align-items:flex-start;flex-direction:column;gap:6px}.ecp-rule-existing-confirm-actions>*{flex:1 1 auto}}
       @media(max-width:640px){.ecp-summary{grid-template-columns:repeat(2,minmax(0,1fr))!important}.ecp-mail-side{justify-items:start;min-width:0}.ecp-class-actions{justify-content:flex-start}}
     `;
     document.head.append(style);
@@ -422,8 +437,24 @@
   }
   function ruleActionChoices(rule) {
     return rule.classification === "IMPORTANT"
-      ? [["PRIORITIZE", "hervorheben"], ["CLASSIFY_ONLY", "nur als wichtig einstufen"]]
-      : [["CLASSIFY_ONLY", "nur als unwichtig einstufen"], ["ARCHIVE", "automatisch archivieren"], ["TRASH", "automatisch in den Papierkorb"]];
+      ? [["PRIORITIZE", "Künftig automatisch hervorheben"], ["CLASSIFY_ONLY", "Nur als wichtig einstufen"]]
+      : [["CLASSIFY_ONLY", "Nur als unwichtig einstufen"], ["ARCHIVE", "Künftig automatisch archivieren"], ["TRASH", "Künftig automatisch in den Papierkorb"]];
+  }
+  function ruleFutureCopy(rule) {
+    const action = String(rule?.action || "CLASSIFY_ONLY").toUpperCase();
+    if (action === "TRASH") return "Zukünftig: passende E-Mails automatisch in den Gmail-Papierkorb";
+    if (action === "ARCHIVE") return "Zukünftig: passende E-Mails automatisch archivieren";
+    if (action === "PRIORITIZE") return "Zukünftig: passende E-Mails automatisch hervorheben";
+    return rule?.classification === "IMPORTANT"
+      ? "Zukünftig: nur als wichtig einstufen · nichts verschieben"
+      : "Zukünftig: nur als unwichtig einstufen · nichts verschieben";
+  }
+  function existingActionCopy(rule, count) {
+    const action = String(rule?.action || "").toUpperCase();
+    if (action === "TRASH") return `${count} bestehende passende E-Mail${count === 1 ? "" : "s"} in den Gmail-Papierkorb verschieben?`;
+    if (action === "ARCHIVE") return `${count} bestehende passende E-Mail${count === 1 ? "" : "s"} archivieren?`;
+    if (action === "PRIORITIZE") return `${count} bestehende passende E-Mail${count === 1 ? "" : "s"} hervorheben?`;
+    return "";
   }
   async function refreshRules() {
     const next = normalizeDashboard(await request("/email/concierge/dashboard"));
@@ -461,19 +492,74 @@
     input.addEventListener("change", async () => { input.disabled = true; try { await request("/email/concierge/rules/update", { method: "POST", body: { rule_id: rule.id, active: input.checked } }); await refreshRules(); } catch (error) { input.checked = !input.checked; showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); } finally { input.disabled = false; } });
     toggle.append(input, el("span", "", rule.active ? "Aktiv" : "Aus"));
     titleRow.append(el("strong", "", text(rule.title, 220) || "Persönliche Regel"), toggle);
-    copy.append(titleRow, el("small", "", (rule.classification_label || "") + " · " + (rule.action_label || "")));
+    copy.append(titleRow);
     if (rule.matcher_label) copy.append(el("small", "ecp-rule-match", rule.matcher_label));
     if (rule.last_applied_at) copy.append(el("small", "ecp-rule-meta", "Zuletzt angewandt: " + fmtDate(rule.last_applied_at) + (number(rule.hit_count) ? " · " + number(rule.hit_count) + " Treffer" : "")));
-    const controls = el("div", "ecp-rule-controls");
-    const select = el("select", "ecp-rule-select"); select.setAttribute("aria-label", "Aktion für " + text(rule.title, 160));
+
+    const future = el("div", "ecp-rule-future");
+    future.append(el("span", "ecp-rule-future-label", rule.classification_label || (rule.classification === "IMPORTANT" ? "Wichtig" : "Unwichtig")), el("strong", "", ruleFutureCopy(rule)));
+    copy.append(future);
+
+    const controls = el("div", "ecp-rule-controls"), actionBlock = el("label", "ecp-rule-action-block");
+    actionBlock.append(el("span", "ecp-rule-control-label", "Für zukünftige passende E-Mails"));
+    const select = el("select", "ecp-rule-select"); select.setAttribute("aria-label", "Zukünftige Behandlung für " + text(rule.title, 160));
     ruleActionChoices(rule).forEach(([value, label]) => { const option = el("option", "", label); option.value = value; option.selected = rule.action === value; select.append(option); });
     select.addEventListener("change", async () => { select.disabled = true; try { await request("/email/concierge/rules/update", { method: "POST", body: { rule_id: rule.id, action: select.value } }); await refreshRules(); } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); } finally { select.disabled = false; } });
-    const remove = button("Löschen", "ecp-link-button"); remove.addEventListener("click", async () => {
+    actionBlock.append(select);
+
+    const remove = button("Regel löschen", "ecp-link-button ecp-rule-delete"); remove.addEventListener("click", async () => {
       if (!confirm("Diese persönliche E-Mail-Regel wirklich löschen?")) return;
       try { await request("/email/concierge/rules/delete", { method: "POST", body: { rule_id: rule.id } }); await refreshRules(); }
       catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
     });
-    controls.append(select, remove); row.append(copy, controls); card.append(row);
+    controls.append(actionBlock, remove);
+    row.append(copy, controls);
+
+    const action = String(rule.action || "CLASSIFY_ONLY").toUpperCase();
+    if (["TRASH", "ARCHIVE", "PRIORITIZE"].includes(action)) {
+      const existing = el("div", "ecp-rule-existing"), existingCopy = el("div", "ecp-rule-existing-copy");
+      existingCopy.append(el("strong", "", "Bestehende passende E-Mails"), el("span", "", "Nur nach separater Bestätigung. Zukünftige E-Mails folgen der Regel automatisch."));
+      const applyExisting = button(action === "TRASH" ? "Bestehende prüfen" : "Bestehende ebenfalls anwenden", "ecp-link-button ecp-rule-existing-button");
+      const feedback = el("span", "ecp-rule-existing-status"); feedback.setAttribute("aria-live", "polite");
+      applyExisting.addEventListener("click", async () => {
+        if (busy) return;
+        applyExisting.disabled = true; feedback.textContent = "Passende E-Mails werden geprüft …";
+        try {
+          const preview = await request("/email/concierge/rules/backfill/preview", { method: "POST", body: { rule_id: rule.id } });
+          const count = number(preview.count);
+          if (!count) { feedback.textContent = "Keine bestehenden passenden E-Mails gefunden."; return; }
+          const confirmation = el("div", "ecp-rule-existing-confirm");
+          const message = existingActionCopy(rule, count);
+          confirmation.append(el("p", "", action === "TRASH" ? message + " Sie werden nicht endgültig gelöscht." : message));
+          const buttons = el("div", "ecp-rule-existing-confirm-actions");
+          const cancel = button("Abbrechen", "ecp-link-button");
+          const confirmApply = button(action === "TRASH" ? "In Papierkorb verschieben" : "Jetzt anwenden", "ecp-action");
+          cancel.addEventListener("click", () => { confirmation.remove(); feedback.textContent = ""; applyExisting.disabled = false; });
+          confirmApply.addEventListener("click", async () => {
+            cancel.disabled = true; confirmApply.disabled = true; feedback.textContent = "Wird angewendet …";
+            try {
+              const applied = await request("/email/concierge/rules/backfill/apply", { method: "POST", body: { rule_id: rule.id, confirmed: true } });
+              const changed = number(applied.changed);
+              feedback.textContent = changed ? `${changed} bestehende E-Mail${changed === 1 ? "" : "s"} wurden bearbeitet.` : "Keine bestehende E-Mail musste geändert werden.";
+              confirmation.remove();
+            } catch (error) { feedback.textContent = "Konnte gerade nicht angewendet werden."; showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
+            finally { applyExisting.disabled = false; }
+          });
+          buttons.append(cancel, confirmApply); confirmation.append(buttons);
+          existing.querySelector(".ecp-rule-existing-confirm")?.remove();
+          existing.append(confirmation);
+          feedback.textContent = `${count} bestehende passende E-Mail${count === 1 ? "" : "s"} gefunden.`;
+        } catch (error) {
+          feedback.textContent = "Bestehende E-Mails konnten gerade nicht geprüft werden.";
+          showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE");
+        } finally {
+          if (!existing.querySelector(".ecp-rule-existing-confirm")) applyExisting.disabled = false;
+        }
+      });
+      existing.append(existingCopy, applyExisting, feedback); row.append(existing);
+    }
+
+    card.append(row);
   }
   function renderSettings(card) {
     const suggestions = list(dashboard.suggestions), rules = list(dashboard.rules);
