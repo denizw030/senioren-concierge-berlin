@@ -125,8 +125,9 @@
   const providerConnections = (id) => connections.filter((connection) => String(connection?.provider || "").toLowerCase() === id && String(connection?.state || "").toUpperCase() === "CONNECTED");
   const providerReady = (provider) => {
     if (provider.mode === "unsupported") return false;
+    if (provider.id === "google") return true;
     const row = catalogRow(provider.id);
-    if (!row) return provider.id === "google";
+    if (!row) return false;
     return row.backend_ready !== false && row.connection_ready !== false && row.direct_support !== false;
   };
 
@@ -143,18 +144,17 @@
   function renderGrid() {
     const grid = document.getElementById("emailLogoProviderGrid");
     if (!grid) return;
-    grid.innerHTML = PROVIDERS.map((provider) => {
+    grid.innerHTML = PROVIDERS.filter((provider) => provider.mode !== "unsupported").map((provider) => {
       const rows = providerConnections(provider.id);
       const connected = rows.length > 0;
       const ready = providerReady(provider);
-      const unsupported = provider.mode === "unsupported";
+      const row = catalogRow(provider.id);
+      const googleApprovalPending = provider.id === "google" && !!row && (row.backend_ready === false || row.connection_ready === false || row.direct_support === false);
       const connectError = String(connectErrors[provider.id] || "");
       const status = connected
         ? `${rows.length} Konto${rows.length === 1 ? "" : "en"} verbunden`
-        : connectError || (unsupported ? "Derzeit nicht direkt unterstützt" : (!ready ? "Noch nicht verfügbar" : ""));
-      const primary = unsupported
-        ? '<span class="email-logo-provider-status" aria-disabled="true">Keine direkte Verbindung</span>'
-        : `<button class="email-provider-add-account email-provider-card-primary" type="button" data-provider-primary="${provider.id}"${!ready && !connected ? " disabled" : ""}>${connected ? "Trennen" : "Verbinden"}</button>`;
+        : connectError || (googleApprovalPending ? "Sicher vorgesehen · Google-Freigabe ausstehend" : (!ready ? "Noch nicht verfügbar" : ""));
+      const primary = `<button class="email-provider-add-account email-provider-card-primary" type="button" data-provider-primary="${provider.id}"${!ready && !connected ? " disabled" : ""}>${connected ? "Trennen" : "Verbinden"}</button>`;
       return `<article class="email-logo-provider-card${connected ? " is-connected" : ""}${!ready ? " is-unavailable" : ""}" data-logo-provider="${provider.id}">
         <span class="email-logo-provider-top">${LOGOS[provider.logo]}</span>
         <span><strong>${esc(provider.name)}</strong>${status ? `<span class="email-logo-provider-status">${esc(status)}</span>` : ""}</span>
@@ -429,10 +429,105 @@
     }
   }
 
+
+  function ensureAccountEmailChrome() {
+    const heading = document.querySelector('.account-panel-heading[data-account-panel="email"]');
+    const providerShell = document.getElementById("emailLogoConnectShell");
+    if (!heading || !providerShell || document.getElementById("emailTopActions")) return;
+
+    const actions = document.createElement("div");
+    actions.id = "emailTopActions";
+    actions.className = "email-page-actions";
+    const settingsButton = document.createElement("button");
+    settingsButton.id = "emailTopSettingsButton";
+    settingsButton.className = "email-page-action";
+    settingsButton.type = "button";
+    settingsButton.textContent = "Einstellungen";
+    const connectTopButton = document.createElement("button");
+    connectTopButton.id = "emailTopConnectButton";
+    connectTopButton.className = "email-page-action email-page-action--primary";
+    connectTopButton.type = "button";
+    connectTopButton.textContent = "Verbinden";
+    actions.append(settingsButton, connectTopButton);
+    heading.append(actions);
+
+    const makeOverlay = (id, title, copy) => {
+      const backdrop = document.createElement("div");
+      backdrop.id = id;
+      backdrop.className = "email-account-overlay";
+      backdrop.hidden = true;
+      const panel = document.createElement("section");
+      panel.className = "email-account-overlay-panel";
+      panel.setAttribute("role", "dialog");
+      panel.setAttribute("aria-modal", "true");
+      const head = document.createElement("div");
+      head.className = "email-account-overlay-head";
+      const textWrap = document.createElement("div");
+      const eyebrow = document.createElement("div");
+      eyebrow.className = "eyebrow";
+      eyebrow.textContent = "E-Mail";
+      const h3 = document.createElement("h3");
+      h3.textContent = title;
+      const p = document.createElement("p");
+      p.textContent = copy;
+      textWrap.append(eyebrow, h3, p);
+      const close = document.createElement("button");
+      close.className = "email-account-overlay-close";
+      close.type = "button";
+      close.setAttribute("aria-label", "Schließen");
+      close.textContent = "×";
+      head.append(textWrap, close);
+      const body = document.createElement("div");
+      body.className = "email-account-overlay-body";
+      panel.append(head, body);
+      backdrop.append(panel);
+      root.append(backdrop);
+      const closeOverlay = () => { backdrop.hidden = true; };
+      close.addEventListener("click", closeOverlay);
+      backdrop.addEventListener("click", (event) => { if (event.target === backdrop) closeOverlay(); });
+      return { backdrop, body, close: closeOverlay };
+    };
+
+    const settingsOverlay = makeOverlay(
+      "emailSettingsOverlay",
+      "Einstellungen",
+      "Lege fest, welche E-Mail-Funktionen dein persönlicher NAHWERK Concierge verwenden darf."
+    );
+    const connectOverlay = makeOverlay(
+      "emailConnectOverlay",
+      "E-Mail-Konto verbinden",
+      "Wähle einen von NAHWERK sicher unterstützten E-Mail-Anbietern."
+    );
+
+    const capabilities = root.querySelector(".email-capabilities");
+    const capabilitySection = capabilities?.parentElement || null;
+    const continuity = root.querySelector(".email-continuity-note");
+    if (capabilitySection) settingsOverlay.body.append(capabilitySection);
+    if (continuity) settingsOverlay.body.append(continuity);
+
+    connectOverlay.body.append(providerShell);
+
+    const legacyProviderWrapper = legacyGrid?.parentElement;
+    if (legacyProviderWrapper && legacyProviderWrapper !== connectOverlay.body && !legacyProviderWrapper.contains(providerShell)) {
+      legacyProviderWrapper.hidden = true;
+    }
+    const innerHead = root.querySelector(".email-account-head");
+    if (innerHead) innerHead.hidden = true;
+
+    settingsButton.addEventListener("click", () => { settingsOverlay.backdrop.hidden = false; });
+    connectTopButton.addEventListener("click", () => { connectOverlay.backdrop.hidden = false; });
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      settingsOverlay.close();
+      connectOverlay.close();
+    });
+  }
+
   assets();
   ensureShell();
   ensureModal();
   retireLegacyControls();
+  ensureAccountEmailChrome();
   renderGrid();
   void refresh().catch(() => { renderGrid(); });
 })();
