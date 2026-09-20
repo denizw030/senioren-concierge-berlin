@@ -49,7 +49,7 @@
       .nw-language-option small{margin-left:auto;color:#8d8a82;font-size:11px;letter-spacing:.08em}
       @media (max-width:1280px){
         .top .nav,.home-reference .top .nav{position:relative}
-        .top .nav>.nw-language,.home-reference .top .nav>.nw-language{display:inline-flex;position:absolute;z-index:130;margin:0!important;align-self:auto}
+        .top .nav>.nw-language,.home-reference .top .nav>.nw-language{display:inline-flex!important;position:fixed!important;z-index:65!important;margin:0!important;align-self:auto;visibility:visible!important;opacity:1!important;pointer-events:auto!important}
         .top .nav>.nw-language .nw-language-menu,.home-reference .top .nav>.nw-language .nw-language-menu{top:calc(100% + 10px);right:0}
         .top .nav>.nw-language .nw-language-button,.home-reference .top .nav>.nw-language .nw-language-button{min-height:0;padding:0 10px;gap:6px}
         .links .nw-language{width:100%;display:block;padding:4px 8px}
@@ -121,11 +121,14 @@
     const toggleRect = toggle.getBoundingClientRect();
     if (!toggleRect.width || !toggleRect.height) return false;
     const gap = 10;
-    wrapper.style.position = 'absolute';
+    wrapper.style.position = 'fixed';
     wrapper.style.margin = '0';
-    wrapper.style.right = `${Math.max(0, Math.round(navRect.right - toggleRect.left + gap))}px`;
-    wrapper.style.top = `${Math.max(0, Math.round(toggleRect.top - navRect.top))}px`;
-    wrapper.style.zIndex = '130';
+    wrapper.style.right = `${Math.max(0, Math.round(window.innerWidth - toggleRect.left + gap))}px`;
+    wrapper.style.top = `${Math.max(0, Math.round(toggleRect.top))}px`;
+    wrapper.style.zIndex = '65';
+    wrapper.style.display = 'inline-flex';
+    wrapper.style.visibility = 'visible';
+    wrapper.style.opacity = '1';
     const button = wrapper.querySelector('.nw-language-button');
     if (button) {
       const height = `${Math.round(toggleRect.height)}px`;
@@ -161,9 +164,25 @@
     const headerNav = nav.closest('.nav') || document.querySelector('.top .nav') || document.querySelector('header .nav');
     const toggle = headerNav?.querySelector(':scope > .nav-toggle') || headerNav?.querySelector('.nav-toggle');
     const compact = window.matchMedia('(max-width: 1280px)').matches;
-    if (compact && headerNav && toggle) {
-      if (wrapper.parentNode !== headerNav || wrapper.nextElementSibling !== toggle) headerNav.insertBefore(wrapper, toggle);
-      pinToToggle(wrapper, headerNav, toggle);
+    if (compact && headerNav) {
+      if (wrapper.parentNode !== headerNav) {
+        if (toggle) headerNav.insertBefore(wrapper, toggle);
+        else if (nav && nav.parentNode === headerNav) headerNav.insertBefore(wrapper, nav);
+        else headerNav.appendChild(wrapper);
+      } else if (toggle && wrapper.nextElementSibling !== toggle) {
+        headerNav.insertBefore(wrapper, toggle);
+      }
+      if (toggle) {
+        pinToToggle(wrapper, headerNav, toggle);
+      } else {
+        wrapper.style.position = 'fixed';
+        wrapper.style.right = '76px';
+        wrapper.style.top = '16px';
+        wrapper.style.zIndex = '65';
+        wrapper.style.display = 'inline-flex';
+        wrapper.style.visibility = 'visible';
+        wrapper.style.opacity = '1';
+      }
       return;
     }
     resetPinned(wrapper);
@@ -175,6 +194,8 @@
       else nav.appendChild(wrapper);
     }
   };
+
+  window.NWLanguageSwitcherRefresh = placeSwitcher;
 
   const clean = (value) => String(value || '').replace(/\s+/g, ' ').trim();
   let catalog = null;
