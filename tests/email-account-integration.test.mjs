@@ -134,3 +134,15 @@ test("workspace OAuth completion is accepted by the email callback surface",()=>
   assert.match(callback,/p\.get\("integration"\)==="connected"/);
   assert.match(callback,/integration=connected/);
 });
+
+test("disconnect keeps Google selected so reconnect works immediately",()=>{
+  assert.match(js,/connection = \{ state: "DISCONNECTED", provider: "GOOGLE"/);
+  assert.match(js,/selectedProvider = "GOOGLE"/);
+  assert.match(js,/connection\?\.provider === "GOOGLE"/);
+  assert.match(js,/googleSelectable\(\)/);
+});
+
+test("connect button does not silently block after a Google disconnect",()=>{
+  assert.match(js,/const hasGoogleSelection = selectedProvider === "GOOGLE" \|\| connection\?\.provider === "GOOGLE"/);
+  assert.match(js,/if \(googleReady\) selectedProvider = "GOOGLE"/);
+});
