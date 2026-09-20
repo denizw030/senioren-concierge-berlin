@@ -885,7 +885,20 @@
     appendMessage("user",content,now,clientId,"WEB");input.value="";resizeInput();sending=true;setComposerReady(true);showTyping();
     try{
       if(guestMode){
-        const response=await gatewayRequest("/web/guest-chat",{method:"POST",auth:false,body:{message:content,source_message_id:sourceMessageId,thread_id:activeThreadId,installation_id:guestInstallationId(),guest_token:guestToken()}});
+        let response=null;
+        for(let attempt=0;attempt<2;attempt++){
+          try{
+            response=await gatewayRequest("/web/guest-chat",{method:"POST",auth:false,body:{message:content,source_message_id:sourceMessageId,thread_id:activeThreadId,installation_id:guestInstallationId(),guest_token:guestToken()}});
+            break;
+          }catch(error){
+            const reason=String(error?.message||"");
+            if(attempt===0&&/GUEST_SESSION_(?:EXPIRED|INVALID)/i.test(reason)){
+              try{localStorage.removeItem(GUEST_TOKEN_KEY);}catch{}
+              continue;
+            }
+            throw error;
+          }
+        }
         if(response?.ok!==true||response?.environment!=="PROD"||response?.authoritative!==true||response?.guest!==true)throw new Error("guest_gateway_response_not_authoritative");
         saveGuestToken(response.guest_token);
         const returnedThreadId=String(response?.thread_id||"");if(validUuid(returnedThreadId)){activeThreadId=returnedThreadId;setGuestThreadId(returnedThreadId);}
@@ -945,7 +958,7 @@
     topbar.innerHTML='<button type="button" class="web-concierge-mobile-exit" aria-label="Chat verlassen">‹</button><button type="button" class="web-concierge-mobile-chats" aria-label="Chats öffnen" aria-expanded="false">☰</button><div class="web-concierge-mobile-topbar-title">NAHWERK Concierge</div><button type="button" class="web-concierge-mobile-new" aria-label="Neuer Chat">＋</button>';
     const backdrop=document.createElement("button");backdrop.type="button";backdrop.className="web-concierge-mobile-backdrop";backdrop.setAttribute("aria-label","Chatliste schließen");
     workspace.prepend(topbar);workspace.appendChild(backdrop);
-    topbar.querySelector(".web-concierge-mobile-exit")?.addEventListener("click",()=>{setMobileDrawer(false);location.href="/konto";});
+    topbar.querySelector(".web-concierge-mobile-exit")?.addEventListener("click",()=>{setMobileDrawer(false);location.href=guestMode?"/de/":"/konto";});
     topbar.querySelector(".web-concierge-mobile-chats")?.addEventListener("click",()=>setMobileDrawer(!workspace.classList.contains("is-mobile-sidebar-open")));
     topbar.querySelector(".web-concierge-mobile-new")?.addEventListener("click",()=>{setMobileDrawer(false);newChat();});
     backdrop.addEventListener("click",()=>setMobileDrawer(false));
@@ -977,6 +990,10 @@ syncIosVisualViewport();
     const token=sessionToken();
     guestMode=!token;
     document.body.classList.toggle("web-concierge-guest",guestMode);
+    if(guestMode){
+      const back=document.querySelector(".web-concierge-back");
+      if(back instanceof HTMLAnchorElement){back.href="/de/";back.textContent="Zurück";}
+    }
     if(!guestMode){
       // Do not block the chat UI on a duplicate client-side session preflight.
       // Every authenticated gateway request validates the bearer session server-side again.
@@ -1004,7 +1021,7 @@ syncIosVisualViewport();
     await initialHistoryPromise.catch(()=>false);
     if(ready){
       if(guestMode){
-        addRuntimeCard("Willkommen bei NAHWERK","Frag mich direkt, was NAHWERK kann oder wobei du Unterstützung brauchst. Chatten ist hier kostenlos. Für persönliche Ausführungen brauchst du erst ein Konto.","is-guest-welcome");
+        appendMessage("assistant","Willkommen bei NAHWERK. Du kannst mich sofort kostenlos fragen, was NAHWERK kann oder wobei du Unterstützung brauchst. Für persönliche Ausführungen brauchst du erst ein Konto.",new Date().toISOString(),"guest:welcome","WEB");
       }else{
         renderIntegrationReturnNotice();
         void refreshPersona(true).then(async()=>{await loadThreads();renderThreads();}).catch(()=>{});
