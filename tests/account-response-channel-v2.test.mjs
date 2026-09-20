@@ -24,13 +24,24 @@ test("persistent selector is explicitly scoped to WhatsApp jobs",()=>{
   assert.match(js,/WhatsApp-Aufträge werden künftig per/);
 });
 
-test("WhatsApp option discloses the per-answer transmission fee clearly",()=>{
-  assert.match(account,/Für Unternehmensantworten über WhatsApp fallen Meta-Gebühren an/);
-  assert.match(account,/0,06 € pro Antwort/);
+test("WhatsApp option discloses the fee without repeating WhatsApp branding icons in the note",()=>{
+  assert.match(account,/Meta berechnet Unternehmen Gebühren für Antworten an Endkunden/);
+  assert.match(account,/Übermittlung einer Antwort über diesen Kanal[^<]*0,06 € pro Antwort/);
+  const fee=account.match(/<small class="response-channel-fee-note">([^<]+)<\/small>/)?.[1]||"";
+  assert.doesNotMatch(fee,/WhatsApp/i);
   assert.match(account,/id="responseChannelSave">Speichern<\/button>/);
   assert.doesNotMatch(account,/WhatsApp-Antwortweg speichern/);
   assert.match(js,/save\.textContent="Speichern"/);
   assert.match(css,/\.response-channel-fee-note/);
+});
+
+test("concierge quick buttons save WhatsApp response routes directly",()=>{
+  assert.match(account,/data-response-channel-quick="EMAIL">WhatsApp → via E-Mail<\/button>/);
+  assert.match(account,/data-response-channel-quick="CALL">WhatsApp → via Telefon<\/button>/);
+  assert.match(js,/const quickButtons=Array\.from\(document\.querySelectorAll\("\[data-response-channel-quick\]"\)\)/);
+  assert.match(js,/async function savePreference\(selected,trigger=null\)/);
+  assert.match(js,/void savePreference\(selected,button\)/);
+  assert.match(js,/button\.classList\.toggle\("is-selected",selected===target\)/);
 });
 
 test("single answers can be delivered elsewhere without changing defaults",()=>{
@@ -48,6 +59,6 @@ test("response channel layout is symmetric and responsive",()=>{
 });
 
 test("response channel assets are cache-busted together",()=>{
-  assert.match(account,/assets\/account-response-channel\.css\?v=5/);
-  assert.match(account,/assets\/account-response-channel\.js\?v=5/);
+  assert.match(account,/assets\/account-response-channel\.css\?v=6/);
+  assert.match(account,/assets\/account-response-channel\.js\?v=6/);
 });
