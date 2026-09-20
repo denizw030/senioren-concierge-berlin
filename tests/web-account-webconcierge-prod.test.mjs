@@ -70,6 +70,24 @@ test("customer message appears immediately and browser sends only message plus c
   assert.match(client, /\/payg#quote-/);
 });
 
+test("webchat safely turns HTTPS URLs into clickable links", () => {
+  assert.match(client, /function appendLinkifiedText\(container,text\)/);
+  assert.match(client, /link\.target="_blank"/);
+  assert.match(client, /link\.rel="noopener noreferrer"/);
+  assert.match(client, /appendLinkifiedText\(body,text\)/);
+  assert.doesNotMatch(client, /body\.innerHTML\s*=\s*text/);
+  assert.match(css, /\.web-concierge-message-link\{/);
+});
+
+test("initial webchat hydration does not wait for readiness or optional channel summaries", () => {
+  assert.match(client, /const initialHistoryPromise=\(async\(\)=>\{/);
+  assert.match(client, /Promise\.allSettled\(\[/);
+  assert.match(client, /channelHistoryRequest\("WHATSAPP",\{summary:true\}\)/);
+  assert.match(client, /const \[data\]=await Promise\.all\(\[/);
+  assert.match(client, /historyRequest\(threadId,\{limit:HISTORY_PAGE_SIZE\}\)/);
+  assert.match(client, /refreshRoutedTurns\(\)\.catch/);
+});
+
 test("persisted chat history is authenticated, paginated and reuses the canonical PROD web gateway", () => {
   assert.match(client, /HISTORY_ENDPOINT = "https:\/\/djicahhmnnamtjuqedqd\.supabase\.co\/functions\/v1\/nahwerk-web-gateway\/web\/history"/);
   assert.match(client, /HISTORY_CONTRACT_VERSION = "canonical-core-receipts-v1"/);
@@ -194,7 +212,7 @@ test("legacy and clean routes expose the same end-customer messenger", () => {
     assert.match(surface, /Neuer Chat/);
     assert.match(surface, /Deine Chats/);
     assert.match(surface, /aria-label="Chatverlauf"/);
-    assert.match(surface, /assets\/web-customer-concierge\.js\?v=40/);
+    assert.match(surface, /assets\/web-customer-concierge\.js\?v=41/);
     assert.doesNotMatch(surface, /web-customer-concierge-thread-scope\.js/);
     assert.doesNotMatch(surface, /PROD|autoritativ|Core-v1|web-gateway-v1|Fail-closed|Shadow-Antworten|kanonische Kundenidentität/i);
   }
