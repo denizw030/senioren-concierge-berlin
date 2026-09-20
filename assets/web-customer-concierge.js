@@ -238,14 +238,6 @@
     const bubble=document.createElement("div");bubble.className=`web-concierge-message web-concierge-message-${role}`;
     const body=document.createElement("span");body.className="web-concierge-message-text";body.textContent=text;
     const meta=document.createElement("span");meta.style.cssText="display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-top:3px;min-height:14px";
-    if(normalizedChannel==="WHATSAPP"){
-      const badge=document.createElement("span");
-      badge.className="web-concierge-channel-badge is-whatsapp";
-      badge.textContent="WhatsApp";
-      badge.setAttribute("aria-label","Nachricht über WhatsApp");
-      badge.style.cssText="display:inline-flex;align-items:center;min-height:16px;padding:1px 6px;border:1px solid rgba(93,188,124,.28);border-radius:999px;background:rgba(54,145,84,.12);color:#91cda4;font-size:.58rem;font-weight:800;letter-spacing:.02em";
-      meta.appendChild(badge);
-    }
     const time=document.createElement("span");time.className="web-concierge-message-time";time.textContent=timeLabel(at);time.style.cssText="float:none;margin:0";
     meta.appendChild(time);
     bubble.append(body,meta);row.appendChild(bubble);log.appendChild(row);if(scroll)scrollBottom();return row;
@@ -526,7 +518,7 @@
   });
   function resizeInput(){const input=document.getElementById("webConciergeInput");if(!(input instanceof HTMLTextAreaElement))return;input.style.height="auto";input.style.height=`${Math.min(input.scrollHeight,132)}px`;}
   function sidebarDate(value){const d=new Date(value||Date.now()),now=new Date();if(Number.isNaN(d.getTime()))return "";if(dateKey(d)===dateKey(now))return timeLabel(d);return new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"2-digit"}).format(d);}
-  // CHANNEL_SIDEBAR_IDENTITY_V3_20260920
+  // CHANNEL_SIDEBAR_IDENTITY_V4_20260920
   function channelIcon(channel){
     const key=String(channel||"").toUpperCase();
     const icon=document.createElement("span");
