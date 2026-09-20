@@ -72,7 +72,8 @@ body.account-premium-ui:has(#accountEmailCard:not([hidden])) .nw-floating-concie
 .ecp-tb-nav-icon{display:grid;place-items:center;width:20px;color:#b8bec7}.ecp-tb-nav-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ecp-tb-nav-count{min-width:20px;text-align:right;color:#9da4ae;font-size:.68rem}
 .ecp-tb-nav-separator{height:1px;margin:8px 4px;background:var(--ecp-tb-border)}
 .ecp-tb-nav-global{font-weight:650}
-.ecp-tb-account{display:grid;grid-template-columns:8px minmax(0,1fr);gap:7px;align-items:center;margin:10px 8px 4px;padding:0 2px;color:#eef1f4;min-width:0}
+.ecp-tb-account{appearance:none;display:grid;grid-template-columns:8px minmax(0,1fr);gap:7px;align-items:center;width:calc(100% - 16px);margin:10px 8px 4px;padding:6px 2px;border:0;border-radius:6px;background:transparent;color:#eef1f4;font:inherit;text-align:left;cursor:pointer;min-width:0}
+.ecp-tb-account:hover{background:#25282e}
 .ecp-tb-account strong{font-size:.69rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ecp-tb-account-dot{width:6px;height:6px;border-radius:50%;background:#35c46a;box-shadow:0 0 0 2px rgba(53,196,106,.12)}
 .ecp-tb-nav-subitem{padding-left:15px}
