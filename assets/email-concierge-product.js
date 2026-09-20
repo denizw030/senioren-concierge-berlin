@@ -86,6 +86,8 @@
   let classification = null;
   let classificationBucket = "UNIMPORTANT";
   let classificationLoading = false;
+  let classificationError = "";
+  let classificationRetryCount = 0;
   let busy = false;
   let chatMessages = [];
   let activityExpanded = false;
@@ -219,7 +221,7 @@
   function classificationMessages() { return classification ? [...classification.buckets.IMPORTANT, ...classification.buckets.UNIMPORTANT, ...classification.buckets.MARKETING] : []; }
   function classificationMessageById(id) { return classificationMessages().find((row) => String(row?.id || "") === String(id || "")) || null; }
   function mailboxAllMessages() {
-    const rows = classification ? classificationMessages() : list(dashboard?.highlights);
+    const rows = classification ? classificationMessages() : [...list(dashboard?.highlights), ...list(dashboard?.warnings)];
     const seen = new Set(), out = [];
     for (const row of rows) { const id = String(row?.id || ""); if (!id || seen.has(id)) continue; seen.add(id); out.push(row); }
     return out.sort((a,b)=>Date.parse(String(b?.date||0))-Date.parse(String(a?.date||0)));
@@ -683,9 +685,16 @@
     titleWrap.append(el("strong","",mailboxFolderTitle()),el("span","",String(rows.length)+" angezeigt")); top.append(titleWrap);
     const refresh = button("↻","ecp-tb-icon-button"); refresh.title="Aktualisieren"; refresh.addEventListener("click",()=>void loadDashboard(false,true)); top.append(refresh); pane.append(top);
     const listNode = el("div","ecp-tb-message-list");
-    if (!classification) listNode.append(el("div","ecp-tb-empty",classificationLoading?"E-Mails werden sortiert …":"E-Mail-Übersicht wird geladen …"));
-    else if (!rows.length) listNode.append(el("div","ecp-tb-empty","Keine passenden E-Mails in dieser Ansicht."));
-    else {
+    if (!rows.length && classificationLoading) {
+      listNode.append(el("div","ecp-tb-empty","E-Mails werden geladen …"));
+    } else if (!rows.length && classificationError) {
+      const errorBox=el("div","ecp-tb-empty");
+      errorBox.append(el("strong","","E-Mails konnten gerade nicht geladen werden."),el("span","","Die Google-Verbindung ist aktiv. Bitte lade die Übersicht erneut."));
+      const retry=button("Erneut laden","ecp-tb-toolbar-button");retry.addEventListener("click",()=>{classificationRetryCount=0;void loadClassification();});
+      errorBox.append(retry);listNode.append(errorBox);
+    } else if (!rows.length) {
+      listNode.append(el("div","ecp-tb-empty","Keine passenden E-Mails in dieser Ansicht."));
+    } else {
       rows.forEach((message)=>{
         const row=el("article","ecp-tb-message"+(String(message.id)===selectedMessageId&&readerMode==="MESSAGE"?" is-selected":""));
         row.tabIndex=0; row.setAttribute("role","button"); row.setAttribute("aria-label",(text(message.subject,220)||"(kein Betreff)")+" öffnen");
@@ -751,15 +760,22 @@
   async function loadClassification() {
     if (!connected || classificationLoading) return;
     classificationLoading = true;
+    classificationError = "";
     render();
     try {
       const next = normalizeClassification(await request("/email/concierge/classification/summary"));
-      if (next) {
-        classification = next;
-        if (!selectedMessageId) { const first = mailboxAllMessages()[0]; if (first?.id) setTimeout(()=>void openMailboxMessage(String(first.id)),0); }
+      if (!next) throw new Error("EMAIL_PROVIDER_UNAVAILABLE");
+      classification = next;
+      classificationRetryCount = 0;
+      if (!selectedMessageId) { const first = mailboxAllMessages()[0]; if (first?.id) setTimeout(()=>void openMailboxMessage(String(first.id)),0); }
+    } catch (error) {
+      classification = null;
+      classificationError = error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE";
+      if (connected && classificationRetryCount < 1) {
+        classificationRetryCount += 1;
+        setTimeout(()=>{ if (connected && !classificationLoading) void loadClassification(); },1600);
       }
-    } catch { classification = null; }
-    finally { classificationLoading = false; render(); }
+    } finally { classificationLoading = false; render(); }
   }
   async function loadDashboard(showLoading = true, force = false) {
     if (!connected) return;
@@ -787,7 +803,7 @@
     const canonical = canonicalGoogleConnection();
     connected = canonical === null ? isConnected === true : canonical;
     ensureHost();
-    if (!connected) { dashboard = null; dashboardLoadedAt = 0; classification = null; chatMessages = []; render(); return; }
+    if (!connected) { dashboard = null; dashboardLoadedAt = 0; classification = null; classificationError = ""; classificationRetryCount = 0; chatMessages = []; render(); return; }
     await loadDashboard();
   }
   window.addEventListener("nahwerk:email-connections-updated", (event) => {
