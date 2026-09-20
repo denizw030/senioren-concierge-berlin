@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="assets/email-provider-logo-connect-v3.css?v=20260916-1" />
     <link rel="stylesheet" href="assets/family-owner-sponsored-access.css?v=1" />
     <link rel="stylesheet" href="assets/account-premium-ui.css?v=5" />
-    <link rel="stylesheet" href="assets/account-response-channel.css?v=3" />
+    <link rel="stylesheet" href="assets/account-response-channel.css?v=4" />
     <link rel="stylesheet" href="assets/owner-product-gaps.css?v=2" />
     <style>
       .dash {
@@ -2074,38 +2074,58 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
             <article class="card wide response-channel-panel" id="responseChannelCard" data-account-panel="concierge" role="tabpanel" aria-labelledby="accountTabConcierge" hidden>
               <div class="response-channel-head">
                 <div>
-                  <div class="eyebrow">Antwortkanal</div>
-                  <h3>Wo soll dein Concierge antworten?</h3>
-                  <p class="muted">Lege fest, wo Antworten ankommen sollen – unabhängig davon, ob du über WhatsApp oder E-Mail schreibst.</p>
+                  <div class="eyebrow">Antwortwege</div>
+                  <h3>Deine Antworten. Dein Weg.</h3>
+                  <p class="muted">Web und App bleiben übersichtlich im jeweiligen Chat. Für WhatsApp-Aufträge legst du fest, wo die Rückmeldung ankommen soll.</p>
                 </div>
                 <span class="response-channel-status" id="responseChannelStatus">Wird geladen …</span>
               </div>
+
+              <div class="response-channel-defaults" aria-label="Standard-Antworten">
+                <div class="response-channel-default">
+                  <span class="response-channel-default-icon" aria-hidden="true">⌁</span>
+                  <span><small>Web</small><strong>Antwort im Web-Chat</strong><em>Standard</em></span>
+                </div>
+                <div class="response-channel-default">
+                  <span class="response-channel-default-icon" aria-hidden="true">◫</span>
+                  <span><small>App</small><strong>Antwort im App-Chat</strong><em>Standard</em></span>
+                </div>
+              </div>
+
+              <div class="response-channel-scope">
+                <div>
+                  <span class="eyebrow">WhatsApp-Aufträge</span>
+                  <strong>Wo soll die Rückmeldung ankommen?</strong>
+                </div>
+                <span>Diese Auswahl verändert Web und App nicht.</span>
+              </div>
+
               <div class="response-channel-options" id="responseChannelOptions">
                 <label class="response-channel-option">
                   <input type="radio" name="responseChannel" value="SAME_CHANNEL" />
-                  <span><strong>Dort, wo ich schreibe</strong><small>Antwort auf demselben Kanal wie deine Nachricht.</small></span>
-                </label>
-                <label class="response-channel-option">
-                  <input type="radio" name="responseChannel" value="WHATSAPP" />
-                  <span><strong>WhatsApp</strong><small id="responseChannelWhatsAppTarget">Deine verknüpfte WhatsApp-Nummer.</small></span>
+                  <span><strong>WhatsApp</strong><small id="responseChannelWhatsAppTarget">Direkt zurück in deinen WhatsApp-Chat.</small></span>
                 </label>
                 <label class="response-channel-option">
                   <input type="radio" name="responseChannel" value="EMAIL" />
-                  <span><strong>E-Mail</strong><small id="responseChannelEmailTarget">Deine hinterlegte E-Mail-Adresse.</small></span>
+                  <span><strong>E-Mail</strong><small id="responseChannelEmailTarget">An deine hinterlegte E-Mail-Adresse.</small></span>
                 </label>
                 <label class="response-channel-option">
                   <input type="radio" name="responseChannel" value="CALL" />
                   <span><strong>Anruf</strong><small id="responseChannelCallTarget">Der Concierge ruft deine verifizierte Nummer an.</small></span>
                 </label>
-                <label class="response-channel-option is-disabled">
-                  <input type="radio" name="responseChannel" value="APP" disabled />
-                  <span><strong>App</strong><small>Folgt später.</small></span>
-                </label>
               </div>
+
+              <div class="response-channel-one-off">
+                <span class="response-channel-one-off-mark" aria-hidden="true">↗</span>
+                <div>
+                  <strong>Einzelne Antwort anders zustellen</strong>
+                  <p>Im Web oder in der App kannst du jederzeit schreiben: „Schick mir diese Übersicht per E-Mail.“ Nur diese Antwort wird dann zusätzlich auf dem gewünschten Weg zugestellt; deine Standards bleiben unverändert.</p>
+                </div>
+              </div>
+
               <div class="response-channel-footer">
-                <p class="muted">Du kannst diese Einstellung auch direkt im Chat ändern, zum Beispiel: „Antworte mir künftig per E-Mail.“</p>
                 <div class="actions">
-                  <button class="btn red" type="button" id="responseChannelSave">Antwortkanal speichern</button>
+                  <button class="btn red" type="button" id="responseChannelSave">WhatsApp-Antwortweg speichern</button>
                 </div>
                 <span class="response-channel-save-status" id="responseChannelSaveStatus" aria-live="polite"></span>
               </div>
@@ -5467,6 +5487,6 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
   <script src="assets/email-provider-logo-connect-v3.js?v=20260920-2"></script>
   <script src="assets/web-core-shadow.js?v=1"></script>
   <script src="assets/web-concierge-chat.js?v=2"></script>
-  <script src="assets/account-response-channel.js?v=3"></script>
+  <script src="assets/account-response-channel.js?v=4"></script>
   <script src="assets/site-ui.js?v=5"></script></body>
 </html>
