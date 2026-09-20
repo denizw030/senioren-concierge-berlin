@@ -31,21 +31,21 @@
       const assert = (condition, message) => { if (!condition) throw new Error(message); };
       const nextLoad = () => new Promise((resolve) => frame.addEventListener("load", resolve, { once:true }));
 
-      async function loadSenior(theme) {
-        localStorage.setItem(KEY, theme);
+      async function loadSenior(requestedTheme) {
+        localStorage.setItem(KEY, requestedTheme);
         const loaded = nextLoad();
-        frame.src = `/senioren-concierge.html?theme_footer_e2e=${theme}-${Date.now()}`;
+        frame.src = `/senioren-concierge.html?theme_footer_e2e=${requestedTheme}-${Date.now()}`;
         await loaded;
         await wait(350);
         const doc = frame.contentDocument;
-        assert(doc, `${theme}: senior document unavailable`);
-        assert(doc.documentElement.dataset.nwPortalTheme === theme, `${theme}: senior html theme mismatch`);
-        assert(doc.body.classList.contains(`nw-portal-${theme}`), `${theme}: senior body theme class missing`);
+        assert(doc, `${requestedTheme}: senior document unavailable`);
+        const expectedTheme = "light";
+        assert(doc.documentElement.dataset.nwPortalTheme === expectedTheme, `${requestedTheme}: senior html must stay canonical light`);
+        assert(doc.body.classList.contains("nw-portal-light"), `${requestedTheme}: senior body must stay canonical light`);
         const footer = doc.querySelector(".footer");
-        assert(footer, `${theme}: senior footer missing`);
+        assert(footer, `${requestedTheme}: senior footer missing`);
         const footerBg = frame.contentWindow.getComputedStyle(footer).backgroundColor;
-        if (theme === "light") assert(!isBlack(footerBg), `light: senior footer stayed black (${footerBg})`);
-        else assert(isBlack(footerBg), `dark: senior footer not deep black (${footerBg})`);
+        assert(!isBlack(footerBg), `${requestedTheme}: senior footer must stay light (${footerBg})`);
       }
 
       async function loadThemeRuntime() {
