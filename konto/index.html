@@ -10,7 +10,8 @@
     <link rel="stylesheet" href="assets/email-provider-logo-connect-v3.css?v=20260916-1" />
     <link rel="stylesheet" href="assets/family-owner-sponsored-access.css?v=1" />
     <link rel="stylesheet" href="assets/account-premium-ui.css?v=6" />
-    <link rel="stylesheet" href="assets/account-response-channel.css?v=3" />
+    <link rel="stylesheet" href="assets/account-response-channel.css?v=5" />
+    <link rel="stylesheet" href="assets/account-header-concierge.css?v=1" />
     <link rel="stylesheet" href="assets/owner-product-gaps.css?v=2" />
     <style>
       .dash {
@@ -1845,6 +1846,155 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
 @media(max-width:720px){.safety-hub,.fraud-protection-grid{grid-template-columns:1fr}.fraud-protection-grid>div.fraud-featured{grid-column:auto}}
 </style>
   <script src="/assets/clean-url.js?v=1"></script>
+
+  <style id="konto-overview-compact-v2">
+    /* Compact account overview: put useful account information above decorative space. */
+    .account-hero{
+      min-height:96px!important;
+      padding:20px 0 16px!important;
+      align-items:center!important;
+    }
+    .account-hero>.wrap{
+      display:flex!important;
+      align-items:center!important;
+      min-height:58px!important;
+    }
+    .account-hero h1{
+      max-width:none!important;
+      margin:0!important;
+      font-size:clamp(1.9rem,3.1vw,2.75rem)!important;
+      line-height:1.02!important;
+      letter-spacing:-.045em!important;
+    }
+    .account-hero .eyebrow,
+    .account-hero p{display:none!important}
+
+    .account-section{
+      padding:22px 0 clamp(68px,7vw,96px)!important;
+    }
+    .account-setup-by{
+      display:grid!important;
+      grid-template-columns:minmax(120px,.7fr) minmax(0,1.35fr) auto!important;
+      align-items:center!important;
+      gap:16px!important;
+      min-height:64px!important;
+      margin:0 0 12px!important;
+      padding:13px 16px!important;
+      border-radius:16px!important;
+      text-align:left!important;
+    }
+    .account-setup-by .eyebrow{margin:0!important}
+    .account-setup-name{
+      text-align:center!important;
+      font-size:14px!important;
+      font-weight:760!important;
+      letter-spacing:-.015em!important;
+    }
+    .account-setup-context-label{
+      justify-self:end!important;
+      white-space:nowrap!important;
+    }
+    .account-tabs-shell{
+      margin-bottom:14px!important;
+      border-radius:15px!important;
+    }
+    .account-session-note{
+      margin:0 0 14px!important;
+      padding:11px 15px!important;
+      border-radius:13px!important;
+      font-size:11.5px!important;
+      line-height:1.45!important;
+    }
+    .dash{gap:12px!important}
+    .summary-card{
+      min-height:132px!important;
+      padding:18px!important;
+      border-radius:18px!important;
+    }
+    .summary-card .eyebrow{margin-bottom:2px!important}
+    .summary-card .value{
+      margin-top:6px!important;
+      font-size:clamp(1.02rem,1.35vw,1.18rem)!important;
+      line-height:1.2!important;
+      letter-spacing:-.018em!important;
+    }
+    .summary-card .muted{
+      margin:9px 0 0!important;
+      font-size:11.25px!important;
+      line-height:1.45!important;
+    }
+    .account-overview-highlights{
+      gap:12px!important;
+      margin-top:0!important;
+    }
+    .account-overview-link{
+      position:relative!important;
+      min-height:108px!important;
+      padding:17px 46px 17px 18px!important;
+      border-radius:18px!important;
+      overflow:hidden!important;
+      transition:border-color .18s ease,background .18s ease,box-shadow .18s ease,transform .18s ease!important;
+    }
+    .account-overview-link::after{
+      content:"›";
+      position:absolute;
+      right:18px;
+      top:50%;
+      transform:translateY(-50%);
+      font-size:25px;
+      font-weight:300;
+      line-height:1;
+      opacity:.42;
+      transition:transform .18s ease,opacity .18s ease;
+    }
+    .account-overview-link:hover{transform:translateY(-1px)!important}
+    .account-overview-link:hover::after{transform:translate(2px,-50%);opacity:.72}
+    .account-overview-link .eyebrow{
+      margin-bottom:8px!important;
+      font-size:10.5px!important;
+      letter-spacing:.09em!important;
+    }
+    .account-overview-link strong{
+      margin-bottom:5px!important;
+      font-size:clamp(.98rem,1.35vw,1.16rem)!important;
+      line-height:1.2!important;
+      letter-spacing:-.022em!important;
+    }
+    .account-overview-link span:last-child{
+      max-width:92%!important;
+      font-size:11.25px!important;
+      line-height:1.42!important;
+    }
+    body:not(.senior-product):not([data-product="senioren"]) .summary-card,
+    body:not(.senior-product):not([data-product="senioren"]) .account-overview-link{
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 10px 30px rgba(0,0,0,.12)!important;
+    }
+
+    @media(max-width:900px){
+      .account-hero{min-height:82px!important;padding:15px 0 12px!important}
+      .account-hero>.wrap{min-height:48px!important}
+      .account-hero h1{font-size:clamp(1.7rem,5.2vw,2.25rem)!important}
+      .account-section{padding-top:16px!important}
+      .account-setup-by{
+        grid-template-columns:1fr auto!important;
+        gap:5px 12px!important;
+      }
+      .account-setup-by .eyebrow{grid-column:1!important}
+      .account-setup-name{grid-column:1!important;text-align:left!important}
+      .account-setup-context-label{grid-column:2!important;grid-row:1/3!important}
+      .summary-card{grid-column:span 6!important}
+    }
+    @media(max-width:700px){
+      .account-hero{min-height:74px!important;padding:12px 0 10px!important}
+      .account-hero>.wrap{min-height:42px!important}
+      .account-hero h1{font-size:1.72rem!important}
+      .account-setup-by{padding:12px 13px!important}
+      .account-setup-context-label{font-size:10px!important}
+      .summary-card{grid-column:1/-1!important;min-height:112px!important;padding:16px!important}
+      .account-overview-highlights{grid-template-columns:1fr!important;gap:9px!important}
+      .account-overview-link{min-height:92px!important;padding:15px 44px 15px 16px!important}
+    }
+  </style>
 </head>
   <body class="account-premium-ui">
     <script>
@@ -1863,11 +2013,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
     <main>
       <section class="hero account-hero">
         <div class="wrap">
-          <div class="eyebrow">Mein Bereich</div>
           <h1>Dein persönlicher Bereich.</h1>
-          <p>
-            Verwalte deinen Account, deinen Concierge, Nutzung und Safety übersichtlich an einem Ort.
-          </p>
         </div>
       </section>
       <section class="section account-section">
@@ -2074,38 +2220,58 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
             <article class="card wide response-channel-panel" id="responseChannelCard" data-account-panel="concierge" role="tabpanel" aria-labelledby="accountTabConcierge" hidden>
               <div class="response-channel-head">
                 <div>
-                  <div class="eyebrow">Antwortkanal</div>
-                  <h3>Wo soll dein Concierge antworten?</h3>
-                  <p class="muted">Lege fest, wo Antworten ankommen sollen – unabhängig davon, ob du über WhatsApp oder E-Mail schreibst.</p>
+                  <div class="eyebrow">Antwortwege</div>
+                  <h3>Deine Antworten. Dein Weg.</h3>
+                  <p class="muted">Web und App bleiben übersichtlich im jeweiligen Chat. Für WhatsApp-Aufträge legst du fest, wo die Rückmeldung ankommen soll.</p>
                 </div>
                 <span class="response-channel-status" id="responseChannelStatus">Wird geladen …</span>
               </div>
+
+              <div class="response-channel-defaults" aria-label="Standard-Antworten">
+                <div class="response-channel-default">
+                  <span class="response-channel-default-icon" aria-hidden="true">⌁</span>
+                  <span><small>Web</small><strong>Antwort im Web-Chat</strong><em>Standard</em></span>
+                </div>
+                <div class="response-channel-default">
+                  <span class="response-channel-default-icon" aria-hidden="true">◫</span>
+                  <span><small>App</small><strong>Antwort im App-Chat</strong><em>Standard</em></span>
+                </div>
+              </div>
+
+              <div class="response-channel-scope">
+                <div>
+                  <span class="eyebrow">WhatsApp-Aufträge</span>
+                  <strong>Wo soll die Rückmeldung ankommen?</strong>
+                </div>
+                <span>Diese Auswahl verändert Web und App nicht.</span>
+              </div>
+
               <div class="response-channel-options" id="responseChannelOptions">
                 <label class="response-channel-option">
                   <input type="radio" name="responseChannel" value="SAME_CHANNEL" />
-                  <span><strong>Dort, wo ich schreibe</strong><small>Antwort auf demselben Kanal wie deine Nachricht.</small></span>
-                </label>
-                <label class="response-channel-option">
-                  <input type="radio" name="responseChannel" value="WHATSAPP" />
-                  <span><strong>WhatsApp</strong><small id="responseChannelWhatsAppTarget">Deine verknüpfte WhatsApp-Nummer.</small></span>
+                  <span><strong>WhatsApp</strong><small id="responseChannelWhatsAppTarget">Direkt zurück in deinen WhatsApp-Chat.</small><small class="response-channel-fee-note">Hinweis: Für Unternehmensantworten über WhatsApp fallen Meta-Gebühren an. Die Übermittlung einer NAHWERK-Antwort über WhatsApp kostet deshalb 0,06 € pro Antwort.</small></span>
                 </label>
                 <label class="response-channel-option">
                   <input type="radio" name="responseChannel" value="EMAIL" />
-                  <span><strong>E-Mail</strong><small id="responseChannelEmailTarget">Deine hinterlegte E-Mail-Adresse.</small></span>
+                  <span><strong>E-Mail</strong><small id="responseChannelEmailTarget">An deine hinterlegte E-Mail-Adresse.</small></span>
                 </label>
                 <label class="response-channel-option">
                   <input type="radio" name="responseChannel" value="CALL" />
                   <span><strong>Anruf</strong><small id="responseChannelCallTarget">Der Concierge ruft deine verifizierte Nummer an.</small></span>
                 </label>
-                <label class="response-channel-option is-disabled">
-                  <input type="radio" name="responseChannel" value="APP" disabled />
-                  <span><strong>App</strong><small>Folgt später.</small></span>
-                </label>
               </div>
+
+              <div class="response-channel-one-off">
+                <span class="response-channel-one-off-mark" aria-hidden="true">↗</span>
+                <div>
+                  <strong>Einzelne Antwort anders zustellen</strong>
+                  <p>Im Web oder in der App kannst du jederzeit schreiben: „Schick mir diese Übersicht per E-Mail.“ Nur diese Antwort wird dann zusätzlich auf dem gewünschten Weg zugestellt; deine Standards bleiben unverändert.</p>
+                </div>
+              </div>
+
               <div class="response-channel-footer">
-                <p class="muted">Du kannst diese Einstellung auch direkt im Chat ändern, zum Beispiel: „Antworte mir künftig per E-Mail.“</p>
                 <div class="actions">
-                  <button class="btn red" type="button" id="responseChannelSave">Antwortkanal speichern</button>
+                  <button class="btn red" type="button" id="responseChannelSave">Speichern</button>
                 </div>
                 <span class="response-channel-save-status" id="responseChannelSaveStatus" aria-live="polite"></span>
               </div>
@@ -2189,7 +2355,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
               <div><div class="eyebrow">Anbieter</div><div class="email-provider-grid" aria-label="E-Mail-Anbieter"><button class="email-provider-card" type="button" data-email-provider="GOOGLE" aria-pressed="false" disabled><strong>Google Gmail / Google Workspace</strong><span data-email-provider-status>Nicht serverseitig bestätigt</span></button><button class="email-provider-card" type="button" data-email-provider="MICROSOFT" aria-pressed="false" disabled><strong>Microsoft Outlook / Microsoft 365</strong><span data-email-provider-status>Nicht serverseitig bestätigt</span></button><button class="email-provider-card" type="button" data-email-provider="GENERIC" aria-pressed="false" disabled><strong>Anderer Anbieter</strong><span data-email-provider-status>Nicht serverseitig bestätigt</span></button></div><p class="email-provider-note">Die Verfügbarkeit wird ausschließlich serverseitig über den NAHWERK E-Mail-Gateway bestätigt. Die technische Verfügbarkeit hängt von den Einstellungen und Richtlinien deines E-Mail-Anbieters ab.</p></div>
               <div><div class="eyebrow">Endkunden-Steuerung</div><div class="email-capabilities" aria-label="E-Mail-Funktionen"><label class="email-capability"><input type="checkbox" value="EMAIL_READ" data-email-capability checked disabled /><span><strong>E-Mails lesen</strong><small>Inhalte öffnen und zusammenfassen</small></span></label><label class="email-capability"><input type="checkbox" value="EMAIL_SEARCH" data-email-capability checked disabled /><span><strong>E-Mails suchen</strong><small>Gezielt im verbundenen Postfach suchen</small></span></label><label class="email-capability"><input type="checkbox" value="EMAIL_ATTACHMENTS" data-email-capability checked disabled /><span><strong>Anhänge berücksichtigen</strong><small>Sichere Anhänge in Aufgaben einbeziehen</small></span></label><label class="email-capability"><input type="checkbox" value="EMAIL_DRAFT" data-email-capability checked disabled /><span><strong>Entwürfe vorbereiten</strong><small>Antworten vorbereiten, noch nicht senden</small></span></label><label class="email-capability"><input type="checkbox" value="EMAIL_MAILBOX" data-email-capability checked disabled /><span><strong>Postfach verwalten</strong><small>Als gelesen markieren, archivieren oder in den Papierkorb</small></span></label><label class="email-capability"><input type="checkbox" value="EMAIL_SEND" data-email-capability checked disabled /><span><strong>Nach Freigabe senden</strong><small>Versand bleibt immer an die vorgesehene Freigabe gebunden</small></span></label></div><p class="email-preferences-note" id="emailPreferencesStatus" aria-live="polite">Nach bestätigter Verbindung kannst du diese Funktionen einzeln ein- oder ausschalten.</p></div>
               <div class="email-state-card" aria-live="polite"><h4 id="emailStateTitle">Verbindung technisch vorbereitet, derzeit noch nicht verfügbar.</h4><p id="emailStateMeta">Der serverseitige Verbindungsstatus bleibt alleinige Authority.</p><span class="email-account-hint" id="emailAccountHint"></span></div>
-              <div class="email-actions"><button class="btn red" type="button" id="emailConnectButton" disabled>E-Mail-Konto verbinden</button><button class="btn red" type="button" id="emailReauthButton" hidden>Erneut verbinden</button><button class="btn light" type="button" id="emailDisconnectButton" hidden>Verbindung trennen</button><button class="btn light" type="button" id="emailRetryButton" hidden>Erneut versuchen</button></div>
+              <div class="email-actions"><button class="btn red" type="button" id="emailConnectButton">Verbinden</button><button class="btn red" type="button" id="emailReauthButton" hidden>Erneut verbinden</button><button class="btn light" type="button" id="emailDisconnectButton" hidden>Verbindung trennen</button><button class="btn light" type="button" id="emailRetryButton" hidden>Erneut versuchen</button></div>
               <form class="email-generic-form" id="emailGenericForm" autocomplete="off" hidden><div class="eyebrow">Anderer Anbieter · APP_PASSWORD</div><h4>IMAP- und SMTP-Zugang</h4><p class="email-generic-help">OAuth2 wird für „Anderer Anbieter“ in Website V1 nicht angeboten. Das App-Passwort wird nur für den unmittelbaren Verbindungsrequest verwendet, niemals gespeichert und nach dem Submit sofort aus dem Eingabefeld gelöscht.</p><div class="email-generic-grid"><label class="email-field"><span>Anbieter</span><select id="emailGenericProviderKey"><option value="GMX">GMX</option><option value="WEBDE">WEB.DE</option><option value="YAHOO">Yahoo</option><option value="TELEKOM">Telekom</option><option value="IONOS">IONOS</option><option value="STRATO">STRATO</option><option value="FASTMAIL">Fastmail</option><option value="ICLOUD">iCloud</option><option value="ZOHO">Zoho</option><option value="CUSTOM">Eigener Anbieter</option></select></label><label class="email-field" id="emailGenericCustomWrap" hidden><span>Anbieterbezeichnung</span><input id="emailGenericCustomLabel" type="text" maxlength="80" /></label><label class="email-field"><span>IMAP-Host</span><input id="emailGenericImapHost" type="text" maxlength="253" autocomplete="off" /></label><label class="email-field"><span>IMAP-Port</span><input id="emailGenericImapPort" type="number" min="1" max="65535" value="993" /></label><label class="email-field"><span>SMTP-Host</span><input id="emailGenericSmtpHost" type="text" maxlength="253" autocomplete="off" /></label><label class="email-field"><span>SMTP-Port</span><input id="emailGenericSmtpPort" type="number" min="1" max="65535" value="465" /></label><label class="email-field"><span>Benutzername</span><input id="emailGenericUsername" type="text" maxlength="320" autocomplete="username" /></label><label class="email-field"><span>App-Passwort</span><input id="emailGenericAppPassword" type="password" maxlength="512" autocomplete="off" /></label></div><input type="hidden" id="emailGenericAuthMode" value="APP_PASSWORD" /><div class="email-tls-row"><label class="email-tls"><input id="emailGenericImapTls" type="checkbox" checked disabled /> IMAP TLS erforderlich</label><label class="email-tls"><input id="emailGenericSmtpTls" type="checkbox" checked disabled /> SMTP TLS erforderlich</label></div><p class="email-generic-help">Die technische Verfügbarkeit hängt von den Einstellungen und Richtlinien deines E-Mail-Anbieters ab.</p></form>
               <p class="email-continuity-note"><strong>Ein NAHWERK.</strong> Die Verbindung gehört zu deiner Person – nicht zu diesem Browser oder einem einzelnen Kanal. Nach einer real bestätigten Verbindung nutzen Web, WhatsApp, Voice und App dieselbe person_id, denselben NAHWERK Core, dieselben Tasks, Memory und Approvals sowie dieselbe email_connections-Wahrheit über den CAO.</p>
             </div>
@@ -2770,7 +2936,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
         <button class="btn light security-nudge-later" type="button" id="securityNudgeLater">Später einrichten</button>
       </div>
     </div>
-    <script src="assets/auth-nav.js?v=41"></script>
+    <script src="assets/auth-nav.js?v=42"></script>
     <script src="assets/owner-product-gaps.js?v=1"></script>
     <script src="assets/nahwerk-analytics.js?v=1"></script>
     <script src="assets/acquisition-v1.js?v=2"></script>
@@ -3171,6 +3337,9 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
           }
         }
         renderActorOwnerName();
+        try {
+          if (sessionToken()) localStorage.removeItem("scb_onboarding");
+        } catch (_) {}
         function activeSelfAccountId() {
           if (activeAccountContext?.selected?.is_self === true && activeAccountContext?.selected?.customer_account_id) {
             return String(activeAccountContext.selected.customer_account_id);
@@ -3467,6 +3636,22 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
         function renderProfilePayload(body) {
           applyAuthoritativeAccountTheme(body?.brand);
           applyProfile(body?.profile || {});
+          const authoritativeFirstName = String(body?.profile?.first_name || "").trim();
+          if (authoritativeFirstName) {
+            document.querySelectorAll(".nw-account-name").forEach((node) => {
+              node.textContent = authoritativeFirstName;
+            });
+            try {
+              const session = accountSession();
+              if (
+                session?.session_token &&
+                (!body?.customer_account_id || String(session.customer_account_id || "") === String(body.customer_account_id))
+              ) {
+                session.first_name = authoritativeFirstName;
+                sessionStorage.setItem("scb_web_session", JSON.stringify(session));
+              }
+            } catch (_) {}
+          }
           const customerNumber = document.getElementById("customerNumber");
           if (customerNumber) customerNumber.textContent = body?.customer_number || "Nicht verfügbar";
           applyPlanAndUsage(body?.plan || null, body?.usage || null);
@@ -5364,22 +5549,27 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
               const overviewConcierge = document.getElementById("overviewConcierge");
               if (overviewConcierge) overviewConcierge.textContent = conciergeName;
             }
-            document.getElementById("recipientName").textContent =
-              d.recipient?.name || "–";
-            document.getElementById("recipientMeta").textContent = [
-              d.recipient?.relationship,
-              d.recipient?.phone,
-              d.recipient?.addressing === "du"
-                ? "Du-Ansprache"
-                : "Sie-Ansprache",
-            ]
-              .filter(Boolean)
-              .join(" · ");
-            document.getElementById("ownerName").textContent =
-              d.owner?.name || "–";
-            if (d.recipient?.note)
-              document.getElementById("profileInfo").textContent =
-                d.recipient.note;
+            // Legacy onboarding data is never authoritative for an authenticated account.
+            // Names, selected person context and "Eingerichtet von" come only from the
+            // server-validated profile/account-context payloads above.
+            if (!sessionToken()) {
+              document.getElementById("recipientName").textContent =
+                d.recipient?.name || "–";
+              document.getElementById("recipientMeta").textContent = [
+                d.recipient?.relationship,
+                d.recipient?.phone,
+                d.recipient?.addressing === "du"
+                  ? "Du-Ansprache"
+                  : "Sie-Ansprache",
+              ]
+                .filter(Boolean)
+                .join(" · ");
+              document.getElementById("ownerName").textContent =
+                d.owner?.name || "–";
+              if (d.recipient?.note)
+                document.getElementById("profileInfo").textContent =
+                  d.recipient.note;
+            }
           }
           prefSummary(
             JSON.parse(
@@ -5391,10 +5581,59 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
     </script>
   <script src="assets/concierge-carousel.js?v=20"></script>
   <script src="assets/family-owner-sponsored-access.js?v=2"></script>
-  <script src="assets/email-account-integration.js?v=3"></script>
-  <script src="assets/email-provider-logo-connect-v3.js?v=20260916-1"></script>
+  <script src="assets/email-account-integration.js?v=8"></script>
+  <script>
+    (() => {
+      const BASE = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-email-runtime";
+      const CAPS = ["EMAIL_READ","EMAIL_SEARCH","EMAIL_ATTACHMENTS","EMAIL_DRAFT","EMAIL_MAILBOX","EMAIL_SEND"];
+      function emailFallbackToken() {
+        try { return String(JSON.parse(sessionStorage.getItem("scb_web_session") || "null")?.session_token || ""); }
+        catch (_) { return ""; }
+      }
+      function emailFallbackMessage(message, detail) {
+        const title = document.getElementById("emailStateTitle");
+        const meta = document.getElementById("emailStateMeta");
+        if (title) title.textContent = message;
+        if (meta) meta.textContent = detail || "";
+      }
+      document.addEventListener("click", async (event) => {
+        const button = event.target?.closest?.("#emailConnectButton");
+        if (!button) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        const sessionToken = emailFallbackToken();
+        if (!sessionToken) {
+          emailFallbackMessage("Deine Sitzung ist nicht mehr gültig.", "Bitte melde dich erneut bei NAHWERK an.");
+          return;
+        }
+        button.disabled = true;
+        button.textContent = "Verbindung wird gestartet …";
+        try {
+          const response = await fetch(BASE + "/email/connect", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: "Bearer " + sessionToken },
+            body: JSON.stringify({ provider: "GOOGLE", requested_capabilities: CAPS })
+          });
+          const data = await response.json().catch(() => ({}));
+          const redirect = String(data?.authorization_redirect_url || "");
+          let url = null;
+          try { url = new URL(redirect); } catch (_) {}
+          if (!response.ok || data?.ok !== true || !url || url.protocol !== "https:" || url.hostname !== "accounts.google.com") {
+            throw new Error(String(data?.error?.code || "EMAIL_OAUTH_FAILED"));
+          }
+          location.assign(url.toString());
+        } catch (_) {
+          emailFallbackMessage("Die Google-Verbindung konnte nicht gestartet werden.", "Bitte versuche es erneut.");
+          button.disabled = false;
+          button.textContent = "Verbinden";
+        }
+      }, true);
+    })();
+  </script>
+  <script src="assets/email-provider-logo-connect-v3.js?v=20260920-2"></script>
   <script src="assets/web-core-shadow.js?v=1"></script>
   <script src="assets/web-concierge-chat.js?v=2"></script>
-  <script src="assets/account-response-channel.js?v=3"></script>
+  <script src="assets/account-header-concierge.js?v=1"></script>
+  <script src="assets/account-response-channel.js?v=5"></script>
   <script src="assets/site-ui.js?v=5"></script></body>
 </html>
