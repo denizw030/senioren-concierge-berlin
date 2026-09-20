@@ -61,16 +61,26 @@ body.account-premium-ui:has(#accountEmailCard:not([hidden])) .nw-floating-concie
 .ecp-tb-search input::placeholder{color:#8b929c}
 .ecp-tb-live{display:inline-flex;align-items:center;gap:7px;padding:6px 9px;border:1px solid #383d44;border-radius:999px;font-size:.7rem;color:#cdd2d8}
 .ecp-tb-live::before{content:"";width:7px;height:7px;border-radius:50%;background:#35c46a}
-.ecp-tb-shell{display:grid;grid-template-columns:220px minmax(320px,390px) minmax(0,1fr);min-height:665px}
+.ecp-tb-shell{display:grid;grid-template-columns:260px minmax(320px,390px) minmax(0,1fr);min-height:665px}
 .ecp-tb-sidebar{display:flex;flex-direction:column;min-width:0;border-right:1px solid var(--ecp-tb-border);background:#191b1f}
 .ecp-tb-brand{display:flex;align-items:center;gap:10px;padding:14px 13px 12px;border-bottom:1px solid var(--ecp-tb-border)}
 .ecp-tb-brandmark{display:grid;place-items:center;width:30px;height:30px;border-radius:7px;background:#1473e6;color:#fff;font-size:.9rem}
 .ecp-tb-brand div{display:grid;gap:2px;min-width:0}.ecp-tb-brand strong{font-size:.82rem}.ecp-tb-brand span:not(.ecp-tb-brandmark){font-size:.67rem;color:var(--ecp-tb-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ecp-tb-nav{display:grid;gap:2px;padding:9px 7px}
+.ecp-tb-nav{display:grid;gap:2px;padding:9px 7px;overflow:auto}
 .ecp-tb-nav-item{appearance:none;display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:7px;align-items:center;width:100%;min-height:36px;padding:7px 8px;border:0;border-radius:6px;background:transparent;color:#dfe3e8;font:inherit;font-size:.78rem;text-align:left;cursor:pointer}
 .ecp-tb-nav-item:hover{background:#25282e}.ecp-tb-nav-item.is-active{background:#31353c;color:#fff}
 .ecp-tb-nav-icon{display:grid;place-items:center;width:20px;color:#b8bec7}.ecp-tb-nav-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ecp-tb-nav-count{min-width:20px;text-align:right;color:#9da4ae;font-size:.68rem}
-.ecp-tb-nav-separator{height:1px;margin:7px 4px;background:var(--ecp-tb-border)}
+.ecp-tb-nav-separator{height:1px;margin:8px 4px;background:var(--ecp-tb-border)}
+.ecp-tb-nav-global{font-weight:650}
+.ecp-tb-account{display:grid;grid-template-columns:8px minmax(0,1fr);gap:7px;align-items:center;margin:10px 8px 4px;padding:0 2px;color:#eef1f4;min-width:0}
+.ecp-tb-account strong{font-size:.69rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ecp-tb-account-dot{width:6px;height:6px;border-radius:50%;background:#35c46a;box-shadow:0 0 0 2px rgba(53,196,106,.12)}
+.ecp-tb-nav-subitem{padding-left:15px}
+.ecp-tb-account-chip{justify-self:start;max-width:100%;padding:3px 6px;border:1px solid #3a3e45;border-radius:999px;color:#9da4ae;font-size:.61rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ecp-tb-reader-account{margin-top:4px;font-size:.67rem;color:#8e959f}
+.ecp-notify-setting{display:grid;grid-template-columns:minmax(0,1fr) minmax(190px,260px);gap:14px;align-items:center;margin:0 0 16px;padding:14px;border:1px solid rgba(127,127,127,.16);border-radius:14px;background:rgba(127,127,127,.035)}
+.ecp-notify-copy{display:grid;gap:4px}.ecp-notify-copy strong{font-size:.8rem}.ecp-notify-copy small{font-size:.69rem;line-height:1.45;opacity:.62}
+.ecp-notify-controls{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:center}
 .ecp-tb-sidebar-foot{margin-top:auto;display:grid;gap:4px;padding:12px;border-top:1px solid var(--ecp-tb-border);font-size:.68rem;line-height:1.35;color:#c4c9d0}.ecp-tb-sidebar-foot small{color:#888f99;font-size:.64rem}
 .ecp-tb-list-pane{min-width:0;border-right:1px solid var(--ecp-tb-border);background:#1d1f23}
 .ecp-tb-list-top{min-height:49px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 10px;border-bottom:1px solid var(--ecp-tb-border);background:#202328}
@@ -103,9 +113,12 @@ body.account-premium-ui:has(#accountEmailCard:not([hidden])) .nw-floating-concie
 .ecp-tb-reader .ecp-chat-log{max-height:345px}.ecp-tb-reader .ecp-chat-input,.ecp-tb-reader .ecp-editor textarea,.ecp-tb-reader .ecp-editor input,.ecp-tb-reader .ecp-rule-select{background:#17191d!important;color:#f2f4f6!important;border-color:#3c4148!important}
 .ecp-tb-reader .ecp-msg-assistant,.ecp-tb-reader .ecp-mail,.ecp-tb-reader .ecp-activity,.ecp-tb-reader .ecp-hint,.ecp-tb-reader .ecp-draft,.ecp-tb-reader .ecp-rule-personal{background:#202328!important;border-color:#363a41!important}
 @media(max-width:1120px){
-  .ecp-tb-shell{grid-template-columns:190px minmax(300px,360px) minmax(0,1fr)}
+  .ecp-tb-shell{grid-template-columns:220px minmax(300px,360px) minmax(0,1fr)}
 }
 @media(max-width:900px){
+  .ecp-notify-setting{grid-template-columns:1fr}
+  .ecp-notify-controls{grid-template-columns:1fr}
+
   .ecp-thunderbird{min-height:0}
   .ecp-tb-toolbar{grid-template-columns:1fr auto}.ecp-tb-search{grid-column:1/-1;grid-row:2}
   .ecp-tb-shell{grid-template-columns:170px minmax(0,1fr)}.ecp-tb-reader{grid-column:1/-1;height:auto;min-height:420px;border-top:1px solid var(--ecp-tb-border)}.ecp-tb-message-list{height:480px}

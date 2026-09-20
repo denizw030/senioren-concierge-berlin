@@ -61,6 +61,9 @@
       highlights: list(data.highlights), warnings: list(data.warnings), hints: list(data.hints),
       drafts: list(data.drafts), activities: list(data.activities),
       rules: list(data.rules), suggestions: list(data.suggestions),
+      notification_preference: data.notification_preference && typeof data.notification_preference === "object"
+        ? { enabled: data.notification_preference.enabled === true, target_channel: text(data.notification_preference.target_channel, 30) || "PORTAL" }
+        : { enabled: false, target_channel: "PORTAL" },
       channels: data.channels && typeof data.channels === "object" ? data.channels : {}
     };
   }
@@ -94,10 +97,19 @@
   let chatMessages = [];
   let chatStarted = false;
   let activityExpanded = false;
+  let emailConnections = [];
+  let activeConnectionId = "";
+  let mailboxScope = "ALL";
   let mailboxFolder = "INBOX";
   let mailboxSearch = "";
+  let mailboxFolderRows = [];
+  let mailboxFolderLoading = false;
+  let mailboxFolderError = "";
+  let allDrafts = [];
+  let draftsLoading = false;
   let readerMode = "MESSAGE";
   let selectedMessageId = "";
+  let selectedMessageConnectionId = "";
   let selectedMessageDetail = null;
   let selectedMessageLoading = false;
 
@@ -169,17 +181,28 @@
     const date = new Date(value); if (!Number.isFinite(date.getTime())) return "";
     return new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(date);
   }
-  async function request(path, { method = "GET", body = null } = {}) {
+  async function request(path, { method = "GET", body = null, connectionId = "", allowBare = false } = {}) {
     const token = sessionToken();
     if (!token) throw new Error("UNAUTHENTICATED");
     const headers = { Authorization: "Bearer " + token };
     const init = { method, headers };
-    if (body !== null) { headers["Content-Type"] = "application/json"; init.body = JSON.stringify(body); }
+    const conciergeScoped = path.includes("/email/concierge/") && !path.includes("/query-all") && !path.includes("/accounts-overview");
+    const scopedId = String(connectionId || (conciergeScoped ? activeConnectionId : "") || "");
+    let requestPath = path, requestBody = body;
+    if (scopedId) {
+      if (method === "GET") {
+        const join = requestPath.includes("?") ? "&" : "?";
+        requestPath += join + "connection_id=" + encodeURIComponent(scopedId);
+      } else {
+        requestBody = { ...(body && typeof body === "object" ? body : {}), connection_id: scopedId };
+      }
+    }
+    if (requestBody !== null) { headers["Content-Type"] = "application/json"; init.body = JSON.stringify(requestBody); }
     let response;
-    try { response = await fetch(BASE + path, init); }
+    try { response = await fetch(BASE + requestPath, init); }
     catch { throw new Error("EMAIL_PROVIDER_UNAVAILABLE"); }
     const data = await response.json().catch(() => null);
-    if (!response.ok || data?.ok !== true) throw new Error(errorCode(data));
+    if (!response.ok || (!allowBare && data?.ok !== true)) throw new Error(errorCode(data));
     return data;
   }
   function ensureHost() {
@@ -223,43 +246,133 @@
   function classificationLabel(value) { return value === "IMPORTANT" ? "Wichtig" : value === "UNIMPORTANT" ? "Unwichtig" : value === "MARKETING" ? "Werbung / Spam" : ""; }
   function classificationMessages() { return classification ? [...classification.buckets.IMPORTANT, ...classification.buckets.UNIMPORTANT, ...classification.buckets.MARKETING] : []; }
   function classificationMessageById(id) { return classificationMessages().find((row) => String(row?.id || "") === String(id || "")) || null; }
+  function connectionById(id) { return emailConnections.find((row) => String(row.connection_id || "") === String(id || "")) || null; }
+  function connectionEmail(id) {
+    const row = connectionById(id);
+    return text(row?.account_email || row?.account_display_hint || row?.provider_label || "Postfach", 320);
+  }
+  function remoteFolderMode() { return mailboxScope === "ALL" || ["INBOX","SENT","SPAM","TRASH"].includes(mailboxFolder); }
+  function decorateRemoteMessage(message, connection) {
+    return {
+      ...message,
+      snippet: text(message?.snippet || message?.text, 600),
+      _connection_id: String(connection?.connection_id || ""),
+      _account_email: text(connection?.account_email || connection?.account_display_hint || connection?.provider_label || "", 320),
+      _provider: String(connection?.provider || "")
+    };
+  }
   function mailboxAllMessages() {
+    if (remoteFolderMode()) return list(mailboxFolderRows);
     const rows = classification ? classificationMessages() : [...list(dashboard?.highlights), ...list(dashboard?.warnings)];
     const seen = new Set(), out = [];
-    for (const row of rows) { const id = String(row?.id || ""); if (!id || seen.has(id)) continue; seen.add(id); out.push(row); }
+    for (const row of rows) { const id = String(row?.id || ""); if (!id || seen.has(id)) continue; seen.add(id); out.push({ ...row, _connection_id: activeConnectionId, _account_email: connectionEmail(activeConnectionId) }); }
     return out.sort((a,b)=>Date.parse(String(b?.date||0))-Date.parse(String(a?.date||0)));
   }
   function mailboxFilteredMessages() {
     let rows = mailboxAllMessages();
-    if (mailboxFolder === "IMPORTANT") rows = rows.filter((m)=>m.classification === "IMPORTANT");
-    else if (mailboxFolder === "UNIMPORTANT") rows = rows.filter((m)=>m.classification === "UNIMPORTANT");
-    else if (mailboxFolder === "MARKETING") rows = rows.filter((m)=>m.classification === "MARKETING");
-    else if (mailboxFolder === "REPLY") rows = rows.filter((m)=>m.needs_reply === true);
+    if (!remoteFolderMode()) {
+      if (mailboxFolder === "IMPORTANT") rows = rows.filter((m)=>m.classification === "IMPORTANT");
+      else if (mailboxFolder === "UNIMPORTANT") rows = rows.filter((m)=>m.classification === "UNIMPORTANT");
+      else if (mailboxFolder === "REPLY") rows = rows.filter((m)=>m.needs_reply === true);
+    }
     const q = mailboxSearch.trim().toLowerCase();
-    if (q) rows = rows.filter((m)=>[m.from,m.subject,m.snippet].some((v)=>String(v||"").toLowerCase().includes(q)));
+    if (q) rows = rows.filter((m)=>[m.from,m.subject,m.snippet,m._account_email].some((v)=>String(v||"").toLowerCase().includes(q)));
     return rows;
   }
   function mailboxFolderTitle() {
-    return ({INBOX:"Posteingang",IMPORTANT:"Wichtig",UNIMPORTANT:"Unwichtig",MARKETING:"Werbung / Spam",REPLY:"Antwort nötig"})[mailboxFolder] || "Posteingang";
+    if (mailboxScope === "ALL") return "Alle Posteingänge";
+    const label = ({INBOX:"Posteingang",IMPORTANT:"Wichtig",UNIMPORTANT:"Unwichtig",REPLY:"Antwort nötig",SENT:"Gesendet",SPAM:"Spam",TRASH:"Papierkorb"})[mailboxFolder] || "Posteingang";
+    const account = connectionEmail(activeConnectionId);
+    return account ? `${label} · ${account}` : label;
   }
-  function mailboxFolderCount(folder) {
-    const all = mailboxAllMessages();
-    if (folder === "INBOX") return classification?.total ?? all.length;
-    if (folder === "IMPORTANT") return all.filter((m)=>m.classification === "IMPORTANT").length;
-    if (folder === "UNIMPORTANT") return all.filter((m)=>m.classification === "UNIMPORTANT").length;
-    if (folder === "MARKETING") return all.filter((m)=>m.classification === "MARKETING").length;
-    if (folder === "REPLY") return all.filter((m)=>m.needs_reply === true).length;
-    if (folder === "DRAFTS") return list(dashboard?.drafts).length;
-    return 0;
+  function mailboxFolderCount(folder, connectionId = activeConnectionId) {
+    if (folder === "ALL") return mailboxScope === "ALL" && !mailboxFolderLoading ? mailboxFolderRows.length : "";
+    if (folder === "DRAFTS") return allDrafts.length || list(dashboard?.drafts).length || "";
+    if (String(connectionId) !== String(activeConnectionId)) return "";
+    if (folder === "INBOX") return classification?.total ?? "";
+    if (folder === "IMPORTANT") return classification?.counts?.IMPORTANT ?? "";
+    if (folder === "UNIMPORTANT") return classification?.counts?.UNIMPORTANT ?? "";
+    if (folder === "REPLY") return mailboxAllMessages().filter((m)=>m.needs_reply === true).length || "";
+    if (mailboxScope === "ACCOUNT" && mailboxFolder === folder && !mailboxFolderLoading) return mailboxFolderRows.length || "";
+    return "";
   }
-  async function openMailboxMessage(messageId) {
-    if (!messageId) return;
-    selectedMessageId = String(messageId); readerMode = "MESSAGE"; selectedMessageLoading = true; selectedMessageDetail = null; render();
+  function folderQuery(folder) {
+    return ({INBOX:"in:inbox",SENT:"in:sent",SPAM:"in:spam",TRASH:"in:trash"})[folder] || "in:inbox";
+  }
+  async function searchRemoteFolder(connection, folder, maxResults = 50) {
+    const data = await request("/email/messages/search", {
+      method: "POST",
+      body: { query: folderQuery(folder), max_results: maxResults, request_id: crypto.randomUUID() },
+      connectionId: String(connection.connection_id || ""),
+      allowBare: true
+    });
+    return list(data?.messages).map((message) => decorateRemoteMessage(message, connection));
+  }
+  async function loadMailboxFolder() {
+    if (!connected || mailboxFolderLoading) return;
+    if (!remoteFolderMode()) { mailboxFolderRows = []; mailboxFolderError = ""; render(); return; }
+    mailboxFolderLoading = true; mailboxFolderError = ""; render();
     try {
-      const data = await request("/email/concierge/messages/open", { method: "POST", body: { message_id: selectedMessageId } });
-      if (selectedMessageId === String(messageId)) selectedMessageDetail = data.message || null;
+      if (mailboxScope === "ALL") {
+        const connectedRows = emailConnections.filter((row) => String(row?.state || "").toUpperCase() === "CONNECTED");
+        const settled = await Promise.allSettled(connectedRows.map((row) => searchRemoteFolder(row, "INBOX", 40)));
+        mailboxFolderRows = settled.flatMap((result) => result.status === "fulfilled" ? result.value : [])
+          .sort((a,b)=>Date.parse(String(b?.date||0))-Date.parse(String(a?.date||0))).slice(0,120);
+        if (settled.some((result)=>result.status === "rejected")) mailboxFolderError = "Ein Postfach konnte gerade nicht geladen werden.";
+      } else {
+        const connection = connectionById(activeConnectionId);
+        if (!connection) throw new Error("EMAIL_CONNECTION_NOT_CONNECTED");
+        mailboxFolderRows = await searchRemoteFolder(connection, mailboxFolder, 50);
+      }
+    } catch (error) {
+      mailboxFolderRows = [];
+      mailboxFolderError = error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE";
+    } finally { mailboxFolderLoading = false; render(); }
+  }
+  async function loadConnections() {
+    const data = await request("/email/connections");
+    emailConnections = list(data?.connections).filter((row) => String(row?.state || "").toUpperCase() === "CONNECTED");
+    if (!activeConnectionId || !connectionById(activeConnectionId)) activeConnectionId = String(emailConnections[0]?.connection_id || "");
+    return emailConnections;
+  }
+  async function loadAllDrafts() {
+    if (draftsLoading) return;
+    draftsLoading = true; render();
+    try {
+      const google = emailConnections.filter((row) => String(row?.state || "").toUpperCase() === "CONNECTED" && String(row?.provider || "").toUpperCase() === "GOOGLE");
+      const settled = await Promise.allSettled(google.map(async (row) => {
+        const data = await request("/email/concierge/dashboard", { connectionId: String(row.connection_id || "") });
+        const normalized = normalizeDashboard(data);
+        return list(normalized?.drafts).map((draft) => ({ ...draft, _connection_id: String(row.connection_id || ""), _account_email: connectionEmail(row.connection_id) }));
+      }));
+      allDrafts = settled.flatMap((result) => result.status === "fulfilled" ? result.value : []);
+    } finally { draftsLoading = false; render(); }
+  }
+  async function selectMailboxFolder(connectionId, folder) {
+    activeConnectionId = String(connectionId || activeConnectionId || "");
+    mailboxScope = "ACCOUNT"; mailboxFolder = folder; readerMode = "MESSAGE";
+    selectedMessageId = ""; selectedMessageConnectionId = ""; selectedMessageDetail = null;
+    mailboxFolderRows = []; classification = null; classificationError = "";
+    render();
+    await loadDashboard(false, true);
+    await loadMailboxFolder();
+  }
+  async function selectAllInboxes() {
+    mailboxScope = "ALL"; mailboxFolder = "INBOX"; readerMode = "MESSAGE";
+    selectedMessageId = ""; selectedMessageConnectionId = ""; selectedMessageDetail = null;
+    mailboxFolderRows = []; render(); await loadMailboxFolder();
+  }
+  async function openMailboxMessage(message) {
+    const messageId = String(message?.id || message || "");
+    const connectionId = String(message?._connection_id || activeConnectionId || "");
+    if (!messageId || !connectionId) return;
+    activeConnectionId = connectionId;
+    selectedMessageId = messageId; selectedMessageConnectionId = connectionId; readerMode = "MESSAGE"; selectedMessageLoading = true; selectedMessageDetail = null; render();
+    try {
+      const data = await request("/email/concierge/messages/open", { method: "POST", body: { message_id: selectedMessageId }, connectionId });
+      if (selectedMessageId === messageId && selectedMessageConnectionId === connectionId) selectedMessageDetail = { ...(data.message || {}), _connection_id: connectionId, _account_email: connectionEmail(connectionId) };
     } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
-    finally { if (selectedMessageId === String(messageId)) selectedMessageLoading = false; render(); }
+    finally { if (selectedMessageId === messageId && selectedMessageConnectionId === connectionId) selectedMessageLoading = false; render(); }
   }
   function classificationControls(message) {
     const wrap = el("div", "ecp-class-actions");
@@ -275,6 +388,7 @@
     for (const entry of chatMessages) {
       for (const mail of list(entry.messages)) if (String(mail?.id || "") === id) mail.classification = value;
     }
+    for (const mail of mailboxFolderRows) if (String(mail?.id || "") === id) mail.classification = value;
     if (dashboard) {
       for (const key of ["highlights", "warnings", "hints"]) {
         for (const mail of list(dashboard[key])) if (String(mail?.id || "") === id) mail.classification = value;
@@ -285,10 +399,11 @@
     if (busy || !message?.id || message.classification === value) return;
     setBusy(true);
     try {
-      const saved = await request("/email/concierge/classification/override", { method: "POST", body: { message_id: message.id, thread_id: message.thread_id || null, classification: value } });
+      const connectionId = String(message?._connection_id || activeConnectionId || "");
+      const saved = await request("/email/concierge/classification/override", { method: "POST", body: { message_id: message.id, thread_id: message.thread_id || null, classification: value }, connectionId });
       message.classification = value;
       syncVisibleClassification(message.id, value);
-      classification = normalizeClassification(await request("/email/concierge/classification/summary"));
+      classification = normalizeClassification(await request("/email/concierge/classification/summary", { connectionId: String(message?._connection_id || activeConnectionId || "") }));
       if (saved?.learning_suggestion_ready) {
         const next = normalizeDashboard(await request("/email/concierge/dashboard"));
         if (next) dashboard = next;
@@ -367,6 +482,7 @@
   function removeMailboxMessages(messageIds) {
     const ids = new Set(list(messageIds).map((id) => String(id || "")).filter(Boolean));
     if (!ids.size) return;
+    mailboxFolderRows = mailboxFolderRows.filter((row) => !ids.has(String(row?.id || "")));
     if (classification) {
       let removed = 0;
       for (const key of ["IMPORTANT", "UNIMPORTANT", "MARKETING"]) {
@@ -381,6 +497,7 @@
     }
     if (selectedMessageId && ids.has(String(selectedMessageId))) {
       selectedMessageId = "";
+      selectedMessageConnectionId = "";
       selectedMessageDetail = null;
       selectedMessageLoading = false;
       readerMode = "MESSAGE";
@@ -452,12 +569,12 @@
     card.append(el("p", "ecp-sort-scope", scope));
   }
   function renderDrafts(card) {
-    const rows = list(dashboard.drafts);
+    const rows = list(allDrafts.length || draftsLoading ? allDrafts : dashboard.drafts);
     if (!rows.length) { card.append(el("div", "ecp-section-empty", "Keine vorbereiteten Entwürfe warten auf dich.")); return; }
     const listNode = el("div", "ecp-list");
     rows.forEach((draft) => {
       const box = el("article", "ecp-draft"), top = el("div", "ecp-draft-top"), title = el("div");
-      title.append(el("div", "ecp-draft-title", text(draft.subject, 300) || "(kein Betreff)"), el("div", "ecp-draft-meta", text(draft.to, 260) ? `An ${text(draft.to, 260)}` : "Empfänger wird aus der Antwort übernommen")); top.append(title, badge(draft.send_state === "WAITING_APPROVAL" ? "Wartet auf Freigabe" : String(draft.status || "Entwurf")));
+      title.append(el("div", "ecp-draft-title", text(draft.subject, 300) || "(kein Betreff)"), el("div", "ecp-draft-meta", [draft._account_email ? text(draft._account_email, 260) : "", text(draft.to, 260) ? `An ${text(draft.to, 260)}` : "Empfänger wird aus der Antwort übernommen"].filter(Boolean).join(" · "))); top.append(title, badge(draft.send_state === "WAITING_APPROVAL" ? "Wartet auf Freigabe" : String(draft.status || "Entwurf")));
       box.append(top, el("div", "ecp-draft-body", text(draft.body_text, 1200)));
       const actions = el("div", "ecp-draft-actions"), edit = button("Bearbeiten"), discard = button("Verwerfen", "ecp-action ecp-action-danger"), send = button("Freigeben & senden", "ecp-action ecp-action-send");
       send.disabled = !draft.approval_id || !draft.send_action_id;
@@ -474,7 +591,7 @@
     save.addEventListener("click", async () => {
       if (!body.value.trim() || busy) return;
       setBusy(true);
-      try { await request("/email/concierge/drafts/edit", { method: "POST", body: { email_send_action_id: draft.id, approval_id: draft.approval_id || null, send_action_id: draft.send_action_id || null, subject: subject.value, to: to.value, body_text: body.value } }); await loadDashboard(); }
+      try { await request("/email/concierge/drafts/edit", { method: "POST", body: { email_send_action_id: draft.id, approval_id: draft.approval_id || null, send_action_id: draft.send_action_id || null, subject: subject.value, to: to.value, body_text: body.value }, connectionId: String(draft._connection_id || activeConnectionId || "") }); await loadAllDrafts(); await loadDashboard(false, true); }
       catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
       finally { setBusy(false); }
     });
@@ -483,7 +600,7 @@
   async function discardDraft(draft) {
     if (busy || !confirm("Diesen Entwurf wirklich verwerfen? Es wird nichts gesendet.")) return;
     setBusy(true);
-    try { await request("/email/concierge/drafts/discard", { method: "POST", body: { email_send_action_id: draft.id, approval_id: draft.approval_id || null, send_action_id: draft.send_action_id || null } }); await loadDashboard(); }
+    try { await request("/email/concierge/drafts/discard", { method: "POST", body: { email_send_action_id: draft.id, approval_id: draft.approval_id || null, send_action_id: draft.send_action_id || null }, connectionId: String(draft._connection_id || activeConnectionId || "") }); await loadAllDrafts(); await loadDashboard(false, true); }
     catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
     finally { setBusy(false); }
   }
@@ -493,7 +610,7 @@
     if (!ok) return;
     setBusy(true);
     try {
-      const data = await request("/email/concierge/drafts/approve-send", { method: "POST", body: { email_send_action_id: draft.id, approval_id: draft.approval_id, send_action_id: draft.send_action_id } });
+      const data = await request("/email/concierge/drafts/approve-send", { method: "POST", body: { email_send_action_id: draft.id, approval_id: draft.approval_id, send_action_id: draft.send_action_id }, connectionId: String(draft._connection_id || activeConnectionId || "") });
       chatMessages.push({ role: "assistant", text: text(data.message, 1000) || "Die E-Mail wurde nach deiner Freigabe gesendet." }); await loadDashboard(false);
     } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
     finally { setBusy(false); render(); }
@@ -656,6 +773,25 @@
     card.append(row);
   }
   function renderSettings(card) {
+    const pref = dashboard.notification_preference || { enabled: false, target_channel: "PORTAL" };
+    const notify = el("section", "ecp-notify-setting"), notifyCopy = el("div", "ecp-notify-copy"), notifyControls = el("div", "ecp-notify-controls");
+    notifyCopy.append(el("strong", "", "Bei vorbereitetem Antwortentwurf benachrichtigen"), el("small", "", "Nur wenn du das aktivierst, informiert dich der Concierge über den von dir gewählten Kanal."));
+    const enabledLabel = el("label", "ecp-rule-toggle"), enabled = el("input"); enabled.type = "checkbox"; enabled.checked = pref.enabled === true; enabled.setAttribute("aria-label", "Benachrichtigungen für Antwortentwürfe");
+    enabledLabel.append(enabled, el("span", "", enabled.checked ? "Aktiv" : "Aus"));
+    const channel = el("select", "ecp-rule-select"); channel.setAttribute("aria-label", "Benachrichtigungskanal für Antwortentwürfe");
+    [["PORTAL","Kundenkonto"],["WHATSAPP","WhatsApp"],["CALL","Telefon"],["EMAIL","E-Mail"]].forEach(([value,label]) => { const option=el("option","",label); option.value=value; option.selected=String(pref.target_channel||"PORTAL").toUpperCase()===value; channel.append(option); });
+    channel.disabled = !enabled.checked;
+    const saveNotification = async () => {
+      enabled.disabled = true; channel.disabled = true;
+      try {
+        const data = await request("/email/concierge/notification-preference", { method: "POST", body: { enabled: enabled.checked, target_channel: channel.value } });
+        dashboard.notification_preference = data.notification_preference || { enabled: enabled.checked, target_channel: channel.value };
+      } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
+      finally { enabled.disabled = false; channel.disabled = !enabled.checked; render(); }
+    };
+    enabled.addEventListener("change",()=>void saveNotification());
+    channel.addEventListener("change",()=>void saveNotification());
+    notifyControls.append(enabledLabel, channel); notify.append(notifyCopy, notifyControls); card.append(notify);
     const suggestions = list(dashboard.suggestions), rules = list(dashboard.rules);
     if (suggestions.length) {
       card.append(el("p", "ecp-rule-heading", "Vorschläge deines Concierges"));
@@ -696,55 +832,65 @@
   function renderMailboxSidebar(shell) {
     const side = el("aside", "ecp-tb-sidebar");
     const brand = el("div", "ecp-tb-brand"), mark = el("span", "ecp-tb-brandmark", "✉"), brandCopy = el("div");
-    brandCopy.append(el("strong", "", "NAHWERK Mail"), el("span", "", "Google · verbunden")); brand.append(mark, brandCopy); side.append(brand);
+    brandCopy.append(el("strong", "", "NAHWERK Mail"), el("span", "", emailConnections.length === 1 ? "1 Postfach verbunden" : `${emailConnections.length} Postfächer verbunden`)); brand.append(mark, brandCopy); side.append(brand);
     const nav = el("nav", "ecp-tb-nav"); nav.setAttribute("aria-label", "E-Mail-Bereiche");
-    const folders = [["INBOX","Posteingang","▣"],["IMPORTANT","Wichtig","★"],["UNIMPORTANT","Unwichtig","○"],["MARKETING","Werbung / Spam","⚑"],["REPLY","Antwort nötig","↩"]];
-    for (const item of folders) {
-      const value=item[0], label=item[1], icon=item[2];
-      const b = button("", "ecp-tb-nav-item" + (mailboxFolder === value && readerMode === "MESSAGE" ? " is-active" : ""));
-      b.append(el("span","ecp-tb-nav-icon",icon),el("span","ecp-tb-nav-label",label),el("span","ecp-tb-nav-count",String(mailboxFolderCount(value))));
-      b.addEventListener("click",()=>{mailboxFolder=value;readerMode="MESSAGE";selectedMessageId="";selectedMessageDetail=null;render();});
-      nav.append(b);
+    const appendNav = (label, icon, active, count, onClick, extraClass="") => {
+      const b = button("", "ecp-tb-nav-item" + (extraClass ? " " + extraClass : "") + (active ? " is-active" : ""));
+      b.append(el("span","ecp-tb-nav-icon",icon),el("span","ecp-tb-nav-label",label));
+      if (count !== "" && count !== null && count !== undefined) b.append(el("span","ecp-tb-nav-count",String(count)));
+      b.addEventListener("click", onClick); nav.append(b); return b;
+    };
+    appendNav("Alle Posteingänge","▣",mailboxScope==="ALL"&&readerMode==="MESSAGE",mailboxFolderCount("ALL"),()=>void selectAllInboxes(),"ecp-tb-nav-global");
+    appendNav("Entwürfe","✎",readerMode==="DRAFTS",mailboxFolderCount("DRAFTS"),()=>{readerMode="DRAFTS";void loadAllDrafts();render();},"ecp-tb-nav-global");
+    nav.append(el("div","ecp-tb-nav-separator"));
+    const folders = [["INBOX","Posteingang","▣"],["IMPORTANT","Wichtig","★"],["UNIMPORTANT","Unwichtig","○"],["REPLY","Antwort nötig","↩"],["SENT","Gesendet","➤"],["SPAM","Spam","⚑"],["TRASH","Papierkorb","⌫"]];
+    for (const account of emailConnections) {
+      const id=String(account.connection_id||""), accountTitle=el("div","ecp-tb-account");
+      accountTitle.append(el("span","ecp-tb-account-dot",""),el("strong","",text(account.account_email||account.account_display_hint||account.provider_label||"Postfach",320)));
+      nav.append(accountTitle);
+      for (const [value,label,icon] of folders) {
+        const active=mailboxScope==="ACCOUNT"&&activeConnectionId===id&&mailboxFolder===value&&readerMode==="MESSAGE";
+        appendNav(label,icon,active,mailboxFolderCount(value,id),()=>void selectMailboxFolder(id,value),"ecp-tb-nav-subitem");
+      }
     }
     nav.append(el("div","ecp-tb-nav-separator"));
-    const utilities = [["DRAFTS","Entwürfe","✎"],["CONCIERGE","Concierge","◇"],["AUTOMATION","Automatik & Schutz","⚙"],["ACTIVITY","Aktivität","≡"]];
-    for (const item of utilities) {
-      const mode=item[0], label=item[1], icon=item[2];
-      const b = button("", "ecp-tb-nav-item" + (readerMode === mode ? " is-active" : ""));
-      b.append(el("span","ecp-tb-nav-icon",icon),el("span","ecp-tb-nav-label",label));
-      if (mode === "DRAFTS") b.append(el("span","ecp-tb-nav-count",String(mailboxFolderCount("DRAFTS"))));
-      b.addEventListener("click",()=>{readerMode=mode;render();}); nav.append(b);
-    }
+    const utilities = [["CONCIERGE","Concierge","◇"],["AUTOMATION","Automatik & Schutz","⚙"],["ACTIVITY","Aktivität","≡"]];
+    for (const [mode,label,icon] of utilities) appendNav(label,icon,readerMode===mode,"",()=>{readerMode=mode;render();});
     side.append(nav);
     const foot = el("div","ecp-tb-sidebar-foot");
-    foot.append(el("span","","Der Concierge lernt aus Wichtig / Unwichtig."),el("small","","Automatiken werden erst nach deiner Bestätigung aktiv."));
+    foot.append(el("span","","Wichtig / Unwichtig wird pro Postfach gelernt."),el("small","","Antwortentwürfe werden nie ohne deine Freigabe gesendet."));
     side.append(foot); shell.append(side);
   }
   function renderMailboxListPane(shell) {
     const pane = el("section","ecp-tb-list-pane"), top = el("div","ecp-tb-list-top"), titleWrap = el("div");
     const rows = mailboxFilteredMessages();
     titleWrap.append(el("strong","",mailboxFolderTitle()),el("span","",String(rows.length)+" angezeigt")); top.append(titleWrap);
-    const refresh = button("↻","ecp-tb-icon-button"); refresh.title="Aktualisieren"; refresh.addEventListener("click",()=>void loadDashboard(false,true)); top.append(refresh); pane.append(top);
+    const refresh = button("↻","ecp-tb-icon-button"); refresh.title="Aktualisieren"; refresh.addEventListener("click",()=>{if(remoteFolderMode())void loadMailboxFolder();else void loadDashboard(false,true);}); top.append(refresh); pane.append(top);
     const listNode = el("div","ecp-tb-message-list");
-    if (!rows.length && classificationLoading) {
+    const loading = remoteFolderMode() ? mailboxFolderLoading : classificationLoading;
+    const loadError = remoteFolderMode() ? mailboxFolderError : classificationError;
+    if (!rows.length && loading) {
       listNode.append(el("div","ecp-tb-empty","E-Mails werden geladen …"));
-    } else if (!rows.length && classificationError) {
+    } else if (!rows.length && loadError) {
       const errorBox=el("div","ecp-tb-empty");
       errorBox.append(el("strong","","E-Mails konnten gerade nicht geladen werden."),el("span","","Die Google-Verbindung ist aktiv. Bitte lade die Übersicht erneut."));
-      const retry=button("Erneut laden","ecp-tb-toolbar-button");retry.addEventListener("click",()=>{classificationRetryCount=0;void loadClassification();});
+      const retry=button("Erneut laden","ecp-tb-toolbar-button");retry.addEventListener("click",()=>{if(remoteFolderMode())void loadMailboxFolder();else{classificationRetryCount=0;void loadClassification();}});
       errorBox.append(retry);listNode.append(errorBox);
     } else if (!rows.length) {
       listNode.append(el("div","ecp-tb-empty","Keine passenden E-Mails in dieser Ansicht."));
     } else {
       rows.forEach((message)=>{
-        const row=el("article","ecp-tb-message"+(String(message.id)===selectedMessageId&&readerMode==="MESSAGE"?" is-selected":""));
+        const messageConnection=String(message?._connection_id||activeConnectionId||"");
+        const row=el("article","ecp-tb-message"+(String(message.id)===selectedMessageId&&messageConnection===selectedMessageConnectionId&&readerMode==="MESSAGE"?" is-selected":""));
         row.tabIndex=0; row.setAttribute("role","button"); row.setAttribute("aria-label",(text(message.subject,220)||"(kein Betreff)")+" öffnen");
         const header=el("div","ecp-tb-message-head"),sender=el("strong","ecp-tb-sender",text(message.from,220)||"Unbekannter Absender"),date=el("time","ecp-tb-date",fmtDate(message.date));
         header.append(sender,date); row.append(header,el("div","ecp-tb-subject",text(message.subject,300)||"(kein Betreff)"));
         if(message.snippet)row.append(el("div","ecp-tb-snippet",text(message.snippet,260)));
         if(message.needs_reply)row.append(el("span","ecp-tb-reply-flag","Antwort empfohlen"));
-        const actions=classificationControls(message); actions.classList.add("ecp-tb-class-actions"); row.append(actions);
-        const open=()=>void openMailboxMessage(String(message.id)); row.addEventListener("click",open); row.addEventListener("keydown",(ev)=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();open();}});
+        const allowClassify=mailboxScope==="ACCOUNT"&&["INBOX","IMPORTANT","UNIMPORTANT","REPLY"].includes(mailboxFolder)&&String(connectionById(messageConnection)?.provider||"GOOGLE").toUpperCase()==="GOOGLE";
+        if(allowClassify){const actions=classificationControls(message); actions.classList.add("ecp-tb-class-actions"); row.append(actions);}
+        if(message._account_email&&mailboxScope==="ALL")row.append(el("span","ecp-tb-account-chip",text(message._account_email,220)));
+        const open=()=>void openMailboxMessage(message); row.addEventListener("click",open); row.addEventListener("keydown",(ev)=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();open();}});
         listNode.append(row);
       });
     }
@@ -777,7 +923,7 @@
     const toolbar=el("div","ecp-tb-reader-toolbar");
     const concierge=button("Mit Concierge bearbeiten","ecp-tb-toolbar-button");concierge.addEventListener("click",()=>{readerMode="CONCIERGE";render();});toolbar.append(concierge);pane.append(toolbar);
     const header=el("div","ecp-tb-reader-message-head");
-    header.append(el("h3","",text(detail.subject,500)||"(kein Betreff)"),el("div","ecp-tb-reader-from",text(detail.from,300)||"Unbekannter Absender"),el("div","ecp-tb-reader-date",fmtDate(detail.date)));
+    header.append(el("h3","",text(detail.subject,500)||"(kein Betreff)"),el("div","ecp-tb-reader-from",text(detail.from,300)||"Unbekannter Absender"),detail._account_email?el("div","ecp-tb-reader-account",text(detail._account_email,300)):el("span"),el("div","ecp-tb-reader-date",fmtDate(detail.date)));
     pane.append(header,el("div","ecp-tb-reader-body",text(detail.body_text,12000)||"Kein Textinhalt verfügbar."));
     const attachments=list(detail.attachments);if(attachments.length)pane.append(el("div","ecp-tb-attachments",String(attachments.length)+" Anhang"+(attachments.length===1?"":"e")+" · gefährliche Dateitypen werden nicht automatisch geöffnet"));
     shell.append(pane);
@@ -808,7 +954,7 @@
       if (!next) throw new Error("EMAIL_PROVIDER_UNAVAILABLE");
       classification = next;
       classificationRetryCount = 0;
-      if (!selectedMessageId) { const first = mailboxAllMessages()[0]; if (first?.id) setTimeout(()=>void openMailboxMessage(String(first.id)),0); }
+      if (!selectedMessageId) { const first = mailboxAllMessages()[0]; if (first?.id) setTimeout(()=>void openMailboxMessage(first),0); }
     } catch (error) {
       classification = null;
       classificationError = error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE";
@@ -832,7 +978,10 @@
         dashboardLoadedAt = Date.now();
       } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
       render();
-      if (dashboard) void loadClassification();
+      if (dashboard) {
+        void loadClassification();
+        if (remoteFolderMode() && !mailboxFolderLoading) void loadMailboxFolder();
+      }
       return dashboard;
     })().finally(() => { dashboardLoadPromise = null; });
     return dashboardLoadPromise;
@@ -845,17 +994,25 @@
     const canonical = canonicalGoogleConnection();
     connected = canonical === null ? isConnected === true : canonical;
     ensureHost();
-    if (!connected) { dashboard = null; dashboardLoadedAt = 0; classification = null; classificationError = ""; classificationRetryCount = 0; chatMessages = []; chatStarted = false; render(); return; }
+    if (!connected) {
+      dashboard = null; dashboardLoadedAt = 0; classification = null; classificationError = ""; classificationRetryCount = 0;
+      emailConnections = []; activeConnectionId = ""; mailboxScope = "ALL"; mailboxFolderRows = []; allDrafts = [];
+      chatMessages = []; chatStarted = false; render(); return;
+    }
+    try { await loadConnections(); } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
+    if (!emailConnections.length) { connected = false; render(); return; }
     await loadDashboard();
+    await loadMailboxFolder();
   }
   window.addEventListener("nahwerk:email-connections-updated", (event) => {
     const rows = Array.isArray(event.detail?.connections) ? event.detail.connections : globalThis.__nahwerkEmailConnections;
     const canonical = canonicalGoogleConnection(rows);
     if (canonical !== null) void setConnectionState(canonical);
+    else if (connected) void loadConnections().then(()=>loadMailboxFolder());
   });
   globalThis.NAHWERKEmailConciergeProduct = Object.freeze({
     setConnectionState,
-    refresh() { return loadDashboard(false, true); }
+    refresh() { return loadConnections().then(()=>loadDashboard(false, true)).then(()=>loadMailboxFolder()); }
   });
   ensureHost();
   window.dispatchEvent(new CustomEvent("nahwerk:email-concierge-product-ready"));

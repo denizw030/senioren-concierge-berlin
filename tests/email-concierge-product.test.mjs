@@ -23,7 +23,7 @@ test("standalone E-Mail-Concierge uses only the canonical PROD email runtime",()
 });
 
 test("customer UI contains the complete Thunderbird-style mail workspace",()=>{
-  for(const phrase of ["NAHWERK Mail","Posteingang","Wichtig","Unwichtig","Werbung / Spam","Antwort nötig","Entwürfe","Concierge","Automatik & Schutz","Aktivität"]) assert.ok(js.includes(phrase),phrase);
+  for(const phrase of ["NAHWERK Mail","Alle Posteingänge","Posteingang","Wichtig","Unwichtig","Antwort nötig","Gesendet","Spam","Papierkorb","Entwürfe","Concierge","Automatik & Schutz","Aktivität"]) assert.ok(js.includes(phrase),phrase);
   assert.match(js,/ecp-thunderbird/);
   assert.match(js,/ecp-tb-list-pane/);
   assert.match(js,/ecp-tb-reader/);
@@ -82,8 +82,8 @@ test("product layout is responsive across desktop and mobile",()=>{
   assert.match(js,/ecp-rule ecp-rule-personal/);
   assert.match(js,/ecp-rule-title-row/);
   assert.match(js,/\.ecp-rule-controls\{display:grid;grid-template-columns:minmax\(0,1fr\) auto/);
-  assert.match(integration,/email-concierge-product\.css\?v=20260920-5/);
-  assert.match(integration,/email-concierge-product\.js\?v=20260920-8/);
+  assert.match(integration,/email-concierge-product\.css\?v=20260920-6/);
+  assert.match(integration,/email-concierge-product\.js\?v=20260920-9/);
 });
 
 
@@ -139,7 +139,7 @@ test("Thunderbird-style workspace keeps folders, message list and reader in one 
   assert.match(js,/ecp-tb-reader/);
   assert.match(js,/Posteingang/);
   assert.match(js,/Automatik & Schutz/);
-  assert.match(css,/grid-template-columns:220px minmax\(320px,390px\) minmax\(0,1fr\)/);
+  assert.match(css,/grid-template-columns:260px minmax\(320px,390px\) minmax\(0,1fr\)/);
   assert.match(css,/\.ecp-tb-class-actions/);
 });
 test("every visible mail can be marked Wichtig or Unwichtig",()=>{
@@ -176,9 +176,10 @@ test("mailbox loading failure is visible and automatically retried once",()=>{
   assert.match(js,/setTimeout\(\(\)=>\{ if \(connected && !classificationLoading\) void loadClassification\(\); \},1600\)/);
 });
 
-test("mailbox can show dashboard fallback rows while classification loads",()=>{
+test("mailbox keeps a visible loading state for both remote folders and classification views",()=>{
   assert.match(js,/\.\.\.list\(dashboard\?\.highlights\), \.\.\.list\(dashboard\?\.warnings\)/);
-  assert.match(js,/!rows\.length && classificationLoading/);
+  assert.match(js,/const loading = remoteFolderMode\(\) \? mailboxFolderLoading : classificationLoading/);
+  assert.match(js,/!rows\.length && loading/);
 });
 
 
@@ -195,4 +196,38 @@ test("mail actions update the Thunderbird workspace immediately and then reconci
   assert.match(js,/applyQueryResultToMailbox\(data\)/);
   assert.match(js,/await loadDashboard\(false, true\)/);
   assert.match(js,/selectedMessageDetail = null/);
+});
+
+
+test("multi-account mailbox navigation mirrors a desktop mail client",()=>{
+  assert.match(js,/\/email\/connections/);
+  assert.match(js,/account_email/);
+  assert.match(js,/Alle Posteingänge/);
+  assert.match(js,/\["SENT","Gesendet","➤"\]/);
+  assert.match(js,/\["SPAM","Spam","⚑"\]/);
+  assert.match(js,/\["TRASH","Papierkorb","⌫"\]/);
+  assert.match(js,/in:sent/);
+  assert.match(js,/in:spam/);
+  assert.match(js,/in:trash/);
+  assert.match(js,/connection_id/);
+  assert.match(css,/\.ecp-tb-account/);
+  assert.match(css,/\.ecp-tb-nav-subitem/);
+});
+
+test("draft notifications are customer-controlled per mailbox and channel",()=>{
+  assert.match(js,/notification_preference/);
+  assert.match(js,/Bei vorbereitetem Antwortentwurf benachrichtigen/);
+  assert.match(js,/Nur wenn du das aktivierst/);
+  for(const channel of ["PORTAL","WHATSAPP","CALL","EMAIL"]) assert.ok(js.includes(channel),channel);
+  assert.match(js,/\/email\/concierge\/notification-preference/);
+});
+
+test("global drafts stay at the top and preserve their source mailbox",()=>{
+  const allPos=js.indexOf('appendNav("Alle Posteingänge"');
+  const draftPos=js.indexOf('appendNav("Entwürfe"');
+  const accountPos=js.indexOf('const folders = [["INBOX"');
+  assert.ok(allPos>=0 && draftPos>allPos && accountPos>draftPos);
+  assert.match(js,/loadAllDrafts/);
+  assert.match(js,/_connection_id/);
+  assert.match(js,/_account_email/);
 });
