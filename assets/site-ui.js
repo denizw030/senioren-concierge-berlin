@@ -610,7 +610,20 @@
         .nw-account-cluster-mobile{top:16px!important;right:calc(clamp(10px,3vw,28px) + 144px)!important;transform:none!important;height:48px!important}
         .nw-account-mobile{height:48px!important;min-height:48px!important}
         .nw-account-cluster-mobile .nw-account-logout{width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important}
-        html[data-nw-portal-theme="light"] body.nw-portal-light:not(.account-premium-ui) .top .links{background:#fffdf8!important;border-color:rgba(74,59,34,.15)!important}
+        html[data-nw-portal-theme="light"] body.nw-portal-light:not(.account-premium-ui) .top .links,
+        html[data-nw-portal-theme="light"] body.account-premium-ui.nw-portal-light .top .links{
+          background:#fffdf8!important;
+          border-color:rgba(74,59,34,.15)!important;
+          color:#393229!important;
+          box-shadow:0 18px 42px rgba(74,57,27,.10)!important;
+        }
+        html[data-nw-portal-theme="light"] body.account-premium-ui.nw-portal-light .top .links :is(a,.auth-link,.nw-account-link,.nw-account-mobile,.nw-account-logout,.nw-language-button){
+          color:#393229!important;
+        }
+        html[data-nw-portal-theme="light"] body.account-premium-ui.nw-portal-light .top .links :is(a,.auth-link):hover{
+          background:rgba(110,87,43,.06)!important;
+          color:#201d17!important;
+        }
       }
       @media(max-width:720px){
         .nw-theme-setting{align-items:flex-start;flex-direction:column;gap:12px}
