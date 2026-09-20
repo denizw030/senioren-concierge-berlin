@@ -105,7 +105,7 @@ test("mobile registration carousel arrows stay inside the photo stage", () => {
   assert.match(carouselCss, /\.nw-carousel-stage>\.nw-carousel-arrow\{[\s\S]*top:50%!important;[\s\S]*bottom:auto!important;/);
   assert.match(carouselCss, /\.nw-carousel-stage>\.nw-carousel-arrow\.prev\{[\s\S]*left:8px!important;[\s\S]*right:auto!important;/);
   assert.match(carouselCss, /\.nw-carousel-stage>\.nw-carousel-arrow\.next\{[\s\S]*right:8px!important;[\s\S]*left:auto!important;/);
-  assert.match(html, /assets\/concierge-carousel\.css\?v=15/);
+  assert.match(html, /assets\/concierge-carousel\.css\?v=16/);
   assert.match(html, /assets\/concierge-carousel\.js\?v=21/);
 });
 
@@ -113,5 +113,12 @@ test("mobile registration carousel arrows stay inside the photo stage", () => {
 test("mobile registration carousel keeps photo corners rounded", () => {
   assert.match(carouselCss, /REGISTRATION_MOBILE_IMAGE_RADIUS_V1_20260920/);
   assert.match(carouselCss, /body\.registration-page \.nw-carousel-master\[data-variant="selection"\] \.nw-carousel-card img\{\s*border-radius:24px 24px 0 0!important;/);
-  assert.match(html, /assets\/concierge-carousel\.css\?v=15/);
+  assert.match(html, /assets\/concierge-carousel\.css\?v=16/);
+});
+
+
+test("neighboring mobile registration cards keep their real rounded outer corners visible", () => {
+  assert.match(carouselCss, /REGISTRATION_MOBILE_NEIGHBOR_CORNERS_V1_20260920/);
+  assert.match(carouselCss, /body\.registration-page \.nw-carousel-master\[data-variant="selection"\]\{\s*--nw-carousel-space:calc\(50% - 107px\)!important;/);
+  assert.match(html, /assets\/concierge-carousel\.css\?v=16/);
 });
