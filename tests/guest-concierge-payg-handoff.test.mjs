@@ -27,6 +27,13 @@ test("guest advice has no account CTA until backend marks a real execution reque
   assert.match(chat,/isExplicitGuestAccountIntent/);
 });
 
+test("guest browsing state stays session-scoped and reload reset does not erase the PAYG handoff key",()=>{
+  assert.match(chat,/sessionStorage\.removeItem\(GUEST_VIEW_STATE_KEY\)/);
+  assert.match(chat,/sessionStorage\.removeItem\(GUEST_THREAD_KEY\)/);
+  assert.match(chat,/sessionStorage\.removeItem\(GUEST_TOKEN_KEY\)/);
+  assert.doesNotMatch(chat,/removeItem\(GUEST_RESUME_KEY\).*resetGuestChatSessionForReload/s);
+});
+
 test("guest execution handoff preserves the request locally and only allows PAYG as post-auth target",()=>{
   assert.match(chat,/nw_guest_resume_request_v1/);
   assert.match(chat,/post_auth_target:"\/payg"/);

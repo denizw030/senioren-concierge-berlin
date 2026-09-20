@@ -31,6 +31,16 @@ test("signed-out web concierge uses the safe guest endpoint instead of redirecti
   assert.match(chat, /Kostenlos chatten · keine Anmeldung nötig/);
 });
 
+test("guest chat survives site navigation in the same tab but resets on a true reload", () => {
+  assert.match(chat, /GUEST_VIEW_STATE_KEY = "nw_web_guest_view_state_v1"/);
+  assert.match(chat, /sessionStorage\.getItem\(GUEST_TOKEN_KEY\)/);
+  assert.match(chat, /performance\.getEntriesByType\?\.\("navigation"\)/);
+  assert.match(chat, /entry\.type==="reload"/);
+  assert.match(chat, /resetGuestChatSessionForReload\(\)/);
+  assert.match(chat, /restoreGuestViewState\(activeThreadId\)/);
+  assert.match(chat, /if\(!guestViewRestored\)appendMessage\("assistant","Willkommen bei NAHWERK/);
+});
+
 test("guest chat offers account actions but keeps authenticated tools out of guest mode", () => {
   assert.match(chat, /CREATE_ACCOUNT/);
   assert.match(chat, /isExplicitGuestAccountIntent/);
@@ -45,14 +55,14 @@ test("guest chat offers account actions but keeps authenticated tools out of gue
 
 test("web concierge clean route stays mirrored and loads refreshed guest assets", () => {
   assert.match(chatPage, /assets\/web-customer-concierge\.css\?v=27/);
-  assert.match(chatPage, /assets\/web-customer-concierge\.js\?v=46/);
+  assert.match(chatPage, /assets\/web-customer-concierge\.js\?v=47/);
   assert.equal(chatPage, chatClean.replace("<head><base href=\"/\">","<head>"));
 });
 
 
 test("guest account CTA renders the backend purpose instead of claiming a hidden button", () => {
   assert.match(chat, /purpose:String\(item\.purpose\|\|""\)\.toUpperCase\(\)/);
-  assert.match(chat, /NAHWERK Konto erstellen/);
+  assert.match(chat, /Anmelden oder Konto erstellen/);
   assert.match(chat, /Konto für die Ausführung erforderlich/);
   assert.match(chat, /renderGuestAccountActions\(response\.ui_actions\)/);
 });

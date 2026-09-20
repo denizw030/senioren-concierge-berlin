@@ -5,6 +5,7 @@
   const GUEST_INSTALLATION_KEY = "nw_web_guest_installation_v1";
   const GUEST_TOKEN_KEY = "nw_web_guest_token_v1";
   const GUEST_THREAD_KEY = "nw_web_guest_thread_v1";
+  const GUEST_VIEW_STATE_KEY = "nw_web_guest_view_state_v1";
   const GUEST_RESUME_KEY = "nw_guest_resume_request_v1";
   const CORE_CONTRACT_VERSION = "core-v1";
   const GATEWAY_CONTRACT_VERSION = "web-gateway-v1";
@@ -25,6 +26,8 @@
   let guestMode = false;
   let sending = false;
   let lastGuestUserMessage = "";
+  let restoringGuestView = false;
+  let guestViewRestored = false;
   let activeThreadId = null;
   let threadCache = [];
   let lastDateKey = "";
@@ -76,13 +79,13 @@
     }
   }
   function guestToken() {
-    try { return String(localStorage.getItem(GUEST_TOKEN_KEY)||""); }
+    try { return String(sessionStorage.getItem(GUEST_TOKEN_KEY)||""); }
     catch { return ""; }
   }
   function saveGuestToken(value) {
     const token=String(value||"");
     if(!token)return;
-    try { localStorage.setItem(GUEST_TOKEN_KEY,token); } catch {}
+    try { sessionStorage.setItem(GUEST_TOKEN_KEY,token); } catch {}
   }
   function guestThreadId() {
     try {
@@ -99,6 +102,81 @@
   function setGuestThreadId(value) {
     if(!validUuid(value))return;
     try { sessionStorage.setItem(GUEST_THREAD_KEY,String(value)); } catch {}
+  }
+
+  function isChatPageReload() {
+    try {
+      const entry=performance.getEntriesByType?.("navigation")?.[0];
+      if(entry?.type)return entry.type==="reload";
+      return performance.navigation?.type===1;
+    } catch { return false; }
+  }
+  function resetGuestChatSessionForReload() {
+    try {
+      sessionStorage.removeItem(GUEST_TOKEN_KEY);
+      sessionStorage.removeItem(GUEST_THREAD_KEY);
+      sessionStorage.removeItem(GUEST_VIEW_STATE_KEY);
+      localStorage.removeItem(GUEST_TOKEN_KEY);
+    } catch {}
+  }
+  function readGuestViewState(threadId="") {
+    try {
+      const raw=JSON.parse(sessionStorage.getItem(GUEST_VIEW_STATE_KEY)||"null");
+      if(!raw||raw.version!==1||!Array.isArray(raw.entries))return null;
+      if(threadId&&raw.thread_id&&String(raw.thread_id)!==String(threadId))return null;
+      return {
+        version:1,
+        thread_id:String(raw.thread_id||threadId||""),
+        entries:raw.entries.slice(-120)
+      };
+    } catch { return null; }
+  }
+  function writeGuestViewState(state) {
+    if(!guestMode||restoringGuestView||!state)return;
+    try {
+      sessionStorage.setItem(GUEST_VIEW_STATE_KEY,JSON.stringify({
+        version:1,
+        thread_id:String(state.thread_id||activeThreadId||""),
+        entries:Array.isArray(state.entries)?state.entries.slice(-120):[]
+      }));
+    } catch {}
+  }
+  function rememberGuestViewEntry(entry) {
+    if(!guestMode||restoringGuestView||!entry)return;
+    const current=readGuestViewState()||{version:1,thread_id:String(activeThreadId||guestThreadId()),entries:[]};
+    current.thread_id=String(activeThreadId||current.thread_id||"");
+    current.entries.push(entry);
+    writeGuestViewState(current);
+  }
+  function rebindGuestViewThread(threadId) {
+    if(!validUuid(threadId))return;
+    const current=readGuestViewState()||{version:1,thread_id:String(threadId),entries:[]};
+    current.thread_id=String(threadId);
+    writeGuestViewState(current);
+  }
+  function restoreGuestViewState(threadId) {
+    const state=readGuestViewState(threadId);
+    if(!state?.entries?.length)return false;
+    const log=logNode();if(!log)return false;
+    clearNode(log);lastDateKey="";historyFingerprint="";
+    restoringGuestView=true;
+    try {
+      for(const entry of state.entries){
+        if(entry?.kind==="message"){
+          const role=entry.role==="user"?"user":"assistant";
+          const text=String(entry.text||"").slice(0,8000);
+          if(!text)continue;
+          appendMessage(role,text,String(entry.at||new Date().toISOString()),String(entry.id||""),String(entry.channel||"WEB"),{scroll:false});
+          if(role==="user")lastGuestUserMessage=text;
+        }else if(entry?.kind==="account_action"&&entry.action){
+          renderGuestAccountActions([entry.action]);
+        }
+      }
+    } finally {
+      restoringGuestView=false;
+    }
+    scrollBottom();
+    return true;
   }
   async function refreshSessionForWrite(){
     const token=sessionToken();
@@ -309,7 +387,9 @@
     const meta=document.createElement("span");meta.style.cssText="display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-top:3px;min-height:14px";
     const time=document.createElement("span");time.className="web-concierge-message-time";time.textContent=timeLabel(at);time.style.cssText="float:none;margin:0";
     meta.appendChild(time);
-    bubble.append(body,meta);row.appendChild(bubble);log.appendChild(row);if(scroll)scrollBottom();return row;
+    bubble.append(body,meta);row.appendChild(bubble);log.appendChild(row);
+    if(guestMode&&!restoringGuestView)rememberGuestViewEntry({kind:"message",role:role==="user"?"user":"assistant",text:String(text),at:String(at),id:String(id||""),channel:normalizedChannel});
+    if(scroll)scrollBottom();return row;
   }
   async function playStoredAudio(messageId,button){
     if(!validUuid(messageId))return;
@@ -494,7 +574,18 @@
       });
       wrap.appendChild(link);
     }
-    card.appendChild(wrap);scrollBottom();return card;
+    card.appendChild(wrap);
+    if(!restoringGuestView)rememberGuestViewEntry({
+      kind:"account_action",
+      action:{
+        type:"CREATE_ACCOUNT",
+        purpose:accountOnly?"ACCOUNT_REQUEST":"EXECUTION",
+        label:String(action?.label||"").trim(),
+        href:String(action?.href||""),
+        post_auth_target:String(action?.post_auth_target||"")
+      }
+    });
+    scrollBottom();return card;
   }
   function renderCoreV1Response(raw) {
     const response=normalizeCoreV1Response(raw);if(!response||!response.authoritative)return false;
@@ -940,7 +1031,7 @@
         }
         if(response?.ok!==true||response?.environment!=="PROD"||response?.authoritative!==true||response?.guest!==true)throw new Error("guest_gateway_response_not_authoritative");
         saveGuestToken(response.guest_token);
-        const returnedThreadId=String(response?.thread_id||"");if(validUuid(returnedThreadId)){activeThreadId=returnedThreadId;setGuestThreadId(returnedThreadId);}
+        const returnedThreadId=String(response?.thread_id||"");if(validUuid(returnedThreadId)){activeThreadId=returnedThreadId;setGuestThreadId(returnedThreadId);rebindGuestViewThread(returnedThreadId);}
         if(!renderCoreV1Response(response.core))throw new Error("guest_core_response_not_authoritative");
         const backendAccountAction=Array.isArray(response?.core?.ui_actions)
           && response.core.ui_actions.some((action)=>String(action?.type||"").toUpperCase()==="CREATE_ACCOUNT");
@@ -1035,6 +1126,8 @@ syncIosVisualViewport();
     guestMode=!token;
     document.body.classList.toggle("web-concierge-guest",guestMode);
     if(guestMode){
+      if(isChatPageReload())resetGuestChatSessionForReload();
+      else{try{localStorage.removeItem(GUEST_TOKEN_KEY);}catch{}}
       const back=document.querySelector(".web-concierge-back");
       if(back instanceof HTMLAnchorElement){back.href="/de/";back.textContent="Zurück";}
     }
@@ -1061,7 +1154,8 @@ syncIosVisualViewport();
     const initialHistoryPromise=(async()=>{
       if(guestMode){
         activeThreadId=guestThreadId();
-        emptyChat();
+        guestViewRestored=restoreGuestViewState(activeThreadId);
+        if(!guestViewRestored)emptyChat();
         return true;
       }
       const loaded=await loadThreads({selectFirst:true});
@@ -1079,7 +1173,7 @@ syncIosVisualViewport();
     await initialHistoryPromise.catch(()=>false);
     if(ready){
       if(guestMode){
-        appendMessage("assistant","Willkommen bei NAHWERK. Sag mir einfach, wobei du Unterstützung suchst. Ich kann dir zeigen, was NAHWERK für dich oder einen Angehörigen übernehmen kann, Funktionen und Preise erklären oder gemeinsam mit dir den passenden Einstieg finden. Fragen und Beratung sind hier kostenlos und ohne Anmeldung möglich. Ein Konto brauchst du erst, wenn ich wirklich etwas für dich ausführen soll.",new Date().toISOString(),"guest:welcome","WEB");
+        if(!guestViewRestored)appendMessage("assistant","Willkommen bei NAHWERK. Sag mir einfach, wobei du Unterstützung suchst. Ich kann dir zeigen, was NAHWERK für dich oder einen Angehörigen übernehmen kann, Funktionen und Preise erklären oder gemeinsam mit dir den passenden Einstieg finden. Fragen und Beratung sind hier kostenlos und ohne Anmeldung möglich. Ein Konto brauchst du erst, wenn ich wirklich etwas für dich ausführen soll.",new Date().toISOString(),"guest:welcome","WEB");
       }else{
         renderIntegrationReturnNotice();
         void refreshPersona(true).then(async()=>{await loadThreads();renderThreads();}).catch(()=>{});
