@@ -63,7 +63,9 @@ jobs:
           assert '/email/concierge/drafts/approve-send' in product
           assert 'Diese E-Mail jetzt wirklich senden?' in product
           assert '/email/drafts/send' not in product
-          assert 'ecp-thunderbird' in product\n          assert 'Automatik & Schutz' in product\n          assert 'UNIMPORTANT_AUTO_TRASH' in product
+          assert 'ecp-thunderbird' in product
+          assert 'Automatik & Schutz' in product
+          assert 'UNIMPORTANT_AUTO_TRASH' in product
           assert '.email-concierge-product' in css
           assert 'email_oauth=complete' in html
           assert '/konto?' in html
