@@ -121,3 +121,16 @@ test('payment method removal binds to exact PROD detach capability and verifies 
   assert.match(guard, /location\.reload\(\)/);
   assert.doesNotMatch(guard, /staging|shadow/i);
 });
+
+
+test('authenticated account identity cannot be overwritten by legacy onboarding localStorage', () => {
+  const account = read('konto.html');
+  assert.match(account, /Legacy onboarding data is never authoritative for an authenticated account/);
+  assert.match(account, /if \(!sessionToken\(\)\) \{/);
+  assert.match(account, /if \(sessionToken\(\)\) localStorage\.removeItem\("scb_onboarding"\)/);
+  const ownerWrites = [...account.matchAll(/document\.getElementById\("ownerName"\)\.textContent\s*=\s*d\.owner\?\.name/g)];
+  assert.equal(ownerWrites.length, 1);
+  const guardedBlock = account.slice(account.indexOf('Legacy onboarding data is never authoritative'), account.indexOf('prefSummary(', account.indexOf('Legacy onboarding data is never authoritative')));
+  assert.match(guardedBlock, /if \(!sessionToken\(\)\)/);
+  assert.match(guardedBlock, /d\.owner\?\.name/);
+});
