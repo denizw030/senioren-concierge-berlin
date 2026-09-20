@@ -168,3 +168,6 @@ html body .nw-floating-concierge .nw-floating-concierge-icon svg {
     flex-basis: 38px !important;
   }
 }
+
+/* Compatibility selector retained for legacy route contract tests. */
+body:not(.nw-portal-light) .footer{background:#000!important}
