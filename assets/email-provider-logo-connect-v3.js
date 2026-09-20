@@ -96,7 +96,7 @@
       const link = document.createElement("link");
       link.id = "emailMultiAccountStyles";
       link.rel = "stylesheet";
-      link.href = "/assets/email-multi-account-v1.css?v=20260920-2";
+      link.href = "/assets/email-multi-account-v1.css?v=20260920-3";
       document.head.appendChild(link);
     }
     if (!document.getElementById("emailMultiAccountConciergeRuntime")) {
