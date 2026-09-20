@@ -941,6 +941,9 @@
       .profile-field{
         min-width:0;
       }
+      .profile-address-field{
+        grid-column:1 / -1;
+      }
       .profile-field label{
         display:block;
         margin-bottom:7px;
@@ -2206,7 +2209,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
                 <div class="profile-head-copy">
                   <div class="eyebrow">Mein Konto</div>
                   <h3>Account</h3>
-                  <p class="muted">Vor- und Nachname kannst du hier direkt aktualisieren. E-Mail und WhatsApp bleiben aus Sicherheitsgründen geschützt.</p>
+                  <p class="muted">Vor- und Nachname sowie optional deine Wohnadresse kannst du hier aktualisieren. E-Mail und WhatsApp bleiben aus Sicherheitsgründen geschützt.</p>
                 </div>
                 <span class="profile-status" id="profileStatusBadge">Sicher verbunden</span>
               </div>
@@ -2229,6 +2232,11 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
                     <label for="profileWhatsapp">WhatsApp / Telefonnummer</label>
                     <input id="profileWhatsapp" type="text" readonly aria-readonly="true" />
                     <p class="profile-help">Identitätsrelevant. Änderungen erfolgen nur über einen gesicherten Nummernwechsel.</p>
+                  </div>
+                  <div class="profile-field profile-address-field">
+                    <label for="profileHomeAddress">Wohnadresse <span aria-hidden="true">·</span> optional</label>
+                    <input id="profileHomeAddress" type="text" autocomplete="street-address" maxlength="240" placeholder="Straße, Hausnummer, PLZ, Ort" />
+                    <p class="profile-help">Optional. Dein Concierge kann sie als Ausgangspunkt für genauere Ergebnisse in deiner Nähe sowie Entfernungen und Fahrzeiten verwenden.</p>
                   </div>
                 </div>
                 <div class="profile-actions">
@@ -4887,6 +4895,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
         const profileLastName = document.getElementById("profileLastName");
         const profileEmail = document.getElementById("profileEmail");
         const profileWhatsapp = document.getElementById("profileWhatsapp");
+        const profileHomeAddress = document.getElementById("profileHomeAddress");
         const profileSaveButton = document.getElementById("profileSaveButton");
         const profileSaveStatus = document.getElementById("profileSaveStatus");
         const profileStatusBadge = document.getElementById("profileStatusBadge");
@@ -4900,6 +4909,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
           profileLastName.value = profile?.last_name || "";
           profileEmail.value = profile?.email || "";
           profileWhatsapp.value = String(profile?.whatsapp_number || "").replace(/^whatsapp:/i, "");
+          profileHomeAddress.value = profile?.home_address || "";
         }
         function renderActorOwnerName(actor = null) {
           const owner = document.getElementById("ownerName");
@@ -4966,7 +4976,8 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
               },
               body: JSON.stringify({
                 first_name: profileFirstName.value.trim(),
-                last_name: profileLastName.value.trim()
+                last_name: profileLastName.value.trim(),
+                home_address: profileHomeAddress.value.trim()
               })
             });
             const body = await response.json().catch(() => ({}));
