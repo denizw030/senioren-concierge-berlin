@@ -38,8 +38,11 @@
       style.id = KONTO_FIX_STYLE_ID;
       style.textContent = `
         body.account-premium-ui .status-summary[data-account-panel="overview"]{display:none!important}
-        body.account-premium-ui .customer-number-summary[data-account-panel="overview"]{order:-20;grid-column:span 6!important}
-        body.account-premium-ui .plan-summary[data-account-panel="overview"]{order:-10;grid-column:span 6!important}
+        body.account-premium-ui .account-overview-highlights[data-account-panel="overview"]{order:-30}
+        body.account-premium-ui .plan-summary[data-account-panel="overview"]{order:-20;grid-column:span 6!important}
+        body.account-premium-ui .customer-number-summary[data-account-panel="overview"]{order:-10;grid-column:span 6!important}
+        body.account-premium-ui .account-overview-highlights[data-account-panel="overview"]>.account-overview-link:first-child{text-align:center!important}
+        body.account-premium-ui .account-overview-highlights[data-account-panel="overview"]>.account-overview-link:first-child [data-overview-concierge-avatar]{margin:8px auto 7px!important}
 
         html[data-nw-portal-theme="light"],
         html[data-nw-portal-theme="light"] body.account-premium-ui,
@@ -198,11 +201,6 @@
       setting.className = 'nw-theme-setting';
       setting.setAttribute('aria-label', 'Darstellung der Weboberfläche');
       setting.innerHTML = `
-        <div class="nw-theme-copy">
-          <span class="eyebrow">Darstellung</span>
-          <strong>Weboberfläche</strong>
-          <span>Zwischen heller und dunkler Ansicht wechseln.</span>
-        </div>
         <label class="nw-theme-toggle" for="nwPortalThemeToggle">
           <span class="nw-theme-option">Hell</span>
           <input id="nwPortalThemeToggle" type="checkbox" role="switch" aria-label="Dunkle Weboberfläche verwenden" />
@@ -412,17 +410,17 @@
       body.account-premium-ui #managedPersonContext.nw-managed-stabilizing:not(.nw-managed-ready){display:none!important}
 
       .nw-theme-setting{
-        display:flex;
-        align-items:center;
-        justify-content:space-between;
-        gap:24px;
-        min-height:76px;
-        margin:0 0 18px;
-        padding:14px 17px;
-        border:1px solid var(--account-line,rgba(173,190,214,.14));
-        border-radius:16px;
-        background:linear-gradient(145deg,rgba(14,19,27,.92),rgba(8,11,16,.94));
-        box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 18px 48px rgba(0,0,0,.12);
+        display:flex!important;
+        align-items:center!important;
+        justify-content:flex-end!important;
+        gap:0!important;
+        min-height:0!important;
+        margin:0 0 14px!important;
+        padding:0 2px!important;
+        border:0!important;
+        border-radius:0!important;
+        background:transparent!important;
+        box-shadow:none!important;
       }
       .nw-theme-copy{display:grid;gap:2px;min-width:0}
       .nw-theme-copy>.eyebrow{font-size:10px!important;margin:0!important}
@@ -475,7 +473,7 @@
       body.account-premium-ui.nw-portal-light .privacy-note{color:#70695f!important}
       body.account-premium-ui.nw-portal-light .eyebrow{color:#8b6828!important}
       body.account-premium-ui.nw-portal-light :is(h1,h2,h3,strong,label,.value,.summary-card .value,.account-overview-link strong){color:#1c1a16!important}
-      body.account-premium-ui.nw-portal-light :is(.account-setup-by,.managed-person-context,.managed-context-notice,.account-tabs-shell,.account-session-note,.dash>.card,.family-owner-panel,.access-panel,.account-overview-link,.profile-card,.concierge-panel,.safety-panel,.usage-panel,.reception-panel,.email-account-card,.nw-theme-setting){
+      body.account-premium-ui.nw-portal-light :is(.account-setup-by,.managed-person-context,.managed-context-notice,.account-tabs-shell,.account-session-note,.dash>.card,.family-owner-panel,.access-panel,.account-overview-link,.profile-card,.concierge-panel,.safety-panel,.usage-panel,.reception-panel,.email-account-card){
         background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(249,245,237,.94))!important;
         border-color:rgba(74,59,34,.16)!important;
         color:#1c1a16!important;
@@ -629,7 +627,7 @@
         }
       }
       @media(max-width:720px){
-        .nw-theme-setting{align-items:flex-start;flex-direction:column;gap:12px}
+        .nw-theme-setting{align-items:center!important;flex-direction:row!important;justify-content:flex-end!important;gap:0!important}
         .nw-theme-toggle{width:100%;justify-content:flex-end}
       }
       @media(max-width:620px){
