@@ -234,8 +234,6 @@
     }
     if (intro) intro.textContent = "Wählen Sie den Concierge, dessen Auftreten und Kommunikationsstil am besten zu Ihnen passt. Die grundlegenden Möglichkeiten bleiben bei allen Profilen gleich.";
     window.NAHWERKCarousel?.mount(choice, { variant: "selection", inputName: "conciergeChoice", selected: choice.dataset.selected || "lena" });
-    const oldHint = field?.querySelector(".tiny");
-    if (oldHint) oldHint.textContent = "Die Auswahl gilt für diesen Zugang und kann später in den Concierge-Einstellungen geändert werden.";
   }
 
   function person() {
