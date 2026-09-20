@@ -80,8 +80,8 @@ test("product layout is responsive across desktop and mobile",()=>{
   assert.match(js,/ecp-rule ecp-rule-personal/);
   assert.match(js,/ecp-rule-title-row/);
   assert.match(js,/\.ecp-rule-controls\{display:grid;grid-template-columns:minmax\(0,1fr\) auto/);
-  assert.match(integration,/email-concierge-product\.css\?v=20260920-4/);
-  assert.match(integration,/email-concierge-product\.js\?v=20260920-4/);
+  assert.match(integration,/email-concierge-product\.css\?v=20260920-5/);
+  assert.match(integration,/email-concierge-product\.js\?v=20260920-6/);
 });
 
 
@@ -123,6 +123,16 @@ test("important and unimportant controls remain directly visible on every classi
   assert.match(js,/@media\(max-width:640px\).*ecp-class-actions/s);
 });
 
+test("Thunderbird-style workspace keeps folders, message list and reader in one mail client",()=>{
+  assert.match(js,/ecp-thunderbird/);
+  assert.match(js,/ecp-tb-sidebar/);
+  assert.match(js,/ecp-tb-list-pane/);
+  assert.match(js,/ecp-tb-reader/);
+  assert.match(js,/Posteingang/);
+  assert.match(js,/Automatik & Schutz/);
+  assert.match(css,/grid-template-columns:220px minmax\(320px,390px\) minmax\(0,1fr\)/);
+  assert.match(css,/\.ecp-tb-class-actions/);
+});
 test("every visible mail can be marked Wichtig or Unwichtig",()=>{
   assert.match(js,/function messageCard\(message, allowOpen = true, allowClassify = true\)/);
   assert.match(js,/\[\["IMPORTANT", "Wichtig"\], \["UNIMPORTANT", "Unwichtig"\]\]/);
