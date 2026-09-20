@@ -7,7 +7,7 @@ const css=fs.readFileSync("assets/account-header-concierge.css","utf8");
 const js=fs.readFileSync("assets/account-header-concierge.js","utf8");
 
 test("account loads a dedicated selected-concierge header shortcut",()=>{
-  assert.match(konto,/assets\/account-header-concierge\.css\?v=1/);
+  assert.match(konto,/assets\/account-header-concierge\.css\?v=2/);
   assert.match(konto,/assets\/account-header-concierge\.js\?v=1/);
   assert.match(js,/id = "accountHeaderConcierge"/);
   assert.match(js,/href = "\/web-concierge"/);
