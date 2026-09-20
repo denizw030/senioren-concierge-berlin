@@ -186,17 +186,31 @@
   function classificationMessageById(id) { return classificationMessages().find((row) => String(row?.id || "") === String(id || "")) || null; }
   function classificationControls(message) {
     const wrap = el("div", "ecp-class-actions");
-    [["IMPORTANT", "Wichtig"], ["UNIMPORTANT", "Unwichtig"], ["MARKETING", "Werbung / Spam"]].forEach(([value, label]) => {
+    [["IMPORTANT", "Wichtig"], ["UNIMPORTANT", "Unwichtig"]].forEach(([value, label]) => {
       const b = button(label, "ecp-class-btn"); b.setAttribute("aria-pressed", String(message?.classification === value)); b.title = message?.classification === value ? `${label} – aktuelle Einstufung` : `Als ${label} markieren`;
       b.addEventListener("click", (event) => { event.stopPropagation(); void setMessageClassification(message, value); }); wrap.append(b);
     });
     return wrap;
+  }
+  function syncVisibleClassification(messageId, value) {
+    const id = String(messageId || "");
+    if (!id) return;
+    for (const entry of chatMessages) {
+      for (const mail of list(entry.messages)) if (String(mail?.id || "") === id) mail.classification = value;
+    }
+    if (dashboard) {
+      for (const key of ["highlights", "warnings", "hints"]) {
+        for (const mail of list(dashboard[key])) if (String(mail?.id || "") === id) mail.classification = value;
+      }
+    }
   }
   async function setMessageClassification(message, value) {
     if (busy || !message?.id || message.classification === value) return;
     setBusy(true);
     try {
       const saved = await request("/email/concierge/classification/override", { method: "POST", body: { message_id: message.id, thread_id: message.thread_id || null, classification: value } });
+      message.classification = value;
+      syncVisibleClassification(message.id, value);
       classification = normalizeClassification(await request("/email/concierge/classification/summary"));
       if (saved?.learning_suggestion_ready) {
         const next = normalizeDashboard(await request("/email/concierge/dashboard"));
@@ -205,7 +219,7 @@
     } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
     finally { setBusy(false); render(); }
   }
-  function messageCard(message, allowOpen = true, allowClassify = false) {
+  function messageCard(message, allowOpen = true, allowClassify = true) {
     const row = el("article", "ecp-mail"), main = el("div", "ecp-mail-main");
     main.append(el("span", "ecp-mail-title", text(message.subject, 300) || "(kein Betreff)"));
     main.append(el("span", "ecp-mail-meta", [text(message.from, 220), fmtDate(message.date)].filter(Boolean).join(" · ")));
@@ -238,7 +252,15 @@
       left.append(el("strong", "", text(data.message?.subject, 300) || "(kein Betreff)"), el("div", "ecp-mail-meta", text(data.message?.from, 300)));
       const close = button("Schließen", "ecp-open"); close.addEventListener("click", () => detail.remove()); head.append(left, close); detail.append(head);
       detail.append(el("div", "ecp-detail-body", text(data.message?.body_text, 12000) || "Kein Textinhalt verfügbar."));
-      const sorted = classificationMessageById(messageId); if (sorted) detail.append(classificationControls(sorted));
+      const sorted = classificationMessageById(messageId);
+      const classifiable = sorted || (data.message?.id ? {
+        id: String(data.message.id),
+        thread_id: data.message.thread_id || data.message.threadId || null,
+        from: data.message.from || "",
+        subject: data.message.subject || "",
+        classification: data.message.classification || null
+      } : null);
+      if (classifiable) detail.append(classificationControls(classifiable));
       const attachments = list(data.message?.attachments); if (attachments.length) detail.append(el("p", "ecp-footer-note", `${attachments.length} Anhang${attachments.length === 1 ? "" : "e"} erkannt. Gefährliche Dateitypen werden nicht automatisch geöffnet.`));
       afterNode.insertAdjacentElement("afterend", detail);
     } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
@@ -250,7 +272,7 @@
     for (const entry of chatMessages) {
       const msg = el("div", `ecp-msg ecp-msg-${entry.role}${entry.error ? " ecp-msg-error" : ""}`, entry.text);
       log.append(msg);
-      for (const mail of list(entry.messages)) log.append(messageCard(mail));
+      for (const mail of list(entry.messages)) log.append(messageCard(mail, true, true));
     }
     const quick = el("div", "ecp-quick");
     QUICK.forEach((label) => { const chip = button(label, "ecp-chip"); chip.addEventListener("click", () => runQuery(label)); quick.append(chip); });
@@ -290,7 +312,7 @@
   function renderHighlights(card) {
     const rows = classification ? classification.buckets.IMPORTANT : list(dashboard.highlights);
     if (!rows.length) { card.append(el("div", "ecp-section-empty", "Keine wichtigen Nachrichten in der aktuellen Übersicht.")); return; }
-    const listNode = el("div", "ecp-list"); rows.slice(0, 10).forEach((row) => listNode.append(messageCard(row, true, Boolean(classification)))); card.append(listNode);
+    const listNode = el("div", "ecp-list"); rows.slice(0, 10).forEach((row) => listNode.append(messageCard(row, true, true))); card.append(listNode);
     if (classification && rows.length > 10) card.append(el("p", "ecp-sort-scope", `${rows.length - 10} weitere wichtige E-Mails findest du unten unter „Sortierung prüfen“.`));
   }
   function focusClassification(bucket) {

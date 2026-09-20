@@ -111,3 +111,12 @@ test("important and unimportant controls remain directly visible on every classi
   assert.match(js,/classification\/override/);
   assert.match(js,/@media\(max-width:640px\).*ecp-class-actions/s);
 });
+
+test("every visible mail can be marked Wichtig or Unwichtig",()=>{
+  assert.match(js,/function messageCard\(message, allowOpen = true, allowClassify = true\)/);
+  assert.match(js,/\[\["IMPORTANT", "Wichtig"\], \["UNIMPORTANT", "Unwichtig"\]\]/);
+  assert.match(js,/messageCard\(mail, true, true\)/);
+  assert.match(js,/messageCard\(row, true, true\)/);
+  assert.match(js,/const classifiable = sorted \|\| \(data\.message\?\.id/);
+  assert.match(js,/syncVisibleClassification\(message\.id, value\)/);
+});
