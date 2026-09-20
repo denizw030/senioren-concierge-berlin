@@ -214,6 +214,13 @@ body.senior-product .nw-voice-preview-language-select:hover,
     linear-gradient(135deg,currentColor 50%,transparent 50%) right 11px center/5px 5px no-repeat,
     #fff!important;
 }
+/* Registration: center the selected language label inside the selector. */
+body.registration-page .nw-carousel[data-variant="selection"] .nw-voice-preview-language-select{
+  text-align:center!important;
+  text-align-last:center!important;
+  padding-left:38px!important;
+}
+
 @media(max-width:520px){
   .nw-voice-preview-control{max-width:100%!important}
   .nw-voice-preview-button,
