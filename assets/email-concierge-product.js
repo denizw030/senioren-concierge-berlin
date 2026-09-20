@@ -105,6 +105,8 @@
   let mailboxFolderRows = [];
   let mailboxFolderLoading = false;
   let mailboxFolderError = "";
+  let mailboxFolderCounts = {};
+  let classificationKnownCounts = {};
   let allDrafts = [];
   let draftsLoading = false;
   let readerMode = "MESSAGE";
@@ -252,6 +254,17 @@
     return text(row?.account_email || row?.account_display_hint || row?.provider_label || "Postfach", 320);
   }
   function remoteFolderMode() { return mailboxScope === "ALL" || ["INBOX","SENT","SPAM","TRASH"].includes(mailboxFolder); }
+  function classificationFolderMode() { return mailboxScope === "ACCOUNT" && ["IMPORTANT","UNIMPORTANT"].includes(mailboxFolder); }
+  function folderBackedMode() { return remoteFolderMode() || classificationFolderMode(); }
+  function setFolderCount(connectionId, folder, meta) {
+    const id=String(connectionId||""); if(!id) return;
+    if(!mailboxFolderCounts[id]) mailboxFolderCounts[id]={};
+    mailboxFolderCounts[id][folder]={ total:number(meta?.messages_total), unread:number(meta?.messages_unread) };
+  }
+  function physicalFolderUnread(connectionId, folder) {
+    const value=mailboxFolderCounts?.[String(connectionId||"")]?.[folder]?.unread;
+    return Number.isFinite(value) && value>0 ? value : "";
+  }
   function decorateRemoteMessage(message, connection) {
     return {
       ...message,
@@ -262,7 +275,7 @@
     };
   }
   function mailboxAllMessages() {
-    if (remoteFolderMode()) return list(mailboxFolderRows);
+    if (folderBackedMode()) return list(mailboxFolderRows);
     const rows = classification ? classificationMessages() : [...list(dashboard?.highlights), ...list(dashboard?.warnings)];
     const seen = new Set(), out = [];
     for (const row of rows) { const id = String(row?.id || ""); if (!id || seen.has(id)) continue; seen.add(id); out.push({ ...row, _connection_id: activeConnectionId, _account_email: connectionEmail(activeConnectionId) }); }
@@ -270,10 +283,8 @@
   }
   function mailboxFilteredMessages() {
     let rows = mailboxAllMessages();
-    if (!remoteFolderMode()) {
-      if (mailboxFolder === "IMPORTANT") rows = rows.filter((m)=>m.classification === "IMPORTANT");
-      else if (mailboxFolder === "UNIMPORTANT") rows = rows.filter((m)=>m.classification === "UNIMPORTANT");
-      else if (mailboxFolder === "REPLY") rows = rows.filter((m)=>m.needs_reply === true);
+    if (!folderBackedMode()) {
+      if (mailboxFolder === "REPLY") rows = rows.filter((m)=>m.needs_reply === true);
     }
     const q = mailboxSearch.trim().toLowerCase();
     if (q) rows = rows.filter((m)=>[m.from,m.subject,m.snippet,m._account_email].some((v)=>String(v||"").toLowerCase().includes(q)));
@@ -286,42 +297,64 @@
     return account ? `${label} · ${account}` : label;
   }
   function mailboxFolderCount(folder, connectionId = activeConnectionId) {
-    if (folder === "ALL") return mailboxScope === "ALL" && !mailboxFolderLoading ? mailboxFolderRows.length : "";
+    if (folder === "ALL") {
+      const unread=emailConnections.reduce((sum,row)=>sum+(Number(mailboxFolderCounts?.[String(row.connection_id||"")]?.INBOX?.unread)||0),0);
+      return unread>0?unread:"";
+    }
     if (folder === "DRAFTS") return allDrafts.length || list(dashboard?.drafts).length || "";
-    if (String(connectionId) !== String(activeConnectionId)) return "";
-    if (folder === "INBOX") return classification?.total ?? "";
-    if (folder === "IMPORTANT") return classification?.counts?.IMPORTANT ?? "";
-    if (folder === "UNIMPORTANT") return classification?.counts?.UNIMPORTANT ?? "";
-    if (folder === "REPLY") return mailboxAllMessages().filter((m)=>m.needs_reply === true).length || "";
-    if (mailboxScope === "ACCOUNT" && mailboxFolder === folder && !mailboxFolderLoading) return mailboxFolderRows.length || "";
+    const id=String(connectionId||"");
+    if (folder === "IMPORTANT" || folder === "UNIMPORTANT") {
+      const known=classificationKnownCounts?.[id]?.[folder];
+      return Number.isFinite(known)&&known>0?known:"";
+    }
+    if (["INBOX","SENT","SPAM","TRASH"].includes(folder)) return physicalFolderUnread(id,folder);
+    if (String(id) !== String(activeConnectionId)) return "";
+    if (folder === "REPLY") return classification ? list(classification.buckets?.IMPORTANT).filter((m)=>m.needs_reply===true).length || "" : "";
     return "";
   }
-  async function searchRemoteFolder(connection, folder, maxResults = 50) {
+  async function searchRemoteFolder(connection, folder, maxResults = 30) {
     const data = await request("/email/concierge/folder", {
       method: "POST",
       body: { folder, max_results: maxResults },
       connectionId: String(connection.connection_id || "")
     });
-    return list(data?.messages).map((message) => decorateRemoteMessage(message, connection));
+    return { messages:list(data?.messages).map((message)=>decorateRemoteMessage(message,connection)), folder_meta:data?.folder_meta||{} };
+  }
+  async function loadClassificationFolder(connection) {
+    const id=String(connection?.connection_id||"");
+    const params=new URLSearchParams({classification:mailboxFolder,limit:"80"});
+    const data=await request("/email/concierge/classification/view?"+params.toString(), { connectionId:id });
+    if(!classificationKnownCounts[id]) classificationKnownCounts[id]={};
+    classificationKnownCounts[id][mailboxFolder]=number(data?.known_total||data?.count);
+    return list(data?.messages).map((message)=>decorateRemoteMessage(message,connection));
   }
   async function loadMailboxFolder() {
     if (!connected || mailboxFolderLoading) return;
-    if (!remoteFolderMode()) { mailboxFolderRows = []; mailboxFolderError = ""; render(); return; }
+    if (!folderBackedMode()) { mailboxFolderRows = []; mailboxFolderError = ""; render(); return; }
     const previousRows = mailboxFolderRows.slice();
     mailboxFolderLoading = true; mailboxFolderError = ""; render();
     try {
       if (mailboxScope === "ALL") {
         const connectedRows = emailConnections.filter((row) => String(row?.state || "").toUpperCase() === "CONNECTED");
-        const settled = await Promise.allSettled(connectedRows.map((row) => searchRemoteFolder(row, "INBOX", 30)));
-        const nextRows = settled.flatMap((result) => result.status === "fulfilled" ? result.value : [])
-          .sort((a,b)=>Date.parse(String(b?.date||0))-Date.parse(String(a?.date||0))).slice(0,120);
-        if (nextRows.length || !previousRows.length) mailboxFolderRows = nextRows;
+        const settled = await Promise.allSettled(connectedRows.map(async(row)=>({row,data:await searchRemoteFolder(row,"INBOX",30)})));
+        const nextRows=[];
+        for(const result of settled){
+          if(result.status!=="fulfilled")continue;
+          setFolderCount(result.value.row.connection_id,"INBOX",result.value.data.folder_meta);
+          nextRows.push(...result.value.data.messages);
+        }
+        nextRows.sort((a,b)=>Date.parse(String(b?.date||0))-Date.parse(String(a?.date||0)));
+        if (nextRows.length || !previousRows.length) mailboxFolderRows = nextRows.slice(0,120);
         if (settled.some((result)=>result.status === "rejected")) mailboxFolderError = "Ein Postfach konnte gerade nicht aktualisiert werden.";
       } else {
         const connection = connectionById(activeConnectionId);
         if (!connection) throw new Error("EMAIL_CONNECTION_NOT_CONNECTED");
-        const nextRows = await searchRemoteFolder(connection, mailboxFolder, 30);
-        mailboxFolderRows = nextRows;
+        if(classificationFolderMode()) mailboxFolderRows = await loadClassificationFolder(connection);
+        else {
+          const data=await searchRemoteFolder(connection,mailboxFolder,30);
+          setFolderCount(activeConnectionId,mailboxFolder,data.folder_meta);
+          mailboxFolderRows=data.messages;
+        }
       }
     } catch (error) {
       if (previousRows.length) mailboxFolderRows = previousRows;
@@ -409,6 +442,10 @@
     }
     if (moved && classification.buckets[value]) classification.buckets[value].unshift(moved);
     for (const key of ["IMPORTANT","UNIMPORTANT","MARKETING"]) classification.counts[key] = list(classification.buckets[key]).length;
+    const id=String(activeConnectionId||"");
+    if(id && classificationKnownCounts[id] && Number.isFinite(classificationKnownCounts[id][value])) {
+      classificationKnownCounts[id][value] = Math.max(classificationKnownCounts[id][value], list(classification.buckets[value]).length);
+    }
   }
   async function setMessageClassification(message, value) {
     if (busy || !message?.id || message.classification === value) return;
@@ -525,8 +562,11 @@
     }
   }
   function applyQueryResultToMailbox(data) {
-    const ids = list(data?.result?.message_ids);
-    if (ids.length) removeMailboxMessages(ids);
+    const ids = list(data?.result?.message_ids).map(String), idSet=new Set(ids);
+    const movedUnimportantToTrash = data?.result?.action === "TRASH" && data?.result?.classification === "UNIMPORTANT";
+    if (movedUnimportantToTrash && classificationFolderMode() && mailboxFolder === "UNIMPORTANT") {
+      for(const row of mailboxFolderRows) if(idSet.has(String(row?.id||""))) row.mailbox_location="TRASH";
+    } else if (ids.length) removeMailboxMessages(ids);
     const single = String(data?.result?.message_id || data?.result?.result?.message_id || "");
     if (single) removeMailboxMessages([single]);
   }
@@ -545,6 +585,7 @@
       applyQueryResultToMailbox(data);
       render();
       await loadDashboard(false, true);
+      if (mailboxScope === "ALL" || mailboxScope === "ACCOUNT") await loadMailboxFolder();
     } catch (error) {
       const code = error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE";
       chatMessages.push({ role: "assistant", text: ERROR_COPY[code] || "Das konnte ich gerade nicht ausführen. Bitte versuche es erneut.", error: true });
@@ -889,16 +930,16 @@
     const pane = el("section","ecp-tb-list-pane"), top = el("div","ecp-tb-list-top"), titleWrap = el("div");
     const rows = mailboxFilteredMessages();
     titleWrap.append(el("strong","",mailboxFolderTitle()),el("span","",String(rows.length)+" angezeigt")); top.append(titleWrap);
-    const refresh = button("↻","ecp-tb-icon-button"); refresh.title="Aktualisieren"; refresh.addEventListener("click",()=>{if(remoteFolderMode())void loadMailboxFolder();else void loadDashboard(false,true);}); top.append(refresh); pane.append(top);
+    const refresh = button("↻","ecp-tb-icon-button"); refresh.title="Aktualisieren"; refresh.addEventListener("click",()=>{if(folderBackedMode())void loadMailboxFolder();else void loadDashboard(false,true);}); top.append(refresh); pane.append(top);
     const listNode = el("div","ecp-tb-message-list");
-    const loading = remoteFolderMode() ? mailboxFolderLoading : classificationLoading;
-    const loadError = remoteFolderMode() ? mailboxFolderError : classificationError;
+    const loading = folderBackedMode() ? mailboxFolderLoading : classificationLoading;
+    const loadError = folderBackedMode() ? mailboxFolderError : classificationError;
     if (!rows.length && loading) {
       listNode.append(el("div","ecp-tb-empty","E-Mails werden geladen …"));
     } else if (!rows.length && loadError) {
       const errorBox=el("div","ecp-tb-empty ecp-tb-error-state");
       errorBox.append(el("strong","","E-Mails konnten gerade nicht geladen werden."),el("span","","Das Postfach konnte nicht gelesen werden. Bitte versuche es erneut."));
-      const retry=button("Erneut laden","ecp-tb-toolbar-button");retry.addEventListener("click",()=>{if(remoteFolderMode())void loadMailboxFolder();else{classificationRetryCount=0;void loadClassification();}});
+      const retry=button("Erneut laden","ecp-tb-toolbar-button");retry.addEventListener("click",()=>{if(folderBackedMode())void loadMailboxFolder();else{classificationRetryCount=0;void loadClassification();}});
       errorBox.append(retry);listNode.append(errorBox);
     } else if (!rows.length) {
       listNode.append(el("div","ecp-tb-empty","Keine passenden E-Mails in dieser Ansicht."));
@@ -911,6 +952,8 @@
         header.append(sender,date); row.append(header,el("div","ecp-tb-subject",text(message.subject,300)||"(kein Betreff)"));
         if(message.snippet)row.append(el("div","ecp-tb-snippet",text(message.snippet,260)));
         if(message.needs_reply)row.append(el("span","ecp-tb-reply-flag","Antwort empfohlen"));
+        if(message.mailbox_location==="TRASH")row.append(el("span","ecp-tb-location-flag","Papierkorb"));
+        else if(message.mailbox_location==="ARCHIVE")row.append(el("span","ecp-tb-location-flag","Archiv"));
         const allowClassify=mailboxScope==="ACCOUNT"&&["INBOX","IMPORTANT","UNIMPORTANT","REPLY"].includes(mailboxFolder)&&String(connectionById(messageConnection)?.provider||"GOOGLE").toUpperCase()==="GOOGLE";
         if(allowClassify){const actions=classificationControls(message); actions.classList.add("ecp-tb-class-actions"); row.append(actions);}
         if(message._account_email&&mailboxScope==="ALL")row.append(el("span","ecp-tb-account-chip",text(message._account_email,220)));
@@ -1020,7 +1063,7 @@
     ensureHost();
     if (!connected) {
       dashboard = null; dashboardLoadedAt = 0; classification = null; classificationError = ""; classificationRetryCount = 0;
-      emailConnections = []; activeConnectionId = ""; mailboxScope = "ALL"; mailboxFolderRows = []; allDrafts = [];
+      emailConnections = []; activeConnectionId = ""; mailboxScope = "ALL"; mailboxFolderRows = []; mailboxFolderCounts = {}; classificationKnownCounts = {}; allDrafts = [];
       chatMessages = []; chatStarted = false; render(); return;
     }
     try { await loadConnections(); } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
@@ -1034,6 +1077,14 @@
     if (canonical !== null) void setConnectionState(canonical);
     else if (connected) void loadConnections().then(()=>loadMailboxFolder());
   });
+  async function refreshLiveMailbox() {
+    if(!connected || busy || document.hidden) return;
+    try { await loadConnections(); await loadMailboxFolder(); }
+    catch { /* current rows stay visible */ }
+  }
+  setInterval(()=>{ void refreshLiveMailbox(); },60000);
+  document.addEventListener("visibilitychange",()=>{ if(!document.hidden) void refreshLiveMailbox(); });
+
   globalThis.NAHWERKEmailConciergeProduct = Object.freeze({
     setConnectionState,
     refresh() { return loadConnections().then(()=>loadDashboard(false, true)).then(()=>loadMailboxFolder()); }
