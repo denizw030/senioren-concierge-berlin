@@ -564,4 +564,9 @@
       return load(true);
     }
   });
+
+  const emailTabAlreadyActive =
+    root.hidden === false ||
+    document.getElementById("accountTabEmail")?.getAttribute("aria-selected") === "true";
+  if (emailTabAlreadyActive) queueMicrotask(() => load(false));
 })();
