@@ -17,7 +17,7 @@
   const normalizePath = (pathname) => {
     const parts = pathname.split('/').filter(Boolean);
     let lang = 'de';
-    if (parts[0] === 'en' || parts[0] === 'tr') lang = parts.shift();
+    if (parts[0] && SUPPORTED[parts[0]]) lang = parts.shift();
     const rawPage = parts.length ? parts[parts.length - 1] : 'index.html';
     const page = rawPage === 'index' ? 'index.html' : (rawPage.endsWith('.html') ? rawPage : `${rawPage}.html`);
     return { lang, page };
