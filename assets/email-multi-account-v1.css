@@ -256,3 +256,45 @@ html[data-nw-portal-theme="light"] body.account-premium-ui .email-multi-account-
 html body.account-premium-ui.nw-portal-light .email-multi-account-detail-body{
   color:#39342c!important;
 }
+
+
+/* NAHWERK email card corner + action symmetry v20260920-1 */
+.email-multi-account-concierge{
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:100%!important;
+  overflow:hidden!important;
+  border-radius:18px!important;
+}
+.email-multi-account-head,
+.email-multi-account-toolbar,
+.email-multi-account-query,
+.email-multi-account-field{
+  min-width:0;
+}
+#accountEmailCard>.email-actions{
+  box-sizing:border-box;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  width:min(100%,340px);
+  margin:12px 0 0;
+  align-items:stretch;
+}
+#accountEmailCard>.email-actions>.btn{
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
+  min-height:42px;
+  margin:0!important;
+  padding:0 14px;
+  border-radius:12px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+#accountEmailCard>.email-actions>[hidden]{display:none!important}
+@media(max-width:460px){
+  #accountEmailCard>.email-actions{width:100%;gap:8px}
+}
