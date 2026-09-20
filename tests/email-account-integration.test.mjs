@@ -143,8 +143,9 @@ test("disconnect keeps Google selected so reconnect works immediately",()=>{
 });
 
 test("connect button does not silently block after a Google disconnect",()=>{
-  assert.match(js,/const hasGoogleSelection = selectedProvider === "GOOGLE" \|\| connection\?\.provider === "GOOGLE"/);
-  assert.match(js,/if \(googleReady\) selectedProvider = "GOOGLE"/);
+  assert.match(js,/selectedProvider = "GOOGLE";\s*connectButton\.disabled = !sessionToken\(\)/s);
+  assert.match(js,/renderError\(new Error\("UNAUTHENTICATED"\)\)/);
+  assert.doesNotMatch(js,/connectButton\.disabled = !sessionToken\(\) \|\| !googleReady/);
 });
 
 test("direct email tab reload auto-activates account runtime",()=>{
