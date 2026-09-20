@@ -169,7 +169,7 @@
           appendMessage(role,text,String(entry.at||new Date().toISOString()),String(entry.id||""),String(entry.channel||"WEB"),{scroll:false});
           if(role==="user")lastGuestUserMessage=text;
         }else if(entry?.kind==="account_action"&&entry.action){
-          renderGuestAccountActions([entry.action]);
+          renderGuestAccountActions([entry.action],{request:String(entry.request||entry.action?.request||"")});
         }
       }
     } finally {
@@ -530,56 +530,58 @@
     if(!value)return false;
     return /(?:\banmelden\b|\beinloggen\b|\blogin\b|\blog in\b|\bregistrieren\b|\bregistrierung\b|\bkonto (?:erstellen|anlegen|machen)\b|\baccount (?:erstellen|anlegen)\b|\bsign in\b|\bsign up\b)/i.test(value);
   }
+  function saveGuestExecutionHandoff(request) {
+    const value=String(request||"").trim().slice(0,4000);
+    if(!value)return;
+    try{
+      localStorage.setItem(GUEST_RESUME_KEY,JSON.stringify({
+        request:value,
+        thread_id:String(activeThreadId||""),
+        post_auth_target:"/payg",
+        created_at:new Date().toISOString()
+      }));
+    }catch{}
+  }
 
-  function renderGuestAccountActions(actions) {
+  function renderGuestAccountActions(actions,{request=""}={}) {
     if(!guestMode||!Array.isArray(actions)||!actions.length)return null;
     const allowed=actions.filter((action)=>String(action?.type||"").toUpperCase()==="CREATE_ACCOUNT");
     if(!allowed.length)return null;
     const action=allowed[0];
-    const purpose=String(action?.purpose||"EXECUTION").toUpperCase();
+    const purpose=String(action?.purpose||"").toUpperCase();
+    if(!["ACCOUNT_REQUEST","EXECUTION"].includes(purpose))return null;
     const accountOnly=purpose==="ACCOUNT_REQUEST";
-    const title=accountOnly?"Anmelden oder Konto erstellen":"Konto für die Ausführung erforderlich";
+    const handoffRequest=String(request||lastGuestUserMessage||"").trim().slice(0,4000);
+    const title=accountOnly?"Anmelden oder Konto erstellen":"Auftrag sicher fortsetzen";
     const body=accountOnly
       ?"Wenn du bereits ein NAHWERK Konto hast, kannst du dich direkt anmelden. Sonst erstellst du in wenigen Schritten ein neues Konto."
-      :"Damit ich die Aufgabe wirklich für dich ausführen kann, brauchst du zuerst ein NAHWERK Konto. Danach kannst du PAYG-Guthaben ab 5 € aufladen; vor einer kostenpflichtigen Ausführung siehst du den Preis.";
+      :"Melde dich an oder erstelle ein Konto. Danach kannst du PAYG-Guthaben ab 5 € aufladen. Dein Auftrag wird nicht automatisch ausgeführt: Du siehst vorher den Preis und gibst die Ausführung ausdrücklich frei.";
     const card=addRuntimeCard(title,body,"is-guest-account");
     if(!card)return null;
     const wrap=document.createElement("div");wrap.className="web-concierge-guest-actions";
-    if(accountOnly){
-      const signIn=document.createElement("a");
-      signIn.className="btn red";
-      signIn.href="/anmelden?source=web_guest_chat";
-      signIn.textContent="Anmelden";
-      const create=document.createElement("a");
-      create.className="btn light";
-      const candidate=String(action?.href||"");
-      create.href=candidate.startsWith("/registrieren?")?candidate:"/registrieren?source=web_guest_chat";
-      create.textContent="Konto erstellen";
-      wrap.append(signIn,create);
-    }else{
-      const link=document.createElement("a");
-      link.className="btn red";
-      const candidate=String(action?.href||"");
-      link.href=candidate.startsWith("/registrieren?")?candidate:"/registrieren?source=web_guest_chat&next=%2Fpayg";
-      link.textContent=String(action?.label||"").trim()||"Konto erstellen";
-      link.addEventListener("click",()=>{
-        try{
-          localStorage.setItem(GUEST_RESUME_KEY,JSON.stringify({
-            request:String(lastGuestUserMessage||"").slice(0,4000),
-            thread_id:String(activeThreadId||""),
-            post_auth_target:"/payg",
-            created_at:new Date().toISOString()
-          }));
-        }catch{}
-      });
-      wrap.appendChild(link);
+    const signIn=document.createElement("a");
+    signIn.className="btn red";
+    signIn.href=accountOnly?"/anmelden?source=web_guest_chat":"/anmelden?source=web_guest_chat&next=%2Fpayg";
+    signIn.textContent="Anmelden";
+    const create=document.createElement("a");
+    create.className="btn light";
+    const candidate=String(action?.href||"");
+    create.href=accountOnly
+      ?(candidate.startsWith("/registrieren?")?candidate:"/registrieren?source=web_guest_chat")
+      :(candidate.startsWith("/registrieren?")&&candidate.includes("next=%2Fpayg")?candidate:"/registrieren?source=web_guest_chat&next=%2Fpayg");
+    create.textContent="Konto erstellen";
+    if(!accountOnly){
+      signIn.addEventListener("click",()=>saveGuestExecutionHandoff(handoffRequest));
+      create.addEventListener("click",()=>saveGuestExecutionHandoff(handoffRequest));
     }
+    wrap.append(signIn,create);
     card.appendChild(wrap);
     if(!restoringGuestView)rememberGuestViewEntry({
       kind:"account_action",
+      request:handoffRequest,
       action:{
         type:"CREATE_ACCOUNT",
-        purpose:accountOnly?"ACCOUNT_REQUEST":"EXECUTION",
+        purpose,
         label:String(action?.label||"").trim(),
         href:String(action?.href||""),
         post_auth_target:String(action?.post_auth_target||"")
@@ -587,13 +589,13 @@
     });
     scrollBottom();return card;
   }
-  function renderCoreV1Response(raw) {
+  function renderCoreV1Response(raw,{guestRequest=""}={}) {
     const response=normalizeCoreV1Response(raw);if(!response||!response.authoritative)return false;
     removeTyping();const now=new Date().toISOString();
     for(const message of response.messages)appendMessage("assistant",message.text,now,`a:${response.turn_id}`,"WEB");
     if(response.pending_approval&&!guestMode)renderApproval(response.pending_approval);
     if(response.error)addRuntimeCard("Das hat noch nicht geklappt",String(response.error.customer_safe_message||"Bitte versuche es noch einmal."),"is-error");
-    renderGuestAccountActions(response.ui_actions);
+    renderGuestAccountActions(response.ui_actions,{request:guestRequest});
     return true;
   }
 
@@ -1023,7 +1025,7 @@
           }catch(error){
             const reason=String(error?.message||"");
             if(attempt===0&&/GUEST_SESSION_(?:EXPIRED|INVALID)/i.test(reason)){
-              try{localStorage.removeItem(GUEST_TOKEN_KEY);}catch{}
+              try{sessionStorage.removeItem(GUEST_TOKEN_KEY);}catch{}
               continue;
             }
             throw error;
@@ -1032,11 +1034,11 @@
         if(response?.ok!==true||response?.environment!=="PROD"||response?.authoritative!==true||response?.guest!==true)throw new Error("guest_gateway_response_not_authoritative");
         saveGuestToken(response.guest_token);
         const returnedThreadId=String(response?.thread_id||"");if(validUuid(returnedThreadId)){activeThreadId=returnedThreadId;setGuestThreadId(returnedThreadId);rebindGuestViewThread(returnedThreadId);}
-        if(!renderCoreV1Response(response.core))throw new Error("guest_core_response_not_authoritative");
+        if(!renderCoreV1Response(response.core,{guestRequest:content}))throw new Error("guest_core_response_not_authoritative");
         const backendAccountAction=Array.isArray(response?.core?.ui_actions)
           && response.core.ui_actions.some((action)=>String(action?.type||"").toUpperCase()==="CREATE_ACCOUNT");
         if(!backendAccountAction&&isExplicitGuestAccountIntent(content)){
-          renderGuestAccountActions([{type:"CREATE_ACCOUNT",purpose:"ACCOUNT_REQUEST",label:"Konto erstellen",href:"/registrieren?source=web_guest_chat"}]);
+          renderGuestAccountActions([{type:"CREATE_ACCOUNT",purpose:"ACCOUNT_REQUEST",label:"Konto erstellen",href:"/registrieren?source=web_guest_chat"}],{request:""});
         }
         return;
       }

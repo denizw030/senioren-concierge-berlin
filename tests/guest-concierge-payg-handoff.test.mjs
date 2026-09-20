@@ -18,7 +18,7 @@ test("guest advice has no account CTA until backend marks a real execution reque
   assert.match(chat,/allowed=actions\.filter\(\(action\)=>String\(action\?\.type\|\|""\)\.toUpperCase\(\)==="CREATE_ACCOUNT"\)/);
   assert.doesNotMatch(chat,/type==="SIGN_UP"/);
   assert.doesNotMatch(chat,/type==="SIGN_IN"/);
-  assert.match(chat,/Konto für die Ausführung erforderlich/);
+  assert.match(chat,/Auftrag sicher fortsetzen/);
   assert.match(chat,/purpose:String\(item\.purpose\|\|""\)\.toUpperCase\(\)/);
   assert.match(chat,/purpose==="ACCOUNT_REQUEST"/);
   assert.match(chat,/Anmelden oder Konto erstellen/);
@@ -34,8 +34,12 @@ test("guest browsing state stays session-scoped and reload reset does not erase 
   assert.doesNotMatch(chat,/removeItem\(GUEST_RESUME_KEY\).*resetGuestChatSessionForReload/s);
 });
 
-test("guest execution handoff preserves the request locally and only allows PAYG as post-auth target",()=>{
+test("guest execution handoff preserves the exact request for both login and registration",()=>{
   assert.match(chat,/nw_guest_resume_request_v1/);
+  assert.match(chat,/handoffRequest=String\(request\|\|lastGuestUserMessage\|\|""\)/);
+  assert.match(chat,/signIn\.href=accountOnly\?"\/anmelden\?source=web_guest_chat":"\/anmelden\?source=web_guest_chat&next=%2Fpayg"/);
+  assert.match(chat,/signIn\.addEventListener\("click",\(\)=>saveGuestExecutionHandoff\(handoffRequest\)\)/);
+  assert.match(chat,/create\.addEventListener\("click",\(\)=>saveGuestExecutionHandoff\(handoffRequest\)\)/);
   assert.match(chat,/post_auth_target:"\/payg"/);
   assert.match(chat,/source=web_guest_chat&next=%2Fpayg/);
   assert.match(onboarding,/params\.get\("next"\) === "\/payg"/);
@@ -71,10 +75,12 @@ test("guest flow loads the refreshed assets only on the touched product surfaces
 });
 
 
-test("explicit account creation CTA does not fake an execution or PAYG resume",()=>{
+test("explicit account CTA stays non-PAYG while execution CTA supports both auth paths",()=>{
   assert.match(chat,/accountOnly=purpose==="ACCOUNT_REQUEST"/);
-  assert.match(chat,/accountOnly\?"\/registrieren\?source=web_guest_chat"/);
-  assert.match(chat,/if\(!accountOnly\)link\.addEventListener\("click"/);
+  assert.match(chat,/signIn\.href=accountOnly/);
+  assert.match(chat,/create\.href=accountOnly/);
+  assert.match(chat,/if\(!accountOnly\)\{/);
   assert.match(chat,/Wenn du bereits ein NAHWERK Konto hast/);
+  assert.match(chat,/saveGuestExecutionHandoff/);
   assert.match(chat,/renderGuestAccountActions\(\[\{type:"CREATE_ACCOUNT",purpose:"ACCOUNT_REQUEST"/);
 });
