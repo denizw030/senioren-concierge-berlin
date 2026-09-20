@@ -143,13 +143,21 @@
     if (!isSeniorLogin || !document.body) return;
     const main = document.querySelector('main');
     if (!main) return;
-    let visual = main.querySelector(':scope > .senior-login-visual');
+
+    const visuals = Array.from(main.querySelectorAll(':scope > .senior-login-visual'));
+    let visual = visuals.shift() || null;
+
+    // Hard guarantee: never allow the senior login portrait to exist twice.
+    visuals.forEach((node) => node.remove());
+
     if (!visual) {
       visual = document.createElement('div');
       visual.className = 'senior-login-visual';
       visual.setAttribute('aria-hidden', 'true');
       main.appendChild(visual);
     }
+
+    visual.id = 'nw-senior-login-visual';
   };
 
   if (product && !applyProduct()) {
