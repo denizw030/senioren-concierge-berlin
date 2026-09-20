@@ -526,6 +526,20 @@
   });
   function resizeInput(){const input=document.getElementById("webConciergeInput");if(!(input instanceof HTMLTextAreaElement))return;input.style.height="auto";input.style.height=`${Math.min(input.scrollHeight,132)}px`;}
   function sidebarDate(value){const d=new Date(value||Date.now()),now=new Date();if(Number.isNaN(d.getTime()))return "";if(dateKey(d)===dateKey(now))return timeLabel(d);return new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"2-digit"}).format(d);}
+  function channelIcon(channel){
+    const key=String(channel||"").toUpperCase();
+    const icon=document.createElement("span");
+    icon.className="web-concierge-channel-icon";
+    icon.setAttribute("aria-hidden","true");
+    if(key==="PHONE"){
+      icon.innerHTML='<svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.69 2.8a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.28-1.28a2 2 0 0 1 2.11-.45c.9.33 1.84.56 2.8.69A2 2 0 0 1 22 16.92Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    }else if(key==="EMAIL"){
+      icon.innerHTML='<svg viewBox="0 0 24 24"><path d="M3.5 5.5h17A1.5 1.5 0 0 1 22 7v10a1.5 1.5 0 0 1-1.5 1.5h-17A1.5 1.5 0 0 1 2 17V7a1.5 1.5 0 0 1 1.5-1.5ZM4 7.5l8 5.6 8-5.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    }else if(key==="WHATSAPP"){
+      icon.innerHTML='<svg viewBox="0 0 24 24"><path d="M20.5 11.7a8.5 8.5 0 0 1-12.6 7.5L3.5 20.5l1.3-4.3A8.5 8.5 0 1 1 20.5 11.7Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.4 7.7c.4-.3.9-.2 1.2.2l1 1.8c.2.4.1.8-.2 1.1l-.7.7c.8 1.6 2.1 2.9 3.7 3.7l.7-.7c.3-.3.8-.4 1.1-.2l1.8 1c.4.3.5.8.2 1.2l-.5.9c-.2.4-.6.6-1 .6-4.7-.4-8.4-4.1-8.8-8.8 0-.4.2-.8.6-1l.9-.5Z" fill="currentColor"/></svg>';
+    }
+    return icon;
+  }
   function renderThreads() {
     const box=document.getElementById("webConciergeThreads");if(!box)return;clearNode(box);
     const list=[...threadCache];
@@ -537,7 +551,9 @@
       b.dataset.threadId=thread.thread_id;
       b.dataset.chatChannel=String(thread.channel_view||channelForThreadId(thread.thread_id));
       if(b.dataset.chatChannel!=="CHAT")b.dataset.chatScope="CHANNEL";
-      const title=document.createElement("span");title.className="web-concierge-thread-title";title.textContent=thread.title||"Chat";
+      const title=document.createElement("span");title.className="web-concierge-thread-title";
+      const titleText=document.createElement("span");titleText.className="web-concierge-thread-title-text";titleText.textContent=thread.title||"Chat";
+      if(b.dataset.chatScope==="CHANNEL")title.append(channelIcon(b.dataset.chatChannel),titleText);else title.append(titleText);
       const preview=document.createElement("span");preview.className="web-concierge-thread-preview";preview.textContent=thread.preview||"";
       const date=document.createElement("span");date.className="web-concierge-thread-date";date.textContent=thread.updated_at?sidebarDate(thread.updated_at):"";
       b.append(title,preview,date);
@@ -598,8 +614,13 @@
         ? {...normal,thread_id:primaryChatThreadId,title:"Chat",channels:["WEB","APP"],channel_view:"CHAT"}
         : {thread_id:primaryChatThreadId,title:"Chat",preview:"",updated_at:null,created_at:null,turn_count:0,channels:["WEB","APP"],channel_view:"CHAT",draft:true};
 
+      let whatsappNumber="";
+      try{
+        const whatsapp=await channelHistoryRequest("WHATSAPP",{summary:true});
+        whatsappNumber=String(whatsapp?.whatsapp_number||"").trim();
+      }catch{}
       const next=[chatThread,{
-        thread_id:VIRTUAL_WHATSAPP_THREAD_ID,title:"WhatsApp",preview:"",updated_at:null,
+        thread_id:VIRTUAL_WHATSAPP_THREAD_ID,title:"WhatsApp",preview:whatsappNumber,updated_at:null,
         channels:["WHATSAPP"],channel_view:"WHATSAPP",virtual_channel_thread:true
       }];
       try{
