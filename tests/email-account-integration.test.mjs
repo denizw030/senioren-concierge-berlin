@@ -153,3 +153,19 @@ test("direct email tab reload auto-activates account runtime",()=>{
   assert.match(js,/accountTabEmail/);
   assert.match(js,/queueMicrotask\(\(\) => load\(false\)\)/);
 });
+
+test("email connect never fails silently",()=>{
+  assert.doesNotMatch(js,/if \(!body \|\| !sessionToken\(\)\) return/);
+  assert.match(js,/renderError\(new Error\("UNAUTHENTICATED"\)\)/);
+  assert.match(js,/renderError\(new Error\("EMAIL_REQUEST_INVALID"\)\)/);
+  assert.match(js,/emailConnectBound/);
+  assert.match(js,/connect\(\) \{\s*return begin\(\);/s);
+});
+
+test("account page contains a direct OAuth fallback if integration binding is missing",()=>{
+  assert.match(konto,/email-account-integration\.js\?v=6/);
+  assert.match(konto,/emailFallbackToken/);
+  assert.match(konto,/BASE \+ "\/email\/connect"/);
+  assert.match(konto,/url\.hostname !== "accounts\.google\.com"/);
+  assert.match(konto,/Die Google-Verbindung konnte nicht gestartet werden/);
+});
