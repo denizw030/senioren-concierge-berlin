@@ -246,24 +246,30 @@ html body.account-premium-ui.account-premium-ui.nw-portal-dark .safety-detail-to
 }
 
 
-/* Account tab icons: optical size equals label text and inherits the same color. */
+/* Account tab icons: one fixed optical box for every tab. */
 html body.account-premium-ui.account-premium-ui .account-tab{
-  gap:.34em!important;
+  gap:7px!important;
 }
 html body.account-premium-ui.account-premium-ui .account-tab-icon{
   display:inline-flex!important;
   align-items:center!important;
   justify-content:center!important;
-  width:1em!important;
-  height:1em!important;
-  flex:0 0 1em!important;
-  font-size:1em!important;
-  line-height:1!important;
+  width:14px!important;
+  height:14px!important;
+  min-width:14px!important;
+  min-height:14px!important;
+  flex:0 0 14px!important;
+  font-size:12px!important;
+  line-height:14px!important;
   color:inherit!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
 }
 html body.account-premium-ui.account-premium-ui .account-tab-person-icon svg{
-  width:1em!important;
-  height:1em!important;
+  display:block!important;
+  width:14px!important;
+  height:14px!important;
   fill:none!important;
   stroke:currentColor!important;
   stroke-width:1.7!important;
@@ -271,9 +277,15 @@ html body.account-premium-ui.account-premium-ui .account-tab-person-icon svg{
   stroke-linejoin:round!important;
 }
 html body.account-premium-ui.account-premium-ui .account-tab-concierge-logo{
-  background-color:currentColor!important;
-  -webkit-mask:url("/logos/NAHWERK-Goldmann-Logo.svg") center/contain no-repeat;
-  mask:url("/logos/NAHWERK-Goldmann-Logo.svg") center/contain no-repeat;
+  background-color:transparent!important;
+  background-image:url("/assets/logos/NAHWERK-Goldmann-nav.webp?v=2")!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+  background-size:14px 14px!important;
+  -webkit-mask:none!important;
+  mask:none!important;
+  color:transparent!important;
+  font-size:0!important;
 }
 
 
