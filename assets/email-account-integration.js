@@ -82,7 +82,7 @@
   async function gatewayRequest({ base = BASE, token, method = "GET", path, body = null, fetchImpl = globalThis.fetch }) {
     if (!token) return { ok: false, error: "UNAUTHENTICATED", networkRequestMade: false };
     const headers = { Authorization: "Bearer " + token };
-    const init = { method, headers };
+    const init = { method, headers, signal: AbortSignal.timeout(8000) };
     if (body !== null) {
       headers["Content-Type"] = "application/json";
       init.body = JSON.stringify(body);
@@ -237,10 +237,9 @@
   stateMeta.textContent = CUSTOMER_COPY.initialMeta;
   ensureProductAssets();
 
-  function setBusy(value) {
-    [connectButton, disconnectButton].forEach((button) => {
-      if (button && !button.hidden) button.disabled = value;
-    });
+  function setBusy(value, includeConnect = false) {
+    if (includeConnect && connectButton && !connectButton.hidden) connectButton.disabled = value;
+    if (disconnectButton && !disconnectButton.hidden) disconnectButton.disabled = value;
   }
 
   function selectedCapabilities() {
@@ -421,8 +420,9 @@
     accountHint.textContent = "";
     renderProviders();
     if (code !== "UNAUTHENTICATED") {
+      selectedProvider = "GOOGLE";
       connectButton.hidden = false;
-      connectButton.disabled = !sessionToken() || selectedProvider !== "GOOGLE";
+      connectButton.disabled = !sessionToken();
     }
     renderCapabilities();
     queueMicrotask(() => syncProduct(false));
@@ -483,7 +483,7 @@
       renderError(new Error("UNAUTHENTICATED"));
       return;
     }
-    setBusy(true);
+    setBusy(true, true);
     connectButton.textContent = "Verbindung wird gestartet …";
     try {
       const path = connection?.scope_required === true ? "/email/reauth" : connectPathForState(state);
@@ -493,7 +493,7 @@
       location.assign(redirect);
     } catch (error) {
       renderError(error);
-      setBusy(false);
+      setBusy(false, true);
     }
   }
 
