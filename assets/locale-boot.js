@@ -103,14 +103,14 @@
       content:""!important;display:block!important;position:relative!important;inset:auto!important;z-index:1!important;
       grid-column:2!important;grid-row:1 / span 2!important;width:100%!important;height:100%!important;min-height:650px!important;
       margin:0!important;padding:0!important;border:0!important;border-radius:34px!important;box-shadow:none!important;pointer-events:none!important;
-      background:#ddd4c8 url("/assets/lifestyle/senior-woman-overview.webp?v=6") 68% 50%/cover no-repeat!important
+      background:#ddd4c8 url("/assets/lifestyle/senior-woman-overview.webp?v=6") 100% 38%/cover no-repeat!important
     }
     @media(max-width:760px){
       html.nw-product-senior-first-paint body.login-image-page main::after,
       body.login-image-page.senior-product main::after,
       body.login-image-page[data-product="senioren"] main::after{
         grid-column:1!important;grid-row:2!important;width:100%!important;height:clamp(300px,68vw,460px)!important;min-height:300px!important;
-        margin:0!important;border-radius:28px!important;background-position:68% 48%!important
+        margin:0!important;border-radius:28px!important;background-position:88% 40%!important
       }
     }
   `;
