@@ -526,6 +526,7 @@
   });
   function resizeInput(){const input=document.getElementById("webConciergeInput");if(!(input instanceof HTMLTextAreaElement))return;input.style.height="auto";input.style.height=`${Math.min(input.scrollHeight,132)}px`;}
   function sidebarDate(value){const d=new Date(value||Date.now()),now=new Date();if(Number.isNaN(d.getTime()))return "";if(dateKey(d)===dateKey(now))return timeLabel(d);return new Intl.DateTimeFormat("de-DE",{day:"2-digit",month:"2-digit"}).format(d);}
+  // CHANNEL_SIDEBAR_IDENTITY_V1_20260920
   function channelIcon(channel){
     const key=String(channel||"").toUpperCase();
     const icon=document.createElement("span");
