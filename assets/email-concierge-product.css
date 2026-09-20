@@ -101,6 +101,10 @@ body.account-premium-ui:has(#accountEmailCard:not([hidden])) .nw-floating-concie
 .ecp-tb-class-actions .ecp-class-btn:hover{background:#30343b!important}
 .ecp-tb-class-actions .ecp-class-btn[aria-pressed="true"]{border-color:#5c9dff!important;background:#173b66!important;color:#fff!important}
 .ecp-tb-empty{padding:20px 14px;color:#9299a3;font-size:.75rem;line-height:1.45}
+.ecp-tb-error-state{min-height:220px;display:grid;align-content:center;justify-items:center;gap:9px;padding:28px 22px;text-align:center}
+.ecp-tb-error-state strong{color:#d8dce2;font-size:.8rem}
+.ecp-tb-error-state span{max-width:280px;line-height:1.5}
+.ecp-tb-error-state .ecp-tb-toolbar-button{margin-top:2px;justify-self:center;min-width:112px}
 .ecp-tb-reader{min-width:0;height:665px;overflow:auto;background:#17181b}
 .ecp-tb-reader-head{min-height:49px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;border-bottom:1px solid var(--ecp-tb-border);background:#202328}.ecp-tb-reader-head strong{font-size:.85rem}.ecp-tb-reader-kicker{font-size:.66rem;color:var(--ecp-tb-muted)}
 .ecp-tb-reader-toolbar{display:flex;justify-content:flex-end;gap:7px;padding:8px 14px;border-bottom:1px solid #30343a;background:#1b1d21}
