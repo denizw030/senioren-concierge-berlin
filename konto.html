@@ -2770,7 +2770,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
         <button class="btn light security-nudge-later" type="button" id="securityNudgeLater">Später einrichten</button>
       </div>
     </div>
-    <script src="assets/auth-nav.js?v=41"></script>
+    <script src="assets/auth-nav.js?v=42"></script>
     <script src="assets/owner-product-gaps.js?v=1"></script>
     <script src="assets/nahwerk-analytics.js?v=1"></script>
     <script src="assets/acquisition-v1.js?v=2"></script>
@@ -3470,6 +3470,22 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
         function renderProfilePayload(body) {
           applyAuthoritativeAccountTheme(body?.brand);
           applyProfile(body?.profile || {});
+          const authoritativeFirstName = String(body?.profile?.first_name || "").trim();
+          if (authoritativeFirstName) {
+            document.querySelectorAll(".nw-account-name").forEach((node) => {
+              node.textContent = authoritativeFirstName;
+            });
+            try {
+              const session = accountSession();
+              if (
+                session?.session_token &&
+                (!body?.customer_account_id || String(session.customer_account_id || "") === String(body.customer_account_id))
+              ) {
+                session.first_name = authoritativeFirstName;
+                sessionStorage.setItem("scb_web_session", JSON.stringify(session));
+              }
+            } catch (_) {}
+          }
           const customerNumber = document.getElementById("customerNumber");
           if (customerNumber) customerNumber.textContent = body?.customer_number || "Nicht verfügbar";
           applyPlanAndUsage(body?.plan || null, body?.usage || null);
