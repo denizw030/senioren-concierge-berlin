@@ -118,6 +118,7 @@
   let classificationKnownCounts = {};
   let classificationFolderCache = {};
   let mailboxLoadSerial = 0;
+  const mailboxIndexWarmStarted = new Set();
   let allDrafts = [];
   let draftsLoading = false;
   let readerMode = "MESSAGE";
@@ -463,10 +464,25 @@
       if(serial===mailboxLoadSerial){mailboxFolderLoading = false; render();}
     }
   }
+  async function warmMailboxIndex(connection) {
+    const id=String(connection?.connection_id||"");
+    if(!id || mailboxIndexWarmStarted.has(id) || String(connection?.provider||"").toUpperCase()!=="GOOGLE") return;
+    mailboxIndexWarmStarted.add(id);
+    try{
+      const status=await request("/email/concierge/index/status",{connectionId:id});
+      if(status?.index_state?.status!=="READY"){
+        await request("/email/concierge/index/warm",{method:"POST",body:{},connectionId:id});
+        if(connected && (mailboxScope==="ALL" || activeConnectionId===id)) void loadMailboxFolder();
+      }
+    }catch{
+      mailboxIndexWarmStarted.delete(id);
+    }
+  }
   async function loadConnections() {
     const data = await request("/email/connections");
     emailConnections = list(data?.connections).filter((row) => String(row?.state || "").toUpperCase() === "CONNECTED");
     if (!activeConnectionId || !connectionById(activeConnectionId)) activeConnectionId = String(emailConnections[0]?.connection_id || "");
+    for(const connection of emailConnections) setTimeout(()=>void warmMailboxIndex(connection),800);
     return emailConnections;
   }
   async function loadAllDrafts() {
@@ -1198,7 +1214,7 @@
     ensureHost();
     if (!connected) {
       dashboard = null; dashboardLoadedAt = 0; classification = null; classificationError = ""; classificationRetryCount = 0;
-      emailConnections = []; activeConnectionId = ""; mailboxScope = "ALL"; mailboxFolderRows = []; mailboxFolderCounts = {}; classificationKnownCounts = {}; classificationFolderCache = {}; mailboxLoadSerial++; allDrafts = [];
+      emailConnections = []; activeConnectionId = ""; mailboxScope = "ALL"; mailboxFolderRows = []; mailboxFolderCounts = {}; classificationKnownCounts = {}; classificationFolderCache = {}; mailboxLoadSerial++; mailboxIndexWarmStarted.clear(); allDrafts = [];
       chatMessages = []; chatStarted = false; chatDraft=""; chatScrollTop=0; mailboxListScrollTop=0; readerScrollTop=0; pendingBackgroundRender=false; render(true); return;
     }
     try { await loadConnections(); } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }

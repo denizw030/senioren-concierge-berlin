@@ -355,3 +355,19 @@ test("Wichtig Unwichtig persistence does not globally disable the concierge comp
   assert.doesNotMatch(block,/setBusy\(false\)/);
   assert.match(block,/render\(true\)/);
 });
+
+
+test("mailbox index warms in the background and refreshes the current folder when ready",()=>{
+  assert.match(js,/mailboxIndexWarmStarted/);
+  assert.match(js,/\/email\/concierge\/index\/status/);
+  assert.match(js,/\/email\/concierge\/index\/warm/);
+  assert.match(js,/setTimeout\(\(\)=>void warmMailboxIndex\(connection\),800\)/);
+});
+
+test("chat typing and scroll remain stable during mailbox background activity",()=>{
+  assert.match(js,/captureTransientUiState/);
+  assert.match(js,/restoreTransientUiState/);
+  assert.match(js,/if\(!force && transient\.chatFocused\)/);
+  assert.match(js,/chatDraft=input\.value/);
+  assert.match(js,/chatLog\.scrollTop=chatAutoScrollNext\?chatLog\.scrollHeight:chatScrollTop/);
+});
