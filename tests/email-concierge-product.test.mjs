@@ -99,9 +99,9 @@ test("connected account overview is topmost and follows canonical provider statu
 
 test("personal rule UI requires explicit customer confirmation and stays reversible",()=>{
   assert.match(js,/Vorschläge deines Concierges/);
-  assert.match(js,/Nur unwichtig/);
-  assert.match(js,/Archivieren/);
-  assert.match(js,/Papierkorb/);
+  assert.match(js,/Nur als unwichtig einstufen/);
+  assert.match(js,/Künftig automatisch archivieren/);
+  assert.match(js,/Künftig automatisch in den Papierkorb/);
   assert.match(js,/decision: "CONFIRM"/);
   assert.match(js,/decision: "REJECT"/);
   assert.match(js,/rule_id: rule\.id, active: input\.checked/);
@@ -109,6 +109,11 @@ test("personal rule UI requires explicit customer confirmation and stays reversi
   assert.match(js,/persönliche E-Mail-Regel wirklich löschen/i);
   assert.match(js,/Bereits vorhandene Nachrichten werden nie automatisch nachträglich verändert/);
   assert.match(js,/endgültiges Löschen bleibt deaktiviert/);
+  assert.match(js,/\/email\/concierge\/rules\/backfill\/preview/);
+  assert.match(js,/\/email\/concierge\/rules\/backfill\/apply/);
+  assert.match(js,/confirmed: true/);
+  assert.match(js,/Sie werden nicht endgültig gelöscht/);
+  assert.match(js,/Zukünftig: passende E-Mails automatisch in den Gmail-Papierkorb/);
 });
 
 test("important and unimportant controls remain directly visible on every classifiable mail",()=>{
