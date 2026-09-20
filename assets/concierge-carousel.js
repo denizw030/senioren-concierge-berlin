@@ -193,11 +193,11 @@
     }
 
     const move=(direction,emit=false,interaction="browse")=>select(active+direction,emit,interaction);
-    root.querySelector(".prev").addEventListener("click",()=>move(-1,false,"browse"));
-    root.querySelector(".next").addEventListener("click",()=>move(1,false,"browse"));
+    prevArrow.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();move(-1,false,"browse");});
+    nextArrow.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();move(1,false,"browse");});
     status.addEventListener("click",()=>{if(registerUrl)goToRegistration();else if(variant==="selection")select(active,true,"select");});
     stage.addEventListener("keydown",event=>{if(event.key==="ArrowLeft"){event.preventDefault();move(-1,false,"browse");}if(event.key==="ArrowRight"){event.preventDefault();move(1,false,"browse");}if(event.key==="Home"){event.preventDefault();select(0,false,"browse");}if(event.key==="End"){event.preventDefault();select(profiles.length-1,false,"browse");}});
-    stage.addEventListener("pointerdown",event=>{if(event.target.closest(".nw-voice-preview-control"))return;dragging=true;moved=false;pointerStart=event.clientX;dragX=0;stage.classList.add("is-dragging");if(!event.target.closest("a.nw-carousel-select"))stage.setPointerCapture?.(event.pointerId);});
+    stage.addEventListener("pointerdown",event=>{if(event.target.closest(".nw-voice-preview-control,.nw-carousel-arrow"))return;dragging=true;moved=false;pointerStart=event.clientX;dragX=0;stage.classList.add("is-dragging");if(!event.target.closest("a.nw-carousel-select"))stage.setPointerCapture?.(event.pointerId);});
     stage.addEventListener("pointermove",event=>{if(!dragging)return;dragX=event.clientX-pointerStart;moved||=Math.abs(dragX)>6;positionCards();});
     const finishDrag=()=>{if(!dragging)return;dragging=false;stage.classList.remove("is-dragging");const steps=Math.round(-dragX/Math.max(1,cardSpacing));if(steps)select(active+steps,false,"browse");else{dragX=0;positionCards();}setTimeout(()=>{moved=false;},0);};
     stage.addEventListener("pointerup",finishDrag); stage.addEventListener("pointercancel",finishDrag);
