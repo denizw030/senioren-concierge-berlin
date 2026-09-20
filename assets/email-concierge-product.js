@@ -526,11 +526,12 @@
         applyExisting.disabled = true; feedback.textContent = "Passende E-Mails werden geprüft …";
         try {
           const preview = await request("/email/concierge/rules/backfill/preview", { method: "POST", body: { rule_id: rule.id } });
-          const count = number(preview.count);
+          const count = number(preview.count), truncated = preview.truncated === true;
           if (!count) { feedback.textContent = "Keine bestehenden passenden E-Mails gefunden."; return; }
           const confirmation = el("div", "ecp-rule-existing-confirm");
           const message = existingActionCopy(rule, count);
-          confirmation.append(el("p", "", action === "TRASH" ? message + " Sie werden nicht endgültig gelöscht." : message));
+          const scopeNote = truncated ? " Es gibt weitere Treffer; mit dieser Bestätigung werden höchstens die 500 gerade geprüften E-Mails bearbeitet." : "";
+          confirmation.append(el("p", "", (action === "TRASH" ? message + " Sie werden nicht endgültig gelöscht." : message) + scopeNote));
           const buttons = el("div", "ecp-rule-existing-confirm-actions");
           const cancel = button("Abbrechen", "ecp-link-button");
           const confirmApply = button(action === "TRASH" ? "In Papierkorb verschieben" : "Jetzt anwenden", "ecp-action");
@@ -539,8 +540,10 @@
             cancel.disabled = true; confirmApply.disabled = true; feedback.textContent = "Wird angewendet …";
             try {
               const applied = await request("/email/concierge/rules/backfill/apply", { method: "POST", body: { rule_id: rule.id, confirmed: true } });
-              const changed = number(applied.changed);
-              feedback.textContent = changed ? `${changed} bestehende E-Mail${changed === 1 ? "" : "s"} wurden bearbeitet.` : "Keine bestehende E-Mail musste geändert werden.";
+              const changed = number(applied.changed), more = applied.truncated === true;
+              feedback.textContent = changed
+                ? `${changed} bestehende E-Mail${changed === 1 ? "" : "s"} wurden bearbeitet.${more ? " Weitere passende E-Mails sind vorhanden – du kannst sie separat erneut prüfen." : ""}`
+                : "Keine bestehende E-Mail musste geändert werden.";
               confirmation.remove();
             } catch (error) { feedback.textContent = "Konnte gerade nicht angewendet werden."; showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
             finally { applyExisting.disabled = false; }
@@ -548,7 +551,7 @@
           buttons.append(cancel, confirmApply); confirmation.append(buttons);
           existing.querySelector(".ecp-rule-existing-confirm")?.remove();
           existing.append(confirmation);
-          feedback.textContent = `${count} bestehende passende E-Mail${count === 1 ? "" : "s"} gefunden.`;
+          feedback.textContent = `${truncated ? "Mindestens " : ""}${count} bestehende passende E-Mail${count === 1 ? "" : "s"} gefunden.`;
         } catch (error) {
           feedback.textContent = "Bestehende E-Mails konnten gerade nicht geprüft werden.";
           showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE");
