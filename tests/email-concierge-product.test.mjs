@@ -29,7 +29,7 @@ test("customer UI contains the complete standalone product areas",()=>{
 
 test("spam fraud sorting and activity controls are customer configurable",()=>{
   const names=Object.keys(api.SETTINGS);
-  for(const key of ["FRAUD_PROTECTION","SPAM_PROTECTION","IMPORTANT","INVOICES","APPOINTMENTS","TRAVEL","ORDERS","PERSONAL","SUPPORT_CONTRACTS","REPLY_ASSISTANT","PROACTIVE_HINTS","ACTIVITY_DIGEST"]) assert.ok(names.includes(key),key);
+  for(const key of ["FRAUD_PROTECTION","SPAM_PROTECTION","IMPORTANT","INVOICES","APPOINTMENTS","TRAVEL","ORDERS","PERSONAL","SUPPORT_CONTRACTS","REPLY_ASSISTANT","PROACTIVE_HINTS","ACTIVITY_DIGEST","UNIMPORTANT_AUTO_TRASH"]) assert.ok(names.includes(key),key);
 });
 
 test("dashboard normalization fails closed and keeps bounded arrays",()=>{
@@ -121,6 +121,13 @@ test("important and unimportant controls remain directly visible on every classi
   assert.match(js,/\["UNIMPORTANT", "Unwichtig"\]/);
   assert.match(js,/classification\/override/);
   assert.match(js,/@media\(max-width:640px\).*ecp-class-actions/s);
+});
+
+test("global unimportant auto-trash is explicit, reversible and never permanent delete",()=>{
+  assert.match(js,/UNIMPORTANT_AUTO_TRASH/);
+  assert.match(js,/Unwichtige automatisch in Papierkorb/);
+  assert.match(js,/confirm\("Unwichtige E-Mails künftig automatisch in den Gmail-Papierkorb verschieben\?/);
+  assert.match(js,/Endgültig gelöscht wird nichts/);
 });
 
 test("Thunderbird-style workspace keeps folders, message list and reader in one mail client",()=>{
