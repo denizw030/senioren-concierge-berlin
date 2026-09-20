@@ -114,7 +114,15 @@
     const stateCard = root.querySelector(".email-state-card");
     const actions = root.querySelector(".email-actions");
     if (stateCard) stateCard.hidden = true;
-    if (actions) actions.hidden = true;
+    if (actions) {
+      actions.hidden = true;
+      actions.setAttribute("aria-hidden", "true");
+      actions.style.setProperty("display", "none", "important");
+      actions.querySelectorAll("button").forEach((button) => {
+        button.hidden = true;
+        button.tabIndex = -1;
+      });
+    }
     if (runtimeNote) runtimeNote.hidden = true;
     const badge = document.getElementById("emailConnectionStatus");
     if (badge) badge.hidden = true;
@@ -554,6 +562,17 @@
   ensureModal();
   retireLegacyControls();
   ensureAccountEmailChrome();
+  const legacyActions = root.querySelector(".email-actions");
+  if (legacyActions) {
+    const keepLegacyActionsRetired = () => {
+      legacyActions.hidden = true;
+      legacyActions.setAttribute("aria-hidden", "true");
+      legacyActions.style.setProperty("display", "none", "important");
+      legacyActions.querySelectorAll("button").forEach((button) => { button.hidden = true; button.tabIndex = -1; });
+    };
+    keepLegacyActionsRetired();
+    new MutationObserver(keepLegacyActionsRetired).observe(legacyActions, { attributes: true, subtree: true, attributeFilter: ["hidden", "style"] });
+  }
   renderGrid();
   void refresh().catch(() => { renderGrid(); });
 })();
