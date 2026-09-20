@@ -83,7 +83,7 @@ test("product layout is responsive across desktop and mobile",()=>{
   assert.match(js,/ecp-rule-title-row/);
   assert.match(js,/\.ecp-rule-controls\{display:grid;grid-template-columns:minmax\(0,1fr\) auto/);
   assert.match(integration,/email-concierge-product\.css\?v=20260920-5/);
-  assert.match(integration,/email-concierge-product\.js\?v=20260920-7/);
+  assert.match(integration,/email-concierge-product\.js\?v=20260920-8/);
 });
 
 
@@ -179,4 +179,20 @@ test("mailbox loading failure is visible and automatically retried once",()=>{
 test("mailbox can show dashboard fallback rows while classification loads",()=>{
   assert.match(js,/\.\.\.list\(dashboard\?\.highlights\), \.\.\.list\(dashboard\?\.warnings\)/);
   assert.match(js,/!rows\.length && classificationLoading/);
+});
+
+
+test("quick prompts disappear permanently after the first user message",()=>{
+  assert.match(js,/let chatStarted = false/);
+  assert.match(js,/chatStarted = true/);
+  assert.match(js,/dashboard\.chat\?\.has_user_message === true/);
+  assert.match(js,/if \(!hasUserMessage\)/);
+  assert.doesNotMatch(js,/card\.append\(log, quick, form\)/);
+});
+
+test("mail actions update the Thunderbird workspace immediately and then reconcile with PROD",()=>{
+  assert.match(js,/function removeMailboxMessages\(messageIds\)/);
+  assert.match(js,/applyQueryResultToMailbox\(data\)/);
+  assert.match(js,/await loadDashboard\(false, true\)/);
+  assert.match(js,/selectedMessageDetail = null/);
 });
