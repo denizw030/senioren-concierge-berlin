@@ -363,50 +363,128 @@
     const scope = classification.complete ? `Alle ${classification.sorted_count} aktuellen Inbox-Konversationen sind in dieser Sortierübersicht berücksichtigt.` : `Zur Performance werden die ${classification.sorted_count} neuesten von insgesamt ${classification.total} Inbox-Konversationen sortiert angezeigt. Ältere E-Mails bleiben in Gmail unverändert erhalten.`;
     card.append(el("p", "ecp-sort-scope", scope));
   }
+  function scheduleLabel(value) {
+    if (!value) return "";
+    const d = new Date(value);
+    if (!Number.isFinite(d.getTime())) return "";
+    return new Intl.DateTimeFormat("de-DE", { dateStyle: "short", timeStyle: "short" }).format(d);
+  }
+  function defaultScheduleLocal() {
+    const d = new Date(Date.now() + 60 * 60 * 1000);
+    d.setSeconds(0, 0);
+    const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+    return local.toISOString().slice(0, 16);
+  }
+  function localScheduleToIso(value) {
+    if (!value) return "";
+    const d = new Date(value);
+    return Number.isFinite(d.getTime()) ? d.toISOString() : "";
+  }
   function renderDrafts(card) {
     const rows = list(dashboard.drafts);
     if (!rows.length) { card.append(el("div", "ecp-section-empty", "Keine vorbereiteten Entwürfe warten auf dich.")); return; }
     const listNode = el("div", "ecp-list");
     rows.forEach((draft) => {
+      const scheduled = String(draft.status || "").toUpperCase() === "SCHEDULED";
+      const failed = String(draft.status || "").toUpperCase() === "ERROR";
       const box = el("article", "ecp-draft"), top = el("div", "ecp-draft-top"), title = el("div");
-      title.append(el("div", "ecp-draft-title", text(draft.subject, 300) || "(kein Betreff)"), el("div", "ecp-draft-meta", text(draft.to, 260) ? `An ${text(draft.to, 260)}` : "Empfänger wird aus der Antwort übernommen")); top.append(title, badge(draft.send_state === "WAITING_APPROVAL" ? "Wartet auf Freigabe" : String(draft.status || "Entwurf")));
+      title.append(
+        el("div", "ecp-draft-title", text(draft.subject, 300) || "(kein Betreff)"),
+        el("div", "ecp-draft-meta", text(draft.to, 260) ? `An ${text(draft.to, 260)}` : "Empfänger wird aus der Antwort übernommen")
+      );
+      const statusText = scheduled
+        ? `Geplant · ${scheduleLabel(draft.scheduled_for) || "Zeit vorgemerkt"}`
+        : failed ? "Versand prüfen" : draft.send_state === "WAITING_APPROVAL" ? "Wartet auf Freigabe" : String(draft.status || "Entwurf");
+      top.append(title, badge(statusText, failed));
       box.append(top, el("div", "ecp-draft-body", text(draft.body_text, 1200)));
-      const actions = el("div", "ecp-draft-actions"), edit = button("Bearbeiten"), discard = button("Verwerfen", "ecp-action ecp-action-danger"), send = button("Freigeben & senden", "ecp-action ecp-action-send");
-      send.disabled = !draft.approval_id || !draft.send_action_id;
-      edit.addEventListener("click", () => showDraftEditor(box, draft));
-      discard.addEventListener("click", () => discardDraft(draft));
-      send.addEventListener("click", () => approveAndSend(draft));
-      actions.append(edit, discard, send); box.append(actions); listNode.append(box);
+      if (scheduled && draft.scheduled_for) box.append(el("div", "ecp-schedule-note", `Automatischer Versand: ${scheduleLabel(draft.scheduled_for)} Uhr`));
+      if (failed && draft.last_error_code) box.append(el("div", "ecp-schedule-error", "Der Versand wurde nicht erneut versucht. Bitte prüfe den Entwurf und gib ihn bei Bedarf erneut frei."));
+
+      const actions = el("div", "ecp-draft-actions");
+      if (scheduled) {
+        const reschedule = button("Zeit ändern"), cancel = button("Versand abbrechen", "ecp-action ecp-action-danger");
+        reschedule.addEventListener("click", () => showScheduleEditor(box, draft, true));
+        cancel.addEventListener("click", () => cancelScheduledDraft(draft));
+        actions.append(reschedule, cancel);
+      } else {
+        const edit = button("Bearbeiten"), discard = button("Verwerfen", "ecp-action ecp-action-danger"), later = button("Später senden"), send = button("Freigeben & senden", "ecp-action ecp-action-send");
+        edit.addEventListener("click", () => showDraftEditor(box, draft));
+        discard.addEventListener("click", () => discardDraft(draft));
+        later.addEventListener("click", () => showScheduleEditor(box, draft, false));
+        send.addEventListener("click", () => approveAndSend(draft));
+        actions.append(edit, discard, later, send);
+      }
+      box.append(actions); listNode.append(box);
     }); card.append(listNode);
   }
   function showDraftEditor(box, draft) {
     box.querySelector(".ecp-editor")?.remove();
+    box.querySelector(".ecp-schedule-editor")?.remove();
     const editor = el("div", "ecp-editor"), subject = el("input"), to = el("input"), body = el("textarea"), save = button("Änderungen speichern", "ecp-action");
     subject.value = text(draft.subject, 500); subject.placeholder = "Betreff"; to.value = text(draft.to, 300); to.placeholder = "Empfänger"; body.value = text(draft.body_text, 10000); body.placeholder = "Antworttext";
     save.addEventListener("click", async () => {
       if (!body.value.trim() || busy) return;
       setBusy(true);
-      try { await request("/email/concierge/drafts/edit", { method: "POST", body: { email_send_action_id: draft.id, approval_id: draft.approval_id || null, send_action_id: draft.send_action_id || null, subject: subject.value, to: to.value, body_text: body.value } }); await loadDashboard(); }
+      try { await request("/email/concierge/drafts/edit", { method: "POST", body: { email_send_action_id: draft.id, approval_id: draft.approval_id || null, send_action_id: draft.send_action_id || null, subject: subject.value, to: to.value, body_text: body.value } }); await loadDashboard(false, true); }
       catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
       finally { setBusy(false); }
     });
     editor.append(subject, to, body, save); box.append(editor);
   }
+  function showScheduleEditor(box, draft, reschedule = false) {
+    box.querySelector(".ecp-editor")?.remove();
+    box.querySelector(".ecp-schedule-editor")?.remove();
+    const editor = el("div", "ecp-schedule-editor"), label = el("label"), input = el("input"), actions = el("div", "ecp-schedule-actions");
+    label.append(el("span", "", reschedule ? "Neue Versandzeit" : "Wann soll diese E-Mail gesendet werden?"));
+    input.type = "datetime-local";
+    input.value = reschedule && draft.scheduled_for
+      ? new Date(new Date(draft.scheduled_for).getTime() - new Date(draft.scheduled_for).getTimezoneOffset() * 60000).toISOString().slice(0, 16)
+      : defaultScheduleLocal();
+    input.min = (() => { const d = new Date(Date.now() + 2 * 60 * 1000); return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16); })();
+    label.append(input);
+    const cancel = button("Abbrechen", "ecp-link-button"), confirmSchedule = button(reschedule ? "Zeit speichern" : "Freigeben & planen", "ecp-action ecp-action-send");
+    cancel.addEventListener("click", () => editor.remove());
+    confirmSchedule.addEventListener("click", async () => {
+      if (busy) return;
+      const iso = localScheduleToIso(input.value);
+      if (!iso || new Date(iso).getTime() <= Date.now() + 30000) { showError("Bitte wähle eine zukünftige Uhrzeit."); return; }
+      setBusy(true);
+      try {
+        const data = reschedule
+          ? await request("/email/concierge/drafts/reschedule", { method: "POST", body: { email_send_action_id: draft.id, scheduled_for: iso } })
+          : await request("/email/concierge/drafts/approve-send", { method: "POST", body: { email_send_action_id: draft.id, approval_id: draft.approval_id || null, send_action_id: draft.send_action_id || null, scheduled_for: iso } });
+        chatMessages.push({ role: "assistant", text: text(data.message, 1000) || `Die E-Mail ist für ${scheduleLabel(iso)} Uhr vorgemerkt.` });
+        await loadDashboard(false, true);
+      } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
+      finally { setBusy(false); render(); }
+    });
+    actions.append(cancel, confirmSchedule); editor.append(label, actions); box.append(editor);
+  }
   async function discardDraft(draft) {
     if (busy || !confirm("Diesen Entwurf wirklich verwerfen? Es wird nichts gesendet.")) return;
     setBusy(true);
-    try { await request("/email/concierge/drafts/discard", { method: "POST", body: { email_send_action_id: draft.id, approval_id: draft.approval_id || null, send_action_id: draft.send_action_id || null } }); await loadDashboard(); }
+    try { await request("/email/concierge/drafts/discard", { method: "POST", body: { email_send_action_id: draft.id, approval_id: draft.approval_id || null, send_action_id: draft.send_action_id || null } }); await loadDashboard(false, true); }
     catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
     finally { setBusy(false); }
   }
+  async function cancelScheduledDraft(draft) {
+    if (busy || !confirm("Den geplanten Versand abbrechen? Der Entwurf bleibt erhalten und wird nicht gesendet.")) return;
+    setBusy(true);
+    try {
+      const data = await request("/email/concierge/drafts/cancel-schedule", { method: "POST", body: { email_send_action_id: draft.id } });
+      chatMessages.push({ role: "assistant", text: text(data.message, 1000) || "Der geplante Versand wurde abgebrochen. Der Entwurf bleibt erhalten." });
+      await loadDashboard(false, true);
+    } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
+    finally { setBusy(false); render(); }
+  }
   async function approveAndSend(draft) {
-    if (busy || !draft.approval_id || !draft.send_action_id) return;
+    if (busy) return;
     const ok = confirm(`Diese E-Mail jetzt wirklich senden?\n\nAn: ${text(draft.to, 240) || "Empfänger"}\nBetreff: ${text(draft.subject, 240) || "(kein Betreff)"}\n\nErst mit „OK“ gibst du den Versand ausdrücklich frei.`);
     if (!ok) return;
     setBusy(true);
     try {
-      const data = await request("/email/concierge/drafts/approve-send", { method: "POST", body: { email_send_action_id: draft.id, approval_id: draft.approval_id, send_action_id: draft.send_action_id } });
-      chatMessages.push({ role: "assistant", text: text(data.message, 1000) || "Die E-Mail wurde nach deiner Freigabe gesendet." }); await loadDashboard(false);
+      const data = await request("/email/concierge/drafts/approve-send", { method: "POST", body: { email_send_action_id: draft.id, approval_id: draft.approval_id || null, send_action_id: draft.send_action_id || null } });
+      chatMessages.push({ role: "assistant", text: text(data.message, 1000) || "Die E-Mail wurde nach deiner Freigabe gesendet." }); await loadDashboard(false, true);
     } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
     finally { setBusy(false); render(); }
   }
@@ -425,17 +503,49 @@
     rows.forEach((row) => { const item = el("article", "ecp-activity"); item.append(el("strong", "", text(row.title, 250)), el("p", "", text(row.summary, 900)), el("span", "ecp-activity-time", fmtDate(row.occurred_at))); listNode.append(item); }); card.append(listNode);
   }
   function renderChannels(card) {
-    const channels = dashboard.channels || {}, items = [
-      ["Web-Kundenkonto", "Hier kannst du deinen E-Mail-Concierge vollständig nutzen.", "Aktiv", true],
-      ["WhatsApp", channels.whatsapp?.state === "CONNECTED" ? "Dein E-Mail-Concierge kann dich auch über WhatsApp begleiten." : "Verbinde WhatsApp, um wichtige Hinweise und E-Mail-Aufträge auch dort zu nutzen.", channels.whatsapp?.state === "CONNECTED" ? "Verbunden" : "Nicht verbunden", channels.whatsapp?.state === "CONNECTED"],
-      ["App", "Wird als zusätzlicher Zugang vorbereitet.", "Geplant", false],
-      ["Telefon", "Wird als zusätzlicher Zugang vorbereitet.", "Geplant", false]
+    const channels = dashboard.channels || {}, pref = dashboard.notification_preference || { enabled: true, target_channel: "PORTAL" };
+    const preference = el("div", "ecp-notification-pref"), copy = el("div", "ecp-notification-copy"), control = el("div", "ecp-notification-control");
+    copy.append(
+      el("strong", "", "Hinweise zu vorbereiteten Antworten"),
+      el("small", "", "Wenn eine E-Mail wahrscheinlich eine Antwort braucht, kann dein Concierge den Entwurf vorbereiten und dich auf diesem Weg informieren.")
+    );
+    const select = el("select", "ecp-notification-select");
+    [
+      ["PORTAL", "Im Kundenkonto", true],
+      ["WHATSAPP", "WhatsApp", channels.whatsapp?.state === "CONNECTED"],
+      ["CALL", "Telefonanruf", channels.phone?.state === "ACTIVE"],
+      ["EMAIL", "E-Mail", true]
+    ].forEach(([value, label, enabled]) => {
+      const option = el("option", "", label); option.value = value; option.disabled = !enabled; option.selected = String(pref.target_channel || "PORTAL") === value; select.append(option);
+    });
+    const state = el("span", "ecp-notification-status", pref.enabled === false ? "Aus" : "Aktiv");
+    select.disabled = pref.enabled === false;
+    select.addEventListener("change", async () => {
+      if (busy) return;
+      select.disabled = true; state.textContent = "Wird gespeichert …";
+      try {
+        const data = await request("/email/concierge/notification-preference", { method: "POST", body: { enabled: true, target_channel: select.value } });
+        dashboard.notification_preference = data.notification_preference || { enabled: true, target_channel: select.value };
+        state.textContent = "Gespeichert";
+      } catch (error) {
+        state.textContent = "Nicht gespeichert";
+        showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE");
+      } finally { select.disabled = false; }
+    });
+    control.append(select, state); preference.append(copy, control); card.append(preference);
+
+    const items = [
+      ["Web-Kundenkonto", "Hier kannst du E-Mails und vorbereitete Antworten direkt prüfen.", "Aktiv", true],
+      ["WhatsApp", channels.whatsapp?.state === "CONNECTED" ? "Hinweise zu vorbereiteten Antworten können hier ankommen." : "WhatsApp ist für E-Mail-Hinweise noch nicht verbunden.", channels.whatsapp?.state === "CONNECTED" ? "Verbunden" : "Nicht verbunden", channels.whatsapp?.state === "CONNECTED"],
+      ["Telefon", channels.phone?.state === "ACTIVE" ? "Der Concierge kann wichtige E-Mail-Hinweise telefonisch übergeben und Nachrichten vorlesen." : "Telefonische E-Mail-Hinweise sind noch nicht aktiv.", channels.phone?.state === "ACTIVE" ? "Aktiv" : "Nicht aktiv", channels.phone?.state === "ACTIVE"],
+      ["E-Mail", "Hinweise können auch an deine hinterlegte Kontakt-E-Mail zugestellt werden.", "Aktiv", true],
+      ["App", "Wird als zusätzlicher Zugang vorbereitet.", "Geplant", false]
     ];
-    items.forEach(([name, desc, state, active], index) => {
-      const row = el("div", "ecp-channel"), copy = el("div"); copy.append(el("strong", "", name), el("small", "", desc));
-      const right = el("div"); right.append(el("div", "ecp-channel-state" + (active ? " ecp-on" : ""), state));
+    items.forEach(([name, desc, channelState, active], index) => {
+      const row = el("div", "ecp-channel"), rowCopy = el("div"); rowCopy.append(el("strong", "", name), el("small", "", desc));
+      const right = el("div"); right.append(el("div", "ecp-channel-state" + (active ? " ecp-on" : ""), channelState));
       if (index === 1 && !active) { const nav = button("WhatsApp verbinden", "ecp-link-button"); nav.addEventListener("click", () => { const target = document.getElementById("accountTabConcierge") || document.getElementById("accountTabZugaenge"); if (target) target.click(); else location.hash = "concierge"; }); right.append(nav); }
-      row.append(copy, right); card.append(row);
+      row.append(rowCopy, right); card.append(row);
     });
   }
   function ruleActionChoices(rule) {
