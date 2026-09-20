@@ -432,19 +432,20 @@
   }
   function applyLocalClassification(messageId, value) {
     if (!classification) return;
-    const id = String(messageId || "");
-    let moved = null;
+    const messageKey = String(messageId || "");
+    let moved = null, previousBucket = "";
     for (const key of ["IMPORTANT","UNIMPORTANT","MARKETING"]) {
       const rows = list(classification.buckets[key]);
-      const hit = rows.find((row)=>String(row?.id||"")===id);
-      if (hit && !moved) moved = { ...hit, classification:value, classification_source:"CUSTOMER", classification_reason:"Von dir korrigiert." };
-      classification.buckets[key] = rows.filter((row)=>String(row?.id||"")!==id);
+      const hit = rows.find((row)=>String(row?.id||"")===messageKey);
+      if (hit && !moved) { moved = { ...hit, classification:value, classification_source:"CUSTOMER", classification_reason:"Von dir korrigiert." }; previousBucket = key; }
+      classification.buckets[key] = rows.filter((row)=>String(row?.id||"")!==messageKey);
     }
     if (moved && classification.buckets[value]) classification.buckets[value].unshift(moved);
     for (const key of ["IMPORTANT","UNIMPORTANT","MARKETING"]) classification.counts[key] = list(classification.buckets[key]).length;
-    const id=String(activeConnectionId||"");
-    if(id && classificationKnownCounts[id] && Number.isFinite(classificationKnownCounts[id][value])) {
-      classificationKnownCounts[id][value] = Math.max(classificationKnownCounts[id][value], list(classification.buckets[value]).length);
+    const connectionKey=String(activeConnectionId||""),known=classificationKnownCounts[connectionKey];
+    if(known && previousBucket && previousBucket!==value){
+      if(Number.isFinite(known[previousBucket])) known[previousBucket]=Math.max(0,known[previousBucket]-1);
+      if(Number.isFinite(known[value])) known[value]=known[value]+1;
     }
   }
   async function setMessageClassification(message, value) {
