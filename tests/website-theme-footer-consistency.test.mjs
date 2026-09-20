@@ -52,8 +52,9 @@ test("dark mode uses deep black for lower areas, chat shell and public senior ca
   assert.match(siteUi, /body\.senior-product\.nw-portal-dark>main>\.section\.alt/);
 });
 
-test("public senior surface honors persisted light/dark while preserving light as first-visit default", () => {
-  assert.match(siteUi, /readStoredPortalTheme\(\) \|\| \(isPublicSeniorSurface && !isProdCustomerSurface \? 'light' : 'dark'\)/);
+test("public senior surface keeps its canonical light presentation while account surfaces honor saved theme", () => {
+  assert.match(siteUi, /if \(isPublicSeniorSurface && !isProdCustomerSurface\) return 'light';/);
+  assert.match(siteUi, /return readStoredPortalTheme\(\) \|\| 'dark';/);
   assert.match(siteUi, /body\.senior-product\.nw-portal-light>main/);
   assert.match(siteUi, /body\.senior-product\.nw-portal-dark/);
 });

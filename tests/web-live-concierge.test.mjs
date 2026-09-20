@@ -11,7 +11,7 @@ test("web chat mounts Live Concierge on the right without replacing voice memo",
   for(const page of ["web-concierge.html","web-concierge/index.html"]){
     const html=read(page);
     assert.match(html,/assets\/web-voice-memo\.js\?v=10/);
-    assert.match(html,/assets\/web-customer-concierge\.js\?v=44/);
+    assert.match(html,/assets\/web-customer-concierge\.js\?v=48/);
     assert.match(html,/assets\/web-live-concierge\.js\?v=18/);
     assert.match(html,/assets\/nahwerk-live-concierge\.css\?v=4/);
   }
@@ -111,14 +111,17 @@ test("WhatsApp channel stays visible without a current WhatsApp turn",()=>{
 });
 
 
-test("composer uses one blue GPT-style action button for Live or send",()=>{
+test("composer keeps normal send as fallback and swaps to Live only when usable",()=>{
   const boot=read("assets/web-live-concierge.js");
   const css=read("assets/web-customer-concierge.css");
-  assert.match(boot,/send\.hidden=true/);
+  assert.match(boot,/send\.hidden=false/);
+  assert.match(boot,/send\.hidden=usable/);
+  assert.match(boot,/send\.removeAttribute\("aria-hidden"\)/);
   assert.match(boot,/is-send-mode/);
   assert.match(boot,/Nachricht senden/);
   assert.match(boot,/bindTrigger:false/);
   assert.match(css,/#webConciergeSend\[hidden\]\{display:none!important\}/);
+  assert.match(css,/body\.web-concierge-guest #webConciergeSend\[hidden\]/);
 });
 
 test("voice memo remains audio in history and receives an audio reply",()=>{
