@@ -154,7 +154,10 @@ const MFA_VERIFY_URL=LOGIN_URL;
 const MFA_RECOVERY_CODE_URL='https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-mfa-recovery-code-secure';
 const RESET_URL='https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-password-recovery-request-secure';
 const SESSION_KEY='scb_web_session';
-const ENTRY_PRODUCT=new URLSearchParams(location.search).get('produkt')==='senioren'?'senioren':null;
+const ENTRY_PARAMS=new URLSearchParams(location.search);
+const ENTRY_PRODUCT=ENTRY_PARAMS.get('produkt')==='senioren'?'senioren':null;
+const ENTRY_GUEST_HANDOFF=ENTRY_PARAMS.get('source')==='web_guest_chat';
+const ENTRY_NEXT=ENTRY_GUEST_HANDOFF&&ENTRY_PARAMS.get('next')==='/payg'?'/payg':'';
 const form=document.getElementById('loginForm');
 const status=document.getElementById('loginStatus');
 const forgot=document.getElementById('forgotPassword');
@@ -181,6 +184,9 @@ let pendingMfa=null;
 if(ENTRY_PRODUCT==='senioren'){
   document.querySelectorAll('a[href="/registrieren"]').forEach(a=>a.href='/registrieren?produkt=senioren');
 }
+if(ENTRY_GUEST_HANDOFF&&ENTRY_NEXT){
+  document.querySelectorAll('a[href="/registrieren"]').forEach(a=>a.href='/registrieren?source=web_guest_chat&next=%2Fpayg');
+}
 
 const eye='<svg class="eye-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.7"></circle></svg>';
 const eyeOff='<svg class="eye-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 3 18 18"></path><path d="M10.7 6.1A10.8 10.8 0 0 1 12 6c6 0 9.5 6 9.5 6a16.3 16.3 0 0 1-2.2 2.8"></path><path d="M6.2 6.2C3.8 8 2.5 12 2.5 12s3.5 6 9.5 6a10 10 0 0 0 4.1-.9"></path><path d="M9.8 9.8A3.1 3.1 0 0 0 14.2 14.2"></path></svg>';
@@ -205,8 +211,10 @@ function completeLogin(body){
     product_context:productContext
   }));
   pendingMfa=null;
-  show('<strong>Erfolgreich angemeldet.</strong><br>Sie werden zum Kundenbereich weitergeleitet.');
-  setTimeout(()=>location.href='/konto',400);
+  show(ENTRY_NEXT==='/payg'
+    ? '<strong>Erfolgreich angemeldet.</strong><br>Du wirst jetzt zu PAYG weitergeleitet und kannst Guthaben aufladen.'
+    : '<strong>Erfolgreich angemeldet.</strong><br>Sie werden zum Kundenbereich weitergeleitet.');
+  setTimeout(()=>location.href=ENTRY_NEXT||'/konto',400);
   return true;
 }
 
