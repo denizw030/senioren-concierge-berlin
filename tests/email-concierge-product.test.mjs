@@ -176,9 +176,9 @@ test("mailbox loading failure is visible and automatically retried once",()=>{
   assert.match(js,/setTimeout\(\(\)=>\{ if \(connected && !classificationLoading\) void loadClassification\(\); \},1600\)/);
 });
 
-test("mailbox keeps a visible loading state for both remote folders and classification views",()=>{
+test("mailbox keeps a visible loading state for both physical and virtual folder views",()=>{
   assert.match(js,/\.\.\.list\(dashboard\?\.highlights\), \.\.\.list\(dashboard\?\.warnings\)/);
-  assert.match(js,/const loading = remoteFolderMode\(\) \? mailboxFolderLoading : classificationLoading/);
+  assert.match(js,/const loading = folderBackedMode\(\) \? mailboxFolderLoading : classificationLoading/);
   assert.match(js,/!rows\.length && loading/);
 });
 
@@ -248,7 +248,7 @@ test("remote folder loading uses the authenticated concierge API",()=>{
 test("mailbox refresh failure preserves the last successful message list",()=>{
   assert.match(js,/const previousRows = mailboxFolderRows\.slice\(\)/);
   assert.match(js,/if \(previousRows\.length\) mailboxFolderRows = previousRows/);
-  assert.match(js,/searchRemoteFolder\(connection, mailboxFolder, 30\)/);
+  assert.match(js,/searchRemoteFolder\(connection,mailboxFolder,30\)/);
 });
 
 test("classification updates immediately without reloading the full classification snapshot",()=>{
