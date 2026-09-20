@@ -248,7 +248,7 @@ test("remote folder loading uses the authenticated concierge API",()=>{
 test("mailbox refresh failure preserves the last successful message list",()=>{
   assert.match(js,/const previousRows = mailboxFolderRows\.slice\(\)/);
   assert.match(js,/if \(previousRows\.length\) mailboxFolderRows = previousRows/);
-  assert.match(js,/searchRemoteFolder\(connection,mailboxFolder,30\)/);
+  assert.match(js,/streamRemoteFolder\(connection,mailboxFolder,serial/);
 });
 
 test("classification updates immediately without reloading the full classification snapshot",()=>{
@@ -319,7 +319,7 @@ test("manual classification sends visible message metadata to avoid a Gmail rere
 });
 
 test("NAHWERK Mail uses a high-contrast white SVG envelope",()=>{
-  assert.match(js,/mark\.innerHTML='<svg/);
+  assert.match(js,/document\.createElementNS\(svgNs,"svg"\)/);
   assert.match(css,/\.ecp-tb-brandmark svg/);
   assert.match(css,/stroke:#fff/);
 });
