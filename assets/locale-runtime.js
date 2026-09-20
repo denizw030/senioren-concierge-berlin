@@ -13,9 +13,16 @@
 
   const detectLang = () => {
     const parts = location.pathname.split('/').filter(Boolean);
-    if (parts[0] === 'en' || parts[0] === 'tr') return parts[0];
+    if (parts[0] && SUPPORTED.has(parts[0])) return parts[0];
+
     const query = new URLSearchParams(location.search).get('lang');
-    if (query === 'en' || query === 'tr') return query;
+    if (query && SUPPORTED.has(query)) return query;
+
+    // Public localized pages use the URL as the single source of truth.
+    // German pages without a locale prefix are canonical DE and must not
+    // be overwritten by an older language stored by another browser/session.
+    if (document.querySelector('link[rel="alternate"][hreflang="de"]')) return 'de';
+
     return storedLang() || 'de';
   };
 
