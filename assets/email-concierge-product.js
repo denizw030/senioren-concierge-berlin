@@ -13,7 +13,8 @@
     SUPPORT_CONTRACTS: ["Verträge & Support", "Erkennt Vertrags-, Anbieter- und Supportthemen."],
     REPLY_ASSISTANT: ["Antwort-Assistent", "Bereitet auf Wunsch Antworten vor. Gesendet wird nur nach deiner Freigabe."],
     PROACTIVE_HINTS: ["Wichtige Hinweise", "Zeigt dezent Fristen, Risiken und Nachrichten mit Handlungsbedarf."],
-    ACTIVITY_DIGEST: ["Aktivitätsübersicht", "Zeigt kompakt, was dein E-Mail-Concierge für dich erledigt hat."]
+    ACTIVITY_DIGEST: ["Aktivitätsübersicht", "Zeigt kompakt, was dein E-Mail-Concierge für dich erledigt hat."],
+    UNIMPORTANT_AUTO_TRASH: ["Unwichtige automatisch in Papierkorb", "Nur nach deiner Bestätigung. Neue eindeutig unwichtige E-Mails werden sofort und zusätzlich minütlich geprüft und in den Gmail-Papierkorb verschoben."]
   });
   const QUICK = [
     "Zeig mir wichtige neue E-Mails.",
@@ -628,7 +629,12 @@
       const row = el("label", "ecp-setting"), copy = el("span"); copy.append(el("strong", "", meta[0]), el("small", "", meta[1]));
       const toggle = el("span", "ecp-switch"), input = el("input"); input.type = "checkbox"; input.checked = current[key] === true; input.setAttribute("aria-label", meta[0]); toggle.append(input, el("span"));
       input.addEventListener("change", async () => {
-        const desired = input.checked; input.disabled = true;
+        const desired = input.checked;
+        if (key === "UNIMPORTANT_AUTO_TRASH" && desired) {
+          const approved = confirm("Unwichtige E-Mails künftig automatisch in den Gmail-Papierkorb verschieben?\n\nDer Concierge prüft neue E-Mails sofort beim Eingang und zusätzlich minütlich. Endgültig gelöscht wird nichts.");
+          if (!approved) { input.checked = false; return; }
+        }
+        input.disabled = true;
         try { const data = await request("/email/concierge/settings", { method: "POST", body: { settings: { [key]: desired } } }); dashboard.settings = data.settings || dashboard.settings; }
         catch (error) { input.checked = !desired; showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
         finally { input.disabled = false; render(); }
