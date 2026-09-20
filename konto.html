@@ -3171,6 +3171,9 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
           }
         }
         renderActorOwnerName();
+        try {
+          if (sessionToken()) localStorage.removeItem("scb_onboarding");
+        } catch (_) {}
         function activeSelfAccountId() {
           if (activeAccountContext?.selected?.is_self === true && activeAccountContext?.selected?.customer_account_id) {
             return String(activeAccountContext.selected.customer_account_id);
