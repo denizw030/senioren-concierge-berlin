@@ -82,8 +82,8 @@ test("product layout is responsive across desktop and mobile",()=>{
   assert.match(js,/ecp-rule ecp-rule-personal/);
   assert.match(js,/ecp-rule-title-row/);
   assert.match(js,/\.ecp-rule-controls\{display:grid;grid-template-columns:minmax\(0,1fr\) auto/);
-  assert.match(integration,/email-concierge-product\.css\?v=20260920-7/);
-  assert.match(integration,/email-concierge-product\.js\?v=20260920-10/);
+  assert.match(integration,/email-concierge-product\.css\?v=20260920-8/);
+  assert.match(integration,/email-concierge-product\.js\?v=20260920-11/);
 });
 
 
@@ -242,4 +242,25 @@ test("remote folder loading uses the authenticated concierge API",()=>{
   assert.match(js,/request\("\/email\/concierge\/folder"/);
   assert.doesNotMatch(js,/allowBare: true/);
   assert.doesNotMatch(js,/\/email\/messages\/search/);
+});
+
+
+test("mailbox refresh failure preserves the last successful message list",()=>{
+  assert.match(js,/const previousRows = mailboxFolderRows\.slice\(\)/);
+  assert.match(js,/if \(previousRows\.length\) mailboxFolderRows = previousRows/);
+  assert.match(js,/searchRemoteFolder\(connection, mailboxFolder, 30\)/);
+});
+
+test("classification updates immediately without reloading the full classification snapshot",()=>{
+  assert.match(js,/function applyLocalClassification\(messageId, value\)/);
+  assert.match(js,/message\.classification = value/);
+  assert.match(js,/applyLocalClassification\(message\.id, value\)/);
+  const block=js.slice(js.indexOf("async function setMessageClassification"),js.indexOf("function messageCard"));
+  assert.doesNotMatch(block,/classification\/summary/);
+});
+
+test("mailbox error retry button is centered in a dedicated state",()=>{
+  assert.match(js,/ecp-tb-empty ecp-tb-error-state/);
+  assert.match(css,/\.ecp-tb-error-state\{min-height:220px;display:grid;align-content:center;justify-items:center/);
+  assert.match(css,/\.ecp-tb-error-state \.ecp-tb-toolbar-button/);
 });

@@ -307,21 +307,24 @@
   async function loadMailboxFolder() {
     if (!connected || mailboxFolderLoading) return;
     if (!remoteFolderMode()) { mailboxFolderRows = []; mailboxFolderError = ""; render(); return; }
+    const previousRows = mailboxFolderRows.slice();
     mailboxFolderLoading = true; mailboxFolderError = ""; render();
     try {
       if (mailboxScope === "ALL") {
         const connectedRows = emailConnections.filter((row) => String(row?.state || "").toUpperCase() === "CONNECTED");
-        const settled = await Promise.allSettled(connectedRows.map((row) => searchRemoteFolder(row, "INBOX", 40)));
-        mailboxFolderRows = settled.flatMap((result) => result.status === "fulfilled" ? result.value : [])
+        const settled = await Promise.allSettled(connectedRows.map((row) => searchRemoteFolder(row, "INBOX", 30)));
+        const nextRows = settled.flatMap((result) => result.status === "fulfilled" ? result.value : [])
           .sort((a,b)=>Date.parse(String(b?.date||0))-Date.parse(String(a?.date||0))).slice(0,120);
-        if (settled.some((result)=>result.status === "rejected")) mailboxFolderError = "Ein Postfach konnte gerade nicht geladen werden.";
+        if (nextRows.length || !previousRows.length) mailboxFolderRows = nextRows;
+        if (settled.some((result)=>result.status === "rejected")) mailboxFolderError = "Ein Postfach konnte gerade nicht aktualisiert werden.";
       } else {
         const connection = connectionById(activeConnectionId);
         if (!connection) throw new Error("EMAIL_CONNECTION_NOT_CONNECTED");
-        mailboxFolderRows = await searchRemoteFolder(connection, mailboxFolder, 50);
+        const nextRows = await searchRemoteFolder(connection, mailboxFolder, 30);
+        mailboxFolderRows = nextRows;
       }
     } catch (error) {
-      mailboxFolderRows = [];
+      if (previousRows.length) mailboxFolderRows = previousRows;
       mailboxFolderError = error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE";
     } finally { mailboxFolderLoading = false; render(); }
   }
@@ -394,21 +397,40 @@
       }
     }
   }
+  function applyLocalClassification(messageId, value) {
+    if (!classification) return;
+    const id = String(messageId || "");
+    let moved = null;
+    for (const key of ["IMPORTANT","UNIMPORTANT","MARKETING"]) {
+      const rows = list(classification.buckets[key]);
+      const hit = rows.find((row)=>String(row?.id||"")===id);
+      if (hit && !moved) moved = { ...hit, classification:value, classification_source:"CUSTOMER", classification_reason:"Von dir korrigiert." };
+      classification.buckets[key] = rows.filter((row)=>String(row?.id||"")!==id);
+    }
+    if (moved && classification.buckets[value]) classification.buckets[value].unshift(moved);
+    for (const key of ["IMPORTANT","UNIMPORTANT","MARKETING"]) classification.counts[key] = list(classification.buckets[key]).length;
+  }
   async function setMessageClassification(message, value) {
     if (busy || !message?.id || message.classification === value) return;
+    const previous = message.classification || null;
+    message.classification = value;
+    syncVisibleClassification(message.id, value);
+    applyLocalClassification(message.id, value);
+    render();
     setBusy(true);
     try {
       const connectionId = String(message?._connection_id || activeConnectionId || "");
       const saved = await request("/email/concierge/classification/override", { method: "POST", body: { message_id: message.id, thread_id: message.thread_id || null, classification: value }, connectionId });
-      message.classification = value;
-      syncVisibleClassification(message.id, value);
-      classification = normalizeClassification(await request("/email/concierge/classification/summary", { connectionId: String(message?._connection_id || activeConnectionId || "") }));
       if (saved?.learning_suggestion_ready) {
-        const next = normalizeDashboard(await request("/email/concierge/dashboard"));
+        const next = normalizeDashboard(await request("/email/concierge/dashboard", { connectionId }));
         if (next) dashboard = next;
       }
-    } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
-    finally { setBusy(false); render(); }
+    } catch (error) {
+      message.classification = previous;
+      syncVisibleClassification(message.id, previous);
+      if (classification) void loadClassification();
+      showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE");
+    } finally { setBusy(false); render(); }
   }
   function messageCard(message, allowOpen = true, allowClassify = true) {
     const row = el("article", "ecp-mail"), main = el("div", "ecp-mail-main");
@@ -874,7 +896,7 @@
     if (!rows.length && loading) {
       listNode.append(el("div","ecp-tb-empty","E-Mails werden geladen …"));
     } else if (!rows.length && loadError) {
-      const errorBox=el("div","ecp-tb-empty");
+      const errorBox=el("div","ecp-tb-empty ecp-tb-error-state");
       errorBox.append(el("strong","","E-Mails konnten gerade nicht geladen werden."),el("span","","Das Postfach konnte nicht gelesen werden. Bitte versuche es erneut."));
       const retry=button("Erneut laden","ecp-tb-toolbar-button");retry.addEventListener("click",()=>{if(remoteFolderMode())void loadMailboxFolder();else{classificationRetryCount=0;void loadClassification();}});
       errorBox.append(retry);listNode.append(errorBox);
