@@ -106,7 +106,7 @@ test("mobile registration carousel arrows stay inside the photo stage", () => {
   assert.match(carouselCss, /\.nw-carousel-stage>\.nw-carousel-arrow\.prev\{[\s\S]*left:8px!important;[\s\S]*right:auto!important;/);
   assert.match(carouselCss, /\.nw-carousel-stage>\.nw-carousel-arrow\.next\{[\s\S]*right:8px!important;[\s\S]*left:auto!important;/);
   assert.match(html, /assets\/concierge-carousel\.css\?v=16/);
-  assert.match(html, /assets\/concierge-carousel\.js\?v=22/);
+  assert.match(html, /assets\/concierge-carousel\.js\?v=23/);
 });
 
 
@@ -128,5 +128,12 @@ test("registration arrow buttons move the slider without starting a drag", () =>
   assert.match(carouselJs, /prevArrow\.addEventListener\("click",event=>\{event\.preventDefault\(\);event\.stopPropagation\(\);move\(-1,false,"browse"\);\}\)/);
   assert.match(carouselJs, /nextArrow\.addEventListener\("click",event=>\{event\.preventDefault\(\);event\.stopPropagation\(\);move\(1,false,"browse"\);\}\)/);
   assert.match(carouselJs, /closest\("\.nw-voice-preview-control,\.nw-carousel-arrow"\)/);
-  assert.match(html, /assets\/concierge-carousel\.js\?v=22/);
+  assert.match(html, /assets\/concierge-carousel\.js\?v=23/);
+});
+
+
+test("registration mobile spacing is based on rendered geometry so neighbor corners cannot be clipped", () => {
+  assert.match(carouselJs, /neighboringCardWidth=activeCardWidth\*\.81/);
+  assert.match(carouselJs, /Math\.max\(44,\(stageWidth-neighboringCardWidth\)\/2-14\)/);
+  assert.match(html, /assets\/concierge-carousel\.js\?v=23/);
 });
