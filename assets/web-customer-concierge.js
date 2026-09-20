@@ -35,6 +35,7 @@
   let primaryChatThreadId = null;
   let routedTurnIds = new Set();
   let routedTurnsLoadedAt = 0;
+  let threadsLoadGeneration = 0;
   const VIRTUAL_WHATSAPP_THREAD_ID="00000000-0000-4000-8000-0000000000a1";
   const VIRTUAL_PHONE_THREAD_ID="00000000-0000-4000-8000-0000000000a3";
   const VIRTUAL_EMAIL_THREAD_ID="00000000-0000-4000-8000-0000000000a4";
@@ -119,6 +120,30 @@
 
   function validUuid(value) { return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || "")); }
   function clearNode(node) { while (node?.firstChild) node.removeChild(node.firstChild); }
+  function appendLinkifiedText(container,text) {
+    const value=String(text??"");
+    const pattern=/https?:\/\/[^\s<>"']+/gi;
+    let cursor=0;
+    for(const match of value.matchAll(pattern)){
+      const index=Number(match.index??0);
+      if(index>cursor)container.appendChild(document.createTextNode(value.slice(cursor,index)));
+      let href=String(match[0]||"");
+      let trailing="";
+      while(href&&/[.,!?;:)\]]$/.test(href)){trailing=href.slice(-1)+trailing;href=href.slice(0,-1);}
+      if(href){
+        const link=document.createElement("a");
+        link.className="web-concierge-message-link";
+        link.href=href;
+        link.target="_blank";
+        link.rel="noopener noreferrer";
+        link.textContent=href;
+        container.appendChild(link);
+      }
+      if(trailing)container.appendChild(document.createTextNode(trailing));
+      cursor=index+String(match[0]||"").length;
+    }
+    if(cursor<value.length)container.appendChild(document.createTextNode(value.slice(cursor)));
+  }
   function logNode() { return document.getElementById("webConciergeLog"); }
   function scrollBottom() { const log=logNode(); if (log) requestAnimationFrame(() => { log.scrollTop=log.scrollHeight; }); }
 
@@ -236,7 +261,7 @@
     const normalizedChannel=String(channel||"WEB").toUpperCase();
     const row=document.createElement("div");row.className=`web-concierge-message-row is-${role}`;row.dataset.channel=normalizedChannel;if(id)row.dataset.messageId=id;
     const bubble=document.createElement("div");bubble.className=`web-concierge-message web-concierge-message-${role}`;
-    const body=document.createElement("span");body.className="web-concierge-message-text";body.textContent=text;
+    const body=document.createElement("span");body.className="web-concierge-message-text";appendLinkifiedText(body,text);
     const meta=document.createElement("span");meta.style.cssText="display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-top:3px;min-height:14px";
     const time=document.createElement("span");time.className="web-concierge-message-time";time.textContent=timeLabel(at);time.style.cssText="float:none;margin:0";
     meta.appendChild(time);
@@ -594,8 +619,10 @@
     return true;
   }
   async function loadThreads({selectFirst=false}={}) {
+    const generation=++threadsLoadGeneration;
     try{
       const data=await historyRequest();
+      if(generation!==threadsLoadGeneration)return false;
       const source=Array.isArray(data.threads)?data.threads:[];
       const normal=source.find(isNormalThread)||null;
       if(validUuid(normal?.thread_id))primaryChatThreadId=String(normal.thread_id);
@@ -606,41 +633,45 @@
       const chatThread=normal&&validUuid(normal?.thread_id)
         ? {...normal,thread_id:primaryChatThreadId,title:"Chat",channels:["WEB","APP"],channel_view:"CHAT"}
         : {thread_id:primaryChatThreadId,title:"Chat",preview:"",updated_at:null,created_at:null,turn_count:0,channels:["WEB","APP"],channel_view:"CHAT",draft:true};
-
-      let whatsappNumber="";
-      try{
-        const whatsapp=await channelHistoryRequest("WHATSAPP",{summary:true});
-        whatsappNumber=String(whatsapp?.whatsapp_number||"").trim();
-      }catch{}
-      const next=[chatThread,{
-        thread_id:VIRTUAL_WHATSAPP_THREAD_ID,title:"WhatsApp",preview:whatsappNumber,updated_at:null,
+      const whatsappThread={
+        thread_id:VIRTUAL_WHATSAPP_THREAD_ID,title:"WhatsApp",preview:"",updated_at:null,
         channels:["WHATSAPP"],channel_view:"WHATSAPP",virtual_channel_thread:true
-      }];
-      try{
-        const phone=await channelHistoryRequest("PHONE",{summary:true});
-        if(phone?.has_calls===true){
+      };
+      threadCache=[chatThread,whatsappThread];
+      if(selectFirst&&(!activeThreadId||!threadCache.some((thread)=>thread.thread_id===activeThreadId))){
+        activeThreadId=primaryChatThreadId;
+      }
+      renderThreads();
+
+      void (async()=>{
+        const [whatsappResult,phoneResult,emailResult]=await Promise.allSettled([
+          channelHistoryRequest("WHATSAPP",{summary:true}),
+          channelHistoryRequest("PHONE",{summary:true}),
+          channelHistoryRequest("EMAIL",{summary:true})
+        ]);
+        if(generation!==threadsLoadGeneration)return;
+        const next=[chatThread,{...whatsappThread}];
+        if(whatsappResult.status==="fulfilled"){
+          next[1].preview=String(whatsappResult.value?.whatsapp_number||"").trim();
+        }
+        if(phoneResult.status==="fulfilled"&&phoneResult.value?.has_calls===true){
           next.push({
             thread_id:VIRTUAL_PHONE_THREAD_ID,title:"Telefonprotokoll",preview:"",updated_at:null,
             channels:["PHONE"],channel_view:"PHONE",virtual_channel_thread:true
           });
         }
-      }catch{}
-      try{
-        const email=await channelHistoryRequest("EMAIL",{summary:true});
-        if(email?.has_email===true){
+        if(emailResult.status==="fulfilled"&&emailResult.value?.has_email===true){
           next.push({
-            thread_id:VIRTUAL_EMAIL_THREAD_ID,title:"E-Mail-Protokoll",preview:String(email?.email_address||""),updated_at:null,
+            thread_id:VIRTUAL_EMAIL_THREAD_ID,title:"E-Mail-Protokoll",preview:String(emailResult.value?.email_address||""),updated_at:null,
             channels:["EMAIL"],channel_view:"EMAIL",virtual_channel_thread:true
           });
         }
-      }catch{}
-      threadCache=next;
-      if(selectFirst&&(!activeThreadId||!threadCache.some((thread)=>thread.thread_id===activeThreadId))){
-        activeThreadId=primaryChatThreadId;
-      }
-      renderThreads();
+        threadCache=next;
+        renderThreads();
+      })();
       return true;
     }catch{
+      if(generation!==threadsLoadGeneration)return false;
       if(!validUuid(primaryChatThreadId))primaryChatThreadId=crypto.randomUUID();
       threadCache=[{
         thread_id:primaryChatThreadId,title:"Chat",preview:"",updated_at:null,
@@ -657,8 +688,11 @@
   async function refreshThread(threadId,{force=false,reset=false}={}) {
     if(!validUuid(threadId)||channelForThreadId(threadId)!=="CHAT")return false;
     try{
-      const data=await historyRequest(threadId,{limit:HISTORY_PAGE_SIZE});if(activeThreadId!==threadId)return false;
-      await refreshRoutedTurns().catch(()=>routedTurnIds);
+      const [data]=await Promise.all([
+        historyRequest(threadId,{limit:HISTORY_PAGE_SIZE}),
+        refreshRoutedTurns().catch(()=>routedTurnIds)
+      ]);
+      if(activeThreadId!==threadId)return false;
       const normalMessages=filterRoutedWebAnswers((Array.isArray(data.messages)?data.messages:[]).filter((message)=>NORMAL_CHAT_CHANNELS.has(String(message?.channel||"WEB").toUpperCase())));
       if(reset){historyMessages=mergeHistory([],normalMessages);historyHasMore=data.has_more===true;historyNextBefore=data.next_before||null;historyLoadedOlder=false;}
       else{
@@ -687,9 +721,11 @@
     loadingOlder=true;renderHistory(historyMessages,{force:true,scrollToBottom:false,preserveScroll:true});
     try{
       const threadId=activeThreadId;
-      const data=await historyRequest(threadId,{before:historyNextBefore,limit:HISTORY_PAGE_SIZE});
+      const [data]=await Promise.all([
+        historyRequest(threadId,{before:historyNextBefore,limit:HISTORY_PAGE_SIZE}),
+        refreshRoutedTurns().catch(()=>routedTurnIds)
+      ]);
       if(activeThreadId!==threadId)return false;
-      await refreshRoutedTurns().catch(()=>routedTurnIds);
       const normalMessages=filterRoutedWebAnswers((Array.isArray(data.messages)?data.messages:[]).filter((message)=>NORMAL_CHAT_CHANNELS.has(String(message?.channel||"WEB").toUpperCase())));
       historyMessages=mergeHistory(normalMessages,historyMessages);
       historyHasMore=data.has_more===true;
@@ -699,7 +735,7 @@
     } catch { return false; }
     finally { loadingOlder=false;renderHistory(historyMessages,{force:true,scrollToBottom:false,preserveScroll:true}); }
   }
-  async function selectThread(threadId) {
+  async function selectThread(threadId,{preserveUntilLoaded=false}={}) {
     if(sending)return;
     activeThreadId=threadId;
     const view=channelForThreadId(threadId);
@@ -707,9 +743,12 @@
     channelViewReadOnly=view!=="CHAT";
     setComposerReady(gatewayReady);
     window.dispatchEvent(new CustomEvent("nahwerk:chat-channel-view",{detail:{channel:view,readOnly:channelViewReadOnly}}));
-    resetHistoryState();renderThreads();emptyChat();
-    if(view==="CHAT"&&validUuid(threadId))await refreshThread(threadId,{force:true,reset:true});
-    else if(view==="WHATSAPP"||view==="PHONE"||view==="EMAIL")await refreshChannelView(view);
+    resetHistoryState();renderThreads();
+    if(!preserveUntilLoaded)emptyChat();
+    let loaded=false;
+    if(view==="CHAT"&&validUuid(threadId))loaded=await refreshThread(threadId,{force:true,reset:true});
+    else if(view==="WHATSAPP"||view==="PHONE"||view==="EMAIL")loaded=await refreshChannelView(view);
+    if(preserveUntilLoaded&&!loaded)emptyChat();
     document.getElementById("webConciergeInput")?.focus();
   }
   function newChat() { if(sending)return;activeThreadId=crypto.randomUUID();resetHistoryState();emptyChat();renderThreads();document.getElementById("webConciergeInput")?.focus(); }
@@ -867,15 +906,21 @@ syncIosVisualViewport();
     const status=document.getElementById("webConciergeStatus");
     setComposerReady(false);
     if(status){status.textContent="Verbindung wird hergestellt …";status.classList.remove("is-online");}
+    const initialHistoryPromise=(async()=>{
+      const loaded=await loadThreads({selectFirst:true});
+      if(activeThreadId)await selectThread(activeThreadId,{preserveUntilLoaded:true});
+      else if(!loaded)newChat();
+      return loaded;
+    })();
     let ready=await checkReadiness();
     if(!ready){
       await new Promise((resolve)=>setTimeout(resolve,650));
       ready=await checkReadiness();
     }
     if(status){status.textContent=ready?"Online":"Verbindung momentan nicht möglich";status.classList.toggle("is-online",ready);}
-    setComposerReady(ready);if(ready){
-      const loaded=await loadThreads({selectFirst:true});
-      if(activeThreadId)await selectThread(activeThreadId);else{newChat();if(!loaded)renderThreads();}
+    setComposerReady(ready);
+    await initialHistoryPromise.catch(()=>false);
+    if(ready){
       renderIntegrationReturnNotice();
       void refreshPersona(true).then(async()=>{await loadThreads();renderThreads();}).catch(()=>{});
       startLiveSync();
@@ -896,6 +941,6 @@ syncIosVisualViewport();
     },
     isAllowed:()=>gatewayReady&&!channelViewReadOnly&&channelView==="CHAT"
   });
-  window.NAHWERKWebCustomerConciergeTestHooks=Object.freeze({configuredEndpoint,configuredHistoryEndpoint,sessionToken,normalizeGatewayReadiness,normalizeCoreV1Response,normalizePersona,applyPersona,renderCoreV1Response,renderConnectionOffer,renderIntegrationReturnNotice,gatewayRequest,historyRequest,refreshPersona,syncHistory,loadOlderMessages,mergeHistory,CORE_CONTRACT_VERSION,GATEWAY_CONTRACT_VERSION,HISTORY_CONTRACT_VERSION,HISTORY_PAGE_SIZE,SYNC_INTERVAL_MS,PERSONA_SYNC_INTERVAL_MS,GATEWAY_ENDPOINT,HISTORY_ENDPOINT});
+  window.NAHWERKWebCustomerConciergeTestHooks=Object.freeze({configuredEndpoint,configuredHistoryEndpoint,sessionToken,normalizeGatewayReadiness,normalizeCoreV1Response,normalizePersona,applyPersona,appendLinkifiedText,renderCoreV1Response,renderConnectionOffer,renderIntegrationReturnNotice,gatewayRequest,historyRequest,refreshPersona,syncHistory,loadOlderMessages,mergeHistory,CORE_CONTRACT_VERSION,GATEWAY_CONTRACT_VERSION,HISTORY_CONTRACT_VERSION,HISTORY_PAGE_SIZE,SYNC_INTERVAL_MS,PERSONA_SYNC_INTERVAL_MS,GATEWAY_ENDPOINT,HISTORY_ENDPOINT});
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();
