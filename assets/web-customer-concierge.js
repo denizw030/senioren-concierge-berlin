@@ -937,7 +937,7 @@
     try{
       const readiness=normalizeGatewayReadiness(await gatewayRequest("/health",{auth:false}));if(readiness?.ready!==true)throw new Error("gateway_not_authoritative");
       gatewayReady=true;
-      void refreshPersona(true).catch(()=>{});
+      if(!guestMode)void refreshPersona(true).catch(()=>{});
       return true;
     }catch{gatewayReady=false;applyPersona(null);return false;}
   }
