@@ -320,7 +320,9 @@
 
   function showConnectButton() {
     connectButton.hidden = false;
-    connectButton.disabled = !sessionToken() || selectedProvider !== "GOOGLE";
+    const googleReady = selectedProvider === "GOOGLE" || connection?.provider === "GOOGLE" || googleSelectable();
+    if (googleReady) selectedProvider = "GOOGLE";
+    connectButton.disabled = !sessionToken() || !googleReady;
   }
 
   function renderGoogleServices() {
@@ -345,6 +347,7 @@
     resetActions();
     accountHint.textContent = connection?.account_display_hint || "";
     const state = String(connection?.state || "DISCONNECTED").toUpperCase();
+    if (connection?.provider === "GOOGLE" && state === "DISCONNECTED") selectedProvider = "GOOGLE";
     queueMicrotask(() => syncProduct(state === "CONNECTED"));
     renderGoogleServices();
 
@@ -465,12 +468,13 @@
 
   async function begin() {
     const state = String(connection?.state || "DISCONNECTED").toUpperCase();
-    const hasGoogleSelection = selectedProvider === "GOOGLE" || connectionHasGoogleContext();
+    const hasGoogleSelection = selectedProvider === "GOOGLE" || connection?.provider === "GOOGLE" || connectionHasGoogleContext() || googleSelectable();
     if (!hasGoogleSelection) {
       stateTitle.textContent = "Google auswählen";
       stateMeta.textContent = "Wähle zuerst Google aus.";
       return;
     }
+    selectedProvider = "GOOGLE";
     const body = connectPayload("GOOGLE", selectedCapabilities());
     if (!body || !sessionToken()) return;
     setBusy(true);
@@ -520,8 +524,8 @@
     setBusy(true);
     try {
       await request("/email/disconnect", { method: "POST", body: { mode: "LOCAL" } });
-      connection = { state: "DISCONNECTED", provider: null, capabilities: [], account_display_hint: null };
-      selectedProvider = null;
+      connection = { state: "DISCONNECTED", provider: "GOOGLE", capabilities: [], account_display_hint: null };
+      selectedProvider = "GOOGLE";
       preferences = null;
       loaded = false;
       await syncProduct(false);
