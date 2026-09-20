@@ -327,7 +327,8 @@
   }
   function remoteFolderMode() { return mailboxScope === "ALL" || ["INBOX","SENT","SPAM","TRASH"].includes(mailboxFolder); }
   function classificationFolderMode() { return mailboxScope === "ACCOUNT" && ["IMPORTANT","UNIMPORTANT"].includes(mailboxFolder); }
-  function folderBackedMode() { return remoteFolderMode() || classificationFolderMode(); }
+  function replyNeededFolderMode() { return mailboxScope === "ACCOUNT" && mailboxFolder === "REPLY"; }
+  function folderBackedMode() { return remoteFolderMode() || classificationFolderMode() || replyNeededFolderMode(); }
   function setFolderCount(connectionId, folder, meta) {
     const id=String(connectionId||""); if(!id) return;
     if(!mailboxFolderCounts[id]) mailboxFolderCounts[id]={};
@@ -381,7 +382,7 @@
     }
     if (["INBOX","SENT","SPAM","TRASH"].includes(folder)) return physicalFolderUnread(id,folder);
     if (String(id) !== String(activeConnectionId)) return "";
-    if (folder === "REPLY") return classification ? list(classification.buckets?.IMPORTANT).filter((m)=>m.needs_reply===true).length || "" : "";
+    if (folder === "REPLY") return mailboxScope==="ACCOUNT" && mailboxFolder==="REPLY" ? (mailboxFolderRows.length || "") : "";
     return "";
   }
   function mailboxRowKey(row) {
@@ -438,6 +439,23 @@
     } while(serial===mailboxLoadSerial && page<100);
     return rows;
   }
+  async function loadReplyNeededFolder(connection, serial) {
+    const id=String(connection?.connection_id||"");
+    let rows=[],offset=0,page=0;
+    do {
+      const params=new URLSearchParams({limit:"100",offset:String(offset)});
+      const data=await request("/email/concierge/reply-needed?"+params.toString(), { connectionId:id });
+      if(serial!==mailboxLoadSerial) return rows;
+      const incoming=list(data?.messages).map((message)=>decorateRemoteMessage(message,connection));
+      rows=mergeMailboxRows(rows,incoming);
+      mailboxFolderRows=rows;
+      render();
+      const next=Number(data?.next_offset);
+      if(!Number.isFinite(next)||next<=offset) break;
+      offset=next;page++;
+    } while(serial===mailboxLoadSerial&&page<100);
+    return rows;
+  }
   async function loadMailboxFolder() {
     if (!connected) return;
     const serial=++mailboxLoadSerial;
@@ -459,6 +477,8 @@
         if (!connection) throw new Error("EMAIL_CONNECTION_NOT_CONNECTED");
         if(classificationFolderMode()) {
           await loadClassificationFolder(connection,serial);
+        } else if(replyNeededFolderMode()) {
+          await loadReplyNeededFolder(connection,serial);
         } else {
           let accumulated=[];
           await streamRemoteFolder(connection,mailboxFolder,serial,(messages,page)=>{
@@ -1165,6 +1185,9 @@
       const card=el("section","ecp-card ecp-tb-embedded-card");renderDrafts(card);pane.append(card);shell.append(pane);return;
     }
     if (selectedMessageLoading) { pane.append(el("div","ecp-tb-reader-empty","E-Mail wird geöffnet …")); shell.append(pane); return; }
+    const currentRows=mailboxFilteredMessages();
+    const selectionStillVisible=currentRows.some((row)=>String(row?.id||"")===String(selectedMessageId||"")&&String(row?._connection_id||activeConnectionId||"")===String(selectedMessageConnectionId||activeConnectionId||""));
+    if(!selectionStillVisible){selectedMessageId="";selectedMessageConnectionId="";selectedMessageDetail=null;selectedMessageLoading=false;}
     const detail = selectedMessageDetail;
     if (!detail) {
       const placeholder=el("div","ecp-tb-reader-empty");placeholder.append(el("strong","","E-Mail auswählen"),el("span","","Wähle eine Nachricht aus. Wichtig / Unwichtig legst du direkt in der mittleren Spalte fest."));pane.append(placeholder);shell.append(pane);return;
@@ -1214,7 +1237,6 @@
       if (!next) throw new Error("EMAIL_PROVIDER_UNAVAILABLE");
       classification = next;
       classificationRetryCount = 0;
-      if (!selectedMessageId) { const first = mailboxAllMessages()[0]; if (first?.id) setTimeout(()=>void openMailboxMessage(first),0); }
     } catch (error) {
       classification = null;
       classificationError = error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE";
