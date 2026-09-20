@@ -371,3 +371,24 @@ test("chat typing and scroll remain stable during mailbox background activity",(
   assert.match(js,/chatDraft=input\.value/);
   assert.match(js,/chatLog\.scrollTop=chatAutoScrollNext\?chatLog\.scrollHeight:chatScrollTop/);
 });
+
+
+test("classification controls preserve the page viewport across DOM replacement",()=>{
+  assert.match(js,/pageScrollX/);
+  assert.match(js,/pageScrollY/);
+  assert.match(js,/scrollTo\(\{left:x,top:y,behavior:"auto"\}\)/);
+});
+
+test("nonempty concierge drafts block even forced background rerenders",()=>{
+  assert.match(js,/transient\.chatFocused && chatDraft\.length>0/);
+  assert.match(js,/pendingBackgroundRender=true/);
+  assert.match(js,/compositionend/);
+});
+
+test("first concierge view explains assisted sorting with interactive example mails",()=>{
+  assert.match(js,/classification_review/);
+  assert.match(js,/Beispiel: So lernt dein E-Mail-Concierge/);
+  assert.match(js,/Dein Posteingang bleibt dabei unverändert/);
+  assert.match(js,/onboardingExampleSelections/);
+  assert.match(js,/\["IMPORTANT","Wichtig"\],\["UNIMPORTANT","Unwichtig"\]/);
+});
