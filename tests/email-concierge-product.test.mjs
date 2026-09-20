@@ -148,7 +148,7 @@ test("every visible mail can be marked Wichtig or Unwichtig",()=>{
   assert.match(js,/messageCard\(mail, true, true\)/);
   assert.match(js,/messageCard\(row, true, true\)/);
   assert.match(js,/const classifiable = sorted \|\| \(data\.message\?\.id/);
-  assert.match(js,/syncVisibleClassification\(message\.id, value\)/);
+  assert.match(js,/syncVisibleClassification\(messageId, value\)/);
 });
 
 test("concierge chat renders classification views locally without another Gmail search",()=>{
@@ -254,7 +254,7 @@ test("mailbox refresh failure preserves the last successful message list",()=>{
 test("classification updates immediately without reloading the full classification snapshot",()=>{
   assert.match(js,/function applyLocalClassification\(messageId, value\)/);
   assert.match(js,/message\.classification = value/);
-  assert.match(js,/applyLocalClassification\(message\.id, value\)/);
+  assert.match(js,/applyLocalClassification\(messageId, value\)/);
   const block=js.slice(js.indexOf("async function setMessageClassification"),js.indexOf("function messageCard"));
   assert.doesNotMatch(block,/classification\/summary/);
 });
