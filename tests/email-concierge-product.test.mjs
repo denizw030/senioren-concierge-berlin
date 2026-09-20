@@ -22,9 +22,11 @@ test("standalone E-Mail-Concierge uses only the canonical PROD email runtime",()
   assert.match(js,/\/email\/concierge\/rules\/delete/);
 });
 
-test("customer UI contains the complete standalone product areas",()=>{
-  for(const phrase of ["Mein E-Mail-Concierge","Wichtige E-Mails","Von NAHWERK vorbereitet","Spam- & Betrugsschutz","Was dein E-Mail-Concierge erledigt hat","Deine Kanäle","Automatik & Schutz"]) assert.match(js,new RegExp(phrase.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")));
-  for(const phrase of ["Wichtig","Ungelesen","Heute","Antwort empfohlen","Rechnungen"]) assert.match(js,new RegExp(phrase));
+test("customer UI contains the complete Thunderbird-style mail workspace",()=>{
+  for(const phrase of ["NAHWERK Mail","Posteingang","Wichtig","Unwichtig","Werbung / Spam","Antwort nötig","Entwürfe","Concierge","Automatik & Schutz","Aktivität"]) assert.ok(js.includes(phrase),phrase);
+  assert.match(js,/ecp-thunderbird/);
+  assert.match(js,/ecp-tb-list-pane/);
+  assert.match(js,/ecp-tb-reader/);
 });
 
 test("spam fraud sorting and activity controls are customer configurable",()=>{
@@ -59,10 +61,10 @@ test("draft edit and discard never imply a send",()=>{
   assert.match(js,/Es wird nichts gesendet/);
 });
 
-test("WhatsApp is optional and remains visibly discoverable",()=>{
-  assert.match(js,/Web-Kundenkonto/);
-  assert.match(js,/WhatsApp verbinden/);
-  assert.match(js,/Der E-Mail-Concierge funktioniert eigenständig im Web/);
+test("mail workspace stays standalone and does not require WhatsApp",()=>{
+  assert.match(js,/ecp-thunderbird/);
+  assert.match(js,/channels\.whatsapp\?\.state/);
+  assert.doesNotMatch(js,/if\s*\(\s*!dashboard\.channels\?\.whatsapp/);
 });
 
 test("account integration loads product assets only from first-party paths and syncs connection state",()=>{
