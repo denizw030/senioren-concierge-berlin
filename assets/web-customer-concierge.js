@@ -5,6 +5,7 @@
   const GUEST_INSTALLATION_KEY = "nw_web_guest_installation_v1";
   const GUEST_TOKEN_KEY = "nw_web_guest_token_v1";
   const GUEST_THREAD_KEY = "nw_web_guest_thread_v1";
+  const GUEST_RESUME_KEY = "nw_guest_resume_request_v1";
   const CORE_CONTRACT_VERSION = "core-v1";
   const GATEWAY_CONTRACT_VERSION = "web-gateway-v1";
   const GATEWAY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway";
@@ -23,6 +24,7 @@
   let gatewayReady = false;
   let guestMode = false;
   let sending = false;
+  let lastGuestUserMessage = "";
   let activeThreadId = null;
   let threadCache = [];
   let lastDateKey = "";
@@ -155,7 +157,7 @@
       active_task_id:raw.active_task_id ? String(raw.active_task_id) : null, response_state:responseState, messages,
       pending_approval:raw.pending_approval && typeof raw.pending_approval === "object" ? raw.pending_approval : null,
       action_refs:Array.isArray(raw.action_refs) ? raw.action_refs : [], error:raw.error && typeof raw.error === "object" ? raw.error : null,
-      ui_actions:Array.isArray(raw.ui_actions) ? raw.ui_actions.filter((item)=>["SIGN_IN","SIGN_UP"].includes(String(item?.type||"").toUpperCase())).map((item)=>({type:String(item.type).toUpperCase(),label:String(item.label||"").trim()})) : [],
+      ui_actions:Array.isArray(raw.ui_actions) ? raw.ui_actions.filter((item)=>["CREATE_ACCOUNT"].includes(String(item?.type||"").toUpperCase())).map((item)=>({type:String(item.type).toUpperCase(),label:String(item.label||"").trim(),href:String(item.href||""),post_auth_target:String(item.post_auth_target||"")})) : [],
       state_version:Number(raw.state_version || 0), correlation_id:String(raw.correlation_id || ""), authoritative
     };
   }
@@ -445,17 +447,28 @@
   }
   function renderGuestAccountActions(actions) {
     if(!guestMode||!Array.isArray(actions)||!actions.length)return;
-    const card=addRuntimeCard("Mit Konto weitermachen","Für persönliche Einstellungen und echte Ausführungen kannst du dich anmelden oder kostenlos ein Konto erstellen.","is-guest-account");
+    const allowed=actions.filter((action)=>String(action?.type||"").toUpperCase()==="CREATE_ACCOUNT");
+    if(!allowed.length)return;
+    const card=addRuntimeCard("Konto für die Ausführung erforderlich","Damit ich die Aufgabe wirklich für dich ausführen kann, brauchst du zuerst ein NAHWERK Konto. Danach kannst du PAYG-Guthaben ab 5 € aufladen; vor einer kostenpflichtigen Ausführung siehst du den Preis.","is-guest-account");
     if(!card)return;
     const wrap=document.createElement("div");wrap.className="web-concierge-guest-actions";
-    for(const action of actions){
-      const type=String(action?.type||"").toUpperCase();
-      const link=document.createElement("a");
-      link.className=type==="SIGN_UP"?"btn red":"btn light";
-      link.href=type==="SIGN_UP"?"/registrieren?produkt=prime&paket=free&source=web_guest_chat":"/anmelden?source=web_guest_chat";
-      link.textContent=String(action?.label||"").trim()||(type==="SIGN_UP"?"Konto erstellen":"Anmelden");
-      wrap.appendChild(link);
-    }
+    const action=allowed[0];
+    const link=document.createElement("a");
+    link.className="btn red";
+    const candidate=String(action?.href||"");
+    link.href=candidate.startsWith("/registrieren?")?candidate:"/registrieren?source=web_guest_chat&next=%2Fpayg";
+    link.textContent=String(action?.label||"").trim()||"Konto erstellen";
+    link.addEventListener("click",()=>{
+      try{
+        localStorage.setItem(GUEST_RESUME_KEY,JSON.stringify({
+          request:String(lastGuestUserMessage||"").slice(0,4000),
+          thread_id:String(activeThreadId||""),
+          post_auth_target:"/payg",
+          created_at:new Date().toISOString()
+        }));
+      }catch{}
+    });
+    wrap.appendChild(link);
     card.appendChild(wrap);scrollBottom();
   }
   function renderCoreV1Response(raw) {
@@ -879,6 +892,7 @@
   async function sendTurn() {
     const input=document.getElementById("webConciergeInput");if(!(input instanceof HTMLTextAreaElement)||!gatewayReady||sending||channelViewReadOnly)return;
     const content=input.value.trim();if(!content||content.length>4000)return;
+    if(guestMode)lastGuestUserMessage=content;
     if(!activeThreadId)activeThreadId=guestMode?guestThreadId():crypto.randomUUID();
     if(!guestMode){try{await refreshSessionForWrite();}catch{window.SCBAuth?.clearLocalAuth?.();location.replace("/anmelden");return;}}
     const sourceMessageId=crypto.randomUUID(),clientId=`local:${sourceMessageId}`,now=new Date().toISOString();
@@ -998,6 +1012,17 @@ syncIosVisualViewport();
       // Do not block the chat UI on a duplicate client-side session preflight.
       // Every authenticated gateway request validates the bearer session server-side again.
       void window.SCBAuth?.validateSession?.().catch(()=>false);
+      if(new URLSearchParams(location.search).get("resume_guest")==="1"){
+        try{
+          const handoff=JSON.parse(localStorage.getItem(GUEST_RESUME_KEY)||"null");
+          const request=String(handoff?.request||"").trim().slice(0,4000);
+          if(request){
+            const input=document.getElementById("webConciergeInput");
+            if(input instanceof HTMLTextAreaElement){input.value=request;resizeInput();}
+            localStorage.removeItem(GUEST_RESUME_KEY);
+          }
+        }catch{}
+      }
     }
     applyPersona(null);
     const status=document.getElementById("webConciergeStatus");
@@ -1024,7 +1049,7 @@ syncIosVisualViewport();
     await initialHistoryPromise.catch(()=>false);
     if(ready){
       if(guestMode){
-        appendMessage("assistant","Willkommen bei NAHWERK. Du kannst mich sofort kostenlos fragen, was NAHWERK kann oder wobei du Unterstützung brauchst. Für persönliche Ausführungen brauchst du erst ein Konto.",new Date().toISOString(),"guest:welcome","WEB");
+        appendMessage("assistant","Willkommen bei NAHWERK. Sag mir einfach, wobei du Unterstützung suchst. Ich kann dir zeigen, was NAHWERK für dich oder einen Angehörigen übernehmen kann, Funktionen und Preise erklären oder gemeinsam mit dir den passenden Einstieg finden. Fragen und Beratung sind hier kostenlos und ohne Anmeldung möglich. Ein Konto brauchst du erst, wenn ich wirklich etwas für dich ausführen soll.",new Date().toISOString(),"guest:welcome","WEB");
       }else{
         renderIntegrationReturnNotice();
         void refreshPersona(true).then(async()=>{await loadThreads();renderThreads();}).catch(()=>{});
