@@ -1,0 +1,100 @@
+/* NAHWERK Konto: modern, clearly visible action buttons in Light mode only. */
+html[data-nw-portal-theme="light"] body.account-premium-ui.account-premium-ui .btn,
+html body.account-premium-ui.account-premium-ui.nw-portal-light .btn{
+  min-height:46px!important;
+  padding:12px 20px!important;
+  border-radius:13px!important;
+  border-width:1px!important;
+  border-style:solid!important;
+  font-weight:750!important;
+  letter-spacing:-.01em!important;
+  opacity:1!important;
+  box-shadow:none!important;
+  filter:none!important;
+  transform:none;
+  transition:background .16s ease,border-color .16s ease,color .16s ease,box-shadow .16s ease,transform .16s ease!important;
+}
+
+html[data-nw-portal-theme="light"] body.account-premium-ui.account-premium-ui .btn.red:not(:disabled),
+html body.account-premium-ui.account-premium-ui.nw-portal-light .btn.red:not(:disabled){
+  background:linear-gradient(180deg,#d4ad55 0%,#bd8f35 100%)!important;
+  border-color:#ad812f!important;
+  color:#18140d!important;
+  box-shadow:0 7px 18px rgba(126,91,29,.14),inset 0 1px 0 rgba(255,255,255,.36)!important;
+}
+
+html[data-nw-portal-theme="light"] body.account-premium-ui.account-premium-ui .btn.red:not(:disabled):hover,
+html body.account-premium-ui.account-premium-ui.nw-portal-light .btn.red:not(:disabled):hover{
+  background:linear-gradient(180deg,#ddb85f 0%,#c5963a 100%)!important;
+  border-color:#9f7428!important;
+  box-shadow:0 9px 22px rgba(126,91,29,.18),inset 0 1px 0 rgba(255,255,255,.42)!important;
+  transform:translateY(-1px)!important;
+}
+
+html[data-nw-portal-theme="light"] body.account-premium-ui.account-premium-ui .btn.light:not(:disabled),
+html body.account-premium-ui.account-premium-ui.nw-portal-light .btn.light:not(:disabled){
+  background:#fff!important;
+  border-color:rgba(88,69,38,.22)!important;
+  color:#312b22!important;
+  box-shadow:0 5px 15px rgba(70,52,23,.06),inset 0 1px 0 rgba(255,255,255,.94)!important;
+}
+
+html[data-nw-portal-theme="light"] body.account-premium-ui.account-premium-ui .btn.light:not(:disabled):hover,
+html body.account-premium-ui.account-premium-ui.nw-portal-light .btn.light:not(:disabled):hover{
+  background:#fffdf8!important;
+  border-color:rgba(157,117,43,.42)!important;
+  color:#201c16!important;
+  box-shadow:0 8px 20px rgba(70,52,23,.09)!important;
+  transform:translateY(-1px)!important;
+}
+
+html[data-nw-portal-theme="light"] body.account-premium-ui.account-premium-ui .btn:focus-visible,
+html body.account-premium-ui.account-premium-ui.nw-portal-light .btn:focus-visible{
+  outline:0!important;
+  box-shadow:0 0 0 4px rgba(177,132,47,.16),0 7px 18px rgba(70,52,23,.10)!important;
+}
+
+html[data-nw-portal-theme="light"] body.account-premium-ui.account-premium-ui .btn:disabled,
+html body.account-premium-ui.account-premium-ui.nw-portal-light .btn:disabled{
+  background:#eee7da!important;
+  border-color:#d8cbb7!important;
+  color:#8a7d69!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.68)!important;
+  opacity:1!important;
+  cursor:not-allowed!important;
+  transform:none!important;
+}
+
+html[data-nw-portal-theme="light"] body.account-premium-ui.account-premium-ui :is(.safety-add-button,.mfa-method,.security-nudge-method):not(:disabled),
+html body.account-premium-ui.account-premium-ui.nw-portal-light :is(.safety-add-button,.mfa-method,.security-nudge-method):not(:disabled){
+  background:#fff!important;
+  border-color:rgba(88,69,38,.20)!important;
+  color:#312b22!important;
+  box-shadow:0 5px 15px rgba(70,52,23,.055)!important;
+}
+
+html[data-nw-portal-theme="light"] body.account-premium-ui.account-premium-ui :is(.safety-add-button,.mfa-method,.security-nudge-method):not(:disabled):hover,
+html body.account-premium-ui.account-premium-ui.nw-portal-light :is(.safety-add-button,.mfa-method,.security-nudge-method):not(:disabled):hover{
+  background:#fffdf8!important;
+  border-color:rgba(157,117,43,.40)!important;
+  color:#201c16!important;
+  box-shadow:0 8px 20px rgba(70,52,23,.08)!important;
+}
+
+html[data-nw-portal-theme="light"] body.account-premium-ui.account-premium-ui .safety-remove-button:not(:disabled),
+html body.account-premium-ui.account-premium-ui.nw-portal-light .safety-remove-button:not(:disabled){
+  background:#fff!important;
+  border-color:rgba(126,89,75,.22)!important;
+  color:#795746!important;
+  box-shadow:0 4px 12px rgba(70,52,23,.045)!important;
+}
+
+html[data-nw-portal-theme="light"] body.account-premium-ui.account-premium-ui :is(.safety-add-button,.safety-remove-button,.mfa-method,.security-nudge-method):disabled,
+html body.account-premium-ui.account-premium-ui.nw-portal-light :is(.safety-add-button,.safety-remove-button,.mfa-method,.security-nudge-method):disabled{
+  background:#f0ebe2!important;
+  border-color:#ddd2c1!important;
+  color:#948a7b!important;
+  opacity:1!important;
+  cursor:not-allowed!important;
+  box-shadow:none!important;
+}
