@@ -143,7 +143,20 @@
       ensureImage(center+2,"auto");
     }
 
-    function measureSpacing(){const raw=getComputedStyle(root).getPropertyValue("--nw-carousel-space").trim(),probe=document.createElement("div");probe.style.cssText=`position:absolute;visibility:hidden;width:${raw}`;root.appendChild(probe);const value=probe.getBoundingClientRect().width;probe.remove();return value||220;}
+    function measureSpacing(){
+      if(document.body?.classList.contains("registration-page")&&variant==="selection"&&matchMedia("(max-width:760px)").matches){
+        const stageWidth=stage.getBoundingClientRect().width||root.getBoundingClientRect().width;
+        const activeCardWidth=cards[active]?.getBoundingClientRect().width||Math.min(innerWidth*.66,252);
+        const neighboringCardWidth=activeCardWidth*.81;
+        return Math.max(44,(stageWidth-neighboringCardWidth)/2-14);
+      }
+      const raw=getComputedStyle(root).getPropertyValue("--nw-carousel-space").trim(),probe=document.createElement("div");
+      probe.style.cssText=`position:absolute;visibility:hidden;width:${raw}`;
+      root.appendChild(probe);
+      const value=probe.getBoundingClientRect().width;
+      probe.remove();
+      return value||220;
+    }
     let cardSpacing=measureSpacing();
 
     function positionCards(){
