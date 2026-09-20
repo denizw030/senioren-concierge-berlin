@@ -88,6 +88,12 @@
   let busy = false;
   let chatMessages = [];
   let activityExpanded = false;
+  let mailboxFolder = "INBOX";
+  let mailboxSearch = "";
+  let readerMode = "MESSAGE";
+  let selectedMessageId = "";
+  let selectedMessageDetail = null;
+  let selectedMessageLoading = false;
 
   function ensureClassificationStyles() {
     if (document.getElementById("nahwerkEmailClassificationStyles")) return;
@@ -211,6 +217,44 @@
   function classificationLabel(value) { return value === "IMPORTANT" ? "Wichtig" : value === "UNIMPORTANT" ? "Unwichtig" : value === "MARKETING" ? "Werbung / Spam" : ""; }
   function classificationMessages() { return classification ? [...classification.buckets.IMPORTANT, ...classification.buckets.UNIMPORTANT, ...classification.buckets.MARKETING] : []; }
   function classificationMessageById(id) { return classificationMessages().find((row) => String(row?.id || "") === String(id || "")) || null; }
+  function mailboxAllMessages() {
+    const rows = classification ? classificationMessages() : list(dashboard?.highlights);
+    const seen = new Set(), out = [];
+    for (const row of rows) { const id = String(row?.id || ""); if (!id || seen.has(id)) continue; seen.add(id); out.push(row); }
+    return out.sort((a,b)=>Date.parse(String(b?.date||0))-Date.parse(String(a?.date||0)));
+  }
+  function mailboxFilteredMessages() {
+    let rows = mailboxAllMessages();
+    if (mailboxFolder === "IMPORTANT") rows = rows.filter((m)=>m.classification === "IMPORTANT");
+    else if (mailboxFolder === "UNIMPORTANT") rows = rows.filter((m)=>m.classification === "UNIMPORTANT");
+    else if (mailboxFolder === "MARKETING") rows = rows.filter((m)=>m.classification === "MARKETING");
+    else if (mailboxFolder === "REPLY") rows = rows.filter((m)=>m.needs_reply === true);
+    const q = mailboxSearch.trim().toLowerCase();
+    if (q) rows = rows.filter((m)=>[m.from,m.subject,m.snippet].some((v)=>String(v||"").toLowerCase().includes(q)));
+    return rows;
+  }
+  function mailboxFolderTitle() {
+    return ({INBOX:"Posteingang",IMPORTANT:"Wichtig",UNIMPORTANT:"Unwichtig",MARKETING:"Werbung / Spam",REPLY:"Antwort nötig"})[mailboxFolder] || "Posteingang";
+  }
+  function mailboxFolderCount(folder) {
+    const all = mailboxAllMessages();
+    if (folder === "INBOX") return classification?.total ?? all.length;
+    if (folder === "IMPORTANT") return all.filter((m)=>m.classification === "IMPORTANT").length;
+    if (folder === "UNIMPORTANT") return all.filter((m)=>m.classification === "UNIMPORTANT").length;
+    if (folder === "MARKETING") return all.filter((m)=>m.classification === "MARKETING").length;
+    if (folder === "REPLY") return all.filter((m)=>m.needs_reply === true).length;
+    if (folder === "DRAFTS") return list(dashboard?.drafts).length;
+    return 0;
+  }
+  async function openMailboxMessage(messageId) {
+    if (!messageId) return;
+    selectedMessageId = String(messageId); readerMode = "MESSAGE"; selectedMessageLoading = true; selectedMessageDetail = null; render();
+    try {
+      const data = await request("/email/concierge/messages/open", { method: "POST", body: { message_id: selectedMessageId } });
+      if (selectedMessageId === String(messageId)) selectedMessageDetail = data.message || null;
+    } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
+    finally { if (selectedMessageId === String(messageId)) selectedMessageLoading = false; render(); }
+  }
   function classificationControls(message) {
     const wrap = el("div", "ecp-class-actions");
     [["IMPORTANT", "Wichtig"], ["UNIMPORTANT", "Unwichtig"]].forEach(([value, label]) => {
