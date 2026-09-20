@@ -121,7 +121,7 @@
   const isSelf = () => form.querySelector('input[name="setupFor"]:checked')?.value === "self";
   const conciergeValue = () => {
     const value = form.querySelector('[name="conciergeChoice"]')?.value;
-    return conciergeProfiles[value] ? value : "nilo";
+    return conciergeProfiles[value] ? value : "lena";
   };
   const concierge = () => conciergeProfiles[conciergeValue()].name;
   const escapeHtml = (value) => String(value || "").replace(/[&<>"']/g, (char) => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[char]));
@@ -233,7 +233,7 @@
       choice.before(intro);
     }
     if (intro) intro.textContent = "Wählen Sie den Concierge, dessen Auftreten und Kommunikationsstil am besten zu Ihnen passt. Die grundlegenden Möglichkeiten bleiben bei allen Profilen gleich.";
-    window.NAHWERKCarousel?.mount(choice, { variant: "selection", inputName: "conciergeChoice", selected: choice.dataset.selected || "nilo" });
+    window.NAHWERKCarousel?.mount(choice, { variant: "selection", inputName: "conciergeChoice", selected: choice.dataset.selected || "lena" });
     const oldHint = field?.querySelector(".tiny");
     if (oldHint) oldHint.textContent = "Die Auswahl gilt für diesen Zugang und kann später in den Concierge-Einstellungen geändert werden.";
   }
@@ -469,7 +469,6 @@
   setupConciergeSelection();
   setupPlanSelection();
   sessionStorage.setItem("nahwerk_product", product);
-  $("registrationTitle").textContent = `${productLabel} Zugang registrieren`;
   $("productLabel").textContent = productLabel;
   document.title = `${productLabel} registrieren | NAHWERK`;
   form.addEventListener("input", render);
