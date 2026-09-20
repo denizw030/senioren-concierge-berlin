@@ -47,6 +47,8 @@
     const summary = data.summary && typeof data.summary === "object" ? data.summary : {};
     return {
       product: data.product || { name: "E-Mail-Concierge", state: "ACTIVE" },
+      connection: data.connection && typeof data.connection === "object" ? data.connection : {},
+      chat: data.chat && typeof data.chat === "object" ? data.chat : { has_user_message: false },
       summary: {
         recent: number(summary.recent), today: number(summary.today), unread: number(summary.unread),
         important: number(summary.important), needs_reply: number(summary.needs_reply), invoices: number(summary.invoices),
@@ -90,6 +92,7 @@
   let classificationRetryCount = 0;
   let busy = false;
   let chatMessages = [];
+  let chatStarted = false;
   let activityExpanded = false;
   let mailboxFolder = "INBOX";
   let mailboxSearch = "";
@@ -342,21 +345,57 @@
   }
   function renderChat(card) {
     const log = el("div", "ecp-chat-log"); log.id = "emailConciergeChatLog"; log.setAttribute("aria-live", "polite");
-    if (!chatMessages.length) log.append(el("div", "ecp-chat-empty", "Sprich hier ganz normal mit deinem E-Mail-Concierge: suchen, wichtig/unwichtig festlegen, archivieren, in den Papierkorb verschieben, Regeln für ähnliche E-Mails anlegen oder Antworten vorbereiten."));
+    const hasUserMessage = chatStarted || chatMessages.some((entry) => entry.role === "user");
+    if (!hasUserMessage && !chatMessages.length) log.append(el("div", "ecp-chat-empty", "Sprich hier ganz normal mit deinem E-Mail-Concierge: suchen, wichtig/unwichtig festlegen, archivieren, in den Papierkorb verschieben, Regeln für ähnliche E-Mails anlegen oder Antworten vorbereiten."));
     for (const entry of chatMessages) {
       const msg = el("div", `ecp-msg ecp-msg-${entry.role}${entry.error ? " ecp-msg-error" : ""}`, entry.text);
       log.append(msg);
       for (const mail of list(entry.messages)) log.append(messageCard(mail, true, true));
     }
-    const quick = el("div", "ecp-quick");
-    QUICK.forEach((label) => { const chip = button(label, "ecp-chip"); chip.addEventListener("click", () => runQuery(label)); quick.append(chip); });
     const form = el("form", "ecp-chat-form"), input = el("input", "ecp-chat-input"), send = button("Senden", "ecp-primary");
     input.type = "text"; input.name = "emailConciergeQuery"; input.maxLength = 5000; input.autocomplete = "off"; input.placeholder = "z. B. GitHub-Mails sind unwichtig"; input.setAttribute("aria-label", "E-Mail-Concierge fragen"); send.type = "submit";
     form.addEventListener("submit", (event) => { event.preventDefault(); const value = input.value.trim(); if (!value) return; input.value = ""; runQuery(value); });
-    form.append(input, send); card.append(log, quick, form);
+    form.append(input, send);
+    card.append(log);
+    if (!hasUserMessage) {
+      const quick = el("div", "ecp-quick");
+      QUICK.forEach((label) => { const chip = button(label, "ecp-chip"); chip.addEventListener("click", () => runQuery(label)); quick.append(chip); });
+      card.append(quick);
+    }
+    card.append(form);
   }
+  function removeMailboxMessages(messageIds) {
+    const ids = new Set(list(messageIds).map((id) => String(id || "")).filter(Boolean));
+    if (!ids.size) return;
+    if (classification) {
+      let removed = 0;
+      for (const key of ["IMPORTANT", "UNIMPORTANT", "MARKETING"]) {
+        const before = list(classification.buckets[key]);
+        const after = before.filter((row) => !ids.has(String(row?.id || "")));
+        removed += before.length - after.length;
+        classification.buckets[key] = after;
+        classification.counts[key] = after.length;
+      }
+      classification.sorted_count = Math.max(0, classification.sorted_count - removed);
+      classification.total = Math.max(0, classification.total - removed);
+    }
+    if (selectedMessageId && ids.has(String(selectedMessageId))) {
+      selectedMessageId = "";
+      selectedMessageDetail = null;
+      selectedMessageLoading = false;
+      readerMode = "MESSAGE";
+    }
+  }
+  function applyQueryResultToMailbox(data) {
+    const ids = list(data?.result?.message_ids);
+    if (ids.length) removeMailboxMessages(ids);
+    const single = String(data?.result?.message_id || data?.result?.result?.message_id || "");
+    if (single) removeMailboxMessages([single]);
+  }
+
   async function runQuery(query) {
     if (busy || !query) return;
+    chatStarted = true;
     chatMessages.push({ role: "user", text: query }); render(); setBusy(true);
     try {
       const data = await request("/email/concierge/query", { method: "POST", body: { text: query, request_id: crypto.randomUUID() } });
@@ -365,7 +404,9 @@
         resultMessages = list(classification.buckets?.[String(data.classification || "")]);
       }
       chatMessages.push({ role: "assistant", text: text(data.message, 2500) || "Erledigt.", messages: resultMessages });
-      await loadDashboard(false);
+      applyQueryResultToMailbox(data);
+      render();
+      await loadDashboard(false, true);
     } catch (error) {
       const code = error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE";
       chatMessages.push({ role: "assistant", text: ERROR_COPY[code] || "Das konnte ich gerade nicht ausführen. Bitte versuche es erneut.", error: true });
@@ -787,6 +828,7 @@
         const dashboardData = await request("/email/concierge/dashboard");
         dashboard = normalizeDashboard(dashboardData);
         if (!dashboard) throw new Error("EMAIL_PROVIDER_UNAVAILABLE");
+        chatStarted = chatStarted || dashboard.chat?.has_user_message === true;
         dashboardLoadedAt = Date.now();
       } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
       render();
@@ -803,7 +845,7 @@
     const canonical = canonicalGoogleConnection();
     connected = canonical === null ? isConnected === true : canonical;
     ensureHost();
-    if (!connected) { dashboard = null; dashboardLoadedAt = 0; classification = null; classificationError = ""; classificationRetryCount = 0; chatMessages = []; render(); return; }
+    if (!connected) { dashboard = null; dashboardLoadedAt = 0; classification = null; classificationError = ""; classificationRetryCount = 0; chatMessages = []; chatStarted = false; render(); return; }
     await loadDashboard();
   }
   window.addEventListener("nahwerk:email-connections-updated", (event) => {
