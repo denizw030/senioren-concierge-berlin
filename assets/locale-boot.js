@@ -92,9 +92,6 @@
     body.login-image-page.senior-product .top,
     body.login-image-page[data-product="senioren"] .top{background:#f7f3ea!important;border-color:rgba(65,51,26,.13)!important;box-shadow:0 1px 0 rgba(65,51,26,.06)!important}
     .senior-login-visual{display:none!important}
-    html.nw-product-senior-first-paint body.login-image-page .senior-login-visual,
-    body.login-image-page.senior-product .senior-login-visual,
-    body.login-image-page[data-product="senioren"] .senior-login-visual{display:block!important}
     html.nw-product-senior-first-paint body.login-image-page main::before,
     body.login-image-page.senior-product main::before,
     body.login-image-page[data-product="senioren"] main::before{
@@ -148,9 +145,7 @@
     if (!isSeniorLogin || !document.body) return;
     const main = document.querySelector('main');
     if (!main) return;
-    const panel = main.querySelector(':scope > .senior-login-visual');
-    if (!panel) return;
-    panel.hidden = false;
+    main.querySelectorAll(':scope > .senior-login-visual').forEach((node) => node.remove());
   };
 
   if (product && !applyProduct()) {
