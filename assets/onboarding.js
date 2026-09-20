@@ -9,6 +9,10 @@
 
   const $ = (id) => document.getElementById(id);
   const params = new URLSearchParams(location.search);
+  const guestChatHandoff = params.get("source") === "web_guest_chat";
+  const requestedNext = params.get("next") === "/payg" ? "/payg" : "";
+  const postAuthTarget = guestChatHandoff && requestedNext ? requestedNext : "";
+  const guestLoginHref = postAuthTarget ? "/anmelden?source=web_guest_chat&next=%2Fpayg" : "/anmelden";
   const requestedProduct = params.get("produkt");
   const product = requestedProduct === "senioren" || (!requestedProduct && sessionStorage.getItem("nahwerk_product") === "senioren") ? "senioren" : "prime";
   const productLabel = product === "senioren" ? "Senioren Concierge" : "Persönlicher Concierge";
@@ -391,10 +395,10 @@
         localStorage.setItem("scb_onboarding_result", JSON.stringify(body));
         if (await login(request.email, password)) {
           show("<strong>Fertig.</strong><br>Die WhatsApp-Identität wurde bestätigt und der Web-Zugang wurde angelegt. Sie werden zum Kundenbereich weitergeleitet.");
-          return setTimeout(() => { location.href = window.NAHWERKLocale?.href("erster-schritt.html") || "erster-schritt.html"; }, 500);
+          return setTimeout(() => { location.href = postAuthTarget || window.NAHWERKLocale?.href("erster-schritt.html") || "erster-schritt.html"; }, 500);
         }
         show("<strong>Der Web-Zugang wurde angelegt.</strong><br>Bitte melden Sie sich jetzt mit Ihrer E-Mail-Adresse und Ihrem Passwort an.", true);
-        return setTimeout(() => { location.href = window.NAHWERKLocale?.href("anmelden.html") || "anmelden.html"; }, 1800);
+        return setTimeout(() => { location.href = postAuthTarget ? guestLoginHref : (window.NAHWERKLocale?.href("anmelden.html") || "anmelden.html"); }, 1800);
       }
 
       if (response.status === 401 && body.status === "verification_failed") {
@@ -409,11 +413,11 @@
       }
       if (response.status === 409 && body.status === "web_access_exists") {
         resetVerificationUi();
-        return show('<strong>Für diese Person besteht bereits ein Web-Zugang.</strong><br><a href="anmelden.html">Zur Anmeldung</a>', true);
+        return show('<strong>Für diese Person besteht bereits ein Web-Zugang.</strong><br><a href="${guestLoginHref}">Zur Anmeldung</a>', true);
       }
       if (response.status === 409 && body.status === "email_in_use") {
         resetVerificationUi();
-        return show('<strong>Für diese E-Mail-Adresse besteht bereits ein Konto.</strong><br><a href="anmelden.html">Zur Anmeldung</a>', true);
+        return show('<strong>Für diese E-Mail-Adresse besteht bereits ein Konto.</strong><br><a href="${guestLoginHref}">Zur Anmeldung</a>', true);
       }
       if (response.status === 409 && body.status === "identity_link_failed") {
         resetVerificationUi();
@@ -466,6 +470,11 @@
   ensureVerificationUi();
   setupConciergeSelection();
   setupPlanSelection();
+  if (postAuthTarget) {
+    document.querySelectorAll('a[href="/anmelden"],a[href="anmelden.html"]').forEach((link) => {
+      if (link instanceof HTMLAnchorElement) link.href = guestLoginHref;
+    });
+  }
   sessionStorage.setItem("nahwerk_product", product);
   $("productLabel").textContent = productLabel;
   document.title = `${productLabel} registrieren | NAHWERK`;
@@ -544,12 +553,12 @@
         localStorage.setItem("scb_onboarding_result", JSON.stringify(body));
         if (await login(request.email, password)) {
           show("<strong>Fertig.</strong><br>Der Zugang wurde angelegt. Sie werden zum Kundenbereich weitergeleitet.");
-          return setTimeout(() => { location.href = window.NAHWERKLocale?.href("erster-schritt.html") || "erster-schritt.html"; }, 500);
+          return setTimeout(() => { location.href = postAuthTarget || window.NAHWERKLocale?.href("erster-schritt.html") || "erster-schritt.html"; }, 500);
         }
         show("<strong>Der Zugang wurde angelegt.</strong><br>Bitte melden Sie sich jetzt an.", true);
-        return setTimeout(() => { location.href = window.NAHWERKLocale?.href("anmelden.html") || "anmelden.html"; }, 1800);
+        return setTimeout(() => { location.href = postAuthTarget ? guestLoginHref : (window.NAHWERKLocale?.href("anmelden.html") || "anmelden.html"); }, 1800);
       }
-      if (response.status === 409 && body.status === "email_in_use") return show('<strong>Für diese E-Mail-Adresse besteht bereits ein Konto.</strong><br><a href="anmelden.html">Zur Anmeldung</a>', true);
+      if (response.status === 409 && body.status === "email_in_use") return show('<strong>Für diese E-Mail-Adresse besteht bereits ein Konto.</strong><br><a href="${guestLoginHref}">Zur Anmeldung</a>', true);
       if (response.status === 400 || body.status === "validation_error") return show("<strong>Bitte prüfen Sie Ihre Angaben.</strong>", true);
       throw new Error(`HTTP ${response.status}`);
     } catch (_) {
