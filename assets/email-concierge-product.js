@@ -670,7 +670,7 @@
     if (!hasUserMessage && !chatMessages.length) {
       const intro=el("div","ecp-chat-empty");
       intro.append(el("strong","","Beispiel: So lernt dein E-Mail-Concierge."));
-      intro.append(el("div","","NAHWERK sortiert zuerst selbst. Prüfe die Vorauswahl mit „Wichtig“ oder „Unwichtig“. Dein Posteingang bleibt dabei unverändert."));
+      intro.append(el("div","","NAHWERK sortiert zuerst selbst. Prüfe die Vorauswahl mit „Wichtig“ oder „Unwichtig“. Danach kannst du weiter suchen, wichtig/unwichtig festlegen, archivieren, in den Papierkorb verschieben oder Antworten vorbereiten. Dein Posteingang bleibt dabei unverändert."));
       log.append(intro);
       const examples=list(dashboard?.classification_review?.examples);
       examples.forEach((example,index)=>{
