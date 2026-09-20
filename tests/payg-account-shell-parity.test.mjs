@@ -14,7 +14,7 @@ test("PAYG uses the customer account shell and persisted appearance", () => {
   assert.match(payg, /assets\/account-premium-ui\.css\?v=6/);
   assert.match(payg, /assets\/account-header-concierge\.css\?v=2/);
   assert.match(payg, /id="nwPortalThemeToggle"/);
-  assert.match(payg, /assets\/payg-account-shell\.js\?v=1/);
+  assert.match(payg, /assets\/payg-account-shell\.js\?v=2/);
   assert.match(shell, /nw_portal_theme_v1/);
   assert.match(shell, /nw-portal-light/);
   assert.match(shell, /nw-portal-dark/);
@@ -45,4 +45,11 @@ test("obsolete PAYG contract notice boxes are no longer rendered", () => {
 
 test("clean PAYG route remains mirrored", () => {
   assert.equal(payg, clean.replace('<head><base href="/">','<head>'));
+});
+
+test("guest execution handoff lands on PAYG without losing the pending request", () => {
+  assert.match(shell, /nw_guest_resume_request_v1/);
+  assert.match(shell, /PAYG-Guthaben aufladen/);
+  assert.match(shell, /\/web-concierge\?resume_guest=1/);
+  assert.match(css, /\.payg-guest-handoff/);
 });
