@@ -17,6 +17,7 @@
   });
   const QUICK = [
     "Zeig mir wichtige neue E-Mails.",
+    "Zeig mir alle unwichtigen.",
     "Zeig mir ungelesene E-Mails.",
     "Welche Rechnungen habe ich diese Woche bekommen?",
     "Welche E-Mails brauchen wahrscheinlich eine Antwort?"
@@ -25,6 +26,7 @@
     UNAUTHENTICATED: "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.",
     EMAIL_CONNECTION_NOT_CONNECTED: "Gmail ist nicht verbunden.",
     EMAIL_PROVIDER_UNAVAILABLE: "Der E-Mail-Concierge ist gerade nicht erreichbar.",
+    EMAIL_PROVIDER_BUSY: "Gmail ist gerade kurz ausgelastet. Deine gespeicherten Sortierungen und Regeln bleiben verfügbar; versuche die Gmail-Aktion gleich noch einmal.",
     EMAIL_QUERY_INVALID: "Diese Anfrage konnte nicht verarbeitet werden.",
     EMAIL_CLASSIFICATION_INVALID: "Diese Sortierung konnte nicht gespeichert werden.",
     MESSAGE_ID_REQUIRED: "Diese E-Mail konnte nicht geöffnet werden.",
@@ -268,7 +270,7 @@
   }
   function renderChat(card) {
     const log = el("div", "ecp-chat-log"); log.id = "emailConciergeChatLog"; log.setAttribute("aria-live", "polite");
-    if (!chatMessages.length) log.append(el("div", "ecp-chat-empty", "Frag deinen E-Mail-Concierge in normaler Sprache. Er kann deine E-Mails suchen, öffnen und Antwortentwürfe vorbereiten."));
+    if (!chatMessages.length) log.append(el("div", "ecp-chat-empty", "Sprich hier ganz normal mit deinem E-Mail-Concierge: suchen, wichtig/unwichtig festlegen, archivieren, in den Papierkorb verschieben, Regeln für ähnliche E-Mails anlegen oder Antworten vorbereiten."));
     for (const entry of chatMessages) {
       const msg = el("div", `ecp-msg ecp-msg-${entry.role}${entry.error ? " ecp-msg-error" : ""}`, entry.text);
       log.append(msg);
@@ -277,7 +279,7 @@
     const quick = el("div", "ecp-quick");
     QUICK.forEach((label) => { const chip = button(label, "ecp-chip"); chip.addEventListener("click", () => runQuery(label)); quick.append(chip); });
     const form = el("form", "ecp-chat-form"), input = el("input", "ecp-chat-input"), send = button("Senden", "ecp-primary");
-    input.type = "text"; input.name = "emailConciergeQuery"; input.maxLength = 5000; input.autocomplete = "off"; input.placeholder = "z. B. Such die letzte Mail von OpenAI"; input.setAttribute("aria-label", "E-Mail-Concierge fragen"); send.type = "submit";
+    input.type = "text"; input.name = "emailConciergeQuery"; input.maxLength = 5000; input.autocomplete = "off"; input.placeholder = "z. B. GitHub-Mails sind unwichtig"; input.setAttribute("aria-label", "E-Mail-Concierge fragen"); send.type = "submit";
     form.addEventListener("submit", (event) => { event.preventDefault(); const value = input.value.trim(); if (!value) return; input.value = ""; runQuery(value); });
     form.append(input, send); card.append(log, quick, form);
   }
@@ -286,7 +288,11 @@
     chatMessages.push({ role: "user", text: query }); render(); setBusy(true);
     try {
       const data = await request("/email/concierge/query", { method: "POST", body: { text: query, request_id: crypto.randomUUID() } });
-      chatMessages.push({ role: "assistant", text: text(data.message, 2500) || "Erledigt.", messages: list(data.messages) });
+      let resultMessages = list(data.messages);
+      if (data.type === "CLASSIFICATION_VIEW" && classification) {
+        resultMessages = list(classification.buckets?.[String(data.classification || "")]);
+      }
+      chatMessages.push({ role: "assistant", text: text(data.message, 2500) || "Erledigt.", messages: resultMessages });
       await loadDashboard(false);
     } catch (error) {
       const code = error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE";

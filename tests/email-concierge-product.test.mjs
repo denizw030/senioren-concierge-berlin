@@ -120,3 +120,19 @@ test("every visible mail can be marked Wichtig or Unwichtig",()=>{
   assert.match(js,/const classifiable = sorted \|\| \(data\.message\?\.id/);
   assert.match(js,/syncVisibleClassification\(message\.id, value\)/);
 });
+
+test("concierge chat renders classification views locally without another Gmail search",()=>{
+  assert.match(js,/data\.type === "CLASSIFICATION_VIEW"/);
+  assert.match(js,/classification\.buckets\?\.\[String\(data\.classification/);
+  assert.match(js,/Zeig mir alle unwichtigen/);
+  assert.match(js,/EMAIL_PROVIDER_BUSY/);
+  assert.match(js,/Gmail ist gerade kurz ausgelastet/);
+});
+
+test("concierge chat explains that commands can control mail and automation",()=>{
+  assert.match(js,/wichtig\/unwichtig festlegen/);
+  assert.match(js,/archivieren/);
+  assert.match(js,/in den Papierkorb verschieben/);
+  assert.match(js,/Regeln für ähnliche E-Mails anlegen/);
+  assert.match(js,/GitHub-Mails sind unwichtig/);
+});
