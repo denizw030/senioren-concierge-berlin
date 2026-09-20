@@ -296,9 +296,6 @@
     if (mailboxScope === "ACCOUNT" && mailboxFolder === folder && !mailboxFolderLoading) return mailboxFolderRows.length || "";
     return "";
   }
-  function folderQuery(folder) {
-    return ({INBOX:"in:inbox",SENT:"in:sent",SPAM:"in:spam",TRASH:"in:trash"})[folder] || "in:inbox";
-  }
   async function searchRemoteFolder(connection, folder, maxResults = 50) {
     const data = await request("/email/concierge/folder", {
       method: "POST",
