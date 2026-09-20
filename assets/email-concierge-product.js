@@ -107,6 +107,8 @@
   let mailboxFolderError = "";
   let mailboxFolderCounts = {};
   let classificationKnownCounts = {};
+  let classificationFolderCache = {};
+  let mailboxLoadSerial = 0;
   let allDrafts = [];
   let draftsLoading = false;
   let readerMode = "MESSAGE";
@@ -312,54 +314,98 @@
     if (folder === "REPLY") return classification ? list(classification.buckets?.IMPORTANT).filter((m)=>m.needs_reply===true).length || "" : "";
     return "";
   }
-  async function searchRemoteFolder(connection, folder, maxResults = 30) {
+  function mailboxRowKey(row) {
+    return String(row?._connection_id||"")+"|"+String(row?.id||"");
+  }
+  function mergeMailboxRows(existing,incoming) {
+    const map=new Map();
+    for(const row of [...list(existing),...list(incoming)]) {
+      const key=mailboxRowKey(row); if(key && !key.endsWith("|")) map.set(key,row);
+    }
+    return [...map.values()].sort((a,b)=>(Date.parse(String(b?.date||""))||0)-(Date.parse(String(a?.date||""))||0));
+  }
+  async function searchRemoteFolder(connection, folder, maxResults = 30, pageToken = "") {
     const data = await request("/email/concierge/folder", {
       method: "POST",
-      body: { folder, max_results: maxResults },
+      body: { folder, max_results: maxResults, page_token: pageToken || null },
       connectionId: String(connection.connection_id || "")
     });
-    return { messages:list(data?.messages).map((message)=>decorateRemoteMessage(message,connection)), folder_meta:data?.folder_meta||{} };
+    return {
+      messages:list(data?.messages).map((message)=>decorateRemoteMessage(message,connection)),
+      folder_meta:data?.folder_meta||{},
+      next_page_token:String(data?.next_page_token||"")
+    };
   }
-  async function loadClassificationFolder(connection) {
-    const id=String(connection?.connection_id||"");
-    const params=new URLSearchParams({classification:mailboxFolder,limit:"80"});
-    const data=await request("/email/concierge/classification/view?"+params.toString(), { connectionId:id });
-    if(!classificationKnownCounts[id]) classificationKnownCounts[id]={};
-    classificationKnownCounts[id][mailboxFolder]=number(data?.known_total||data?.count);
-    return list(data?.messages).map((message)=>decorateRemoteMessage(message,connection));
+  async function streamRemoteFolder(connection, folder, serial, onPage) {
+    let pageToken="",page=0;
+    do {
+      const data=await searchRemoteFolder(connection,folder,page===0?30:100,pageToken);
+      if(serial!==mailboxLoadSerial) return;
+      setFolderCount(connection.connection_id,folder,data.folder_meta);
+      onPage(data.messages,page);
+      render();
+      pageToken=data.next_page_token;
+      page++;
+    } while(pageToken && serial===mailboxLoadSerial && page<100);
+  }
+  async function loadClassificationFolder(connection, serial) {
+    const id=String(connection?.connection_id||""),cacheKey=id+"|"+mailboxFolder;
+    let rows=list(classificationFolderCache[cacheKey]),offset=0,page=0;
+    do {
+      const params=new URLSearchParams({classification:mailboxFolder,limit:"100",offset:String(offset)});
+      const data=await request("/email/concierge/classification/view?"+params.toString(), { connectionId:id });
+      if(serial!==mailboxLoadSerial) return rows;
+      if(!classificationKnownCounts[id]) classificationKnownCounts[id]={};
+      classificationKnownCounts[id][mailboxFolder]=number(data?.known_total||data?.count);
+      const incoming=list(data?.messages).map((message)=>decorateRemoteMessage(message,connection));
+      rows=mergeMailboxRows(rows,incoming);
+      classificationFolderCache[cacheKey]=rows;
+      mailboxFolderRows=rows;
+      render();
+      const next=Number(data?.next_offset);
+      if(!Number.isFinite(next)||next<=offset) break;
+      offset=next; page++;
+    } while(serial===mailboxLoadSerial && page<100);
+    return rows;
   }
   async function loadMailboxFolder() {
-    if (!connected || mailboxFolderLoading) return;
-    if (!folderBackedMode()) { mailboxFolderRows = []; mailboxFolderError = ""; render(); return; }
+    if (!connected) return;
+    const serial=++mailboxLoadSerial;
+    if (!folderBackedMode()) { mailboxFolderRows = []; mailboxFolderError = ""; mailboxFolderLoading=false; render(); return; }
     const previousRows = mailboxFolderRows.slice();
     mailboxFolderLoading = true; mailboxFolderError = ""; render();
     try {
       if (mailboxScope === "ALL") {
         const connectedRows = emailConnections.filter((row) => String(row?.state || "").toUpperCase() === "CONNECTED");
-        const settled = await Promise.allSettled(connectedRows.map(async(row)=>({row,data:await searchRemoteFolder(row,"INBOX",30)})));
-        const nextRows=[];
-        for(const result of settled){
-          if(result.status!=="fulfilled")continue;
-          setFolderCount(result.value.row.connection_id,"INBOX",result.value.data.folder_meta);
-          nextRows.push(...result.value.data.messages);
-        }
-        nextRows.sort((a,b)=>Date.parse(String(b?.date||0))-Date.parse(String(a?.date||0)));
-        if (nextRows.length || !previousRows.length) mailboxFolderRows = nextRows.slice(0,120);
-        if (settled.some((result)=>result.status === "rejected")) mailboxFolderError = "Ein Postfach konnte gerade nicht aktualisiert werden.";
+        const byConnection=new Map();
+        await Promise.allSettled(connectedRows.map((row)=>streamRemoteFolder(row,"INBOX",serial,(messages)=>{
+          byConnection.set(String(row.connection_id||""),mergeMailboxRows(byConnection.get(String(row.connection_id||""))||[],messages));
+          mailboxFolderRows=[...byConnection.values()].flat().sort((a,b)=>(Date.parse(String(b?.date||""))||0)-(Date.parse(String(a?.date||""))||0));
+        })));
+        if(serial!==mailboxLoadSerial)return;
+        if(!mailboxFolderRows.length && previousRows.length) mailboxFolderRows=previousRows;
       } else {
         const connection = connectionById(activeConnectionId);
         if (!connection) throw new Error("EMAIL_CONNECTION_NOT_CONNECTED");
-        if(classificationFolderMode()) mailboxFolderRows = await loadClassificationFolder(connection);
-        else {
-          const data=await searchRemoteFolder(connection,mailboxFolder,30);
-          setFolderCount(activeConnectionId,mailboxFolder,data.folder_meta);
-          mailboxFolderRows=data.messages;
+        if(classificationFolderMode()) {
+          await loadClassificationFolder(connection,serial);
+        } else {
+          let accumulated=[];
+          await streamRemoteFolder(connection,mailboxFolder,serial,(messages,page)=>{
+            accumulated=mergeMailboxRows(accumulated,messages);
+            if(serial===mailboxLoadSerial) mailboxFolderRows=accumulated;
+          });
+          if(serial!==mailboxLoadSerial)return;
+          if(!mailboxFolderRows.length && previousRows.length) mailboxFolderRows=previousRows;
         }
       }
     } catch (error) {
+      if(serial!==mailboxLoadSerial)return;
       if (previousRows.length) mailboxFolderRows = previousRows;
       mailboxFolderError = error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE";
-    } finally { mailboxFolderLoading = false; render(); }
+    } finally {
+      if(serial===mailboxLoadSerial){mailboxFolderLoading = false; render();}
+    }
   }
   async function loadConnections() {
     const data = await request("/email/connections");
@@ -386,16 +432,21 @@
     activeConnectionId = nextConnectionId;
     mailboxScope = "ACCOUNT"; mailboxFolder = folder; readerMode = "MESSAGE";
     selectedMessageId = ""; selectedMessageConnectionId = ""; selectedMessageDetail = null;
-    mailboxFolderRows = [];
     if (switchingConnection) { classification = null; classificationError = ""; }
+    if (["IMPORTANT","UNIMPORTANT"].includes(folder)) {
+      const connection=connectionById(nextConnectionId),cacheKey=nextConnectionId+"|"+folder;
+      const cached=list(classificationFolderCache[cacheKey]);
+      const instant=cached.length?cached:list(classification?.buckets?.[folder]).map((message)=>decorateRemoteMessage(message,connection));
+      mailboxFolderRows=instant;
+    } else mailboxFolderRows = [];
     render();
-    await loadDashboard(false, true);
-    await loadMailboxFolder();
+    void loadDashboard(false, true);
+    void loadMailboxFolder();
   }
   async function selectAllInboxes() {
     mailboxScope = "ALL"; mailboxFolder = "INBOX"; readerMode = "MESSAGE";
     selectedMessageId = ""; selectedMessageConnectionId = ""; selectedMessageDetail = null;
-    mailboxFolderRows = []; render(); await loadMailboxFolder();
+    mailboxFolderRows = []; render(); void loadMailboxFolder();
   }
   async function openMailboxMessage(message) {
     const messageId = String(message?.id || message || "");
@@ -447,6 +498,13 @@
       if(Number.isFinite(known[previousBucket])) known[previousBucket]=Math.max(0,known[previousBucket]-1);
       if(Number.isFinite(known[value])) known[value]=known[value]+1;
     }
+    if(connectionKey){
+      for(const bucket of ["IMPORTANT","UNIMPORTANT"]){
+        const cacheKey=connectionKey+"|"+bucket,rows=list(classificationFolderCache[cacheKey]).filter((row)=>String(row?.id||"")!==messageKey);
+        if(bucket===value&&moved) rows.unshift({...moved,_connection_id:connectionKey,_account_email:connectionEmail(connectionKey)});
+        classificationFolderCache[cacheKey]=rows;
+      }
+    }
   }
   async function setMessageClassification(message, value) {
     if (busy || !message?.id || message.classification === value) return;
@@ -458,7 +516,7 @@
     setBusy(true);
     try {
       const connectionId = String(message?._connection_id || activeConnectionId || "");
-      const saved = await request("/email/concierge/classification/override", { method: "POST", body: { message_id: message.id, thread_id: message.thread_id || null, classification: value }, connectionId });
+      const saved = await request("/email/concierge/classification/override", { method: "POST", body: { message_id: message.id, thread_id: message.thread_id || null, classification: value, message_snapshot: { thread_id: message.thread_id || null, from: message.from || "", subject: message.subject || "", snippet: message.snippet || "", date: message.date || null } }, connectionId });
       if (saved?.learning_suggestion_ready) {
         const next = normalizeDashboard(await request("/email/concierge/dashboard", { connectionId }));
         if (next) dashboard = next;
@@ -894,7 +952,12 @@
   }
   function renderMailboxSidebar(shell) {
     const side = el("aside", "ecp-tb-sidebar");
-    const brand = el("div", "ecp-tb-brand"), mark = el("span", "ecp-tb-brandmark", "✉"), brandCopy = el("div");
+    const brand = el("div", "ecp-tb-brand"), mark = el("span", "ecp-tb-brandmark"), brandCopy = el("div");
+    mark.setAttribute("aria-hidden","true");
+    const svgNs="http://www.w3.org/2000/svg",mailSvg=document.createElementNS(svgNs,"svg"),mailRect=document.createElementNS(svgNs,"rect"),mailPath=document.createElementNS(svgNs,"path");
+    mailSvg.setAttribute("viewBox","0 0 24 24");mailSvg.setAttribute("focusable","false");mailSvg.setAttribute("aria-hidden","true");
+    mailRect.setAttribute("x","3.25");mailRect.setAttribute("y","5.25");mailRect.setAttribute("width","17.5");mailRect.setAttribute("height","13.5");mailRect.setAttribute("rx","2.25");
+    mailPath.setAttribute("d","M4.5 7.25 12 13l7.5-5.75");mailSvg.append(mailRect,mailPath);mark.append(mailSvg);
     brandCopy.append(el("strong", "", "NAHWERK Mail"), el("span", "", emailConnections.length === 1 ? "1 Postfach verbunden" : `${emailConnections.length} Postfächer verbunden`)); brand.append(mark, brandCopy); side.append(brand);
     const nav = el("nav", "ecp-tb-nav"); nav.setAttribute("aria-label", "E-Mail-Bereiche");
     const appendNav = (label, icon, active, count, onClick, extraClass="") => {
@@ -930,7 +993,7 @@
   function renderMailboxListPane(shell) {
     const pane = el("section","ecp-tb-list-pane"), top = el("div","ecp-tb-list-top"), titleWrap = el("div");
     const rows = mailboxFilteredMessages();
-    titleWrap.append(el("strong","",mailboxFolderTitle()),el("span","",String(rows.length)+" angezeigt")); top.append(titleWrap);
+    titleWrap.append(el("strong","",mailboxFolderTitle()),el("span","",mailboxFolderLoading ? String(rows.length)+" geladen · weitere werden geladen …" : String(rows.length)+" angezeigt")); top.append(titleWrap);
     const refresh = button("↻","ecp-tb-icon-button"); refresh.title="Aktualisieren"; refresh.addEventListener("click",()=>{if(folderBackedMode())void loadMailboxFolder();else void loadDashboard(false,true);}); top.append(refresh); pane.append(top);
     const listNode = el("div","ecp-tb-message-list");
     const loading = folderBackedMode() ? mailboxFolderLoading : classificationLoading;
@@ -1048,7 +1111,7 @@
       render();
       if (dashboard) {
         void loadClassification();
-        if (remoteFolderMode() && !mailboxFolderLoading) void loadMailboxFolder();
+        if (folderBackedMode() && !mailboxFolderLoading) void loadMailboxFolder();
       }
       return dashboard;
     })().finally(() => { dashboardLoadPromise = null; });
@@ -1064,7 +1127,7 @@
     ensureHost();
     if (!connected) {
       dashboard = null; dashboardLoadedAt = 0; classification = null; classificationError = ""; classificationRetryCount = 0;
-      emailConnections = []; activeConnectionId = ""; mailboxScope = "ALL"; mailboxFolderRows = []; mailboxFolderCounts = {}; classificationKnownCounts = {}; allDrafts = [];
+      emailConnections = []; activeConnectionId = ""; mailboxScope = "ALL"; mailboxFolderRows = []; mailboxFolderCounts = {}; classificationKnownCounts = {}; classificationFolderCache = {}; mailboxLoadSerial++; allDrafts = [];
       chatMessages = []; chatStarted = false; render(); return;
     }
     try { await loadConnections(); } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
