@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="assets/account-email-light-parity.css?v=1" />
     <link rel="stylesheet" href="assets/account-response-channel.css?v=6" />
     <link rel="stylesheet" href="assets/account-header-concierge.css?v=2" />
+    <link rel="stylesheet" href="assets/account-address-editor.css?v=1" />
     <link rel="stylesheet" href="assets/owner-product-gaps.css?v=2" />
     <style>
       .dash {
@@ -2236,9 +2237,40 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
                     <p class="profile-help">Identitätsrelevant. Änderungen erfolgen nur über einen gesicherten Nummernwechsel.</p>
                   </div>
                   <div class="profile-field profile-address-field">
-                    <label for="profileHomeAddress">Wohnadresse <span aria-hidden="true">·</span> optional</label>
-                    <input id="profileHomeAddress" type="text" autocomplete="street-address" maxlength="240" placeholder="Straße, Hausnummer, PLZ, Ort" />
-                    <p class="profile-help">Optional. Dein Concierge kann sie als Ausgangspunkt für genauere Ergebnisse in deiner Nähe sowie Entfernungen und Fahrzeiten verwenden.</p>
+                    <div class="profile-address-shell" id="profileAddressShell">
+                      <div class="profile-address-heading">
+                        <div class="profile-address-heading-copy">
+                          <label id="profileAddressLabel">Wohnadresse</label>
+                          <span class="profile-address-optional">Optional</span>
+                        </div>
+                        <span class="profile-address-provider">Adressvorschläge über Google Maps</span>
+                      </div>
+                      <div class="profile-address-grid" aria-labelledby="profileAddressLabel">
+                        <div class="profile-field profile-address-street">
+                          <label for="profileStreet">Straße</label>
+                          <input id="profileStreet" type="text" autocomplete="off" maxlength="140" placeholder="Straße eingeben" aria-autocomplete="list" aria-controls="profileAddressSuggestions" aria-expanded="false" />
+                        </div>
+                        <div class="profile-field profile-address-house">
+                          <label for="profileHouseNumber">Hausnummer</label>
+                          <input id="profileHouseNumber" type="text" autocomplete="off" maxlength="20" placeholder="Nr." />
+                        </div>
+                        <div class="profile-address-suggestions" id="profileAddressSuggestions" role="listbox" aria-label="Adressvorschläge von Google Maps" hidden>
+                          <div id="profileAddressSuggestionList"></div>
+                          <div class="profile-address-attribution">Google Maps</div>
+                        </div>
+                        <div class="profile-field profile-address-postal">
+                          <label for="profilePostalCode">PLZ</label>
+                          <input id="profilePostalCode" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="10" placeholder="PLZ" />
+                        </div>
+                        <div class="profile-field profile-address-city">
+                          <label for="profileCity">Stadt</label>
+                          <input id="profileCity" type="text" autocomplete="address-level2" maxlength="120" placeholder="Stadt" />
+                        </div>
+                        <div class="profile-address-search-state" id="profileAddressSearchState" aria-live="polite"></div>
+                      </div>
+                      <input id="profileHomeAddress" type="hidden" />
+                      <p class="profile-help">Beginne mit der Straße und wähle die passende Adresse aus. PLZ und Stadt werden automatisch übernommen. Dein Concierge kann die gespeicherte Adresse für Ergebnisse in deiner Nähe, Entfernungen und Fahrzeiten verwenden.</p>
+                    </div>
                   </div>
                 </div>
                 <div class="profile-actions">
@@ -4912,6 +4944,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
           profileEmail.value = profile?.email || "";
           profileWhatsapp.value = String(profile?.whatsapp_number || "").replace(/^whatsapp:/i, "");
           profileHomeAddress.value = profile?.home_address || "";
+          window.NWProfileAddressEditor?.setValue(profileHomeAddress.value);
         }
         function renderActorOwnerName(actor = null) {
           const owner = document.getElementById("ownerName");
@@ -5803,6 +5836,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
   <script src="assets/web-core-shadow.js?v=1"></script>
   <script src="assets/web-concierge-chat.js?v=3"></script>
   <script src="assets/account-header-concierge.js?v=1"></script>
+    <script src="assets/account-address-editor.js?v=1"></script>
   <script src="assets/account-response-channel.js?v=6"></script>
   <script src="assets/site-ui.js?v=11"></script></body>
 </html>
