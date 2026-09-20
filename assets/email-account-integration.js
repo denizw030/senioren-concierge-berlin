@@ -174,7 +174,7 @@
       const link = document.createElement("link");
       link.id = "emailConciergeProductStyles";
       link.rel = "stylesheet";
-      link.href = "/assets/email-concierge-product.css?v=20260920-2";
+      link.href = "/assets/email-concierge-product.css?v=20260920-3";
       document.head.appendChild(link);
     }
     productAssetPromise = new Promise((resolve) => {
@@ -186,7 +186,7 @@
       }
       const script = document.createElement("script");
       script.id = "emailConciergeProductRuntime";
-      script.src = "/assets/email-concierge-product.js?v=20260920-2";
+      script.src = "/assets/email-concierge-product.js?v=20260920-3";
       script.async = true;
       script.addEventListener("load", () => resolve(globalThis.NAHWERKEmailConciergeProduct || null), { once: true });
       script.addEventListener("error", () => resolve(null), { once: true });
