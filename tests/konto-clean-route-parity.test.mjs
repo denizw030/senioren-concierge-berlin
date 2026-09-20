@@ -12,8 +12,8 @@ test("clean /konto route stays byte-equivalent to canonical account except root 
 
 test("both account entries expose the same current response-channel and header assets",()=>{
   for(const html of [canonical,clean]){
-    assert.match(html,/account-response-channel\.css\?v=5/);
-    assert.match(html,/account-response-channel\.js\?v=5/);
+    assert.match(html,/account-response-channel\.css\?v=6/);
+    assert.match(html,/account-response-channel\.js\?v=6/);
     assert.match(html,/account-header-concierge\.css\?v=1/);
     assert.match(html,/account-header-concierge\.js\?v=1/);
     assert.match(html,/0,06 € pro Antwort/);
