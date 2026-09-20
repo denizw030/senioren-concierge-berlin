@@ -82,8 +82,8 @@ test("product layout is responsive across desktop and mobile",()=>{
   assert.match(js,/ecp-rule ecp-rule-personal/);
   assert.match(js,/ecp-rule-title-row/);
   assert.match(js,/\.ecp-rule-controls\{display:grid;grid-template-columns:minmax\(0,1fr\) auto/);
-  assert.match(integration,/email-concierge-product\.css\?v=20260920-6/);
-  assert.match(integration,/email-concierge-product\.js\?v=20260920-9/);
+  assert.match(integration,/email-concierge-product\.css\?v=20260920-7/);
+  assert.match(integration,/email-concierge-product\.js\?v=20260920-10/);
 });
 
 
@@ -206,10 +206,10 @@ test("multi-account mailbox navigation mirrors a desktop mail client",()=>{
   assert.match(js,/\["SENT","Gesendet","➤"\]/);
   assert.match(js,/\["SPAM","Spam","⚑"\]/);
   assert.match(js,/\["TRASH","Papierkorb","⌫"\]/);
-  assert.match(js,/in:sent/);
-  assert.match(js,/in:spam/);
-  assert.match(js,/in:trash/);
+  assert.match(js,/\/email\/concierge\/folder/);
+  assert.doesNotMatch(js,/\/email\/messages\/search/);
   assert.match(js,/connection_id/);
+  assert.match(js,/accountTitle\.addEventListener\("click",\(\)=>void selectMailboxFolder\(id,"INBOX"\)\)/);
   assert.match(css,/\.ecp-tb-account/);
   assert.match(css,/\.ecp-tb-nav-subitem/);
 });
@@ -230,4 +230,16 @@ test("global drafts stay at the top and preserve their source mailbox",()=>{
   assert.match(js,/loadAllDrafts/);
   assert.match(js,/_connection_id/);
   assert.match(js,/_account_email/);
+});
+
+
+test("mailbox switch keeps visible counts for the same account while refreshing",()=>{
+  assert.match(js,/const switchingConnection = Boolean\(activeConnectionId && nextConnectionId && activeConnectionId !== nextConnectionId\)/);
+  assert.match(js,/if \(switchingConnection\) \{ classification = null; classificationError = ""; \}/);
+});
+
+test("remote folder loading uses the authenticated concierge API",()=>{
+  assert.match(js,/request\("\/email\/concierge\/folder"/);
+  assert.doesNotMatch(js,/allowBare: true/);
+  assert.doesNotMatch(js,/\/email\/messages\/search/);
 });
