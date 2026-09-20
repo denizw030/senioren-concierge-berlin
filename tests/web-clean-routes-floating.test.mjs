@@ -41,7 +41,9 @@ test('public sitemap and key canonicals contain no html suffixes',()=>{
 });
 
 test('dark footer is deep black and floating button has mobile safe-area',()=>{
-  assert.match(css,/body:not\(\.nw-portal-light\) \.footer\{background:#000!important\}/);
+  assert.match(css,/GLOBAL DARK FOOTER CONTRACT v2/);
+  assert.match(css,/background:\s*#000 !important/);
+  assert.match(css,/background-image:\s*none !important/);
   assert.match(css,/env\(safe-area-inset-right\)/);
   assert.match(css,/env\(safe-area-inset-bottom\)/);
 });
