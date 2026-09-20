@@ -176,9 +176,10 @@ test("mailbox loading failure is visible and automatically retried once",()=>{
   assert.match(js,/setTimeout\(\(\)=>\{ if \(connected && !classificationLoading\) void loadClassification\(\); \},1600\)/);
 });
 
-test("mailbox can show dashboard fallback rows while classification loads",()=>{
+test("mailbox keeps a visible loading state for both remote folders and classification views",()=>{
   assert.match(js,/\.\.\.list\(dashboard\?\.highlights\), \.\.\.list\(dashboard\?\.warnings\)/);
-  assert.match(js,/!rows\.length && classificationLoading/);
+  assert.match(js,/const loading = remoteFolderMode\(\) \? mailboxFolderLoading : classificationLoading/);
+  assert.match(js,/!rows\.length && loading/);
 });
 
 
