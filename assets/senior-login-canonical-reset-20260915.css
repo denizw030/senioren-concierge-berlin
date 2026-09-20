@@ -639,3 +639,79 @@ html body.login-image-page[data-product="senioren"] main>.senior-login-visual~.s
   padding:0!important;
   overflow:hidden!important;
 }
+
+
+/* SENIOREN LOGIN SINGLE UPPER IMAGE v5 */
+html.nw-product-senior-first-paint body.login-image-page main>.senior-login-visual,
+html body.login-image-page.senior-product main>.senior-login-visual,
+html body.login-image-page[data-product="senioren"] main>.senior-login-visual{
+  display:none!important;
+  visibility:hidden!important;
+  opacity:0!important;
+  width:0!important;
+  height:0!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+}
+html.nw-product-senior-first-paint body.login-image-page main::before,
+html body.login-image-page.senior-product main::before,
+html body.login-image-page[data-product="senioren"] main::before{
+  content:none!important;
+  display:none!important;
+}
+html.nw-product-senior-first-paint body.login-image-page main::after,
+html body.login-image-page.senior-product main::after,
+html body.login-image-page[data-product="senioren"] main::after{
+  content:""!important;
+  position:relative!important;
+  inset:auto!important;
+  z-index:1!important;
+  grid-column:2!important;
+  grid-row:1 / span 2!important;
+  display:block!important;
+  width:100%!important;
+  max-width:none!important;
+  height:100%!important;
+  min-height:650px!important;
+  margin:0!important;
+  padding:0!important;
+  border:1px solid rgba(78,60,31,.10)!important;
+  border-radius:34px!important;
+  background:#ddd4c8 url("/assets/lifestyle/senior-woman-overview.webp?v=6") 68% 50%/cover no-repeat!important;
+  box-shadow:0 28px 76px rgba(61,46,23,.14)!important;
+  pointer-events:none!important;
+}
+@media(max-width:760px){
+  html.nw-product-senior-first-paint body.login-image-page main,
+  html body.login-image-page.senior-product main,
+  html body.login-image-page[data-product="senioren"] main{
+    grid-template-columns:1fr!important;
+    grid-template-rows:auto auto auto!important;
+  }
+  html.nw-product-senior-first-paint body.login-image-page main>.hero,
+  html body.login-image-page.senior-product main>.hero,
+  html body.login-image-page[data-product="senioren"] main>.hero{
+    grid-column:1!important;
+    grid-row:1!important;
+  }
+  html.nw-product-senior-first-paint body.login-image-page main::after,
+  html body.login-image-page.senior-product main::after,
+  html body.login-image-page[data-product="senioren"] main::after{
+    grid-column:1!important;
+    grid-row:2!important;
+    width:min(100%,720px)!important;
+    height:clamp(300px,68vw,460px)!important;
+    min-height:300px!important;
+    margin:0 auto!important;
+    border-radius:28px!important;
+    background-position:68% 48%!important;
+  }
+  html.nw-product-senior-first-paint body.login-image-page main>.section,
+  html body.login-image-page.senior-product main>.section,
+  html body.login-image-page[data-product="senioren"] main>.section{
+    grid-column:1!important;
+    grid-row:3!important;
+  }
+}
