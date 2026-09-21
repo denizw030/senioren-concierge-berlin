@@ -20,11 +20,13 @@ test("concierge tab uses a balanced two-card desktop layout",()=>{
   assert.match(account,/\.concierge-chat-portrait\{[^}]*width:104px;[^}]*height:104px;[^}]*border-radius:50%/s);
 });
 
-test("concierge card presents two equal stacked WhatsApp quick actions",()=>{
-  assert.match(account,/\.concierge-channel-quick-actions\{[^}]*grid-template-columns:1fr;[^}]*gap:9px/s);
-  assert.match(account,/\.concierge-channel-quick\{[^}]*width:100%;[^}]*min-height:44px/s);
-  assert.match(account,/data-response-channel-quick="EMAIL">WhatsApp → via E-Mail/);
-  assert.match(account,/data-response-channel-quick="CALL">WhatsApp → via Telefon/);
+test("concierge keeps WhatsApp response routing in the dedicated response-channel card",()=>{
+  assert.match(account,/id="responseChannelCard"/);
+  assert.match(account,/name="responseChannel" value="SAME_CHANNEL"/);
+  assert.match(account,/name="responseChannel" value="EMAIL"/);
+  assert.match(account,/name="responseChannel" value="CALL"/);
+  assert.match(account,/id="responseChannelSave">Speichern<\/button>/);
+  assert.doesNotMatch(account,/data-response-channel-quick=/);
 });
 
 test("chat card gets authoritative persona name and image",()=>{
