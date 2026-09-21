@@ -10,9 +10,9 @@
     { id: "microsoft", name: "Outlook", mode: "microsoft", logo: "microsoft", secret: "", help: "Mit deinem Microsoft-Konto anmelden und NAHWERK freigeben." },
     { id: "yahoo", name: "Yahoo Mail", mode: "yahoo", logo: "yahoo", secret: "", help: "Mit deinem Yahoo-Konto anmelden und NAHWERK freigeben." },
     { id: "icloud", name: "iCloud Mail", mode: "manual", logo: "icloud", secret: "App-spezifisches Passwort", credentialKind: "app", help: "Apple nutzt für externe Mail-Dienste ein app-spezifisches Passwort.", helpUrl: "https://support.apple.com/de-de/102654", helpAction: "App-Passwort bei Apple erstellen" },
-    { id: "gmx", name: "GMX", mode: "manual", logo: "gmx", secret: "App-Passwort", credentialKind: "app", help: "Für NAHWERK verwendest du bei GMX ein separates App-Passwort – nicht dein normales Login-Passwort.", helpUrl: "https://hilfe.gmx.net/account/logindaten/app-passwort.html", helpAction: "App-Passwort bei GMX erstellen" },
+    { id: "gmx", name: "GMX", mode: "manual", logo: "gmx", secret: "Passwort", credentialKind: "mail_first", help: "Gib zuerst einfach deine E-Mail-Adresse und dein normales GMX-Passwort ein. NAHWERK übernimmt die technischen Einstellungen. Nur wenn dein Konto eine zusätzliche Sicherheitsfreigabe verlangt, zeigen wir dir genau diesen Schritt.", helpUrl: "https://hilfe.gmx.net/pop-imap/index.html", helpAction: "GMX-Freigabe öffnen" },
     { id: "webde", name: "WEB.DE", mode: "manual", logo: "webde", secret: "Passwort", credentialKind: "mail_first", help: "Verwende zunächst dein normales WEB.DE-Passwort. Falls WEB.DE eine zusätzliche Sicherheitsfreigabe verlangt, führt dich NAHWERK durch die nächsten Schritte.", helpUrl: "https://hilfe.web.de/pop-imap/einschalten.html", helpAction: "WEB.DE Freigabe öffnen" },
-    { id: "telekom", name: "Telekom Mail", mode: "manual", logo: "telekom", secret: "Passwort für E-Mail-Programme", credentialKind: "mail_program", help: "Für NAHWERK brauchst du das separate „Passwort für E-Mail-Programme“ – nicht dein Telekom Login-Passwort.", helpUrl: "https://www.telekom.de/hilfe/apps-dienste/e-mail/programm-passwort-verwalten", helpAction: "Passwort bei Telekom einrichten" },
+    { id: "telekom", name: "Telekom / T-Online", mode: "manual", logo: "telekom", secret: "Passwort", credentialKind: "guided_mail_program", help: "Gib deine Telekom/T-Online E-Mail-Adresse ein. Für die Verbindung verlangt Telekom ein eigenes E-Mail-Programm-Passwort. NAHWERK führt dich direkt zur richtigen Telekom-Seite und übernimmt danach alle technischen Einstellungen.", helpUrl: "https://www.telekom.de/hilfe/apps-dienste/e-mail/programm-passwort-verwalten", helpAction: "Bei Telekom einmal freigeben" },
     { id: "fastmail", name: "Fastmail", mode: "manual", logo: "fastmail", secret: "App-Passwort", credentialKind: "app", help: "Fastmail benötigt für externe Dienste ein eigenes App-Passwort. IMAP/SMTP muss in deinem Tarif verfügbar sein.", helpUrl: "https://www.fastmail.help/hc/en-us/articles/360058752854-App-passwords", helpAction: "App-Passwort bei Fastmail erstellen" },
     { id: "zoho", name: "Zoho Mail", mode: "manual", logo: "zoho", secret: "App- oder Mail-Passwort", credentialKind: "conditional_app", help: "Bei aktivierter Zwei-Faktor-Authentifizierung nutzt du ein App-Passwort. NAHWERK übernimmt die technischen Mailserver-Einstellungen.", helpUrl: "https://www.zoho.com/de/mail/help/imap-access.html", helpAction: "Zoho-Anleitung öffnen" },
     { id: "ionos", name: "IONOS", mode: "manual", logo: "ionos", secret: "E-Mail-Passwort", credentialKind: "mail", help: "Nutze das Passwort genau dieses IONOS-E-Mail-Postfachs. NAHWERK übernimmt IMAP, SMTP, Ports und Verschlüsselung automatisch.", helpUrl: "https://www.ionos.de/hilfe/e-mail/allgemeine-themen/serverinformationen-fuer-imap-pop3-und-smtp/", helpAction: "IONOS-Hilfe öffnen" },
@@ -228,7 +228,7 @@
     if (logo) logo.innerHTML = LOGOS[selected.logo];
     setText(document.getElementById("emailProviderConnectTitle"), selected.name);
     setText(document.getElementById("emailProviderConnectSubtitle"), rows.length ? `${rows.length} Konto${rows.length === 1 ? "" : "en"} verbunden` : "Sicher verbinden");
-    setText(document.getElementById("emailProviderConnectCopy"), rows.length ? "Wähle das Konto, das du trennen möchtest. Weitere Konten kannst du jederzeit zusätzlich verbinden." : selected.id === "webde" ? "Gib deine WEB.DE E-Mail-Adresse und dein normales Passwort ein. NAHWERK übernimmt die technischen Einstellungen automatisch." : "Gib nur deine E-Mail-Adresse und das für Mail-Apps vorgesehene Passwort ein. Server, Ports und technische Einstellungen übernimmt NAHWERK.");
+    setText(document.getElementById("emailProviderConnectCopy"), rows.length ? "Wähle das Konto, das du trennen möchtest. Weitere Konten kannst du jederzeit zusätzlich verbinden." : (selected.id === "webde" || selected.id === "gmx") ? `Gib deine ${selected.id === "webde" ? "WEB.DE" : "GMX"} E-Mail-Adresse und dein normales Passwort ein. NAHWERK übernimmt die technischen Einstellungen automatisch.` : selected.id === "telekom" ? "Gib deine Telekom/T-Online E-Mail-Adresse ein. Falls du das E-Mail-Programm-Passwort noch nicht eingerichtet hast, führt dich der Button direkt zur Telekom. Danach nur noch Passwort einfügen und verbinden." : "Gib nur deine E-Mail-Adresse und das für Mail-Apps vorgesehene Passwort ein. Server, Ports und technische Einstellungen übernimmt NAHWERK.");
     setText(document.getElementById("emailProviderConnectSecretLabel"), selected.secret || "Passwort");
     setText(document.getElementById("emailProviderConnectHelp"), selected.help);
     const guide = document.getElementById("emailProviderCredentialGuide");
@@ -237,8 +237,10 @@
     const helpLink = document.getElementById("emailProviderCredentialHelpLink");
     if (selected.mode === "manual") {
       const kind = String(selected.credentialKind || "mail");
-      const title = kind === "mail_program" ? "Welches Passwort?" : kind === "app" ? "App-Passwort verwenden" : kind === "conditional_app" ? "Passwort prüfen" : kind === "mail_first" ? "Einfach dein normales Passwort" : "E-Mail-Passwort verwenden";
-      const text = kind === "mail_program"
+      const title = kind === "guided_mail_program" ? "Einmal bei Telekom freigeben" : kind === "mail_program" ? "Welches Passwort?" : kind === "app" ? "App-Passwort verwenden" : kind === "conditional_app" ? "Passwort prüfen" : kind === "mail_first" ? "Einfach dein normales Passwort" : "E-Mail-Passwort verwenden";
+      const text = kind === "guided_mail_program"
+        ? "Telekom trennt dein normales Login-Passwort vom Zugriff durch Mail-Dienste. Öffne die Telekom-Seite über den Button, lege dort einmal das Passwort für E-Mail-Programme fest und füge es anschließend hier ein. Server, Ports und Verschlüsselung erledigt NAHWERK."
+        : kind === "mail_program"
         ? "Nicht dein normales Kundenkonto-Passwort. Verwende das separate Passwort für E-Mail-Programme."
         : kind === "app"
           ? "Nicht dein normales Login-Passwort. Erstelle beim Anbieter ein separates App-Passwort für NAHWERK."
@@ -395,7 +397,9 @@
 
   function connectionErrorMessage(error) {
     const code = String(error?.message || error || "");
-    if (code === "provider_authentication_failed" && selected?.id === "webde") return "WEB.DE konnte die Anmeldung mit diesem Passwort nicht bestätigen. Prüfe zuerst, ob der Zugriff für E-Mail-Programme in WEB.DE aktiviert ist. Wenn du die Zwei-Faktor-Anmeldung nutzt, kann WEB.DE zusätzlich ein separates Passwort verlangen.";
+    if (code === "provider_authentication_failed" && selected?.id === "webde") return "WEB.DE konnte die Anmeldung noch nicht bestätigen. Öffne die WEB.DE-Freigabe über den Hilfe-Button. Falls du Zwei-Faktor-Anmeldung nutzt, kann WEB.DE zusätzlich ein eigenes Passwort für externe Mail-Dienste verlangen.";
+    if (code === "provider_authentication_failed" && selected?.id === "gmx") return "GMX konnte die Anmeldung noch nicht bestätigen. Öffne die GMX-Freigabe über den Hilfe-Button. Falls du Zwei-Faktor-Anmeldung nutzt, verlangt GMX ein separates App-Passwort.";
+    if (code === "provider_authentication_failed" && selected?.id === "telekom") return "Telekom konnte die Anmeldung noch nicht bestätigen. Verwende das Passwort für E-Mail-Programme. Über den Hilfe-Button kommst du direkt zur Telekom-Einrichtung.";
     if (code === "provider_authentication_failed") return "Anmeldung abgelehnt. Prüfe E-Mail-Adresse und Passwort/App-Passwort sowie, ob IMAP/SMTP beim Anbieter aktiviert ist.";
     if (code === "provider_tls_connection_failed") return "Die sichere Verbindung zum E-Mail-Anbieter konnte nicht hergestellt werden. Bitte versuche es später erneut.";
     if (code === "provider_connection_failed") return "Der E-Mail-Anbieter ist gerade nicht erreichbar. Bitte versuche es später erneut.";
