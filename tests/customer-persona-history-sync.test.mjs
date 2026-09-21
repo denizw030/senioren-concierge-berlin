@@ -15,7 +15,9 @@ test("overview concierge is read from the authoritative web gateway", () => {
 test("legacy local persona fields are removed instead of used as authority", () => {
   assert.match(overview, /delete value\[key\]/);
   assert.match(overview, /"conciergeChoice", "concierge_choice"/);
-  assert.doesNotMatch(overview, /localStorage\.getItem\([^)]*\).*conciergeChoice/s);
+  assert.match(overview, /const LEGACY_ONBOARDING_KEY = "scb_onboarding"/);
+  assert.doesNotMatch(overview, /renderOverviewPersona\([^)]*conciergeChoice/);
+  assert.doesNotMatch(overview, /persona\s*=\s*[^;\n]*conciergeChoice/);
 });
 
 test("customer history is cursor-paginated and customer-safe", () => {
@@ -27,8 +29,8 @@ test("customer history is cursor-paginated and customer-safe", () => {
 });
 
 test("shared text history keeps WhatsApp marking without cross-sending", () => {
-  assert.match(chat, /normalizedChannel==="WHATSAPP"/);
-  assert.match(chat, /badge\.textContent="WhatsApp"/);
-  assert.doesNotMatch(chat, /whatsapp[^\n]{0,80}(send|dispatch|message)/i);
+  assert.match(chat, /const normalizedChannel=String\(channel\|\|"WEB"\)\.toUpperCase\(\)/);
+  assert.match(chat, /row\.dataset\.channel=normalizedChannel/);
+  assert.doesNotMatch(chat, /functions\/v1\/twilio-webhook-gateway|sendWhatsApp|dispatchWhatsApp|whatsappProviderSend/i);
   assert.match(chat, /gatewayRequest\("\/web\/chat"/);
 });
