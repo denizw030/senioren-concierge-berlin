@@ -83,6 +83,262 @@
           body.account-premium-ui .customer-number-summary[data-account-panel="overview"],
           body.account-premium-ui .plan-summary[data-account-panel="overview"]{grid-column:1!important}
         }
+
+        /* ACCOUNT_PORTAL_OPEN_DIVIDERS_V1_20260921
+           Remove rounded portal containers only; keep content, controls and behavior intact.
+           Divider tone deliberately reuses the account navigation line. */
+        body.account-premium-ui .dash{
+          gap:0!important;
+          row-gap:0!important;
+          column-gap:0!important;
+        }
+
+        body.account-premium-ui :is(
+          .dash>.card,
+          .account-overview-link,
+          .usagebox,
+          .safety-hub-card,
+          .fraud-protection-grid>div,
+          .email-provider-card,
+          .email-capability,
+          .email-state-card,
+          .response-channel-option,
+          .reception-check,
+          .fraud-channel-item,
+          .safety-summary-item,
+          .safety-chain-step,
+          .empty,
+          .recommend,
+          .access-empty,
+          .family-owner-empty,
+          .family-owner-panel
+        ){
+          border:0!important;
+          border-radius:0!important;
+          background-color:transparent!important;
+          box-shadow:none!important;
+        }
+
+        body.account-premium-ui :is(
+          .dash>.card,
+          .account-overview-link,
+          .usagebox,
+          .safety-hub-card,
+          .fraud-protection-grid>div,
+          .email-provider-card,
+          .email-capability,
+          .email-state-card,
+          .response-channel-option,
+          .reception-check,
+          .fraud-channel-item,
+          .safety-summary-item,
+          .safety-chain-step,
+          .empty,
+          .recommend,
+          .access-empty,
+          .family-owner-empty,
+          .family-owner-panel
+        ):hover{
+          box-shadow:none!important;
+        }
+
+        /* Every top-level portal section receives a restrained horizontal divider,
+           inset by exactly 5 mm on both sides. */
+        body.account-premium-ui .dash>.card{
+          position:relative!important;
+          background-image:
+            linear-gradient(to right,
+              transparent 0,
+              transparent 5mm,
+              var(--account-nav-line) 5mm,
+              var(--account-nav-line) calc(100% - 5mm),
+              transparent calc(100% - 5mm),
+              transparent 100%)!important;
+          background-repeat:no-repeat!important;
+          background-position:left bottom!important;
+          background-size:100% 1px!important;
+        }
+
+        /* Overview: one open grid. Concierge spans the first row.
+           Every following two-column row has one centered vertical divider. */
+        body.account-premium-ui .account-overview-highlights[data-account-panel="overview"]{
+          gap:0!important;
+          row-gap:0!important;
+          column-gap:0!important;
+        }
+        body.account-premium-ui .account-overview-link{
+          position:relative!important;
+          background-image:
+            linear-gradient(to right,
+              transparent 0,
+              transparent 5mm,
+              var(--account-nav-line) 5mm,
+              var(--account-nav-line) calc(100% - 5mm),
+              transparent calc(100% - 5mm),
+              transparent 100%)!important;
+          background-repeat:no-repeat!important;
+          background-position:left bottom!important;
+          background-size:100% 1px!important;
+        }
+        body.account-premium-ui .account-overview-link:nth-child(2n+1):not(:first-child){
+          background-image:
+            linear-gradient(to bottom,
+              transparent 0,
+              transparent 5mm,
+              var(--account-nav-line) 5mm,
+              var(--account-nav-line) calc(100% - 5mm),
+              transparent calc(100% - 5mm),
+              transparent 100%),
+            linear-gradient(to right,
+              transparent 0,
+              transparent 5mm,
+              var(--account-nav-line) 5mm,
+              var(--account-nav-line) calc(100% - 5mm),
+              transparent calc(100% - 5mm),
+              transparent 100%)!important;
+          background-repeat:no-repeat,no-repeat!important;
+          background-position:left top,left bottom!important;
+          background-size:1px 100%,100% 1px!important;
+        }
+
+        /* The known paired overview rows use the same centered divider. */
+        body.account-premium-ui :is(
+          .customer-number-summary[data-account-panel="overview"],
+          .owner-product-gap-shortcut[data-account-panel="overview"]
+        ){
+          background-image:
+            linear-gradient(to bottom,
+              transparent 0,
+              transparent 5mm,
+              var(--account-nav-line) 5mm,
+              var(--account-nav-line) calc(100% - 5mm),
+              transparent calc(100% - 5mm),
+              transparent 100%),
+            linear-gradient(to right,
+              transparent 0,
+              transparent 5mm,
+              var(--account-nav-line) 5mm,
+              var(--account-nav-line) calc(100% - 5mm),
+              transparent calc(100% - 5mm),
+              transparent 100%)!important;
+          background-repeat:no-repeat,no-repeat!important;
+          background-position:left top,left bottom!important;
+          background-size:1px 100%,100% 1px!important;
+        }
+
+        /* Two-column portal groups follow the same open-divider principle. */
+        body.account-premium-ui :is(.usagegrid,.safety-hub,.fraud-protection-grid){
+          gap:0!important;
+          row-gap:0!important;
+          column-gap:0!important;
+        }
+        body.account-premium-ui :is(.usagebox,.safety-hub-card,.fraud-protection-grid>div){
+          position:relative!important;
+          background-image:
+            linear-gradient(to right,
+              transparent 0,
+              transparent 5mm,
+              var(--account-nav-line) 5mm,
+              var(--account-nav-line) calc(100% - 5mm),
+              transparent calc(100% - 5mm),
+              transparent 100%)!important;
+          background-repeat:no-repeat!important;
+          background-position:left bottom!important;
+          background-size:100% 1px!important;
+        }
+        body.account-premium-ui :is(.usagebox,.safety-hub-card,.fraud-protection-grid>div):nth-child(2n):not(.fraud-featured){
+          background-image:
+            linear-gradient(to bottom,
+              transparent 0,
+              transparent 5mm,
+              var(--account-nav-line) 5mm,
+              var(--account-nav-line) calc(100% - 5mm),
+              transparent calc(100% - 5mm),
+              transparent 100%),
+            linear-gradient(to right,
+              transparent 0,
+              transparent 5mm,
+              var(--account-nav-line) 5mm,
+              var(--account-nav-line) calc(100% - 5mm),
+              transparent calc(100% - 5mm),
+              transparent 100%)!important;
+          background-repeat:no-repeat,no-repeat!important;
+          background-position:left top,left bottom!important;
+          background-size:1px 100%,100% 1px!important;
+        }
+
+        /* Repeated rows on Concierge, E-Mail, Safety and Access stay functional,
+           but no longer render as rounded cards. */
+        body.account-premium-ui :is(
+          .email-provider-card,
+          .email-capability,
+          .email-state-card,
+          .response-channel-option,
+          .reception-check,
+          .fraud-channel-item,
+          .safety-summary-item,
+          .safety-chain-step,
+          .empty,
+          .recommend,
+          .access-empty,
+          .family-owner-empty,
+          .family-owner-panel
+        ){
+          background-image:
+            linear-gradient(to right,
+              transparent 0,
+              transparent 5mm,
+              var(--account-nav-line) 5mm,
+              var(--account-nav-line) calc(100% - 5mm),
+              transparent calc(100% - 5mm),
+              transparent 100%)!important;
+          background-repeat:no-repeat!important;
+          background-position:left bottom!important;
+          background-size:100% 1px!important;
+        }
+
+        body.account-premium-ui :is(
+          .account-overview-link,
+          .safety-hub-card
+        ):hover,
+        body.account-premium-ui :is(
+          .account-overview-link,
+          .safety-hub-card
+        ):focus-visible{
+          transform:none!important;
+          background-color:transparent!important;
+          box-shadow:none!important;
+        }
+
+        @media(max-width:760px){
+          body.account-premium-ui .account-overview-highlights[data-account-panel="overview"],
+          body.account-premium-ui :is(.usagegrid,.safety-hub,.fraud-protection-grid){
+            grid-template-columns:1fr!important;
+            gap:0!important;
+          }
+
+          /* On one-column mobile layouts no center divider is drawn. */
+          body.account-premium-ui :is(
+            .account-overview-link:nth-child(2n+1):not(:first-child),
+            .customer-number-summary[data-account-panel="overview"],
+            .owner-product-gap-shortcut[data-account-panel="overview"],
+            .usagebox:nth-child(2n),
+            .safety-hub-card:nth-child(2n),
+            .fraud-protection-grid>div:nth-child(2n)
+          ){
+            background-image:
+              linear-gradient(to right,
+                transparent 0,
+                transparent 5mm,
+                var(--account-nav-line) 5mm,
+                var(--account-nav-line) calc(100% - 5mm),
+                transparent calc(100% - 5mm),
+                transparent 100%)!important;
+            background-repeat:no-repeat!important;
+            background-position:left bottom!important;
+            background-size:100% 1px!important;
+          }
+        }
       `;
     }
     document.head.appendChild(style);
