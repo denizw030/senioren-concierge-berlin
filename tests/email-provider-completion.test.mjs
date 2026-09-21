@@ -6,6 +6,16 @@ const callback = fs.readFileSync('oauth/yahoo/callback/index.html', 'utf8');
 
 assert.match(ui, /id: "yahoo"[\s\S]*mode: "yahoo"/);
 assert.ok(ui.includes('/email/connect/yahoo/web'));
+
+assert.ok(ui.includes('/email/connect/auto/web'));
+assert.ok(ui.includes('emailAutoConnectEmail'));
+assert.ok(ui.includes('Anbieter wird erkannt'));
+assert.ok(ui.includes('NAHWERK erkennt den Anbieter automatisch'));
+assert.ok(ui.includes('CREDENTIALS_REQUIRED'));
+assert.ok(ui.includes('email_provider_selection_required'));
+
+const emailReturn = fs.readFileSync('email-concierge.html', 'utf8');
+assert.ok(emailReturn.includes('["GOOGLE","MICROSOFT","YAHOO"].includes(provider)'));
 assert.ok(ui.includes('host === "api.login.yahoo.com"'));
 assert.ok(ui.includes('/email/yahoo/disconnect/web'));
 assert.ok(ui.includes('row.connection_ready !== false'));
