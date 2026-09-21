@@ -93,9 +93,9 @@ test("connected account overview is topmost and follows canonical provider statu
   assert.match(js,/accountHead\.insertAdjacentElement\("afterend", host\)/);
   assert.match(js,/__nahwerkEmailConnections/);
   assert.match(js,/nahwerk:email-connections-updated/);
-  assert.match(js,/async function loadConnections/);
-  assert.match(js,/emailConnections = list\\(data\\?\\.connections\\)\\.filter/);
-  assert.match(js,/activeConnectionId = String\\(emailConnections\\[0\\]\\?\\.connection_id/);
+  assert.ok(js.includes("async function loadConnections()"));
+  assert.ok(js.includes("emailConnections = list(data?.connections).filter"));
+  assert.ok(js.includes('activeConnectionId = String(emailConnections[0]?.connection_id || "")'));
   assert.match(multi,/emailConciergeProduct/);
   assert.match(multi,/accountRoot\.querySelector\("\.email-account-head"\)/);
   assert.doesNotMatch(multi,/emailLogoConnectShell/);
