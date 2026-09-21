@@ -356,24 +356,31 @@ html[data-nw-portal-theme="light"] body.concierge-portal-settings .nw-voice-prev
 </style>
 <style id="concierge-settings-dark-parity-v1">
 /* Dark Concierge settings matches the canonical authenticated account world. */
+html[data-nw-portal-theme="dark"],
 html[data-nw-portal-theme="dark"] body.concierge-portal-settings{
   background:#030405!important;
+  background-color:#030405!important;
   background-image:none!important;
   color:#f5f3ee!important;
   color-scheme:dark!important;
 }
+html[data-nw-portal-theme="dark"] body.concierge-portal-settings:not(.senior-product):not([data-product="senioren"]) main,
+html[data-nw-portal-theme="dark"] body.concierge-portal-settings:not(.senior-product):not([data-product="senioren"]) main>.section.concierge-settings-section,
 html[data-nw-portal-theme="dark"] body.concierge-portal-settings main,
 html[data-nw-portal-theme="dark"] body.concierge-portal-settings main>.section.concierge-settings-section{
   background:
     radial-gradient(900px 520px at 92% 2%,rgba(31,51,88,.16),transparent 68%),
     radial-gradient(720px 460px at 8% 58%,rgba(28,39,60,.10),transparent 72%),
     linear-gradient(180deg,#030405 0%,#06090d 48%,#030405 100%)!important;
+  background-color:#030405!important;
   color:#f5f3ee!important;
 }
+html[data-nw-portal-theme="dark"] body.concierge-portal-settings:not(.senior-product):not([data-product="senioren"]) .concierge-settings-section>.wrap,
 html[data-nw-portal-theme="dark"] body.concierge-portal-settings .concierge-settings-section>.wrap{
   background:transparent!important;
+  background-color:transparent!important;
   background-image:none!important;
-  border:0!important;
+  border-color:transparent!important;
   box-shadow:none!important;
   color:#f5f3ee!important;
 }

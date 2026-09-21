@@ -20,6 +20,9 @@ test("Concierge settings dark mode matches the canonical account dark palette", 
   assert.match(page, /concierge-settings-dark-parity-v1/);
   assert.match(page, /html\[data-nw-portal-theme="dark"\] body\.concierge-portal-settings\{/);
   assert.match(page, /background:#030405!important/);
+  assert.match(page, /html\[data-nw-portal-theme="dark"\],/);
+  assert.match(page, /body\.concierge-portal-settings:not\(\.senior-product\):not\(\[data-product="senioren"\]\) main/);
+  assert.match(page, /background-color:#030405!important/);
   assert.match(page, /linear-gradient\(180deg,#030405 0%,#06090d 48%,#030405 100%\)!important/);
   assert.match(page, /background-color:#0b0f14!important/);
   assert.match(page, /color:#f5f3ee!important/);
