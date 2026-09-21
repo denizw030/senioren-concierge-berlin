@@ -419,7 +419,7 @@
 
   function connectionErrorMessage(error) {
     const code = String(error?.message || error || "");
-    if (code === "provider_authentication_failed" && selected?.id === "webde") return "WEB.DE konnte die Anmeldung noch nicht bestätigen. Öffne die WEB.DE-Freigabe über den Hilfe-Button. Falls du Zwei-Faktor-Anmeldung nutzt, kann WEB.DE zusätzlich ein eigenes Passwort für externe Mail-Dienste verlangen.";
+    if (code === "provider_authentication_failed" && selected?.id === "webde") return "WEB.DE benötigt noch deine Freigabe oder konnte das Passwort nicht bestätigen. Tippe auf „WEB.DE Freigabe öffnen“, erlaube dort den Zugriff für E-Mail-Programme und komme anschließend hierher zurück. Bei aktivierter Zwei-Faktor-Anmeldung kann WEB.DE zusätzlich ein eigenes Passwort für externe Mail-Dienste verlangen.";
     if (code === "provider_authentication_failed" && selected?.id === "gmx") return "GMX konnte die Anmeldung noch nicht bestätigen. Öffne die GMX-Freigabe über den Hilfe-Button. Falls du Zwei-Faktor-Anmeldung nutzt, verlangt GMX ein separates App-Passwort.";
     if (code === "provider_authentication_failed" && selected?.id === "telekom") return "Telekom konnte die Anmeldung noch nicht bestätigen. Verwende das Passwort für E-Mail-Programme. Über den Hilfe-Button kommst du direkt zur Telekom-Einrichtung.";
     if (code === "provider_authentication_failed") return "Anmeldung abgelehnt. Prüfe E-Mail-Adresse und Passwort/App-Passwort sowie, ob IMAP/SMTP beim Anbieter aktiviert ist.";
