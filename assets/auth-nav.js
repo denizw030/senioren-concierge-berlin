@@ -371,6 +371,7 @@
     link.className = "nw-floating-concierge";
     link.href = "/web-concierge";
     link.setAttribute("aria-label", "Persönlichen NAHWERK Concierge öffnen");
+    link.setAttribute("role", "complementary");
     link.innerHTML = '<span class="nw-floating-concierge-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 6.8A2.8 2.8 0 0 1 7.8 4h8.4A2.8 2.8 0 0 1 19 6.8v5.9a2.8 2.8 0 0 1-2.8 2.8h-4.7L7 19v-3.5A2.8 2.8 0 0 1 5 12.8Z"></path><path d="M9 9h6M9 12h4"></path></svg></span><span>Concierge</span>';
     document.body.appendChild(link);
   }
