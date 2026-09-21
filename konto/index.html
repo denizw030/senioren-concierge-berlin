@@ -2195,7 +2195,82 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
   </style>
 
     <link rel="stylesheet" href="assets/account-portal-text-nav-v1.css?v=13" />
-</head>
+<style id="nw-overview-connected-grid-v1">
+/* Overview-only visual refinement: connected separators and centered concierge identity. */
+body.account-premium-ui .account-overview-highlights[data-account-panel="overview"]{
+  gap:0!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+}
+body.account-premium-ui .account-overview-highlights[data-account-panel="overview"] .account-overview-link{
+  min-height:122px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  margin:0!important;
+}
+body.account-premium-ui .account-overview-highlights[data-account-panel="overview"] .account-overview-link:nth-child(odd){border-right:1px solid var(--account-line)!important}
+body.account-premium-ui .account-overview-highlights[data-account-panel="overview"] .account-overview-link:nth-child(n+3){border-top:1px solid var(--account-line)!important}
+body.account-premium-ui .account-overview-highlights[data-account-panel="overview"] .account-overview-link:first-child{
+  display:grid!important;
+  grid-template-columns:auto minmax(0,max-content) auto!important;
+  grid-template-rows:auto auto auto!important;
+  justify-content:center!important;
+  align-content:center!important;
+  column-gap:14px!important;
+  text-align:left!important;
+}
+body.account-premium-ui .account-overview-highlights[data-account-panel="overview"] .account-overview-link:first-child .eyebrow,
+body.account-premium-ui .account-overview-highlights[data-account-panel="overview"] .account-overview-link:first-child strong,
+body.account-premium-ui .account-overview-highlights[data-account-panel="overview"] .account-overview-link:first-child>span:last-child{
+  grid-column:2!important;
+  width:100%!important;
+  max-width:none!important;
+  margin-left:0!important;
+  margin-right:0!important;
+  text-align:left!important;
+}
+body.account-premium-ui .account-overview-highlights[data-account-panel="overview"] .account-overview-link:first-child .eyebrow{grid-row:1!important}
+body.account-premium-ui .account-overview-highlights[data-account-panel="overview"] .account-overview-link:first-child strong{grid-row:2!important}
+body.account-premium-ui .account-overview-highlights[data-account-panel="overview"] .account-overview-link:first-child>span:last-child{grid-row:3!important}
+body.account-premium-ui .account-overview-highlights[data-account-panel="overview"] .account-overview-link:first-child img,
+body.account-premium-ui .account-overview-highlights[data-account-panel="overview"] .account-overview-link:first-child [class*="avatar"],
+body.account-premium-ui .account-overview-highlights[data-account-panel="overview"] .account-overview-link:first-child [class*="portrait"]{
+  grid-column:1!important;grid-row:1/4!important;align-self:center!important;justify-self:end!important;margin:0!important;
+}
+
+/* The four lower overview surfaces use the same open 2x2 separator language. */
+body.account-premium-ui .dash>.plan-summary[data-account-panel="overview"],
+body.account-premium-ui .dash>.customer-number-summary[data-account-panel="overview"],
+body.account-premium-ui .dash>.overview-saved-info[data-account-panel="overview"],
+body.account-premium-ui .dash>.owner-product-gap-shortcut[data-account-panel="overview"]{
+  grid-column:span 6!important;
+  min-height:154px!important;
+  margin:0!important;
+  padding:20px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+body.account-premium-ui .dash>.plan-summary[data-account-panel="overview"],
+body.account-premium-ui .dash>.overview-saved-info[data-account-panel="overview"]{border-right:1px solid var(--account-line)!important}
+body.account-premium-ui .dash>.overview-saved-info[data-account-panel="overview"],
+body.account-premium-ui .dash>.owner-product-gap-shortcut[data-account-panel="overview"]{border-top:1px solid var(--account-line)!important}
+body.account-premium-ui .overview-saved-info .empty{border:0!important;border-radius:0!important;background:transparent!important;padding:10px 0 0!important}
+@media(max-width:700px){
+ body.account-premium-ui .account-overview-highlights[data-account-panel="overview"]{grid-template-columns:1fr!important}
+ body.account-premium-ui .account-overview-highlights[data-account-panel="overview"] .account-overview-link:nth-child(odd){border-right:0!important}
+ body.account-premium-ui .account-overview-highlights[data-account-panel="overview"] .account-overview-link:nth-child(n+2){border-top:1px solid var(--account-line)!important}
+ body.account-premium-ui .dash>.plan-summary[data-account-panel="overview"],
+ body.account-premium-ui .dash>.customer-number-summary[data-account-panel="overview"],
+ body.account-premium-ui .dash>.overview-saved-info[data-account-panel="overview"],
+ body.account-premium-ui .dash>.owner-product-gap-shortcut[data-account-panel="overview"]{grid-column:1/-1!important;border-right:0!important}
+ body.account-premium-ui .dash>.customer-number-summary[data-account-panel="overview"],
+ body.account-premium-ui .dash>.overview-saved-info[data-account-panel="overview"],
+ body.account-premium-ui .dash>.owner-product-gap-shortcut[data-account-panel="overview"]{border-top:1px solid var(--account-line)!important}
+}
+</style></head>
   <body class="account-premium-ui">
     <script>
       (() => {
@@ -5885,7 +5960,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
       }, true);
     })();
   </script>
-  <script src="assets/email-provider-logo-connect-v3.js?v=20260921-4"></script>
+  <script src="assets/email-provider-logo-connect-v3.js?v=20260921-6"></script>
   <script src="assets/web-core-shadow.js?v=1"></script>
   <script src="assets/web-concierge-chat.js?v=3"></script>
   <script src="assets/account-header-concierge.js?v=1"></script>
