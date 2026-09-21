@@ -841,10 +841,38 @@ html body.account-premium-ui.account-premium-ui .account-session-note[data-accou
 }
 
 
-/* EMAIL_ACTIONS_EMAIL_TAB_ONLY_V1_20260921 */
+/* EMAIL_ACTIONS_EMAIL_TAB_ONLY_V2_20260921 */
+html body.account-premium-ui.account-premium-ui .account-panel-heading[data-account-panel="email"][hidden]{
+  display:none!important;
+}
 body.account-premium-ui:not(:has(#accountTabEmail[aria-selected="true"])) #emailTopActions{
   display:none!important;
 }
-body.account-premium-ui:has(#accountTabEmail[aria-selected="true"]) #emailTopActions{
+body.account-premium-ui:has(#accountTabEmail[aria-selected="true"]) .account-panel-heading[data-account-panel="email"] #emailTopActions{
+  position:static!important;
+  inset:auto!important;
+  order:4!important;
   display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:8px!important;
+  width:100%!important;
+  margin:10px 0 0!important;
+  padding:0!important;
+}
+body.account-premium-ui:has(#accountTabEmail[aria-selected="true"]) .account-panel-heading[data-account-panel="email"] #emailTopActions .email-page-action{
+  width:auto!important;
+  min-width:128px!important;
+  min-height:40px!important;
+  margin:0!important;
+}
+@media(max-width:760px){
+  body.account-premium-ui:has(#accountTabEmail[aria-selected="true"]) .account-panel-heading[data-account-panel="email"] #emailTopActions{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  body.account-premium-ui:has(#accountTabEmail[aria-selected="true"]) .account-panel-heading[data-account-panel="email"] #emailTopActions .email-page-action{
+    width:100%!important;
+    min-width:0!important;
+  }
 }
