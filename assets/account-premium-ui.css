@@ -326,3 +326,31 @@ html body.account-premium-ui.account-premium-ui.nw-portal-dark footer.footer::af
   box-shadow:none!important;
   filter:none!important;
 }
+
+
+/* NAHWERK overview ambient palette v20260921-1
+ * Overview only: subtle olive / wine / violet / blue atmosphere
+ * inspired by the public NAHWERK concierge surface. Other account tabs
+ * and the light theme intentionally remain unchanged.
+ */
+@supports selector(body:has(*)){
+  html[data-nw-portal-theme="dark"] body.account-premium-ui.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) main,
+  html body.account-premium-ui.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) main{
+    background:
+      radial-gradient(980px 620px at -4% 34%,rgba(111,103,54,.16),transparent 67%),
+      radial-gradient(880px 560px at 58% 15%,rgba(88,38,72,.14),transparent 69%),
+      radial-gradient(920px 640px at 102% 68%,rgba(50,43,100,.15),transparent 70%),
+      radial-gradient(720px 500px at 30% 92%,rgba(36,65,67,.10),transparent 72%),
+      linear-gradient(145deg,#040506 0%,#09080d 48%,#050507 100%)!important;
+    background-attachment:fixed!important;
+  }
+
+  html[data-nw-portal-theme="dark"] body.account-premium-ui.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) .account-hero,
+  html[data-nw-portal-theme="dark"] body.account-premium-ui.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) main>.section,
+  html[data-nw-portal-theme="dark"] body.account-premium-ui.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) .account-section,
+  html body.account-premium-ui.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) .account-hero,
+  html body.account-premium-ui.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) main>.section,
+  html body.account-premium-ui.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) .account-section{
+    background:transparent!important;
+  }
+}
