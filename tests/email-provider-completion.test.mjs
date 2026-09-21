@@ -30,6 +30,44 @@ assert.ok(ui.includes('authcode-context=u4lA8TiGpA'));
 assert.ok(ui.includes('helpAction: "Bei GMX anmelden"'));
 assert.ok(ui.includes('copyProviderEmailForHelpLink'));
 assert.ok(ui.includes('E-Mail-Adresse kopiert. Bei ${label} einfach einfügen.'));
+const providerLoginLinks = [
+  ['yahoo', 'https://login.yahoo.com/', 'Bei Yahoo Mail anmelden'],
+  ['icloud', 'https://account.apple.com/', 'Bei iCloud anmelden'],
+  ['telekom', 'https://www.telekom.de/tech/sam/ess/login', 'Bei Telekom anmelden'],
+  ['fastmail', 'https://app.fastmail.com/login/', 'Bei Fastmail anmelden'],
+  ['zoho', 'https://accounts.zoho.eu/signin?servicename=ZohoMail', 'Bei Zoho anmelden'],
+  ['ionos', 'https://id.ionos.de/identifier?client_app=IONOSMAIL', 'Bei IONOS anmelden'],
+  ['strato', 'https://webmail.strato.de/', 'Bei STRATO anmelden'],
+  ['mailcom', 'https://account.mail.com/ciss/login', 'Bei mail.com anmelden'],
+  ['freenet', 'https://mail.freenet.de/', 'Bei freenet anmelden'],
+  ['mailboxorg', 'https://login.mailbox.org/', 'Bei mailbox.org anmelden'],
+  ['vodafone', 'https://mail.vodafone.de/', 'Bei Vodafone anmelden'],
+  ['arcor', 'https://mail.vodafone.de/', 'Bei Arcor anmelden'],
+  ['kabeldeutschland', 'https://mail.vodafone.de/', 'Bei Kabel Deutschland anmelden'],
+  ['unitymedia', 'https://mail.vodafone.de/', 'Bei Unitymedia anmelden'],
+  ['migadu', 'https://webmail.migadu.com/', 'Bei Migadu anmelden']
+];
+for (const [provider, href, action] of providerLoginLinks) {
+  const start = ui.indexOf(`id: "${provider}"`);
+  assert.ok(start >= 0, provider);
+  const row = ui.slice(start, ui.indexOf('\n', start));
+  assert.ok(row.includes(`helpUrl: "${href}"`), `${provider} login URL`);
+  assert.ok(row.includes(`helpAction: "${action}"`), `${provider} login action`);
+}
+assert.ok(ui.includes('class="email-provider-webde-guide" id="emailProviderCredentialGuide"'));
+assert.ok(ui.includes('id="emailProviderCredentialGuideSteps"'));
+assert.ok(ui.includes('id="emailProviderCredentialVideoToggle"'));
+assert.ok(ui.includes('<strong>Video-Anleitung ansehen</strong>'));
+assert.ok(ui.includes('guide.steps.slice(0, 3)'));
+assert.ok(ui.includes('selected.mode !== "manual" || selected.id === "webde"'));
+assert.ok(ui.includes('GMX einmal freigeben'));
+assert.ok(ui.includes('Yahoo App-Passwort erstellen'));
+assert.ok(ui.includes('Telekom Passwort für E-Mail-Programme'));
+assert.ok(ui.includes('iCloud App-Passwort erstellen'));
+assert.ok(ui.includes('Fastmail App-Passwort erstellen'));
+assert.ok(ui.includes('Zoho IMAP-Zugriff freigeben'));
+assert.ok(ui.includes('mail.com IMAP-Zugriff prüfen'));
+assert.ok(ui.includes('mailbox.org App-Passwort prüfen'));
 assert.match(ui,/id: "webde"[\s\S]{0,420}secret: "Passwort"[\s\S]{0,420}credentialKind: "password_first"/);
 assert.ok(ui.includes('Gib deine E-Mail-Adresse und dein normales Passwort ein.'));
 assert.ok(ui.includes('credentialGuideNeeded'));
