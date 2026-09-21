@@ -4,8 +4,8 @@ import fs from 'node:fs';
 const ui = fs.readFileSync('assets/email-provider-logo-connect-v3.js', 'utf8');
 const callback = fs.readFileSync('oauth/yahoo/callback/index.html', 'utf8');
 
-assert.match(ui, /id: "yahoo"[\s\S]*mode: "yahoo"/);
-assert.ok(ui.includes('/email/connect/yahoo/web'));
+assert.match(ui, /id: "yahoo"[\s\S]*mode: "manual"[\s\S]*secret: "Passwort"[\s\S]*credentialKind: "password_first"/);
+assert.ok(ui.includes('CREATE_YAHOO_APP_PASSWORD'));
 
 assert.ok(ui.includes('/email/connect/auto/web'));
 assert.ok(ui.includes('emailAutoConnectEmail'));
@@ -24,8 +24,11 @@ assert.ok(ui.includes('/email/yahoo/disconnect/web'));
 assert.ok(ui.includes('row.connection_ready !== false'));
 assert.ok(ui.includes('row.direct_support !== false'));
 assert.ok(ui.includes('Noch nicht verfügbar'));
-assert.match(ui,/id: "gmx"[\s\S]{0,320}secret: "App-Passwort"[\s\S]{0,320}credentialKind: "app"/);
-assert.match(ui,/id: "webde"[\s\S]{0,420}credentialKind: "mail_first"/);
+assert.match(ui,/id: "gmx"[\s\S]{0,320}secret: "Passwort"[\s\S]{0,320}credentialKind: "password_first"/);
+assert.match(ui,/id: "webde"[\s\S]{0,420}secret: "Passwort"[\s\S]{0,420}credentialKind: "password_first"/);
+assert.ok(ui.includes('Gib deine E-Mail-Adresse und dein normales Passwort ein.'));
+assert.ok(ui.includes('credentialGuideNeeded'));
+assert.ok(ui.includes('guidance_code'));
 assert.ok(ui.includes("https://auth.web.de/login?prompt=none"));
 assert.ok(ui.includes("authcode-context=VD0Cgr9WhV"));
 assert.ok(ui.includes('emailProviderWebdeGuide'));
@@ -73,7 +76,7 @@ const audioStopAfterVideo = ui.indexOf('function stopWebdeGuideAudio()', videoTo
 assert.ok(videoToggleStart >= 0 && audioStopAfterVideo > videoToggleStart);
 assert.equal(ui.slice(videoToggleStart, audioStopAfterVideo).includes('stopWebdeGuideAudio()'), false);
 assert.ok(ui.includes('renderModal();\n      renderGrid();'));
-assert.match(ui,/id: "fastmail"[\s\S]{0,320}secret: "App-Passwort"[\s\S]{0,320}credentialKind: "app"/);
+assert.match(ui,/id: "fastmail"[\s\S]{0,320}secret: "Passwort"[\s\S]{0,320}credentialKind: "password_first"/);
 assert.ok(ui.includes('emailProviderZohoDc'));
 assert.ok(ui.includes('value="eu"'));
 assert.ok(ui.includes('zoho_organization: organization'));
