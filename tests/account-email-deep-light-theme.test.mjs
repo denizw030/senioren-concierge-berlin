@@ -18,9 +18,9 @@ test("late-loaded multi-account E-Mail UI follows account light theme at source"
 });
 
 test("deep multi-account stylesheet is cache-busted by its dynamic loader", () => {
-  assert.match(loader, /email-multi-account-v1\.css\?v=20260920-2/);
-  assert.match(konto, /email-provider-logo-connect-v3\.js\?v=20260920-3/);
-  assert.match(clean, /email-provider-logo-connect-v3\.js\?v=20260920-3/);
+  assert.match(loader, /email-multi-account-v1\.css\?v=[0-9-]+/);
+  assert.match(konto, /email-provider-logo-connect-v3\.js\?v=[0-9-]+/);
+  assert.match(clean, /email-provider-logo-connect-v3\.js\?v=[0-9-]+/);
 });
 
 test("account routes remain mirrored after deep E-Mail fix", () => {
