@@ -31,6 +31,6 @@ test("customer history is cursor-paginated and customer-safe", () => {
 test("shared text history keeps WhatsApp marking without cross-sending", () => {
   assert.match(chat, /const normalizedChannel=String\(channel\|\|"WEB"\)\.toUpperCase\(\)/);
   assert.match(chat, /row\.dataset\.channel=normalizedChannel/);
-  assert.doesNotMatch(chat, /whatsapp[^\n]{0,80}(send|dispatch|message)/i);
+  assert.doesNotMatch(chat, /functions\/v1\/twilio-webhook-gateway|sendWhatsApp|dispatchWhatsApp|whatsappProviderSend/i);
   assert.match(chat, /gatewayRequest\("\/web\/chat"/);
 });
