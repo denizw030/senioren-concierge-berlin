@@ -8,23 +8,23 @@
   const PROVIDERS = Object.freeze([
     { id: "google", name: "Gmail", mode: "google", logo: "gmail", secret: "", help: "Mit deinem Google-Konto anmelden und NAHWERK freigeben." },
     { id: "microsoft", name: "Outlook", mode: "microsoft", logo: "microsoft", secret: "", help: "Mit deinem Microsoft-Konto anmelden und NAHWERK freigeben." },
-    { id: "yahoo", name: "Yahoo Mail", mode: "manual", logo: "yahoo", secret: "Passwort", credentialKind: "password_first", helpUrl: "", helpAction: "" },
-    { id: "icloud", name: "iCloud Mail", mode: "manual", logo: "icloud", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://support.apple.com/de-de/102654", helpAction: "Apple-Hilfe öffnen" },
+    { id: "yahoo", name: "Yahoo Mail", mode: "manual", logo: "yahoo", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://login.yahoo.com/", helpAction: "Bei Yahoo Mail anmelden" },
+    { id: "icloud", name: "iCloud Mail", mode: "manual", logo: "icloud", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://account.apple.com/", helpAction: "Bei iCloud anmelden" },
     { id: "gmx", name: "GMX", mode: "manual", logo: "gmx", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://auth.gmx.net/login?prompt=none&state=eyJpZCI6ImE1NzI4OGY4LTY4YzUtNDVmOC1hMGI3LWQ0Zjk5OGQyOGRhYiIsImNsaWVudElkIjoiZ214bmV0X2FsbGlnYXRvcl9saXZlIiwieFVpQXBwIjoiZ214bmV0LmFsbGlnYXRvci8yLjIuMSIsInBheWxvYWQiOiJleUowWVhKblpYUlZVa2tpT2lKb2RIUndjem92TDNkbFlteHBibXN1WjIxNExtNWxkQzl0WVdsc0wzTm9iM2RUZEdGeWRGWnBaWGNpTENKd2NtOWpaWE56U1dRaU9pSnZhVjl3YTJObE1TSjkifQ%3D%3D&authcode-context=u4lA8TiGpA", helpAction: "Bei GMX anmelden" },
     { id: "webde", name: "WEB.DE", mode: "manual", logo: "webde", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://anmelden.web.de/", helpAction: "Bei WEB.DE anmelden & freigeben" },
-    { id: "telekom", name: "Telekom Mail", mode: "manual", logo: "telekom", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://www.telekom.de/hilfe/apps-dienste/e-mail/programm-passwort-verwalten", helpAction: "Telekom-Hilfe öffnen" },
-    { id: "fastmail", name: "Fastmail", mode: "manual", logo: "fastmail", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://www.fastmail.help/hc/en-us/articles/360058752854-App-passwords", helpAction: "Fastmail-Hilfe öffnen" },
-    { id: "zoho", name: "Zoho Mail", mode: "manual", logo: "zoho", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://www.zoho.com/de/mail/help/imap-access.html", helpAction: "Zoho-Hilfe öffnen" },
-    { id: "ionos", name: "IONOS", mode: "manual", logo: "ionos", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://www.ionos.de/hilfe/e-mail/allgemeine-themen/serverinformationen-fuer-imap-pop3-und-smtp/", helpAction: "IONOS-Hilfe öffnen" },
-    { id: "strato", name: "STRATO", mode: "manual", logo: "strato", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://www.strato.de/faq/mail/externes-e-mail-programm-mit-strato-e-mail-adresse-nutzen/", helpAction: "STRATO-Hilfe öffnen" },
-    { id: "mailcom", name: "mail.com", mode: "manual", logo: "mailcom", secret: "Passwort", credentialKind: "password_first", helpUrl: "", helpAction: "" },
-    { id: "freenet", name: "freenet", mode: "manual", logo: "freenet", secret: "Passwort", credentialKind: "password_first", helpUrl: "", helpAction: "" },
-    { id: "mailboxorg", name: "mailbox.org", mode: "manual", logo: "mailboxorg", secret: "Passwort", credentialKind: "password_first", helpUrl: "", helpAction: "" },
-    { id: "vodafone", name: "Vodafone Mail", mode: "manual", logo: "vodafone", secret: "Passwort", credentialKind: "password_first", helpUrl: "", helpAction: "" },
-    { id: "arcor", name: "Arcor Mail", mode: "manual", logo: "arcor", secret: "Passwort", credentialKind: "password_first", helpUrl: "", helpAction: "" },
-    { id: "kabeldeutschland", name: "Kabel Deutschland Mail", mode: "manual", logo: "kabeldeutschland", secret: "Passwort", credentialKind: "password_first", helpUrl: "", helpAction: "" },
-    { id: "unitymedia", name: "Unitymedia Mail", mode: "manual", logo: "unitymedia", secret: "Passwort", credentialKind: "password_first", helpUrl: "", helpAction: "" },
-    { id: "migadu", name: "Migadu", mode: "manual", logo: "migadu", secret: "Passwort", credentialKind: "password_first", helpUrl: "", helpAction: "" },
+    { id: "telekom", name: "Telekom Mail", mode: "manual", logo: "telekom", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://www.telekom.de/tech/sam/ess/login", helpAction: "Bei Telekom anmelden" },
+    { id: "fastmail", name: "Fastmail", mode: "manual", logo: "fastmail", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://app.fastmail.com/login/", helpAction: "Bei Fastmail anmelden" },
+    { id: "zoho", name: "Zoho Mail", mode: "manual", logo: "zoho", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://accounts.zoho.eu/signin?servicename=ZohoMail", helpAction: "Bei Zoho anmelden" },
+    { id: "ionos", name: "IONOS", mode: "manual", logo: "ionos", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://id.ionos.de/identifier?client_app=IONOSMAIL", helpAction: "Bei IONOS anmelden" },
+    { id: "strato", name: "STRATO", mode: "manual", logo: "strato", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://webmail.strato.de/", helpAction: "Bei STRATO anmelden" },
+    { id: "mailcom", name: "mail.com", mode: "manual", logo: "mailcom", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://account.mail.com/ciss/login", helpAction: "Bei mail.com anmelden" },
+    { id: "freenet", name: "freenet", mode: "manual", logo: "freenet", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://mail.freenet.de/", helpAction: "Bei freenet anmelden" },
+    { id: "mailboxorg", name: "mailbox.org", mode: "manual", logo: "mailboxorg", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://login.mailbox.org/", helpAction: "Bei mailbox.org anmelden" },
+    { id: "vodafone", name: "Vodafone Mail", mode: "manual", logo: "vodafone", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://mail.vodafone.de/", helpAction: "Bei Vodafone anmelden" },
+    { id: "arcor", name: "Arcor Mail", mode: "manual", logo: "arcor", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://mail.vodafone.de/", helpAction: "Bei Arcor anmelden" },
+    { id: "kabeldeutschland", name: "Kabel Deutschland Mail", mode: "manual", logo: "kabeldeutschland", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://mail.vodafone.de/", helpAction: "Bei Kabel Deutschland anmelden" },
+    { id: "unitymedia", name: "Unitymedia Mail", mode: "manual", logo: "unitymedia", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://mail.vodafone.de/", helpAction: "Bei Unitymedia anmelden" },
+    { id: "migadu", name: "Migadu", mode: "manual", logo: "migadu", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://webmail.migadu.com/", helpAction: "Bei Migadu anmelden" },
     { id: "proton", name: "Proton Mail", mode: "unsupported", logo: "proton", secret: "", help: "Proton Mail benötigt Proton Bridge auf einem lokalen Gerät. Eine direkte serverseitige Verbindung zu NAHWERK wird derzeit nicht unterstützt." },
     { id: "tuta", name: "Tuta Mail", mode: "unsupported", logo: "tuta", secret: "", help: "Tuta bietet keinen normalen IMAP-Zugriff. Eine direkte Verbindung zu NAHWERK wird derzeit nicht unterstützt." }
   ]);
@@ -272,7 +272,7 @@
     backdrop.id = "emailProviderConnectBackdrop";
     backdrop.className = "email-provider-connect-backdrop";
     backdrop.hidden = true;
-    backdrop.innerHTML = '<section class="email-provider-connect-modal" role="dialog" aria-modal="true" aria-labelledby="emailProviderConnectTitle"><div class="email-provider-connect-head"><div class="email-provider-connect-identity"><span id="emailProviderConnectLogo"></span><div><h3 id="emailProviderConnectTitle">E-Mail verbinden</h3><p id="emailProviderConnectSubtitle">Sicher mit NAHWERK verbinden</p></div></div><button class="email-provider-connect-close" id="emailProviderConnectClose" type="button" aria-label="Schließen">×</button></div><p class="email-provider-connect-copy" id="emailProviderConnectCopy"></p><div class="email-provider-account-list" id="emailProviderAccountList"></div><button class="email-provider-add-account" id="emailProviderAddAccount" type="button" hidden>+ Weiteres Konto verbinden</button><div id="emailProviderCredentialFields"><label class="email-provider-connect-field"><span>E-Mail-Adresse</span><input id="emailProviderConnectEmail" type="email" inputmode="email" autocomplete="email" maxlength="320"></label><label class="email-provider-connect-field"><span id="emailProviderConnectSecretLabel">Passwort</span><input id="emailProviderConnectSecret" type="password" autocomplete="current-password" maxlength="512"></label><div id="emailProviderZohoOptions" hidden><label class="email-provider-connect-field"><span>Zoho-Rechenzentrum</span><select id="emailProviderZohoDc"><option value="com">Global (.com)</option><option value="eu">Europa (.eu)</option><option value="in">Indien (.in)</option><option value="com.au">Australien (.com.au)</option><option value="jp">Japan (.jp)</option><option value="ca">Kanada (.ca)</option><option value="sa">Saudi-Arabien (.sa)</option></select></label><label class="email-provider-connect-field"><span><input id="emailProviderZohoOrganization" type="checkbox"> Organisations-/Business-Postfach</span></label></div><button class="email-provider-connect-primary email-provider-connect-inline-submit" id="emailProviderConnectSubmit" type="button">Verbinden</button><div class="email-provider-credential-guide" id="emailProviderCredentialGuide" hidden><strong id="emailProviderCredentialGuideTitle"></strong><span id="emailProviderCredentialGuideText"></span><a id="emailProviderCredentialHelpLink" href="#" target="_blank" rel="noopener noreferrer" hidden></a></div><div class="email-provider-webde-guide" id="emailProviderWebdeGuide" hidden><strong>WEB.DE einmal freigeben</strong><ol><li>Bei WEB.DE anmelden.</li><li>E-Mail-Einstellungen → POP3/IMAP öffnen.</li><li>„POP3- und IMAP-Zugriff erlauben“ einschalten.</li></ol><div class="email-provider-webde-guide-actions"><button class="email-provider-connect-secondary" id="emailProviderWebdeSpeak" type="button">Lena anhören</button><a class="email-provider-webde-login" id="emailProviderWebdeLogin" href="https://auth.web.de/login?prompt=none&amp;state=eyJpZCI6IjczMWU1ZjhhLTgxNTItNGIyZC05YWQzLTlkZTkzZjM2YTY0MiIsImNsaWVudElkIjoid2ViZGVfYWxsaWdhdG9yX2xpdmUiLCJ4VWlBcHAiOiJ3ZWJkZS5hbGxpZ2F0b3IvMi4yLjEiLCJwYXlsb2FkIjoiZXlKMFlYSm5aWFJWVWtraU9pSm9kSFJ3Y3pvdkwzZGxZbXhwYm1zdWQyVmlMbVJsTDIxaGFXd3ZjMmh2ZDFOMFlYSjBWbWxsZHlJc0luQnliMk5sYzNOSlpDSTZJbTlwWDNCclkyVXhJbjA9In0%3D&amp;authcode-context=VD0Cgr9WhV" target="_blank" rel="noopener noreferrer">Bei WEB.DE anmelden</a></div><div class="email-provider-webde-video"><button class="email-provider-webde-video-toggle" id="emailProviderWebdeVideoToggle" type="button" aria-expanded="false"><span class="email-provider-webde-video-play" aria-hidden="true">▶</span><span><strong>Video-Anleitung ansehen</strong><small>So aktivierst du POP3/IMAP bei WEB.DE</small></span></button><video id="emailProviderWebdeVideo" class="email-provider-webde-video-player" preload="none" playsinline muted controls hidden></video></div><span class="email-provider-webde-return">Danach zu NAHWERK zurückkehren, Passwort eingeben und verbinden.</span></div><p class="email-provider-connect-help" id="emailProviderConnectHelp"></p><p class="email-provider-security-note">NAHWERK trägt Server, Ports und Verschlüsselung automatisch ein. Deine Zugangsdaten werden nicht im Browser dauerhaft gespeichert.</p></div><div class="email-provider-connect-message" id="emailProviderConnectMessage" aria-live="polite"></div><div class="email-provider-connect-actions" id="emailProviderConnectActions"><button class="email-provider-connect-secondary" id="emailProviderCancelAdd" type="button" hidden>Abbrechen</button></div></section>';
+    backdrop.innerHTML = '<section class="email-provider-connect-modal" role="dialog" aria-modal="true" aria-labelledby="emailProviderConnectTitle"><div class="email-provider-connect-head"><div class="email-provider-connect-identity"><span id="emailProviderConnectLogo"></span><div><h3 id="emailProviderConnectTitle">E-Mail verbinden</h3><p id="emailProviderConnectSubtitle">Sicher mit NAHWERK verbinden</p></div></div><button class="email-provider-connect-close" id="emailProviderConnectClose" type="button" aria-label="Schließen">×</button></div><p class="email-provider-connect-copy" id="emailProviderConnectCopy"></p><div class="email-provider-account-list" id="emailProviderAccountList"></div><button class="email-provider-add-account" id="emailProviderAddAccount" type="button" hidden>+ Weiteres Konto verbinden</button><div id="emailProviderCredentialFields"><label class="email-provider-connect-field"><span>E-Mail-Adresse</span><input id="emailProviderConnectEmail" type="email" inputmode="email" autocomplete="email" maxlength="320"></label><label class="email-provider-connect-field"><span id="emailProviderConnectSecretLabel">Passwort</span><input id="emailProviderConnectSecret" type="password" autocomplete="current-password" maxlength="512"></label><div id="emailProviderZohoOptions" hidden><label class="email-provider-connect-field"><span>Zoho-Rechenzentrum</span><select id="emailProviderZohoDc"><option value="com">Global (.com)</option><option value="eu">Europa (.eu)</option><option value="in">Indien (.in)</option><option value="com.au">Australien (.com.au)</option><option value="jp">Japan (.jp)</option><option value="ca">Kanada (.ca)</option><option value="sa">Saudi-Arabien (.sa)</option></select></label><label class="email-provider-connect-field"><span><input id="emailProviderZohoOrganization" type="checkbox"> Organisations-/Business-Postfach</span></label></div><button class="email-provider-connect-primary email-provider-connect-inline-submit" id="emailProviderConnectSubmit" type="button">Verbinden</button><div class="email-provider-webde-guide" id="emailProviderCredentialGuide" hidden><strong id="emailProviderCredentialGuideTitle"></strong><ol id="emailProviderCredentialGuideSteps"></ol><div class="email-provider-webde-guide-actions"><a class="email-provider-webde-login" id="emailProviderCredentialHelpLink" href="#" target="_blank" rel="noopener noreferrer" hidden></a></div><div class="email-provider-webde-video"><button class="email-provider-webde-video-toggle" id="emailProviderCredentialVideoToggle" type="button" disabled aria-expanded="false"><span class="email-provider-webde-video-play" aria-hidden="true">▶</span><span><strong>Video-Anleitung ansehen</strong><small id="emailProviderCredentialVideoHint">Video folgt</small></span></button><video id="emailProviderCredentialVideo" class="email-provider-webde-video-player" preload="none" playsinline muted controls hidden></video></div><span class="email-provider-webde-return" id="emailProviderCredentialReturn"></span></div><div class="email-provider-webde-guide" id="emailProviderWebdeGuide" hidden><strong>WEB.DE einmal freigeben</strong><ol><li>Bei WEB.DE anmelden.</li><li>E-Mail-Einstellungen → POP3/IMAP öffnen.</li><li>„POP3- und IMAP-Zugriff erlauben“ einschalten.</li></ol><div class="email-provider-webde-guide-actions"><button class="email-provider-connect-secondary" id="emailProviderWebdeSpeak" type="button">Lena anhören</button><a class="email-provider-webde-login" id="emailProviderWebdeLogin" href="https://auth.web.de/login?prompt=none&amp;state=eyJpZCI6IjczMWU1ZjhhLTgxNTItNGIyZC05YWQzLTlkZTkzZjM2YTY0MiIsImNsaWVudElkIjoid2ViZGVfYWxsaWdhdG9yX2xpdmUiLCJ4VWlBcHAiOiJ3ZWJkZS5hbGxpZ2F0b3IvMi4yLjEiLCJwYXlsb2FkIjoiZXlKMFlYSm5aWFJWVWtraU9pSm9kSFJ3Y3pvdkwzZGxZbXhwYm1zdWQyVmlMbVJsTDIxaGFXd3ZjMmh2ZDFOMFlYSjBWbWxsZHlJc0luQnliMk5sYzNOSlpDSTZJbTlwWDNCclkyVXhJbjA9In0%3D&amp;authcode-context=VD0Cgr9WhV" target="_blank" rel="noopener noreferrer">Bei WEB.DE anmelden</a></div><div class="email-provider-webde-video"><button class="email-provider-webde-video-toggle" id="emailProviderWebdeVideoToggle" type="button" aria-expanded="false"><span class="email-provider-webde-video-play" aria-hidden="true">▶</span><span><strong>Video-Anleitung ansehen</strong><small>So aktivierst du POP3/IMAP bei WEB.DE</small></span></button><video id="emailProviderWebdeVideo" class="email-provider-webde-video-player" preload="none" playsinline muted controls hidden></video></div><span class="email-provider-webde-return">Danach zu NAHWERK zurückkehren, Passwort eingeben und verbinden.</span></div><p class="email-provider-connect-help" id="emailProviderConnectHelp"></p><p class="email-provider-security-note">NAHWERK trägt Server, Ports und Verschlüsselung automatisch ein. Deine Zugangsdaten werden nicht im Browser dauerhaft gespeichert.</p></div><div class="email-provider-connect-message" id="emailProviderConnectMessage" aria-live="polite"></div><div class="email-provider-connect-actions" id="emailProviderConnectActions"><button class="email-provider-connect-secondary" id="emailProviderCancelAdd" type="button" hidden>Abbrechen</button></div></section>';
     document.body.appendChild(backdrop);
     backdrop.addEventListener("click", (event) => { if (event.target === backdrop) closeModal(); });
     document.getElementById("emailProviderConnectClose")?.addEventListener("click", closeModal);
@@ -323,7 +323,7 @@
   }
 
   function copyProviderEmailForHelpLink() {
-    if (!["gmx"].includes(String(selected?.id || ""))) return;
+    if (!selected || selected.mode !== "manual" || selected.id === "webde") return;
     const email = String(document.getElementById("emailProviderConnectEmail")?.value || "").trim();
     if (!email) return;
     const message = document.getElementById("emailProviderConnectMessage");
@@ -531,22 +531,27 @@
     setText(document.getElementById("emailProviderConnectHelp"), "");
     const guide = document.getElementById("emailProviderCredentialGuide");
     const guideTitle = document.getElementById("emailProviderCredentialGuideTitle");
-    const guideText = document.getElementById("emailProviderCredentialGuideText");
+    const guideSteps = document.getElementById("emailProviderCredentialGuideSteps");
     const helpLink = document.getElementById("emailProviderCredentialHelpLink");
+    const guideVideoHint = document.getElementById("emailProviderCredentialVideoHint");
+    const guideReturn = document.getElementById("emailProviderCredentialReturn");
     const webdeGuide = document.getElementById("emailProviderWebdeGuide");
     if (selected.mode === "manual" && credentialGuideNeeded && selected.id !== "webde") {
       const guidance = providerCredentialFailureGuide(selected, { guidance_code: credentialGuideCode });
       if (guide) guide.hidden = false;
       setText(guideTitle, guidance.title);
-      setText(guideText, guidance.text);
+      if (guideSteps) guideSteps.innerHTML = guidance.steps.map((step) => `<li>${esc(step)}</li>`).join("");
+      setText(guideVideoHint, guidance.videoHint);
+      setText(guideReturn, guidance.returnText);
       if (helpLink) {
         const href = String(selected.helpUrl || "");
         helpLink.hidden = !href;
         helpLink.href = href || "#";
-        helpLink.textContent = String(selected.helpAction || "Hilfe beim Anbieter öffnen");
+        helpLink.textContent = String(selected.helpAction || `Bei ${selected.name} anmelden`);
       }
     } else {
       if (guide) guide.hidden = true;
+      if (guideSteps) guideSteps.innerHTML = "";
       if (helpLink) helpLink.hidden = true;
     }
     renderAccounts();
@@ -703,22 +708,115 @@
 
   function providerCredentialFailureGuide(provider, error) {
     const code = String(error?.guidance_code || error?.payload?.guidance_code || "");
+    const id = String(provider?.id || "").toLowerCase();
     const name = String(provider?.name || "deinem Anbieter");
-    const map = {
-      ENABLE_POP_IMAP_THEN_RETRY: { title: "Zugriff für E-Mail-Programme aktivieren", text: `Bei ${name} ist der Zugriff für E-Mail-Programme wahrscheinlich noch nicht freigegeben. Aktiviere POP3/IMAP beim Anbieter und versuche danach mit demselben Passwort erneut.` },
-      ENABLE_POP_IMAP_SMTP_THEN_RETRY: { title: "E-Mail-Zugriff aktivieren", text: `Bei ${name} ist der Zugriff für externe E-Mail-Programme wahrscheinlich noch deaktiviert. Aktiviere POP3/IMAP/SMTP und versuche danach erneut.` },
-      ENABLE_IMAP_THEN_RETRY: { title: "IMAP aktivieren", text: `Bei ${name} muss IMAP möglicherweise zuerst freigeschaltet werden. Aktiviere den Zugriff und versuche danach erneut.` },
-      ENABLE_POP_IMAP_PREMIUM_REQUIRED: { title: "POP3/IMAP prüfen", text: `Bei ${name} kann POP3/IMAP vom Tarif oder einer Freigabe abhängen. Prüfe den Zugriff beim Anbieter und versuche danach erneut.` },
-      CREATE_MAIL_PROGRAM_PASSWORD: { title: "Passwort für E-Mail-Programme erforderlich", text: `${name} verlangt für externe E-Mail-Programme ein separates Passwort. Richte es beim Anbieter ein und gib dieses anschließend hier ein.` },
-      CREATE_YAHOO_APP_PASSWORD: { title: "Zusätzliches Passwort erforderlich", text: "Yahoo hat das normale Passwort für diese Verbindung nicht akzeptiert. Erstelle bei Yahoo ein Passwort für eine externe Mail-App und gib es anschließend hier ein." },
-      CREATE_ICLOUD_APP_SPECIFIC_PASSWORD: { title: "Zusätzliches Passwort erforderlich", text: "iCloud hat das normale Passwort für diese Verbindung nicht akzeptiert. Erstelle bei Apple ein app-spezifisches Passwort und gib es anschließend hier ein." },
-      CREATE_FASTMAIL_APP_PASSWORD: { title: "Zusätzliches Passwort erforderlich", text: "Fastmail hat das normale Passwort für diese Verbindung nicht akzeptiert. Erstelle bei Fastmail ein App-Passwort und gib es anschließend hier ein." },
-      CREATE_APP_PASSWORD_IF_2FA: { title: "Anmeldung prüfen", text: `Wenn bei ${name} die Zwei-Faktor-Anmeldung aktiv ist, kann ein separates Passwort für Mail-Apps erforderlich sein.` },
-      USE_EMAIL_IMAP_PASSWORD: { title: "E-Mail-Passwort prüfen", text: `Verwende bei ${name} das Passwort, das für dieses E-Mail-Postfach bzw. den IMAP-Zugriff gilt.` },
-      CHECK_MAILBOX_PASSWORD: { title: "Passwort prüfen", text: `Prüfe bei ${name}, ob du das Passwort des E-Mail-Postfachs und nicht ein separates Kundenkonto-Passwort verwendest.` }
+    const guides = {
+      gmx: {
+        title: "GMX einmal freigeben",
+        steps: ["Bei GMX anmelden.", "E-Mail-Einstellungen → POP3/IMAP öffnen.", "„POP3- und IMAP-Zugriff erlauben“ einschalten."],
+        videoHint: "So aktivierst du POP3/IMAP bei GMX"
+      },
+      yahoo: {
+        title: "Yahoo App-Passwort erstellen",
+        steps: ["Bei Yahoo anmelden.", "Account-Sicherheit → Externe Verbindungen öffnen.", "App-Passwort erstellen und anschließend hier verwenden."],
+        videoHint: "So erstellst du ein Yahoo App-Passwort"
+      },
+      telekom: {
+        title: "Telekom Passwort für E-Mail-Programme",
+        steps: ["Bei Telekom anmelden.", "Im E-Mail Center ein „Passwort für E-Mail-Programme“ einrichten.", "Dieses Passwort anschließend hier verwenden."],
+        videoHint: "So richtest du das E-Mail-Programm-Passwort ein"
+      },
+      icloud: {
+        title: "iCloud App-Passwort erstellen",
+        steps: ["Bei deinem Apple Account anmelden.", "Anmeldung & Sicherheit → App-spezifische Passwörter öffnen.", "App-spezifisches Passwort erstellen und anschließend hier verwenden."],
+        videoHint: "So erstellst du ein iCloud App-Passwort"
+      },
+      fastmail: {
+        title: "Fastmail App-Passwort erstellen",
+        steps: ["Bei Fastmail anmelden.", "Einstellungen → Datenschutz & Sicherheit → App-Passwörter öffnen.", "App-Passwort erstellen; Fastmail Basic unterstützt kein IMAP/SMTP."],
+        videoHint: "So erstellst du ein Fastmail App-Passwort"
+      },
+      zoho: {
+        title: "Zoho IMAP-Zugriff freigeben",
+        steps: ["Bei Zoho anmelden.", "In Zoho Mail den IMAP-Zugriff aktivieren.", "Bei MFA ein anwendungsspezifisches Passwort erstellen und anschließend hier verwenden."],
+        videoHint: "So aktivierst du IMAP bei Zoho"
+      },
+      ionos: {
+        title: "IONOS Zugang prüfen",
+        steps: ["Bei IONOS Webmail anmelden.", "E-Mail-Adresse und Passwort dieses Postfachs prüfen.", "Danach mit demselben Postfach-Passwort bei NAHWERK erneut verbinden."],
+        videoHint: "So prüfst du deinen IONOS Mail-Zugang"
+      },
+      strato: {
+        title: "STRATO Zugang prüfen",
+        steps: ["Bei STRATO Webmail anmelden.", "E-Mail-Adresse und Passwort dieses Postfachs prüfen.", "Danach mit demselben E-Mail-Passwort bei NAHWERK erneut verbinden."],
+        videoHint: "So prüfst du deinen STRATO Mail-Zugang"
+      },
+      mailcom: {
+        title: "mail.com IMAP-Zugriff prüfen",
+        steps: ["Bei mail.com anmelden.", "Prüfen, ob dein Tarif POP3/IMAP unterstützt – das ist eine Premium-Funktion.", "Bei Premium mit dem E-Mail-Passwort erneut bei NAHWERK verbinden."],
+        videoHint: "So prüfst du POP3/IMAP bei mail.com"
+      },
+      freenet: {
+        title: "freenet E-Mail-Zugriff aktivieren",
+        steps: ["Bei freenet anmelden.", "POP3/IMAP/SMTP für externe E-Mail-Programme aktivieren.", "Danach mit demselben E-Mail-Passwort erneut verbinden."],
+        videoHint: "So aktivierst du den E-Mail-Zugriff bei freenet"
+      },
+      mailboxorg: {
+        title: "mailbox.org App-Passwort prüfen",
+        steps: ["Bei mailbox.org anmelden.", "Bei aktiver 2FA unter Sicherheit ein E-Mail-App-Passwort für IMAP/SMTP erstellen.", "Dieses App-Passwort anschließend hier verwenden."],
+        videoHint: "So erstellst du ein mailbox.org E-Mail-App-Passwort"
+      },
+      vodafone: {
+        title: "Vodafone Mail-Zugang prüfen",
+        steps: ["Bei Vodafone Mail anmelden.", "Vollständige E-Mail-Adresse und E-Mail-/IMAP-Passwort prüfen.", "Danach mit diesen Zugangsdaten bei NAHWERK erneut verbinden."],
+        videoHint: "So prüfst du deinen Vodafone Mail-Zugang"
+      },
+      arcor: {
+        title: "Arcor Mail-Zugang prüfen",
+        steps: ["Bei Vodafone Mail für Arcor anmelden.", "Vollständige Arcor-Adresse und E-Mail-/IMAP-Passwort prüfen.", "Danach mit diesen Zugangsdaten bei NAHWERK erneut verbinden."],
+        videoHint: "So prüfst du deinen Arcor Mail-Zugang"
+      },
+      kabeldeutschland: {
+        title: "Kabel Deutschland Mail-Zugang prüfen",
+        steps: ["Bei Vodafone Mail anmelden.", "Vollständige Kabel-Deutschland-Adresse und E-Mail-/IMAP-Passwort prüfen.", "Danach mit diesen Zugangsdaten bei NAHWERK erneut verbinden."],
+        videoHint: "So prüfst du deinen Kabel Deutschland Mail-Zugang"
+      },
+      unitymedia: {
+        title: "Unitymedia Mail-Zugang prüfen",
+        steps: ["Bei Vodafone Mail anmelden.", "Vollständige Unitymedia-Adresse und E-Mail-/IMAP-Passwort prüfen.", "Danach mit diesen Zugangsdaten bei NAHWERK erneut verbinden."],
+        videoHint: "So prüfst du deinen Unitymedia Mail-Zugang"
+      },
+      migadu: {
+        title: "Migadu Zugang prüfen",
+        steps: ["Bei Migadu Webmail anmelden.", "Vollständige Mailbox-Adresse und Mailbox-Passwort prüfen.", "Danach mit demselben Mailbox-Passwort bei NAHWERK erneut verbinden."],
+        videoHint: "So prüfst du deinen Migadu Mail-Zugang"
+      }
     };
-    const fallback = { title: "Anmeldung nicht bestätigt", text: `Das normale Passwort wurde von ${name} nicht akzeptiert. Prüfe zuerst, ob der Zugriff für E-Mail-Programme beim Anbieter freigegeben werden muss.` };
-    return { code, ...(map[code] || fallback) };
+    const codeFallbacks = {
+      ENABLE_POP_IMAP_THEN_RETRY: ["Beim Anbieter anmelden.", "POP3/IMAP für externe E-Mail-Programme aktivieren.", "Danach mit demselben Passwort erneut verbinden."],
+      ENABLE_POP_IMAP_SMTP_THEN_RETRY: ["Beim Anbieter anmelden.", "POP3/IMAP/SMTP für externe E-Mail-Programme aktivieren.", "Danach mit demselben Passwort erneut verbinden."],
+      ENABLE_IMAP_THEN_RETRY: ["Beim Anbieter anmelden.", "IMAP für externe E-Mail-Programme aktivieren.", "Danach erneut verbinden."],
+      ENABLE_POP_IMAP_PREMIUM_REQUIRED: ["Beim Anbieter anmelden.", "Prüfen, ob der Tarif POP3/IMAP unterstützt.", "Danach erneut verbinden."],
+      CREATE_MAIL_PROGRAM_PASSWORD: ["Beim Anbieter anmelden.", "Ein separates Passwort für E-Mail-Programme erstellen.", "Dieses Passwort anschließend hier verwenden."],
+      CREATE_YAHOO_APP_PASSWORD: ["Bei Yahoo anmelden.", "Ein App-Passwort für externe Mail-Apps erstellen.", "Dieses Passwort anschließend hier verwenden."],
+      CREATE_ICLOUD_APP_SPECIFIC_PASSWORD: ["Beim Apple Account anmelden.", "Ein app-spezifisches Passwort erstellen.", "Dieses Passwort anschließend hier verwenden."],
+      CREATE_FASTMAIL_APP_PASSWORD: ["Bei Fastmail anmelden.", "Ein App-Passwort erstellen.", "Dieses Passwort anschließend hier verwenden."],
+      CREATE_APP_PASSWORD_IF_2FA: ["Beim Anbieter anmelden.", "Bei aktiver 2FA ein App-Passwort für E-Mail erstellen.", "Dieses Passwort anschließend hier verwenden."],
+      USE_EMAIL_IMAP_PASSWORD: ["Beim Anbieter anmelden.", "E-Mail-/IMAP-Passwort prüfen.", "Danach mit diesem Passwort erneut verbinden."],
+      CHECK_MAILBOX_PASSWORD: ["Beim Anbieter anmelden.", "Passwort des E-Mail-Postfachs prüfen.", "Danach mit diesem Passwort erneut verbinden."]
+    };
+    const guide = guides[id] || {
+      title: `${name} Anmeldung prüfen`,
+      steps: codeFallbacks[code] || ["Beim Anbieter anmelden.", "E-Mail-Adresse und Passwort des Postfachs prüfen.", "Danach erneut bei NAHWERK verbinden."],
+      videoHint: `Anleitung für ${name} folgt`
+    };
+    return {
+      code,
+      title: guide.title,
+      steps: guide.steps.slice(0, 3),
+      videoHint: guide.videoHint,
+      returnText: "Danach zu NAHWERK zurückkehren und mit dem passenden Passwort erneut verbinden."
+    };
   }
   function connectionErrorMessage(error) {
     const code = String(error?.message || error || "");
