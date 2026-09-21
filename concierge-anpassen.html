@@ -503,6 +503,7 @@ html[data-nw-portal-theme="light"] body.concierge-portal-settings .nw-voice-prev
       const response=await fetch(GATEWAY_URL+"/web/chat",{method:"POST",headers:{Authorization:"Bearer "+s.session_token,"Content-Type":"application/json"},body:JSON.stringify({message:"Wechsle zu "+key,source_message_id:sourceId,thread_id:threadId}),cache:"no-store",credentials:"omit"});
       const body=await response.json().catch(()=>({}));
       if(!response.ok||body?.ok!==true||body?.authoritative!==true)throw new Error("switch_failed");
+      personaPrefetchPromise=null;
       await loadCanonicalPersona(s);
       render();
       show("Concierge gewechselt: "+activePersonaName()+".");

@@ -36,6 +36,14 @@ test("Concierge settings mounts and reveals the slider only after authoritative 
   assert.match(settings, /concierge-carousel\.js\?v=24/);
 });
 
+test("Concierge switch drops stale persona prefetch before authoritative reload", () => {
+  const start = settings.indexOf("async function switchCanonicalPersona");
+  const end = settings.indexOf("function render()", start);
+  const block = settings.slice(start, end);
+  assert.match(block, /personaPrefetchPromise=null;\s*await loadCanonicalPersona\(s\);/);
+  assert.ok(block.indexOf("personaPrefetchPromise=null;") < block.indexOf("await loadCanonicalPersona(s);"));
+});
+
 test("clean account and Concierge settings routes remain exact mirrors apart from base href", () => {
   assert.equal(account, accountClean.replace('<head><base href="/">','<head>'));
   assert.equal(settings, settingsClean.replace('<head><base href="/">','<head>'));
