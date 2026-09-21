@@ -68,6 +68,9 @@
   let webdeGuideNeeded = false;
   let webdeGuideAudio = null;
   let webdeGuideAudioUrl = "";
+  let webdeGuideAudioPrefetch = null;
+  let webdeGuideVideoUrl = "";
+  let webdeGuideVideoPromise = null;
   const connectErrors = Object.create(null);
 
   const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
@@ -260,13 +263,14 @@
     backdrop.id = "emailProviderConnectBackdrop";
     backdrop.className = "email-provider-connect-backdrop";
     backdrop.hidden = true;
-    backdrop.innerHTML = '<section class="email-provider-connect-modal" role="dialog" aria-modal="true" aria-labelledby="emailProviderConnectTitle"><div class="email-provider-connect-head"><div class="email-provider-connect-identity"><span id="emailProviderConnectLogo"></span><div><h3 id="emailProviderConnectTitle">E-Mail verbinden</h3><p id="emailProviderConnectSubtitle">Sicher mit NAHWERK verbinden</p></div></div><button class="email-provider-connect-close" id="emailProviderConnectClose" type="button" aria-label="Schließen">×</button></div><p class="email-provider-connect-copy" id="emailProviderConnectCopy"></p><div class="email-provider-account-list" id="emailProviderAccountList"></div><button class="email-provider-add-account" id="emailProviderAddAccount" type="button" hidden>+ Weiteres Konto verbinden</button><div id="emailProviderCredentialFields"><label class="email-provider-connect-field"><span>E-Mail-Adresse</span><input id="emailProviderConnectEmail" type="email" inputmode="email" autocomplete="email" maxlength="320"></label><label class="email-provider-connect-field"><span id="emailProviderConnectSecretLabel">Passwort</span><input id="emailProviderConnectSecret" type="password" autocomplete="current-password" maxlength="512"></label><div id="emailProviderZohoOptions" hidden><label class="email-provider-connect-field"><span>Zoho-Rechenzentrum</span><select id="emailProviderZohoDc"><option value="com">Global (.com)</option><option value="eu">Europa (.eu)</option><option value="in">Indien (.in)</option><option value="com.au">Australien (.com.au)</option><option value="jp">Japan (.jp)</option><option value="ca">Kanada (.ca)</option><option value="sa">Saudi-Arabien (.sa)</option></select></label><label class="email-provider-connect-field"><span><input id="emailProviderZohoOrganization" type="checkbox"> Organisations-/Business-Postfach</span></label></div><button class="email-provider-connect-primary email-provider-connect-inline-submit" id="emailProviderConnectSubmit" type="button">Verbinden</button><div class="email-provider-credential-guide" id="emailProviderCredentialGuide" hidden><strong id="emailProviderCredentialGuideTitle"></strong><span id="emailProviderCredentialGuideText"></span><a id="emailProviderCredentialHelpLink" href="#" target="_blank" rel="noopener noreferrer" hidden></a></div><div class="email-provider-webde-guide" id="emailProviderWebdeGuide" hidden><strong>WEB.DE einmal freigeben</strong><ol><li>Bei WEB.DE anmelden.</li><li>E-Mail-Einstellungen → POP3/IMAP öffnen.</li><li>„POP3- und IMAP-Zugriff erlauben“ einschalten.</li></ol><div class="email-provider-webde-guide-actions"><button class="email-provider-connect-secondary" id="emailProviderWebdeSpeak" type="button">Lena anhören</button><a class="email-provider-webde-login" id="emailProviderWebdeLogin" href="https://auth.web.de/login?prompt=none&amp;state=eyJpZCI6IjczMWU1ZjhhLTgxNTItNGIyZC05YWQzLTlkZTkzZjM2YTY0MiIsImNsaWVudElkIjoid2ViZGVfYWxsaWdhdG9yX2xpdmUiLCJ4VWlBcHAiOiJ3ZWJkZS5hbGxpZ2F0b3IvMi4yLjEiLCJwYXlsb2FkIjoiZXlKMFlYSm5aWFJWVWtraU9pSm9kSFJ3Y3pvdkwzZGxZbXhwYm1zdWQyVmlMbVJsTDIxaGFXd3ZjMmh2ZDFOMFlYSjBWbWxsZHlJc0luQnliMk5sYzNOSlpDSTZJbTlwWDNCclkyVXhJbjA9In0%3D&amp;authcode-context=VD0Cgr9WhV" target="_blank" rel="noopener noreferrer">Bei WEB.DE anmelden</a></div><span class="email-provider-webde-return">Danach zu NAHWERK zurückkehren, Passwort eingeben und verbinden.</span></div><p class="email-provider-connect-help" id="emailProviderConnectHelp"></p><p class="email-provider-security-note">NAHWERK trägt Server, Ports und Verschlüsselung automatisch ein. Deine Zugangsdaten werden nicht im Browser dauerhaft gespeichert.</p></div><div class="email-provider-connect-message" id="emailProviderConnectMessage" aria-live="polite"></div><div class="email-provider-connect-actions" id="emailProviderConnectActions"><button class="email-provider-connect-secondary" id="emailProviderCancelAdd" type="button" hidden>Abbrechen</button></div></section>';
+    backdrop.innerHTML = '<section class="email-provider-connect-modal" role="dialog" aria-modal="true" aria-labelledby="emailProviderConnectTitle"><div class="email-provider-connect-head"><div class="email-provider-connect-identity"><span id="emailProviderConnectLogo"></span><div><h3 id="emailProviderConnectTitle">E-Mail verbinden</h3><p id="emailProviderConnectSubtitle">Sicher mit NAHWERK verbinden</p></div></div><button class="email-provider-connect-close" id="emailProviderConnectClose" type="button" aria-label="Schließen">×</button></div><p class="email-provider-connect-copy" id="emailProviderConnectCopy"></p><div class="email-provider-account-list" id="emailProviderAccountList"></div><button class="email-provider-add-account" id="emailProviderAddAccount" type="button" hidden>+ Weiteres Konto verbinden</button><div id="emailProviderCredentialFields"><label class="email-provider-connect-field"><span>E-Mail-Adresse</span><input id="emailProviderConnectEmail" type="email" inputmode="email" autocomplete="email" maxlength="320"></label><label class="email-provider-connect-field"><span id="emailProviderConnectSecretLabel">Passwort</span><input id="emailProviderConnectSecret" type="password" autocomplete="current-password" maxlength="512"></label><div id="emailProviderZohoOptions" hidden><label class="email-provider-connect-field"><span>Zoho-Rechenzentrum</span><select id="emailProviderZohoDc"><option value="com">Global (.com)</option><option value="eu">Europa (.eu)</option><option value="in">Indien (.in)</option><option value="com.au">Australien (.com.au)</option><option value="jp">Japan (.jp)</option><option value="ca">Kanada (.ca)</option><option value="sa">Saudi-Arabien (.sa)</option></select></label><label class="email-provider-connect-field"><span><input id="emailProviderZohoOrganization" type="checkbox"> Organisations-/Business-Postfach</span></label></div><button class="email-provider-connect-primary email-provider-connect-inline-submit" id="emailProviderConnectSubmit" type="button">Verbinden</button><div class="email-provider-credential-guide" id="emailProviderCredentialGuide" hidden><strong id="emailProviderCredentialGuideTitle"></strong><span id="emailProviderCredentialGuideText"></span><a id="emailProviderCredentialHelpLink" href="#" target="_blank" rel="noopener noreferrer" hidden></a></div><div class="email-provider-webde-guide" id="emailProviderWebdeGuide" hidden><strong>WEB.DE einmal freigeben</strong><ol><li>Bei WEB.DE anmelden.</li><li>E-Mail-Einstellungen → POP3/IMAP öffnen.</li><li>„POP3- und IMAP-Zugriff erlauben“ einschalten.</li></ol><div class="email-provider-webde-guide-actions"><button class="email-provider-connect-secondary" id="emailProviderWebdeSpeak" type="button">Lena anhören</button><a class="email-provider-webde-login" id="emailProviderWebdeLogin" href="https://auth.web.de/login?prompt=none&amp;state=eyJpZCI6IjczMWU1ZjhhLTgxNTItNGIyZC05YWQzLTlkZTkzZjM2YTY0MiIsImNsaWVudElkIjoid2ViZGVfYWxsaWdhdG9yX2xpdmUiLCJ4VWlBcHAiOiJ3ZWJkZS5hbGxpZ2F0b3IvMi4yLjEiLCJwYXlsb2FkIjoiZXlKMFlYSm5aWFJWVWtraU9pSm9kSFJ3Y3pvdkwzZGxZbXhwYm1zdWQyVmlMbVJsTDIxaGFXd3ZjMmh2ZDFOMFlYSjBWbWxsZHlJc0luQnliMk5sYzNOSlpDSTZJbTlwWDNCclkyVXhJbjA9In0%3D&amp;authcode-context=VD0Cgr9WhV" target="_blank" rel="noopener noreferrer">Bei WEB.DE anmelden</a></div><div class="email-provider-webde-video"><button class="email-provider-webde-video-toggle" id="emailProviderWebdeVideoToggle" type="button" aria-expanded="false"><span class="email-provider-webde-video-play" aria-hidden="true">▶</span><span><strong>Video-Anleitung ansehen</strong><small>So aktivierst du POP3/IMAP bei WEB.DE</small></span></button><video id="emailProviderWebdeVideo" class="email-provider-webde-video-player" preload="none" playsinline muted controls hidden></video></div><span class="email-provider-webde-return">Danach zu NAHWERK zurückkehren, Passwort eingeben und verbinden.</span></div><p class="email-provider-connect-help" id="emailProviderConnectHelp"></p><p class="email-provider-security-note">NAHWERK trägt Server, Ports und Verschlüsselung automatisch ein. Deine Zugangsdaten werden nicht im Browser dauerhaft gespeichert.</p></div><div class="email-provider-connect-message" id="emailProviderConnectMessage" aria-live="polite"></div><div class="email-provider-connect-actions" id="emailProviderConnectActions"><button class="email-provider-connect-secondary" id="emailProviderCancelAdd" type="button" hidden>Abbrechen</button></div></section>';
     document.body.appendChild(backdrop);
     backdrop.addEventListener("click", (event) => { if (event.target === backdrop) closeModal(); });
     document.getElementById("emailProviderConnectClose")?.addEventListener("click", closeModal);
     document.getElementById("emailProviderConnectSubmit")?.addEventListener("click", () => void submitManual());
     document.getElementById("emailProviderWebdeSpeak")?.addEventListener("click", speakWebdeGuide);
     document.getElementById("emailProviderWebdeLogin")?.addEventListener("click", copyWebdeEmailForLogin);
+    document.getElementById("emailProviderWebdeVideoToggle")?.addEventListener("click", () => void toggleWebdeGuideVideo());
     document.getElementById("emailProviderAddAccount")?.addEventListener("click", () => { addMode = true; renderModal(); });
     document.getElementById("emailProviderCancelAdd")?.addEventListener("click", () => { addMode = false; clearCredentials(); renderModal(); });
     document.addEventListener("keydown", (event) => { if (event.key === "Escape" && !backdrop.hidden) closeModal(); });
@@ -329,6 +333,105 @@
     }
   }
 
+  async function fetchWebdeGuideAudioBlob() {
+    const session = token();
+    if (!session) throw new Error("UNAUTHENTICATED");
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+    try {
+      const response = await fetch(BASE + "/email/guidance/webde/audio", {
+        method: "GET",
+        headers: { Authorization: `Bearer ${session}` },
+        credentials: "omit",
+        signal: controller.signal
+      });
+      if (!response.ok) throw new Error("LENA_AUDIO_FAILED");
+      const blob = await response.blob();
+      if (!blob.size || !String(blob.type || "").startsWith("audio/")) throw new Error("LENA_AUDIO_INVALID");
+      return blob;
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  function prefetchWebdeGuideAudio() {
+    if (selected?.id !== "webde") return;
+    webdeGuideAudioPrefetch = fetchWebdeGuideAudioBlob().catch(() => null);
+  }
+
+  async function ensureWebdeGuideVideoUrl() {
+    if (webdeGuideVideoUrl) return webdeGuideVideoUrl;
+    if (!webdeGuideVideoPromise) {
+      webdeGuideVideoPromise = fetch("/assets/webde-guide-video.b64?v=20260922-1", { credentials: "same-origin" })
+        .then((response) => {
+          if (!response.ok) throw new Error("WEBDE_VIDEO_FAILED");
+          return response.text();
+        })
+        .then((base64) => {
+          const binary = atob(String(base64 || "").trim());
+          const bytes = new Uint8Array(binary.length);
+          for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
+          webdeGuideVideoUrl = URL.createObjectURL(new Blob([bytes], { type: "video/mp4" }));
+          return webdeGuideVideoUrl;
+        })
+        .finally(() => { webdeGuideVideoPromise = null; });
+    }
+    return webdeGuideVideoPromise;
+  }
+
+  function resetWebdeGuideVideo(revoke = false) {
+    const video = document.getElementById("emailProviderWebdeVideo");
+    const button = document.getElementById("emailProviderWebdeVideoToggle");
+    if (video) {
+      try { video.pause(); video.currentTime = 0; } catch {}
+      video.hidden = true;
+      if (revoke) video.removeAttribute("src");
+    }
+    if (button) {
+      button.disabled = false;
+      button.setAttribute("aria-expanded", "false");
+      const strong = button.querySelector("strong");
+      if (strong) strong.textContent = "Video-Anleitung ansehen";
+    }
+    if (revoke && webdeGuideVideoUrl) {
+      try { URL.revokeObjectURL(webdeGuideVideoUrl); } catch {}
+      webdeGuideVideoUrl = "";
+    }
+    if (revoke) webdeGuideVideoPromise = null;
+  }
+
+  async function toggleWebdeGuideVideo() {
+    if (selected?.id !== "webde" || !webdeGuideNeeded) return;
+    const video = document.getElementById("emailProviderWebdeVideo");
+    const button = document.getElementById("emailProviderWebdeVideoToggle");
+    if (!video || !button) return;
+    const strong = button.querySelector("strong");
+
+    if (!video.hidden) {
+      video.pause();
+      video.hidden = true;
+      button.setAttribute("aria-expanded", "false");
+      if (strong) strong.textContent = "Video-Anleitung ansehen";
+      return;
+    }
+
+    button.disabled = true;
+    if (strong) strong.textContent = "Video wird geladen …";
+    try {
+      const url = await ensureWebdeGuideVideoUrl();
+      if (!video.src) video.src = url;
+      video.hidden = false;
+      button.setAttribute("aria-expanded", "true");
+      if (strong) strong.textContent = "Video ausblenden";
+      await video.play().catch(() => {});
+      video.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } catch {
+      if (strong) strong.textContent = "Video konnte nicht geladen werden";
+    } finally {
+      button.disabled = false;
+    }
+  }
+
   function stopWebdeGuideAudio() {
     if (webdeGuideAudio) {
       try { webdeGuideAudio.pause(); webdeGuideAudio.currentTime = 0; } catch {}
@@ -348,22 +451,12 @@
       stopWebdeGuideAudio();
       return;
     }
-    const session = token();
     const button = document.getElementById("emailProviderWebdeSpeak");
-    if (!session) return;
     if (button) { button.disabled = true; button.textContent = "Lena wird geladen …"; }
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 30000);
     try {
-      const response = await fetch(BASE + "/email/guidance/webde/audio", {
-        method: "GET",
-        headers: { Authorization: `Bearer ${session}` },
-        credentials: "omit",
-        signal: controller.signal
-      });
-      if (!response.ok) throw new Error("LENA_AUDIO_FAILED");
-      const blob = await response.blob();
-      if (!blob.size || !String(blob.type || "").startsWith("audio/")) throw new Error("LENA_AUDIO_INVALID");
+      const prefetched = webdeGuideAudioPrefetch ? await webdeGuideAudioPrefetch : null;
+      webdeGuideAudioPrefetch = null;
+      const blob = prefetched || await fetchWebdeGuideAudioBlob();
       stopWebdeGuideAudio();
       webdeGuideAudioUrl = URL.createObjectURL(blob);
       const audio = new Audio(webdeGuideAudioUrl);
@@ -374,9 +467,8 @@
       await audio.play();
       if (button) { button.disabled = false; button.textContent = "Lena stoppen"; }
     } catch {
+      webdeGuideAudioPrefetch = null;
       stopWebdeGuideAudio();
-    } finally {
-      clearTimeout(timeout);
     }
   }
 
@@ -444,7 +536,11 @@
     const actions = document.getElementById("emailProviderConnectActions");
     const submit = document.getElementById("emailProviderConnectSubmit");
     const showCredentials = selected.mode === "manual" && (addMode || rows.length === 0);
-    if (webdeGuide) webdeGuide.hidden = selected.id !== "webde" || !showCredentials || !webdeGuideNeeded;
+    if (webdeGuide) {
+      const showWebdeGuide = selected.id === "webde" && showCredentials && webdeGuideNeeded;
+      webdeGuide.hidden = !showWebdeGuide;
+      if (!showWebdeGuide) resetWebdeGuideVideo();
+    }
     if (fields) fields.hidden = !showCredentials;
     if (zohoOptions) zohoOptions.hidden = !showCredentials || selected.id !== "zoho";
     if (add) add.hidden = selected.mode !== "manual" || rows.length === 0 || addMode;
@@ -484,6 +580,8 @@
     clearCredentials();
     webdeGuideSpoken = false;
     webdeGuideNeeded = false;
+    webdeGuideAudioPrefetch = null;
+    resetWebdeGuideVideo(true);
     stopWebdeGuideAudio();
     const backdrop = document.getElementById("emailProviderConnectBackdrop");
     if (backdrop) backdrop.hidden = true;
@@ -614,9 +712,14 @@
     const message = document.getElementById("emailProviderConnectMessage");
     const button = document.getElementById("emailProviderConnectSubmit");
     let speakWebdeAfterFailure = false;
+    const isWebdeAttempt = selected?.id === "webde";
+    if (isWebdeAttempt) prefetchWebdeGuideAudio();
     busy = true;
     if (button) button.disabled = true;
-    try { await connectManual(); }
+    try {
+      await connectManual();
+      if (isWebdeAttempt) webdeGuideAudioPrefetch = null;
+    }
     catch (error) {
       clearSecretOnly();
       setText(message, connectionErrorMessage(error));
