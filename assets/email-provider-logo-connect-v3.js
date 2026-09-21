@@ -159,7 +159,7 @@
     const button = document.getElementById("emailAutoConnectButton");
     const status = document.getElementById("emailAutoConnectStatus");
     const email = String(input?.value || "").trim().toLowerCase();
-    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setText(status, "Bitte eine gültige E-Mail-Adresse eingeben.");
       return;
     }

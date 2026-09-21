@@ -13,6 +13,9 @@ assert.ok(ui.includes('Anbieter wird erkannt'));
 assert.ok(ui.includes('NAHWERK erkennt den Anbieter automatisch'));
 assert.ok(ui.includes('CREDENTIALS_REQUIRED'));
 assert.ok(ui.includes('email_provider_selection_required'));
+const slash = String.fromCharCode(92);
+assert.ok(ui.includes('[^' + slash + 's@]'));
+assert.equal(ui.includes('[^' + slash + slash + 's@]'), false);
 
 const emailReturn = fs.readFileSync('email-concierge.html', 'utf8');
 assert.ok(emailReturn.includes('["GOOGLE","MICROSOFT","YAHOO"].includes(provider)'));
