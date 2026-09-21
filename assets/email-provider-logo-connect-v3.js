@@ -8,23 +8,23 @@
   const PROVIDERS = Object.freeze([
     { id: "google", name: "Gmail", mode: "google", logo: "gmail", secret: "", help: "Mit deinem Google-Konto anmelden und NAHWERK freigeben." },
     { id: "microsoft", name: "Outlook", mode: "microsoft", logo: "microsoft", secret: "", help: "Mit deinem Microsoft-Konto anmelden und NAHWERK freigeben." },
-    { id: "yahoo", name: "Yahoo Mail", mode: "yahoo", logo: "yahoo", secret: "", help: "Mit deinem Yahoo-Konto anmelden und NAHWERK freigeben." },
-    { id: "icloud", name: "iCloud Mail", mode: "manual", logo: "icloud", secret: "App-spezifisches Passwort", credentialKind: "app", help: "Apple nutzt für externe Mail-Dienste ein app-spezifisches Passwort.", helpUrl: "https://support.apple.com/de-de/102654", helpAction: "App-Passwort bei Apple erstellen" },
-    { id: "gmx", name: "GMX", mode: "manual", logo: "gmx", secret: "App-Passwort", credentialKind: "app", help: "Für NAHWERK verwendest du bei GMX ein separates App-Passwort – nicht dein normales Login-Passwort.", helpUrl: "https://hilfe.gmx.net/account/logindaten/app-passwort.html", helpAction: "App-Passwort bei GMX erstellen" },
-    { id: "webde", name: "WEB.DE", mode: "manual", logo: "webde", secret: "Passwort", credentialKind: "mail_first", help: "WEB.DE braucht einmalig die Freigabe für E-Mail-Programme. NAHWERK führt dich kurz durch die Aktivierung.", helpUrl: "https://anmelden.web.de/", helpAction: "Bei WEB.DE anmelden & freigeben" },
-    { id: "telekom", name: "Telekom Mail", mode: "manual", logo: "telekom", secret: "Passwort für E-Mail-Programme", credentialKind: "mail_program", help: "Für NAHWERK brauchst du das separate „Passwort für E-Mail-Programme“ – nicht dein Telekom Login-Passwort.", helpUrl: "https://www.telekom.de/hilfe/apps-dienste/e-mail/programm-passwort-verwalten", helpAction: "Passwort bei Telekom einrichten" },
-    { id: "fastmail", name: "Fastmail", mode: "manual", logo: "fastmail", secret: "App-Passwort", credentialKind: "app", help: "Fastmail benötigt für externe Dienste ein eigenes App-Passwort. IMAP/SMTP muss in deinem Tarif verfügbar sein.", helpUrl: "https://www.fastmail.help/hc/en-us/articles/360058752854-App-passwords", helpAction: "App-Passwort bei Fastmail erstellen" },
-    { id: "zoho", name: "Zoho Mail", mode: "manual", logo: "zoho", secret: "App- oder Mail-Passwort", credentialKind: "conditional_app", help: "Bei aktivierter Zwei-Faktor-Authentifizierung nutzt du ein App-Passwort. NAHWERK übernimmt die technischen Mailserver-Einstellungen.", helpUrl: "https://www.zoho.com/de/mail/help/imap-access.html", helpAction: "Zoho-Anleitung öffnen" },
-    { id: "ionos", name: "IONOS", mode: "manual", logo: "ionos", secret: "E-Mail-Passwort", credentialKind: "mail", help: "Nutze das Passwort genau dieses IONOS-E-Mail-Postfachs. NAHWERK übernimmt IMAP, SMTP, Ports und Verschlüsselung automatisch.", helpUrl: "https://www.ionos.de/hilfe/e-mail/allgemeine-themen/serverinformationen-fuer-imap-pop3-und-smtp/", helpAction: "IONOS-Hilfe öffnen" },
-    { id: "strato", name: "STRATO", mode: "manual", logo: "strato", secret: "E-Mail-Passwort", credentialKind: "mail", help: "Nutze das Passwort genau dieses STRATO-E-Mail-Postfachs. NAHWERK übernimmt IMAP, SMTP, Ports und Verschlüsselung automatisch.", helpUrl: "https://www.strato.de/faq/mail/externes-e-mail-programm-mit-strato-e-mail-adresse-nutzen/", helpAction: "STRATO-Hilfe öffnen" },
-    { id: "mailcom", name: "mail.com", mode: "manual", logo: "mailcom", secret: "E-Mail-Passwort", credentialKind: "mail", help: "Nutze dein E-Mail-Passwort. Direkter IMAP-Zugriff ist bei mail.com für entsprechend freigeschaltete Konten vorgesehen." },
-    { id: "freenet", name: "freenet", mode: "manual", logo: "freenet", secret: "E-Mail-Passwort", credentialKind: "mail", help: "Nutze dein freenet E-Mail-Passwort. IMAP/SMTP muss im Postfach aktiviert sein; die technischen Daten setzt NAHWERK automatisch." },
-    { id: "mailboxorg", name: "mailbox.org", mode: "manual", logo: "mailboxorg", secret: "Passwort / Mail-App-Passwort", credentialKind: "conditional_app", help: "Bei aktivierter Zwei-Faktor-Authentifizierung nutzt du ein Mail-App-Passwort. NAHWERK übernimmt die technischen Einstellungen." },
-    { id: "vodafone", name: "Vodafone Mail", mode: "manual", logo: "vodafone", secret: "E-Mail-/IMAP-Passwort", credentialKind: "mail", help: "Nutze deine vollständige E-Mail-Adresse und das zugehörige E-Mail-/IMAP-Passwort. Server und Ports setzt NAHWERK automatisch." },
-    { id: "arcor", name: "Arcor Mail", mode: "manual", logo: "arcor", secret: "E-Mail-/IMAP-Passwort", credentialKind: "mail", help: "Nutze deine vollständige E-Mail-Adresse und das E-Mail-/IMAP-Passwort. NAHWERK erkennt die passende Vodafone-Mail-Infrastruktur automatisch." },
-    { id: "kabeldeutschland", name: "Kabel Deutschland Mail", mode: "manual", logo: "kabeldeutschland", secret: "E-Mail-/IMAP-Passwort", credentialKind: "mail", help: "Nutze deine vollständige E-Mail-Adresse und das E-Mail-/IMAP-Passwort. NAHWERK setzt die passenden Mailserver automatisch." },
-    { id: "unitymedia", name: "Unitymedia Mail", mode: "manual", logo: "unitymedia", secret: "E-Mail-/IMAP-Passwort", credentialKind: "mail", help: "Nutze deine vollständige E-Mail-Adresse und das E-Mail-/IMAP-Passwort. NAHWERK setzt die passenden Mailserver automatisch." },
-    { id: "migadu", name: "Migadu", mode: "manual", logo: "migadu", secret: "Mailbox-Passwort", credentialKind: "mail", help: "Nutze die vollständige Mailbox-Adresse und das zugehörige Migadu-Passwort. Die technischen Einstellungen übernimmt NAHWERK." },
+    { id: "yahoo", name: "Yahoo Mail", mode: "manual", logo: "yahoo", secret: "Passwort", credentialKind: "password_first", helpUrl: "", helpAction: "" },
+    { id: "icloud", name: "iCloud Mail", mode: "manual", logo: "icloud", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://support.apple.com/de-de/102654", helpAction: "Apple-Hilfe öffnen" },
+    { id: "gmx", name: "GMX", mode: "manual", logo: "gmx", secret: "Passwort", credentialKind: "password_first", helpUrl: "", helpAction: "" },
+    { id: "webde", name: "WEB.DE", mode: "manual", logo: "webde", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://anmelden.web.de/", helpAction: "Bei WEB.DE anmelden & freigeben" },
+    { id: "telekom", name: "Telekom Mail", mode: "manual", logo: "telekom", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://www.telekom.de/hilfe/apps-dienste/e-mail/programm-passwort-verwalten", helpAction: "Telekom-Hilfe öffnen" },
+    { id: "fastmail", name: "Fastmail", mode: "manual", logo: "fastmail", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://www.fastmail.help/hc/en-us/articles/360058752854-App-passwords", helpAction: "Fastmail-Hilfe öffnen" },
+    { id: "zoho", name: "Zoho Mail", mode: "manual", logo: "zoho", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://www.zoho.com/de/mail/help/imap-access.html", helpAction: "Zoho-Hilfe öffnen" },
+    { id: "ionos", name: "IONOS", mode: "manual", logo: "ionos", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://www.ionos.de/hilfe/e-mail/allgemeine-themen/serverinformationen-fuer-imap-pop3-und-smtp/", helpAction: "IONOS-Hilfe öffnen" },
+    { id: "strato", name: "STRATO", mode: "manual", logo: "strato", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://www.strato.de/faq/mail/externes-e-mail-programm-mit-strato-e-mail-adresse-nutzen/", helpAction: "STRATO-Hilfe öffnen" },
+    { id: "mailcom", name: "mail.com", mode: "manual", logo: "mailcom", secret: "Passwort", credentialKind: "password_first", helpUrl: "", helpAction: "" },
+    { id: "freenet", name: "freenet", mode: "manual", logo: "freenet", secret: "Passwort", credentialKind: "password_first", helpUrl: "", helpAction: "" },
+    { id: "mailboxorg", name: "mailbox.org", mode: "manual", logo: "mailboxorg", secret: "Passwort", credentialKind: "password_first", helpUrl: "", helpAction: "" },
+    { id: "vodafone", name: "Vodafone Mail", mode: "manual", logo: "vodafone", secret: "Passwort", credentialKind: "password_first", helpUrl: "", helpAction: "" },
+    { id: "arcor", name: "Arcor Mail", mode: "manual", logo: "arcor", secret: "Passwort", credentialKind: "password_first", helpUrl: "", helpAction: "" },
+    { id: "kabeldeutschland", name: "Kabel Deutschland Mail", mode: "manual", logo: "kabeldeutschland", secret: "Passwort", credentialKind: "password_first", helpUrl: "", helpAction: "" },
+    { id: "unitymedia", name: "Unitymedia Mail", mode: "manual", logo: "unitymedia", secret: "Passwort", credentialKind: "password_first", helpUrl: "", helpAction: "" },
+    { id: "migadu", name: "Migadu", mode: "manual", logo: "migadu", secret: "Passwort", credentialKind: "password_first", helpUrl: "", helpAction: "" },
     { id: "proton", name: "Proton Mail", mode: "unsupported", logo: "proton", secret: "", help: "Proton Mail benötigt Proton Bridge auf einem lokalen Gerät. Eine direkte serverseitige Verbindung zu NAHWERK wird derzeit nicht unterstützt." },
     { id: "tuta", name: "Tuta Mail", mode: "unsupported", logo: "tuta", secret: "", help: "Tuta bietet keinen normalen IMAP-Zugriff. Eine direkte Verbindung zu NAHWERK wird derzeit nicht unterstützt." }
   ]);
@@ -66,6 +66,8 @@
   let addMode = false;
   let webdeGuideSpoken = false;
   let webdeGuideNeeded = false;
+  let credentialGuideNeeded = false;
+  let credentialGuideCode = "";
   let webdeGuideAudio = null;
   let webdeGuideAudioUrl = "";
   let webdeGuideAudioPrefetch = null;
@@ -91,7 +93,12 @@
     try {
       const response = await fetch(BASE + path, { ...options, headers, credentials: "omit", signal: controller.signal });
       const data = await response.json().catch(() => ({}));
-      if (!response.ok || data?.ok === false) throw new Error(String(data?.error?.code || data?.error || "EMAIL_REQUEST_FAILED"));
+      if (!response.ok || data?.ok === false) {
+        const error = new Error(String(data?.error?.code || data?.error || "EMAIL_REQUEST_FAILED"));
+        error.payload = data;
+        error.guidance_code = String(data?.guidance_code || "");
+        throw error;
+      }
       return data;
     } finally {
       clearTimeout(timeout);
@@ -192,13 +199,15 @@
         addMode = true;
         webdeGuideSpoken = false;
         webdeGuideNeeded = false;
+        credentialGuideNeeded = false;
+        credentialGuideCode = "";
         clearCredentials();
         renderModal();
         const backdrop = document.getElementById("emailProviderConnectBackdrop");
         if (backdrop) backdrop.hidden = false;
         const emailField = document.getElementById("emailProviderConnectEmail");
         if (emailField) emailField.value = email;
-        setText(document.getElementById("emailProviderConnectMessage"), `${data?.provider_label || provider.name} wurde automatisch erkannt. Gib nur noch das benötigte Mail-/App-Passwort ein.`);
+        setText(document.getElementById("emailProviderConnectMessage"), `${data?.provider_label || provider.name} wurde automatisch erkannt. Gib jetzt dein normales Passwort ein.`);
         return;
       }
       throw new Error("EMAIL_PROVIDER_UNAVAILABLE");
@@ -495,37 +504,28 @@
     if (logo) logo.innerHTML = LOGOS[selected.logo];
     setText(document.getElementById("emailProviderConnectTitle"), selected.name);
     setText(document.getElementById("emailProviderConnectSubtitle"), rows.length ? `${rows.length} Konto${rows.length === 1 ? "" : "en"} verbunden` : "Sicher verbinden");
-    setText(document.getElementById("emailProviderConnectCopy"), rows.length ? "Wähle das Konto, das du trennen möchtest. Weitere Konten kannst du jederzeit zusätzlich verbinden." : selected.id === "webde" ? "Gib deine WEB.DE E-Mail-Adresse und dein normales Passwort ein. NAHWERK übernimmt die technischen Einstellungen automatisch." : "Gib nur deine E-Mail-Adresse und das für Mail-Apps vorgesehene Passwort ein. Server, Ports und technische Einstellungen übernimmt NAHWERK.");
-    setText(document.getElementById("emailProviderConnectSecretLabel"), selected.secret || "Passwort");
-    setText(document.getElementById("emailProviderConnectHelp"), selected.help);
+    setText(document.getElementById("emailProviderConnectCopy"), rows.length ? "Wähle das Konto, das du trennen möchtest. Weitere Konten kannst du jederzeit zusätzlich verbinden." : "Gib deine E-Mail-Adresse und dein normales Passwort ein. NAHWERK übernimmt Server, Ports und technische Einstellungen automatisch.");
+    setText(document.getElementById("emailProviderConnectSecretLabel"), "Passwort");
+    setText(document.getElementById("emailProviderConnectHelp"), "");
     const guide = document.getElementById("emailProviderCredentialGuide");
     const guideTitle = document.getElementById("emailProviderCredentialGuideTitle");
     const guideText = document.getElementById("emailProviderCredentialGuideText");
     const helpLink = document.getElementById("emailProviderCredentialHelpLink");
     const webdeGuide = document.getElementById("emailProviderWebdeGuide");
-    if (selected.mode === "manual") {
-      const kind = String(selected.credentialKind || "mail");
-      const title = kind === "mail_program" ? "Welches Passwort?" : kind === "app" ? "App-Passwort verwenden" : kind === "conditional_app" ? "Passwort prüfen" : kind === "mail_first" ? "Einfach dein normales Passwort" : "E-Mail-Passwort verwenden";
-      const text = kind === "mail_program"
-        ? "Nicht dein normales Kundenkonto-Passwort. Verwende das separate Passwort für E-Mail-Programme."
-        : kind === "app"
-          ? "Nicht dein normales Login-Passwort. Erstelle beim Anbieter ein separates App-Passwort für NAHWERK."
-          : kind === "conditional_app"
-            ? "Wenn dein Anbieter Zwei-Faktor-Anmeldung nutzt, brauchst du meist ein separates App-Passwort."
-            : kind === "mail_first"
-              ? "Versuche zuerst dein normales WEB.DE-Passwort. Zusätzliche Schritte zeigt NAHWERK nur, wenn WEB.DE sie tatsächlich verlangt."
-              : "Verwende das Passwort des E-Mail-Postfachs. Technische Serverdaten brauchst du nicht.";
-      if (guide) guide.hidden = selected.id === "webde";
-      setText(guideTitle, title);
-      setText(guideText, text);
+    if (selected.mode === "manual" && credentialGuideNeeded && selected.id !== "webde") {
+      const guidance = providerCredentialFailureGuide(selected, { guidance_code: credentialGuideCode });
+      if (guide) guide.hidden = false;
+      setText(guideTitle, guidance.title);
+      setText(guideText, guidance.text);
       if (helpLink) {
         const href = String(selected.helpUrl || "");
-        helpLink.hidden = selected.id === "webde" || !href;
+        helpLink.hidden = !href;
         helpLink.href = href || "#";
         helpLink.textContent = String(selected.helpAction || "Hilfe beim Anbieter öffnen");
       }
-    } else if (guide) {
-      guide.hidden = true;
+    } else {
+      if (guide) guide.hidden = true;
+      if (helpLink) helpLink.hidden = true;
     }
     renderAccounts();
 
@@ -558,6 +558,8 @@
     addMode = adding || providerConnections(provider.id).length === 0;
     webdeGuideSpoken = false;
     webdeGuideNeeded = false;
+    credentialGuideNeeded = false;
+    credentialGuideCode = "";
     clearCredentials();
     setText(document.getElementById("emailProviderConnectMessage"), "");
     renderModal();
@@ -580,6 +582,8 @@
     clearCredentials();
     webdeGuideSpoken = false;
     webdeGuideNeeded = false;
+    credentialGuideNeeded = false;
+    credentialGuideCode = "";
     webdeGuideAudioPrefetch = null;
     resetWebdeGuideVideo(true);
     stopWebdeGuideAudio();
@@ -675,14 +679,33 @@
     await connectProvider(provider);
   }
 
+  function providerCredentialFailureGuide(provider, error) {
+    const code = String(error?.guidance_code || error?.payload?.guidance_code || "");
+    const name = String(provider?.name || "deinem Anbieter");
+    const map = {
+      ENABLE_POP_IMAP_THEN_RETRY: { title: "Zugriff für E-Mail-Programme aktivieren", text: `Bei ${name} ist der Zugriff für E-Mail-Programme wahrscheinlich noch nicht freigegeben. Aktiviere POP3/IMAP beim Anbieter und versuche danach mit demselben Passwort erneut.` },
+      ENABLE_POP_IMAP_SMTP_THEN_RETRY: { title: "E-Mail-Zugriff aktivieren", text: `Bei ${name} ist der Zugriff für externe E-Mail-Programme wahrscheinlich noch deaktiviert. Aktiviere POP3/IMAP/SMTP und versuche danach erneut.` },
+      ENABLE_IMAP_THEN_RETRY: { title: "IMAP aktivieren", text: `Bei ${name} muss IMAP möglicherweise zuerst freigeschaltet werden. Aktiviere den Zugriff und versuche danach erneut.` },
+      ENABLE_POP_IMAP_PREMIUM_REQUIRED: { title: "POP3/IMAP prüfen", text: `Bei ${name} kann POP3/IMAP vom Tarif oder einer Freigabe abhängen. Prüfe den Zugriff beim Anbieter und versuche danach erneut.` },
+      CREATE_MAIL_PROGRAM_PASSWORD: { title: "Passwort für E-Mail-Programme erforderlich", text: `${name} verlangt für externe E-Mail-Programme ein separates Passwort. Richte es beim Anbieter ein und gib dieses anschließend hier ein.` },
+      CREATE_YAHOO_APP_PASSWORD: { title: "Zusätzliches Passwort erforderlich", text: "Yahoo hat das normale Passwort für diese Verbindung nicht akzeptiert. Erstelle bei Yahoo ein Passwort für eine externe Mail-App und gib es anschließend hier ein." },
+      CREATE_ICLOUD_APP_SPECIFIC_PASSWORD: { title: "Zusätzliches Passwort erforderlich", text: "iCloud hat das normale Passwort für diese Verbindung nicht akzeptiert. Erstelle bei Apple ein app-spezifisches Passwort und gib es anschließend hier ein." },
+      CREATE_FASTMAIL_APP_PASSWORD: { title: "Zusätzliches Passwort erforderlich", text: "Fastmail hat das normale Passwort für diese Verbindung nicht akzeptiert. Erstelle bei Fastmail ein App-Passwort und gib es anschließend hier ein." },
+      CREATE_APP_PASSWORD_IF_2FA: { title: "Anmeldung prüfen", text: `Wenn bei ${name} die Zwei-Faktor-Anmeldung aktiv ist, kann ein separates Passwort für Mail-Apps erforderlich sein.` },
+      USE_EMAIL_IMAP_PASSWORD: { title: "E-Mail-Passwort prüfen", text: `Verwende bei ${name} das Passwort, das für dieses E-Mail-Postfach bzw. den IMAP-Zugriff gilt.` },
+      CHECK_MAILBOX_PASSWORD: { title: "Passwort prüfen", text: `Prüfe bei ${name}, ob du das Passwort des E-Mail-Postfachs und nicht ein separates Kundenkonto-Passwort verwendest.` }
+    };
+    const fallback = { title: "Anmeldung nicht bestätigt", text: `Das normale Passwort wurde von ${name} nicht akzeptiert. Prüfe zuerst, ob der Zugriff für E-Mail-Programme beim Anbieter freigegeben werden muss.` };
+    return { code, ...(map[code] || fallback) };
+  }
   function connectionErrorMessage(error) {
     const code = String(error?.message || error || "");
-    if (code === "provider_authentication_failed" && selected?.id === "webde") return "WEB.DE konnte die Anmeldung mit diesem Passwort nicht bestätigen. Prüfe zuerst, ob der Zugriff für E-Mail-Programme in WEB.DE aktiviert ist. Wenn du die Zwei-Faktor-Anmeldung nutzt, kann WEB.DE zusätzlich ein separates Passwort verlangen.";
-    if (code === "provider_authentication_failed") return "Anmeldung abgelehnt. Prüfe E-Mail-Adresse und Passwort/App-Passwort sowie, ob IMAP/SMTP beim Anbieter aktiviert ist.";
+    if (code === "provider_authentication_failed" && selected?.id === "webde") return "WEB.DE konnte die Anmeldung mit diesem Passwort nicht bestätigen. Prüfe zuerst, ob der Zugriff für E-Mail-Programme in WEB.DE aktiviert ist.";
+    if (code === "provider_authentication_failed") return "Die Anmeldung mit diesem Passwort wurde nicht bestätigt. NAHWERK zeigt dir jetzt den passenden nächsten Schritt.";
     if (code === "provider_tls_connection_failed") return "Die sichere Verbindung zum E-Mail-Anbieter konnte nicht hergestellt werden. Bitte versuche es später erneut.";
     if (code === "provider_connection_failed") return "Der E-Mail-Anbieter ist gerade nicht erreichbar. Bitte versuche es später erneut.";
     if (selected?.id === "webde") return "WEB.DE konnte die Anmeldung gerade nicht bestätigen. Prüfe E-Mail-Adresse und Passwort und versuche es erneut.";
-    return "Anmeldung konnte nicht bestätigt werden. Prüfe bitte E-Mail-Adresse und das für Mail-Apps vorgesehene Passwort.";
+    return "Anmeldung konnte nicht bestätigt werden. Prüfe bitte E-Mail-Adresse und Passwort.";
   }
 
   async function connectManual() {
@@ -727,6 +750,9 @@
         webdeGuideNeeded = true;
         webdeGuideSpoken = false;
         speakWebdeAfterFailure = true;
+      } else {
+        credentialGuideNeeded = true;
+        credentialGuideCode = String(error?.guidance_code || error?.payload?.guidance_code || "");
       }
     } finally {
       busy = false;
