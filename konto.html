@@ -2257,124 +2257,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
   </style>
 
 
-  <style id="konto-overview-lower-match-upper-v3">
-    /* ONLY these four lower overview tiles. Match the upper overview tile surface exactly. */
-    body.account-premium-ui .dash > :is(
-      .plan-summary,
-      .customer-number-summary,
-      .overview-saved-info,
-      .owner-product-gap-shortcut
-    )[data-account-panel="overview"]{
-      position:relative!important;
-      min-width:0!important;
-      width:100%!important;
-      min-height:108px!important;
-      padding:17px 46px 17px 18px!important;
-      margin:0!important;
-      border:1px solid rgba(174,181,192,.16)!important;
-      border-radius:18px!important;
-      background:rgba(5,7,10,.22)!important;
-      box-shadow:none!important;
-      -webkit-backdrop-filter:blur(7px)!important;
-      backdrop-filter:blur(7px)!important;
-      overflow:hidden!important;
-      align-self:stretch!important;
-    }
-
-    body.account-premium-ui .dash > :is(
-      .plan-summary,
-      .overview-saved-info
-    )[data-account-panel="overview"]{
-      grid-column:1 / 7!important;
-    }
-
-    body.account-premium-ui .dash > :is(
-      .customer-number-summary,
-      .owner-product-gap-shortcut
-    )[data-account-panel="overview"]{
-      grid-column:7 / 13!important;
-    }
-
-    body.account-premium-ui .dash > :is(
-      .plan-summary,
-      .customer-number-summary,
-      .overview-saved-info,
-      .owner-product-gap-shortcut
-    )[data-account-panel="overview"] .eyebrow{
-      margin-bottom:8px!important;
-      font-size:10.5px!important;
-      letter-spacing:.09em!important;
-    }
-
-    body.account-premium-ui .dash > :is(
-      .plan-summary,
-      .customer-number-summary
-    )[data-account-panel="overview"] .value,
-    body.account-premium-ui .dash > :is(
-      .overview-saved-info,
-      .owner-product-gap-shortcut
-    )[data-account-panel="overview"] h3{
-      margin:0 0 5px!important;
-      font-size:clamp(.98rem,1.35vw,1.16rem)!important;
-      line-height:1.2!important;
-      letter-spacing:-.022em!important;
-      font-weight:760!important;
-    }
-
-    body.account-premium-ui .dash > :is(
-      .plan-summary,
-      .customer-number-summary,
-      .overview-saved-info,
-      .owner-product-gap-shortcut
-    )[data-account-panel="overview"] :is(.muted,.empty){
-      max-width:92%!important;
-      margin:0!important;
-      padding:0!important;
-      border:0!important;
-      border-radius:0!important;
-      background:transparent!important;
-      font-size:11.25px!important;
-      line-height:1.42!important;
-    }
-
-    body.account-premium-ui .dash > .owner-product-gap-shortcut[data-account-panel="overview"] .owner-product-gap-shortcut-actions{
-      margin-top:10px!important;
-    }
-
-    html[data-nw-portal-theme="light"] body.account-premium-ui .dash > :is(
-      .plan-summary,
-      .customer-number-summary,
-      .overview-saved-info,
-      .owner-product-gap-shortcut
-    )[data-account-panel="overview"],
-    body.account-premium-ui.nw-portal-light .dash > :is(
-      .plan-summary,
-      .customer-number-summary,
-      .overview-saved-info,
-      .owner-product-gap-shortcut
-    )[data-account-panel="overview"]{
-      border-color:rgba(112,87,39,.13)!important;
-      background:
-        radial-gradient(280px 150px at 100% 0%,rgba(202,155,57,.10),transparent 68%),
-        rgba(255,255,255,.60)!important;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.72)!important;
-      -webkit-backdrop-filter:none!important;
-      backdrop-filter:none!important;
-    }
-
-    @media(max-width:700px){
-      body.account-premium-ui .dash > :is(
-        .plan-summary,
-        .customer-number-summary,
-        .overview-saved-info,
-        .owner-product-gap-shortcut
-      )[data-account-panel="overview"]{
-        grid-column:1/-1!important;
-        min-height:92px!important;
-        padding:15px 44px 15px 16px!important;
-      }
-    }
-  </style>
+  
 
 </head>
   <body class="account-premium-ui">
@@ -2567,7 +2450,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
               </article>
             </div>
 
-            <article class="card summary-card plan-summary" data-account-panel="overview">
+            <article class="card summary-card account-overview-link plan-summary" data-account-panel="overview">
               <div class="eyebrow">Paket</div>
               <div class="value" id="planName">Tarif wird geladen …</div>
               <p class="muted" id="planMeta">Tarifdaten werden sicher geladen …</p>
@@ -2580,7 +2463,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
               </div>
               <p class="muted" id="planStatusMeta">Tarifstatus wird geladen …</p>
             </article>
-            <article class="card summary-card customer-number-summary" data-account-panel="overview">
+            <article class="card summary-card account-overview-link customer-number-summary" data-account-panel="overview">
               <div class="eyebrow">Kundennummer</div>
               <div class="value" id="customerNumber">Wird geladen …</div>
               <p class="muted">Diese Nummer kannst du zur sicheren Verknüpfung deines Telefonzugangs verwenden.</p>
@@ -3277,13 +3160,13 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
                 <div class="safety-save-status" id="safetySaveStatus" aria-live="polite"></div>
               </form>
             </article>
-            <article class="card wide info-panel overview-saved-info" data-account-panel="overview">
+            <article class="card wide info-panel account-overview-link overview-saved-info" data-account-panel="overview">
               <h3>Gespeicherte Informationen</h3>
               <div class="empty" id="profileInfo">
                 Noch keine Geräte oder weiteren Informationen hinterlegt.
               </div>
             </article>
-            <article class="card wide info-panel owner-product-gap-shortcut" data-account-panel="overview" data-owner-product-gap>
+            <article class="card wide info-panel account-overview-link owner-product-gap-shortcut" data-account-panel="overview" data-owner-product-gap>
               <div class="owner-product-gap-shortcut-head">
                 <div>
                   <div class="eyebrow">Produktentwicklung</div>
