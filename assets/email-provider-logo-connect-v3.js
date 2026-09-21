@@ -11,7 +11,7 @@
     { id: "yahoo", name: "Yahoo Mail", mode: "yahoo", logo: "yahoo", secret: "", help: "Mit deinem Yahoo-Konto anmelden und NAHWERK freigeben." },
     { id: "icloud", name: "iCloud Mail", mode: "manual", logo: "icloud", secret: "App-spezifisches Passwort", credentialKind: "app", help: "Apple nutzt für externe Mail-Dienste ein app-spezifisches Passwort.", helpUrl: "https://support.apple.com/de-de/102654", helpAction: "App-Passwort bei Apple erstellen" },
     { id: "gmx", name: "GMX", mode: "manual", logo: "gmx", secret: "App-Passwort", credentialKind: "app", help: "Für NAHWERK verwendest du bei GMX ein separates App-Passwort – nicht dein normales Login-Passwort.", helpUrl: "https://hilfe.gmx.net/account/logindaten/app-passwort.html", helpAction: "App-Passwort bei GMX erstellen" },
-    { id: "webde", name: "WEB.DE", mode: "manual", logo: "webde", secret: "Passwort", credentialKind: "mail_first", help: "Verwende zunächst dein normales WEB.DE-Passwort. Falls WEB.DE eine zusätzliche Sicherheitsfreigabe verlangt, führt dich NAHWERK durch die nächsten Schritte.", helpUrl: "https://hilfe.web.de/pop-imap/einschalten.html", helpAction: "WEB.DE Freigabe öffnen" },
+    { id: "webde", name: "WEB.DE", mode: "manual", logo: "webde", secret: "Passwort", credentialKind: "mail_first", help: "WEB.DE braucht einmalig die Freigabe für E-Mail-Programme. NAHWERK führt dich kurz durch die Aktivierung.", helpUrl: "https://anmelden.web.de/", helpAction: "Bei WEB.DE anmelden & freigeben" },
     { id: "telekom", name: "Telekom Mail", mode: "manual", logo: "telekom", secret: "Passwort für E-Mail-Programme", credentialKind: "mail_program", help: "Für NAHWERK brauchst du das separate „Passwort für E-Mail-Programme“ – nicht dein Telekom Login-Passwort.", helpUrl: "https://www.telekom.de/hilfe/apps-dienste/e-mail/programm-passwort-verwalten", helpAction: "Passwort bei Telekom einrichten" },
     { id: "fastmail", name: "Fastmail", mode: "manual", logo: "fastmail", secret: "App-Passwort", credentialKind: "app", help: "Fastmail benötigt für externe Dienste ein eigenes App-Passwort. IMAP/SMTP muss in deinem Tarif verfügbar sein.", helpUrl: "https://www.fastmail.help/hc/en-us/articles/360058752854-App-passwords", helpAction: "App-Passwort bei Fastmail erstellen" },
     { id: "zoho", name: "Zoho Mail", mode: "manual", logo: "zoho", secret: "App- oder Mail-Passwort", credentialKind: "conditional_app", help: "Bei aktivierter Zwei-Faktor-Authentifizierung nutzt du ein App-Passwort. NAHWERK übernimmt die technischen Mailserver-Einstellungen.", helpUrl: "https://www.zoho.com/de/mail/help/imap-access.html", helpAction: "Zoho-Anleitung öffnen" },
@@ -64,6 +64,7 @@
   let selected = null;
   let busy = false;
   let addMode = false;
+  let webdeGuideSpoken = false;
   const connectErrors = Object.create(null);
 
   const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
@@ -183,10 +184,12 @@
       if (String(data?.state || "").toUpperCase() === "CREDENTIALS_REQUIRED" && provider?.mode === "manual") {
         selected = provider;
         addMode = true;
+        webdeGuideSpoken = false;
         clearCredentials();
         renderModal();
         const backdrop = document.getElementById("emailProviderConnectBackdrop");
         if (backdrop) backdrop.hidden = false;
+        maybeSpeakWebdeGuide();
         const emailField = document.getElementById("emailProviderConnectEmail");
         if (emailField) emailField.value = email;
         setText(document.getElementById("emailProviderConnectMessage"), `${data?.provider_label || provider.name} wurde automatisch erkannt. Gib nur noch das benötigte Mail-/App-Passwort ein.`);
@@ -253,11 +256,12 @@
     backdrop.id = "emailProviderConnectBackdrop";
     backdrop.className = "email-provider-connect-backdrop";
     backdrop.hidden = true;
-    backdrop.innerHTML = '<section class="email-provider-connect-modal" role="dialog" aria-modal="true" aria-labelledby="emailProviderConnectTitle"><div class="email-provider-connect-head"><div class="email-provider-connect-identity"><span id="emailProviderConnectLogo"></span><div><h3 id="emailProviderConnectTitle">E-Mail verbinden</h3><p id="emailProviderConnectSubtitle">Sicher mit NAHWERK verbinden</p></div></div><button class="email-provider-connect-close" id="emailProviderConnectClose" type="button" aria-label="Schließen">×</button></div><p class="email-provider-connect-copy" id="emailProviderConnectCopy"></p><div class="email-provider-account-list" id="emailProviderAccountList"></div><button class="email-provider-add-account" id="emailProviderAddAccount" type="button" hidden>+ Weiteres Konto verbinden</button><div id="emailProviderCredentialFields"><label class="email-provider-connect-field"><span>E-Mail-Adresse</span><input id="emailProviderConnectEmail" type="email" inputmode="email" autocomplete="email" maxlength="320"></label><label class="email-provider-connect-field"><span id="emailProviderConnectSecretLabel">Passwort</span><input id="emailProviderConnectSecret" type="password" autocomplete="new-password" maxlength="512"></label><div id="emailProviderZohoOptions" hidden><label class="email-provider-connect-field"><span>Zoho-Rechenzentrum</span><select id="emailProviderZohoDc"><option value="com">Global (.com)</option><option value="eu">Europa (.eu)</option><option value="in">Indien (.in)</option><option value="com.au">Australien (.com.au)</option><option value="jp">Japan (.jp)</option><option value="ca">Kanada (.ca)</option><option value="sa">Saudi-Arabien (.sa)</option></select></label><label class="email-provider-connect-field"><span><input id="emailProviderZohoOrganization" type="checkbox"> Organisations-/Business-Postfach</span></label></div><div class="email-provider-credential-guide" id="emailProviderCredentialGuide" hidden><strong id="emailProviderCredentialGuideTitle"></strong><span id="emailProviderCredentialGuideText"></span><a id="emailProviderCredentialHelpLink" href="#" target="_blank" rel="noopener noreferrer" hidden></a></div><p class="email-provider-connect-help" id="emailProviderConnectHelp"></p><p class="email-provider-security-note">NAHWERK trägt Server, Ports und Verschlüsselung automatisch ein. Deine Zugangsdaten werden nicht im Browser dauerhaft gespeichert.</p></div><div class="email-provider-connect-message" id="emailProviderConnectMessage" aria-live="polite"></div><div class="email-provider-connect-actions"><button class="email-provider-connect-secondary" id="emailProviderCancelAdd" type="button" hidden>Abbrechen</button><button class="email-provider-connect-primary" id="emailProviderConnectSubmit" type="button">Verbinden</button></div></section>';
+    backdrop.innerHTML = '<section class="email-provider-connect-modal" role="dialog" aria-modal="true" aria-labelledby="emailProviderConnectTitle"><div class="email-provider-connect-head"><div class="email-provider-connect-identity"><span id="emailProviderConnectLogo"></span><div><h3 id="emailProviderConnectTitle">E-Mail verbinden</h3><p id="emailProviderConnectSubtitle">Sicher mit NAHWERK verbinden</p></div></div><button class="email-provider-connect-close" id="emailProviderConnectClose" type="button" aria-label="Schließen">×</button></div><p class="email-provider-connect-copy" id="emailProviderConnectCopy"></p><div class="email-provider-account-list" id="emailProviderAccountList"></div><button class="email-provider-add-account" id="emailProviderAddAccount" type="button" hidden>+ Weiteres Konto verbinden</button><div id="emailProviderCredentialFields"><label class="email-provider-connect-field"><span>E-Mail-Adresse</span><input id="emailProviderConnectEmail" type="email" inputmode="email" autocomplete="email" maxlength="320"></label><label class="email-provider-connect-field"><span id="emailProviderConnectSecretLabel">Passwort</span><input id="emailProviderConnectSecret" type="password" autocomplete="new-password" maxlength="512"></label><div id="emailProviderZohoOptions" hidden><label class="email-provider-connect-field"><span>Zoho-Rechenzentrum</span><select id="emailProviderZohoDc"><option value="com">Global (.com)</option><option value="eu">Europa (.eu)</option><option value="in">Indien (.in)</option><option value="com.au">Australien (.com.au)</option><option value="jp">Japan (.jp)</option><option value="ca">Kanada (.ca)</option><option value="sa">Saudi-Arabien (.sa)</option></select></label><label class="email-provider-connect-field"><span><input id="emailProviderZohoOrganization" type="checkbox"> Organisations-/Business-Postfach</span></label></div><div class="email-provider-credential-guide" id="emailProviderCredentialGuide" hidden><strong id="emailProviderCredentialGuideTitle"></strong><span id="emailProviderCredentialGuideText"></span><a id="emailProviderCredentialHelpLink" href="#" target="_blank" rel="noopener noreferrer" hidden></a></div><div class="email-provider-webde-guide" id="emailProviderWebdeGuide" hidden><strong>WEB.DE einmal freigeben</strong><ol><li>Bei WEB.DE anmelden.</li><li>E-Mail-Einstellungen → POP3/IMAP öffnen.</li><li>„POP3- und IMAP-Zugriff erlauben“ einschalten.</li></ol><div class="email-provider-webde-guide-actions"><button class="email-provider-connect-secondary" id="emailProviderWebdeSpeak" type="button">Anleitung anhören</button><a class="email-provider-webde-login" href="https://anmelden.web.de/" target="_blank" rel="noopener noreferrer">Bei WEB.DE anmelden</a></div><span class="email-provider-webde-return">Danach zu NAHWERK zurückkehren, Passwort eingeben und verbinden.</span></div><p class="email-provider-connect-help" id="emailProviderConnectHelp"></p><p class="email-provider-security-note">NAHWERK trägt Server, Ports und Verschlüsselung automatisch ein. Deine Zugangsdaten werden nicht im Browser dauerhaft gespeichert.</p></div><div class="email-provider-connect-message" id="emailProviderConnectMessage" aria-live="polite"></div><div class="email-provider-connect-actions"><button class="email-provider-connect-secondary" id="emailProviderCancelAdd" type="button" hidden>Abbrechen</button><button class="email-provider-connect-primary" id="emailProviderConnectSubmit" type="button">Verbinden</button></div></section>';
     document.body.appendChild(backdrop);
     backdrop.addEventListener("click", (event) => { if (event.target === backdrop) closeModal(); });
     document.getElementById("emailProviderConnectClose")?.addEventListener("click", closeModal);
     document.getElementById("emailProviderConnectSubmit")?.addEventListener("click", () => void submitManual());
+    document.getElementById("emailProviderWebdeSpeak")?.addEventListener("click", speakWebdeGuide);
     document.getElementById("emailProviderAddAccount")?.addEventListener("click", () => { addMode = true; renderModal(); });
     document.getElementById("emailProviderCancelAdd")?.addEventListener("click", () => { addMode = false; clearCredentials(); renderModal(); });
     document.addEventListener("keydown", (event) => { if (event.key === "Escape" && !backdrop.hidden) closeModal(); });
@@ -273,6 +277,29 @@
     if (zohoDc) zohoDc.value = "com";
     if (zohoOrg) zohoOrg.checked = false;
   }
+
+  function clearSecretOnly() {
+    const secret = document.getElementById("emailProviderConnectSecret");
+    if (secret) secret.value = "";
+  }
+
+  function speakWebdeGuide() {
+    if (selected?.id !== "webde" || !("speechSynthesis" in window)) return;
+    try {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance("WEB.DE braucht einmalig eine Freigabe. Melde dich bei WEB.DE an. Öffne E-Mail-Einstellungen, dann POP3/IMAP. Schalte POP3- und IMAP-Zugriff erlauben ein. Kehre danach zu NAHWERK zurück, gib dein Passwort ein und klicke auf Verbinden.");
+      utterance.lang = "de-DE";
+      utterance.rate = 0.96;
+      window.speechSynthesis.speak(utterance);
+    } catch {}
+  }
+
+  function maybeSpeakWebdeGuide() {
+    if (selected?.id !== "webde" || webdeGuideSpoken) return;
+    webdeGuideSpoken = true;
+    setTimeout(speakWebdeGuide, 80);
+  }
+
 
   function renderAccounts() {
     const list = document.getElementById("emailProviderAccountList");
@@ -297,6 +324,7 @@
     const guideTitle = document.getElementById("emailProviderCredentialGuideTitle");
     const guideText = document.getElementById("emailProviderCredentialGuideText");
     const helpLink = document.getElementById("emailProviderCredentialHelpLink");
+    const webdeGuide = document.getElementById("emailProviderWebdeGuide");
     if (selected.mode === "manual") {
       const kind = String(selected.credentialKind || "mail");
       const title = kind === "mail_program" ? "Welches Passwort?" : kind === "app" ? "App-Passwort verwenden" : kind === "conditional_app" ? "Passwort prüfen" : kind === "mail_first" ? "Einfach dein normales Passwort" : "E-Mail-Passwort verwenden";
@@ -309,12 +337,12 @@
             : kind === "mail_first"
               ? "Versuche zuerst dein normales WEB.DE-Passwort. Zusätzliche Schritte zeigt NAHWERK nur, wenn WEB.DE sie tatsächlich verlangt."
               : "Verwende das Passwort des E-Mail-Postfachs. Technische Serverdaten brauchst du nicht.";
-      if (guide) guide.hidden = false;
+      if (guide) guide.hidden = selected.id === "webde";
       setText(guideTitle, title);
       setText(guideText, text);
       if (helpLink) {
         const href = String(selected.helpUrl || "");
-        helpLink.hidden = !href;
+        helpLink.hidden = selected.id === "webde" || !href;
         helpLink.href = href || "#";
         helpLink.textContent = String(selected.helpAction || "Hilfe beim Anbieter öffnen");
       }
@@ -329,6 +357,7 @@
     const cancel = document.getElementById("emailProviderCancelAdd");
     const submit = document.getElementById("emailProviderConnectSubmit");
     const showCredentials = selected.mode === "manual" && (addMode || rows.length === 0);
+    if (webdeGuide) webdeGuide.hidden = selected.id !== "webde" || !showCredentials;
     if (fields) fields.hidden = !showCredentials;
     if (zohoOptions) zohoOptions.hidden = !showCredentials || selected.id !== "zoho";
     if (add) add.hidden = selected.mode !== "manual" || rows.length === 0 || addMode;
@@ -343,12 +372,14 @@
   function openManual(provider, adding = false) {
     selected = provider;
     addMode = adding || providerConnections(provider.id).length === 0;
+    webdeGuideSpoken = false;
     clearCredentials();
     setText(document.getElementById("emailProviderConnectMessage"), "");
     renderModal();
     const backdrop = document.getElementById("emailProviderConnectBackdrop");
     if (backdrop) backdrop.hidden = false;
     setTimeout(() => document.getElementById("emailProviderConnectEmail")?.focus?.(), 0);
+    maybeSpeakWebdeGuide();
   }
 
   function openManage(provider) {
@@ -363,6 +394,8 @@
 
   function closeModal() {
     clearCredentials();
+    webdeGuideSpoken = false;
+    try { window.speechSynthesis?.cancel?.(); } catch {}
     const backdrop = document.getElementById("emailProviderConnectBackdrop");
     if (backdrop) backdrop.hidden = true;
     selected = null;
@@ -495,11 +528,15 @@
     if (button) button.disabled = true;
     try { await connectManual(); }
     catch (error) {
-      clearCredentials();
+      clearSecretOnly();
       setText(message, connectionErrorMessage(error));
+      if (selected?.id === "webde") {
+        webdeGuideSpoken = false;
+        maybeSpeakWebdeGuide();
+      }
     } finally {
       busy = false;
-      if (button) button.disabled = false;
+      renderModal();
       renderGrid();
     }
   }
