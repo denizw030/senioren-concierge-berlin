@@ -29,7 +29,11 @@ assert.match(ui,/id: "webde"[\s\S]{0,420}credentialKind: "mail_first"[\s\S]{0,52
 assert.ok(ui.includes('emailProviderWebdeGuide'));
 assert.ok(ui.includes('emailProviderWebdeSpeak'));
 assert.ok(ui.includes('POP3- und IMAP-Zugriff erlauben'));
-assert.ok(ui.includes('SpeechSynthesisUtterance'));
+assert.ok(ui.includes('/email/guidance/webde/audio'));
+assert.ok(ui.includes('Lena wird geladen'));
+assert.ok(ui.includes('Lena stoppen'));
+assert.equal(ui.includes('SpeechSynthesisUtterance'), false);
+assert.equal(ui.includes('speechSynthesis'), false);
 assert.ok(ui.includes('clearSecretOnly'));
 assert.ok(ui.includes('renderModal();\n      renderGrid();'));
 assert.match(ui,/id: "fastmail"[\s\S]{0,320}secret: "App-Passwort"[\s\S]{0,320}credentialKind: "app"/);
