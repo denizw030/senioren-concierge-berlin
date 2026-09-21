@@ -2450,12 +2450,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
               </article>
             </div>
 
-            <article class="summary-card account-overview-link plan-summary" data-account-panel="overview">
-              <div class="eyebrow">Paket</div>
-              <div class="value" id="planName">Tarif wird geladen …</div>
-              <p class="muted" id="planMeta">Tarifdaten werden sicher geladen …</p>
-            </article>
-            <article class="card summary-card status-summary" data-account-panel="overview">
+                        <article class="card summary-card status-summary" data-account-panel="overview">
               <div class="eyebrow">Status</div>
               <div class="value">
                 <span class="statusdot"></span
@@ -2463,12 +2458,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
               </div>
               <p class="muted" id="planStatusMeta">Tarifstatus wird geladen …</p>
             </article>
-            <article class="summary-card account-overview-link customer-number-summary" data-account-panel="overview">
-              <div class="eyebrow">Kundennummer</div>
-              <div class="value" id="customerNumber">Wird geladen …</div>
-              <p class="muted">Diese Nummer kannst du zur sicheren Verknüpfung deines Telefonzugangs verwenden.</p>
-            </article>
-            <article class="card summary-card person-summary" data-account-panel="overview">
+                        <article class="card summary-card person-summary" data-account-panel="overview">
               <div class="eyebrow">Unterstützte Person</div>
               <div class="value" id="recipientName">Noch nicht angelegt</div>
               <p class="muted" id="recipientMeta">–</p>
@@ -2489,6 +2479,37 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
                 <strong id="overviewUsage">Keine Live-Daten</strong>
                 <span>Monatliche Nutzung und verfügbare Kontingente anzeigen.</span>
               </button>
+            </div>
+            <div class="account-overview-highlights account-overview-lower-highlights" data-account-panel="overview">
+              <article class="account-overview-link plan-summary" data-account-panel="overview">
+                            <div class="eyebrow">Paket</div>
+                            <div class="value" id="planName">Tarif wird geladen …</div>
+                            <p class="muted" id="planMeta">Tarifdaten werden sicher geladen …</p>
+                          </article>
+              <article class="account-overview-link customer-number-summary" data-account-panel="overview">
+                            <div class="eyebrow">Kundennummer</div>
+                            <div class="value" id="customerNumber">Wird geladen …</div>
+                            <p class="muted">Diese Nummer kannst du zur sicheren Verknüpfung deines Telefonzugangs verwenden.</p>
+                          </article>
+              <article class="account-overview-link overview-saved-info" data-account-panel="overview">
+                            <h3>Gespeicherte Informationen</h3>
+                            <div class="empty" id="profileInfo">
+                              Noch keine Geräte oder weiteren Informationen hinterlegt.
+                            </div>
+                          </article>
+              <article class="account-overview-link owner-product-gap-shortcut" data-account-panel="overview" data-owner-product-gap>
+                            <div class="owner-product-gap-shortcut-head">
+                              <div>
+                                <div class="eyebrow">Produktentwicklung</div>
+                                <h3>Kundenwünsche & Produktlücken</h3>
+                              </div>
+                              <span class="owner-product-gap-badge" id="ownerProductGapBadge">0 neu</span>
+                            </div>
+                            <p class="muted" id="ownerProductGapSummary">Noch keine neuen Produktlücken erfasst.</p>
+                            <div class="actions owner-product-gap-shortcut-actions">
+                              <a class="btn light" href="/produktluecken">Produktlücken öffnen</a>
+                            </div>
+                          </article>
             </div>
             <div class="account-panel-heading" data-account-panel="concierge" hidden>
               <div class="eyebrow">Concierge</div>
@@ -3160,26 +3181,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
                 <div class="safety-save-status" id="safetySaveStatus" aria-live="polite"></div>
               </form>
             </article>
-            <article class="wide info-panel account-overview-link overview-saved-info" data-account-panel="overview">
-              <h3>Gespeicherte Informationen</h3>
-              <div class="empty" id="profileInfo">
-                Noch keine Geräte oder weiteren Informationen hinterlegt.
-              </div>
-            </article>
-            <article class="wide info-panel account-overview-link owner-product-gap-shortcut" data-account-panel="overview" data-owner-product-gap>
-              <div class="owner-product-gap-shortcut-head">
-                <div>
-                  <div class="eyebrow">Produktentwicklung</div>
-                  <h3>Kundenwünsche & Produktlücken</h3>
-                </div>
-                <span class="owner-product-gap-badge" id="ownerProductGapBadge">0 neu</span>
-              </div>
-              <p class="muted" id="ownerProductGapSummary">Noch keine neuen Produktlücken erfasst.</p>
-              <div class="actions owner-product-gap-shortcut-actions">
-                <a class="btn light" href="/produktluecken">Produktlücken öffnen</a>
-              </div>
-            </article>
-            <article class="card wide info-panel overview-open-issues" data-account-panel="overview">
+                                    <article class="card wide info-panel overview-open-issues" data-account-panel="overview">
               <h3>Offene Anliegen</h3>
               <div class="empty">Aktuell keine offenen Anliegen.</div>
             </article>
@@ -5955,5 +5957,5 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
   <script src="assets/account-header-concierge.js?v=1"></script>
     <script src="assets/account-address-editor.js?v=1"></script>
   <script src="assets/account-response-channel.js?v=6"></script>
-  <script src="assets/site-ui.js?v=19"></script></body>
+  <script src="assets/site-ui.js?v=20"></script></body>
 </html>
