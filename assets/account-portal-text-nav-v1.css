@@ -776,3 +776,66 @@ html body.account-premium-ui.account-premium-ui .account-session-note[data-accou
     display:none!important;
   }
 }
+
+
+/* ACCOUNT_EMAIL_COMPACT_HEADER_V1_20260921 */
+/* Desktop only. Keeps mobile and all non-account surfaces unchanged. */
+@media(min-width:761px){
+  body.account-premium-ui .account-section{
+    padding-top:8px!important;
+  }
+  body.account-premium-ui .account-setup-by{
+    min-height:32px!important;
+    padding:0 2px 3px!important;
+    gap:8px!important;
+    line-height:1!important;
+  }
+  body.account-premium-ui .account-setup-by .eyebrow{
+    line-height:1!important;
+  }
+  body.account-premium-ui .account-setup-name,
+  body.account-premium-ui .account-setup-context-label{
+    line-height:1.1!important;
+  }
+  body.account-premium-ui .account-tabs-shell{
+    margin-bottom:7px!important;
+  }
+  body.account-premium-ui #nwPortalThemeSetting{
+    min-height:38px!important;
+    margin:0 0 5px!important;
+    padding:0 2px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    gap:10px!important;
+  }
+  body.account-premium-ui #nwPortalThemeSetting #emailTopActions{
+    position:static!important;
+    inset:auto!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    gap:8px!important;
+    margin:0!important;
+    padding:0!important;
+    order:0!important;
+  }
+  body.account-premium-ui #nwPortalThemeSetting .nw-theme-toggle{
+    order:1!important;
+    flex:0 0 auto!important;
+  }
+  body.account-premium-ui .account-panel-heading[data-account-panel="email"]{
+    padding:0 2px 4px!important;
+    padding-right:2px!important;
+    margin:0 0 8px!important;
+  }
+  body.account-premium-ui .account-panel-heading[data-account-panel="email"] h2{
+    margin:4px 0 5px!important;
+  }
+  body.account-premium-ui .account-panel-heading[data-account-panel="email"] p{
+    line-height:1.45!important;
+  }
+  body.account-premium-ui .email-page-action{
+    min-height:38px!important;
+  }
+}
