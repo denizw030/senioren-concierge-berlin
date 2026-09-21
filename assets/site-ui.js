@@ -226,6 +226,89 @@
           background-size:1px 100%,100% 1px!important;
         }
 
+        /* ACCOUNT_OVERVIEW_LOWER_EXACT_PARITY_V1_20260921
+           Only Paket, Kundennummer, Gespeicherte Informationen and Produktentwicklung.
+           They intentionally reuse the exact visible geometry of the four upper overview tiles. */
+        body.account-premium-ui .dash > :is(
+          .plan-summary.account-overview-link,
+          .customer-number-summary.account-overview-link,
+          .overview-saved-info.account-overview-link,
+          .owner-product-gap-shortcut.account-overview-link
+        )[data-account-panel="overview"]{
+          grid-column:span 6!important;
+          box-sizing:border-box!important;
+          width:auto!important;
+          min-width:0!important;
+          min-height:108px!important;
+          height:auto!important;
+          margin:0!important;
+          padding:17px 46px 17px 18px!important;
+          border:0!important;
+          border-radius:0!important;
+          background-color:transparent!important;
+          box-shadow:none!important;
+          -webkit-backdrop-filter:none!important;
+          backdrop-filter:none!important;
+          overflow:hidden!important;
+          transform:none!important;
+        }
+
+        body.account-premium-ui .dash > :is(
+          .plan-summary.account-overview-link,
+          .customer-number-summary.account-overview-link,
+          .overview-saved-info.account-overview-link,
+          .owner-product-gap-shortcut.account-overview-link
+        )[data-account-panel="overview"] .eyebrow{
+          display:block!important;
+          margin:0 0 8px!important;
+          font-size:10.5px!important;
+          line-height:1.2!important;
+          letter-spacing:.09em!important;
+        }
+
+        body.account-premium-ui .dash > :is(
+          .plan-summary.account-overview-link,
+          .customer-number-summary.account-overview-link
+        )[data-account-panel="overview"] .value,
+        body.account-premium-ui .dash > :is(
+          .overview-saved-info.account-overview-link,
+          .owner-product-gap-shortcut.account-overview-link
+        )[data-account-panel="overview"] h3{
+          display:block!important;
+          margin:0 0 5px!important;
+          font-size:clamp(.98rem,1.35vw,1.16rem)!important;
+          font-weight:700!important;
+          line-height:1.2!important;
+          letter-spacing:-.022em!important;
+        }
+
+        body.account-premium-ui .dash > :is(
+          .plan-summary.account-overview-link,
+          .customer-number-summary.account-overview-link,
+          .overview-saved-info.account-overview-link,
+          .owner-product-gap-shortcut.account-overview-link
+        )[data-account-panel="overview"] :is(.muted,.empty){
+          display:block!important;
+          max-width:92%!important;
+          min-height:0!important;
+          margin:0!important;
+          padding:0!important;
+          border:0!important;
+          border-radius:0!important;
+          background-color:transparent!important;
+          background-image:none!important;
+          box-shadow:none!important;
+          font-size:11.25px!important;
+          line-height:1.42!important;
+        }
+
+        body.account-premium-ui .dash > .owner-product-gap-shortcut.account-overview-link[data-account-panel="overview"] .owner-product-gap-shortcut-head{
+          margin:0!important;
+        }
+        body.account-premium-ui .dash > .owner-product-gap-shortcut.account-overview-link[data-account-panel="overview"] .owner-product-gap-shortcut-actions{
+          margin-top:10px!important;
+        }
+
         /* Two-column portal groups follow the same open-divider principle. */
         body.account-premium-ui :is(.usagegrid,.safety-hub,.fraud-protection-grid){
           gap:0!important;
