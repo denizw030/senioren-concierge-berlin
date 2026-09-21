@@ -28,6 +28,18 @@ test("Concierge settings dark mode matches the canonical account dark palette", 
   assert.match(page, /footer\.footer/);
 });
 
+test("Concierge settings exposes the shared Hell/Dunkel portal switch", () => {
+  assert.match(page, /id="conciergeThemeToolbar"/);
+  assert.match(page, /id="nwPortalThemeToggle"/);
+  assert.match(page, />Hell<\/span>/);
+  assert.match(page, />Dunkel<\/span>/);
+  assert.match(page, /const KEY = "nw_portal_theme_v1"/);
+  assert.match(page, /localStorage\.setItem\(KEY, next\)/);
+  assert.match(page, /document\.documentElement\.dataset\.nwPortalTheme = normalized/);
+  assert.match(page, /classList\.toggle\("nw-portal-dark"/);
+  assert.match(page, /concierge-settings-theme-toggle-v1/);
+});
+
 test("voice preview language control is a centered white button", () => {
   assert.match(page, /\.nw-voice-preview-language-select/);
   assert.match(page, /width:min\(100%,190px\)!important/);
