@@ -2256,6 +2256,125 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
     }
   </style>
 
+
+  <style id="konto-overview-lower-symmetric-v1">
+    /* Overview only: make the lower 2x2 information area use the same quiet
+       separator-based layout as Safety / Nutzung / PAYG / Web Concierge. */
+    body.account-premium-ui .dash > :is(
+      .plan-summary,
+      .customer-number-summary,
+      .overview-saved-info,
+      .owner-product-gap-shortcut,
+      .overview-open-issues
+    )[data-account-panel="overview"]{
+      border-radius:0!important;
+      background:transparent!important;
+      box-shadow:none!important;
+      -webkit-backdrop-filter:none!important;
+      backdrop-filter:none!important;
+      margin:0!important;
+    }
+
+    body.account-premium-ui .dash > .plan-summary[data-account-panel="overview"],
+    body.account-premium-ui .dash > .overview-saved-info[data-account-panel="overview"]{
+      grid-column:1!important;
+    }
+    body.account-premium-ui .dash > .customer-number-summary[data-account-panel="overview"],
+    body.account-premium-ui .dash > .owner-product-gap-shortcut[data-account-panel="overview"]{
+      grid-column:2!important;
+    }
+    body.account-premium-ui .dash > .overview-open-issues[data-account-panel="overview"]{
+      grid-column:1/-1!important;
+    }
+
+    body.account-premium-ui .dash > :is(
+      .plan-summary,
+      .customer-number-summary,
+      .overview-saved-info,
+      .owner-product-gap-shortcut,
+      .overview-open-issues
+    )[data-account-panel="overview"]{
+      padding:22px 20px!important;
+      border:0!important;
+      border-top:1px solid rgba(137,154,178,.16)!important;
+      align-self:stretch!important;
+    }
+    body.account-premium-ui .dash > :is(
+      .plan-summary,
+      .overview-saved-info
+    )[data-account-panel="overview"]{
+      border-right:1px solid rgba(137,154,178,.16)!important;
+    }
+
+    body.account-premium-ui .dash > :is(
+      .plan-summary,
+      .customer-number-summary
+    )[data-account-panel="overview"]{
+      min-height:132px!important;
+    }
+    body.account-premium-ui .dash > :is(
+      .overview-saved-info,
+      .owner-product-gap-shortcut
+    )[data-account-panel="overview"]{
+      min-height:168px!important;
+    }
+
+    body.account-premium-ui .dash > .overview-saved-info[data-account-panel="overview"] .empty{
+      padding:12px 14px!important;
+      margin-top:8px!important;
+      border:0!important;
+      border-radius:0!important;
+      background:transparent!important;
+    }
+
+    body.account-premium-ui .dash > .owner-product-gap-shortcut[data-account-panel="overview"] .owner-product-gap-shortcut-actions{
+      margin-top:14px!important;
+    }
+
+    html[data-nw-portal-theme="light"] body.account-premium-ui .dash > :is(
+      .plan-summary,
+      .customer-number-summary,
+      .overview-saved-info,
+      .owner-product-gap-shortcut,
+      .overview-open-issues
+    )[data-account-panel="overview"],
+    body.account-premium-ui.nw-portal-light .dash > :is(
+      .plan-summary,
+      .customer-number-summary,
+      .overview-saved-info,
+      .owner-product-gap-shortcut,
+      .overview-open-issues
+    )[data-account-panel="overview"]{
+      border-top-color:rgba(74,59,34,.16)!important;
+    }
+
+    html[data-nw-portal-theme="light"] body.account-premium-ui .dash > :is(
+      .plan-summary,
+      .overview-saved-info
+    )[data-account-panel="overview"],
+    body.account-premium-ui.nw-portal-light .dash > :is(
+      .plan-summary,
+      .overview-saved-info
+    )[data-account-panel="overview"]{
+      border-right-color:rgba(74,59,34,.16)!important;
+    }
+
+    @media(max-width:700px){
+      body.account-premium-ui .dash > :is(
+        .plan-summary,
+        .customer-number-summary,
+        .overview-saved-info,
+        .owner-product-gap-shortcut,
+        .overview-open-issues
+      )[data-account-panel="overview"]{
+        grid-column:1/-1!important;
+        min-height:auto!important;
+        border-right:0!important;
+        padding:18px 16px!important;
+      }
+    }
+  </style>
+
 </head>
   <body class="account-premium-ui">
     <script>
