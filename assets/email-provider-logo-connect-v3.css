@@ -535,6 +535,29 @@
   color: #111;
 }
 
+.email-provider-webde-video {
+  margin-top: 10px;
+}
+
+.email-provider-webde-video-toggle {
+  width: 100%;
+  min-height: 42px;
+}
+
+.email-provider-webde-video-player {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 10px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 12px;
+  background: #000;
+}
+
+.email-provider-webde-video-player[hidden] {
+  display: none;
+}
+
 .email-provider-webde-return {
   display: block;
   margin-top: 10px;
