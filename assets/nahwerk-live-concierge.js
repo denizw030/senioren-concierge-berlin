@@ -125,6 +125,8 @@ export function mountNahwerkLiveConcierge({
   const muteBtn=q(".nw-live-mute"),endBtn=q(".nw-live-end"),closeBtn=q(".nw-live-close");
 
   let pc=null,dc=null,micStream=null,micMeter=null,outMeter=null,raf=0,inputFlushTimer=0,outputFlushTimer=0,transcriptSeq=0,userTurnSeq=0,assistantTurnSeq=0,maxSessionTimer=0;
+  // LIVE_TRANSCRIPT_FINAL_FLUSH_V1_20260922
+  const transcriptWrites=new Set();
   // VOICE_DYNAMIC_PRICE_CLIENT_V1_20260920
   let currentQuote=null;
   let sessionId="",inputTranscript="",outputTranscript="",lastUserTurnText="",started=false,muted=false,ending=false;
@@ -227,7 +229,7 @@ export function mountNahwerkLiveConcierge({
     const value=String(text??"");
     if(!sessionId||!value.trim())return;
     transcriptSeq+=1;
-    await post("/transcript",{
+    const write=post("/transcript",{
       session_id:sessionId,
       event_key:String(eventKey||`${String(role||"").toLowerCase()}:${transcriptSeq}:${uid()}`).slice(0,300),
       role,
@@ -237,6 +239,15 @@ export function mountNahwerkLiveConcierge({
     }).catch((error)=>{
       reportClientDiagnostic("TRANSCRIPT_WRITE_"+String(error?.message||error?.name||"FAILED"));
     });
+    transcriptWrites.add(write);
+    try{await write;}finally{transcriptWrites.delete(write);}
+  };
+  const drainTranscriptWrites=async(timeoutMs=1800)=>{
+    const deadline=Date.now()+Math.max(250,Number(timeoutMs)||1800);
+    while(transcriptWrites.size&&Date.now()<deadline){
+      const pending=[...transcriptWrites];
+      await Promise.race([Promise.allSettled(pending),wait(Math.min(250,Math.max(1,deadline-Date.now())))]);
+    }
   };
   const flushUserTranscript=async()=>{
     if(inputFlushTimer){clearTimeout(inputFlushTimer);inputFlushTimer=0;}
@@ -331,7 +342,7 @@ export function mountNahwerkLiveConcierge({
 
   async function start(){
     if(pc)return;
-    ending=false;started=false;inputTranscript="";outputTranscript="";lastUserTurnText="";inputStartMs=null;inputEndMs=null;outputStartMs=null;outputEndMs=null;transcriptSeq=0;userTurnSeq=0;assistantTurnSeq=0;
+    ending=false;started=false;inputTranscript="";outputTranscript="";lastUserTurnText="";inputStartMs=null;inputEndMs=null;outputStartMs=null;outputEndMs=null;transcriptSeq=0;userTurnSeq=0;assistantTurnSeq=0;transcriptWrites.clear();
     stopCallTimer();if(duration){duration.textContent="0:00";duration.hidden=true;}
     ui.hidden=false;document.documentElement.classList.add("nw-live-open");
     setPersona(currentPersonaFromPage());
@@ -426,15 +437,18 @@ export function mountNahwerkLiveConcierge({
 
   async function stop({notifyBackend=true,keepVisible=false}={}){
     if(ending)return; ending=true;
+    // Give the Live data channel a short grace period to deliver the final transcript deltas.
+    if(started&&dc?.readyState==="open")await wait(450);
     if(inputFlushTimer){clearTimeout(inputFlushTimer);inputFlushTimer=0;}
     if(outputFlushTimer){clearTimeout(outputFlushTimer);outputFlushTimer=0;}
     await flushUserTranscript();
     await flushAssistantTranscript();
+    await drainTranscriptWrites(1800);
     stopCallTimer();
     if(maxSessionTimer)clearTimeout(maxSessionTimer);maxSessionTimer=0;
     currentQuote=null;
     cancelAnimationFrame(raf);
-    if(notifyBackend&&sessionId)post("/end",{session_id:sessionId}).catch(()=>{});
+    if(notifyBackend&&sessionId)await post("/end",{session_id:sessionId}).catch(()=>{});
     try{dc?.close();}catch{}
     try{pc?.close();}catch{}
     micStream?.getTracks()?.forEach(t=>t.stop());
