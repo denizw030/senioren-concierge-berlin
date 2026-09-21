@@ -84,11 +84,15 @@ assert.ok(ui.includes('zoho_organization: organization'));
 for (const provider of ['mailcom','freenet','mailboxorg','vodafone','arcor','kabeldeutschland','unitymedia','migadu']) {
   assert.match(ui, new RegExp(`id: "${provider}"[\\s\\S]*?mode: "manual"`), provider);
 }
-assert.match(ui,/id: "mailcom"[\s\S]{0,500}Direkter IMAP-Zugriff/);
-assert.ok(ui.includes('IMAP/SMTP muss im Postfach aktiviert sein'));
-assert.ok(ui.includes('mailbox.org'));
-assert.ok(ui.includes('Vodafone-Mail-Infrastruktur'));
-assert.ok(ui.includes('Migadu-Passwort'));
+for (const provider of ['yahoo','icloud','gmx','webde','telekom','fastmail','zoho','ionos','strato','mailcom','freenet','mailboxorg','vodafone','arcor','kabeldeutschland','unitymedia','migadu']) {
+  assert.match(ui, new RegExp(`id: "${provider}"[\\s\\S]{0,360}secret: "Passwort"[\\s\\S]{0,360}credentialKind: "password_first"`), provider);
+}
+assert.ok(ui.includes('ENABLE_POP_IMAP_THEN_RETRY'));
+assert.ok(ui.includes('ENABLE_POP_IMAP_SMTP_THEN_RETRY'));
+assert.ok(ui.includes('CREATE_MAIL_PROGRAM_PASSWORD'));
+assert.ok(ui.includes('CREATE_YAHOO_APP_PASSWORD'));
+assert.ok(ui.includes('CREATE_ICLOUD_APP_SPECIFIC_PASSWORD'));
+assert.ok(ui.includes('CREATE_FASTMAIL_APP_PASSWORD'));
 assert.ok(ui.includes('provider_authentication_failed'));
 assert.ok(ui.includes('provider_tls_connection_failed'));
 assert.ok(ui.includes('provider_connection_failed'));
