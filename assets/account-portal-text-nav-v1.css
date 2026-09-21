@@ -395,6 +395,14 @@ html body.account-premium-ui.account-premium-ui .dash>.account-overview-highligh
   gap:10px!important;
   margin:0!important;
 }
+
+/* ACCOUNT_OVERVIEW_INTERGROUP_GAP_V1_20260921
+   Match the vertical spacing between PAYG/Web Concierge and the lower overview grid
+   to the same 10px rhythm used between all overview rows. */
+html body.account-premium-ui.account-premium-ui .dash>
+.account-overview-highlights.account-overview-lower-highlights[data-account-panel="overview"]{
+  margin-top:10px!important;
+}
 html body.account-premium-ui.account-premium-ui .dash>.plan-summary[data-account-panel="overview"]{order:20!important}
 html body.account-premium-ui.account-premium-ui .dash>.status-summary[data-account-panel="overview"]{order:30!important}
 html body.account-premium-ui.account-premium-ui .dash>.person-summary[data-account-panel="overview"]{order:40!important}
