@@ -36,7 +36,11 @@
   async function syncPaygBalance(force = false) {
     if (!force && Date.now() - lastPaygLoad < 30000) return;
     const current = readSession();
-    if (!current?.session_token || !current?.customer_account_id) return;
+    if (!current?.session_token || !current?.customer_account_id) {
+      paygValueNode.textContent = "–";
+      paygNode.hidden = false;
+      return;
+    }
     lastPaygLoad = Date.now();
     try {
       const response = await fetch(PAYG_URL, {
@@ -47,13 +51,15 @@
       });
       const body = await response.json().catch(() => ({}));
       if (!response.ok || body?.ok === false || body?.environment === "STAGING") return;
-      const wallet = body?.wallet;
-      if (!wallet || String(wallet.status || "").toUpperCase() !== "ACTIVE") return;
-      const value = moneyFromCents(wallet.available_cents, wallet.currency || "EUR");
+      const wallet = body?.wallet || {};
+      const value = moneyFromCents(Number.isFinite(Number(wallet.available_cents)) ? wallet.available_cents : 0, wallet.currency || "EUR");
       paygValueNode.textContent = value;
       paygNode.hidden = false;
       link.setAttribute("aria-label", `${displayedName} öffnen und chatten. PAYG-Guthaben ${value}`);
-    } catch (_) {}
+    } catch (_) {
+      paygValueNode.textContent = "–";
+      paygNode.hidden = false;
+    }
   }
 
   function sync() {
@@ -75,6 +81,8 @@
     link.setAttribute("aria-label", name + " öffnen und chatten");
     link.title = "Mit " + name + " chatten";
     link.hidden = false;
+    paygValueNode.textContent ||= "wird geladen …";
+    paygNode.hidden = false;
     void syncPaygBalance();
     return true;
   }
