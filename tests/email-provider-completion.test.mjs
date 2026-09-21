@@ -22,7 +22,7 @@ for (const provider of ['mailcom','freenet','mailboxorg','vodafone','arcor','kab
   assert.match(ui, new RegExp(`id: "${provider}"[\\s\\S]*?mode: "manual"`), provider);
 }
 assert.match(ui,/id: "mailcom"[\s\S]{0,500}Direkter IMAP-Zugriff/);
-assert.ok(ui.includes('IMAP/SMTP im Postfach aktiviert'));
+assert.ok(ui.includes('IMAP/SMTP muss im Postfach aktiviert sein'));
 assert.ok(ui.includes('mailbox.org'));
 assert.ok(ui.includes('Vodafone-Mail-Infrastruktur'));
 assert.ok(ui.includes('Migadu-Passwort'));
@@ -32,7 +32,7 @@ assert.ok(ui.includes('provider_connection_failed'));
 
 assert.match(ui, /id: "proton"[\s\S]*mode: "unsupported"[\s\S]*Proton Bridge/);
 assert.match(ui, /id: "tuta"[\s\S]*mode: "unsupported"[\s\S]*kein(?:en)? normalen IMAP-Zugriff/);
-assert.ok(ui.includes('Keine direkte Verbindung'));
+assert.match(ui,/id: "tuta"[\s\S]*?Eine direkte Verbindung zu NAHWERK wird derzeit nicht unterstützt/);
 assert.ok(ui.includes('provider.mode === "unsupported"'));
 assert.equal(ui.includes('imap_host'), false);
 assert.equal(ui.includes('smtp_host'), false);
