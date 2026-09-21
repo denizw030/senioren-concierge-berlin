@@ -535,6 +535,70 @@
   color: #111;
 }
 
+.email-provider-webde-video {
+  margin-top: 10px;
+}
+
+.email-provider-webde-video-toggle {
+  width: 100%;
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(212,175,55,.38);
+  border-radius: 14px;
+  background: rgba(212,175,55,.07);
+  color: #f5f4ef;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.email-provider-webde-video-toggle:disabled {
+  opacity: .65;
+  cursor: wait;
+}
+
+.email-provider-webde-video-play {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #d4af37;
+  color: #111;
+  font-size: 13px;
+  padding-left: 2px;
+}
+
+.email-provider-webde-video-toggle strong,
+.email-provider-webde-video-toggle small {
+  display: block;
+}
+
+.email-provider-webde-video-toggle small {
+  margin-top: 2px;
+  color: #9aa6b2;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.email-provider-webde-video-player {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 10px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 12px;
+  background: #000;
+}
+
+.email-provider-webde-video-player[hidden] {
+  display: none;
+}
+
 .email-provider-webde-return {
   display: block;
   margin-top: 10px;
