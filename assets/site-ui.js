@@ -41,8 +41,8 @@
         body.account-premium-ui .account-overview-highlights[data-account-panel="overview"]{order:-30}
         body.account-premium-ui .dash > .plan-summary[data-account-panel="overview"]{order:-20;grid-column:span 6!important}
         body.account-premium-ui .dash > .customer-number-summary[data-account-panel="overview"]{order:-10;grid-column:span 6!important}
-        body.account-premium-ui .account-overview-highlights[data-account-panel="overview"]>.account-overview-link:first-child{text-align:center!important}
-        body.account-premium-ui .account-overview-highlights[data-account-panel="overview"]>.account-overview-link:first-child [data-overview-concierge-avatar]{margin:8px auto 7px!important}
+        body.account-premium-ui .account-overview-highlights[data-account-panel="overview"]>.account-overview-link:first-child{text-align:left!important}
+        body.account-premium-ui .account-overview-highlights[data-account-panel="overview"]>.account-overview-link:first-child [data-overview-concierge-avatar]{margin:0!important}
 
         html[data-nw-portal-theme="light"],
         html[data-nw-portal-theme="light"] body.account-premium-ui,
@@ -239,7 +239,7 @@
           row-gap:0!important;
           column-gap:0!important;
           width:100%!important;
-          margin:0!important;
+          margin:10px 0 0!important;
           padding:0!important;
         }
 
