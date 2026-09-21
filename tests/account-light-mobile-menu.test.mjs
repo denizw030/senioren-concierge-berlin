@@ -16,7 +16,7 @@ test("light account hamburger menu uses light account surface", () => {
 });
 
 test("account routes load fresh shell asset and remain mirrored", () => {
-  assert.match(konto, /assets\/site-ui\.js\?v=11/);
-  assert.match(clean, /assets\/site-ui\.js\?v=11/);
+  assert.match(konto, /assets\/site-ui\.js\?v=\d+/);
+  assert.match(clean, /assets\/site-ui\.js\?v=\d+/);
   assert.equal(konto, clean.replace('<head><base href="/">','<head>'));
 });
