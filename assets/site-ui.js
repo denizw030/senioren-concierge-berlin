@@ -309,6 +309,53 @@
           margin-top:10px!important;
         }
 
+        /* ACCOUNT_OVERVIEW_SPACING_SYMMETRY_V1_20260921
+           Desktop-only spacing polish for the overview tiles.
+           No colors, content, navigation or behavior are changed. */
+        @media(min-width:761px){
+          body.account-premium-ui .account-overview-highlights[data-account-panel="overview"] >
+          .account-overview-link:not(:first-child),
+          body.account-premium-ui .dash > :is(
+            .plan-summary.account-overview-link,
+            .customer-number-summary.account-overview-link,
+            .overview-saved-info.account-overview-link,
+            .owner-product-gap-shortcut.account-overview-link
+          )[data-account-panel="overview"]{
+            box-sizing:border-box!important;
+            height:140px!important;
+            min-height:140px!important;
+            padding:20px 46px 20px 18px!important;
+            margin:0!important;
+          }
+
+          body.account-premium-ui .account-overview-highlights[data-account-panel="overview"] >
+          .account-overview-link:not(:first-child){
+            display:flex!important;
+            flex-direction:column!important;
+            align-items:flex-start!important;
+            justify-content:flex-start!important;
+          }
+
+          body.account-premium-ui .dash > :is(
+            .plan-summary.account-overview-link,
+            .customer-number-summary.account-overview-link,
+            .overview-saved-info.account-overview-link,
+            .owner-product-gap-shortcut.account-overview-link
+          )[data-account-panel="overview"]{
+            display:flex!important;
+            flex-direction:column!important;
+            align-items:stretch!important;
+            justify-content:flex-start!important;
+          }
+
+          body.account-premium-ui .dash >
+          .owner-product-gap-shortcut.account-overview-link[data-account-panel="overview"]
+          .owner-product-gap-shortcut-actions{
+            margin-top:auto!important;
+            padding-top:10px!important;
+          }
+        }
+
         /* Two-column portal groups follow the same open-divider principle. */
         body.account-premium-ui :is(.usagegrid,.safety-hub,.fraud-protection-grid){
           gap:0!important;
