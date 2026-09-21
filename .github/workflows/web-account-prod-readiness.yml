@@ -9,13 +9,14 @@ on:
       - "anmelden.html"
       - "registrieren.html"
       - "payg.html"
+      - "vertrag-widerrufen.html"
       - "assets/account-*.css"
       - "assets/account-*.js"
       - "assets/email-account-integration.js"
       - "assets/email-concierge-product.js"
       - "assets/email-concierge-product.css"
-      - "assets/payg-account.js"
-      - "assets/payg-payment-method-remove-guard.js"
+      - "assets/payg-*.js"
+      - "assets/web-customer-concierge.js"
       - "assets/site-ui.js"
       - "assets/auth-nav.js"
       - "assets/onboarding.js"
@@ -29,6 +30,10 @@ on:
       - "tests/concierge-settings-light-theme.test.mjs"
       - "tests/email-concierge-product.test.mjs"
       - "tests/konto-clean-route-parity.test.mjs"
+      - "tests/registration-ux.test.mjs"
+      - "tests/guest-concierge-payg-handoff.test.mjs"
+      - "tests/web-payg-consumer-rights-readiness.test.mjs"
+      - "tests/web-account-shared-contract-ready.test.mjs"
       - ".github/workflows/web-account-prod-readiness.yml"
   workflow_dispatch:
 permissions:
@@ -36,23 +41,25 @@ permissions:
 jobs:
   web-account-prod:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Portal and E-Mail stability regressions
+      - name: Portal E-Mail registration and PAYG regressions
         run: |
-          node --test             tests/web-account-prod-readiness.test.mjs             tests/account-light-mobile-menu.test.mjs             tests/account-theme-canonical.test.mjs             tests/theme-first-paint-no-flash.test.mjs             tests/account-overview-compact-v2.test.mjs             tests/account-portal-divider-layout.test.mjs             tests/account-email-deep-light-theme.test.mjs             tests/concierge-settings-light-theme.test.mjs             tests/email-concierge-product.test.mjs             tests/konto-clean-route-parity.test.mjs
+          node --test             tests/web-account-prod-readiness.test.mjs             tests/account-light-mobile-menu.test.mjs             tests/account-theme-canonical.test.mjs             tests/theme-first-paint-no-flash.test.mjs             tests/account-overview-compact-v2.test.mjs             tests/account-portal-divider-layout.test.mjs             tests/account-email-deep-light-theme.test.mjs             tests/concierge-settings-light-theme.test.mjs             tests/email-concierge-product.test.mjs             tests/konto-clean-route-parity.test.mjs             tests/registration-ux.test.mjs             tests/guest-concierge-payg-handoff.test.mjs             tests/web-payg-consumer-rights-readiness.test.mjs             tests/web-account-shared-contract-ready.test.mjs
       - name: Website runtime JS syntax
         run: |
           node --check assets/site-ui.js
           node --check assets/email-account-integration.js
           node --check assets/email-concierge-product.js
           node --check assets/payg-account.js
+          node --check assets/payg-consumer-rights-guard.js
           node --check assets/payg-payment-method-remove-guard.js
-      - name: Static account route smoke
+          node --check assets/web-customer-concierge.js
+      - name: Static customer route smoke
         run: |
           python3 -m http.server 4173 >/tmp/nw-web-account-http.log 2>&1 &
           server_pid=$!
@@ -64,6 +71,9 @@ jobs:
           curl -fsS "http://127.0.0.1:4173/konto.html" >/dev/null
           curl -fsS "http://127.0.0.1:4173/konto/" >/dev/null
           curl -fsS "http://127.0.0.1:4173/concierge-anpassen.html" >/dev/null
+          curl -fsS "http://127.0.0.1:4173/registrieren.html" >/dev/null
           curl -fsS "http://127.0.0.1:4173/payg.html" >/dev/null
+          curl -fsS "http://127.0.0.1:4173/vertrag-widerrufen.html" >/dev/null
           curl -fsS "http://127.0.0.1:4173/assets/site-ui.js" >/dev/null
           curl -fsS "http://127.0.0.1:4173/assets/email-concierge-product.js" >/dev/null
+          curl -fsS "http://127.0.0.1:4173/assets/web-customer-concierge.js" >/dev/null
