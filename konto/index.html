@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="assets/email-account-integration.css?v=3" />
     <link rel="stylesheet" href="assets/email-provider-logo-connect-v3.css?v=20260921-2" />
     <link rel="stylesheet" href="assets/family-owner-sponsored-access.css?v=1" />
-    <link rel="stylesheet" href="assets/account-premium-ui.css?v=12" />
+    <link rel="stylesheet" href="assets/account-premium-ui.css?v=13" />
     <link rel="stylesheet" href="assets/account-email-light-parity.css?v=1" />
     <link rel="stylesheet" href="assets/account-response-channel.css?v=6" />
     <link rel="stylesheet" href="assets/account-header-concierge.css?v=3" />
@@ -2195,6 +2195,193 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
   </style>
 
     <link rel="stylesheet" href="assets/account-portal-text-nav-v1.css?v=13" />
+
+  <style id="konto-overview-ambient-final-v1">
+    /* Overview only — ambient NAHWERK palette. Keep layout and all other tabs untouched. */
+    @supports selector(body:has(*)){
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) main,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) main{
+        background:
+          radial-gradient(980px 640px at -6% 28%,rgba(122,112,63,.18),transparent 66%),
+          radial-gradient(920px 620px at 48% 10%,rgba(91,39,72,.16),transparent 69%),
+          radial-gradient(980px 700px at 102% 55%,rgba(49,43,105,.18),transparent 70%),
+          radial-gradient(760px 520px at 28% 96%,rgba(36,66,66,.09),transparent 72%),
+          linear-gradient(145deg,#050607 0%,#09080d 48%,#050508 100%)!important;
+        background-attachment:fixed!important;
+      }
+
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) .account-hero,
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) main>.section,
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) .account-section,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) .account-hero,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) main>.section,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) .account-section{
+        background:transparent!important;
+      }
+
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) .dash>.card[data-account-panel="overview"],
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) .dash>.card[data-account-panel="overview"]{
+        background:rgba(5,7,10,.32)!important;
+        border-color:rgba(174,181,192,.18)!important;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.018)!important;
+        -webkit-backdrop-filter:blur(8px)!important;
+        backdrop-filter:blur(8px)!important;
+      }
+
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) .account-overview-link,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) .account-overview-link{
+        background:rgba(5,7,10,.22)!important;
+        border-color:rgba(174,181,192,.16)!important;
+        box-shadow:none!important;
+        -webkit-backdrop-filter:blur(7px)!important;
+        backdrop-filter:blur(7px)!important;
+      }
+
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) .dash>.card[data-account-panel="overview"]:hover,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) .dash>.card[data-account-panel="overview"]:hover,
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) .account-overview-link:hover,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) .account-overview-link:hover{
+        background:rgba(7,9,12,.38)!important;
+        border-color:rgba(201,174,111,.25)!important;
+        box-shadow:none!important;
+      }
+
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) .overview-saved-info .empty,
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) .overview-open-issues .empty,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) .overview-saved-info .empty,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) .overview-open-issues .empty{
+        background:transparent!important;
+        border-color:transparent!important;
+      }
+    }
+  </style>
+
+
+  <style id="konto-overview-lower-symmetric-v2">
+    /* ONLY the four lower overview tiles: match the upper overview tile geometry. */
+    body.account-premium-ui .dash > :is(
+      .plan-summary,
+      .customer-number-summary,
+      .overview-saved-info,
+      .owner-product-gap-shortcut
+    )[data-account-panel="overview"]{
+      min-width:0!important;
+      width:100%!important;
+      min-height:108px!important;
+      padding:17px 46px 17px 18px!important;
+      margin:0!important;
+      border-radius:0!important;
+      background:transparent!important;
+      box-shadow:none!important;
+      -webkit-backdrop-filter:none!important;
+      backdrop-filter:none!important;
+      align-self:stretch!important;
+      overflow:hidden!important;
+    }
+
+    body.account-premium-ui .dash > :is(
+      .plan-summary,
+      .overview-saved-info
+    )[data-account-panel="overview"]{
+      grid-column:1 / 7!important;
+      border:0!important;
+      border-top:1px solid rgba(137,154,178,.16)!important;
+      border-right:1px solid rgba(137,154,178,.16)!important;
+    }
+
+    body.account-premium-ui .dash > :is(
+      .customer-number-summary,
+      .owner-product-gap-shortcut
+    )[data-account-panel="overview"]{
+      grid-column:7 / 13!important;
+      border:0!important;
+      border-top:1px solid rgba(137,154,178,.16)!important;
+    }
+
+    body.account-premium-ui .dash > :is(
+      .plan-summary,
+      .customer-number-summary,
+      .overview-saved-info,
+      .owner-product-gap-shortcut
+    )[data-account-panel="overview"] .eyebrow{
+      margin-bottom:8px!important;
+      font-size:10.5px!important;
+      letter-spacing:.09em!important;
+    }
+
+    body.account-premium-ui .dash > :is(
+      .plan-summary,
+      .customer-number-summary
+    )[data-account-panel="overview"] .value,
+    body.account-premium-ui .dash > :is(
+      .overview-saved-info,
+      .owner-product-gap-shortcut
+    )[data-account-panel="overview"] h3{
+      margin:0 0 5px!important;
+      font-size:clamp(.98rem,1.35vw,1.16rem)!important;
+      line-height:1.2!important;
+      letter-spacing:-.022em!important;
+      font-weight:760!important;
+    }
+
+    body.account-premium-ui .dash > :is(
+      .plan-summary,
+      .customer-number-summary,
+      .overview-saved-info,
+      .owner-product-gap-shortcut
+    )[data-account-panel="overview"] :is(.muted,.empty){
+      max-width:92%!important;
+      margin:0!important;
+      padding:0!important;
+      border:0!important;
+      border-radius:0!important;
+      background:transparent!important;
+      font-size:11.25px!important;
+      line-height:1.42!important;
+    }
+
+    body.account-premium-ui .dash > .owner-product-gap-shortcut[data-account-panel="overview"] .owner-product-gap-shortcut-actions{
+      margin-top:10px!important;
+    }
+
+    html[data-nw-portal-theme="light"] body.account-premium-ui .dash > :is(
+      .plan-summary,
+      .overview-saved-info
+    )[data-account-panel="overview"],
+    body.account-premium-ui.nw-portal-light .dash > :is(
+      .plan-summary,
+      .overview-saved-info
+    )[data-account-panel="overview"]{
+      border-top-color:rgba(74,59,34,.16)!important;
+      border-right-color:rgba(74,59,34,.16)!important;
+    }
+
+    html[data-nw-portal-theme="light"] body.account-premium-ui .dash > :is(
+      .customer-number-summary,
+      .owner-product-gap-shortcut
+    )[data-account-panel="overview"],
+    body.account-premium-ui.nw-portal-light .dash > :is(
+      .customer-number-summary,
+      .owner-product-gap-shortcut
+    )[data-account-panel="overview"]{
+      border-top-color:rgba(74,59,34,.16)!important;
+    }
+
+    @media(max-width:700px){
+      body.account-premium-ui .dash > :is(
+        .plan-summary,
+        .customer-number-summary,
+        .overview-saved-info,
+        .owner-product-gap-shortcut
+      )[data-account-panel="overview"]{
+        grid-column:1/-1!important;
+        min-height:92px!important;
+        padding:15px 44px 15px 16px!important;
+        border-right:0!important;
+      }
+    }
+  </style>
+
 </head>
   <body class="account-premium-ui">
     <script>
