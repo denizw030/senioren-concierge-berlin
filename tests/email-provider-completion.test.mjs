@@ -4,8 +4,8 @@ import fs from 'node:fs';
 const ui = fs.readFileSync('assets/email-provider-logo-connect-v3.js', 'utf8');
 const callback = fs.readFileSync('oauth/yahoo/callback/index.html', 'utf8');
 
-assert.match(ui, /id: "yahoo"[\s\S]*mode: "yahoo"/);
-assert.ok(ui.includes('/email/connect/yahoo/web'));
+assert.match(ui, /id: "yahoo"[\s\S]*mode: "manual"[\s\S]*secret: "Passwort"[\s\S]*credentialKind: "password_first"/);
+assert.ok(ui.includes('CREATE_YAHOO_APP_PASSWORD'));
 
 assert.ok(ui.includes('/email/connect/auto/web'));
 assert.ok(ui.includes('emailAutoConnectEmail'));
@@ -24,8 +24,11 @@ assert.ok(ui.includes('/email/yahoo/disconnect/web'));
 assert.ok(ui.includes('row.connection_ready !== false'));
 assert.ok(ui.includes('row.direct_support !== false'));
 assert.ok(ui.includes('Noch nicht verfügbar'));
-assert.match(ui,/id: "gmx"[\s\S]{0,320}secret: "App-Passwort"[\s\S]{0,320}credentialKind: "app"/);
-assert.match(ui,/id: "webde"[\s\S]{0,420}credentialKind: "mail_first"/);
+assert.match(ui,/id: "gmx"[\s\S]{0,320}secret: "Passwort"[\s\S]{0,320}credentialKind: "password_first"/);
+assert.match(ui,/id: "webde"[\s\S]{0,420}secret: "Passwort"[\s\S]{0,420}credentialKind: "password_first"/);
+assert.ok(ui.includes('Gib deine E-Mail-Adresse und dein normales Passwort ein.'));
+assert.ok(ui.includes('credentialGuideNeeded'));
+assert.ok(ui.includes('guidance_code'));
 assert.ok(ui.includes("https://auth.web.de/login?prompt=none"));
 assert.ok(ui.includes("authcode-context=VD0Cgr9WhV"));
 assert.ok(ui.includes('emailProviderWebdeGuide'));
@@ -73,7 +76,7 @@ const audioStopAfterVideo = ui.indexOf('function stopWebdeGuideAudio()', videoTo
 assert.ok(videoToggleStart >= 0 && audioStopAfterVideo > videoToggleStart);
 assert.equal(ui.slice(videoToggleStart, audioStopAfterVideo).includes('stopWebdeGuideAudio()'), false);
 assert.ok(ui.includes('renderModal();\n      renderGrid();'));
-assert.match(ui,/id: "fastmail"[\s\S]{0,320}secret: "App-Passwort"[\s\S]{0,320}credentialKind: "app"/);
+assert.match(ui,/id: "fastmail"[\s\S]{0,320}secret: "Passwort"[\s\S]{0,320}credentialKind: "password_first"/);
 assert.ok(ui.includes('emailProviderZohoDc'));
 assert.ok(ui.includes('value="eu"'));
 assert.ok(ui.includes('zoho_organization: organization'));
@@ -81,11 +84,15 @@ assert.ok(ui.includes('zoho_organization: organization'));
 for (const provider of ['mailcom','freenet','mailboxorg','vodafone','arcor','kabeldeutschland','unitymedia','migadu']) {
   assert.match(ui, new RegExp(`id: "${provider}"[\\s\\S]*?mode: "manual"`), provider);
 }
-assert.match(ui,/id: "mailcom"[\s\S]{0,500}Direkter IMAP-Zugriff/);
-assert.ok(ui.includes('IMAP/SMTP muss im Postfach aktiviert sein'));
-assert.ok(ui.includes('mailbox.org'));
-assert.ok(ui.includes('Vodafone-Mail-Infrastruktur'));
-assert.ok(ui.includes('Migadu-Passwort'));
+for (const provider of ['yahoo','icloud','gmx','webde','telekom','fastmail','zoho','ionos','strato','mailcom','freenet','mailboxorg','vodafone','arcor','kabeldeutschland','unitymedia','migadu']) {
+  assert.match(ui, new RegExp(`id: "${provider}"[\\s\\S]{0,360}secret: "Passwort"[\\s\\S]{0,360}credentialKind: "password_first"`), provider);
+}
+assert.ok(ui.includes('ENABLE_POP_IMAP_THEN_RETRY'));
+assert.ok(ui.includes('ENABLE_POP_IMAP_SMTP_THEN_RETRY'));
+assert.ok(ui.includes('CREATE_MAIL_PROGRAM_PASSWORD'));
+assert.ok(ui.includes('CREATE_YAHOO_APP_PASSWORD'));
+assert.ok(ui.includes('CREATE_ICLOUD_APP_SPECIFIC_PASSWORD'));
+assert.ok(ui.includes('CREATE_FASTMAIL_APP_PASSWORD'));
 assert.ok(ui.includes('provider_authentication_failed'));
 assert.ok(ui.includes('provider_tls_connection_failed'));
 assert.ok(ui.includes('provider_connection_failed'));
