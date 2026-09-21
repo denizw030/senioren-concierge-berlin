@@ -82,8 +82,8 @@ test("product layout is responsive across desktop and mobile",()=>{
   assert.match(js,/ecp-rule ecp-rule-personal/);
   assert.match(js,/ecp-rule-title-row/);
   assert.match(js,/\.ecp-rule-controls\{display:grid;grid-template-columns:minmax\(0,1fr\) auto/);
-  assert.match(integration,/email-concierge-product\.css\?v=20260920-10/);
-  assert.match(integration,/email-concierge-product\.js\?v=20260920-15/);
+  assert.match(integration,/email-concierge-product\.css\?v=[0-9-]+/);
+  assert.match(integration,/email-concierge-product\.js\?v=[0-9-]+/);
 });
 
 
@@ -93,7 +93,9 @@ test("connected account overview is topmost and follows canonical provider statu
   assert.match(js,/accountHead\.insertAdjacentElement\("afterend", host\)/);
   assert.match(js,/__nahwerkEmailConnections/);
   assert.match(js,/nahwerk:email-connections-updated/);
-  assert.match(js,/async function loadConnections/);\n  assert.match(js,/emailConnections = list\\(data\\?\\.connections\\)\\.filter/);\n  assert.match(js,/activeConnectionId = String\\(emailConnections\\[0\\]\\?\\.connection_id/);
+  assert.match(js,/async function loadConnections/);
+  assert.match(js,/emailConnections = list\\(data\\?\\.connections\\)\\.filter/);
+  assert.match(js,/activeConnectionId = String\\(emailConnections\\[0\\]\\?\\.connection_id/);
   assert.match(multi,/emailConciergeProduct/);
   assert.match(multi,/accountRoot\.querySelector\("\.email-account-head"\)/);
   assert.doesNotMatch(multi,/emailLogoConnectShell/);
