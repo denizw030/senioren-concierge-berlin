@@ -839,3 +839,12 @@ html body.account-premium-ui.account-premium-ui .account-session-note[data-accou
     min-height:38px!important;
   }
 }
+
+
+/* EMAIL_ACTIONS_EMAIL_TAB_ONLY_V1_20260921 */
+body.account-premium-ui:not(:has(#accountTabEmail[aria-selected="true"])) #emailTopActions{
+  display:none!important;
+}
+body.account-premium-ui:has(#accountTabEmail[aria-selected="true"]) #emailTopActions{
+  display:flex!important;
+}
