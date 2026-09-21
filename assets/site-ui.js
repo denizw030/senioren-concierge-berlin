@@ -226,6 +226,109 @@
       });
     }
 
+    /* NW_MOBILE_ACCOUNT_MENU_V1_20260921: presentation-only mobile account navigation and theme placement. */
+    const setupBy = document.querySelector('.account-setup-by');
+    const themeSetting = document.getElementById('nwPortalThemeSetting');
+    const mobileAccountMedia = window.matchMedia('(max-width:760px)');
+
+    const syncMobileThemePlacement = () => {
+      if (!tabsShell || !setupBy || !themeSetting) return;
+      if (mobileAccountMedia.matches) {
+        if (themeSetting.parentElement !== setupBy) setupBy.appendChild(themeSetting);
+      } else if (themeSetting.previousElementSibling !== tabsShell || themeSetting.parentElement !== tabsShell.parentElement) {
+        tabsShell.insertAdjacentElement('afterend', themeSetting);
+      }
+    };
+
+    let mobileAccountNav = document.getElementById('nwMobileAccountNav');
+    if (tabsShell && !mobileAccountNav) {
+      mobileAccountNav = document.createElement('div');
+      mobileAccountNav.id = 'nwMobileAccountNav';
+      mobileAccountNav.className = 'nw-mobile-account-nav';
+      mobileAccountNav.innerHTML = `
+        <button class="nw-mobile-account-home" type="button" aria-label="Übersicht öffnen">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 11.2 12 5l7.5 6.2"></path><path d="M6.5 10.4V19h11v-8.6"></path></svg>
+          <span>Übersicht</span>
+        </button>
+        <button class="nw-mobile-account-menu-button" type="button" aria-expanded="false" aria-controls="nwMobileAccountMenu">
+          <span class="nw-mobile-account-menu-current">Menü</span>
+          <span class="nw-mobile-account-menu-lines" aria-hidden="true"><i></i><i></i><i></i></span>
+        </button>
+        <div class="nw-mobile-account-menu" id="nwMobileAccountMenu" hidden role="menu" aria-label="Kundenbereich">
+          <button type="button" role="menuitem" data-mobile-account-target="concierge">Concierge</button>
+          <button type="button" role="menuitem" data-mobile-account-target="email">E-Mail</button>
+          <button type="button" role="menuitem" data-mobile-account-target="safety">Safety</button>
+          <button type="button" role="menuitem" data-mobile-account-target="usage">Nutzung</button>
+          <button type="button" role="menuitem" data-mobile-account-target="personal">Account</button>
+          <button type="button" role="menuitem" data-mobile-account-target="access">Zugänge</button>
+        </div>
+      `;
+      tabsShell.insertAdjacentElement('beforebegin', mobileAccountNav);
+
+      const home = mobileAccountNav.querySelector('.nw-mobile-account-home');
+      const menuButton = mobileAccountNav.querySelector('.nw-mobile-account-menu-button');
+      const menu = mobileAccountNav.querySelector('.nw-mobile-account-menu');
+      const currentLabel = mobileAccountNav.querySelector('.nw-mobile-account-menu-current');
+
+      const closeMenu = () => {
+        menu.hidden = true;
+        menuButton.setAttribute('aria-expanded', 'false');
+        mobileAccountNav.classList.remove('is-open');
+      };
+      const openMenu = () => {
+        menu.hidden = false;
+        menuButton.setAttribute('aria-expanded', 'true');
+        mobileAccountNav.classList.add('is-open');
+      };
+      const syncMobileAccountState = () => {
+        const selected = tabsShell.querySelector('.account-tab[aria-selected="true"]');
+        const key = selected?.dataset.accountTab || 'overview';
+        const label = selected?.querySelector(':scope > span:last-child')?.textContent?.trim() || 'Menü';
+        currentLabel.textContent = key === 'overview' ? 'Menü' : label;
+        home.classList.toggle('is-active', key === 'overview');
+        mobileAccountNav.querySelectorAll('[data-mobile-account-target]').forEach((button) => {
+          button.classList.toggle('is-active', button.dataset.mobileAccountTarget === key);
+        });
+      };
+
+      home.addEventListener('click', () => {
+        closeMenu();
+        document.getElementById('accountTabOverview')?.click();
+      });
+      menuButton.addEventListener('click', () => {
+        if (menu.hidden) openMenu();
+        else closeMenu();
+      });
+      mobileAccountNav.querySelectorAll('[data-mobile-account-target]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const target = button.dataset.mobileAccountTarget;
+          closeMenu();
+          if (target === 'concierge') {
+            location.href = '/web-concierge';
+            return;
+          }
+          document.querySelector(`[data-account-tab="${target}"]`)?.click();
+        });
+      });
+      document.addEventListener('click', (event) => {
+        if (!mobileAccountNav.contains(event.target)) closeMenu();
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeMenu();
+      });
+      new MutationObserver(syncMobileAccountState).observe(tabsShell, {
+        subtree:true,
+        attributes:true,
+        attributeFilter:['aria-selected']
+      });
+      mobileAccountMedia.addEventListener?.('change', () => {
+        syncMobileThemePlacement();
+        if (!mobileAccountMedia.matches) closeMenu();
+      });
+      syncMobileAccountState();
+    }
+    syncMobileThemePlacement();
+
     const highlights = document.querySelector(".account-overview-highlights[data-account-panel='overview']");
     if (highlights && !document.getElementById("accountPaygEntry")) {
       const payg = document.createElement("a");
