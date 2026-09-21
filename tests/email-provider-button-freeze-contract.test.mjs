@@ -30,5 +30,5 @@ for (const provider of ['mailcom','freenet','mailboxorg','vodafone','arcor','kab
 }
 assert.match(p, /id: "proton"[\s\S]*?mode: "unsupported"/);
 assert.match(p, /id: "tuta"[\s\S]*?mode: "unsupported"/);
-assert.ok(p.includes('Keine direkte Verbindung'));
+assert.match(p,/id: "proton"[\s\S]*?direkte serverseitige Verbindung zu NAHWERK wird derzeit nicht unterstützt/);
 console.log('EMAIL_PROVIDER_BUTTON_FREEZE_CONTRACT=GREEN');
