@@ -263,21 +263,21 @@ body.account-premium-ui .account-tabs.account-tabs-modern .account-tab{
   display:inline-flex!important;
   align-items:center!important;
   justify-content:center!important;
-  gap:7px!important;
+  gap:8px!important;
 }
 body.account-premium-ui .account-tabs.account-tabs-modern .account-tab>.account-tab-icon{
   display:inline-flex!important;
   align-items:center!important;
   justify-content:center!important;
-  width:14px!important;
-  height:14px!important;
-  min-width:14px!important;
-  min-height:14px!important;
-  flex:0 0 14px!important;
+  width:16px!important;
+  height:16px!important;
+  min-width:16px!important;
+  min-height:16px!important;
+  flex:0 0 16px!important;
   margin:0!important;
   padding:0!important;
   box-sizing:border-box!important;
-  line-height:14px!important;
+  line-height:16px!important;
   vertical-align:middle!important;
   color:currentColor!important;
   transform:translateY(-1px)!important;
@@ -285,10 +285,10 @@ body.account-premium-ui .account-tabs.account-tabs-modern .account-tab>.account-
 }
 body.account-premium-ui .account-tabs.account-tabs-modern .account-tab>.account-tab-icon svg{
   display:block!important;
-  width:14px!important;
-  height:14px!important;
-  min-width:14px!important;
-  min-height:14px!important;
+  width:15px!important;
+  height:15px!important;
+  min-width:15px!important;
+  min-height:15px!important;
   margin:0!important;
   overflow:visible!important;
   fill:none!important;
@@ -302,7 +302,7 @@ body.account-premium-ui .account-tabs.account-tabs-modern .account-tab>.account-
   background-image:url("/assets/logos/NAHWERK-Goldmann-Icon.svg?v=2")!important;
   background-repeat:no-repeat!important;
   background-position:center!important;
-  background-size:14px 14px!important;
+  background-size:16px 16px!important;
   -webkit-mask:none!important;
   mask:none!important;
   color:transparent!important;
@@ -414,25 +414,50 @@ html body.account-premium-ui.account-premium-ui .dash>.overview-open-issues[data
 html body.account-premium-ui.account-premium-ui .account-overview-highlights[data-account-panel="overview"]>
 .account-overview-link[data-open-account-tab="concierge"]{
   grid-column:1/-1!important;
+  display:grid!important;
+  grid-template-columns:58px minmax(0,560px)!important;
+  grid-template-rows:auto auto auto!important;
+  align-items:center!important;
+  justify-content:center!important;
+  column-gap:16px!important;
+  row-gap:0!important;
   min-height:112px!important;
-  padding:18px 48px 18px 94px!important;
+  padding:18px 48px!important;
+  text-align:left!important;
+}
+html body.account-premium-ui.account-premium-ui .account-overview-link[data-open-account-tab="concierge"]>.eyebrow{
+  grid-column:2!important;
+  grid-row:1!important;
+  width:100%!important;
+  text-align:left!important;
 }
 html body.account-premium-ui.account-premium-ui .account-overview-link[data-open-account-tab="concierge"] [data-overview-concierge-avatar]{
-  position:absolute!important;
-  left:18px!important;
-  top:50%!important;
+  position:static!important;
+  grid-column:1!important;
+  grid-row:1/4!important;
+  align-self:center!important;
   width:58px!important;
   height:58px!important;
   min-width:58px!important;
   min-height:58px!important;
   margin:0!important;
-  transform:translateY(-50%)!important;
+  transform:none!important;
   border-radius:50%!important;
   background-position:center top!important;
   background-size:cover!important;
 }
 html body.account-premium-ui.account-premium-ui .account-overview-link[data-open-account-tab="concierge"] strong{
+  grid-column:2!important;
+  grid-row:2!important;
+  width:100%!important;
   font-size:clamp(1.06rem,1.5vw,1.24rem)!important;
+  text-align:left!important;
+}
+html body.account-premium-ui.account-premium-ui .account-overview-link[data-open-account-tab="concierge"]>span:last-child{
+  grid-column:2!important;
+  grid-row:3!important;
+  width:100%!important;
+  text-align:left!important;
 }
 
 /* 3) The connection note remains the final overview element, with deliberate separation above it. */
@@ -491,11 +516,12 @@ html body.account-premium-ui.account-premium-ui .account-session-note[data-accou
   html body.account-premium-ui.account-premium-ui .account-overview-highlights[data-account-panel="overview"]>
   .account-overview-link[data-open-account-tab="concierge"]{
     grid-column:1!important;
+    grid-template-columns:52px minmax(0,1fr)!important;
+    column-gap:14px!important;
     min-height:104px!important;
-    padding:16px 42px 16px 82px!important;
+    padding:16px 42px 16px 16px!important;
   }
   html body.account-premium-ui.account-premium-ui .account-overview-link[data-open-account-tab="concierge"] [data-overview-concierge-avatar]{
-    left:16px!important;
     width:52px!important;
     height:52px!important;
     min-width:52px!important;
