@@ -303,6 +303,60 @@
           letter-spacing:.09em!important;
         }
 
+        /* Final overview structure: the lower account information is moved into
+           the very same grid as Safety, Nutzung, PAYG and Web Concierge. */
+        body.account-premium-ui .account-overview-highlights[data-account-panel="overview"] >
+        :is(.plan-summary,.customer-number-summary) .value,
+        body.account-premium-ui .account-overview-highlights[data-account-panel="overview"] >
+        :is(.overview-saved-info,.owner-product-gap-shortcut) h3{
+          display:block!important;
+          margin:0 0 5px!important;
+          font-size:clamp(.98rem,1.35vw,1.16rem)!important;
+          font-weight:700!important;
+          line-height:1.2!important;
+          letter-spacing:-.022em!important;
+        }
+        body.account-premium-ui .account-overview-highlights[data-account-panel="overview"] >
+        :is(.plan-summary,.customer-number-summary,.overview-saved-info,.owner-product-gap-shortcut) :is(.muted,.empty){
+          display:block!important;
+          max-width:92%!important;
+          min-height:0!important;
+          margin:0!important;
+          padding:0!important;
+          border:0!important;
+          border-radius:0!important;
+          background:none!important;
+          box-shadow:none!important;
+          font-size:11.25px!important;
+          line-height:1.42!important;
+        }
+        body.account-premium-ui .account-overview-highlights[data-account-panel="overview"] >
+        .overview-saved-info::before{
+          content:""!important;
+          display:block!important;
+          height:12.6px!important;
+          margin:0 0 8px!important;
+        }
+        body.account-premium-ui .account-overview-highlights[data-account-panel="overview"] >
+        .owner-product-gap-shortcut .owner-product-gap-shortcut-head{margin:0!important}
+        @media(min-width:761px){
+          body.account-premium-ui .account-overview-highlights[data-account-panel="overview"] >
+          .owner-product-gap-shortcut .owner-product-gap-shortcut-actions{
+            position:absolute!important;
+            left:18px!important;
+            bottom:14px!important;
+            margin:0!important;
+            padding:0!important;
+          }
+          body.account-premium-ui .account-overview-highlights[data-account-panel="overview"] >
+          .owner-product-gap-shortcut .owner-product-gap-shortcut-actions .btn{
+            min-height:34px!important;
+            height:34px!important;
+            padding:0 14px!important;
+            font-size:11px!important;
+          }
+        }
+
         body.account-premium-ui .account-overview-lower-highlights[data-account-panel="overview"] >
         :is(.plan-summary,.customer-number-summary) .value,
         body.account-premium-ui .account-overview-lower-highlights[data-account-panel="overview"] >
@@ -773,6 +827,22 @@
     syncMobileThemePlacement();
 
     const highlights = document.querySelector(".account-overview-highlights[data-account-panel='overview']");
+    const lowerOverviewTiles = [
+      document.querySelector(".plan-summary[data-account-panel='overview']"),
+      document.querySelector(".customer-number-summary[data-account-panel='overview']"),
+      document.querySelector(".overview-saved-info[data-account-panel='overview']"),
+      document.querySelector(".owner-product-gap-shortcut[data-account-panel='overview']")
+    ].filter(Boolean);
+    if (highlights) {
+      lowerOverviewTiles.forEach((tile) => {
+        tile.classList.add("account-overview-link");
+        highlights.appendChild(tile);
+      });
+      document.querySelectorAll(".account-overview-lower-highlights").forEach((group) => {
+        if (!group.children.length) group.remove();
+      });
+    }
+    const firstLowerOverviewTile = lowerOverviewTiles[0] || null;
     if (highlights && !document.getElementById("accountPaygEntry")) {
       const payg = document.createElement("a");
       payg.id = "accountPaygEntry";
@@ -780,7 +850,7 @@
       payg.href = "/payg";
       payg.setAttribute("aria-label", "PAYG – Bezahlen pro Auftrag öffnen");
       payg.innerHTML = '<span class="eyebrow">PAYG</span><strong>Bezahlen pro Auftrag</strong><span>Status, Zahlungsmethode und Kosten transparent anzeigen.</span>';
-      highlights.appendChild(payg);
+      highlights.insertBefore(payg, firstLowerOverviewTile);
     }
 
     if (highlights && !document.getElementById("accountWebConciergeEntry")) {
@@ -790,7 +860,7 @@
       concierge.href = "/web-concierge";
       concierge.setAttribute("aria-label", "Web Concierge öffnen");
       concierge.innerHTML = '<span class="eyebrow">Web Concierge</span><strong>Concierge im Kundenkonto</strong><span>Aktuelle PROD-Verfügbarkeit des persönlichen Webkanals ansehen.</span>';
-      highlights.appendChild(concierge);
+      highlights.insertBefore(concierge, firstLowerOverviewTile);
     }
   };
 
