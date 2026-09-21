@@ -360,7 +360,9 @@ jobs:
           src=Path("konto.html").read_text(encoding="utf-8")
           links="\n".join(re.findall(r'<link[^>]+rel="stylesheet"[^>]*>',src,re.I))
           styles="\n".join(re.findall(r'<style[^>]*>[\s\S]*?</style>',src,re.I))
-          tabs=re.search(r'<div class="account-tabs-shell">[\s\S]*?</nav>\s*</div>',src,re.I).group(0)
+          tabs_start=src.index('<div class="account-tabs-shell">')
+          tabs_end=src.index('\n\n          <div class="dash">',tabs_start)
+          tabs=src[tabs_start:tabs_end]
           setup=re.search(r'<div class="account-setup-by"[\s\S]*?</div>',src,re.I).group(0)
           summaries=[]
           for klass in ["plan-summary","status-summary","customer-number-summary","person-summary"]:
