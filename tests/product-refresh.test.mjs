@@ -52,43 +52,33 @@ test("senior page keeps real-world examples while personal page follows the froz
 
 test("current launch tariff matrix is consistent while FREE entitlement stays central", () => {
   const publicTariffValues = [
-    "50 App-Dialoge",
-    "20 WhatsApp-Dialoge",
+    "0 € / Monat",
+    "App unbegrenzt · Web unbegrenzt · 20 WhatsApp-Kundennachrichten",
     "5,99 € / Monat",
-    "100 App-Dialoge",
-    "30 WhatsApp-Dialoge",
+    "App unbegrenzt · Web unbegrenzt · 30 WhatsApp-Kundennachrichten",
     "10,99 € / Monat",
-    "180 App-Dialoge",
-    "50 WhatsApp-Dialoge",
+    "App unbegrenzt · Web unbegrenzt · 50 WhatsApp-Kundennachrichten",
     "19,99 € / Monat",
-    "400 App-Dialoge",
-    "100 WhatsApp-Dialoge",
+    "App unbegrenzt · Web unbegrenzt · 100 WhatsApp-Kundennachrichten",
     "34,99 € / Monat",
-    "750 App-Dialoge",
-    "160 WhatsApp-Dialoge",
+    "App unbegrenzt · Web unbegrenzt · 160 WhatsApp-Kundennachrichten",
     "59,66 € / Monat",
-    "1.200 App-Dialoge",
-    "300 WhatsApp-Dialoge"
+    "App unbegrenzt · Web unbegrenzt · 300 WhatsApp-Kundennachrichten"
   ];
   for (const value of publicTariffValues)
     assert.equal(visibleText(packages).includes(value), true, `${value} is shown on package page`);
 
   for (const value of [
     "5,99 € / Monat",
-    "100 App-Dialoge",
-    "30 WhatsApp-Dialoge",
+    "App unbegrenzt · 30 WhatsApp-Dialoge",
     "10,99 € / Monat",
-    "180 App-Dialoge",
-    "50 WhatsApp-Dialoge",
+    "App unbegrenzt · 50 WhatsApp-Dialoge",
     "19,99 € / Monat",
-    "400 App-Dialoge",
-    "100 WhatsApp-Dialoge",
+    "App unbegrenzt · 100 WhatsApp-Dialoge",
     "34,99 € / Monat",
-    "750 App-Dialoge",
-    "160 WhatsApp-Dialoge",
+    "App unbegrenzt · 160 WhatsApp-Dialoge",
     "59,66 € / Monat",
-    "1.200 App-Dialoge",
-    "300 WhatsApp-Dialoge"
+    "App unbegrenzt · 300 WhatsApp-Dialoge"
   ]) assert.equal(onboarding.includes(value), true, `${value} is used in paid registration preview`);
 
   assert.match(onboarding, /code: "FREE"[\s\S]*price: "0 € \/ Monat"[\s\S]*Zentrales FREE-Kontingent · nach Login live sichtbar/);

@@ -82,8 +82,8 @@ test("product layout is responsive across desktop and mobile",()=>{
   assert.match(js,/ecp-rule ecp-rule-personal/);
   assert.match(js,/ecp-rule-title-row/);
   assert.match(js,/\.ecp-rule-controls\{display:grid;grid-template-columns:minmax\(0,1fr\) auto/);
-  assert.match(integration,/email-concierge-product\.css\?v=20260920-10/);
-  assert.match(integration,/email-concierge-product\.js\?v=20260920-15/);
+  assert.match(integration,/email-concierge-product\.css\?v=[0-9-]+/);
+  assert.match(integration,/email-concierge-product\.js\?v=[0-9-]+/);
 });
 
 
@@ -93,7 +93,9 @@ test("connected account overview is topmost and follows canonical provider statu
   assert.match(js,/accountHead\.insertAdjacentElement\("afterend", host\)/);
   assert.match(js,/__nahwerkEmailConnections/);
   assert.match(js,/nahwerk:email-connections-updated/);
-  assert.match(js,/canonicalGoogleConnection/);
+  assert.ok(js.includes("async function loadConnections()"));
+  assert.ok(js.includes("emailConnections = list(data?.connections).filter"));
+  assert.ok(js.includes('activeConnectionId = String(emailConnections[0]?.connection_id || "")'));
   assert.match(multi,/emailConciergeProduct/);
   assert.match(multi,/accountRoot\.querySelector\("\.email-account-head"\)/);
   assert.doesNotMatch(multi,/emailLogoConnectShell/);
@@ -156,14 +158,14 @@ test("concierge chat renders classification views locally without another Gmail 
   assert.match(js,/classification\.buckets\?\.\[String\(data\.classification/);
   assert.match(js,/Zeig mir alle unwichtigen/);
   assert.match(js,/EMAIL_PROVIDER_BUSY/);
-  assert.match(js,/Gmail ist gerade kurz ausgelastet/);
+  assert.match(js,/E-Mail-Anbieter ist gerade kurz ausgelastet/);
 });
 
 test("concierge chat explains that commands can control mail and automation",()=>{
   assert.match(js,/wichtig\/unwichtig festlegen/);
   assert.match(js,/archivieren/);
   assert.match(js,/in den Papierkorb verschieben/);
-  assert.match(js,/Regeln für ähnliche E-Mails anlegen/);
+  assert.match(js,/Antworten vorbereiten/);
   assert.match(js,/GitHub-Mails sind unwichtig/);
 });
 

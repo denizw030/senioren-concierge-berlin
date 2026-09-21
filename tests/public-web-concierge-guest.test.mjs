@@ -73,5 +73,5 @@ test("guest account CTA renders the backend purpose instead of claiming a hidden
   assert.match(chat, /purpose:String\(item\.purpose\|\|""\)\.toUpperCase\(\)/);
   assert.match(chat, /Anmelden oder Konto erstellen/);
   assert.match(chat, /Auftrag sicher fortsetzen/);
-  assert.match(chat, /renderGuestAccountActions\(response\.ui_actions\)/);
+  assert.match(chat, /renderGuestAccountActions\(response\.ui_actions,\{request:guestRequest\}\)/);
 });

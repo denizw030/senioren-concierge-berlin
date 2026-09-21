@@ -11,9 +11,9 @@ assert.ok(ui.includes('/email/yahoo/disconnect/web'));
 assert.ok(ui.includes('row.connection_ready !== false'));
 assert.ok(ui.includes('row.direct_support !== false'));
 assert.ok(ui.includes('Noch nicht verfügbar'));
-assert.ok(ui.includes('GMX App-Passwort'));
-assert.ok(ui.includes('WEB.DE App-Passwort'));
-assert.ok(ui.includes('Fastmail App-Passwort'));
+assert.match(ui,/id: "gmx"[\s\S]{0,320}secret: "App-Passwort"[\s\S]{0,320}credentialKind: "app"/);
+assert.match(ui,/id: "webde"[\s\S]{0,360}credentialKind: "mail_first"[\s\S]{0,420}WEB\.DE Freigabe öffnen/);
+assert.match(ui,/id: "fastmail"[\s\S]{0,320}secret: "App-Passwort"[\s\S]{0,320}credentialKind: "app"/);
 assert.ok(ui.includes('emailProviderZohoDc'));
 assert.ok(ui.includes('value="eu"'));
 assert.ok(ui.includes('zoho_organization: organization'));
@@ -21,8 +21,8 @@ assert.ok(ui.includes('zoho_organization: organization'));
 for (const provider of ['mailcom','freenet','mailboxorg','vodafone','arcor','kabeldeutschland','unitymedia','migadu']) {
   assert.match(ui, new RegExp(`id: "${provider}"[\\s\\S]*?mode: "manual"`), provider);
 }
-assert.ok(ui.includes('mail.com für Premium-Konten'));
-assert.ok(ui.includes('IMAP/SMTP im Postfach aktiviert'));
+assert.match(ui,/id: "mailcom"[\s\S]{0,500}Direkter IMAP-Zugriff/);
+assert.ok(ui.includes('IMAP/SMTP muss im Postfach aktiviert sein'));
 assert.ok(ui.includes('mailbox.org'));
 assert.ok(ui.includes('Vodafone-Mail-Infrastruktur'));
 assert.ok(ui.includes('Migadu-Passwort'));
@@ -32,7 +32,7 @@ assert.ok(ui.includes('provider_connection_failed'));
 
 assert.match(ui, /id: "proton"[\s\S]*mode: "unsupported"[\s\S]*Proton Bridge/);
 assert.match(ui, /id: "tuta"[\s\S]*mode: "unsupported"[\s\S]*kein(?:en)? normalen IMAP-Zugriff/);
-assert.ok(ui.includes('Keine direkte Verbindung'));
+assert.match(ui,/id: "tuta"[\s\S]*?Eine direkte Verbindung zu NAHWERK wird derzeit nicht unterstützt/);
 assert.ok(ui.includes('provider.mode === "unsupported"'));
 assert.equal(ui.includes('imap_host'), false);
 assert.equal(ui.includes('smtp_host'), false);

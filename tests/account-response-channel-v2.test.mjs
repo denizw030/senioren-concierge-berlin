@@ -35,13 +35,14 @@ test("WhatsApp option discloses the fee without repeating WhatsApp branding icon
   assert.match(css,/\.response-channel-fee-note/);
 });
 
-test("concierge quick buttons save WhatsApp response routes directly",()=>{
-  assert.match(account,/data-response-channel-quick="EMAIL">WhatsApp → via E-Mail<\/button>/);
-  assert.match(account,/data-response-channel-quick="CALL">WhatsApp → via Telefon<\/button>/);
-  assert.match(js,/const quickButtons=Array\.from\(document\.querySelectorAll\("\[data-response-channel-quick\]"\)\)/);
+test("response routes are saved from the dedicated WhatsApp preference selector",()=>{
+  assert.doesNotMatch(account,/data-response-channel-quick=/);
+  assert.match(account,/name="responseChannel" value="EMAIL"/);
+  assert.match(account,/name="responseChannel" value="CALL"/);
+  assert.match(account,/id="responseChannelSave">Speichern<\/button>/);
   assert.match(js,/async function savePreference\(selected,trigger=null\)/);
-  assert.match(js,/void savePreference\(selected,button\)/);
-  assert.match(js,/button\.classList\.toggle\("is-selected",selected===target\)/);
+  assert.match(js,/const selected=radios\.find\(\(r\)=>r\.checked&&!r\.disabled\)\?\.value/);
+  assert.match(js,/void savePreference\(selected,save\)/);
 });
 
 test("single answers can be delivered elsewhere without changing defaults",()=>{

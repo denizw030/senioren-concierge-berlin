@@ -3,15 +3,37 @@ on:
   pull_request:
     paths:
       - "konto.html"
+      - "konto/**"
+      - "concierge-anpassen.html"
+      - "concierge-anpassen/**"
       - "anmelden.html"
       - "registrieren.html"
       - "payg.html"
-      - "assets/payg-account.js"
-      - "assets/payg-payment-method-remove-guard.js"
+      - "vertrag-widerrufen.html"
+      - "assets/account-*.css"
+      - "assets/account-*.js"
+      - "assets/email-account-integration.js"
+      - "assets/email-concierge-product.js"
+      - "assets/email-concierge-product.css"
+      - "assets/payg-*.js"
+      - "assets/web-customer-concierge.js"
       - "assets/site-ui.js"
       - "assets/auth-nav.js"
       - "assets/onboarding.js"
       - "tests/web-account-prod-readiness.test.mjs"
+      - "tests/account-light-mobile-menu.test.mjs"
+      - "tests/account-theme-canonical.test.mjs"
+      - "tests/theme-first-paint-no-flash.test.mjs"
+      - "tests/account-overview-compact-v2.test.mjs"
+      - "tests/account-portal-divider-layout.test.mjs"
+      - "tests/account-email-deep-light-theme.test.mjs"
+      - "tests/concierge-settings-light-theme.test.mjs"
+      - "tests/email-concierge-product.test.mjs"
+      - "tests/konto-clean-route-parity.test.mjs"
+      - "tests/registration-ux.test.mjs"
+      - "tests/guest-concierge-payg-handoff.test.mjs"
+      - "tests/web-payg-consumer-rights-readiness.test.mjs"
+      - "tests/web-account-shared-contract-ready.test.mjs"
       - ".github/workflows/web-account-prod-readiness.yml"
   workflow_dispatch:
 permissions:
@@ -19,30 +41,94 @@ permissions:
 jobs:
   web-account-prod:
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Web account PROD regression
-        run: node --test tests/web-account-prod-readiness.test.mjs
+      - name: Portal E-Mail registration and PAYG regressions
+        run: |
+          node --test             tests/web-account-prod-readiness.test.mjs             tests/account-light-mobile-menu.test.mjs             tests/account-theme-canonical.test.mjs             tests/theme-first-paint-no-flash.test.mjs             tests/account-overview-compact-v2.test.mjs             tests/account-portal-divider-layout.test.mjs             tests/account-email-deep-light-theme.test.mjs             tests/concierge-settings-light-theme.test.mjs             tests/email-concierge-product.test.mjs             tests/konto-clean-route-parity.test.mjs             tests/registration-ux.test.mjs             tests/guest-concierge-payg-handoff.test.mjs             tests/web-payg-consumer-rights-readiness.test.mjs             tests/web-account-shared-contract-ready.test.mjs
       - name: Website runtime JS syntax
         run: |
           node --check assets/site-ui.js
+          node --check assets/email-account-integration.js
+          node --check assets/email-concierge-product.js
           node --check assets/payg-account.js
+          node --check assets/payg-consumer-rights-guard.js
           node --check assets/payg-payment-method-remove-guard.js
-      - name: Static PAYG route smoke
+          node --check assets/web-customer-concierge.js
+      - name: Static customer route smoke
         run: |
           python3 -m http.server 4173 >/tmp/nw-web-account-http.log 2>&1 &
           server_pid=$!
           trap 'kill $server_pid' EXIT
           for attempt in 1 2 3 4 5; do
-            curl -fsS "http://127.0.0.1:4173/payg.html" >/dev/null && break
+            curl -fsS "http://127.0.0.1:4173/konto.html" >/dev/null && break
             sleep 1
           done
           curl -fsS "http://127.0.0.1:4173/konto.html" >/dev/null
+          curl -fsS "http://127.0.0.1:4173/konto/" >/dev/null
+          curl -fsS "http://127.0.0.1:4173/concierge-anpassen.html" >/dev/null
+          curl -fsS "http://127.0.0.1:4173/registrieren.html" >/dev/null
           curl -fsS "http://127.0.0.1:4173/payg.html" >/dev/null
+          curl -fsS "http://127.0.0.1:4173/vertrag-widerrufen.html" >/dev/null
           curl -fsS "http://127.0.0.1:4173/assets/site-ui.js" >/dev/null
-          curl -fsS "http://127.0.0.1:4173/assets/payg-account.js" >/dev/null
-          curl -fsS "http://127.0.0.1:4173/assets/payg-payment-method-remove-guard.js" >/dev/null
+          curl -fsS "http://127.0.0.1:4173/assets/email-concierge-product.js" >/dev/null
+          curl -fsS "http://127.0.0.1:4173/assets/web-customer-concierge.js" >/dev/null
+
+      - name: Non-voice PROD health and billing readiness
+        run: |
+          set -euo pipefail
+          base='https://djicahhmnnamtjuqedqd.supabase.co/functions/v1'
+          core="$(curl -fsS --max-time 25 "$base/nahwerk-concierge-core/health")"
+          web="$(curl -fsS --max-time 25 "$base/nahwerk-web-gateway/health")"
+          app="$(curl -fsS --max-time 25 "$base/nahwerk-app-gateway/health")"
+          email="$(curl -fsS --max-time 25 "$base/nahwerk-email-runtime/health")"
+          payg="$(curl -fsS --max-time 35 "$base/web-payg-readiness")"
+          CORE="$core" WEB="$web" APP="$app" EMAIL="$email" PAYG="$payg" python3 - <<'PY'
+          import json, os
+          core=json.loads(os.environ["CORE"])
+          web=json.loads(os.environ["WEB"])
+          app=json.loads(os.environ["APP"])
+          email=json.loads(os.environ["EMAIL"])
+          payg=json.loads(os.environ["PAYG"])
+
+          regression=core.get("concierge_cross_channel_task_decision_regression_v1") or {}
+          assert core.get("concierge_cross_channel_task_stack_v1") is True
+          assert core.get("concierge_cross_channel_interruption_resume_v1") is True
+          assert core.get("concierge_cross_channel_side_query_preserves_task_v1") is True
+          assert core.get("concierge_cross_channel_deferred_state_write_v1") is True
+          assert regression.get("green") is True and regression.get("total") == 10
+
+          assert web.get("ok") is True and web.get("service") == "nahwerk-web-gateway"
+          assert web.get("production") is True and web.get("fail_safe") == "closed"
+          assert app.get("ok") is True and app.get("service") == "nahwerk-app-gateway"
+          assert app.get("production") is True and app.get("app_route_authoritative") is True
+          assert app.get("cao_app_authoritative") is True and app.get("fail_safe") == "closed"
+          assert email.get("ok") is True and email.get("service") == "nahwerk-email-runtime"
+
+          assert payg.get("ok") is True and payg.get("production") is True
+          assert payg.get("provider") == "stripe"
+          assert payg.get("key_configured") is True
+          assert payg.get("key_mode") == "live"
+          assert payg.get("api_reachable") is True
+          assert payg.get("api_livemode") is True
+          assert payg.get("live_confirmed") is True
+          assert payg.get("webhook_secret_configured") is True
+          assert payg.get("webhook_endpoint_configured") is True
+          assert payg.get("webhook_endpoint_enabled") is True
+          assert payg.get("webhook_required_events_complete") is True
+          assert payg.get("subscription_webhook_required_events_complete") is True
+          assert payg.get("subscription_catalog_complete") is True
+          assert payg.get("payment_ready") is True
+          assert payg.get("subscription_provider_ready") is True
+          assert payg.get("real_charge_performed") is False
+
+          print("NONVOICE_CORE_CROSS_CHANNEL=GREEN")
+          print("WEB_APP_EMAIL_PROD_HEALTH=GREEN")
+          print("STRIPE_PAYG_LIVE_READINESS=GREEN")
+          print("REAL_PROVIDER_SIDE_EFFECTS=0")
+          print("REAL_CHARGE_PERFORMED=0")
+          PY

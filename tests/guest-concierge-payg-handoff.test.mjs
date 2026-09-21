@@ -22,7 +22,7 @@ test("guest advice has no account CTA until backend marks a real execution reque
   assert.match(chat,/purpose:String\(item\.purpose\|\|""\)\.toUpperCase\(\)/);
   assert.match(chat,/purpose==="ACCOUNT_REQUEST"/);
   assert.match(chat,/Anmelden oder Konto erstellen/);
-  assert.match(chat,/signIn\.href="\/anmelden\?source=web_guest_chat"/);
+  assert.match(chat,/signIn\.href=accountOnly\?/);
   assert.match(chat,/create\.textContent="Konto erstellen"/);
   assert.match(chat,/isExplicitGuestAccountIntent/);
 });

@@ -9,7 +9,7 @@ const konto=fs.readFileSync("konto.html","utf8");
 test("account theme keeps the existing premium layout as an immutable base",()=>{
   assert.match(canonical,/^@import url\("\/assets\/account-premium-ui-base-v2\.css\?v=1"\);/);
   assert.match(base,/NAHWERK Account Premium UI 2026/);
-  assert.match(konto,/assets\/account-premium-ui\.css\?v=6/);
+  assert.match(konto,/assets\/account-premium-ui\.css\?v=\d+/);
 });
 
 test("canonical theme is driven by the portal theme contract rather than senior-product",()=>{

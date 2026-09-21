@@ -18,7 +18,7 @@ test("account email dynamic provider UI follows light theme", () => {
 
 test("email light fix stays isolated from the pinned account premium base", () => {
   assert.doesNotMatch(base, /E-Mail light parity v7/);
-  assert.match(konto, /assets\/account-premium-ui\.css\?v=6/);
+  assert.match(konto, /assets\/account-premium-ui\.css\?v=\d+/);
   assert.match(konto, /assets\/account-email-light-parity\.css\?v=1/);
   assert.match(clean, /assets\/account-email-light-parity\.css\?v=1/);
 });

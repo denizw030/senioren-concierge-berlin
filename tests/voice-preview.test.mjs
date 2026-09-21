@@ -137,7 +137,7 @@ test("optimized lifestyle assets are assigned by audience",()=>{
   const senior=read("senioren-concierge.html");
   const home=read("de/index.html");
   const services=read("leistungen.html");
-  assert.match(senior,/assets\/lifestyle\/senior-man-phone\.webp/);
+  assert.match(senior,/assets\/lifestyle\/nahwerk-senior-web-q88\.webp/);
   assert.match(home,/assets\/lifestyle\/senior-woman-overview\.webp/);
   assert.match(services,/assets\/lifestyle\/young-woman-kitchen\.webp/);
   assert.match(services,/services-hero-layout/);
