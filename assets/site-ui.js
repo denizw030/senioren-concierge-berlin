@@ -303,10 +303,6 @@
         button.addEventListener('click', () => {
           const target = button.dataset.mobileAccountTarget;
           closeMenu();
-          if (target === 'concierge') {
-            location.href = '/web-concierge';
-            return;
-          }
           document.querySelector(`[data-account-tab="${target}"]`)?.click();
         });
       });
