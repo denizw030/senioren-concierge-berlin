@@ -229,6 +229,53 @@
   text-align: right;
 }
 
+#accountEmailCard .email-provider-auto-connect {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 10px;
+  margin: 0 0 14px;
+  padding: 16px;
+  border: 1px solid rgba(133,154,182,.16);
+  border-radius: 16px;
+  background: rgba(7,13,20,.36);
+}
+
+#accountEmailCard .email-provider-auto-connect .email-provider-connect-field {
+  margin-top: 0;
+}
+
+#accountEmailCard .email-provider-auto-connect .email-provider-connect-primary {
+  min-width: 154px;
+  min-height: 48px;
+}
+
+#accountEmailCard .email-provider-auto-status {
+  grid-column: 1 / -1;
+  min-height: 17px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+#accountEmailCard .email-provider-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0 14px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+#accountEmailCard .email-provider-divider::before,
+#accountEmailCard .email-provider-divider::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: rgba(133,154,182,.16);
+}
+
 #accountEmailCard .email-logo-provider-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -492,6 +539,8 @@
 
 @media (max-width: 720px) {
   #accountEmailCard .email-logo-connect-heading { display: block; }
+  #accountEmailCard .email-provider-auto-connect { grid-template-columns: 1fr; }
+  #accountEmailCard .email-provider-auto-connect .email-provider-connect-primary { width: 100%; }
   #accountEmailCard .email-logo-connect-heading p { margin-top: 7px; text-align: left; }
   #accountEmailCard .email-logo-provider-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
   #accountEmailCard .email-logo-provider-card { min-height: 116px; padding: 14px; }
