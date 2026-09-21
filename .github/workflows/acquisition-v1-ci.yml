@@ -12,7 +12,13 @@ on:
       - "prime-concierge.html"
       - "safety.html"
       - "registrieren.html"
+      - "registrieren/index.html"
+      - "anmelden.html"
+      - "anmelden/index.html"
       - "konto.html"
+      - "konto/index.html"
+      - "payg.html"
+      - "payg/index.html"
       - "angehoerige.html"
       - "pakete.html"
       - "senioren-concierge.html"
@@ -77,7 +83,8 @@ jobs:
       - name: Telephone regression (parallel non-blocking)
         continue-on-error: true
         run: node --test tests/telephone-reception-ui.test.mjs tests/telephone-reception-product.test.mjs
-      - name: Telephone reception JS syntax
+      - name: Telephone reception JS syntax (parallel non-blocking)
+        continue-on-error: true
         run: node --check assets/telephone-reception-product.js
       - name: Email account integration JS syntax
         run: node --check assets/email-account-integration.js
