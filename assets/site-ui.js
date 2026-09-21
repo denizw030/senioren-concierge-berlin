@@ -209,8 +209,6 @@
         </label>
       `;
       tabsShell.insertAdjacentElement('afterend', setting);
-      const emailActions = document.getElementById('emailTopActions');
-      if (emailActions) setting.prepend(emailActions);
 
       const toggle = setting.querySelector('#nwPortalThemeToggle');
       const syncToggle = () => {
