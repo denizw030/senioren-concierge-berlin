@@ -39,8 +39,8 @@
       style.textContent = `
         body.account-premium-ui .status-summary[data-account-panel="overview"]{display:none!important}
         body.account-premium-ui .account-overview-highlights[data-account-panel="overview"]{order:-30}
-        body.account-premium-ui .plan-summary[data-account-panel="overview"]{order:-20;grid-column:span 6!important}
-        body.account-premium-ui .customer-number-summary[data-account-panel="overview"]{order:-10;grid-column:span 6!important}
+        body.account-premium-ui .dash > .plan-summary[data-account-panel="overview"]{order:-20;grid-column:span 6!important}
+        body.account-premium-ui .dash > .customer-number-summary[data-account-panel="overview"]{order:-10;grid-column:span 6!important}
         body.account-premium-ui .account-overview-highlights[data-account-panel="overview"]>.account-overview-link:first-child{text-align:center!important}
         body.account-premium-ui .account-overview-highlights[data-account-panel="overview"]>.account-overview-link:first-child [data-overview-concierge-avatar]{margin:8px auto 7px!important}
 
@@ -80,8 +80,8 @@
         body.account-premium-ui.nw-portal-light .footergrid a:hover{color:#8b6828!important}
 
         @media(max-width:700px){
-          body.account-premium-ui .customer-number-summary[data-account-panel="overview"],
-          body.account-premium-ui .plan-summary[data-account-panel="overview"]{grid-column:1!important}
+          body.account-premium-ui .dash > .customer-number-summary[data-account-panel="overview"],
+          body.account-premium-ui .dash > .plan-summary[data-account-panel="overview"]{grid-column:1!important}
         }
 
         /* ACCOUNT_PORTAL_OPEN_DIVIDERS_V1_20260921
@@ -247,6 +247,8 @@
         .account-overview-link{
           position:relative!important;
           box-sizing:border-box!important;
+          grid-column:auto!important;
+          order:initial!important;
           width:100%!important;
           margin:0!important;
           border:0!important;
@@ -391,6 +393,7 @@
           }
           body.account-premium-ui .account-overview-lower-highlights[data-account-panel="overview"] >
           .account-overview-link{
+            grid-column:1/-1!important;
             height:auto!important;
             min-height:92px!important;
             padding:15px 44px 15px 16px!important;
