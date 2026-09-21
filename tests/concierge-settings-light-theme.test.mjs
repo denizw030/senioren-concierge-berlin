@@ -16,6 +16,18 @@ test("Concierge settings light theme matches the account light palette", () => {
   assert.match(page, /background:#fff!important/);
 });
 
+test("Concierge settings dark mode matches the canonical account dark palette", () => {
+  assert.match(page, /concierge-settings-dark-parity-v1/);
+  assert.match(page, /html\[data-nw-portal-theme="dark"\] body\.concierge-portal-settings\{/);
+  assert.match(page, /background:#030405!important/);
+  assert.match(page, /linear-gradient\(180deg,#030405 0%,#06090d 48%,#030405 100%\)!important/);
+  assert.match(page, /background-color:#0b0f14!important/);
+  assert.match(page, /color:#f5f3ee!important/);
+  assert.match(page, /\.nw-carousel-card\.is-active/);
+  assert.match(page, /\.nw-voice-preview-language-select/);
+  assert.match(page, /footer\.footer/);
+});
+
 test("voice preview language control is a centered white button", () => {
   assert.match(page, /\.nw-voice-preview-language-select/);
   assert.match(page, /width:min\(100%,190px\)!important/);
