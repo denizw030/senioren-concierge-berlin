@@ -65,6 +65,7 @@
   let busy = false;
   let addMode = false;
   const connectErrors = Object.create(null);
+  const PROVIDER_BY_DOMAIN = Object.freeze({ "gmail.com":"google", "googlemail.com":"google", "outlook.com":"microsoft", "hotmail.com":"microsoft", "live.com":"microsoft", "yahoo.com":"yahoo", "yahoo.de":"yahoo", "gmx.de":"gmx", "gmx.net":"gmx", "web.de":"webde", "t-online.de":"telekom", "magenta.de":"telekom", "icloud.com":"icloud", "me.com":"icloud", "mac.com":"icloud" });
 
   const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
   const setText = (element, value) => { if (element && element.textContent !== String(value ?? "")) element.textContent = String(value ?? ""); };
@@ -280,6 +281,26 @@
     }
   }
 
+  function suggestedProviderForEmail(value) {
+    const domain = String(value || "").trim().toLowerCase().split("@").pop();
+    return providerById(PROVIDER_BY_DOMAIN[domain] || "");
+  }
+
+  function bindProviderDetection() {
+    const input = document.getElementById("emailProviderConnectEmail");
+    if (!input || input.dataset.providerDetectionBound === "true") return;
+    input.dataset.providerDetectionBound = "true";
+    input.addEventListener("blur", () => {
+      const detected = suggestedProviderForEmail(input.value);
+      if (!detected || !selected || detected.id === selected.id) return;
+      const message = document.getElementById("emailProviderConnectMessage");
+      setText(message, `Diese Adresse gehört zu ${detected.name}. NAHWERK hat den passenden Verbindungsweg erkannt.`);
+      selected = detected;
+      addMode = providerConnections(detected.id).length === 0;
+      renderModal();
+    });
+  }
+
   function openManual(provider, adding = false) {
     selected = provider;
     addMode = adding || providerConnections(provider.id).length === 0;
@@ -288,6 +309,7 @@
     renderModal();
     const backdrop = document.getElementById("emailProviderConnectBackdrop");
     if (backdrop) backdrop.hidden = false;
+    bindProviderDetection();
     setTimeout(() => document.getElementById("emailProviderConnectEmail")?.focus?.(), 0);
   }
 
@@ -413,6 +435,13 @@
     const secretElement = document.getElementById("emailProviderConnectSecret");
     const message = document.getElementById("emailProviderConnectMessage");
     const email = String(emailElement?.value || "").trim();
+    const detected = suggestedProviderForEmail(email);
+    if (detected && detected.id !== selected.id) {
+      selected = detected;
+      renderModal();
+      setText(message, `NAHWERK hat ${detected.name} erkannt. Bitte prüfe kurz die angezeigte Anmeldung und tippe dann auf Verbinden.`);
+      return;
+    }
     const secret = String(secretElement?.value || "");
     if (!email.includes("@") || !secret) { setText(message, "Bitte E-Mail-Adresse und Passwort prüfen."); return; }
     const payload = { provider: selected.id, provider_email: email, username: email, secret };
@@ -434,7 +463,8 @@
     const message = document.getElementById("emailProviderConnectMessage");
     const button = document.getElementById("emailProviderConnectSubmit");
     busy = true;
-    if (button) button.disabled = true;
+    if (button) { button.disabled = true; button.textContent = "Wird verbunden …"; }
+    setText(message, "Verbindung wird sicher geprüft …");
     try { await connectManual(); }
     catch (error) {
       clearCredentials();
@@ -443,6 +473,7 @@
       busy = false;
       if (button) button.disabled = false;
       renderGrid();
+      if (selected) renderModal();
     }
   }
 
