@@ -145,8 +145,70 @@
     const shell = document.createElement("div");
     shell.id = "emailLogoConnectShell";
     shell.className = "email-logo-connect-shell";
-    shell.innerHTML = '<div class="email-logo-connect-heading"><div><div class="eyebrow">E-Mail-Anbieter</div><h4>Verbinde deine Postfächer.</h4></div><p>Du kannst mehrere Konten gleichzeitig verbinden – auch mehrere beim selben Anbieter. Dein Concierge behält die Quellen getrennt und kann sie gemeinsam durchsuchen.</p></div><div class="email-logo-provider-grid" id="emailLogoProviderGrid" aria-label="E-Mail-Anbieter"></div>';
+    shell.innerHTML = '<div class="email-logo-connect-heading"><div><div class="eyebrow">E-Mail-Konto</div><h4>E-Mail-Adresse eingeben.</h4></div><p>NAHWERK erkennt den Anbieter automatisch und übernimmt Server, Ports und Verschlüsselung. Du musst keine technischen Daten kennen.</p></div><div class="email-provider-auto-connect"><label class="email-provider-connect-field"><span>E-Mail-Adresse</span><input id="emailAutoConnectEmail" type="email" inputmode="email" autocomplete="email" maxlength="320" placeholder="name@anbieter.de"></label><button class="email-provider-connect-primary" id="emailAutoConnectButton" type="button">E-Mail verbinden</button><p class="email-provider-auto-status" id="emailAutoConnectStatus" aria-live="polite"></p></div><div class="email-provider-divider"><span>Oder Anbieter direkt wählen</span></div><div class="email-logo-provider-grid" id="emailLogoProviderGrid" aria-label="E-Mail-Anbieter"></div>';
     wrapper.insertBefore(shell, legacyGrid || null);
+    document.getElementById("emailAutoConnectButton")?.addEventListener("click", () => void autoConnectEmail());
+    document.getElementById("emailAutoConnectEmail")?.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") { event.preventDefault(); void autoConnectEmail(); }
+    });
+  }
+
+  async function autoConnectEmail() {
+    if (busy) return;
+    const input = document.getElementById("emailAutoConnectEmail");
+    const button = document.getElementById("emailAutoConnectButton");
+    const status = document.getElementById("emailAutoConnectStatus");
+    const email = String(input?.value || "").trim().toLowerCase();
+    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+      setText(status, "Bitte eine gültige E-Mail-Adresse eingeben.");
+      return;
+    }
+    busy = true;
+    if (button) { button.disabled = true; button.textContent = "Anbieter wird erkannt …"; }
+    setText(status, "");
+    try {
+      const data = await api("/email/connect/auto/web", {
+        method: "POST",
+        body: JSON.stringify({ email, return_to: RETURN_TO })
+      });
+      const providerId = String(data?.provider || "").toLowerCase();
+      const provider = providerById(providerId);
+      if (String(data?.state || "").toUpperCase() === "CONNECTING" && data?.authorization_url) {
+        if (providerId === "google") await redirectOAuth(data, (host) => host === "accounts.google.com", "EMAIL_OAUTH_FAILED");
+        else if (providerId === "microsoft") await redirectOAuth(data, (host) => host.endsWith("microsoftonline.com"), "MICROSOFT_OAUTH_FAILED");
+        else if (providerId === "yahoo") await redirectOAuth(data, (host) => host === "api.login.yahoo.com", "YAHOO_OAUTH_FAILED");
+        else throw new Error("EMAIL_PROVIDER_UNAVAILABLE");
+        return;
+      }
+      if (String(data?.state || "").toUpperCase() === "CREDENTIALS_REQUIRED" && provider?.mode === "manual") {
+        selected = provider;
+        addMode = true;
+        clearCredentials();
+        renderModal();
+        const backdrop = document.getElementById("emailProviderConnectBackdrop");
+        if (backdrop) backdrop.hidden = false;
+        const emailField = document.getElementById("emailProviderConnectEmail");
+        if (emailField) emailField.value = email;
+        setText(document.getElementById("emailProviderConnectMessage"), `${data?.provider_label || provider.name} wurde automatisch erkannt. Gib nur noch das benötigte Mail-/App-Passwort ein.`);
+        return;
+      }
+      throw new Error("EMAIL_PROVIDER_UNAVAILABLE");
+    } catch (error) {
+      const code = String(error?.message || "EMAIL_REQUEST_FAILED");
+      if (code === "email_provider_not_directly_supported") {
+        setText(status, "Dieser Anbieter unterstützt keine direkte Server-Verbindung mit NAHWERK.");
+      } else if (code === "email_provider_selection_required") {
+        setText(status, "Anbieter konnte nicht eindeutig erkannt werden. Wähle ihn unten direkt aus.");
+      } else if (code === "UNAUTHENTICATED") {
+        setText(status, "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.");
+      } else {
+        setText(status, "Die Verbindung konnte gerade nicht gestartet werden. Bitte versuche es erneut.");
+      }
+    } finally {
+      busy = false;
+      if (button) { button.disabled = !token(); button.textContent = "E-Mail verbinden"; }
+      renderGrid();
+    }
   }
 
   function renderGrid() {
