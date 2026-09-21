@@ -458,18 +458,6 @@
           background-size:1px 100%,100% 1px!important;
         }
 
-        /* ACCOUNT_OVERVIEW_LIGHT_NO_DIVIDERS_V1_20260921
-           Light theme only: remove the overview divider strokes without changing
-           spacing, sizing, content, arrows, dark mode or any other portal surface. */
-        html[data-nw-portal-theme="light"] body.account-premium-ui
-        .account-overview-highlights[data-account-panel="overview"] >
-        .account-overview-link,
-        body.account-premium-ui.nw-portal-light
-        .account-overview-highlights[data-account-panel="overview"] >
-        .account-overview-link{
-          background-image:none!important;
-        }
-
         /* Repeated rows on Concierge, E-Mail, Safety and Access stay functional,
            but no longer render as rounded cards. */
         body.account-premium-ui :is(
