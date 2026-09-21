@@ -10,7 +10,7 @@
     { id: "microsoft", name: "Outlook", mode: "microsoft", logo: "microsoft", secret: "", help: "Mit deinem Microsoft-Konto anmelden und NAHWERK freigeben." },
     { id: "yahoo", name: "Yahoo Mail", mode: "manual", logo: "yahoo", secret: "Passwort", credentialKind: "password_first", helpUrl: "", helpAction: "" },
     { id: "icloud", name: "iCloud Mail", mode: "manual", logo: "icloud", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://support.apple.com/de-de/102654", helpAction: "Apple-Hilfe öffnen" },
-    { id: "gmx", name: "GMX", mode: "manual", logo: "gmx", secret: "Passwort", credentialKind: "password_first", helpUrl: "", helpAction: "" },
+    { id: "gmx", name: "GMX", mode: "manual", logo: "gmx", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://auth.gmx.net/login?prompt=none&state=eyJpZCI6ImE1NzI4OGY4LTY4YzUtNDVmOC1hMGI3LWQ0Zjk5OGQyOGRhYiIsImNsaWVudElkIjoiZ214bmV0X2FsbGlnYXRvcl9saXZlIiwieFVpQXBwIjoiZ214bmV0LmFsbGlnYXRvci8yLjIuMSIsInBheWxvYWQiOiJleUowWVhKblpYUlZVa2tpT2lKb2RIUndjem92TDNkbFlteHBibXN1WjIxNExtNWxkQzl0WVdsc0wzTm9iM2RUZEdGeWRGWnBaWGNpTENKd2NtOWpaWE56U1dRaU9pSnZhVjl3YTJObE1TSjkifQ%3D%3D&authcode-context=u4lA8TiGpA", helpAction: "Bei GMX anmelden" },
     { id: "webde", name: "WEB.DE", mode: "manual", logo: "webde", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://anmelden.web.de/", helpAction: "Bei WEB.DE anmelden & freigeben" },
     { id: "telekom", name: "Telekom Mail", mode: "manual", logo: "telekom", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://www.telekom.de/hilfe/apps-dienste/e-mail/programm-passwort-verwalten", helpAction: "Telekom-Hilfe öffnen" },
     { id: "fastmail", name: "Fastmail", mode: "manual", logo: "fastmail", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://www.fastmail.help/hc/en-us/articles/360058752854-App-passwords", helpAction: "Fastmail-Hilfe öffnen" },
@@ -279,6 +279,7 @@
     document.getElementById("emailProviderConnectSubmit")?.addEventListener("click", () => void submitManual());
     document.getElementById("emailProviderWebdeSpeak")?.addEventListener("click", speakWebdeGuide);
     document.getElementById("emailProviderWebdeLogin")?.addEventListener("click", copyWebdeEmailForLogin);
+    document.getElementById("emailProviderCredentialHelpLink")?.addEventListener("click", copyProviderEmailForHelpLink);
     document.getElementById("emailProviderWebdeVideoToggle")?.addEventListener("click", () => void toggleWebdeGuideVideo());
     document.getElementById("emailProviderAddAccount")?.addEventListener("click", () => { addMode = true; renderModal(); });
     document.getElementById("emailProviderCancelAdd")?.addEventListener("click", () => { addMode = false; clearCredentials(); renderModal(); });
@@ -321,6 +322,27 @@
     return copied;
   }
 
+  function copyProviderEmailForHelpLink() {
+    if (!["gmx"].includes(String(selected?.id || ""))) return;
+    const email = String(document.getElementById("emailProviderConnectEmail")?.value || "").trim();
+    if (!email) return;
+    const message = document.getElementById("emailProviderConnectMessage");
+    let copied = legacyCopyText(email);
+    const label = selected?.name || "Anbieter";
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+      void navigator.clipboard.writeText(email)
+        .then(() => {
+          copied = true;
+          setText(message, `E-Mail-Adresse kopiert. Bei ${label} einfach einfügen.`);
+        })
+        .catch(() => {
+          if (!copied) copied = legacyCopyText(email);
+          setText(message, copied ? `E-Mail-Adresse kopiert. Bei ${label} einfach einfügen.` : `${label} wird geöffnet. Kopiere deine E-Mail-Adresse bei Bedarf aus dem Feld oben.`);
+        });
+    } else {
+      setText(message, copied ? `E-Mail-Adresse kopiert. Bei ${label} einfach einfügen.` : `${label} wird geöffnet. Kopiere deine E-Mail-Adresse bei Bedarf aus dem Feld oben.`);
+    }
+  }
   function copyWebdeEmailForLogin() {
     if (selected?.id !== "webde") return;
     const email = String(document.getElementById("emailProviderConnectEmail")?.value || "").trim();
