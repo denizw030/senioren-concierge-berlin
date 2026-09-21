@@ -3,15 +3,32 @@ on:
   pull_request:
     paths:
       - "konto.html"
+      - "konto/**"
+      - "concierge-anpassen.html"
+      - "concierge-anpassen/**"
       - "anmelden.html"
       - "registrieren.html"
       - "payg.html"
+      - "assets/account-*.css"
+      - "assets/account-*.js"
+      - "assets/email-account-integration.js"
+      - "assets/email-concierge-product.js"
+      - "assets/email-concierge-product.css"
       - "assets/payg-account.js"
       - "assets/payg-payment-method-remove-guard.js"
       - "assets/site-ui.js"
       - "assets/auth-nav.js"
       - "assets/onboarding.js"
       - "tests/web-account-prod-readiness.test.mjs"
+      - "tests/account-light-mobile-menu.test.mjs"
+      - "tests/account-theme-canonical.test.mjs"
+      - "tests/theme-first-paint-no-flash.test.mjs"
+      - "tests/account-overview-compact-v2.test.mjs"
+      - "tests/account-portal-divider-layout.test.mjs"
+      - "tests/account-email-deep-light-theme.test.mjs"
+      - "tests/concierge-settings-light-theme.test.mjs"
+      - "tests/email-concierge-product.test.mjs"
+      - "tests/konto-clean-route-parity.test.mjs"
       - ".github/workflows/web-account-prod-readiness.yml"
   workflow_dispatch:
 permissions:
@@ -19,30 +36,34 @@ permissions:
 jobs:
   web-account-prod:
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Web account PROD regression
-        run: node --test tests/web-account-prod-readiness.test.mjs
+      - name: Portal and E-Mail stability regressions
+        run: |
+          node --test             tests/web-account-prod-readiness.test.mjs             tests/account-light-mobile-menu.test.mjs             tests/account-theme-canonical.test.mjs             tests/theme-first-paint-no-flash.test.mjs             tests/account-overview-compact-v2.test.mjs             tests/account-portal-divider-layout.test.mjs             tests/account-email-deep-light-theme.test.mjs             tests/concierge-settings-light-theme.test.mjs             tests/email-concierge-product.test.mjs             tests/konto-clean-route-parity.test.mjs
       - name: Website runtime JS syntax
         run: |
           node --check assets/site-ui.js
+          node --check assets/email-account-integration.js
+          node --check assets/email-concierge-product.js
           node --check assets/payg-account.js
           node --check assets/payg-payment-method-remove-guard.js
-      - name: Static PAYG route smoke
+      - name: Static account route smoke
         run: |
           python3 -m http.server 4173 >/tmp/nw-web-account-http.log 2>&1 &
           server_pid=$!
           trap 'kill $server_pid' EXIT
           for attempt in 1 2 3 4 5; do
-            curl -fsS "http://127.0.0.1:4173/payg.html" >/dev/null && break
+            curl -fsS "http://127.0.0.1:4173/konto.html" >/dev/null && break
             sleep 1
           done
           curl -fsS "http://127.0.0.1:4173/konto.html" >/dev/null
+          curl -fsS "http://127.0.0.1:4173/konto/" >/dev/null
+          curl -fsS "http://127.0.0.1:4173/concierge-anpassen.html" >/dev/null
           curl -fsS "http://127.0.0.1:4173/payg.html" >/dev/null
           curl -fsS "http://127.0.0.1:4173/assets/site-ui.js" >/dev/null
-          curl -fsS "http://127.0.0.1:4173/assets/payg-account.js" >/dev/null
-          curl -fsS "http://127.0.0.1:4173/assets/payg-payment-method-remove-guard.js" >/dev/null
+          curl -fsS "http://127.0.0.1:4173/assets/email-concierge-product.js" >/dev/null
