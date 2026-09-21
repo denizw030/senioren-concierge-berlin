@@ -67,6 +67,20 @@
     line-height:1.2;
     letter-spacing:-.012em;
   }
+  .nw-header-concierge-payg{
+    display:block;
+    max-width:112px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    color:#b9aa82;
+    font-size:9px;
+    font-weight:550;
+    line-height:1.15;
+    letter-spacing:-.005em;
+  }
+  .nw-header-concierge-payg[hidden]{display:none!important}
+  .nw-header-concierge-payg b{color:#e4cf95;font:inherit;font-weight:750}
   .nw-header-concierge-chat{
     display:grid;
     place-items:center;
@@ -102,6 +116,7 @@
   }
   .nw-header-concierge-copy small{display:none}
   .nw-header-concierge-copy strong{max-width:62px;font-size:11.5px}
+  .nw-header-concierge-payg{max-width:68px;font-size:8px}
   .nw-header-concierge-chat{width:24px;height:24px;flex-basis:24px}
 }
 
@@ -124,6 +139,8 @@
   body.account-premium-ui.nw-portal-light .nw-header-concierge-copy strong{
     color:#201d17!important;
   }
+  body.account-premium-ui.nw-portal-light .nw-header-concierge-payg{color:#756c5d!important}
+  body.account-premium-ui.nw-portal-light .nw-header-concierge-payg b{color:#8b6828!important}
   body.account-premium-ui.nw-portal-light .nw-header-concierge-chat{
     background:rgba(167,125,45,.10)!important;
     color:#8b6828!important;
