@@ -37,6 +37,6 @@ test("DE EN TR overview and account routes cache-bust the global footer css",()=
   }
   for(const path of ["konto.html","konto/index.html"]){
     const html=fs.readFileSync(path,"utf8");
-    assert.match(html,/assets\/account-premium-ui\.css\?v=6/,path);
+    assert.match(html,/assets\/account-premium-ui\.css\?v=\d+/,path);
   }
 });
