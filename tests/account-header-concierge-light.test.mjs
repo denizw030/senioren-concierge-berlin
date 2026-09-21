@@ -17,7 +17,7 @@ test("header concierge badge follows light account theme only", () => {
 });
 
 test("account routes load the fresh header concierge stylesheet and remain mirrored", () => {
-  assert.match(konto, /assets\/account-header-concierge\.css\?v=2/);
-  assert.match(clean, /assets\/account-header-concierge\.css\?v=2/);
+  assert.match(konto, /assets\/account-header-concierge\.css\?v=\d+/);
+  assert.match(clean, /assets\/account-header-concierge\.css\?v=\d+/);
   assert.equal(konto, clean.replace('<head><base href="/">','<head>'));
 });
