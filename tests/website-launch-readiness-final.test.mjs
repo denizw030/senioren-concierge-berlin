@@ -26,7 +26,7 @@ test('launch-readiness cleanup does not change frozen public prices or FREE quot
   for (const expected of ['0 €', '5,99 €', '10,99 €', '19,99 €', '34,99 €', '59,66 €']) {
     assert.ok(pricing.includes(expected), `missing frozen price ${expected}`);
   }
-  assert.ok(pricing.includes('50 App-Dialoge · 20 WhatsApp-Dialoge'));
+  assert.ok(pricing.includes('App unbegrenzt · Web unbegrenzt · 20 WhatsApp-Kundennachrichten'));
 });
 
 test('homepage Safety copy is bound to configured escalation behavior', () => {
