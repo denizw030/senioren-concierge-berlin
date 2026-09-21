@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="assets/email-account-integration.css?v=3" />
     <link rel="stylesheet" href="assets/email-provider-logo-connect-v3.css?v=20260916-1" />
     <link rel="stylesheet" href="assets/family-owner-sponsored-access.css?v=1" />
-    <link rel="stylesheet" href="assets/account-premium-ui.css?v=12" />
+    <link rel="stylesheet" href="assets/account-premium-ui.css?v=13" />
     <link rel="stylesheet" href="assets/account-email-light-parity.css?v=1" />
     <link rel="stylesheet" href="assets/account-response-channel.css?v=6" />
     <link rel="stylesheet" href="assets/account-header-concierge.css?v=3" />
@@ -2195,6 +2195,67 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
   </style>
 
     <link rel="stylesheet" href="assets/account-portal-text-nav-v1.css?v=13" />
+
+  <style id="konto-overview-ambient-final-v1">
+    /* Overview only — ambient NAHWERK palette. Keep layout and all other tabs untouched. */
+    @supports selector(body:has(*)){
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) main,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) main{
+        background:
+          radial-gradient(980px 640px at -6% 28%,rgba(122,112,63,.18),transparent 66%),
+          radial-gradient(920px 620px at 48% 10%,rgba(91,39,72,.16),transparent 69%),
+          radial-gradient(980px 700px at 102% 55%,rgba(49,43,105,.18),transparent 70%),
+          radial-gradient(760px 520px at 28% 96%,rgba(36,66,66,.09),transparent 72%),
+          linear-gradient(145deg,#050607 0%,#09080d 48%,#050508 100%)!important;
+        background-attachment:fixed!important;
+      }
+
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) .account-hero,
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) main>.section,
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) .account-section,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) .account-hero,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) main>.section,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) .account-section{
+        background:transparent!important;
+      }
+
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) .dash>.card[data-account-panel="overview"],
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) .dash>.card[data-account-panel="overview"]{
+        background:rgba(5,7,10,.32)!important;
+        border-color:rgba(174,181,192,.18)!important;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.018)!important;
+        -webkit-backdrop-filter:blur(8px)!important;
+        backdrop-filter:blur(8px)!important;
+      }
+
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) .account-overview-link,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) .account-overview-link{
+        background:rgba(5,7,10,.22)!important;
+        border-color:rgba(174,181,192,.16)!important;
+        box-shadow:none!important;
+        -webkit-backdrop-filter:blur(7px)!important;
+        backdrop-filter:blur(7px)!important;
+      }
+
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) .dash>.card[data-account-panel="overview"]:hover,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) .dash>.card[data-account-panel="overview"]:hover,
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) .account-overview-link:hover,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) .account-overview-link:hover{
+        background:rgba(7,9,12,.38)!important;
+        border-color:rgba(201,174,111,.25)!important;
+        box-shadow:none!important;
+      }
+
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) .overview-saved-info .empty,
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) .overview-open-issues .empty,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) .overview-saved-info .empty,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) .overview-open-issues .empty{
+        background:transparent!important;
+        border-color:transparent!important;
+      }
+    }
+  </style>
+
 </head>
   <body class="account-premium-ui">
     <script>
