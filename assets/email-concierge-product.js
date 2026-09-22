@@ -121,6 +121,8 @@
   let chatScrollTop = 0;
   let mailboxListScrollTop = 0;
   let readerScrollTop = 0;
+  let preservePageScrollUntil = 0;
+  let preservePageScrollY = 0;
   let chatSelectionStart = 0;
   let chatSelectionEnd = 0;
   let chatAutoScrollNext = false;
@@ -550,6 +552,8 @@
     } finally { draftsLoading = false; render(); }
   }
   async function selectMailboxFolder(connectionId, folder) {
+    preservePageScrollY = Number(window.scrollY || window.pageYOffset || 0);
+    preservePageScrollUntil = Date.now() + 1800;
     const nextConnectionId = String(connectionId || activeConnectionId || "");
     const switchingConnection = Boolean(activeConnectionId && nextConnectionId && activeConnectionId !== nextConnectionId);
     activeConnectionId = nextConnectionId;
@@ -567,6 +571,8 @@
     void loadMailboxFolder();
   }
   async function selectAllInboxes() {
+    preservePageScrollY = Number(window.scrollY || window.pageYOffset || 0);
+    preservePageScrollUntil = Date.now() + 1800;
     mailboxScope = "ALL"; mailboxFolder = "INBOX"; readerMode = "MESSAGE";
     selectedMessageId = ""; selectedMessageConnectionId = ""; selectedMessageDetail = null;
     mailboxFolderRows = []; render(); void loadMailboxFolder();
@@ -1244,6 +1250,7 @@
     const status=el("span","ecp-tb-live","Aktiv"); toolbar.append(left,searchWrap,status);workspace.append(toolbar);
     const shell=el("div","ecp-tb-shell");renderMailboxSidebar(shell);renderMailboxListPane(shell);renderMailboxReader(shell);workspace.append(shell);root.append(workspace);
     restoreTransientUiState(root,transient);
+    if (Date.now() < preservePageScrollUntil) requestAnimationFrame(() => window.scrollTo({ top: preservePageScrollY, left: 0, behavior: "auto" }));
   }
   async function loadClassification() {
     if (!connected || classificationLoading) return;
