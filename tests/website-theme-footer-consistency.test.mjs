@@ -67,7 +67,7 @@ test("both chat routes use the full consistent footer and complete legal links",
       assert.ok(page.includes(label), `missing footer link ${label}`);
     }
     assert.match(page, /assets\/site-ui\.js\?v=8/);
-    assert.match(page, /assets\/web-customer-concierge\.js\?v=48/);
+    assert.match(page, /assets\/web-customer-concierge\.js\?v=49/);
   }
   assert.doesNotMatch(cleanChat, /web-customer-concierge-thread-scope\.js/);
 });
