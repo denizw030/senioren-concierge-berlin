@@ -127,6 +127,7 @@ export function mountNahwerkLiveConcierge({
   let pc=null,dc=null,micStream=null,micMeter=null,outMeter=null,raf=0,inputFlushTimer=0,outputFlushTimer=0,transcriptSeq=0,userTurnSeq=0,assistantTurnSeq=0,maxSessionTimer=0;
   // LIVE_TRANSCRIPT_TERMINAL_FLUSH_V3_20260922
   const transcriptWrites=new Set();
+  const transcriptMirror=[];
   let lastTranscriptEventAt=0,lastUserPersistedEndMs=null,lastAssistantPersistedEndMs=null,responseActive=false,inputSpeechActive=false;
   // VOICE_DYNAMIC_PRICE_CLIENT_V1_20260920
   let currentQuote=null;
@@ -262,6 +263,44 @@ export function mountNahwerkLiveConcierge({
     }
     await drainTranscriptWrites(2800);
   };
+  const mirrorTranscriptDelta=(role,delta,startMs,endMs)=>{
+    const text=String(delta??"");
+    if(!text)return;
+    const start=Number.isFinite(Number(startMs))?Number(startMs):null;
+    const end=Number.isFinite(Number(endMs))?Number(endMs):start;
+    const last=transcriptMirror[transcriptMirror.length-1];
+    const gap=last&&last.end_ms!==null&&start!==null?start-last.end_ms:null;
+    if(last&&last.role===role&&(gap===null||gap<=2200)){
+      last.text=(String(last.text||"")+text).slice(0,12000);
+      if(end!==null)last.end_ms=end;
+    }else{
+      transcriptMirror.push({role,text:text.slice(0,12000),start_ms:start,end_ms:end});
+      if(transcriptMirror.length>160)transcriptMirror.splice(0,transcriptMirror.length-160);
+    }
+  };
+  const mirrorTranscriptFinal=(role,event)=>{
+    const full=String(event?.transcript??event?.text??event?.content??"").trim();
+    if(!full)return;
+    let found=-1;
+    for(let i=transcriptMirror.length-1;i>=0;i--){if(transcriptMirror[i]?.role===role){found=i;break;}}
+    const start=Number.isFinite(Number(event?.start_ms))?Number(event.start_ms):null;
+    const end=Number.isFinite(Number(event?.end_ms))?Number(event.end_ms):null;
+    if(found<0){
+      transcriptMirror.push({role,text:full.slice(0,12000),start_ms:start,end_ms:end??start});
+      return;
+    }
+    const current=String(transcriptMirror[found]?.text??"").trim();
+    if(!current||full===current||full.startsWith(current)||current.startsWith(full)){
+      if(full.length>=current.length)transcriptMirror[found].text=full.slice(0,12000);
+      if(start!==null&&transcriptMirror[found].start_ms===null)transcriptMirror[found].start_ms=start;
+      if(end!==null)transcriptMirror[found].end_ms=end;
+    }
+  };
+  const transcriptSnapshot=()=>transcriptMirror
+    .map((x)=>({role:x.role,text:String(x.text||"").trim(),start_ms:x.start_ms,end_ms:x.end_ms}))
+    .filter((x)=>x.text)
+    .slice(-160);
+
   const finalTranscriptTail=(finalText,seenText)=>{
     const full=String(finalText??"").trim(),seen=String(seenText??"").trim();
     if(!full)return "";
@@ -344,11 +383,13 @@ export function mountNahwerkLiveConcierge({
       inputTranscript=(inputTranscript+delta).slice(-12000);
       if(inputStartMs===null&&start!==null)inputStartMs=start;
       if(end!==null){inputEndMs=end;lastUserPersistedEndMs=end;}
+      mirrorTranscriptDelta("USER",delta,start,end);
       void persistTranscript("USER",delta,start,end,`delta:user:${String(e.event_id||uid())}`);
       return;
     }
     if(e.type==="session.input_transcript.done"||e.type==="conversation.item.input_audio_transcription.completed"){
       noteTranscriptEvent();
+      mirrorTranscriptFinal("USER",e);
       await persistFinalTranscriptTail("USER",e);
       await flushUserTranscript();
       return;
@@ -366,11 +407,13 @@ export function mountNahwerkLiveConcierge({
       outputTranscript=(outputTranscript+delta).slice(-12000);
       if(outputStartMs===null&&start!==null)outputStartMs=start;
       if(end!==null){outputEndMs=end;lastAssistantPersistedEndMs=end;}
+      mirrorTranscriptDelta("ASSISTANT",delta,start,end);
       void persistTranscript("ASSISTANT",delta,start,end,`delta:assistant:${String(e.event_id||uid())}`);
       setStatus((name.textContent||"Concierge")+" spricht …");return;
     }
     if(e.type==="session.output_transcript.done"||e.type==="response.audio_transcript.done"||e.type==="response.output_audio_transcript.done"){
       noteTranscriptEvent();
+      mirrorTranscriptFinal("ASSISTANT",e);
       await persistFinalTranscriptTail("ASSISTANT",e);
       await flushAssistantTranscript();
       return;
@@ -388,13 +431,7 @@ export function mountNahwerkLiveConcierge({
       return;
     }
     if(e.type==="response.event"&&e.event){
-      const nested=e.event;
-      if(nested.type==="response.done"){
-        responseActive=false;noteTranscriptEvent();
-        outputTranscript="";
-        outputStartMs=null;
-        outputEndMs=null;
-      }
+      await handleEvent({data:JSON.stringify(e.event)});
       return;
     }
         if(e.type==="session.delegation.created"){await handleDelegation(e);return;}
@@ -404,7 +441,7 @@ export function mountNahwerkLiveConcierge({
 
   async function start(){
     if(pc)return;
-    ending=false;started=false;responseActive=false;inputSpeechActive=false;liveThreadId="";inputTranscript="";outputTranscript="";lastUserTurnText="";lastAssistantTurnText="";inputStartMs=null;inputEndMs=null;outputStartMs=null;outputEndMs=null;lastUserPersistedEndMs=null;lastAssistantPersistedEndMs=null;lastTranscriptEventAt=Date.now();transcriptSeq=0;userTurnSeq=0;assistantTurnSeq=0;transcriptWrites.clear();
+    ending=false;started=false;responseActive=false;inputSpeechActive=false;liveThreadId="";inputTranscript="";outputTranscript="";lastUserTurnText="";lastAssistantTurnText="";inputStartMs=null;inputEndMs=null;outputStartMs=null;outputEndMs=null;lastUserPersistedEndMs=null;lastAssistantPersistedEndMs=null;lastTranscriptEventAt=Date.now();transcriptSeq=0;userTurnSeq=0;assistantTurnSeq=0;transcriptWrites.clear();transcriptMirror.length=0;
     stopCallTimer();if(duration){duration.textContent="0:00";duration.hidden=true;}
     ui.hidden=false;document.documentElement.classList.add("nw-live-open");
     setPersona(currentPersonaFromPage());
@@ -516,7 +553,7 @@ export function mountNahwerkLiveConcierge({
     currentQuote=null;
     cancelAnimationFrame(raf);
     if(notifyBackend&&sessionId){
-      await post("/end",{session_id:sessionId,transcript_finalized:true}).catch(()=>{});
+      await post("/end",{session_id:sessionId,transcript_finalized:true,transcript_snapshot:transcriptSnapshot()}).catch(()=>{});
       await wait(700);
       await drainTranscriptWrites(2400);
     }

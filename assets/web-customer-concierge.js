@@ -608,14 +608,16 @@
     void (async()=>{
       const exactThread=validUuid(liveThread)?liveThread:(validUuid(activeThreadId)?activeThreadId:"");
       if(validUuid(exactThread)){activeThreadId=exactThread;primaryChatThreadId=exactThread;}
-      await new Promise((resolve)=>setTimeout(resolve,250));
-      if(validUuid(exactThread))await refreshThread(exactThread,{force:true,reset:true});
-      await new Promise((resolve)=>setTimeout(resolve,1100));
-      if(validUuid(exactThread))await refreshThread(exactThread,{force:true,reset:true});
-      await loadThreads();
-      if(validUuid(exactThread)&&activeThreadId!==exactThread){
-        activeThreadId=exactThread;primaryChatThreadId=exactThread;renderThreads();
-        await refreshThread(exactThread,{force:true,reset:true});
+      // LIVE_HISTORY_EVENTUAL_CONSISTENCY_V4_20260922
+      // Reload the exact Live thread repeatedly until the authoritative final snapshot is visible.
+      for(const delay of [250,900,1800,3200]){
+        await new Promise((resolve)=>setTimeout(resolve,delay));
+        if(lastLiveHistoryRefreshKey!==refreshKey)break;
+        await loadThreads();
+        if(validUuid(exactThread)){
+          activeThreadId=exactThread;primaryChatThreadId=exactThread;renderThreads();
+          await refreshThread(exactThread,{force:true,reset:true});
+        }
       }
     })().finally(()=>{setTimeout(()=>{if(lastLiveHistoryRefreshKey===refreshKey)lastLiveHistoryRefreshKey="";},5000);});
   });

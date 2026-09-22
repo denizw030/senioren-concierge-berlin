@@ -11,8 +11,8 @@ test("web chat mounts Live Concierge on the right without replacing voice memo",
   for(const page of ["web-concierge.html","web-concierge/index.html"]){
     const html=read(page);
     assert.match(html,/assets\/web-voice-memo\.js\?v=10/);
-    assert.match(html,/assets\/web-customer-concierge\.js\?v=49/);
-    assert.match(html,/assets\/web-live-concierge\.js\?v=21/);
+    assert.match(html,/assets\/web-customer-concierge\.js\?v=50/);
+    assert.match(html,/assets\/web-live-concierge\.js\?v=22/);
     assert.match(html,/assets\/nahwerk-live-concierge\.css\?v=4/);
   }
   const boot=read("assets/web-live-concierge.js");
@@ -245,7 +245,14 @@ test("Live waits for transcript quiescence and terminal transcript writes before
   const stopIndex=client.indexOf("async function stop");
   const quiescenceIndex=client.indexOf("await waitForTranscriptQuiescence",stopIndex);
   const drainIndex=client.indexOf("await drainTranscriptWrites(2800)",stopIndex);
-  const endIndex=client.indexOf('await post("/end",{session_id:sessionId,transcript_finalized:true})',stopIndex);
+  assert.match(client,/transcriptMirror/);
+  assert.match(client,/mirrorTranscriptDelta\("USER"/);
+  assert.match(client,/mirrorTranscriptDelta\("ASSISTANT"/);
+  assert.match(client,/mirrorTranscriptFinal\("USER"/);
+  assert.match(client,/mirrorTranscriptFinal\("ASSISTANT"/);
+  assert.match(client,/transcript_snapshot:transcriptSnapshot\(\)/);
+  assert.match(client,/await handleEvent\(\{data:JSON\.stringify\(e\.event\)\}\)/);
+  const endIndex=client.indexOf('await post("/end",{session_id:sessionId,transcript_finalized:true,transcript_snapshot:transcriptSnapshot()})',stopIndex);
   const closeIndex=client.indexOf("try{dc?.close();}",stopIndex);
   assert.ok(stopIndex>=0&&quiescenceIndex>stopIndex&&drainIndex>quiescenceIndex&&endIndex>drainIndex&&closeIndex>endIndex);
 });
@@ -268,7 +275,7 @@ test("Live end refreshes the exact transcript thread after persistence settles",
   assert.match(boot,/new CustomEvent\("nahwerk:live-ended",\{detail\}\)/);
   assert.match(chat,/detail\.thread_id/);
   assert.match(chat,/primaryChatThreadId=exactThread/);
-  const first=chat.indexOf("await refreshThread(exactThread,{force:true,reset:true})");
-  const second=chat.indexOf("await refreshThread(exactThread,{force:true,reset:true})",first+1);
-  assert.ok(first>=0&&second>first);
+  assert.match(chat,/LIVE_HISTORY_EVENTUAL_CONSISTENCY_V4_20260922/);
+  assert.match(chat,/\[250,900,1800,3200\]/);
+  assert.match(chat,/refreshThread\(exactThread,\{force:true,reset:true\}\)/);
 });
