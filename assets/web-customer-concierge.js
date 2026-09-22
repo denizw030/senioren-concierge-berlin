@@ -599,12 +599,25 @@
     return true;
   }
 
-  window.addEventListener("nahwerk:live-ended",()=>{
+  let lastLiveHistoryRefreshKey="";
+  window.addEventListener("nahwerk:live-ended",(event)=>{
+    const detail=event?.detail||{},liveThread=String(detail.thread_id||""),sessionId=String(detail.session_id||"");
+    const refreshKey=sessionId||liveThread||String(Date.now());
+    if(refreshKey===lastLiveHistoryRefreshKey)return;
+    lastLiveHistoryRefreshKey=refreshKey;
     void (async()=>{
-      await new Promise((resolve)=>setTimeout(resolve,180));
+      const exactThread=validUuid(liveThread)?liveThread:(validUuid(activeThreadId)?activeThreadId:"");
+      if(validUuid(exactThread)){activeThreadId=exactThread;primaryChatThreadId=exactThread;}
+      await new Promise((resolve)=>setTimeout(resolve,250));
+      if(validUuid(exactThread))await refreshThread(exactThread,{force:true,reset:true});
+      await new Promise((resolve)=>setTimeout(resolve,1100));
+      if(validUuid(exactThread))await refreshThread(exactThread,{force:true,reset:true});
       await loadThreads();
-      if(validUuid(activeThreadId))await refreshThread(activeThreadId,{force:true,reset:true});
-    })();
+      if(validUuid(exactThread)&&activeThreadId!==exactThread){
+        activeThreadId=exactThread;primaryChatThreadId=exactThread;renderThreads();
+        await refreshThread(exactThread,{force:true,reset:true});
+      }
+    })().finally(()=>{setTimeout(()=>{if(lastLiveHistoryRefreshKey===refreshKey)lastLiveHistoryRefreshKey="";},5000);});
   });
 
   window.addEventListener("nahwerk:voice-memo-sent",(event)=>{
