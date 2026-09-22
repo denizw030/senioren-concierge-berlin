@@ -233,14 +233,18 @@ test("GPT-Live transcript deltas persist immediately and chat refreshes after Li
 });
 
 
-test("Live waits for final transcript writes before ending the session",()=>{
+test("Live waits for transcript quiescence and terminal transcript writes before ending the session",()=>{
   const client=read("assets/nahwerk-live-concierge.js");
   assert.match(client,/transcriptWrites=new Set/);
-  assert.match(client,/drainTranscriptWrites/);
-  assert.match(client,/await drainTranscriptWrites\(1800\)/);
-  assert.match(client,/await post\("\/end",\{session_id:sessionId\}\)/);
-  const drainIndex=client.indexOf("await drainTranscriptWrites(1800)");
-  const endIndex=client.indexOf('await post("/end",{session_id:sessionId})');
+  assert.match(client,/waitForTranscriptQuiescence/);
+  assert.match(client,/await drainTranscriptWrites\(2400\)/);
+  assert.match(client,/transcript_finalized:true/);
+  assert.match(client,/session\.input_transcript\.done/);
+  assert.match(client,/session\.output_transcript\.done/);
+  assert.match(client,/finalTranscriptTail/);
+  const quiescenceIndex=client.indexOf("await waitForTranscriptQuiescence");
+  const drainIndex=client.indexOf("await drainTranscriptWrites(2400)");
+  const endIndex=client.indexOf('await post("/end",{session_id:sessionId,transcript_finalized:true})');
   const closeIndex=client.indexOf("try{dc?.close();}");
-  assert.ok(drainIndex>=0&&endIndex>drainIndex&&closeIndex>endIndex);
+  assert.ok(quiescenceIndex>=0&&drainIndex>quiescenceIndex&&endIndex>drainIndex&&closeIndex>endIndex);
 });
