@@ -820,6 +820,13 @@
   }
   function connectionErrorMessage(error) {
     const code = String(error?.message || error || "");
+    const stage = String(error?.payload?.verification_stage || "").toUpperCase();
+    if (selected?.id === "gmx") {
+      if (stage === "CREDENTIAL_LOAD") return "NAHWERK konnte die Zugangsdaten für die Prüfung nicht sicher laden. Bitte verbinde das GMX-Konto erneut.";
+      if (stage === "IMAP_CONNECT" && code === "provider_authentication_failed") return "GMX hat den IMAP-Zugriff nicht bestätigt. Prüfe bei GMX die POP3/IMAP-Freigabe und dein Passwort und versuche es erneut.";
+      if (stage === "IMAP_INBOX") return "Die Anmeldung bei GMX hat funktioniert, aber der Posteingang konnte nicht geöffnet werden. Prüfe die POP3/IMAP-Freigabe bei GMX und versuche es erneut.";
+      if (stage === "SMTP_VERIFY" && code === "provider_authentication_failed") return "Der GMX-Posteingang ist erreichbar, aber die Anmeldung zum Senden wurde nicht bestätigt. Prüfe dein GMX-Passwort und versuche es erneut.";
+    }
     if (code === "provider_authentication_failed" && selected?.id === "webde") return "WEB.DE konnte die Anmeldung mit diesem Passwort nicht bestätigen. Prüfe zuerst, ob der Zugriff für E-Mail-Programme in WEB.DE aktiviert ist.";
     if (code === "provider_authentication_failed") return "Die Anmeldung mit diesem Passwort wurde nicht bestätigt. NAHWERK zeigt dir jetzt den passenden nächsten Schritt.";
     if (code === "provider_tls_connection_failed") return "Die sichere Verbindung zum E-Mail-Anbieter konnte nicht hergestellt werden. Bitte versuche es später erneut.";
@@ -865,6 +872,7 @@
     }
     catch (error) {
       clearSecretOnly();
+      try { await refresh(); } catch {}
       setText(message, connectionErrorMessage(error));
       if (selected?.id === "webde") {
         webdeGuideNeeded = true;
