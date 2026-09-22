@@ -219,7 +219,7 @@ test("legacy and clean routes expose the same end-customer messenger", () => {
     assert.match(surface, /Neuer Chat/);
     assert.match(surface, /Deine Chats/);
     assert.match(surface, /aria-label="Chatverlauf"/);
-    assert.match(surface, /assets\/web-customer-concierge\.js\?v=49/);
+    assert.match(surface, /assets\/web-customer-concierge\.js\?v=50/);
     assert.doesNotMatch(surface, /web-customer-concierge-thread-scope\.js/);
     assert.doesNotMatch(surface, /PROD|autoritativ|Core-v1|web-gateway-v1|Fail-closed|Shadow-Antworten|kanonische Kundenidentität/i);
   }
