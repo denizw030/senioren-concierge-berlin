@@ -1184,7 +1184,7 @@
     const pane = el("section","ecp-tb-list-pane"), top = el("div","ecp-tb-list-top"), titleWrap = el("div");
     const rows = mailboxFilteredMessages();
     const truthLabel=mailboxProviderTruthLabel();
-    titleWrap.append(el("strong","",mailboxFolderTitle()),el("span","",mailboxFolderLoading ? truthLabel+" · E-Mails werden geladen …" : truthLabel)); top.append(titleWrap);
+    titleWrap.append(el("strong","",mailboxFolderTitle()),el("span","",mailboxFolderLoading ? truthLabel+" · weitere werden geladen …" : truthLabel)); top.append(titleWrap);
     const refresh = button("↻","ecp-tb-icon-button"); refresh.title="Aktualisieren"; refresh.addEventListener("click",()=>{if(folderBackedMode())void loadMailboxFolder();else void loadDashboard(false,true);}); top.append(refresh); pane.append(top);
     const listNode = el("div","ecp-tb-message-list");
     const loading = folderBackedMode() ? mailboxFolderLoading : classificationLoading;
