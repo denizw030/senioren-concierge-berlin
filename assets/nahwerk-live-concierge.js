@@ -125,12 +125,12 @@ export function mountNahwerkLiveConcierge({
   const muteBtn=q(".nw-live-mute"),endBtn=q(".nw-live-end"),closeBtn=q(".nw-live-close");
 
   let pc=null,dc=null,micStream=null,micMeter=null,outMeter=null,raf=0,inputFlushTimer=0,outputFlushTimer=0,transcriptSeq=0,userTurnSeq=0,assistantTurnSeq=0,maxSessionTimer=0;
-  // LIVE_TRANSCRIPT_TERMINAL_FLUSH_V2_20260922
+  // LIVE_TRANSCRIPT_TERMINAL_FLUSH_V3_20260922
   const transcriptWrites=new Set();
-  let lastTranscriptEventAt=0,lastUserPersistedEndMs=null,lastAssistantPersistedEndMs=null;
+  let lastTranscriptEventAt=0,lastUserPersistedEndMs=null,lastAssistantPersistedEndMs=null,responseActive=false,inputSpeechActive=false;
   // VOICE_DYNAMIC_PRICE_CLIENT_V1_20260920
   let currentQuote=null;
-  let sessionId="",inputTranscript="",outputTranscript="",lastUserTurnText="",lastAssistantTurnText="",started=false,muted=false,ending=false;
+  let sessionId="",liveThreadId="",inputTranscript="",outputTranscript="",lastUserTurnText="",lastAssistantTurnText="",started=false,muted=false,ending=false;
   let inputStartMs=null,inputEndMs=null,outputStartMs=null,outputEndMs=null,callStartedAt=0,callTimer=0;
 
   const state=(value,detail={})=>{onStateChange({state:value,...detail});};
@@ -251,16 +251,16 @@ export function mountNahwerkLiveConcierge({
       await Promise.race([Promise.allSettled(pending),wait(Math.min(250,Math.max(1,deadline-Date.now())))]);
     }
   };
-  const waitForTranscriptQuiescence=async({quietMs=1300,minWaitMs=850,maxWaitMs=4800}={})=>{
+  const waitForTranscriptQuiescence=async({quietMs=1500,minWaitMs=1000,maxWaitMs=7000}={})=>{
     const startedAt=Date.now();
     if(!lastTranscriptEventAt)lastTranscriptEventAt=startedAt;
     while(dc?.readyState==="open"&&Date.now()-startedAt<maxWaitMs){
       const elapsed=Date.now()-startedAt;
       const idle=Date.now()-lastTranscriptEventAt;
-      if(elapsed>=minWaitMs&&idle>=quietMs)break;
+      if(elapsed>=minWaitMs&&idle>=quietMs&&!responseActive&&!inputSpeechActive)break;
       await wait(Math.min(180,Math.max(30,quietMs-idle)));
     }
-    await drainTranscriptWrites(2400);
+    await drainTranscriptWrites(2800);
   };
   const finalTranscriptTail=(finalText,seenText)=>{
     const full=String(finalText??"").trim(),seen=String(seenText??"").trim();
@@ -318,7 +318,7 @@ export function mountNahwerkLiveConcierge({
     }
     setStatus("Prüft …");
     try{
-      const d=await post("/delegation",{session_id:sessionId,delegation_id:id,transcript,source_message_id:"live-"+uid()});
+      const d=await post("/delegation",{session_id:sessionId,delegation_id:id,transcript,last_assistant_utterance:(outputTranscript.trim()||lastAssistantTurnText).slice(0,2000),source_message_id:"live-"+uid()});
       sendEvent({type:"session.commentary.append",delegation_id:id,content:d.commentary,event_id:"nw-"+uid()});
     }catch{
       sendEvent({type:"session.commentary.append",delegation_id:id,content:"Die sichere Prüfung ist gerade nicht verfügbar. Behaupte keinen Erfolg und bitte kurz darum, es erneut zu versuchen.",event_id:"nw-"+uid()});
@@ -327,8 +327,10 @@ export function mountNahwerkLiveConcierge({
   const handleEvent=async(raw)=>{
     let e; try{e=JSON.parse(raw.data);}catch{return;}
     if(e.type==="session.started"){
-      started=true;startCallTimer();setStatus("Hört zu …");state("connected",{session_id:sessionId});return;
+      started=true;startCallTimer();setStatus("Hört zu …");state("connected",{session_id:sessionId,thread_id:liveThreadId||null});return;
     }
+    if(e.type==="input_audio_buffer.speech_started"){inputSpeechActive=true;noteTranscriptEvent();return;}
+    if(e.type==="response.created"||e.type==="response.in_progress"){responseActive=true;noteTranscriptEvent();}
     if(e.type==="session.input_transcript.delta"||e.type==="conversation.item.input_audio_transcription.delta"){
       noteTranscriptEvent();
       const delta=String(e.delta??"");
@@ -374,12 +376,13 @@ export function mountNahwerkLiveConcierge({
       return;
     }
     if(e.type==="input_audio_buffer.speech_stopped"){
+      inputSpeechActive=false;noteTranscriptEvent();
       if(inputFlushTimer)clearTimeout(inputFlushTimer);
       inputFlushTimer=setTimeout(()=>{void flushUserTranscript();},800);
       return;
     }
     if(e.type==="response.done"){
-      noteTranscriptEvent();
+      responseActive=false;noteTranscriptEvent();
       if(outputFlushTimer)clearTimeout(outputFlushTimer);
       outputFlushTimer=setTimeout(()=>{void flushAssistantTranscript();},450);
       return;
@@ -387,6 +390,7 @@ export function mountNahwerkLiveConcierge({
     if(e.type==="response.event"&&e.event){
       const nested=e.event;
       if(nested.type==="response.done"){
+        responseActive=false;noteTranscriptEvent();
         outputTranscript="";
         outputStartMs=null;
         outputEndMs=null;
@@ -400,7 +404,7 @@ export function mountNahwerkLiveConcierge({
 
   async function start(){
     if(pc)return;
-    ending=false;started=false;inputTranscript="";outputTranscript="";lastUserTurnText="";lastAssistantTurnText="";inputStartMs=null;inputEndMs=null;outputStartMs=null;outputEndMs=null;lastUserPersistedEndMs=null;lastAssistantPersistedEndMs=null;lastTranscriptEventAt=Date.now();transcriptSeq=0;userTurnSeq=0;assistantTurnSeq=0;transcriptWrites.clear();
+    ending=false;started=false;responseActive=false;inputSpeechActive=false;liveThreadId="";inputTranscript="";outputTranscript="";lastUserTurnText="";lastAssistantTurnText="";inputStartMs=null;inputEndMs=null;outputStartMs=null;outputEndMs=null;lastUserPersistedEndMs=null;lastAssistantPersistedEndMs=null;lastTranscriptEventAt=Date.now();transcriptSeq=0;userTurnSeq=0;assistantTurnSeq=0;transcriptWrites.clear();
     stopCallTimer();if(duration){duration.textContent="0:00";duration.hidden=true;}
     ui.hidden=false;document.documentElement.classList.add("nw-live-open");
     setPersona(currentPersonaFromPage());
@@ -443,6 +447,7 @@ export function mountNahwerkLiveConcierge({
 
       const threadId=ch==="WEB"?await getThreadId():null;
       if(ch==="WEB"&&!threadId)throw new Error("THREAD_ID_REQUIRED");
+      liveThreadId=String(threadId||"");
 
       const live=await post("/session",{channel:ch,sdp:localSdp,initial_sdp:initialSdp,thread_id:threadId,price_acknowledged:Boolean(currentQuote&&currentQuote.customer_charge===true&&currentQuote.billing_exempt!==true),price_version:String(currentQuote?.price_version||"")});
       sessionId=live.session_id;
@@ -495,40 +500,40 @@ export function mountNahwerkLiveConcierge({
 
   async function stop({notifyBackend=true,keepVisible=false}={}){
     if(ending)return; ending=true;
-    // Stop accepting new speech immediately, but keep the data channel alive until the
-    // provider has been transcript-quiet long enough to deliver terminal transcript events.
+    const endedSessionId=sessionId,endedThreadId=liveThreadId;
+    // Stop accepting new speech immediately, but keep the data channel alive until both
+    // speech and any active assistant response have reached a transcript-stable boundary.
     micStream?.getAudioTracks()?.forEach(t=>t.enabled=false);
     setStatus("Gespräch wird abgeschlossen …");
-    if(started&&dc?.readyState==="open")await waitForTranscriptQuiescence({quietMs:1300,minWaitMs:850,maxWaitMs:4800});
+    if(started&&dc?.readyState==="open")await waitForTranscriptQuiescence({quietMs:1500,minWaitMs:1000,maxWaitMs:7000});
     if(inputFlushTimer){clearTimeout(inputFlushTimer);inputFlushTimer=0;}
     if(outputFlushTimer){clearTimeout(outputFlushTimer);outputFlushTimer=0;}
     await flushUserTranscript();
     await flushAssistantTranscript();
-    await drainTranscriptWrites(2400);
+    await drainTranscriptWrites(2800);
     stopCallTimer();
     if(maxSessionTimer)clearTimeout(maxSessionTimer);maxSessionTimer=0;
     currentQuote=null;
     cancelAnimationFrame(raf);
     if(notifyBackend&&sessionId){
       await post("/end",{session_id:sessionId,transcript_finalized:true}).catch(()=>{});
-      // The server intentionally keeps the provider alive briefly during terminal hangup.
-      // Keep receiving and drain any transcript event that lands in that grace window.
-      await wait(320);
-      await drainTranscriptWrites(1600);
+      await wait(700);
+      await drainTranscriptWrites(2400);
     }
     try{dc?.close();}catch{}
     try{pc?.close();}catch{}
     micStream?.getTracks()?.forEach(t=>t.stop());
     micMeter?.close?.();outMeter?.close?.();
     remoteAudio.pause();remoteAudio.srcObject=null;
-    pc=null;dc=null;micStream=null;micMeter=null;outMeter=null;sessionId="";started=false;muted=false;
+    pc=null;dc=null;micStream=null;micMeter=null;outMeter=null;sessionId="";liveThreadId="";started=false;muted=false;responseActive=false;inputSpeechActive=false;
     muteBtn.classList.remove("is-muted");
+    const endDetail={session_id:endedSessionId||null,thread_id:endedThreadId||null,transcript_finalized:true};
     if(!keepVisible){
       ui.hidden=true;
       document.documentElement.classList.remove("nw-live-open");
-      try{onClose();}catch{}
+      try{onClose(endDetail);}catch{}
     }
-    state("ended");ending=false;
+    state("ended",endDetail);ending=false;
   }
 
   function toggleMute(){
