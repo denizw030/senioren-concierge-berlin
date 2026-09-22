@@ -710,6 +710,15 @@
     const code = String(error?.guidance_code || error?.payload?.guidance_code || "");
     const id = String(provider?.id || "").toLowerCase();
     const name = String(provider?.name || "deinem Anbieter");
+    if (id === "gmx" && code === "CHECK_MAILBOX_PASSWORD") {
+      return {
+        code,
+        title: "GMX Passwort prüfen",
+        steps: ["Bei GMX anmelden und prüfen, ob das normale Postfach-Passwort funktioniert.", "Das Passwort des GMX-Postfachs erneut bei NAHWERK eingeben.", "Falls Zwei-Faktor-Schutz die Anmeldung blockiert, die GMX-Sicherheitseinstellungen prüfen."],
+        videoHint: "So prüfst du deinen GMX Mail-Zugang",
+        returnText: "Danach zu NAHWERK zurückkehren und erneut verbinden."
+      };
+    }
     const guides = {
       gmx: {
         title: "GMX einmal freigeben",
