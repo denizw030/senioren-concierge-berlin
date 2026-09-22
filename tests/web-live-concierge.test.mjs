@@ -12,7 +12,7 @@ test("web chat mounts Live Concierge on the right without replacing voice memo",
     const html=read(page);
     assert.match(html,/assets\/web-voice-memo\.js\?v=10/);
     assert.match(html,/assets\/web-customer-concierge\.js\?v=48/);
-    assert.match(html,/assets\/web-live-concierge\.js\?v=19/);
+    assert.match(html,/assets\/web-live-concierge\.js\?v=20/);
     assert.match(html,/assets\/nahwerk-live-concierge\.css\?v=4/);
   }
   const boot=read("assets/web-live-concierge.js");
@@ -233,14 +233,19 @@ test("GPT-Live transcript deltas persist immediately and chat refreshes after Li
 });
 
 
-test("Live waits for final transcript writes before ending the session",()=>{
+test("Live waits for transcript quiescence and terminal transcript writes before ending the session",()=>{
   const client=read("assets/nahwerk-live-concierge.js");
   assert.match(client,/transcriptWrites=new Set/);
-  assert.match(client,/drainTranscriptWrites/);
-  assert.match(client,/await drainTranscriptWrites\(1800\)/);
-  assert.match(client,/await post\("\/end",\{session_id:sessionId\}\)/);
-  const drainIndex=client.indexOf("await drainTranscriptWrites(1800)");
-  const endIndex=client.indexOf('await post("/end",{session_id:sessionId})');
-  const closeIndex=client.indexOf("try{dc?.close();}");
-  assert.ok(drainIndex>=0&&endIndex>drainIndex&&closeIndex>endIndex);
+  assert.match(client,/waitForTranscriptQuiescence/);
+  assert.match(client,/await drainTranscriptWrites\(2400\)/);
+  assert.match(client,/transcript_finalized:true/);
+  assert.match(client,/session\.input_transcript\.done/);
+  assert.match(client,/session\.output_transcript\.done/);
+  assert.match(client,/finalTranscriptTail/);
+  const stopIndex=client.indexOf("async function stop");
+  const quiescenceIndex=client.indexOf("await waitForTranscriptQuiescence",stopIndex);
+  const drainIndex=client.indexOf("await drainTranscriptWrites(2400)",stopIndex);
+  const endIndex=client.indexOf('await post("/end",{session_id:sessionId,transcript_finalized:true})',stopIndex);
+  const closeIndex=client.indexOf("try{dc?.close();}",stopIndex);
+  assert.ok(stopIndex>=0&&quiescenceIndex>stopIndex&&drainIndex>quiescenceIndex&&endIndex>drainIndex&&closeIndex>endIndex);
 });
