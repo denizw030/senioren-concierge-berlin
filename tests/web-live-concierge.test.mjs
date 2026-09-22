@@ -244,7 +244,7 @@ test("Live waits for transcript quiescence and terminal transcript writes before
   assert.match(client,/finalTranscriptTail/);
   const stopIndex=client.indexOf("async function stop");
   const quiescenceIndex=client.indexOf("await waitForTranscriptQuiescence",stopIndex);
-  const drainIndex=client.indexOf("await drainTranscriptWrites(2400)",stopIndex);
+  const drainIndex=client.indexOf("await drainTranscriptWrites(2800)",stopIndex);
   const endIndex=client.indexOf('await post("/end",{session_id:sessionId,transcript_finalized:true})',stopIndex);
   const closeIndex=client.indexOf("try{dc?.close();}",stopIndex);
   assert.ok(stopIndex>=0&&quiescenceIndex>stopIndex&&drainIndex>quiescenceIndex&&endIndex>drainIndex&&closeIndex>endIndex);
