@@ -120,6 +120,8 @@
   let chatDraft = "";
   let chatScrollTop = 0;
   let mailboxListScrollTop = 0;
+  let mailboxSidebarScrollTop = 0;
+  let mailboxSidebarScrollLeft = 0;
   let readerScrollTop = 0;
   let preservePageScrollUntil = 0;
   let preservePageScrollY = 0;
@@ -268,6 +270,8 @@
     if(chatLog) chatScrollTop=chatLog.scrollTop;
     const listNode=root?.querySelector?.(".ecp-tb-message-list");
     if(listNode) mailboxListScrollTop=listNode.scrollTop;
+    const sidebarNav=root?.querySelector?.(".ecp-tb-nav");
+    if(sidebarNav){mailboxSidebarScrollTop=sidebarNav.scrollTop;mailboxSidebarScrollLeft=sidebarNav.scrollLeft;}
     const reader=root?.querySelector?.(".ecp-tb-reader");
     if(reader) readerScrollTop=reader.scrollTop;
     const input=root?.querySelector?.(".ecp-chat-input");
@@ -290,6 +294,8 @@
     }
     const listNode=root?.querySelector?.(".ecp-tb-message-list");
     if(listNode) listNode.scrollTop=mailboxListScrollTop;
+    const sidebarNav=root?.querySelector?.(".ecp-tb-nav");
+    if(sidebarNav){sidebarNav.scrollTop=mailboxSidebarScrollTop;sidebarNav.scrollLeft=mailboxSidebarScrollLeft;}
     const reader=root?.querySelector?.(".ecp-tb-reader");
     if(reader) reader.scrollTop=readerScrollTop;
     const input=root?.querySelector?.(".ecp-chat-input");
@@ -358,6 +364,25 @@
     const value=mailboxFolderCounts?.[String(connectionId||"")]?.[folder]?.unread;
     return Number.isFinite(value) && value>0 ? value : "";
   }
+  function inboxProviderTruth(connectionId) {
+    const meta=mailboxFolderCounts?.[String(connectionId||"")]?.INBOX;
+    if(!meta || !Number.isFinite(meta.total) || !Number.isFinite(meta.unread)) return null;
+    return {messages_total:Math.max(0,Number(meta.total)||0),messages_unread:Math.max(0,Number(meta.unread)||0)};
+  }
+  function formatMailboxNumber(value) {
+    return Math.max(0,Number(value)||0).toLocaleString("de-DE");
+  }
+  function mailboxProviderTruthLabel() {
+    if(mailboxScope==="ALL"){
+      const truths=emailConnections.map((row)=>inboxProviderTruth(row.connection_id));
+      if(!emailConnections.length || truths.some((row)=>!row)) return "Postfachzahlen werden aktualisiert …";
+      const total=truths.reduce((sum,row)=>sum+row.messages_total,0),unread=truths.reduce((sum,row)=>sum+row.messages_unread,0);
+      return `Alle Posteingänge · ${formatMailboxNumber(total)} E-Mails insgesamt · ${formatMailboxNumber(unread)} ungelesen`;
+    }
+    const address=connectionEmail(activeConnectionId),truth=inboxProviderTruth(activeConnectionId);
+    if(!truth) return `${address} · Postfachzahlen werden aktualisiert …`;
+    return `${address} · ${formatMailboxNumber(truth.messages_total)} E-Mails insgesamt · ${formatMailboxNumber(truth.messages_unread)} ungelesen`;
+  }
   function decorateRemoteMessage(message, connection) {
     return {
       ...message,
@@ -423,7 +448,10 @@
     });
     return {
       messages:list(data?.messages).map((message)=>decorateRemoteMessage(message,connection)),
-      folder_meta:data?.folder_meta||{},
+      folder_meta:{
+        messages_total:number(data?.messages_total??data?.folder_meta?.messages_total),
+        messages_unread:number(data?.messages_unread??data?.folder_meta?.messages_unread)
+      },
       next_page_token:String(data?.next_page_token||"")
     };
   }
@@ -1155,7 +1183,8 @@
   function renderMailboxListPane(shell) {
     const pane = el("section","ecp-tb-list-pane"), top = el("div","ecp-tb-list-top"), titleWrap = el("div");
     const rows = mailboxFilteredMessages();
-    titleWrap.append(el("strong","",mailboxFolderTitle()),el("span","",mailboxFolderLoading ? String(rows.length)+" geladen · weitere werden geladen …" : String(rows.length)+" angezeigt")); top.append(titleWrap);
+    const truthLabel=mailboxProviderTruthLabel();
+    titleWrap.append(el("strong","",mailboxFolderTitle()),el("span","",mailboxFolderLoading ? truthLabel+" · weitere werden geladen …" : truthLabel)); top.append(titleWrap);
     const refresh = button("↻","ecp-tb-icon-button"); refresh.title="Aktualisieren"; refresh.addEventListener("click",()=>{if(folderBackedMode())void loadMailboxFolder();else void loadDashboard(false,true);}); top.append(refresh); pane.append(top);
     const listNode = el("div","ecp-tb-message-list");
     const loading = folderBackedMode() ? mailboxFolderLoading : classificationLoading;
@@ -1239,7 +1268,7 @@
     ensureClassificationStyles();
     root.hidden = !connected; if (!connected) { root.replaceChildren(); return; }
     root.replaceChildren();
-    if (!dashboard) { root.append(el("div", "ecp-loading", "Dein E-Mail-Concierge wird geladen …")); return; }
+    if (!dashboard) { root.append(el("div", "ecp-loading", "Dein E-Mail-Concierge wird geladen …")); restoreTransientUiState(root,transient); return; }
     const workspace = el("section","ecp-thunderbird"); workspace.setAttribute("aria-label","E-Mail-Arbeitsbereich");
     const toolbar = el("div","ecp-tb-toolbar"), left=el("div","ecp-tb-toolbar-title"), searchWrap=el("label","ecp-tb-search");
     left.append(el("strong","","E-Mail"),el("span","","NAHWERK Concierge"));
@@ -1320,7 +1349,7 @@
     if (!connected) {
       dashboard = null; dashboardLoadedAt = 0; classification = null; classificationError = ""; classificationRetryCount = 0;
       emailConnections = []; activeConnectionId = ""; mailboxScope = "ALL"; mailboxFolderRows = []; mailboxFolderCounts = {}; classificationKnownCounts = {}; classificationFolderCache = {}; mailboxLoadSerial++; mailboxIndexWarmStarted.clear(); allDrafts = [];
-      chatMessages = []; chatStarted = false; chatDraft=""; chatScrollTop=0; mailboxListScrollTop=0; readerScrollTop=0; pendingBackgroundRender=false; onboardingExampleSelections.clear(); render(true); return;
+      chatMessages = []; chatStarted = false; chatDraft=""; chatScrollTop=0; mailboxListScrollTop=0; mailboxSidebarScrollTop=0; mailboxSidebarScrollLeft=0; readerScrollTop=0; pendingBackgroundRender=false; onboardingExampleSelections.clear(); render(true); return;
     }
     try { await loadConnections(); } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
     if (!emailConnections.length) { connected = false; render(); return; }
