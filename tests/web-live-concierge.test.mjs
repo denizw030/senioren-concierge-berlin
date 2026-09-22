@@ -11,8 +11,8 @@ test("web chat mounts Live Concierge on the right without replacing voice memo",
   for(const page of ["web-concierge.html","web-concierge/index.html"]){
     const html=read(page);
     assert.match(html,/assets\/web-voice-memo\.js\?v=10/);
-    assert.match(html,/assets\/web-customer-concierge\.js\?v=48/);
-    assert.match(html,/assets\/web-live-concierge\.js\?v=20/);
+    assert.match(html,/assets\/web-customer-concierge\.js\?v=49/);
+    assert.match(html,/assets\/web-live-concierge\.js\?v=21/);
     assert.match(html,/assets\/nahwerk-live-concierge\.css\?v=4/);
   }
   const boot=read("assets/web-live-concierge.js");
@@ -237,7 +237,7 @@ test("Live waits for transcript quiescence and terminal transcript writes before
   const client=read("assets/nahwerk-live-concierge.js");
   assert.match(client,/transcriptWrites=new Set/);
   assert.match(client,/waitForTranscriptQuiescence/);
-  assert.match(client,/await drainTranscriptWrites\(2400\)/);
+  assert.match(client,/await drainTranscriptWrites\(2800\)/);
   assert.match(client,/transcript_finalized:true/);
   assert.match(client,/session\.input_transcript\.done/);
   assert.match(client,/session\.output_transcript\.done/);
@@ -248,4 +248,27 @@ test("Live waits for transcript quiescence and terminal transcript writes before
   const endIndex=client.indexOf('await post("/end",{session_id:sessionId,transcript_finalized:true})',stopIndex);
   const closeIndex=client.indexOf("try{dc?.close();}",stopIndex);
   assert.ok(stopIndex>=0&&quiescenceIndex>stopIndex&&drainIndex>quiescenceIndex&&endIndex>drainIndex&&closeIndex>endIndex);
+});
+
+
+test("Live carries the last spoken assistant turn into delegated Core follow-ups",()=>{
+  const client=read("assets/nahwerk-live-concierge.js");
+  assert.match(client,/last_assistant_utterance/);
+  assert.match(client,/lastAssistantTurnText/);
+  assert.match(client,/liveThreadId/);
+});
+
+test("Live end refreshes the exact transcript thread after persistence settles",()=>{
+  const client=read("assets/nahwerk-live-concierge.js");
+  const boot=read("assets/web-live-concierge.js");
+  const chat=read("assets/web-customer-concierge.js");
+  assert.match(client,/thread_id:endedThreadId/);
+  assert.match(client,/responseActive/);
+  assert.match(client,/inputSpeechActive/);
+  assert.match(boot,/new CustomEvent\("nahwerk:live-ended",\{detail\}\)/);
+  assert.match(chat,/detail\.thread_id/);
+  assert.match(chat,/primaryChatThreadId=exactThread/);
+  const first=chat.indexOf("await refreshThread(exactThread,{force:true,reset:true})");
+  const second=chat.indexOf("await refreshThread(exactThread,{force:true,reset:true})",first+1);
+  assert.ok(first>=0&&second>first);
 });
