@@ -413,3 +413,21 @@ html body.account-premium-ui.account-premium-ui #accountTabConcierge[aria-select
   filter:none!important;
   transform:none!important;
 }
+
+
+/* Account tab bottom alignment excluding Goldmann v20260923 */
+@media(min-width:761px){
+  html body.account-premium-ui.account-premium-ui .account-tabs.account-tabs-modern .account-tab:not(#accountTabConcierge){
+    align-items:flex-end!important;
+  }
+  html body.account-premium-ui.account-premium-ui .account-tabs.account-tabs-modern .account-tab:not(#accountTabConcierge) .account-tab-icon,
+  html body.account-premium-ui.account-premium-ui .account-tabs.account-tabs-modern .account-tab:not(#accountTabConcierge)>span:last-child{
+    align-self:flex-end!important;
+  }
+  html body.account-premium-ui.account-premium-ui .account-tabs.account-tabs-modern .account-tab:not(#accountTabConcierge)>span:last-child{
+    line-height:16px!important;
+  }
+  html body.account-premium-ui.account-premium-ui #accountTabConcierge{
+    align-items:center!important;
+  }
+}
