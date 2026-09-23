@@ -52,7 +52,10 @@
     } catch (_) {}
     try {
       const persistent = JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
-      if (persistent?.session_token && persistent?.remember_me === true) return persistent;
+      if (persistent?.session_token && persistent?.remember_me === true) {
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(persistent));
+        return persistent;
+      }
       if (persistent?.session_token) localStorage.removeItem(SESSION_KEY);
     } catch (_) {
       localStorage.removeItem(SESSION_KEY);
@@ -306,7 +309,8 @@
         lastValidatedProfile = null;
         localStorage.removeItem(SESSION_KEY);
         sessionStorage.removeItem(SESSION_KEY);
-        (remember_me ? localStorage : sessionStorage).setItem(SESSION_KEY, JSON.stringify(validatedSession));
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(validatedSession));
+        if (remember_me) localStorage.setItem(SESSION_KEY, JSON.stringify(validatedSession));
         return true;
       }
       if (response.status === 401 || response.status === 403) {
