@@ -77,7 +77,7 @@ test('legacy clean-url runtime marks .html compatibility routes noindex before r
 });
 
 test('known indexed legacy prime-concierge URLs are explicit noindex redirects', () => {
-  const pairs = [['prime-concierge.html', '/prime-concierge'], ['en/prime-concierge.html', '/en/prime-concierge']];
+  const pairs = [['prime-concierge.html', '/prime-concierge'], ['en/prime-concierge.html', '/en/prime-concierge'], ['tr/prime-concierge.html', '/tr/prime-concierge']];
   for (const pair of pairs) {
     const file = pair[0], target = pair[1];
     const html = read(file);
