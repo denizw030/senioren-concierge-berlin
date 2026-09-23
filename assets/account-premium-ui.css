@@ -248,7 +248,7 @@ html body.account-premium-ui.account-premium-ui.nw-portal-dark .safety-detail-to
 
 /* Account tab icons: Concierge is the optical reference; every icon uses the same geometry. */
 html body.account-premium-ui.account-premium-ui .account-tab{
-  gap:7px!important;
+  gap:4px!important;
   align-items:center!important;
 }
 html body.account-premium-ui.account-premium-ui .account-tab-icon{
@@ -265,7 +265,7 @@ html body.account-premium-ui.account-premium-ui .account-tab-icon{
   box-sizing:border-box!important;
   line-height:14px!important;
   color:inherit!important;
-  transform:translateY(-1px)!important;
+  transform:none!important;
   transform-origin:center center!important;
 }
 html body.account-premium-ui.account-premium-ui .account-tab-icon svg{
@@ -284,7 +284,7 @@ html body.account-premium-ui.account-premium-ui .account-tab-icon svg{
 }
 html body.account-premium-ui.account-premium-ui .account-tab-concierge-logo{
   background-color:transparent!important;
-  background-image:url("/assets/logos/NAHWERK-Goldmann-Icon.svg?v=2")!important;
+  background-image:url("/assets/logos/NAHWERK-Goldmann-Logo.svg?v=1")!important;
   background-repeat:no-repeat!important;
   background-position:center!important;
   background-size:14px 14px!important;
