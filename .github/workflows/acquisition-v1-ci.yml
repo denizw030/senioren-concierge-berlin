@@ -351,14 +351,14 @@ jobs:
           tabs=re.search(r'<div class="account-tabs-shell">[\s\S]*?</div>\s*(?=<div class="dash">)',src,re.I).group(0)
           setup=re.search(r'<div class="account-setup-by"[\s\S]*?</div>',src,re.I).group(0)
           summaries=[]
-          for klass in ["plan-summary","status-summary","customer-number-summary","person-summary"]:
+          for klass in ["status-summary","person-summary"]:
             summaries.append(re.search(r'<article class="card summary-card [^"]*'+klass+r'"[\s\S]*?</article>',src,re.I).group(0))
           highlights=re.search(r'<div class="account-overview-highlights"[\s\S]*?</div>\s*<div class="account-panel-heading" data-account-panel="concierge"',src,re.I).group(0)
           highlights=highlights.rsplit('<div class="account-panel-heading"',1)[0]
           access_heading=re.search(r'<div class="account-panel-heading" data-account-panel="access"[\s\S]*?</div>\s*<article class="card wide access-panel"',src,re.I).group(0)
           access_heading=access_heading.rsplit('<article',1)[0]
           family_start=src.index('<div id="familyOwnerPanelSlot"')
-          family_end=src.index('<article class="card summary-card plan-summary"',family_start)
+          family_end=src.index('<article class="card summary-card status-summary"',family_start)
           family=src[family_start:family_end]
           family=re.sub(r'\s+hidden(?=[^>]*>)','',family)
           family=family.replace('Berechtigung wird serverseitig geprüft.','OWNER bestätigt · Personen und Kontingente autorisiert')
