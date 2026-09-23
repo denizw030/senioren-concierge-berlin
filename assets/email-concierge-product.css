@@ -61,6 +61,7 @@ body.account-premium-ui:has(#accountEmailCard:not([hidden])) .nw-floating-concie
 .ecp-tb-search input::placeholder{color:#8b929c}
 .ecp-tb-live{display:inline-flex;align-items:center;gap:7px;padding:6px 9px;border:1px solid #383d44;border-radius:999px;font-size:.7rem;color:#cdd2d8}
 .ecp-tb-live::before{content:"";width:7px;height:7px;border-radius:50%;background:#35c46a}
+.ecp-tb-provider-truth{min-width:0;max-width:min(44vw,560px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ecp-tb-shell{display:grid;grid-template-columns:260px minmax(320px,390px) minmax(0,1fr);min-height:665px}
 .ecp-tb-sidebar{display:flex;flex-direction:column;min-width:0;border-right:1px solid var(--ecp-tb-border);background:#191b1f}
 .ecp-tb-brand{display:flex;align-items:center;gap:10px;padding:14px 13px 12px;border-bottom:1px solid var(--ecp-tb-border)}
