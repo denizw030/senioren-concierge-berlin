@@ -129,5 +129,5 @@ test("account header name is server-authoritative and never restored from stale 
   assert.doesNotMatch(authNav, /\|\| session\.first_name/);
   assert.match(account, /const authoritativeFirstName = String\(body\?\.profile\?\.first_name/);
   assert.match(account, /session\.first_name = authoritativeFirstName/);
-  assert.match(account, /assets\/auth-nav\.js\?v=43/);
+  assert.match(account, /assets\/auth-nav\.js\?v=44/);
 });
