@@ -10,7 +10,29 @@
     return pathname.replace(/\/([^/]+)\.html\/?$/i, '/$1');
   };
 
+  const isLegacyHtml = (pathname) =>
+    /\/(?!404\.html(?:$|\/))[^/]+\.html\/?$/i.test(pathname || '');
+
   const targetPath = cleanPath(location.pathname);
+
+  if (isLegacyHtml(location.pathname) && targetPath !== location.pathname) {
+    let robots = document.querySelector('meta[name="robots"]');
+    if (!robots) {
+      robots = document.createElement('meta');
+      robots.name = 'robots';
+      document.head.prepend(robots);
+    }
+    robots.content = 'noindex,follow';
+
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.rel = 'canonical';
+      document.head.appendChild(canonical);
+    }
+    canonical.href = new URL(targetPath, location.origin).href;
+  }
+
   if (targetPath !== location.pathname) {
     location.replace(`${targetPath}${location.search}${location.hash}`);
     return;
