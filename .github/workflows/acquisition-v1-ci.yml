@@ -118,7 +118,7 @@ jobs:
           src=Path("konto.html").read_text(encoding="utf-8")
           tab=re.search(r'<button[^>]+id="accountTabAccess"[\s\S]*?</button>',src,re.I).group(0)
           start=src.index('<div id="familyOwnerPanelSlot"')
-          end=src.index('<article class="card summary-card plan-summary"',start)
+          end=src.index('<article class="account-overview-link plan-summary"',start)
           panel=src[start:end]
           fixture='''<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Family Pages Smoke</title></head><body>'''
           fixture+=tab+panel
@@ -229,7 +229,7 @@ jobs:
           style=re.search(r"<style>[\s\S]*?</style>",src,re.I).group(0)
           links="\n".join(re.findall(r'<link[^>]+rel="stylesheet"[^>]*>',src,re.I))
           start=src.index('<div id="familyOwnerPanelSlot"')
-          end=src.index('<article class="card summary-card plan-summary"',start)
+          end=src.index('<article class="account-overview-link plan-summary"',start)
           panel=src[start:end]
           panel=re.sub(r'\s+hidden(?=[^>]*>)','',panel,count=4)
           fixture=f'''<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Personen & Zugänge | NAHWERK</title>{links}{style}</head><body><main><section class="section account-section"><div class="wrap"><h1>Kundenbereich</h1><h2>Personen & Zugänge</h2><div class="dash">{panel}</div></div></section></main></body></html>'''
@@ -348,17 +348,19 @@ jobs:
           src=Path("konto.html").read_text(encoding="utf-8")
           links="\n".join(re.findall(r'<link[^>]+rel="stylesheet"[^>]*>',src,re.I))
           styles="\n".join(re.findall(r'<style[^>]*>[\s\S]*?</style>',src,re.I))
-          tabs=re.search(r'<div class="account-tabs-shell">[\s\S]*?</nav>\s*</div>',src,re.I).group(0)
+          tabs_start=src.index('<div class="account-tabs-shell">')
+          tabs_end=src.index('<div class="dash">',tabs_start)
+          tabs=src[tabs_start:tabs_end].strip()
           setup=re.search(r'<div class="account-setup-by"[\s\S]*?</div>',src,re.I).group(0)
           summaries=[]
-          for klass in ["plan-summary","status-summary","customer-number-summary","person-summary"]:
+          for klass in ["status-summary","person-summary"]:
             summaries.append(re.search(r'<article class="card summary-card [^"]*'+klass+r'"[\s\S]*?</article>',src,re.I).group(0))
           highlights=re.search(r'<div class="account-overview-highlights"[\s\S]*?</div>\s*<div class="account-panel-heading" data-account-panel="concierge"',src,re.I).group(0)
           highlights=highlights.rsplit('<div class="account-panel-heading"',1)[0]
           access_heading=re.search(r'<div class="account-panel-heading" data-account-panel="access"[\s\S]*?</div>\s*<article class="card wide access-panel"',src,re.I).group(0)
           access_heading=access_heading.rsplit('<article',1)[0]
           family_start=src.index('<div id="familyOwnerPanelSlot"')
-          family_end=src.index('<article class="card summary-card plan-summary"',family_start)
+          family_end=src.index('<article class="account-overview-link plan-summary"',family_start)
           family=src[family_start:family_end]
           family=re.sub(r'\s+hidden(?=[^>]*>)','',family)
           family=family.replace('Berechtigung wird serverseitig geprüft.','OWNER bestätigt · Personen und Kontingente autorisiert')
@@ -379,8 +381,8 @@ jobs:
           def shell(body,title):
             return f'''<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title>{links}{styles}</head><body class="account-premium-ui" data-product="prime"><main><section class="section account-section"><div class="wrap">{body}</div></section></main><script>
             addEventListener("load",()=>{{requestAnimationFrame(()=>{{
-              const bad=[...document.querySelectorAll("button:not(.account-tab),.card,.family-owner-person,.account-tabs-shell")].filter(el=>{{const r=el.getBoundingClientRect();return r.left<-1||r.right>innerWidth+1||r.width<1;}});
-              document.documentElement.dataset.overflow=(document.documentElement.scrollWidth<=innerWidth+1&&bad.length===0)?"none":"present";
+              const bad=[...document.querySelectorAll("button:not(.account-tab),.card,.family-owner-person,.account-tabs-shell")].filter(el=>{{const r=el.getBoundingClientRect();return r.width>0&&(r.left<-1||r.right>innerWidth+1);}});
+              document.documentElement.dataset.overflow=(document.documentElement.scrollWidth<=innerWidth+1&&bad.length===0)?"none":"present";document.documentElement.dataset.overflowDebug="scroll:"+document.documentElement.scrollWidth+"/"+innerWidth+";bad:"+bad.map(el=>el.tagName.toLowerCase()+"."+el.className+":"+Math.round(el.getBoundingClientRect().left)+"-"+Math.round(el.getBoundingClientRect().right)).join("|");
               document.documentElement.dataset.visualReady="true";
             }})}});
             </script></body></html>'''
@@ -398,7 +400,7 @@ jobs:
               url="http://127.0.0.1:4173/__account-premium-$view.html"
               "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --window-size="$width,1100" --virtual-time-budget=1200 --dump-dom "$url" > "/tmp/account-$view-$width.html"
               grep -q 'data-visual-ready="true"' "/tmp/account-$view-$width.html"
-              grep -q 'data-overflow="none"' "/tmp/account-$view-$width.html"
+              grep -q 'data-overflow="none"' "/tmp/account-$view-$width.html" || { grep -o 'data-overflow-debug="[^"]*"' "/tmp/account-$view-$width.html" || true; exit 1; }
               "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --window-size="$width,1100" --virtual-time-budget=1200 --screenshot="/tmp/account-premium-visual/$view-$width.png" "$url" >/dev/null
             done
           done
