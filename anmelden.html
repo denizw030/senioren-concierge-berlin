@@ -147,7 +147,7 @@
           <span>Persönlicher Concierge über WhatsApp</span>
         </div>
       </div>
-    </footer><script src="assets/auth-nav.js?v=44"></script><script>(()=>{
+    </footer><script src="assets/auth-nav.js?v=45"></script><script>(()=>{
 const LOGIN_URL='https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-login-secure';
 const MFA_CHALLENGE_URL=LOGIN_URL;
 const MFA_VERIFY_URL=LOGIN_URL;
@@ -215,7 +215,8 @@ function completeLogin(body){
   };
   localStorage.removeItem(SESSION_KEY);
   sessionStorage.removeItem(SESSION_KEY);
-  (rememberMe?localStorage:sessionStorage).setItem(SESSION_KEY,JSON.stringify(sessionPayload));
+  sessionStorage.setItem(SESSION_KEY,JSON.stringify(sessionPayload));
+  if(rememberMe)localStorage.setItem(SESSION_KEY,JSON.stringify(sessionPayload));
   pendingMfa=null;
   show(ENTRY_NEXT==='/payg'
     ? '<strong>Erfolgreich angemeldet.</strong><br>Du wirst jetzt zu PAYG weitergeleitet und kannst Guthaben aufladen.'
