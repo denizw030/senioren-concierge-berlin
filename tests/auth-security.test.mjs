@@ -26,7 +26,8 @@ test("login persists a session only when the backend confirms remember-me", () =
   assert.match(login, /id="rememberMe" type="checkbox"/);
   assert.match(login, /remember_me:rememberInput\.checked===true/);
   assert.match(login, /const rememberMe=body\.remember_me===true/);
-  assert.match(login, /\(rememberMe\?localStorage:sessionStorage\)\.setItem/);
+  assert.match(login, /sessionStorage\.setItem\(SESSION_KEY,JSON\.stringify\(sessionPayload\)\)/);
+  assert.match(login, /if\(rememberMe\)localStorage\.setItem\(SESSION_KEY,JSON\.stringify\(sessionPayload\)\)/);
   assert.match(login, /body\.status==='invalid_credentials'/);
   assert.match(login, /res\.status===429/);
 });
@@ -74,7 +75,9 @@ test("persistent web sessions require explicit remember-me and remain revocable"
   assert.match(authNav, /sessionStorage\.getItem\(SESSION_KEY/);
   assert.match(authNav, /localStorage\.getItem\(SESSION_KEY/);
   assert.match(authNav, /persistent\?\.remember_me === true/);
-  assert.match(authNav, /remember_me \? localStorage : sessionStorage/);
+  assert.match(authNav, /remembered\?\.remember_me === true/);
+  assert.match(authNav, /sessionStorage\.setItem\(SESSION_KEY, JSON\.stringify\(remembered\)\)/);
+  assert.match(authNav, /if \(remember_me\) localStorage\.setItem\(SESSION_KEY, JSON\.stringify\(validatedSession\)\)/);
   assert.match(authNav, /localStorage\.removeItem\(SESSION_KEY/);
   assert.match(authNav, /JSON\.stringify\(\{ action: "logout" \}\)/);
 });
@@ -129,5 +132,5 @@ test("account header name is server-authoritative and never restored from stale 
   assert.doesNotMatch(authNav, /\|\| session\.first_name/);
   assert.match(account, /const authoritativeFirstName = String\(body\?\.profile\?\.first_name/);
   assert.match(account, /session\.first_name = authoritativeFirstName/);
-  assert.match(account, /assets\/auth-nav\.js\?v=44/);
+  assert.match(account, /assets\/auth-nav\.js\?v=46/);
 });
