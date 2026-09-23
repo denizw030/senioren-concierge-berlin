@@ -26,6 +26,12 @@ test("all seven account tabs and functional ids remain intact",()=>{
     assert.ok(konto.includes('id="'+id+'"'),id);
 });
 
+test("account tab icons stay tightly aligned and concierge uses the original Goldmann logo",()=>{
+  assert.match(theme,/account-tabs\.account-tabs-modern \.account-tab\{[\s\S]*gap:4px!important/);
+  assert.match(theme,/NAHWERK-Goldmann-Logo\.svg\?v=1/);
+  assert.match(theme,/#accountTabConcierge \.account-tab-concierge-logo\{[\s\S]*filter:none!important/);
+});
+
 test("context bar and access hierarchy use compact premium copy",()=>{
   assert.match(konto,/account-setup-context-label">Verwaltetes Profil</);
   assert.match(konto,/>Zugänge<\/div>/);
