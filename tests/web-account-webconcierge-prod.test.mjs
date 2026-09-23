@@ -79,6 +79,14 @@ test("webchat safely turns HTTPS URLs into clickable links", () => {
   assert.match(css, /\.web-concierge-message-link\{/);
 });
 
+test("desktop Web Concierge stays inside the visible viewport with only message history scrolling", () => {
+  assert.match(css, /DESKTOP_STATIC_VIEWPORT_CHAT_V1_20260924/);
+  assert.match(css, /body\.web-concierge-page\{[\s\S]*display:flex!important;[\s\S]*flex-direction:column!important/);
+  assert.match(css, /\.web-concierge-shell\{[\s\S]*grid-template-rows:auto minmax\(0,1fr\)!important/);
+  assert.match(css, /\.web-concierge-workspace\{[\s\S]*height:auto!important;[\s\S]*min-height:0!important/);
+  assert.match(css, /\.web-concierge-log\{[\s\S]*overflow-y:auto!important/);
+});
+
 test("initial webchat hydration does not wait for readiness or optional channel summaries", () => {
   assert.match(client, /const initialHistoryPromise=\(async\(\)=>\{/);
   assert.match(client, /Promise\.allSettled\(\[/);
