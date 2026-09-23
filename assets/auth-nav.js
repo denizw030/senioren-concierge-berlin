@@ -9,6 +9,15 @@
   const LOGOUT_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-session-secure";
   const PROTECTED = new Set(["konto.html", "concierge-anpassen.html"]);
   const CONTEXT_PAGES = new Set(["pakete.html", "registrieren.html", "anmelden.html", "konto.html", "concierge-anpassen.html"]);
+  // A remembered session is durable in localStorage, but legacy account modules still
+  // consume the active-tab copy from sessionStorage. Restore that copy synchronously
+  // before any account-page scripts execute.
+  try {
+    const remembered = JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
+    if (remembered?.session_token && remembered?.remember_me === true) {
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(remembered));
+    }
+  } catch (_) {}
   const NAV = [["/de/", "Übersicht"], ["/prime-concierge", "Persönlicher Concierge"], ["/concierges", "NAHWERK weltweit"], ["/senioren-concierge", "Senioren Concierge"], ["/senioren-concierge#angehoerige", "Für Angehörige"], ["/leistungen", "Leistungen"], ["/kontakt", "Kontakt"]];
   let sessionValidated = false;
   let validatedSession = null;
