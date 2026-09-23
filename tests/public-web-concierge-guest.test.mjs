@@ -64,7 +64,7 @@ test("guest chat offers account actions but keeps authenticated tools out of gue
 
 test("web concierge clean route stays mirrored and loads refreshed guest assets", () => {
   assert.match(chatPage, /assets\/web-customer-concierge\.css\?v=28/);
-  assert.match(chatPage, /assets\/web-customer-concierge\.js\?v=48/);
+  assert.match(chatPage, /assets\/web-customer-concierge\.js\?v=50/);
   assert.equal(chatPage, chatClean.replace("<head><base href=\"/\">","<head>"));
 });
 
