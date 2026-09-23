@@ -296,8 +296,8 @@
     if(listNode) listNode.scrollTop=mailboxListScrollTop;
     const sidebarNav=root?.querySelector?.(".ecp-tb-nav");
     if(sidebarNav){
+      sidebarNav.scrollTop=mailboxSidebarScrollTop;sidebarNav.scrollLeft=mailboxSidebarScrollLeft;
       const top=mailboxSidebarScrollTop,left=mailboxSidebarScrollLeft;
-      sidebarNav.scrollTop=top;sidebarNav.scrollLeft=left;
       requestAnimationFrame(()=>{if(sidebarNav.isConnected){sidebarNav.scrollTop=top;sidebarNav.scrollLeft=left;}});
     }
     const reader=root?.querySelector?.(".ecp-tb-reader");
