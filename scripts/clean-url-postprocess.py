@@ -6,9 +6,9 @@ import re
 ROOT = Path(__file__).resolve().parents[1]
 DOMAIN = "https://nahwerkconcierge.com"
 EXCLUDED_TOP = {".git", ".github", "android-app", "api", "docs", "tests"}
-SCRIPT_TAG = '<script src="/assets/clean-url.js?v=1"></script>'
+SCRIPT_TAG = '<script src="/assets/clean-url.js?v=2"></script>'
 CLEAN_SCRIPT_RE = re.compile(
-    r'''\s*<script\s+src=["']/assets/clean-url\.js\?v=1["'][^>]*></script>\s*''',
+    r'''\s*<script\s+src=["']/assets/clean-url\.js\?v=2["'][^>]*></script>\s*''',
     re.I,
 )
 LOCALE_RUNTIME_RE = re.compile(

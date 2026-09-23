@@ -965,9 +965,15 @@
 
 // Public homepage structured data. Isolated from customer/product runtime.
 (() => {
-  const path = location.pathname.replace(/\/+$/, '') || '/';
-  if (path !== '/' && !/\/index\.html$/.test(path)) return;
-  if (document.querySelector('script[data-nw-structured-data="v1"]')) return;
+  const normalizedPath = (location.pathname.replace(/\/+$/, '') || '/').toLowerCase();
+  const localeByPath = {
+    '/de': { language: 'de-DE', serviceUrl: 'https://nahwerkconcierge.com/prime-concierge', serviceName: 'Persönlicher NAHWERK Concierge' },
+    '/en': { language: 'en-GB', serviceUrl: 'https://nahwerkconcierge.com/en/prime-concierge', serviceName: 'NAHWERK Personal Concierge' },
+    '/tr': { language: 'tr-TR', serviceUrl: 'https://nahwerkconcierge.com/tr/prime-concierge', serviceName: 'NAHWERK Kişisel Concierge' }
+  };
+  const locale = localeByPath[normalizedPath];
+  if (!locale) return;
+  if (document.querySelector('script[data-nw-structured-data]')) return;
 
   const schema = {
     '@context': 'https://schema.org',
@@ -987,15 +993,25 @@
         '@id': 'https://nahwerkconcierge.com/#website',
         url: 'https://nahwerkconcierge.com/',
         name: 'NAHWERK Concierge',
-        inLanguage: 'de-DE',
+        inLanguage: locale.language,
         publisher: { '@id': 'https://nahwerkconcierge.com/#organization' }
       },
       {
         '@type': 'Service',
         '@id': 'https://nahwerkconcierge.com/#personal-concierge',
-        name: 'Persönlicher NAHWERK Concierge',
-        serviceType: 'Persönlicher Concierge',
-        url: 'https://nahwerkconcierge.com/prime-concierge',
+        name: locale.serviceName,
+        serviceType: 'Personal Concierge',
+        url: locale.serviceUrl,
+        provider: { '@id': 'https://nahwerkconcierge.com/#organization' }
+      },
+      {
+        '@type': 'SoftwareApplication',
+        '@id': 'https://nahwerkconcierge.com/#software',
+        name: 'NAHWERK Concierge',
+        applicationCategory: 'LifestyleApplication',
+        operatingSystem: 'Web, iOS, Android',
+        url: locale.serviceUrl,
+        inLanguage: locale.language,
         provider: { '@id': 'https://nahwerkconcierge.com/#organization' }
       }
     ]
@@ -1003,7 +1019,7 @@
 
   const script = document.createElement('script');
   script.type = 'application/ld+json';
-  script.dataset.nwStructuredData = 'v1';
+  script.dataset.nwStructuredData = 'v2';
   script.textContent = JSON.stringify(schema);
   document.head.appendChild(script);
 })();
