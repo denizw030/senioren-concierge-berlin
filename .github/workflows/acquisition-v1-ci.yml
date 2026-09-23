@@ -353,7 +353,7 @@ jobs:
           tabs=src[tabs_start:tabs_end].strip()
           setup=re.search(r'<div class="account-setup-by"[\s\S]*?</div>',src,re.I).group(0)
           summaries=[]
-          for klass in ["plan-summary","status-summary","customer-number-summary","person-summary"]:
+          for klass in ["status-summary","person-summary"]:
             summaries.append(re.search(r'<article class="card summary-card [^"]*'+klass+r'"[\s\S]*?</article>',src,re.I).group(0))
           highlights=re.search(r'<div class="account-overview-highlights"[\s\S]*?</div>\s*<div class="account-panel-heading" data-account-panel="concierge"',src,re.I).group(0)
           highlights=highlights.rsplit('<div class="account-panel-heading"',1)[0]
