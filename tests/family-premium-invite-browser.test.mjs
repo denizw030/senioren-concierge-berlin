@@ -20,7 +20,7 @@ function chromeBinary(){
 function extractFixture(){
   const tab=(account.match(/<button[^>]+id="accountTabAccess"[\s\S]*?<\/button>/i)||[])[0];
   const start=account.indexOf('<div id="familyOwnerPanelSlot"');
-  const end=account.indexOf('<article class="card summary-card plan-summary"',start);
+  const end=account.indexOf('<article class="account-overview-link plan-summary"',start);
   assert.ok(tab&&start>=0&&end>start,"family fixture anchors must exist");
   return {tab,panel:account.slice(start,end)};
 }
