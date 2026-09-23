@@ -715,3 +715,73 @@ body.web-concierge-guest #webConciergeSend[hidden]{
   body.web-concierge-guest .web-concierge-sidebar{display:none!important}
   body.web-concierge-guest .web-concierge-workspace.is-mobile-sidebar-open .web-concierge-sidebar{display:none!important}
 }
+
+
+/* DESKTOP_STATIC_VIEWPORT_CHAT_V1_20260924 */
+@media(min-width:821px){
+  html,
+  body.web-concierge-page{
+    height:100dvh!important;
+    min-height:100dvh!important;
+    max-height:100dvh!important;
+    overflow:hidden!important;
+  }
+
+  body.web-concierge-page{
+    display:flex!important;
+    flex-direction:column!important;
+  }
+
+  body.web-concierge-page>.top{
+    flex:0 0 auto!important;
+  }
+
+  body.web-concierge-page .web-concierge-shell{
+    box-sizing:border-box!important;
+    width:100%!important;
+    flex:1 1 0!important;
+    min-height:0!important;
+    height:auto!important;
+    max-height:none!important;
+    overflow:hidden!important;
+    display:grid!important;
+    grid-template-rows:auto minmax(0,1fr)!important;
+  }
+
+  body.web-concierge-page .web-concierge-pagebar{
+    min-height:0!important;
+    flex:0 0 auto!important;
+  }
+
+  body.web-concierge-page .web-concierge-workspace{
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:hidden!important;
+  }
+
+  body.web-concierge-page .web-concierge-sidebar,
+  body.web-concierge-page .web-concierge-chat-panel{
+    min-height:0!important;
+    overflow:hidden!important;
+  }
+
+  body.web-concierge-page .web-concierge-threads{
+    min-height:0!important;
+    overflow-y:auto!important;
+    overscroll-behavior:contain!important;
+  }
+
+  body.web-concierge-page .web-concierge-log{
+    min-height:0!important;
+    height:auto!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    overscroll-behavior:contain!important;
+  }
+
+  body.web-concierge-page .web-concierge-form{
+    position:relative!important;
+    inset:auto!important;
+  }
+}
