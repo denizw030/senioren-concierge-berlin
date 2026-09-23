@@ -118,7 +118,7 @@ jobs:
           src=Path("konto.html").read_text(encoding="utf-8")
           tab=re.search(r'<button[^>]+id="accountTabAccess"[\s\S]*?</button>',src,re.I).group(0)
           start=src.index('<div id="familyOwnerPanelSlot"')
-          end=src.index('<article class="card summary-card plan-summary"',start)
+          end=src.index('<article class="account-overview-link plan-summary"',start)
           panel=src[start:end]
           fixture='''<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Family Pages Smoke</title></head><body>'''
           fixture+=tab+panel
