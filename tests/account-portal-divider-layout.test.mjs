@@ -30,6 +30,6 @@ test("mobile portal removes vertical separators while preserving horizontal stru
 });
 
 test("only account routes receive the new site-ui cache version",()=>{
-  assert.match(account,/assets\/site-ui\.js\?v=17/);
-  assert.match(accountClean,/assets\/site-ui\.js\?v=17/);
+  assert.match(account,/assets\/site-ui\.js\?v=23/);
+  assert.match(accountClean,/assets\/site-ui\.js\?v=23/);
 });
