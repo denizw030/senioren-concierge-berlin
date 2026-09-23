@@ -51,13 +51,9 @@
       if (session?.session_token) return session;
     } catch (_) {}
     try {
-      const legacy = JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
-      if (legacy?.session_token) {
-        sessionStorage.setItem(SESSION_KEY, JSON.stringify(legacy));
-        localStorage.removeItem(SESSION_KEY);
-        return legacy;
-      }
-      localStorage.removeItem(SESSION_KEY);
+      const persistent = JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
+      if (persistent?.session_token && persistent?.remember_me === true) return persistent;
+      if (persistent?.session_token) localStorage.removeItem(SESSION_KEY);
     } catch (_) {
       localStorage.removeItem(SESSION_KEY);
     }
@@ -295,6 +291,7 @@
         if (product_context === "senioren" || product_context === "prime") {
           sessionStorage.setItem(PRODUCT_KEY, product_context);
         }
+        const remember_me = body.remember_me === true || session.remember_me === true;
         validatedSession = {
           session_token,
           customer_account_id: body.customer_account_id,
@@ -302,11 +299,14 @@
           role: body.role,
           expires_at: body.expires_at,
           first_name,
-          product_context
+          product_context,
+          remember_me
         };
         sessionValidated = true;
         lastValidatedProfile = null;
-        sessionStorage.setItem(SESSION_KEY, JSON.stringify(validatedSession));
+        localStorage.removeItem(SESSION_KEY);
+        sessionStorage.removeItem(SESSION_KEY);
+        (remember_me ? localStorage : sessionStorage).setItem(SESSION_KEY, JSON.stringify(validatedSession));
         return true;
       }
       if (response.status === 401 || response.status === 403) {
