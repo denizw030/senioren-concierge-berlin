@@ -295,7 +295,11 @@
     const listNode=root?.querySelector?.(".ecp-tb-message-list");
     if(listNode) listNode.scrollTop=mailboxListScrollTop;
     const sidebarNav=root?.querySelector?.(".ecp-tb-nav");
-    if(sidebarNav){sidebarNav.scrollTop=mailboxSidebarScrollTop;sidebarNav.scrollLeft=mailboxSidebarScrollLeft;}
+    if(sidebarNav){
+      sidebarNav.scrollTop=mailboxSidebarScrollTop;sidebarNav.scrollLeft=mailboxSidebarScrollLeft;
+      const top=mailboxSidebarScrollTop,left=mailboxSidebarScrollLeft;
+      requestAnimationFrame(()=>{if(sidebarNav.isConnected){sidebarNav.scrollTop=top;sidebarNav.scrollLeft=left;}});
+    }
     const reader=root?.querySelector?.(".ecp-tb-reader");
     if(reader) reader.scrollTop=readerScrollTop;
     const input=root?.querySelector?.(".ecp-chat-input");
@@ -1150,6 +1154,7 @@
     mailPath.setAttribute("d","M4.5 7.25 12 13l7.5-5.75");mailSvg.append(mailRect,mailPath);mark.append(mailSvg);
     brandCopy.append(el("strong", "", "NAHWERK Mail"), el("span", "", emailConnections.length === 1 ? "1 Postfach verbunden" : `${emailConnections.length} Postfächer verbunden`)); brand.append(mark, brandCopy); side.append(brand);
     const nav = el("nav", "ecp-tb-nav"); nav.setAttribute("aria-label", "E-Mail-Bereiche");
+    nav.addEventListener("scroll",()=>{mailboxSidebarScrollTop=nav.scrollTop;mailboxSidebarScrollLeft=nav.scrollLeft;},{passive:true});
     const appendNav = (label, icon, active, count, onClick, extraClass="") => {
       const b = button("", "ecp-tb-nav-item" + (extraClass ? " " + extraClass : "") + (active ? " is-active" : ""));
       b.append(el("span","ecp-tb-nav-icon",icon),el("span","ecp-tb-nav-label",label));
@@ -1276,7 +1281,7 @@
     search.addEventListener("change",()=>{mailboxSearch=search.value;render(true);});
     search.addEventListener("keydown",(ev)=>{if(ev.key==="Enter"){ev.preventDefault();mailboxSearch=search.value;render(true);}});
     searchWrap.append(el("span","","⌕"),search);
-    const status=el("span","ecp-tb-live","Aktiv"); toolbar.append(left,searchWrap,status);workspace.append(toolbar);
+    const providerTruth=mailboxProviderTruthLabel(),status=el("span","ecp-tb-live ecp-tb-provider-truth",providerTruth);status.title=providerTruth; toolbar.append(left,searchWrap,status);workspace.append(toolbar);
     const shell=el("div","ecp-tb-shell");renderMailboxSidebar(shell);renderMailboxListPane(shell);renderMailboxReader(shell);workspace.append(shell);root.append(workspace);
     restoreTransientUiState(root,transient);
     if (Date.now() < preservePageScrollUntil) requestAnimationFrame(() => window.scrollTo({ top: preservePageScrollY, left: 0, behavior: "auto" }));

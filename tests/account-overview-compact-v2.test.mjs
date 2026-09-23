@@ -16,9 +16,13 @@ test("account hero is compact and contains only the personal-area title",()=>{
   assert.match(account,/\.account-hero h1\{[^}]*font-size:clamp\(1\.9rem,3\.1vw,2\.75rem\)!important;/s);
 });
 
-test("overview keeps four equal compact account facts and three symmetric quick links",()=>{
-  assert.equal((account.match(/class="card summary-card/g)||[]).length,4);
+test("overview keeps compact account facts, three primary quick links and canonical lower account facts",()=>{
+  assert.equal((account.match(/class="card summary-card/g)||[]).length,2);
   assert.equal((account.match(/class="account-overview-link"/g)||[]).length,3);
+  assert.match(account,/class="account-overview-link plan-summary"[^>]*data-account-panel="overview"/);
+  assert.match(account,/class="account-overview-link customer-number-summary"[^>]*data-account-panel="overview"/);
+  assert.match(account,/id="planName"/);
+  assert.match(account,/id="customerNumber"/);
   assert.match(account,/\.summary-card\{[^}]*min-height:132px!important;/s);
   assert.match(account,/\.account-overview-highlights\{[^}]*gap:12px!important;/s);
   assert.match(account,/\.account-overview-link\{[^}]*min-height:108px!important;/s);
