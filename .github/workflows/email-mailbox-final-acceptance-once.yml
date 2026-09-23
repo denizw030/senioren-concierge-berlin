@@ -1,0 +1,37 @@
+name: Email Mailbox Final Acceptance Once
+
+on:
+  push:
+    branches:
+      - fix/email-mailbox-final-20260923
+    paths:
+      - '.github/workflows/email-mailbox-final-acceptance-once.yml'
+      - 'assets/email-account-integration.js'
+      - 'assets/email-concierge-product.js'
+      - 'tests/email-*.test.mjs'
+
+permissions:
+  contents: read
+
+jobs:
+  email-mailbox-final:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: JavaScript syntax
+        run: |
+          node --check assets/email-account-integration.js
+          node --check assets/email-concierge-product.js
+      - name: E-Mail website regressions
+        run: |
+          node --test \
+            tests/email-account-integration.test.mjs \
+            tests/email-concierge-product.test.mjs \
+            tests/email-mailbox-account-switch-20260922.test.mjs \
+            tests/email-mailbox-scroll-counts-20260923.test.mjs \
+            tests/email-provider-button-freeze-contract.test.mjs \
+            tests/email-provider-completion.test.mjs
