@@ -229,7 +229,7 @@ jobs:
           style=re.search(r"<style>[\s\S]*?</style>",src,re.I).group(0)
           links="\n".join(re.findall(r'<link[^>]+rel="stylesheet"[^>]*>',src,re.I))
           start=src.index('<div id="familyOwnerPanelSlot"')
-          end=src.index('<article class="card summary-card plan-summary"',start)
+          end=src.index('<article class="account-overview-link plan-summary"',start)
           panel=src[start:end]
           panel=re.sub(r'\s+hidden(?=[^>]*>)','',panel,count=4)
           fixture=f'''<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Personen & Zugänge | NAHWERK</title>{links}{style}</head><body><main><section class="section account-section"><div class="wrap"><h1>Kundenbereich</h1><h2>Personen & Zugänge</h2><div class="dash">{panel}</div></div></section></main></body></html>'''
@@ -358,7 +358,7 @@ jobs:
           access_heading=re.search(r'<div class="account-panel-heading" data-account-panel="access"[\s\S]*?</div>\s*<article class="card wide access-panel"',src,re.I).group(0)
           access_heading=access_heading.rsplit('<article',1)[0]
           family_start=src.index('<div id="familyOwnerPanelSlot"')
-          family_end=src.index('<article class="card summary-card plan-summary"',family_start)
+          family_end=src.index('<article class="account-overview-link plan-summary"',family_start)
           family=src[family_start:family_end]
           family=re.sub(r'\s+hidden(?=[^>]*>)','',family)
           family=family.replace('Berechtigung wird serverseitig geprüft.','OWNER bestätigt · Personen und Kontingente autorisiert')
