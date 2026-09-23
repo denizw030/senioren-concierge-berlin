@@ -153,3 +153,33 @@ body.story-site .footer h3,body.story-site .footer h4{color:#fff!important}
   html{scroll-behavior:auto}
   .story-btn{transition:none}
 }
+
+/* Family story page keeps its authored dark story palette even when the shared
+   public-senior theme key is light. This prevents light-shell/dark-copy
+   contrast collisions without changing the shared theme runtime. */
+html[data-nw-portal-theme="light"] body.nw-family-page.story-site.nw-portal-light,
+html[data-nw-portal-theme="light"] body.nw-family-page.story-site.nw-portal-light>main{
+  background:var(--story-bg)!important;
+  color:var(--story-text)!important;
+  color-scheme:dark!important;
+}
+html[data-nw-portal-theme="light"] body.nw-family-page.story-site.nw-portal-light .top{
+  background:#000!important;
+  border-bottom-color:rgba(255,255,255,.08)!important;
+  color:var(--story-text)!important;
+}
+html[data-nw-portal-theme="light"] body.nw-family-page.story-site.nw-portal-light .top .links,
+html[data-nw-portal-theme="light"] body.nw-family-page.story-site.nw-portal-light .top .links a{
+  color:#f7f5f0!important;
+}
+html[data-nw-portal-theme="light"] body.nw-family-page.story-site.nw-portal-light .footer{
+  background:#030304!important;
+  border-top-color:var(--story-line)!important;
+  color:#cbc7bf!important;
+}
+html[data-nw-portal-theme="light"] body.nw-family-page.story-site.nw-portal-light .footer :is(p,a,span,.footbottom,.footbottom span){
+  color:#cbc7bf!important;
+}
+html[data-nw-portal-theme="light"] body.nw-family-page.story-site.nw-portal-light .footer :is(h3,h4){
+  color:#fff!important;
+}
