@@ -17,7 +17,9 @@ test("account hero is compact and contains only the personal-area title",()=>{
 });
 
 test("overview keeps two primary compact account facts, four lower facts and three symmetric quick links",()=>{
-  assert.equal((account.match(/class="card summary-card/g)||[]).length,2);\n  assert.match(account,/class="account-overview-highlights account-overview-lower-highlights"/);\n  assert.equal((account.match(/<article class="account-overview-link (?:plan-summary|customer-number-summary|overview-saved-info|owner-product-gap-shortcut)/g)||[]).length,4);
+  assert.equal((account.match(/class="card summary-card/g)||[]).length,2);
+  assert.match(account,/class="account-overview-highlights account-overview-lower-highlights"/);
+  assert.equal((account.match(/<article class="account-overview-link (?:plan-summary|customer-number-summary|overview-saved-info|owner-product-gap-shortcut)/g)||[]).length,4);
   assert.equal((account.match(/class="account-overview-link"/g)||[]).length,3);
   assert.match(account,/\.summary-card\{[^}]*min-height:132px!important;/s);
   assert.match(account,/\.account-overview-highlights\{[^}]*gap:12px!important;/s);
