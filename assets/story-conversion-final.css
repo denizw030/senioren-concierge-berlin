@@ -183,3 +183,11 @@ html[data-nw-portal-theme="light"] body.nw-family-page.story-site.nw-portal-ligh
 html[data-nw-portal-theme="light"] body.nw-family-page.story-site.nw-portal-light .footer :is(h3,h4){
   color:#fff!important;
 }
+
+/* CI accessibility parity: the family story remains dark even when the shared
+   portal preference is light, so these two shared-theme text hooks must keep
+   authored dark-story contrast as well. */
+html[data-nw-portal-theme="light"] body.nw-family-page.story-site.nw-portal-light .nw-language-button > span:nth-child(2),
+html[data-nw-portal-theme="light"] body.nw-family-page.story-site.nw-portal-light .story-split > div:nth-child(1) > h2{
+  color:#fff!important;
+}
