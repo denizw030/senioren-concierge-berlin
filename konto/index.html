@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="assets/email-account-integration.css?v=3" />
     <link rel="stylesheet" href="assets/email-provider-logo-connect-v3.css?v=20260922-1" />
     <link rel="stylesheet" href="assets/family-owner-sponsored-access.css?v=1" />
-    <link rel="stylesheet" href="assets/account-premium-ui.css?v=12" />
+    <link rel="stylesheet" href="assets/account-premium-ui.css?v=13" />
     <link rel="stylesheet" href="assets/account-email-light-parity.css?v=1" />
     <link rel="stylesheet" href="assets/account-response-channel.css?v=6" />
     <link rel="stylesheet" href="assets/account-header-concierge.css?v=4" />
@@ -2195,6 +2195,70 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
   </style>
 
     <link rel="stylesheet" href="assets/account-portal-text-nav-v1.css?v=15" />
+
+  <style id="konto-overview-ambient-final-v1">
+    /* Overview only — ambient NAHWERK palette. Keep layout and all other tabs untouched. */
+    @supports selector(body:has(*)){
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) main,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) main{
+        background:
+          radial-gradient(980px 640px at -6% 28%,rgba(122,112,63,.18),transparent 66%),
+          radial-gradient(920px 620px at 48% 10%,rgba(91,39,72,.16),transparent 69%),
+          radial-gradient(980px 700px at 102% 55%,rgba(49,43,105,.18),transparent 70%),
+          radial-gradient(760px 520px at 28% 96%,rgba(36,66,66,.09),transparent 72%),
+          linear-gradient(145deg,#050607 0%,#09080d 48%,#050508 100%)!important;
+        background-attachment:fixed!important;
+      }
+
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) .account-hero,
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) main>.section,
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) .account-section,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) .account-hero,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) main>.section,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) .account-section{
+        background:transparent!important;
+      }
+
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) .dash>.card[data-account-panel="overview"],
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) .dash>.card[data-account-panel="overview"]{
+        background:rgba(5,7,10,.32)!important;
+        border-color:rgba(174,181,192,.18)!important;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.018)!important;
+        -webkit-backdrop-filter:blur(8px)!important;
+        backdrop-filter:blur(8px)!important;
+      }
+
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) .account-overview-link,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) .account-overview-link{
+        background:rgba(5,7,10,.22)!important;
+        border-color:rgba(174,181,192,.16)!important;
+        box-shadow:none!important;
+        -webkit-backdrop-filter:blur(7px)!important;
+        backdrop-filter:blur(7px)!important;
+      }
+
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) .dash>.card[data-account-panel="overview"]:hover,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) .dash>.card[data-account-panel="overview"]:hover,
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) .account-overview-link:hover,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) .account-overview-link:hover{
+        background:rgba(7,9,12,.38)!important;
+        border-color:rgba(201,174,111,.25)!important;
+        box-shadow:none!important;
+      }
+
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) .overview-saved-info .empty,
+      html[data-nw-portal-theme="dark"] body.account-premium-ui:has(#accountTabOverview[aria-selected="true"]) .overview-open-issues .empty,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) .overview-saved-info .empty,
+      body.account-premium-ui.nw-portal-dark:has(#accountTabOverview[aria-selected="true"]) .overview-open-issues .empty{
+        background:transparent!important;
+        border-color:transparent!important;
+      }
+    }
+  </style>
+
+
+  
+
 </head>
   <body class="account-premium-ui">
     <script>
@@ -2386,12 +2450,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
               </article>
             </div>
 
-            <article class="card summary-card plan-summary" data-account-panel="overview">
-              <div class="eyebrow">Paket</div>
-              <div class="value" id="planName">Tarif wird geladen …</div>
-              <p class="muted" id="planMeta">Tarifdaten werden sicher geladen …</p>
-            </article>
-            <article class="card summary-card status-summary" data-account-panel="overview">
+                        <article class="card summary-card status-summary" data-account-panel="overview">
               <div class="eyebrow">Status</div>
               <div class="value">
                 <span class="statusdot"></span
@@ -2399,12 +2458,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
               </div>
               <p class="muted" id="planStatusMeta">Tarifstatus wird geladen …</p>
             </article>
-            <article class="card summary-card customer-number-summary" data-account-panel="overview">
-              <div class="eyebrow">Kundennummer</div>
-              <div class="value" id="customerNumber">Wird geladen …</div>
-              <p class="muted">Diese Nummer kannst du zur sicheren Verknüpfung deines Telefonzugangs verwenden.</p>
-            </article>
-            <article class="card summary-card person-summary" data-account-panel="overview">
+                        <article class="card summary-card person-summary" data-account-panel="overview">
               <div class="eyebrow">Unterstützte Person</div>
               <div class="value" id="recipientName">Noch nicht angelegt</div>
               <p class="muted" id="recipientMeta">–</p>
@@ -2425,6 +2479,37 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
                 <strong id="overviewUsage">Keine Live-Daten</strong>
                 <span>Monatliche Nutzung und verfügbare Kontingente anzeigen.</span>
               </button>
+            </div>
+            <div class="account-overview-highlights account-overview-lower-highlights" data-account-panel="overview">
+              <article class="account-overview-link plan-summary" data-account-panel="overview">
+                            <div class="eyebrow">Paket</div>
+                            <div class="value" id="planName">Tarif wird geladen …</div>
+                            <p class="muted" id="planMeta">Tarifdaten werden sicher geladen …</p>
+                          </article>
+              <article class="account-overview-link customer-number-summary" data-account-panel="overview">
+                            <div class="eyebrow">Kundennummer</div>
+                            <div class="value" id="customerNumber">Wird geladen …</div>
+                            <p class="muted">Diese Nummer kannst du zur sicheren Verknüpfung deines Telefonzugangs verwenden.</p>
+                          </article>
+              <article class="account-overview-link overview-saved-info" data-account-panel="overview">
+                            <h3>Gespeicherte Informationen</h3>
+                            <div class="empty" id="profileInfo">
+                              Noch keine Geräte oder weiteren Informationen hinterlegt.
+                            </div>
+                          </article>
+              <article class="account-overview-link owner-product-gap-shortcut" data-account-panel="overview" data-owner-product-gap>
+                            <div class="owner-product-gap-shortcut-head">
+                              <div>
+                                <div class="eyebrow">Produktentwicklung</div>
+                                <h3>Kundenwünsche & Produktlücken</h3>
+                              </div>
+                              <span class="owner-product-gap-badge" id="ownerProductGapBadge">0 neu</span>
+                            </div>
+                            <p class="muted" id="ownerProductGapSummary">Noch keine neuen Produktlücken erfasst.</p>
+                            <div class="actions owner-product-gap-shortcut-actions">
+                              <a class="btn light" href="/produktluecken">Produktlücken öffnen</a>
+                            </div>
+                          </article>
             </div>
             <div class="account-panel-heading" data-account-panel="concierge" hidden>
               <div class="eyebrow">Concierge</div>
@@ -3096,26 +3181,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
                 <div class="safety-save-status" id="safetySaveStatus" aria-live="polite"></div>
               </form>
             </article>
-            <article class="card wide info-panel overview-saved-info" data-account-panel="overview">
-              <h3>Gespeicherte Informationen</h3>
-              <div class="empty" id="profileInfo">
-                Noch keine Geräte oder weiteren Informationen hinterlegt.
-              </div>
-            </article>
-            <article class="card wide info-panel owner-product-gap-shortcut" data-account-panel="overview" data-owner-product-gap>
-              <div class="owner-product-gap-shortcut-head">
-                <div>
-                  <div class="eyebrow">Produktentwicklung</div>
-                  <h3>Kundenwünsche & Produktlücken</h3>
-                </div>
-                <span class="owner-product-gap-badge" id="ownerProductGapBadge">0 neu</span>
-              </div>
-              <p class="muted" id="ownerProductGapSummary">Noch keine neuen Produktlücken erfasst.</p>
-              <div class="actions owner-product-gap-shortcut-actions">
-                <a class="btn light" href="/produktluecken">Produktlücken öffnen</a>
-              </div>
-            </article>
-            <article class="card wide info-panel overview-open-issues" data-account-panel="overview">
+                                    <article class="card wide info-panel overview-open-issues" data-account-panel="overview">
               <h3>Offene Anliegen</h3>
               <div class="empty">Aktuell keine offenen Anliegen.</div>
             </article>
@@ -5888,7 +5954,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
   <script src="assets/email-provider-logo-connect-v3.js?v=20260922-6"></script>
   <script src="assets/web-core-shadow.js?v=1"></script>
   <script src="assets/web-concierge-chat.js?v=3"></script>
-  <script src="assets/account-header-concierge.js?v=3"></script>
+  <script src="assets/account-header-concierge.js?v=4"></script>
     <script src="assets/account-address-editor.js?v=1"></script>
   <script src="assets/account-response-channel.js?v=6"></script>
   <script src="assets/site-ui.js?v=23"></script></body>
