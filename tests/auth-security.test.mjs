@@ -21,10 +21,12 @@ test("website login uses the secure Supabase login and recovery endpoints", () =
   assert.match(onboarding, /functions\/v1\/web-login-secure/);
 });
 
-test("login only creates a session-scoped session after a successful backend login", () => {
+test("login persists a session only when the backend confirms remember-me", () => {
   assert.match(login, /body\.status!=='logged_in'\|\|!body\.session_token/);
-  assert.match(login, /sessionStorage\.setItem\(SESSION_KEY,JSON\.stringify/);
-  assert.equal(/localStorage\.setItem\(SESSION_KEY/.test(login), false);
+  assert.match(login, /id="rememberMe" type="checkbox"/);
+  assert.match(login, /remember_me:rememberInput\.checked===true/);
+  assert.match(login, /const rememberMe=body\.remember_me===true/);
+  assert.match(login, /\(rememberMe\?localStorage:sessionStorage\)\.setItem/);
   assert.match(login, /body\.status==='invalid_credentials'/);
   assert.match(login, /res\.status===429/);
 });
@@ -66,12 +68,13 @@ test("registration keeps the hardened passphrase policy and never persists the p
   assert.match(registration, /assets\/onboarding\.js\?v=25/);
 });
 
-test("raw web session tokens are not persisted in localStorage", () => {
-  assert.equal(/localStorage\.setItem\(SESSION_KEY/.test(login), false);
+test("persistent web sessions require explicit remember-me and remain revocable", () => {
   assert.equal(/localStorage\.setItem\(SESSION_KEY/.test(onboarding), false);
   assert.equal(/localStorage\.(getItem|setItem)\("scb_web_session"/.test(account), false);
   assert.match(authNav, /sessionStorage\.getItem\(SESSION_KEY/);
-  assert.match(authNav, /sessionStorage\.setItem\(SESSION_KEY/);
+  assert.match(authNav, /localStorage\.getItem\(SESSION_KEY/);
+  assert.match(authNav, /persistent\?\.remember_me === true/);
+  assert.match(authNav, /remember_me \? localStorage : sessionStorage/);
   assert.match(authNav, /localStorage\.removeItem\(SESSION_KEY/);
   assert.match(authNav, /JSON\.stringify\(\{ action: "logout" \}\)/);
 });
