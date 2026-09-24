@@ -10,6 +10,11 @@
     />
     <meta name="theme-color" content="#070706" />
     <meta name="color-scheme" content="dark light" />
+    <style id="registration-required-markers">
+      .required-mark{color:#c7a24d;font-weight:800;margin-left:2px}
+      .required-fields-hint{margin:-8px 0 16px;color:#aaa69d;font-size:12px;line-height:1.4}
+      .required-fields-hint .required-mark{margin-left:0;margin-right:3px}
+    </style>
     <style id="registration-first-paint">html,body{margin:0;background:#070706;color-scheme:dark}.family-message-field textarea{min-height:112px;resize:vertical}.family-message-field .tiny{display:block;margin-top:7px}</style>
     <link rel="stylesheet" href="assets/site.css?v=24" />
     <style>
@@ -769,6 +774,7 @@
               </div>
             </div>
             <h2 style="font-size: 25px">Deine Angaben</h2>
+            <p class="required-fields-hint"><span class="required-mark" aria-hidden="true">*</span> Pflichtfeld</p>
             <div class="row name">
               <div class="field">
                 <label for="ownerSalutation">Anrede</label
@@ -779,7 +785,7 @@
                 </select>
               </div>
               <div class="field">
-                <label for="ownerFirstName">Vorname</label
+                <label for="ownerFirstName">Vorname <span class="required-mark" aria-hidden="true">*</span></label
                 ><input
                   id="ownerFirstName"
                   autocomplete="given-name"
@@ -787,7 +793,7 @@
                 />
               </div>
               <div class="field">
-                <label for="ownerLastName">Nachname</label
+                <label for="ownerLastName">Nachname <span class="required-mark" aria-hidden="true">*</span></label
                 ><input
                   id="ownerLastName"
                   autocomplete="family-name"
@@ -796,7 +802,7 @@
               </div>
             </div>
             <div class="field">
-              <label for="ownerEmail">E-Mail-Adresse für deinen Web-Zugang</label
+              <label for="ownerEmail">E-Mail-Adresse für deinen Web-Zugang <span class="required-mark" aria-hidden="true">*</span></label
               ><input
                 id="ownerEmail"
                 type="email"
@@ -806,7 +812,7 @@
             </div>
             <div class="row password-single-row">
               <div class="field">
-                <label for="webPassword">Passwort</label>
+                <label for="webPassword">Passwort <span class="required-mark" aria-hidden="true">*</span></label>
                 <div class="password-wrap">
                   <input
                     id="webPassword"
@@ -914,11 +920,11 @@
                   </select>
                 </div>
                 <div class="field">
-                  <label for="recipientFirstName">Vorname</label
+                  <label for="recipientFirstName">Vorname <span class="required-mark" aria-hidden="true">*</span></label
                   ><input id="recipientFirstName" autocomplete="given-name" />
                 </div>
                 <div class="field">
-                  <label for="recipientLastName">Nachname</label
+                  <label for="recipientLastName">Nachname <span class="required-mark" aria-hidden="true">*</span></label
                   ><input id="recipientLastName" autocomplete="family-name" />
                 </div>
               </div>
@@ -988,7 +994,7 @@
             <div class="progressive-panel" id="safetyFields" hidden>
               <div class="row">
                 <div class="field">
-                  <label for="checkinTimes">Gewünschte Check-in-Zeit(en)</label
+                  <label for="checkinTimes">Gewünschte Check-in-Zeit(en) <span class="required-mark" aria-hidden="true">*</span></label
                   ><input
                     id="checkinTimes"
                     placeholder="z. B. täglich um 9:00 Uhr"
@@ -996,7 +1002,7 @@
                 </div>
                 <div class="field">
                   <label for="trustedContactPhone"
-                    >Telefonnummer der Vertrauensperson</label
+                    >Telefonnummer der Vertrauensperson <span class="required-mark" aria-hidden="true">*</span></label
                   ><input
                     id="trustedContactPhone"
                     type="tel"
@@ -1023,7 +1029,7 @@
               ><input type="checkbox" id="consent" /><span
                 >Der unterstützte Klient ist mit der Kontaktaufnahme über
                 WhatsApp einverstanden und weiß, dass ich den Zugang für den Kliente
-                einrichte.</span
+                einrichte. <span class="required-mark" aria-hidden="true">*</span></span
               ></label
             ><label class="check"
               ><input type="checkbox" id="privacy" required /><span
@@ -1033,7 +1039,7 @@
                   style="color: var(--gold); text-decoration: underline"
                   >Datenschutzerklärung</a
                 >
-                zur Kenntnis genommen.</span
+                zur Kenntnis genommen. <span class="required-mark" aria-hidden="true">*</span></span
               ></label
             ><label class="check"
               ><input type="checkbox" id="terms" required /><span
@@ -1049,7 +1055,7 @@
                   style="color: var(--gold); text-decoration: underline"
                   >KI-Transparenz</a
                 >
-                zur Kenntnis genommen.</span
+                zur Kenntnis genommen. <span class="required-mark" aria-hidden="true">*</span></span
               ></label
             ><button class="btn red" type="submit" id="registrationSubmit">
               Kostenlosen Zugang registrieren
