@@ -155,12 +155,26 @@
   let selectedMessageConnectionId = "";
   let selectedMessageDetail = null;
   let selectedMessageLoading = false;
+  let composeState = null;
+  let composeSaving = false;
 
   function ensureClassificationStyles() {
     if (document.getElementById("nahwerkEmailClassificationStyles")) return;
     const style = document.createElement("style"); style.id = "nahwerkEmailClassificationStyles";
     style.textContent = `
       .ecp-summary{grid-template-columns:repeat(6,minmax(0,1fr))!important}
+      .ecp-tb-compose-button{width:calc(100% - 24px);margin:0 12px 10px;min-height:42px;border:1px solid rgba(212,175,55,.34);border-radius:12px;background:rgba(212,175,55,.10);color:inherit;font:inherit;font-weight:750;cursor:pointer}
+      .ecp-tb-compose-button:hover{background:rgba(212,175,55,.16)}
+      .ecp-compose{display:grid;gap:14px;padding:18px 20px 24px}
+      .ecp-compose-field{display:grid;gap:6px}
+      .ecp-compose-field>span{font-size:.69rem;font-weight:750;opacity:.58}
+      .ecp-compose input,.ecp-compose select,.ecp-compose textarea{width:100%;border:1px solid rgba(127,127,127,.22);border-radius:10px;background:rgba(127,127,127,.025);color:inherit;font:inherit;padding:11px 12px}
+      .ecp-compose textarea{min-height:260px;resize:vertical;line-height:1.55}
+      .ecp-compose-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;padding-top:4px}
+      .ecp-compose-status{font-size:.75rem;line-height:1.4;opacity:.68}
+      .ecp-compose-note{font-size:.72rem;line-height:1.45;opacity:.58}
+      .ecp-tb-reader-toolbar{flex-wrap:wrap}
+      @media(max-width:640px){.ecp-compose{padding:14px}.ecp-compose-actions>*{flex:1 1 auto}}
       .ecp-stat-button{appearance:none;color:inherit;font:inherit;text-align:left;cursor:pointer;width:100%;transition:transform .16s ease,background .16s ease,border-color .16s ease}
       .ecp-stat-button:hover{background:rgba(127,127,127,.09);border-color:rgba(127,127,127,.34)}
       .ecp-stat-button:active{transform:scale(.985)}
@@ -1111,6 +1125,116 @@
     if (classification.complete) return `${classification.total} E-Mails insgesamt im Posteingang. NAHWERK hat sie in dieser Übersicht in ${c.IMPORTANT} wichtig, ${c.UNIMPORTANT} unwichtig und ${c.MARKETING} Werbung / Spam eingeordnet. ${s.unread} sind ungelesen, ${s.today} heute eingegangen.`;
     return `${classification.total} E-Mails insgesamt im Posteingang. Von den ${classification.sorted_count} neuesten hat NAHWERK ${c.IMPORTANT} als wichtig, ${c.UNIMPORTANT} als unwichtig und ${c.MARKETING} als Werbung / Spam eingeordnet. ${s.unread} sind ungelesen, ${s.today} heute eingegangen.`;
   }
+  function composeAddresses(value) {
+    return [...new Set((String(value || "").match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi) || []).map((v)=>v.toLowerCase()))];
+  }
+  function composeSubject(prefix, subject) {
+    const raw=text(subject,500)||"(kein Betreff)";
+    if(prefix==="RE") return /^re:/i.test(raw)?raw:`Re: ${raw}`;
+    if(prefix==="FWD") return /^(?:fwd?|wg):/i.test(raw)?raw:`Fwd: ${raw}`;
+    return raw;
+  }
+  function replyAllRecipients(detail) {
+    const own=composeAddresses(connectionEmail(String(detail?._connection_id||activeConnectionId||"")));
+    const all=[...composeAddresses(detail?.from),...composeAddresses(detail?.to)];
+    return [...new Set(all.filter((address)=>!own.includes(address)))].join(", ");
+  }
+  function startComposer(mode="NEW", detail=null) {
+    const normalized=String(mode||"NEW").toUpperCase();
+    const connectionId=String(detail?._connection_id||activeConnectionId||emailConnections[0]?.connection_id||"");
+    if(!connectionId){showError("EMAIL_CONNECTION_NOT_CONNECTED");return}
+    activeConnectionId=connectionId;
+    const reply=normalized==="REPLY"||normalized==="REPLY_ALL";
+    const forward=normalized==="FORWARD";
+    composeState={
+      mode:normalized,
+      connection_id:connectionId,
+      from:connectionEmail(connectionId),
+      source_message_id:reply?String(detail?.id||""):"",
+      thread_id:reply?String(detail?.thread_id||""):"",
+      to:normalized==="REPLY"?composeAddresses(detail?.from).join(", "):normalized==="REPLY_ALL"?replyAllRecipients(detail):"",
+      subject:reply?composeSubject("RE",detail?.subject):forward?composeSubject("FWD",detail?.subject):"",
+      body_text:forward?`\n\n---------- Weitergeleitete Nachricht ----------\nVon: ${text(detail?.from,300)}\nDatum: ${fmtDate(detail?.date)}\nBetreff: ${text(detail?.subject,500)}\nAn: ${text(detail?.to,300)}\n\n${text(detail?.body_text,12000)}`:"",
+      savedDraft:null,dirty:true,status:""
+    };
+    readerMode="COMPOSE";render(true);
+  }
+  async function saveComposerDraft() {
+    if(!composeState||composeSaving)return null;
+    const state=composeState,to=String(state.to||"").trim(),subject=String(state.subject||"").trim(),bodyText=String(state.body_text||"");
+    if(!to.includes("@")){state.status="Bitte einen gültigen Empfänger eintragen.";render(true);return null}
+    if(!bodyText.trim()){state.status="Bitte Nachrichtentext eingeben.";render(true);return null}
+    if(state.savedDraft && !state.dirty){state.status="Im echten Entwürfe-Ordner gespeichert.";return state.savedDraft}
+    composeSaving=true;state.status="Entwurf wird gespeichert …";render(true);
+    try{
+      let data;
+      if(state.savedDraft){
+        data=await request("/email/concierge/drafts/edit",{method:"POST",body:{
+          email_send_action_id:state.savedDraft.email_send_action_id,
+          approval_id:state.savedDraft.approval_id||null,
+          send_action_id:state.savedDraft.send_action_id||null,
+          to,subject,body_text:bodyText
+        },connectionId:state.connection_id});
+      }else{
+        data=await request("/email/concierge/drafts/create",{method:"POST",body:{
+          compose_mode:state.mode,to,subject,body_text:bodyText,
+          source_message_id:state.source_message_id||null,
+          thread_id:state.thread_id||null
+        },connectionId:state.connection_id});
+      }
+      state.savedDraft=data?.draft||state.savedDraft;
+      state.dirty=false;state.status="Im echten Entwürfe-Ordner gespeichert.";
+      remoteFolderCache.clear();
+      return state.savedDraft;
+    }catch(error){state.status=ERROR_COPY[error instanceof Error?error.message:""]||"Entwurf konnte gerade nicht gespeichert werden.";return null}
+    finally{composeSaving=false;render(true)}
+  }
+  async function sendComposer() {
+    if(!composeState||composeSaving)return;
+    const draft=await saveComposerDraft();if(!draft)return;
+    if(!confirm(`Diese E-Mail jetzt wirklich senden?\n\nAn: ${composeState.to}\nBetreff: ${composeState.subject||"(kein Betreff)"}`))return;
+    composeSaving=true;composeState.status="E-Mail wird nach deiner Freigabe gesendet …";render(true);
+    try{
+      await request("/email/concierge/drafts/approve-send",{method:"POST",body:{
+        email_send_action_id:draft.email_send_action_id,
+        approval_id:draft.approval_id,
+        send_action_id:draft.send_action_id
+      },connectionId:composeState.connection_id});
+      const connectionId=composeState.connection_id;
+      composeState=null;activeConnectionId=connectionId;mailboxScope="ACCOUNT";mailboxFolder="SENT";readerMode="MESSAGE";
+      selectedMessageId="";selectedMessageConnectionId="";selectedMessageDetail=null;mailboxFolderRows=[];remoteFolderCache.clear();
+      render(true);void loadMailboxFolder(true);
+    }catch(error){composeState.status=ERROR_COPY[error instanceof Error?error.message:""]||"Die E-Mail konnte gerade nicht gesendet werden."}
+    finally{composeSaving=false;render(true)}
+  }
+  function renderComposer(pane) {
+    const state=composeState;if(!state){startComposer("NEW");return}
+    const head=el("div","ecp-tb-reader-head");
+    const title=state.mode==="REPLY"?"Antworten":state.mode==="REPLY_ALL"?"Allen antworten":state.mode==="FORWARD"?"Weiterleiten":"Neue Nachricht";
+    head.append(el("strong","",title),el("span","ecp-tb-reader-kicker",state.savedDraft?"Entwurf gespeichert":"Noch nicht gesendet"));pane.append(head);
+    const form=el("div","ecp-compose");
+    const fromField=el("label","ecp-compose-field"),fromSelect=el("select");
+    fromField.append(el("span","","Von"));
+    for(const row of emailConnections){const option=el("option");option.value=String(row.connection_id||"");option.textContent=text(row.account_email||row.account_display_hint||row.provider_label,320);option.selected=option.value===state.connection_id;fromSelect.append(option)}
+    fromSelect.disabled=state.mode==="REPLY"||state.mode==="REPLY_ALL"||Boolean(state.savedDraft);
+    fromSelect.addEventListener("change",()=>{state.connection_id=fromSelect.value;state.from=connectionEmail(fromSelect.value);state.dirty=true});
+    fromField.append(fromSelect);
+    const field=(label,value,kind="input")=>{const wrap=el("label","ecp-compose-field"),control=kind==="textarea"?el("textarea"):el("input");wrap.append(el("span","",label));control.value=value||"";return {wrap,control}};
+    const toField=field("An",state.to),subjectField=field("Betreff",state.subject),bodyField=field("Nachricht",state.body_text,"textarea");
+    toField.control.addEventListener("input",()=>{state.to=toField.control.value;state.dirty=true;state.status=""});
+    subjectField.control.addEventListener("input",()=>{state.subject=subjectField.control.value;state.dirty=true;state.status=""});
+    bodyField.control.addEventListener("input",()=>{state.body_text=bodyField.control.value;state.dirty=true;state.status=""});
+    form.append(fromField,toField.wrap,subjectField.wrap,bodyField.wrap);
+    form.append(el("div","ecp-compose-note","Speichern legt einen echten Provider-Entwurf an. Gesendet wird erst nach deiner ausdrücklichen Freigabe."));
+    if(state.status)form.append(el("div","ecp-compose-status",state.status));
+    const actions=el("div","ecp-compose-actions"),cancel=button("Abbrechen","ecp-tb-toolbar-button"),save=button("Als Entwurf speichern","ecp-tb-toolbar-button"),send=button("Senden","ecp-primary");
+    cancel.disabled=composeSaving;save.disabled=composeSaving;send.disabled=composeSaving;
+    cancel.addEventListener("click",()=>{composeState=null;readerMode="MESSAGE";render(true)});
+    save.addEventListener("click",()=>void saveComposerDraft());
+    send.addEventListener("click",()=>void sendComposer());
+    actions.append(cancel,save,send);form.append(actions);pane.append(form);
+  }
+
   function renderMailboxSidebar(shell) {
     const side = el("aside", "ecp-tb-sidebar");
     const brand = el("div", "ecp-tb-brand"), mark = el("span", "ecp-tb-brandmark"), brandCopy = el("div");
@@ -1120,6 +1244,7 @@
     mailRect.setAttribute("x","3.25");mailRect.setAttribute("y","5.25");mailRect.setAttribute("width","17.5");mailRect.setAttribute("height","13.5");mailRect.setAttribute("rx","2.25");
     mailPath.setAttribute("d","M4.5 7.25 12 13l7.5-5.75");mailSvg.append(mailRect,mailPath);mark.append(mailSvg);
     brandCopy.append(el("strong", "", "NAHWERK Mail"), el("span", "", emailConnections.length === 1 ? "1 Postfach verbunden" : `${emailConnections.length} Postfächer verbunden`)); brand.append(mark, brandCopy); side.append(brand);
+    const composeButton=button("＋ Neue Nachricht","ecp-tb-compose-button");composeButton.addEventListener("click",()=>startComposer("NEW"));side.append(composeButton);
     const nav = el("nav", "ecp-tb-nav"); nav.setAttribute("aria-label", "E-Mail-Bereiche");
     nav.addEventListener("scroll",()=>{mailboxSidebarScrollTop=nav.scrollTop;mailboxSidebarScrollLeft=nav.scrollLeft;},{passive:true});
     const appendNav = (label, icon, active, count, onClick, extraClass="") => {
@@ -1190,6 +1315,7 @@
   }
   function renderMailboxReader(shell) {
     const pane = el("section","ecp-tb-reader");
+    if (readerMode === "COMPOSE") { renderComposer(pane); shell.append(pane); return; }
     if (readerMode === "CONCIERGE") {
       const head=el("div","ecp-tb-reader-head");head.append(el("strong","","E-Mail-Concierge"),el("span","ecp-tb-reader-kicker","Befehle & Antworten"));pane.append(head);
       const card=el("section","ecp-card ecp-tb-embedded-card");renderChat(card);pane.append(card);shell.append(pane);return;
@@ -1216,7 +1342,12 @@
       const placeholder=el("div","ecp-tb-reader-empty");placeholder.append(el("strong","","E-Mail auswählen"),el("span","","Wähle eine Nachricht aus. Wichtig / Unwichtig bleibt eine interne Concierge-Einschätzung und erzeugt keine Ordner."));pane.append(placeholder);shell.append(pane);return;
     }
     const toolbar=el("div","ecp-tb-reader-toolbar");
-    const concierge=button("Mit Concierge bearbeiten","ecp-tb-toolbar-button");concierge.addEventListener("click",()=>{readerMode="CONCIERGE";render();});toolbar.append(concierge);pane.append(toolbar);
+    const reply=button("Antworten","ecp-tb-toolbar-button"),replyAll=button("Allen antworten","ecp-tb-toolbar-button"),forward=button("Weiterleiten","ecp-tb-toolbar-button"),concierge=button("Mit Concierge bearbeiten","ecp-tb-toolbar-button");
+    reply.addEventListener("click",()=>startComposer("REPLY",detail));
+    replyAll.addEventListener("click",()=>startComposer("REPLY_ALL",detail));
+    forward.addEventListener("click",()=>startComposer("FORWARD",detail));
+    concierge.addEventListener("click",()=>{readerMode="CONCIERGE";render();});
+    toolbar.append(reply,replyAll,forward,concierge);pane.append(toolbar);
     const header=el("div","ecp-tb-reader-message-head");
     header.append(el("h3","",text(detail.subject,500)||"(kein Betreff)"),el("div","ecp-tb-reader-from",text(detail.from,300)||"Unbekannter Absender"),detail._account_email?el("div","ecp-tb-reader-account",text(detail._account_email,300)):el("span"),el("div","ecp-tb-reader-date",fmtDate(detail.date)));
     pane.append(header,el("div","ecp-tb-reader-body",text(detail.body_text,12000)||"Kein Textinhalt verfügbar."));
@@ -1246,7 +1377,9 @@
     search.addEventListener("change",()=>{mailboxSearch=search.value;render(true);});
     search.addEventListener("keydown",(ev)=>{if(ev.key==="Enter"){ev.preventDefault();mailboxSearch=search.value;render(true);}});
     searchWrap.append(el("span","","⌕"),search);
-    const providerTruth=mailboxProviderTruthLabel(),status=el("span","ecp-tb-live ecp-tb-provider-truth",providerTruth);status.title=providerTruth; toolbar.append(left,searchWrap,status);workspace.append(toolbar);
+    const providerTruth=mailboxProviderTruthLabel(),status=el("span","ecp-tb-live ecp-tb-provider-truth",providerTruth);status.title=providerTruth;
+    const composeTop=button("＋ Neue Nachricht","ecp-tb-toolbar-button");composeTop.addEventListener("click",()=>startComposer("NEW"));
+    toolbar.append(left,composeTop,searchWrap,status);workspace.append(toolbar);
     const shell=el("div","ecp-tb-shell");renderMailboxSidebar(shell);renderMailboxListPane(shell);renderMailboxReader(shell);workspace.append(shell);root.append(workspace);
     restoreTransientUiState(root,transient);
     if (Date.now() < preservePageScrollUntil) requestAnimationFrame(() => window.scrollTo({ top: preservePageScrollY, left: 0, behavior: "auto" }));
@@ -1315,6 +1448,7 @@
     if (!connected) {
       dashboard = null; dashboardLoadedAt = 0; classification = null; classificationError = ""; classificationRetryCount = 0;
       emailConnections = []; activeConnectionId = ""; mailboxScope = "ALL"; mailboxFolderRows = []; mailboxFolderCounts = {}; classificationKnownCounts = {}; classificationFolderCache = {}; mailboxLoadSerial++; mailboxIndexWarmStarted.clear(); remoteFolderCache.clear(); remoteFolderInflight.clear(); allDrafts = [];
+      composeState=null;composeSaving=false;
       chatMessages = []; chatStarted = false; chatDraft=""; chatScrollTop=0; mailboxListScrollTop=0; mailboxSidebarScrollTop=0; mailboxSidebarScrollLeft=0; readerScrollTop=0; pendingBackgroundRender=false; onboardingExampleSelections.clear(); render(true); return;
     }
     try { await loadConnections(); } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
