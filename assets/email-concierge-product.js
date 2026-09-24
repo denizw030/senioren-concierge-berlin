@@ -166,6 +166,11 @@
       .ecp-tb-compose-button{width:calc(100% - 24px);margin:0 12px 10px;min-height:42px;border:1px solid rgba(201,164,88,.38);border-radius:10px;background:linear-gradient(180deg,rgba(201,164,88,.18),rgba(201,164,88,.09));color:inherit;font:inherit;font-weight:760;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
       .ecp-tb-compose-button:hover{border-color:rgba(201,164,88,.58);background:linear-gradient(180deg,rgba(201,164,88,.24),rgba(201,164,88,.12))}
       .ecp-compose-shell{min-height:100%;display:flex;flex-direction:column;background:rgba(12,13,15,.34)}
+      .ecp-thunderbird.is-compose .ecp-tb-shell{grid-template-columns:minmax(190px,220px) minmax(0,1fr)!important}
+      .ecp-thunderbird.is-compose .ecp-tb-list-pane{display:none!important}
+      .ecp-thunderbird.is-compose .ecp-tb-reader{min-width:0}
+      .ecp-thunderbird.is-compose .ecp-tb-search{visibility:hidden;pointer-events:none}
+      .ecp-thunderbird.is-compose .ecp-tb-provider-truth{opacity:.46}
       .ecp-compose-head{min-height:54px;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:0 16px;border-bottom:1px solid rgba(127,127,127,.18);background:rgba(127,127,127,.025)}
       .ecp-compose-title{display:grid;gap:2px;min-width:0}
       .ecp-compose-title strong{font-size:.92rem;letter-spacing:-.01em}
@@ -1282,10 +1287,7 @@
     const foot=el("div","ecp-compose-foot"),footCopy=el("div");
     footCopy.append(el("div","ecp-compose-note","Entwurf wird im echten Entwürfe-Ordner des gewählten Postfachs gespeichert."));
     if(state.status)footCopy.append(el("div","ecp-compose-status",state.status));
-    const footActions=el("div","ecp-compose-actions"),saveBottom=button("Entwurf speichern","ecp-tb-toolbar-button"),sendBottom=button("Senden","ecp-primary ecp-compose-send");
-    saveBottom.disabled=composeSaving;sendBottom.disabled=composeSaving;
-    saveBottom.addEventListener("click",()=>void saveComposerDraft());sendBottom.addEventListener("click",()=>void sendComposer());
-    footActions.append(saveBottom,sendBottom);foot.append(footCopy,footActions);form.append(foot);
+    foot.append(footCopy);form.append(foot);
 
     shell.append(form);pane.append(shell);
     requestAnimationFrame(()=>{const target=state.mode==="NEW"&&!state.to?toField.control:bodyField;try{target.focus({preventScroll:true})}catch{target.focus()}});
@@ -1427,6 +1429,7 @@
     root.replaceChildren();
     if (!dashboard) { root.append(el("div", "ecp-loading", "Dein E-Mail-Concierge wird geladen …")); restoreTransientUiState(root,transient); return; }
     const workspace = el("section","ecp-thunderbird"); workspace.setAttribute("aria-label","E-Mail-Arbeitsbereich");
+    if(readerMode==="COMPOSE")workspace.classList.add("is-compose");
     const toolbar = el("div","ecp-tb-toolbar"), left=el("div","ecp-tb-toolbar-title"), searchWrap=el("label","ecp-tb-search");
     left.append(el("strong","","E-Mail"),el("span","","NAHWERK Concierge"));
     const search=el("input","");search.type="search";search.value=mailboxSearch;search.placeholder="Suchen …";search.setAttribute("aria-label","E-Mails durchsuchen");
@@ -1435,7 +1438,7 @@
     searchWrap.append(el("span","","⌕"),search);
     const providerTruth=mailboxProviderTruthLabel(),status=el("span","ecp-tb-live ecp-tb-provider-truth",providerTruth);status.title=providerTruth;
     toolbar.append(left,searchWrap,status);workspace.append(toolbar);
-    const shell=el("div","ecp-tb-shell");renderMailboxSidebar(shell);renderMailboxListPane(shell);renderMailboxReader(shell);workspace.append(shell);root.append(workspace);
+    const shell=el("div","ecp-tb-shell");if(readerMode==="COMPOSE")shell.classList.add("is-compose");renderMailboxSidebar(shell);renderMailboxListPane(shell);renderMailboxReader(shell);workspace.append(shell);root.append(workspace);
     restoreTransientUiState(root,transient);
     if (Date.now() < preservePageScrollUntil) requestAnimationFrame(() => window.scrollTo({ top: preservePageScrollY, left: 0, behavior: "auto" }));
   }
