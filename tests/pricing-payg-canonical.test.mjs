@@ -1,1 +1,41 @@
-import assert from "node:assert/strict";\nimport fs from "node:fs";\nimport test from "node:test";\n\nconst read = (path) => fs.readFileSync(new URL("../" + path, import.meta.url), "utf8");\nconst normalizeClean = (html) => html.replace('<head><base href="/">', "<head>");\n\ntest("pricing clean route mirrors canonical pricing page", () => {\n  const canonical = read("pakete.html");\n  const clean = normalizeClean(read("pakete/index.html"));\n  assert.equal(clean, canonical);\n});\n\ntest("canonical package prices and WhatsApp limits stay aligned", () => {\n  const pricing = read("pakete.html");\n  for (const expected of [\n    "FREE", "0 € / Monat", "20 WhatsApp-Kundennachrichten",\n    "STANDARD", "5,99 € / Monat", "30 WhatsApp-Kundennachrichten",\n    "PLUS", "10,99 € / Monat", "50 WhatsApp-Kundennachrichten",\n    "PREMIUM", "19,99 € / Monat", "100 WhatsApp-Kundennachrichten",\n    "PREMIUM PLUS", "34,99 € / Monat", "160 WhatsApp-Kundennachrichten",\n    "FAMILIE", "59,66 € / Monat", "300 WhatsApp-Kundennachrichten",\n  ]) assert.ok(pricing.includes(expected), `missing ${expected}`);\n});\n\ntest("FREE legal copy uses unlimited app/web and 30-day cycle", () => {\n  for (const path of ["agb.html", "agb/index.html", "nutzungsbedingungen/index.html"]) {\n    const html = read(path);\n    assert.match(html, /App- und Web-Dialoge[\s\S]{0,120}unbegrenzt/);\n    assert.match(html, /20[\s\S]{0,80}WhatsApp-Kundennachrichten[\s\S]{0,120}30-Tage-Nutzungszeitraum/);\n    assert.doesNotMatch(html, /50 App-Dialoge/);\n  }\n});\n\ntest("PAYG offers the first real 5 euro wallet top-up", () => {\n  for (const path of ["payg.html", "payg/index.html"]) {\n    const html = read(path);\n    assert.match(html, /data-topup-cents="500">5 €<\/button>/);\n    assert.match(html, /id="paygActivate">PAYG aktivieren<\/button>/);\n  }\n});\n
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import test from "node:test";
+
+const read = (path) => fs.readFileSync(new URL("../" + path, import.meta.url), "utf8");
+const normalizeClean = (html) => html.replace('<head><base href="/">', "<head>");
+
+test("pricing clean route mirrors canonical pricing page", () => {
+  const canonical = read("pakete.html");
+  const clean = normalizeClean(read("pakete/index.html"));
+  assert.equal(clean, canonical);
+});
+
+test("canonical package prices and WhatsApp limits stay aligned", () => {
+  const pricing = read("pakete.html");
+  for (const expected of [
+    "FREE", "0 € / Monat", "20 WhatsApp-Kundennachrichten",
+    "STANDARD", "5,99 € / Monat", "30 WhatsApp-Kundennachrichten",
+    "PLUS", "10,99 € / Monat", "50 WhatsApp-Kundennachrichten",
+    "PREMIUM", "19,99 € / Monat", "100 WhatsApp-Kundennachrichten",
+    "PREMIUM PLUS", "34,99 € / Monat", "160 WhatsApp-Kundennachrichten",
+    "FAMILIE", "59,66 € / Monat", "300 WhatsApp-Kundennachrichten",
+  ]) assert.ok(pricing.includes(expected), `missing ${expected}`);
+});
+
+test("FREE legal copy uses unlimited app/web and 30-day cycle", () => {
+  for (const path of ["agb.html", "agb/index.html", "nutzungsbedingungen/index.html"]) {
+    const html = read(path);
+    assert.match(html, /App- und Web-Dialoge[\s\S]{0,120}unbegrenzt/);
+    assert.match(html, /20[\s\S]{0,80}WhatsApp-Kundennachrichten[\s\S]{0,120}30-Tage-Nutzungszeitraum/);
+    assert.doesNotMatch(html, /50 App-Dialoge/);
+  }
+});
+
+test("PAYG offers the first real 5 euro wallet top-up", () => {
+  for (const path of ["payg.html", "payg/index.html"]) {
+    const html = read(path);
+    assert.match(html, /data-topup-cents="500">5 €<\/button>/);
+    assert.match(html, /id="paygActivate">PAYG aktivieren<\/button>/);
+  }
+});
