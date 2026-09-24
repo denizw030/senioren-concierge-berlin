@@ -387,7 +387,7 @@ html body.account-premium-ui.account-premium-ui .account-tabs.account-tabs-moder
 }
 
 /* 3/5) Concierge first and prominent; remaining overview content follows in a calm hierarchy. */
-html body.account-premium-ui.account-premium-ui .dash>.account-overview-highlights[data-account-panel="overview"]{
+html body.account-premium-ui.account-premium-ui .dash>.account-overview-highlights[data-account-panel="overview"]:not([hidden]):not([data-account-tab-visible="false"]){
   order:10!important;
   grid-column:1/-1!important;
   display:grid!important;
