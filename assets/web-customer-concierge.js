@@ -16,7 +16,6 @@
   const HISTORY_PAGE_SIZE = 60;
   const SYNC_INTERVAL_MS = 3000;
   const PERSONA_SYNC_INTERVAL_MS = 3000;
-  const CHANNEL_META_CACHE_KEY = "nw_web_channel_sidebar_meta_v1";
   const CHANNEL_META_REFRESH_MS = 60000;
   const CLIENT_FETCH_TIMEOUT_MS = 40000;
   const SETTINGS_URL = "/concierge-anpassen";
@@ -48,7 +47,7 @@
   let routedTurnsLoadedAt = 0;
   let threadsLoadGeneration = 0;
   let channelMetaRefreshPromise = null;
-  let channelMetaCache = readChannelMetaCache();
+  let channelMetaCache = {version:1,updated_at:0,WHATSAPP:[],PHONE:[],EMAIL:[]};
   const VIRTUAL_WHATSAPP_THREAD_ID="00000000-0000-4000-8000-0000000000a1";
   const VIRTUAL_PHONE_THREAD_ID="00000000-0000-4000-8000-0000000000a3";
   const VIRTUAL_EMAIL_THREAD_ID="00000000-0000-4000-8000-0000000000a4";
@@ -56,24 +55,6 @@
 
   function normalizeChannelMetaLines(values){
     return (Array.isArray(values)?values:[]).map((value)=>String(value||"").trim()).filter(Boolean).slice(0,2);
-  }
-  function readChannelMetaCache(){
-    try{
-      const parsed=JSON.parse(sessionStorage.getItem(CHANNEL_META_CACHE_KEY)||"null");
-      if(!parsed||parsed.version!==1)return {version:1,updated_at:0,WHATSAPP:[],PHONE:[],EMAIL:[]};
-      return {
-        version:1,
-        updated_at:Number(parsed.updated_at)||0,
-        WHATSAPP:normalizeChannelMetaLines(parsed.WHATSAPP),
-        PHONE:normalizeChannelMetaLines(parsed.PHONE),
-        EMAIL:normalizeChannelMetaLines(parsed.EMAIL)
-      };
-    }catch{
-      return {version:1,updated_at:0,WHATSAPP:[],PHONE:[],EMAIL:[]};
-    }
-  }
-  function saveChannelMetaCache(){
-    try{sessionStorage.setItem(CHANNEL_META_CACHE_KEY,JSON.stringify(channelMetaCache));}catch{}
   }
   function sidebarMetaLines(channel){
     return normalizeChannelMetaLines(channelMetaCache?.[String(channel||"").toUpperCase()]);
@@ -123,7 +104,6 @@
         next.EMAIL=normalizeChannelMetaLines([...new Map(addresses.map((value)=>[value.toLowerCase(),value])).values()]);
       }
       channelMetaCache=next;
-      saveChannelMetaCache();
       applyChannelMetaToThreadCache();
       renderThreads();
       return true;
