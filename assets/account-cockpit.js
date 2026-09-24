@@ -30,11 +30,21 @@
     el.addEventListener("click",()=>openTab(el.getAttribute("data-cockpit-open-tab")));
   });
 
-  function text(id,value){const el=$(id);if(el)el.textContent=value;}
+  function text(id,value){
+    const el=$(id);
+    if(!el)return;
+    const next=String(value??"");
+    if(el.textContent!==next)el.textContent=next;
+  }
   function copyLegacy(){
     const ctx=context();
-    const first=String(document.querySelector(".nw-account-name")?.textContent||"").trim();
-    if(first&&first!=="Konto")text("cockpitGreetingName",first);
+    const profileFirst=String($("profileFirstName")?.value||"").trim();
+    const sessionFirst=(()=>{
+      try{return String(JSON.parse(sessionStorage.getItem("scb_web_session")||"null")?.first_name||"").trim();}
+      catch(_){return "";}
+    })();
+    const first=profileFirst||sessionFirst;
+    if(first)text("cockpitGreetingName",first);
     if(ctx?.is_self===false){
       const name=String(ctx.display_name||"").trim()||"verwaltetes Profil";
       text("cockpitProfileContext","Du verwaltest gerade: "+name);
@@ -83,8 +93,9 @@
       el.addEventListener?.("input",copyLegacy);
       el.addEventListener?.("change",copyLegacy);
     });
-    const accountName=document.querySelector(".nw-account-name");
-    if(accountName)new MutationObserver(copyLegacy).observe(accountName,{subtree:true,childList:true,characterData:true});
+    const profileFirstName=$("profileFirstName");
+    profileFirstName?.addEventListener("input",copyLegacy);
+    profileFirstName?.addEventListener("change",copyLegacy);
     const select=$("personContextSelect");
     select?.addEventListener("change",()=>setTimeout(()=>{copyLegacy();load();},0));
     window.addEventListener("pageshow",copyLegacy);
