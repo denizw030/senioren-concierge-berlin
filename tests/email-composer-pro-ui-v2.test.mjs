@@ -40,10 +40,10 @@ test("composer keeps explicit send approval and real provider drafts",()=>{
 });
 
 test("fresh composer assets are loaded on both account routes",()=>{
-  assert.match(integration,/email-concierge-product\.js\?v=20260924-compose3/);
-  assert.match(integration,/email-concierge-product\.css\?v=20260924-compose3/);
-  assert.match(konto,/email-account-integration\.js\?v=17/);
-  assert.match(clean,/email-account-integration\.js\?v=17/);
+  assert.match(integration,/email-concierge-product\.js\?v=20260924-reader4/);
+  assert.match(integration,/email-concierge-product\.css\?v=20260924-reader4/);
+  assert.match(konto,/email-account-integration\.js\?v=18/);
+  assert.match(clean,/email-account-integration\.js\?v=18/);
 });
 
 console.log("EMAIL_COMPOSER_PRO_UI_V2=GREEN");
