@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="assets/account-address-editor.css?v=1" />
     <link rel="stylesheet" href="assets/account-light-buttons.css?v=1" />
     <link rel="stylesheet" href="assets/owner-product-gaps.css?v=2" />
+    <link rel="stylesheet" href="assets/account-cockpit.css?v=1" />
     <style>
       .dash {
         display: grid;
@@ -2494,6 +2495,99 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
               </article>
             </div>
 
+
+            <section class="account-cockpit" id="accountCockpit" data-account-panel="overview" role="tabpanel" aria-labelledby="accountTabOverview">
+              <header class="cockpit-welcome">
+                <div>
+                  <div class="eyebrow">Deine Übersicht</div>
+                  <h2>Hallo <span class="nw-account-name" id="cockpitGreetingName">Konto</span>.</h2>
+                  <p id="cockpitProfileContext">Dein persönlicher NAHWERK Bereich.</p>
+                </div>
+                <span class="cockpit-plan-badge" id="cockpitPlanBadge">Tarif wird geladen …</span>
+              </header>
+
+              <article class="cockpit-card cockpit-concierge">
+                <div class="cockpit-concierge-avatar" id="cockpitConciergeAvatar" aria-hidden="true"></div>
+                <div class="cockpit-concierge-copy">
+                  <div class="eyebrow">Dein Concierge</div>
+                  <h3 id="cockpitConciergeName">NAHWERK Concierge</h3>
+                  <p>Dein direkter Einstieg für Fragen, Organisation und Ausführungen.</p>
+                  <div class="cockpit-status-line"><span class="cockpit-status-dot" aria-hidden="true"></span><strong>Bereit</strong><span id="cockpitConciergeLast">Wird geladen …</span></div>
+                </div>
+                <div class="cockpit-concierge-action">
+                  <a class="btn red" href="/web-concierge">Concierge öffnen</a>
+                </div>
+              </article>
+
+              <div class="cockpit-primary-grid">
+                <article class="cockpit-card">
+                  <div class="eyebrow">Offene Anliegen</div>
+                  <h3>Was gerade für dich läuft.</h3>
+                  <div class="cockpit-list" id="cockpitOpenItems"><div class="cockpit-empty">Aktuelle Anliegen werden geladen …</div></div>
+                  <div class="cockpit-section-actions"><a class="cockpit-mini-link" href="/web-concierge">Im Concierge ansehen</a></div>
+                </article>
+                <article class="cockpit-card">
+                  <div class="eyebrow">Zuletzt erledigt</div>
+                  <h3>Was NAHWERK abgeschlossen hat.</h3>
+                  <div class="cockpit-list" id="cockpitRecentItems"><div class="cockpit-empty">Aktivitäten werden geladen …</div></div>
+                  <div class="cockpit-section-actions"><a class="cockpit-mini-link" href="/web-concierge">Concierge-Historie öffnen</a></div>
+                </article>
+              </div>
+
+              <div class="cockpit-secondary-grid">
+                <button class="cockpit-card cockpit-card-button" type="button" data-cockpit-open-tab="safety">
+                  <div class="eyebrow">Sicherheit</div>
+                  <div class="cockpit-metric" id="cockpitSafetyMetric">Safety-Status wird geladen …</div>
+                  <p id="cockpitSafetyMeta">Schutzstatus wird sicher geprüft.</p>
+                </button>
+                <button class="cockpit-card cockpit-card-button" type="button" data-cockpit-open-tab="usage">
+                  <div class="eyebrow">Nutzung & Guthaben</div>
+                  <div class="cockpit-metric" id="cockpitUsageMetric">Nutzung wird geladen …</div>
+                  <p>Dialogkontingente und PAYG-Guthaben im Nutzungsbereich verwalten.</p>
+                </button>
+              </div>
+
+              <article class="cockpit-card cockpit-channels">
+                <div class="eyebrow">Meine Kanäle</div>
+                <h3>So erreichst du deinen Concierge.</h3>
+                <div class="cockpit-channel-grid">
+                  <div class="cockpit-channel"><span>App / Web</span><strong id="cockpitChannelApp">Wird geladen …</strong></div>
+                  <div class="cockpit-channel"><span>WhatsApp</span><strong id="cockpitChannelWhatsapp">Wird geladen …</strong></div>
+                  <div class="cockpit-channel"><span>Telefon</span><strong id="cockpitChannelPhone">Wird geladen …</strong></div>
+                  <div class="cockpit-channel"><span>E-Mail</span><strong id="cockpitChannelEmail">Wird geladen …</strong></div>
+                </div>
+              </article>
+
+              <div class="cockpit-tertiary-grid">
+                <article class="cockpit-card">
+                  <div class="eyebrow">Tarif & PAYG</div>
+                  <div class="cockpit-metric" id="cockpitPlanDetail">Tarif wird geladen …</div>
+                  <p id="cockpitPlanMeta">Tarifdaten werden sicher geladen …</p>
+                  <div class="cockpit-section-actions">
+                    <button class="cockpit-mini-link" type="button" data-cockpit-open-tab="usage">Nutzung ansehen</button>
+                    <a class="cockpit-mini-link" href="/payg">PAYG öffnen</a>
+                  </div>
+                </article>
+                <article class="cockpit-card">
+                  <div class="eyebrow">Kundennummer</div>
+                  <div class="cockpit-metric cockpit-customer-number" id="cockpitCustomerNumber">Wird geladen …</div>
+                  <p>Für die sichere Zuordnung deines NAHWERK-Kontos.</p>
+                  <div class="cockpit-section-actions"><button class="cockpit-mini-link" type="button" id="cockpitCopyCustomerNumber">Kopieren</button></div>
+                </article>
+              </div>
+
+              <article class="cockpit-card">
+                <div class="eyebrow">Gespeicherte Informationen</div>
+                <h3>Das kennt NAHWERK für deinen Zugang.</h3>
+                <div class="cockpit-saved-grid">
+                  <div class="cockpit-saved-item"><span>Zuhause</span><strong id="cockpitSavedHome">Wird geladen …</strong></div>
+                  <div class="cockpit-saved-item"><span>Bevorzugte Sprache</span><strong id="cockpitSavedLanguage">Wird geladen …</strong></div>
+                  <div class="cockpit-saved-item"><span>E-Mail</span><strong id="cockpitSavedEmail">Wird geladen …</strong></div>
+                  <div class="cockpit-saved-item"><span>WhatsApp</span><strong id="cockpitSavedWhatsapp">Wird geladen …</strong></div>
+                </div>
+                <div class="cockpit-section-actions"><button class="cockpit-mini-link" type="button" data-cockpit-open-tab="personal">Account öffnen</button><button class="cockpit-mini-link" type="button" data-cockpit-open-tab="concierge">Concierge-Einstellungen</button></div>
+              </article>
+            </section>
                         <article class="card summary-card status-summary" data-account-panel="overview">
               <div class="eyebrow">Status</div>
               <div class="value">
@@ -6000,6 +6094,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
   <script src="assets/email-provider-logo-connect-v3.js?v=20260922-6"></script>
   <script src="assets/web-core-shadow.js?v=1"></script>
   <script src="assets/web-concierge-chat.js?v=3"></script>
+  <script src="assets/account-cockpit.js?v=1"></script>
   <script src="assets/account-header-concierge.js?v=4"></script>
     <script src="assets/account-address-editor.js?v=1"></script>
   <script src="assets/account-response-channel.js?v=6"></script>
