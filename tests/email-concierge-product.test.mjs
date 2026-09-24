@@ -171,7 +171,9 @@ test("concierge chat renders classification views locally without another Gmail 
 
 test("concierge chat explains internal classification without inventing physical folders",()=>{
   assert.match(js,/Wichtig \/ Unwichtig wird intern gelernt/);
-  assert.doesNotMatch(js,/archivieren/);
+  assert.doesNotMatch(js,/const folders = .*ARCHIVE/);
+  assert.doesNotMatch(js,/\["ARCHIVE","Archiv/);
+  assert.match(js,/button\("Archivieren","ecp-tb-toolbar-button"\)/);
   assert.match(js,/in den Papierkorb verschieben/);
   assert.match(js,/Antworten vorbereiten/);
   assert.match(js,/GitHub-Mails sind unwichtig/);
