@@ -370,11 +370,12 @@
     const value=mailboxFolderCounts?.[String(connectionId||"")]?.[folder]?.unread;
     return Number.isFinite(value) && value>0 ? value : "";
   }
-  function inboxProviderTruth(connectionId) {
-    const meta=mailboxFolderCounts?.[String(connectionId||"")]?.INBOX;
+  function folderProviderTruth(connectionId, folder = "INBOX") {
+    const meta=mailboxFolderCounts?.[String(connectionId||"")]?.[folder];
     if(!meta || !Number.isFinite(meta.total) || !Number.isFinite(meta.unread)) return null;
     return {messages_total:Math.max(0,Number(meta.total)||0),messages_unread:Math.max(0,Number(meta.unread)||0)};
   }
+  function inboxProviderTruth(connectionId) { return folderProviderTruth(connectionId,"INBOX"); }
   function formatMailboxNumber(value) {
     return Math.max(0,Number(value)||0).toLocaleString("de-DE");
   }
@@ -385,9 +386,9 @@
       const total=truths.reduce((sum,row)=>sum+row.messages_total,0),unread=truths.reduce((sum,row)=>sum+row.messages_unread,0);
       return `Alle Posteingänge · ${formatMailboxNumber(total)} E-Mails insgesamt · ${formatMailboxNumber(unread)} ungelesen`;
     }
-    const address=connectionEmail(activeConnectionId),truth=inboxProviderTruth(activeConnectionId);
+    const address=connectionEmail(activeConnectionId),truth=folderProviderTruth(activeConnectionId,mailboxFolder);
     if(!truth) return `${address} · Postfachzahlen werden aktualisiert …`;
-    return `${address} · ${formatMailboxNumber(truth.messages_total)} E-Mails insgesamt · ${formatMailboxNumber(truth.messages_unread)} ungelesen`;
+    return `${address} · ${formatMailboxNumber(truth.messages_total)} E-Mails in diesem Bereich · ${formatMailboxNumber(truth.messages_unread)} ungelesen`;
   }
   function decorateRemoteMessage(message, connection) {
     return {
@@ -1302,9 +1303,6 @@
         showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE");
       }
       render();
-      if (dashboard) {
-        void loadClassification();
-      }
       return dashboard;
     })().finally(() => { dashboardLoadPromise = null; });
     return dashboardLoadPromise;
