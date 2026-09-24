@@ -163,8 +163,10 @@
     const style = document.createElement("style"); style.id = "nahwerkEmailClassificationStyles";
     style.textContent = `
       .ecp-summary{grid-template-columns:repeat(6,minmax(0,1fr))!important}
-      .ecp-tb-compose-button{width:calc(100% - 24px);margin:0 12px 10px;min-height:42px;border:1px solid rgba(201,164,88,.38);border-radius:10px;background:linear-gradient(180deg,rgba(201,164,88,.18),rgba(201,164,88,.09));color:inherit;font:inherit;font-weight:760;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
-      .ecp-tb-compose-button:hover{border-color:rgba(201,164,88,.58);background:linear-gradient(180deg,rgba(201,164,88,.24),rgba(201,164,88,.12))}
+      .ecp-tb-compose-button{width:calc(100% - 24px);margin:12px;min-height:36px;padding:8px 12px;border:1px solid rgba(255,255,255,.12);border-radius:10px;background:linear-gradient(180deg,#2f7dff,#1765e8);color:#fff;font:inherit;font-size:.78rem;font-weight:700;line-height:1.2;cursor:pointer;box-shadow:0 6px 16px rgba(23,101,232,.18);transition:transform .16s ease,filter .16s ease,box-shadow .16s ease}
+      .ecp-tb-compose-button:hover{filter:brightness(1.06);box-shadow:0 8px 20px rgba(23,101,232,.24)}
+      .ecp-tb-compose-button:active{transform:scale(.985)}
+      .ecp-tb-compose-button:focus-visible{outline:2px solid rgba(47,125,255,.7);outline-offset:2px}
       .ecp-compose-shell{min-height:100%;display:flex;flex-direction:column;background:rgba(12,13,15,.34)}
       .ecp-thunderbird.is-compose .ecp-tb-shell{grid-template-columns:minmax(190px,220px) minmax(0,1fr)!important}
       .ecp-thunderbird.is-compose .ecp-tb-list-pane{display:none!important}
