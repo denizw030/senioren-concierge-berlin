@@ -41,9 +41,9 @@ test("already saved unchanged draft is not rewritten before send",()=>{
 });
 
 test("composer rollout busts both integration and product asset caches",()=>{
-  assert.match(integration,/email-concierge-product\.js\?v=20260924-compose3/);
-  assert.match(integration,/email-concierge-product\.css\?v=20260924-compose3/);
-  assert.match(konto,/email-account-integration\.js\?v=17/);
+  assert.match(integration,/email-concierge-product\.js\?v=20260924-reader4/);
+  assert.match(integration,/email-concierge-product\.css\?v=20260924-reader4/);
+  assert.match(konto,/email-account-integration\.js\?v=18/);
 });
 
 test("five-folder mailbox contract remains unchanged",()=>{
