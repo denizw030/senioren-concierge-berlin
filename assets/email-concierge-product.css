@@ -200,8 +200,8 @@ body.account-premium-ui:has(#accountEmailCard:not([hidden])) .nw-floating-concie
 
   /* Keine Kopfblöcke vor Nachrichten: Verlauf beginnt direkt oben. */
   .ecp-tb-list-top,
-  .ecp-tb-reader-head,
-  .ecp-tb-reader-toolbar{display:none!important}
+  .ecp-tb-reader-head{display:none!important}
+  .ecp-tb-reader-toolbar{display:flex!important;position:sticky!important;top:0!important;z-index:8!important;padding:7px 9px!important;gap:5px!important}
 
   .ecp-tb-list-pane{display:block!important;overflow:hidden!important}
   .ecp-tb-message-list{height:100%!important;max-height:none!important;overflow:auto!important}

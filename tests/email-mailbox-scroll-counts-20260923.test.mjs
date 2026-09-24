@@ -31,8 +31,8 @@ test("selected account header and inbox badge use the same canonical provider tr
 });
 
 test("mailbox fix is cache-busted in account integration",()=>{
-  assert.match(integration,/email-concierge-product\.js\?v=20260924-compose3/);
-  assert.match(integration,/email-concierge-product\.css\?v=20260924-compose3/);
+  assert.match(integration,/email-concierge-product\.js\?v=20260924-reader4/);
+  assert.match(integration,/email-concierge-product\.css\?v=20260924-reader4/);
 });
 
 console.log("EMAIL_MAILBOX_SCROLL_COUNTS=GREEN");

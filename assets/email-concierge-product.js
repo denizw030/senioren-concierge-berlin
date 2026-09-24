@@ -157,6 +157,7 @@
   let selectedMessageLoading = false;
   let composeState = null;
   let composeSaving = false;
+  let readerActionBusy = false;
 
   function ensureClassificationStyles() {
     if (document.getElementById("nahwerkEmailClassificationStyles")) return;
@@ -193,7 +194,12 @@
       .ecp-compose-status{font-size:.7rem;line-height:1.4;opacity:.74}
       .ecp-compose-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
       .ecp-compose-send{min-width:94px}
-      .ecp-tb-reader-toolbar{flex-wrap:wrap}
+      .ecp-tb-reader-toolbar{position:sticky;top:0;z-index:8;display:flex!important;align-items:center;justify-content:flex-start;gap:6px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid rgba(127,127,127,.22);background:rgba(27,29,33,.96);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+      .ecp-tb-toolbar-spacer{flex:1 1 auto;min-width:8px}
+      .ecp-tb-toolbar-danger{border-color:rgba(255,92,92,.32)!important;color:#ffb1b1!important}
+      .ecp-tb-toolbar-danger:hover{background:rgba(255,92,92,.10)!important}
+      @media(max-width:900px){.ecp-tb-reader-toolbar{display:flex!important;position:sticky!important;top:0!important;padding:7px 9px!important;gap:5px!important}.ecp-tb-reader-toolbar .ecp-tb-toolbar-button{padding:6px 8px!important;font-size:.64rem!important}}
+
       @media(max-width:760px){
         .ecp-compose-head{align-items:flex-start;padding:10px 12px}
         .ecp-compose-head-actions{width:100%;justify-content:flex-end}
@@ -1373,6 +1379,27 @@
     }
     pane.append(listNode); shell.append(pane);
   }
+  async function runReaderMailboxAction(detail, actionRaw) {
+    if(readerActionBusy)return;
+    const action=String(actionRaw||"").toUpperCase(),messageId=String(detail?.id||""),connectionId=String(detail?._connection_id||selectedMessageConnectionId||activeConnectionId||"");
+    if(!messageId||!connectionId)return;
+    readerActionBusy=true;render(true);
+    try{
+      const snapshot={thread_id:detail?.thread_id||null,from:detail?.from||"",subject:detail?.subject||"",snippet:detail?.snippet||detail?.body_text||"",date:detail?.date||null,unread:detail?.unread===true};
+      const result=await request("/email/concierge/mailbox-action",{method:"POST",body:{action,message_id:messageId,message_snapshot:snapshot},connectionId});
+      if(Number(result?.changed||0)<1)throw new Error("EMAIL_MAILBOX_ACTION_FAILED");
+      mailboxFolderRows=mailboxFolderRows.filter((row)=>!(String(row?.id||"")===messageId&&String(row?._connection_id||connectionId)===connectionId));
+      selectedMessageId="";selectedMessageConnectionId="";selectedMessageDetail=null;selectedMessageLoading=false;
+      remoteFolderCache.clear();
+      if(action==="SPAM"&&String(connectionById(connectionId)?.provider||"").toUpperCase()==="GOOGLE")void loadClassification();
+      await loadMailboxFolder(true);
+    }catch(error){
+      showError(error instanceof Error?error.message:"EMAIL_MAILBOX_ACTION_FAILED");
+    }finally{
+      readerActionBusy=false;render(true);
+    }
+  }
+
   function renderMailboxReader(shell) {
     const pane = el("section","ecp-tb-reader");
     if (readerMode === "COMPOSE") { renderComposer(pane); shell.append(pane); return; }
@@ -1394,20 +1421,24 @@
       const card=el("section","ecp-card ecp-tb-embedded-card");renderDrafts(card);pane.append(card);shell.append(pane);return;
     }
     if (selectedMessageLoading) { pane.append(el("div","ecp-tb-reader-empty","E-Mail wird geöffnet …")); shell.append(pane); return; }
-    const currentRows=mailboxFilteredMessages();
-    const selectionStillVisible=currentRows.some((row)=>String(row?.id||"")===String(selectedMessageId||"")&&String(row?._connection_id||activeConnectionId||"")===String(selectedMessageConnectionId||activeConnectionId||""));
-    if(!selectionStillVisible){selectedMessageId="";selectedMessageConnectionId="";selectedMessageDetail=null;selectedMessageLoading=false;}
+    // Keep an explicitly opened message stable while the middle list refreshes in the background.
+    // Folder switches and successful mailbox actions clear the selection explicitly.
     const detail = selectedMessageDetail;
     if (!detail) {
       const placeholder=el("div","ecp-tb-reader-empty");placeholder.append(el("strong","","E-Mail auswählen"),el("span","","Wähle eine Nachricht aus. Wichtig / Unwichtig bleibt eine interne Concierge-Einschätzung und erzeugt keine Ordner."));pane.append(placeholder);shell.append(pane);return;
     }
     const toolbar=el("div","ecp-tb-reader-toolbar");
-    const reply=button("Antworten","ecp-tb-toolbar-button"),replyAll=button("Allen antworten","ecp-tb-toolbar-button"),forward=button("Weiterleiten","ecp-tb-toolbar-button"),concierge=button("Mit Concierge bearbeiten","ecp-tb-toolbar-button");
+    const reply=button("Antworten","ecp-tb-toolbar-button"),replyAll=button("Allen antworten","ecp-tb-toolbar-button"),forward=button("Weiterleiten","ecp-tb-toolbar-button"),archive=button("Archivieren","ecp-tb-toolbar-button"),spam=button("Spam","ecp-tb-toolbar-button ecp-tb-toolbar-danger"),concierge=button("Concierge","ecp-tb-toolbar-button"),spacer=el("span","ecp-tb-toolbar-spacer","");
+    for(const actionButton of [reply,replyAll,forward,archive,spam,concierge])actionButton.disabled=readerActionBusy;
     reply.addEventListener("click",()=>startComposer("REPLY",detail));
     replyAll.addEventListener("click",()=>startComposer("REPLY_ALL",detail));
     forward.addEventListener("click",()=>startComposer("FORWARD",detail));
+    archive.addEventListener("click",()=>void runReaderMailboxAction(detail,"ARCHIVE"));
+    spam.addEventListener("click",()=>void runReaderMailboxAction(detail,"SPAM"));
+    spam.title="In Spam verschieben und dem Concierge als Lernsignal geben";
+    archive.title="Aus dem Posteingang archivieren";
     concierge.addEventListener("click",()=>{readerMode="CONCIERGE";render();});
-    toolbar.append(reply,replyAll,forward,concierge);pane.append(toolbar);
+    toolbar.append(reply,replyAll,forward,spacer,archive,spam,concierge);pane.append(toolbar);
     const header=el("div","ecp-tb-reader-message-head");
     header.append(el("h3","",text(detail.subject,500)||"(kein Betreff)"),el("div","ecp-tb-reader-from",text(detail.from,300)||"Unbekannter Absender"),detail._account_email?el("div","ecp-tb-reader-account",text(detail._account_email,300)):el("span"),el("div","ecp-tb-reader-date",fmtDate(detail.date)));
     pane.append(header,el("div","ecp-tb-reader-body",text(detail.body_text,12000)||"Kein Textinhalt verfügbar."));
