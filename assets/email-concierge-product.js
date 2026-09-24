@@ -786,11 +786,8 @@
     }
   }
   function applyQueryResultToMailbox(data) {
-    const ids = list(data?.result?.message_ids).map(String), idSet=new Set(ids);
-    const movedUnimportantToTrash = data?.result?.action === "TRASH" && data?.result?.classification === "UNIMPORTANT";
-    if (movedUnimportantToTrash && classificationFolderMode() && mailboxFolder === "UNIMPORTANT") {
-      for(const row of mailboxFolderRows) if(idSet.has(String(row?.id||""))) row.mailbox_location="TRASH";
-    } else if (ids.length) removeMailboxMessages(ids);
+    const ids = list(data?.result?.message_ids).map(String);
+    if (ids.length) removeMailboxMessages(ids);
     const single = String(data?.result?.message_id || data?.result?.result?.message_id || "");
     if (single) removeMailboxMessages([single]);
   }
