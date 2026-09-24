@@ -1,6 +1,13 @@
 (() => {
   "use strict";
 
+  const WEB_CONCIERGE_CLIENT_VERSION = 55;
+  const WEB_CONCIERGE_RUNTIME_KEY = "__nahwerkWebCustomerConciergeRuntime";
+  if(window[WEB_CONCIERGE_RUNTIME_KEY]?.active===true)return;
+  const runtimeToken=crypto.randomUUID();
+  window[WEB_CONCIERGE_RUNTIME_KEY]={active:true,version:WEB_CONCIERGE_CLIENT_VERSION,token:runtimeToken};
+  document.documentElement.dataset.nwWebConciergeClient=String(WEB_CONCIERGE_CLIENT_VERSION);
+
   const SESSION_KEY = "scb_web_session";
   const GUEST_INSTALLATION_KEY = "nw_web_guest_installation_v1";
   const GUEST_TOKEN_KEY = "nw_web_guest_token_v1";
@@ -48,6 +55,7 @@
   let threadsLoadGeneration = 0;
   let channelMetaRefreshPromise = null;
   let channelMetaCache = {version:1,updated_at:0,WHATSAPP:[],PHONE:[],EMAIL:[]};
+  let sidebarRenderSignature = "";
   const VIRTUAL_WHATSAPP_THREAD_ID="00000000-0000-4000-8000-0000000000a1";
   const VIRTUAL_PHONE_THREAD_ID="00000000-0000-4000-8000-0000000000a3";
   const VIRTUAL_EMAIL_THREAD_ID="00000000-0000-4000-8000-0000000000a4";
@@ -69,7 +77,7 @@
       const channel=String(thread?.channel_view||channelForThreadId(thread?.thread_id||"")).toUpperCase();
       if(!mapping[channel])return thread;
       const lines=sidebarMetaLines(channel);
-      return {...thread,meta_lines:lines,preview:lines.join(" · ")};
+      return {...thread,meta_lines:lines,preview:""};
     });
   }
   async function refreshChannelSidebarMeta({force=false}={}){
@@ -103,10 +111,17 @@
           : [String(emailResult.value?.email_address||"").trim(),String(emailResult.value?.customer_email||"").trim()].filter(Boolean);
         next.EMAIL=normalizeChannelMetaLines([...new Map(addresses.map((value)=>[value.toLowerCase(),value])).values()]);
       }
+      const changed=["WHATSAPP","PHONE","EMAIL"].some((channel)=>{
+        const before=normalizeChannelMetaLines(channelMetaCache?.[channel]);
+        const after=normalizeChannelMetaLines(next?.[channel]);
+        return before.length!==after.length||before.some((value,index)=>value!==after[index]);
+      });
       channelMetaCache=next;
-      applyChannelMetaToThreadCache();
-      renderThreads();
-      return true;
+      if(changed){
+        applyChannelMetaToThreadCache();
+        renderThreads();
+      }
+      return changed;
     })().finally(()=>{channelMetaRefreshPromise=null;});
     return channelMetaRefreshPromise;
   }
@@ -829,10 +844,36 @@
     }
     return icon;
   }
-  function renderThreads() {
-    const box=document.getElementById("webConciergeThreads");if(!box)return;clearNode(box);
+  function sidebarSignatureFor(list){
+    return JSON.stringify({
+      active:String(activeThreadId||""),
+      rows:(Array.isArray(list)?list:[]).map((thread)=>{
+        const channel=String(thread?.channel_view||channelForThreadId(thread?.thread_id||"")).toUpperCase();
+        const isChannel=channel!=="CHAT";
+        const meta=isChannel?normalizeChannelMetaLines(thread?.meta_lines):[];
+        return {
+          id:String(thread?.thread_id||""),
+          channel,
+          title:String(thread?.title||""),
+          preview:isChannel?"":String(thread?.preview||""),
+          meta,
+          updated:String(thread?.updated_at||"")
+        };
+      })
+    });
+  }
+  function renderThreads({force=false}={}) {
+    const box=document.getElementById("webConciergeThreads");if(!box)return false;
     const list=[...threadCache];
-    if(!list.length){const e=document.createElement("div");e.className="web-concierge-threads-empty";e.textContent="Noch keine gespeicherten Chats.";box.appendChild(e);return;}
+    const signature=sidebarSignatureFor(list);
+    if(!force&&signature===sidebarRenderSignature&&box.childElementCount>0)return false;
+    sidebarRenderSignature=signature;
+    box.dataset.nwSidebarRenderer="single-writer-v5";
+    box.dataset.nwSidebarClient="55";
+    clearNode(box);
+    if(!list.length){
+      const e=document.createElement("div");e.className="web-concierge-threads-empty";e.textContent="Noch keine gespeicherten Chats.";box.appendChild(e);return true;
+    }
     for(const thread of list){
       const b=document.createElement("button");
       b.type="button";
@@ -844,12 +885,14 @@
       const titleText=document.createElement("span");titleText.className="web-concierge-thread-title-text";titleText.textContent=thread.title||"Chat";
       if(b.dataset.chatScope==="CHANNEL")title.append(channelIcon(b.dataset.chatChannel),titleText);else title.append(titleText);
       const preview=document.createElement("span");preview.className="web-concierge-thread-preview";
-      const metaLines=Array.isArray(thread.meta_lines)?thread.meta_lines.map((value)=>String(value||"").trim()).filter(Boolean):[];
-      if(metaLines.length){
+      if(b.dataset.chatScope==="CHANNEL"){
+        const metaLines=normalizeChannelMetaLines(thread.meta_lines);
         for(const value of metaLines){
           const line=document.createElement("span");line.className="web-concierge-thread-preview-line";line.textContent=value;preview.appendChild(line);
         }
-      }else preview.textContent=thread.preview||"";
+      }else{
+        preview.textContent=thread.preview||"";
+      }
       const date=document.createElement("span");date.className="web-concierge-thread-date";date.textContent=thread.updated_at?sidebarDate(thread.updated_at):"";
       b.append(title,preview,date);
       b.addEventListener("click",()=>{setMobileDrawer(false);void selectThread(thread.thread_id);});
@@ -857,6 +900,7 @@
     }
     const firstChannel=[...box.querySelectorAll(".web-concierge-thread")].find((button)=>button.dataset.chatScope==="CHANNEL");
     if(firstChannel)firstChannel.dataset.chatChannelFirst="true";
+    return true;
   }
   function historySignature(messages) {
     return `${historyHasMore?"more":"end"}\n`+(Array.isArray(messages)?messages:[]).map((m)=>`${m?.id||""}|${m?.at||""}|${m?.role||""}|${m?.channel||""}|${m?.kind||"TEXT"}|${m?.audio_message_id||""}|${m?.text||""}`).join("\n");
@@ -914,15 +958,15 @@
       const phoneMeta=sidebarMetaLines("PHONE");
       const emailMeta=sidebarMetaLines("EMAIL");
       const whatsappThread={
-        thread_id:VIRTUAL_WHATSAPP_THREAD_ID,title:"WhatsApp",preview:whatsappMeta.join(" · "),meta_lines:whatsappMeta,updated_at:null,
+        thread_id:VIRTUAL_WHATSAPP_THREAD_ID,title:"WhatsApp",preview:"",meta_lines:whatsappMeta,updated_at:null,
         channels:["WHATSAPP"],channel_view:"WHATSAPP",virtual_channel_thread:true
       };
       const phoneThread={
-        thread_id:VIRTUAL_PHONE_THREAD_ID,title:"Telefonprotokoll",preview:phoneMeta.join(" · "),meta_lines:phoneMeta,updated_at:null,
+        thread_id:VIRTUAL_PHONE_THREAD_ID,title:"Telefonprotokoll",preview:"",meta_lines:phoneMeta,updated_at:null,
         channels:["PHONE"],channel_view:"PHONE",virtual_channel_thread:true
       };
       const emailThread={
-        thread_id:VIRTUAL_EMAIL_THREAD_ID,title:"E-Mail-Protokoll",preview:emailMeta.join(" · "),meta_lines:emailMeta,updated_at:null,
+        thread_id:VIRTUAL_EMAIL_THREAD_ID,title:"E-Mail-Protokoll",preview:"",meta_lines:emailMeta,updated_at:null,
         channels:["EMAIL"],channel_view:"EMAIL",virtual_channel_thread:true
       };
       threadCache=[chatThread,whatsappThread,phoneThread,emailThread];
@@ -946,13 +990,13 @@
         thread_id:primaryChatThreadId,title:"Chat",preview:"",updated_at:null,
         created_at:null,turn_count:0,channels:["WEB","APP"],channel_view:"CHAT",draft:true
       },{
-        thread_id:VIRTUAL_WHATSAPP_THREAD_ID,title:"WhatsApp",preview:whatsappMeta.join(" · "),meta_lines:whatsappMeta,updated_at:null,
+        thread_id:VIRTUAL_WHATSAPP_THREAD_ID,title:"WhatsApp",preview:"",meta_lines:whatsappMeta,updated_at:null,
         channels:["WHATSAPP"],channel_view:"WHATSAPP",virtual_channel_thread:true
       },{
-        thread_id:VIRTUAL_PHONE_THREAD_ID,title:"Telefonprotokoll",preview:phoneMeta.join(" · "),meta_lines:phoneMeta,updated_at:null,
+        thread_id:VIRTUAL_PHONE_THREAD_ID,title:"Telefonprotokoll",preview:"",meta_lines:phoneMeta,updated_at:null,
         channels:["PHONE"],channel_view:"PHONE",virtual_channel_thread:true
       },{
-        thread_id:VIRTUAL_EMAIL_THREAD_ID,title:"E-Mail-Protokoll",preview:emailMeta.join(" · "),meta_lines:emailMeta,updated_at:null,
+        thread_id:VIRTUAL_EMAIL_THREAD_ID,title:"E-Mail-Protokoll",preview:"",meta_lines:emailMeta,updated_at:null,
         channels:["EMAIL"],channel_view:"EMAIL",virtual_channel_thread:true
       }];
       if(selectFirst&&!activeThreadId)activeThreadId=primaryChatThreadId;

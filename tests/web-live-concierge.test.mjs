@@ -11,8 +11,8 @@ test("web chat mounts Live Concierge on the right without replacing voice memo",
   for(const page of ["web-concierge.html","web-concierge/index.html"]){
     const html=read(page);
     assert.match(html,/assets\/web-voice-memo\.js\?v=10/);
-    assert.match(html,/assets\/web-customer-concierge\.js\?v=54/);
-    assert.match(html,/assets\/web-live-concierge\.js\?v=22/);
+    assert.match(html,/assets\/web-customer-concierge\.js\?v=55/);
+    assert.match(html,/assets\/web-live-concierge\.js\?v=23/);
     assert.match(html,/assets\/nahwerk-live-concierge\.css\?v=4/);
   }
   const boot=read("assets/web-live-concierge.js");
@@ -73,7 +73,8 @@ test("web chat keeps session validation nonblocking while gateway validates ever
 
 test("web, WhatsApp, phone and E-Mail stay separate with normal chat first",()=>{
   const chat=read("assets/web-customer-concierge.js");
-  assert.match(chat,/const next=\[chatThread,\{/);
+  assert.match(chat,/threadCache=\[chatThread,whatsappThread,phoneThread,emailThread\]/);
+  assert.match(chat,/const whatsappMeta=sidebarMetaLines\("WHATSAPP"\)/);
   assert.match(chat,/title:"WhatsApp"/);
   assert.match(chat,/channels:\["WEB","APP"\]/);
   assert.match(chat,/channels:\["WHATSAPP"\]/);
@@ -96,7 +97,8 @@ test("channel chats are grouped after normal chat and delete-all uses the shared
   assert.match(chat,/const phoneThread=\{/);
   assert.match(chat,/const emailThread=\{/);
   assert.match(chat,/threadCache=\[chatThread,whatsappThread,phoneThread,emailThread\]/);
-  assert.match(chat,/const next=\[chatThread,\{\.\.\.whatsappThread\},\{\.\.\.phoneThread\},\{\.\.\.emailThread\}\]/);
+  assert.match(chat,/function refreshChannelSidebarMeta/);
+  assert.match(chat,/function sidebarSignatureFor\(list\)/);
   assert.match(chat,/\/web\/chats\/reset/);
   assert.match(chat,/Alle Chats aus Web und App entfernen/);
 });

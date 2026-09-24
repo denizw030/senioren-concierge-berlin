@@ -198,7 +198,9 @@ test("WhatsApp is a separate read-only protocol and cannot accidentally send as 
 
 test("phone and email protocol entries stay mounted during every sidebar refresh", () => {
   assert.match(client, /threadCache=\[chatThread,whatsappThread,phoneThread,emailThread\]/);
-  assert.match(client, /const next=\[chatThread,\{\.\.\.whatsappThread\},\{\.\.\.phoneThread\},\{\.\.\.emailThread\}\]/);
+  assert.match(client, /const phoneMeta=sidebarMetaLines\("PHONE"\)/);
+  assert.match(client, /const emailMeta=sidebarMetaLines\("EMAIL"\)/);
+  assert.match(client, /if\(!force&&signature===sidebarRenderSignature&&box\.childElementCount>0\)return false/);
   assert.match(client, /thread_id:VIRTUAL_PHONE_THREAD_ID,title:"Telefonprotokoll"/);
   assert.match(client, /thread_id:VIRTUAL_EMAIL_THREAD_ID,title:"E-Mail-Protokoll"/);
 });
@@ -227,7 +229,7 @@ test("legacy and clean routes expose the same end-customer messenger", () => {
     assert.match(surface, /Neuer Chat/);
     assert.match(surface, /Deine Chats/);
     assert.match(surface, /aria-label="Chatverlauf"/);
-    assert.match(surface, /assets\/web-customer-concierge\.js\?v=54/);
+    assert.match(surface, /assets\/web-customer-concierge\.js\?v=55/);
     assert.doesNotMatch(surface, /web-customer-concierge-thread-scope\.js/);
     assert.doesNotMatch(surface, /PROD|autoritativ|Core-v1|web-gateway-v1|Fail-closed|Shadow-Antworten|kanonische Kundenidentität/i);
   }
