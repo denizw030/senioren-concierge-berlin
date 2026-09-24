@@ -1,0 +1,453 @@
+/* ACCOUNT_OVERVIEW_VISUAL_PARITY_V1_20260925
+ * Pure presentation layer for the customer portal.
+ * Goal: every account tab follows the same visual language as Overview.
+ * No display/hidden/state rules, no form behavior, no DOM or data changes.
+ */
+
+body.account-premium-ui{
+  --nw-parity-line:var(--account-nav-line);
+  --nw-parity-dark-surface:rgba(5,7,10,.22);
+  --nw-parity-dark-surface-strong:rgba(5,7,10,.32);
+  --nw-parity-dark-text:#f2efe8;
+  --nw-parity-dark-muted:#969690;
+  --nw-parity-light-surface:rgba(255,255,255,.34);
+  --nw-parity-light-text:#28231b;
+  --nw-parity-light-muted:#6d665c;
+}
+
+html[data-nw-portal-theme="dark"] body.account-premium-ui main,
+body.account-premium-ui.nw-portal-dark main{
+  background:
+    radial-gradient(980px 640px at -6% 28%,rgba(122,112,63,.18),transparent 66%),
+    radial-gradient(920px 620px at 48% 10%,rgba(91,39,72,.16),transparent 69%),
+    radial-gradient(980px 700px at 102% 55%,rgba(49,43,105,.18),transparent 70%),
+    radial-gradient(760px 520px at 28% 96%,rgba(36,66,66,.09),transparent 72%),
+    linear-gradient(145deg,#050607 0%,#09080d 48%,#050508 100%)!important;
+  background-attachment:fixed!important;
+}
+
+html[data-nw-portal-theme="dark"] body.account-premium-ui .account-hero,
+html[data-nw-portal-theme="dark"] body.account-premium-ui main>.section,
+html[data-nw-portal-theme="dark"] body.account-premium-ui .account-section,
+body.account-premium-ui.nw-portal-dark .account-hero,
+body.account-premium-ui.nw-portal-dark main>.section,
+body.account-premium-ui.nw-portal-dark .account-section{
+  background:transparent!important;
+}
+
+html[data-nw-portal-theme="light"] body.account-premium-ui main,
+body.account-premium-ui.nw-portal-light main{
+  background:
+    radial-gradient(900px 520px at 92% 2%,rgba(196,157,79,.12),transparent 68%),
+    linear-gradient(180deg,#fbf8f1 0%,#f7f3ea 54%,#f2ebdf 100%)!important;
+  background-attachment:fixed!important;
+}
+
+html[data-nw-portal-theme="light"] body.account-premium-ui .account-hero,
+html[data-nw-portal-theme="light"] body.account-premium-ui main>.section,
+html[data-nw-portal-theme="light"] body.account-premium-ui .account-section,
+body.account-premium-ui.nw-portal-light .account-hero,
+body.account-premium-ui.nw-portal-light main>.section,
+body.account-premium-ui.nw-portal-light .account-section{
+  background:transparent!important;
+}
+
+/* Every tab heading uses the same open section rhythm as Overview. */
+body.account-premium-ui .account-panel-heading[data-account-panel]:not([data-account-panel="overview"]){
+  box-sizing:border-box!important;
+  width:100%!important;
+  margin:0!important;
+  padding:22px 18px 18px!important;
+  border:0!important;
+  border-radius:0!important;
+  background-color:transparent!important;
+  background-image:
+    linear-gradient(to right,
+      transparent 0,
+      transparent 5mm,
+      var(--nw-parity-line) 5mm,
+      var(--nw-parity-line) calc(100% - 5mm),
+      transparent calc(100% - 5mm),
+      transparent 100%)!important;
+  background-repeat:no-repeat!important;
+  background-position:left bottom!important;
+  background-size:100% 1px!important;
+  box-shadow:none!important;
+}
+
+body.account-premium-ui .account-panel-heading[data-account-panel]:not([data-account-panel="overview"]) h2{
+  margin:5px 0 7px!important;
+  font-size:clamp(1.45rem,2.2vw,2rem)!important;
+  line-height:1.08!important;
+  letter-spacing:-.035em!important;
+}
+
+body.account-premium-ui .account-panel-heading[data-account-panel]:not([data-account-panel="overview"]) p{
+  max-width:760px!important;
+  margin:0!important;
+  font-size:12px!important;
+  line-height:1.55!important;
+}
+
+/* Top-level tab sections are open surfaces, not a second card system. */
+body.account-premium-ui .dash>
+:is(
+  article.card,
+  .safety-hub,
+  #familyOwnerPanelSlot
+)[data-account-panel]:not([data-account-panel="overview"]){
+  box-sizing:border-box!important;
+  width:100%!important;
+  margin:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background-color:transparent!important;
+  box-shadow:none!important;
+}
+
+body.account-premium-ui .dash>
+article.card[data-account-panel]:not([data-account-panel="overview"]){
+  padding:22px 18px!important;
+  background-image:
+    linear-gradient(to right,
+      transparent 0,
+      transparent 5mm,
+      var(--nw-parity-line) 5mm,
+      var(--nw-parity-line) calc(100% - 5mm),
+      transparent calc(100% - 5mm),
+      transparent 100%)!important;
+  background-repeat:no-repeat!important;
+  background-position:left bottom!important;
+  background-size:100% 1px!important;
+}
+
+/* Shared internal surfaces: same transparent/divider language as Overview. */
+body.account-premium-ui :is(
+  .usagebox,
+  .safety-hub-card,
+  .email-provider-card,
+  .email-capability,
+  .email-state-card,
+  .email-runtime-note,
+  .email-continuity-note,
+  .recommend,
+  .response-channel-default,
+  .response-channel-option,
+  .response-channel-one-off,
+  .reception-check,
+  .reception-contact,
+  .fraud-protection-grid>div,
+  .fraud-channel-item,
+  .fraud-situation-check,
+  .fraud-channel-section,
+  .fraud-final-note,
+  .safety-summary-item,
+  .safety-chain-step,
+  .mfa-method,
+  .mfa-form,
+  .mfa-setup,
+  .access-empty,
+  .access-person,
+  .access-right,
+  .family-owner-empty,
+  .family-owner-panel,
+  .family-owner-form,
+  .family-quota-section,
+  .family-quota-field,
+  .family-managed-detail
+){
+  border:0!important;
+  border-radius:0!important;
+  background-color:transparent!important;
+  box-shadow:none!important;
+  background-image:
+    linear-gradient(to right,
+      transparent 0,
+      transparent 5mm,
+      var(--nw-parity-line) 5mm,
+      var(--nw-parity-line) calc(100% - 5mm),
+      transparent calc(100% - 5mm),
+      transparent 100%)!important;
+  background-repeat:no-repeat!important;
+  background-position:left bottom!important;
+  background-size:100% 1px!important;
+}
+
+/* Keep grids, but make their spacing match the calm Overview rhythm. */
+body.account-premium-ui :is(
+  .usagegrid,
+  .safety-hub,
+  .email-provider-grid,
+  .email-capabilities,
+  .response-channel-defaults,
+  .response-channel-options,
+  .fraud-protection-grid,
+  .safety-summary-grid,
+  .mfa-method-grid,
+  .access-list,
+  .family-owner-list
+){
+  gap:0!important;
+  row-gap:0!important;
+  column-gap:0!important;
+}
+
+body.account-premium-ui :is(
+  .usagebox,
+  .safety-hub-card,
+  .email-provider-card,
+  .email-capability,
+  .response-channel-default,
+  .response-channel-option,
+  .fraud-protection-grid>div,
+  .safety-summary-item,
+  .mfa-method
+){
+  min-height:96px!important;
+  padding:17px 18px!important;
+}
+
+/* Paired/tiled groups get the same restrained center divider as Overview. */
+@media(min-width:761px){
+  body.account-premium-ui :is(
+    .usagebox,
+    .safety-hub-card,
+    .response-channel-default,
+    .response-channel-option,
+    .safety-summary-item,
+    .mfa-method
+  ):nth-child(2n){
+    background-image:
+      linear-gradient(to bottom,
+        transparent 0,
+        transparent 5mm,
+        var(--nw-parity-line) 5mm,
+        var(--nw-parity-line) calc(100% - 5mm),
+        transparent calc(100% - 5mm),
+        transparent 100%),
+      linear-gradient(to right,
+        transparent 0,
+        transparent 5mm,
+        var(--nw-parity-line) 5mm,
+        var(--nw-parity-line) calc(100% - 5mm),
+        transparent calc(100% - 5mm),
+        transparent 100%)!important;
+    background-repeat:no-repeat,no-repeat!important;
+    background-position:left top,left bottom!important;
+    background-size:1px 100%,100% 1px!important;
+  }
+
+  body.account-premium-ui .email-provider-card:not(:first-child){
+    border-left:1px solid var(--nw-parity-line)!important;
+  }
+}
+
+/* Status/control surfaces keep their meaning but use the same material tone. */
+body.account-premium-ui :is(
+  .email-status-badge,
+  .response-channel-status,
+  .reception-status,
+  .profile-status,
+  .family-owner-status
+){
+  box-shadow:none!important;
+  background:transparent!important;
+  border-color:var(--nw-parity-line)!important;
+}
+
+/* Keep inputs and buttons functional; only normalize surrounding form sections. */
+body.account-premium-ui :is(
+  .email-generic-form,
+  .reception-grid,
+  .reception-checks,
+  .mfa-method-chooser,
+  .profile-body,
+  .family-owner-form,
+  .family-quota-section
+){
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+
+html[data-nw-portal-theme="dark"] body.account-premium-ui
+:is(
+  .account-panel-heading,
+  .dash>article.card[data-account-panel]:not([data-account-panel="overview"]),
+  .safety-hub-card,
+  .usagebox,
+  .email-provider-card,
+  .email-capability,
+  .email-state-card,
+  .email-runtime-note,
+  .email-continuity-note,
+  .recommend,
+  .response-channel-default,
+  .response-channel-option,
+  .response-channel-one-off,
+  .reception-check,
+  .fraud-protection-grid>div,
+  .fraud-channel-item,
+  .fraud-situation-check,
+  .fraud-channel-section,
+  .fraud-final-note,
+  .safety-summary-item,
+  .mfa-method,
+  .mfa-form,
+  .mfa-setup,
+  .access-empty,
+  .access-person,
+  .access-right,
+  .family-owner-empty,
+  .family-owner-panel,
+  .family-owner-form,
+  .family-quota-section,
+  .family-quota-field,
+  .family-managed-detail
+),
+body.account-premium-ui.nw-portal-dark
+:is(
+  .account-panel-heading,
+  .dash>article.card[data-account-panel]:not([data-account-panel="overview"]),
+  .safety-hub-card,
+  .usagebox,
+  .email-provider-card,
+  .email-capability,
+  .email-state-card,
+  .response-channel-default,
+  .response-channel-option,
+  .response-channel-one-off,
+  .reception-check,
+  .fraud-protection-grid>div,
+  .fraud-channel-item,
+  .safety-summary-item,
+  .mfa-method,
+  .mfa-form,
+  .mfa-setup,
+  .access-empty,
+  .family-owner-empty,
+  .family-managed-detail
+){
+  color:var(--nw-parity-dark-text)!important;
+}
+
+html[data-nw-portal-theme="dark"] body.account-premium-ui :is(.muted,.account-panel-heading p),
+body.account-premium-ui.nw-portal-dark :is(.muted,.account-panel-heading p){
+  color:var(--nw-parity-dark-muted)!important;
+}
+
+html[data-nw-portal-theme="light"] body.account-premium-ui
+:is(
+  .account-panel-heading,
+  .dash>article.card[data-account-panel]:not([data-account-panel="overview"]),
+  .safety-hub-card,
+  .usagebox,
+  .email-provider-card,
+  .email-capability,
+  .email-state-card,
+  .response-channel-default,
+  .response-channel-option,
+  .response-channel-one-off,
+  .reception-check,
+  .fraud-protection-grid>div,
+  .fraud-channel-item,
+  .safety-summary-item,
+  .mfa-method,
+  .mfa-form,
+  .mfa-setup,
+  .access-empty,
+  .family-owner-empty,
+  .family-managed-detail
+),
+body.account-premium-ui.nw-portal-light
+:is(
+  .account-panel-heading,
+  .dash>article.card[data-account-panel]:not([data-account-panel="overview"]),
+  .safety-hub-card,
+  .usagebox,
+  .email-provider-card,
+  .email-capability,
+  .email-state-card,
+  .response-channel-default,
+  .response-channel-option,
+  .response-channel-one-off,
+  .reception-check,
+  .fraud-protection-grid>div,
+  .fraud-channel-item,
+  .safety-summary-item,
+  .mfa-method,
+  .mfa-form,
+  .mfa-setup,
+  .access-empty,
+  .family-owner-empty,
+  .family-managed-detail
+){
+  color:var(--nw-parity-light-text)!important;
+}
+
+html[data-nw-portal-theme="light"] body.account-premium-ui :is(.muted,.account-panel-heading p),
+body.account-premium-ui.nw-portal-light :is(.muted,.account-panel-heading p){
+  color:var(--nw-parity-light-muted)!important;
+}
+
+/* Preserve interaction affordances without reintroducing card elevation. */
+body.account-premium-ui :is(
+  .safety-hub-card,
+  .email-provider-card,
+  .response-channel-option,
+  .mfa-method
+):hover,
+body.account-premium-ui :is(
+  .safety-hub-card,
+  .email-provider-card,
+  .response-channel-option,
+  .mfa-method
+):focus-visible{
+  transform:none!important;
+  box-shadow:none!important;
+  background-color:rgba(255,255,255,.025)!important;
+}
+
+html[data-nw-portal-theme="light"] body.account-premium-ui :is(
+  .safety-hub-card,
+  .email-provider-card,
+  .response-channel-option,
+  .mfa-method
+):hover,
+body.account-premium-ui.nw-portal-light :is(
+  .safety-hub-card,
+  .email-provider-card,
+  .response-channel-option,
+  .mfa-method
+):hover{
+  background-color:rgba(112,87,39,.035)!important;
+}
+
+/* Mobile: same open hierarchy, no artificial center dividers. */
+@media(max-width:760px){
+  body.account-premium-ui .account-panel-heading[data-account-panel]:not([data-account-panel="overview"]){
+    padding:18px 16px 15px!important;
+  }
+
+  body.account-premium-ui .dash>
+  article.card[data-account-panel]:not([data-account-panel="overview"]){
+    padding:18px 16px!important;
+  }
+
+  body.account-premium-ui :is(
+    .usagegrid,
+    .safety-hub,
+    .email-provider-grid,
+    .email-capabilities,
+    .response-channel-defaults,
+    .response-channel-options,
+    .fraud-protection-grid,
+    .safety-summary-grid,
+    .mfa-method-grid
+  ){
+    grid-template-columns:1fr!important;
+  }
+
+  body.account-premium-ui .email-provider-card:not(:first-child){
+    border-left:0!important;
+  }
+}
