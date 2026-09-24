@@ -163,18 +163,38 @@
     const style = document.createElement("style"); style.id = "nahwerkEmailClassificationStyles";
     style.textContent = `
       .ecp-summary{grid-template-columns:repeat(6,minmax(0,1fr))!important}
-      .ecp-tb-compose-button{width:calc(100% - 24px);margin:0 12px 10px;min-height:42px;border:1px solid rgba(212,175,55,.34);border-radius:12px;background:rgba(212,175,55,.10);color:inherit;font:inherit;font-weight:750;cursor:pointer}
-      .ecp-tb-compose-button:hover{background:rgba(212,175,55,.16)}
-      .ecp-compose{display:grid;gap:14px;padding:18px 20px 24px}
-      .ecp-compose-field{display:grid;gap:6px}
-      .ecp-compose-field>span{font-size:.69rem;font-weight:750;opacity:.58}
-      .ecp-compose input,.ecp-compose select,.ecp-compose textarea{width:100%;border:1px solid rgba(127,127,127,.22);border-radius:10px;background:rgba(127,127,127,.025);color:inherit;font:inherit;padding:11px 12px}
-      .ecp-compose textarea{min-height:260px;resize:vertical;line-height:1.55}
-      .ecp-compose-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;padding-top:4px}
-      .ecp-compose-status{font-size:.75rem;line-height:1.4;opacity:.68}
-      .ecp-compose-note{font-size:.72rem;line-height:1.45;opacity:.58}
+      .ecp-tb-compose-button{width:calc(100% - 24px);margin:0 12px 10px;min-height:42px;border:1px solid rgba(201,164,88,.38);border-radius:10px;background:linear-gradient(180deg,rgba(201,164,88,.18),rgba(201,164,88,.09));color:inherit;font:inherit;font-weight:760;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+      .ecp-tb-compose-button:hover{border-color:rgba(201,164,88,.58);background:linear-gradient(180deg,rgba(201,164,88,.24),rgba(201,164,88,.12))}
+      .ecp-compose-shell{min-height:100%;display:flex;flex-direction:column;background:rgba(12,13,15,.34)}
+      .ecp-compose-head{min-height:54px;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:0 16px;border-bottom:1px solid rgba(127,127,127,.18);background:rgba(127,127,127,.025)}
+      .ecp-compose-title{display:grid;gap:2px;min-width:0}
+      .ecp-compose-title strong{font-size:.92rem;letter-spacing:-.01em}
+      .ecp-compose-title span{font-size:.68rem;opacity:.5}
+      .ecp-compose-head-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+      .ecp-compose{display:flex;flex-direction:column;min-height:0;flex:1}
+      .ecp-compose-field{display:grid;grid-template-columns:62px minmax(0,1fr);align-items:center;min-height:44px;border-bottom:1px solid rgba(127,127,127,.14);padding:0 14px}
+      .ecp-compose-field>span{font-size:.71rem;font-weight:700;opacity:.58}
+      .ecp-compose-field input,.ecp-compose-field select{width:100%;min-width:0;height:43px;border:0!important;outline:0!important;background:transparent!important;color:inherit;font:inherit;padding:0 4px!important;border-radius:0!important;box-shadow:none!important}
+      .ecp-compose-field input::placeholder{color:currentColor;opacity:.34}
+      .ecp-compose-field select{appearance:auto}
+      .ecp-compose-field:focus-within{background:rgba(47,125,255,.035)}
+      .ecp-compose-body-wrap{display:flex;flex:1;min-height:320px;padding:0}
+      .ecp-compose-body{width:100%;min-height:360px;flex:1;resize:none;border:0!important;outline:0!important;background:transparent!important;color:inherit;font:inherit;font-size:.88rem;line-height:1.65;padding:20px 18px!important;border-radius:0!important;box-shadow:none!important}
+      .ecp-compose-body::placeholder{color:currentColor;opacity:.32}
+      .ecp-compose-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;padding:8px 14px;border-top:1px solid rgba(127,127,127,.14);background:rgba(127,127,127,.018)}
+      .ecp-compose-note{font-size:.67rem;line-height:1.4;opacity:.45}
+      .ecp-compose-status{font-size:.7rem;line-height:1.4;opacity:.74}
+      .ecp-compose-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+      .ecp-compose-send{min-width:94px}
       .ecp-tb-reader-toolbar{flex-wrap:wrap}
-      @media(max-width:640px){.ecp-compose{padding:14px}.ecp-compose-actions>*{flex:1 1 auto}}
+      @media(max-width:760px){
+        .ecp-compose-head{align-items:flex-start;padding:10px 12px}
+        .ecp-compose-head-actions{width:100%;justify-content:flex-end}
+        .ecp-compose-field{grid-template-columns:48px minmax(0,1fr);padding:0 10px}
+        .ecp-compose-body{min-height:300px;padding:16px 12px!important}
+        .ecp-compose-foot{align-items:flex-start;flex-direction:column}
+        .ecp-compose-actions{width:100%;justify-content:flex-end}
+      }
       .ecp-stat-button{appearance:none;color:inherit;font:inherit;text-align:left;cursor:pointer;width:100%;transition:transform .16s ease,background .16s ease,border-color .16s ease}
       .ecp-stat-button:hover{background:rgba(127,127,127,.09);border-color:rgba(127,127,127,.34)}
       .ecp-stat-button:active{transform:scale(.985)}
@@ -1209,30 +1229,66 @@
   }
   function renderComposer(pane) {
     const state=composeState;if(!state){startComposer("NEW");return}
-    const head=el("div","ecp-tb-reader-head");
     const title=state.mode==="REPLY"?"Antworten":state.mode==="REPLY_ALL"?"Allen antworten":state.mode==="FORWARD"?"Weiterleiten":"Neue Nachricht";
-    head.append(el("strong","",title),el("span","ecp-tb-reader-kicker",state.savedDraft?"Entwurf gespeichert":"Noch nicht gesendet"));pane.append(head);
-    const form=el("div","ecp-compose");
-    const fromField=el("label","ecp-compose-field"),fromSelect=el("select");
-    fromField.append(el("span","","Von"));
-    for(const row of emailConnections){const option=el("option");option.value=String(row.connection_id||"");option.textContent=text(row.account_email||row.account_display_hint||row.provider_label,320);option.selected=option.value===state.connection_id;fromSelect.append(option)}
-    fromSelect.disabled=state.mode==="REPLY"||state.mode==="REPLY_ALL"||Boolean(state.savedDraft);
-    fromSelect.addEventListener("change",()=>{state.connection_id=fromSelect.value;state.from=connectionEmail(fromSelect.value);state.dirty=true});
-    fromField.append(fromSelect);
-    const field=(label,value,kind="input")=>{const wrap=el("label","ecp-compose-field"),control=kind==="textarea"?el("textarea"):el("input");wrap.append(el("span","",label));control.value=value||"";return {wrap,control}};
-    const toField=field("An",state.to),subjectField=field("Betreff",state.subject),bodyField=field("Nachricht",state.body_text,"textarea");
-    toField.control.addEventListener("input",()=>{state.to=toField.control.value;state.dirty=true;state.status=""});
-    subjectField.control.addEventListener("input",()=>{state.subject=subjectField.control.value;state.dirty=true;state.status=""});
-    bodyField.control.addEventListener("input",()=>{state.body_text=bodyField.control.value;state.dirty=true;state.status=""});
-    form.append(fromField,toField.wrap,subjectField.wrap,bodyField.wrap);
-    form.append(el("div","ecp-compose-note","Speichern legt einen echten Provider-Entwurf an. Gesendet wird erst nach deiner ausdrücklichen Freigabe."));
-    if(state.status)form.append(el("div","ecp-compose-status",state.status));
-    const actions=el("div","ecp-compose-actions"),cancel=button("Abbrechen","ecp-tb-toolbar-button"),save=button("Als Entwurf speichern","ecp-tb-toolbar-button"),send=button("Senden","ecp-primary");
+    const shell=el("section","ecp-compose-shell");
+
+    const head=el("div","ecp-compose-head"),titleWrap=el("div","ecp-compose-title"),headActions=el("div","ecp-compose-head-actions");
+    titleWrap.append(el("strong","",title),el("span","",state.savedDraft?"Im Entwürfe-Ordner gespeichert":"Noch nicht gesendet"));
+    const cancel=button("Abbrechen","ecp-tb-toolbar-button"),save=button("Entwurf speichern","ecp-tb-toolbar-button"),send=button("Senden","ecp-primary ecp-compose-send");
     cancel.disabled=composeSaving;save.disabled=composeSaving;send.disabled=composeSaving;
-    cancel.addEventListener("click",()=>{composeState=null;readerMode="MESSAGE";render(true)});
+    cancel.addEventListener("click",()=>{
+      if(state.dirty&&!state.savedDraft&&!confirm("Diesen ungespeicherten Entwurf verwerfen?"))return;
+      composeState=null;readerMode="MESSAGE";render(true);
+    });
     save.addEventListener("click",()=>void saveComposerDraft());
     send.addEventListener("click",()=>void sendComposer());
-    actions.append(cancel,save,send);form.append(actions);pane.append(form);
+    headActions.append(cancel,save,send);head.append(titleWrap,headActions);shell.append(head);
+
+    const form=el("div","ecp-compose");
+    const fromField=el("label","ecp-compose-field"),fromLabel=el("span","","Von"),fromSelect=el("select");
+    fromSelect.setAttribute("aria-label","Absender");
+    for(const row of emailConnections){
+      const option=el("option");
+      option.value=String(row.connection_id||"");
+      option.textContent=text(row.account_email||row.account_display_hint||row.provider_label,320);
+      option.selected=option.value===state.connection_id;
+      fromSelect.append(option);
+    }
+    fromSelect.disabled=state.mode==="REPLY"||state.mode==="REPLY_ALL"||Boolean(state.savedDraft);
+    fromSelect.addEventListener("change",()=>{state.connection_id=fromSelect.value;state.from=connectionEmail(fromSelect.value);state.dirty=true});
+    fromField.append(fromLabel,fromSelect);
+
+    const makeInputField=(label,value,placeholder)=>{
+      const wrap=el("label","ecp-compose-field"),caption=el("span","",label),control=el("input");
+      control.type="text";control.value=value||"";control.placeholder=placeholder||"";control.autocomplete="off";
+      wrap.append(caption,control);
+      return {wrap,control};
+    };
+    const toField=makeInputField("An",state.to,"name@beispiel.de");
+    const subjectField=makeInputField("Betreff",state.subject,"Betreff");
+    const bodyWrap=el("div","ecp-compose-body-wrap"),bodyField=el("textarea","ecp-compose-body");
+    bodyField.value=state.body_text||"";bodyField.placeholder="Nachricht schreiben …";bodyField.setAttribute("aria-label","Nachricht");
+
+    toField.control.addEventListener("input",()=>{state.to=toField.control.value;state.dirty=true;state.status=""});
+    subjectField.control.addEventListener("input",()=>{state.subject=subjectField.control.value;state.dirty=true;state.status=""});
+    bodyField.addEventListener("input",()=>{state.body_text=bodyField.value;state.dirty=true;state.status=""});
+    bodyField.addEventListener("keydown",(ev)=>{
+      if((ev.metaKey||ev.ctrlKey)&&ev.key==="Enter"){ev.preventDefault();void sendComposer()}
+    });
+
+    bodyWrap.append(bodyField);
+    form.append(fromField,toField.wrap,subjectField.wrap,bodyWrap);
+
+    const foot=el("div","ecp-compose-foot"),footCopy=el("div");
+    footCopy.append(el("div","ecp-compose-note","Entwurf wird im echten Entwürfe-Ordner des gewählten Postfachs gespeichert."));
+    if(state.status)footCopy.append(el("div","ecp-compose-status",state.status));
+    const footActions=el("div","ecp-compose-actions"),saveBottom=button("Entwurf speichern","ecp-tb-toolbar-button"),sendBottom=button("Senden","ecp-primary ecp-compose-send");
+    saveBottom.disabled=composeSaving;sendBottom.disabled=composeSaving;
+    saveBottom.addEventListener("click",()=>void saveComposerDraft());sendBottom.addEventListener("click",()=>void sendComposer());
+    footActions.append(saveBottom,sendBottom);foot.append(footCopy,footActions);form.append(foot);
+
+    shell.append(form);pane.append(shell);
+    requestAnimationFrame(()=>{const target=state.mode==="NEW"&&!state.to?toField.control:bodyField;try{target.focus({preventScroll:true})}catch{target.focus()}});
   }
 
   function renderMailboxSidebar(shell) {
@@ -1378,8 +1434,7 @@
     search.addEventListener("keydown",(ev)=>{if(ev.key==="Enter"){ev.preventDefault();mailboxSearch=search.value;render(true);}});
     searchWrap.append(el("span","","⌕"),search);
     const providerTruth=mailboxProviderTruthLabel(),status=el("span","ecp-tb-live ecp-tb-provider-truth",providerTruth);status.title=providerTruth;
-    const composeTop=button("＋ Neue Nachricht","ecp-tb-toolbar-button");composeTop.addEventListener("click",()=>startComposer("NEW"));
-    toolbar.append(left,composeTop,searchWrap,status);workspace.append(toolbar);
+    toolbar.append(left,searchWrap,status);workspace.append(toolbar);
     const shell=el("div","ecp-tb-shell");renderMailboxSidebar(shell);renderMailboxListPane(shell);renderMailboxReader(shell);workspace.append(shell);root.append(workspace);
     restoreTransientUiState(root,transient);
     if (Date.now() < preservePageScrollUntil) requestAnimationFrame(() => window.scrollTo({ top: preservePageScrollY, left: 0, behavior: "auto" }));
