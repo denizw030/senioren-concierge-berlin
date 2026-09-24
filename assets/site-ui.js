@@ -584,6 +584,19 @@
             background-size:100% 1px!important;
           }
         }
+
+        /* ACCOUNT_PANEL_VISIBILITY_AUTHORITY_V2_20260924
+           Tab routing is independent from component-level hidden state.
+           This is the final account-style invariant and intentionally wins over
+           all earlier display:grid/flex !important presentation rules. */
+        html body.account-premium-ui.account-premium-ui [data-account-panel][data-account-tab-visible="false"]{
+          display:none!important;
+          visibility:hidden!important;
+          pointer-events:none!important;
+        }
+        html body.account-premium-ui.account-premium-ui [data-account-panel][hidden]{
+          display:none!important;
+        }
       `;
     }
     document.head.appendChild(style);

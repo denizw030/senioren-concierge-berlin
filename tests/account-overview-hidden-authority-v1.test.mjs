@@ -18,6 +18,6 @@ test("overview lower grid cannot override hidden state on non-overview tabs",()=
 });
 
 test("account routes load the fixed site-ui asset",()=>{
-  assert.match(konto,/assets\/site-ui\.js\?v=24/);
-  assert.match(clean,/assets\/site-ui\.js\?v=24/);
+  assert.match(konto,/assets\/site-ui\.js\?v=25/);
+  assert.match(clean,/assets\/site-ui\.js\?v=25/);
 });
