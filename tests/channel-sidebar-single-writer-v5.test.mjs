@@ -9,7 +9,7 @@ test("channel sidebar is idempotent and does not rebuild unchanged DOM",()=>{
   assert.match(client,/function sidebarSignatureFor\(list\)/);
   assert.match(client,/if\(!force&&signature===sidebarRenderSignature&&box\.childElementCount>0\)return false/);
   assert.match(client,/box\.dataset\.nwSidebarRenderer="single-writer-v5"/);
-  assert.match(client,/box\.dataset\.nwSidebarClient="55"/);
+  assert.match(client,/box\.dataset\.nwSidebarClient="56"/);
 });
 
 test("virtual channel rows can never fall back to combined preview text",()=>{
@@ -27,7 +27,7 @@ test("unchanged channel metadata does not trigger a sidebar repaint",()=>{
 });
 
 test("only one concierge runtime can start timers in a page",()=>{
-  assert.match(client,/WEB_CONCIERGE_CLIENT_VERSION = 55/);
+  assert.match(client,/WEB_CONCIERGE_CLIENT_VERSION = 56/);
   assert.match(client,/WEB_CONCIERGE_RUNTIME_KEY/);
   assert.match(client,/if\(window\[WEB_CONCIERGE_RUNTIME_KEY\]\?\.active===true\)return/);
 });

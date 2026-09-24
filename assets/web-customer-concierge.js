@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const WEB_CONCIERGE_CLIENT_VERSION = 55;
+  const WEB_CONCIERGE_CLIENT_VERSION = 56;
   const WEB_CONCIERGE_RUNTIME_KEY = "__nahwerkWebCustomerConciergeRuntime";
   if(window[WEB_CONCIERGE_RUNTIME_KEY]?.active===true)return;
   const runtimeToken=crypto.randomUUID();
@@ -97,18 +97,18 @@
         const conciergeWhatsapp=String(whatsappResult.value?.concierge_whatsapp_number||"").trim();
         next.WHATSAPP=normalizeChannelMetaLines([
           customerWhatsapp,
-          conciergeWhatsapp?("Concierge "+conciergeWhatsapp):""
+          conciergeWhatsapp
         ]);
       }
       if(phoneResult.status==="fulfilled"){
-        const phone=formatSidebarPhone(phoneResult.value?.phone_number);
+        const customerPhone=String(phoneResult.value?.phone_number||"").trim().replace(/^whatsapp:/i,"");
         const customerNumber=String(phoneResult.value?.customer_number||"").trim();
-        next.PHONE=normalizeChannelMetaLines([phone,customerNumber?(`Kundennr. ${customerNumber}`):""]);
+        next.PHONE=normalizeChannelMetaLines([customerPhone,customerNumber?(`Kundennr. ${customerNumber}`):""]);
       }
       if(emailResult.status==="fulfilled"){
         const addresses=Array.isArray(emailResult.value?.email_addresses)
           ? emailResult.value.email_addresses.map((value)=>String(value||"").trim()).filter(Boolean)
-          : [String(emailResult.value?.email_address||"").trim(),String(emailResult.value?.customer_email||"").trim()].filter(Boolean);
+          : [String(emailResult.value?.customer_email||"").trim(),String(emailResult.value?.email_address||"").trim()].filter(Boolean);
         next.EMAIL=normalizeChannelMetaLines([...new Map(addresses.map((value)=>[value.toLowerCase(),value])).values()]);
       }
       const changed=["WHATSAPP","PHONE","EMAIL"].some((channel)=>{
@@ -124,12 +124,6 @@
       return changed;
     })().finally(()=>{channelMetaRefreshPromise=null;});
     return channelMetaRefreshPromise;
-  }
-
-  function formatSidebarPhone(value){
-    const raw=String(value||"").trim().replace(/^whatsapp:/i,"");
-    if(/^\+49\d+$/.test(raw))return "0"+raw.slice(3);
-    return raw;
   }
 
   function channelForThreadId(threadId){
@@ -869,7 +863,7 @@
     if(!force&&signature===sidebarRenderSignature&&box.childElementCount>0)return false;
     sidebarRenderSignature=signature;
     box.dataset.nwSidebarRenderer="single-writer-v5";
-    box.dataset.nwSidebarClient="55";
+    box.dataset.nwSidebarClient="56";
     clearNode(box);
     if(!list.length){
       const e=document.createElement("div");e.className="web-concierge-threads-empty";e.textContent="Noch keine gespeicherten Chats.";box.appendChild(e);return true;
