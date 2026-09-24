@@ -66,7 +66,7 @@ test("registration keeps the hardened passphrase policy and never persists the p
   assert.match(onboarding, /blockedPasswords = new Set/);
   assert.match(onboarding, /web_password: undefined/);
   assert.match(onboarding, /web_password_repeat: undefined/);
-  assert.match(registration, /assets\/onboarding\.js\?v=25/);
+  assert.match(registration, /assets\/onboarding\.js\?v=26/);
 });
 
 test("persistent web sessions require explicit remember-me and remain revocable", () => {
@@ -86,6 +86,12 @@ test("protected account pages validate against the secure session layer", () => 
   assert.match(authNav, /const PROTECTED = new Set\(\["konto\.html", "concierge-anpassen\.html"\]\)/);
   assert.match(authNav, /functions\/v1\/web-session-secure/);
   assert.match(authNav, /response\.ok && body\.ok && body\.status === "session_valid"/);
+});
+
+test("new account security defaults to Authenticator app instead of SMS", () => {
+  assert.match(account, /let mfaSelectedMethod = "totp"/);
+  assert.match(account, /beginMfaMethod\("totp"\)/);
+  assert.match(account, /Authenticator-App der Standard/);
 });
 
 test("account security supports MFA enrollment, disable, cross-factor recovery and recovery codes", () => {
