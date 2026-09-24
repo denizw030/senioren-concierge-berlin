@@ -17,10 +17,10 @@ test("channel metadata is decoupled from the 3-second thread refresh",()=>{
   assert.doesNotMatch(block,/Promise\.allSettled\(\[\s*channelHistoryRequest\("WHATSAPP"/s);
 });
 
-test("stable session cache keeps metadata visible through normal syncs and reloads",()=>{
-  assert.match(client,/sessionStorage\.getItem\(CHANNEL_META_CACHE_KEY\)/);
-  assert.match(client,/sessionStorage\.setItem\(CHANNEL_META_CACHE_KEY/);
+test("stable in-memory cache keeps metadata visible through normal syncs",()=>{
+  assert.match(client,/let channelMetaCache = \{version:1,updated_at:0,WHATSAPP:\[\],PHONE:\[\],EMAIL:\[\]\}/);
   assert.match(client,/applyChannelMetaToThreadCache\(\)/);
+  assert.doesNotMatch(client,/CHANNEL_META_CACHE_KEY/);
 });
 
 test("transient history failures do not clear visible channel metadata",()=>{
