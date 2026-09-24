@@ -1,6 +1,13 @@
 (() => {
   "use strict";
 
+  const WEB_CONCIERGE_CLIENT_VERSION = 55;
+  const WEB_CONCIERGE_RUNTIME_KEY = "__nahwerkWebCustomerConciergeRuntime";
+  if(window[WEB_CONCIERGE_RUNTIME_KEY]?.active===true)return;
+  const runtimeToken=crypto.randomUUID();
+  window[WEB_CONCIERGE_RUNTIME_KEY]={active:true,version:WEB_CONCIERGE_CLIENT_VERSION,token:runtimeToken};
+  document.documentElement.dataset.nwWebConciergeClient=String(WEB_CONCIERGE_CLIENT_VERSION);
+
   const SESSION_KEY = "scb_web_session";
   const GUEST_INSTALLATION_KEY = "nw_web_guest_installation_v1";
   const GUEST_TOKEN_KEY = "nw_web_guest_token_v1";
