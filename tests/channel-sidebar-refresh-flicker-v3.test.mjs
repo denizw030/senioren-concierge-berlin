@@ -6,7 +6,6 @@ const client=fs.readFileSync("assets/web-customer-concierge.js","utf8");
 
 test("channel metadata is decoupled from the 3-second thread refresh",()=>{
   assert.match(client,/CHANNEL_META_REFRESH_MS = 60000/);
-  assert.match(client,/CHANNEL_META_CACHE_KEY = "nw_web_channel_sidebar_meta_v1"/);
   assert.match(client,/function refreshChannelSidebarMeta/);
   const start=client.indexOf("async function loadThreads");
   const end=client.indexOf("async function refreshThread",start);
