@@ -148,6 +148,8 @@
   const remoteFolderCache = new Map();
   const remoteFolderInflight = new Map();
   const REMOTE_FOLDER_CACHE_MS = 15000;
+  let allDrafts = [];
+  let draftsLoading = false;
   let readerMode = "MESSAGE";
   let selectedMessageId = "";
   let selectedMessageConnectionId = "";
@@ -503,7 +505,7 @@
     } while(serial===mailboxLoadSerial&&page<100);
     return rows;
   }
-  async function loadMailboxFolder() {
+  async function loadMailboxFolder(force = false) {
     if (!connected) return;
     const serial=++mailboxLoadSerial;
     if (!folderBackedMode()) { mailboxFolderRows = []; mailboxFolderError = ""; mailboxFolderLoading=false; render(); return; }
@@ -516,7 +518,7 @@
         await Promise.allSettled(connectedRows.map((row)=>streamRemoteFolder(row,"INBOX",serial,(messages)=>{
           byConnection.set(String(row.connection_id||""),mergeMailboxRows(byConnection.get(String(row.connection_id||""))||[],messages));
           mailboxFolderRows=[...byConnection.values()].flat().sort((a,b)=>(Date.parse(String(b?.date||""))||0)-(Date.parse(String(a?.date||""))||0));
-        })));
+        },force)));
         if(serial!==mailboxLoadSerial)return;
         if(!mailboxFolderRows.length && previousRows.length) mailboxFolderRows=previousRows;
       } else {
@@ -526,7 +528,7 @@
         await streamRemoteFolder(connection,mailboxFolder,serial,(messages)=>{
           accumulated=mergeMailboxRows(accumulated,messages);
           if(serial===mailboxLoadSerial) mailboxFolderRows=accumulated;
-        });
+        },force);
         if(serial!==mailboxLoadSerial)return;
         if(!mailboxFolderRows.length && previousRows.length) mailboxFolderRows=previousRows;
       }
@@ -569,7 +571,6 @@
     if (switchingConnection) { classification = null; classificationError = ""; }
     mailboxFolderRows = [];
     render();
-    void loadDashboard(false, true);
     void loadMailboxFolder();
   }
   async function selectAllInboxes() {
@@ -936,7 +937,6 @@
   function ruleFutureCopy(rule) {
     const action = String(rule?.action || "CLASSIFY_ONLY").toUpperCase();
     if (action === "TRASH") return "Zukünftig: passende E-Mails automatisch in den Gmail-Papierkorb";
-    if (action === "ARCHIVE") return "Zukünftig: passende E-Mails automatisch archivieren";
     if (action === "PRIORITIZE") return "Zukünftig: passende E-Mails automatisch hervorheben";
     return rule?.classification === "IMPORTANT"
       ? "Zukünftig: nur als wichtig einstufen · nichts verschieben"
@@ -945,7 +945,6 @@
   function existingActionCopy(rule, count) {
     const action = String(rule?.action || "").toUpperCase();
     if (action === "TRASH") return `${count} bestehende passende E-Mail${count === 1 ? "" : "s"} in den Gmail-Papierkorb verschieben?`;
-    if (action === "ARCHIVE") return `${count} bestehende passende E-Mail${count === 1 ? "" : "s"} archivieren?`;
     if (action === "PRIORITIZE") return `${count} bestehende passende E-Mail${count === 1 ? "" : "s"} hervorheben?`;
     return "";
   }
@@ -1159,7 +1158,7 @@
     const rows = mailboxFilteredMessages();
     const truthLabel=mailboxProviderTruthLabel();
     titleWrap.append(el("strong","",mailboxFolderTitle()),el("span","",mailboxFolderLoading ? truthLabel+" · weitere werden geladen …" : truthLabel)); top.append(titleWrap);
-    const refresh = button("↻","ecp-tb-icon-button"); refresh.title="Aktualisieren"; refresh.addEventListener("click",()=>{if(folderBackedMode())void loadMailboxFolder();else void loadDashboard(false,true);}); top.append(refresh); pane.append(top);
+    const refresh = button("↻","ecp-tb-icon-button"); refresh.title="Aktualisieren"; refresh.addEventListener("click",()=>{if(folderBackedMode())void loadMailboxFolder(true);else void loadDashboard(false,true);}); top.append(refresh); pane.append(top);
     const listNode = el("div","ecp-tb-message-list");
     const loading = folderBackedMode() ? mailboxFolderLoading : classificationLoading;
     const loadError = folderBackedMode() ? mailboxFolderError : classificationError;
@@ -1168,7 +1167,7 @@
     } else if (!rows.length && loadError) {
       const errorBox=el("div","ecp-tb-empty ecp-tb-error-state");
       errorBox.append(el("strong","","E-Mails konnten gerade nicht geladen werden."),el("span","","Das Postfach konnte nicht gelesen werden. Bitte versuche es erneut."));
-      const retry=button("Erneut laden","ecp-tb-toolbar-button");retry.addEventListener("click",()=>{if(folderBackedMode())void loadMailboxFolder();else{classificationRetryCount=0;void loadClassification();}});
+      const retry=button("Erneut laden","ecp-tb-toolbar-button");retry.addEventListener("click",()=>{if(folderBackedMode())void loadMailboxFolder(true);else{classificationRetryCount=0;void loadClassification();}});
       errorBox.append(retry);listNode.append(errorBox);
     } else if (!rows.length) {
       listNode.append(el("div","ecp-tb-empty","Keine passenden E-Mails in dieser Ansicht."));
@@ -1182,8 +1181,7 @@
         if(message.snippet)row.append(el("div","ecp-tb-snippet",text(message.snippet,260)));
         if(message.needs_reply)row.append(el("span","ecp-tb-reply-flag","Antwort empfohlen"));
         if(message.mailbox_location==="TRASH")row.append(el("span","ecp-tb-location-flag","Papierkorb"));
-        else if(message.mailbox_location==="ARCHIVE")row.append(el("span","ecp-tb-location-flag","Archiv"));
-        const allowClassify=mailboxScope==="ACCOUNT"&&["INBOX","IMPORTANT","UNIMPORTANT","REPLY"].includes(mailboxFolder)&&String(connectionById(messageConnection)?.provider||"GOOGLE").toUpperCase()==="GOOGLE";
+        const allowClassify=mailboxScope==="ACCOUNT"&&mailboxFolder==="INBOX"&&String(connectionById(messageConnection)?.provider||"GOOGLE").toUpperCase()==="GOOGLE";
         if(allowClassify){const actions=classificationControls(message); actions.classList.add("ecp-tb-class-actions"); row.append(actions);}
         if(message._account_email&&mailboxScope==="ALL")row.append(el("span","ecp-tb-account-chip",text(message._account_email,220)));
         const open=()=>void openMailboxMessage(message); row.addEventListener("click",open); row.addEventListener("keydown",(ev)=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();open();}});
@@ -1321,7 +1319,7 @@
     ensureHost();
     if (!connected) {
       dashboard = null; dashboardLoadedAt = 0; classification = null; classificationError = ""; classificationRetryCount = 0;
-      emailConnections = []; activeConnectionId = ""; mailboxScope = "ALL"; mailboxFolderRows = []; mailboxFolderCounts = {}; classificationKnownCounts = {}; classificationFolderCache = {}; mailboxLoadSerial++; mailboxIndexWarmStarted.clear(); remoteFolderCache.clear(); remoteFolderInflight.clear();
+      emailConnections = []; activeConnectionId = ""; mailboxScope = "ALL"; mailboxFolderRows = []; mailboxFolderCounts = {}; classificationKnownCounts = {}; classificationFolderCache = {}; mailboxLoadSerial++; mailboxIndexWarmStarted.clear(); remoteFolderCache.clear(); remoteFolderInflight.clear(); allDrafts = [];
       chatMessages = []; chatStarted = false; chatDraft=""; chatScrollTop=0; mailboxListScrollTop=0; mailboxSidebarScrollTop=0; mailboxSidebarScrollLeft=0; readerScrollTop=0; pendingBackgroundRender=false; onboardingExampleSelections.clear(); render(true); return;
     }
     try { await loadConnections(); } catch (error) { showError(error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE"); }
