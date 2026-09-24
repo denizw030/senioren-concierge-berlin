@@ -131,7 +131,7 @@ export function mountNahwerkLiveConcierge({
   let lastTranscriptEventAt=0,lastUserPersistedEndMs=null,lastAssistantPersistedEndMs=null,responseActive=false,inputSpeechActive=false;
   // VOICE_DYNAMIC_PRICE_CLIENT_V1_20260920
   let currentQuote=null;
-  let sessionId="",liveThreadId="",inputTranscript="",outputTranscript="",lastUserTurnText="",lastAssistantTurnText="",started=false,muted=false,ending=false;
+  let sessionId="",liveThreadId="",initialGreeting="",inputTranscript="",outputTranscript="",lastUserTurnText="",lastAssistantTurnText="",started=false,muted=false,ending=false,startWithGreeting=false,initialGreetingSent=false;
   let inputStartMs=null,inputEndMs=null,outputStartMs=null,outputEndMs=null,callStartedAt=0,callTimer=0;
 
   const state=(value,detail={})=>{onStateChange({state:value,...detail});};
@@ -366,7 +366,16 @@ export function mountNahwerkLiveConcierge({
   const handleEvent=async(raw)=>{
     let e; try{e=JSON.parse(raw.data);}catch{return;}
     if(e.type==="session.started"){
-      started=true;startCallTimer();setStatus("Hört zu …");state("connected",{session_id:sessionId,thread_id:liveThreadId||null});return;
+      started=true;startCallTimer();
+      state("connected",{session_id:sessionId,thread_id:liveThreadId||null,greeting_contract:startWithGreeting?"live-proactive-greeting-v1":null});
+      if(startWithGreeting&&!initialGreetingSent){
+        initialGreetingSent=true;
+        setStatus((name.textContent||"Concierge")+" spricht …");
+        sendEvent({type:"response.create"});
+      }else{
+        setStatus("Hört zu …");
+      }
+      return;
     }
     if(e.type==="input_audio_buffer.speech_started"){inputSpeechActive=true;noteTranscriptEvent();return;}
     if(e.type==="response.created"||e.type==="response.in_progress"){responseActive=true;noteTranscriptEvent();}
@@ -441,7 +450,7 @@ export function mountNahwerkLiveConcierge({
 
   async function start(){
     if(pc)return;
-    ending=false;started=false;responseActive=false;inputSpeechActive=false;liveThreadId="";inputTranscript="";outputTranscript="";lastUserTurnText="";lastAssistantTurnText="";inputStartMs=null;inputEndMs=null;outputStartMs=null;outputEndMs=null;lastUserPersistedEndMs=null;lastAssistantPersistedEndMs=null;lastTranscriptEventAt=Date.now();transcriptSeq=0;userTurnSeq=0;assistantTurnSeq=0;transcriptWrites.clear();transcriptMirror.length=0;
+    ending=false;started=false;responseActive=false;inputSpeechActive=false;liveThreadId="";initialGreeting="";startWithGreeting=false;initialGreetingSent=false;inputTranscript="";outputTranscript="";lastUserTurnText="";lastAssistantTurnText="";inputStartMs=null;inputEndMs=null;outputStartMs=null;outputEndMs=null;lastUserPersistedEndMs=null;lastAssistantPersistedEndMs=null;lastTranscriptEventAt=Date.now();transcriptSeq=0;userTurnSeq=0;assistantTurnSeq=0;transcriptWrites.clear();transcriptMirror.length=0;
     stopCallTimer();if(duration){duration.textContent="0:00";duration.hidden=true;}
     ui.hidden=false;document.documentElement.classList.add("nw-live-open");
     setPersona(currentPersonaFromPage());
@@ -488,6 +497,9 @@ export function mountNahwerkLiveConcierge({
 
       const live=await post("/session",{channel:ch,sdp:localSdp,initial_sdp:initialSdp,thread_id:threadId,price_acknowledged:Boolean(currentQuote&&currentQuote.customer_charge===true&&currentQuote.billing_exempt!==true),price_version:String(currentQuote?.price_version||"")});
       sessionId=live.session_id;
+      startWithGreeting=live?.start_with_greeting===true&&String(live?.greeting_contract||"")==="live-proactive-greeting-v1";
+      initialGreeting=String(live?.initial_greeting||"").trim();
+      if(startWithGreeting&&!initialGreeting)throw new Error("LIVE_INITIAL_GREETING_MISSING");
       setPersona(live.persona);
       const remoteSdp=String(live?.sdp||"");
       if(!/^v=0(?:\r?\n)/.test(remoteSdp)||!/(?:^|\r?\n)m=audio\s/.test(remoteSdp))throw new Error("REMOTE_SDP_INVALID");
@@ -562,7 +574,7 @@ export function mountNahwerkLiveConcierge({
     micStream?.getTracks()?.forEach(t=>t.stop());
     micMeter?.close?.();outMeter?.close?.();
     remoteAudio.pause();remoteAudio.srcObject=null;
-    pc=null;dc=null;micStream=null;micMeter=null;outMeter=null;sessionId="";liveThreadId="";started=false;muted=false;responseActive=false;inputSpeechActive=false;
+    pc=null;dc=null;micStream=null;micMeter=null;outMeter=null;sessionId="";liveThreadId="";initialGreeting="";started=false;muted=false;responseActive=false;inputSpeechActive=false;startWithGreeting=false;initialGreetingSent=false;
     muteBtn.classList.remove("is-muted");
     const endDetail={session_id:endedSessionId||null,thread_id:endedThreadId||null,transcript_finalized:true};
     if(!keepVisible){
