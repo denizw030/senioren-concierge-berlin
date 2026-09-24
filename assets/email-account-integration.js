@@ -186,7 +186,7 @@
       }
       const script = document.createElement("script");
       script.id = "emailConciergeProductRuntime";
-      script.src = "/assets/email-concierge-product.js?v=20260924-compose3";
+      script.src = "/assets/email-concierge-product.js?v=20260924-reader4";
       script.async = true;
       script.addEventListener("load", () => resolve(globalThis.NAHWERKEmailConciergeProduct || null), { once: true });
       script.addEventListener("error", () => resolve(null), { once: true });
