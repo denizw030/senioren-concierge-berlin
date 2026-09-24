@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const WEB_CONCIERGE_CLIENT_VERSION = 55;
+  const WEB_CONCIERGE_CLIENT_VERSION = 56;
   const WEB_CONCIERGE_RUNTIME_KEY = "__nahwerkWebCustomerConciergeRuntime";
   if(window[WEB_CONCIERGE_RUNTIME_KEY]?.active===true)return;
   const runtimeToken=crypto.randomUUID();
@@ -863,7 +863,7 @@
     if(!force&&signature===sidebarRenderSignature&&box.childElementCount>0)return false;
     sidebarRenderSignature=signature;
     box.dataset.nwSidebarRenderer="single-writer-v5";
-    box.dataset.nwSidebarClient="55";
+    box.dataset.nwSidebarClient="56";
     clearNode(box);
     if(!list.length){
       const e=document.createElement("div");e.className="web-concierge-threads-empty";e.textContent="Noch keine gespeicherten Chats.";box.appendChild(e);return true;
