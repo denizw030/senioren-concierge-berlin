@@ -1,0 +1,41 @@
+name: Website Integrity Guard
+
+on:
+  pull_request:
+    paths:
+      - "konto.html"
+      - "konto/**"
+      - "web-concierge.html"
+      - "web-concierge/**"
+      - "assets/**"
+      - "tests/critical-route-parity.test.mjs"
+      - "tests/konto-clean-route-parity.test.mjs"
+      - "AGENTS.md"
+      - "docs/WEBSITE-SOURCE-OF-TRUTH.md"
+      - ".github/workflows/website-integrity-guard.yml"
+  push:
+    branches: [main]
+    paths:
+      - "konto.html"
+      - "konto/**"
+      - "web-concierge.html"
+      - "web-concierge/**"
+      - "assets/**"
+      - "tests/critical-route-parity.test.mjs"
+      - "tests/konto-clean-route-parity.test.mjs"
+
+permissions:
+  contents: read
+
+jobs:
+  critical-route-parity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Verify account and Web Concierge route parity
+        run: node --test tests/critical-route-parity.test.mjs
+      - name: Verify account route contract
+        run: node --test tests/konto-clean-route-parity.test.mjs
