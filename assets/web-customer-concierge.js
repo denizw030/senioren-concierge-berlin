@@ -850,17 +850,19 @@
         ? {...normal,thread_id:primaryChatThreadId,title:"Chat",channels:["WEB","APP"],channel_view:"CHAT"}
         : {thread_id:primaryChatThreadId,title:"Chat",preview:"",updated_at:null,created_at:null,turn_count:0,channels:["WEB","APP"],channel_view:"CHAT",draft:true};
       const existingWhatsApp=threadCache.find((thread)=>String(thread?.thread_id||"")===VIRTUAL_WHATSAPP_THREAD_ID)||null;
+      const existingPhone=threadCache.find((thread)=>String(thread?.thread_id||"")===VIRTUAL_PHONE_THREAD_ID)||null;
       const existingEmail=threadCache.find((thread)=>String(thread?.thread_id||"")===VIRTUAL_EMAIL_THREAD_ID)||null;
+      const preservedMeta=(thread)=>Array.isArray(thread?.meta_lines)?thread.meta_lines.map((value)=>String(value||"").trim()).filter(Boolean):[];
       const whatsappThread={
-        thread_id:VIRTUAL_WHATSAPP_THREAD_ID,title:"WhatsApp",preview:String(existingWhatsApp?.preview||""),updated_at:null,
+        thread_id:VIRTUAL_WHATSAPP_THREAD_ID,title:"WhatsApp",preview:String(existingWhatsApp?.preview||""),meta_lines:preservedMeta(existingWhatsApp),updated_at:null,
         channels:["WHATSAPP"],channel_view:"WHATSAPP",virtual_channel_thread:true
       };
       const phoneThread={
-        thread_id:VIRTUAL_PHONE_THREAD_ID,title:"Telefonprotokoll",preview:"",updated_at:null,
+        thread_id:VIRTUAL_PHONE_THREAD_ID,title:"Telefonprotokoll",preview:String(existingPhone?.preview||""),meta_lines:preservedMeta(existingPhone),updated_at:null,
         channels:["PHONE"],channel_view:"PHONE",virtual_channel_thread:true
       };
       const emailThread={
-        thread_id:VIRTUAL_EMAIL_THREAD_ID,title:"E-Mail-Protokoll",preview:String(existingEmail?.preview||""),updated_at:null,
+        thread_id:VIRTUAL_EMAIL_THREAD_ID,title:"E-Mail-Protokoll",preview:String(existingEmail?.preview||""),meta_lines:preservedMeta(existingEmail),updated_at:null,
         channels:["EMAIL"],channel_view:"EMAIL",virtual_channel_thread:true
       };
       threadCache=[chatThread,whatsappThread,phoneThread,emailThread];
@@ -905,18 +907,22 @@
       return true;
     }catch{
       if(generation!==threadsLoadGeneration)return false;
+      if(threadCache.length){
+        renderThreads();
+        return false;
+      }
       if(!validUuid(primaryChatThreadId))primaryChatThreadId=crypto.randomUUID();
       threadCache=[{
         thread_id:primaryChatThreadId,title:"Chat",preview:"",updated_at:null,
         created_at:null,turn_count:0,channels:["WEB","APP"],channel_view:"CHAT",draft:true
       },{
-        thread_id:VIRTUAL_WHATSAPP_THREAD_ID,title:"WhatsApp",preview:"",updated_at:null,
+        thread_id:VIRTUAL_WHATSAPP_THREAD_ID,title:"WhatsApp",preview:"",meta_lines:[],updated_at:null,
         channels:["WHATSAPP"],channel_view:"WHATSAPP",virtual_channel_thread:true
       },{
-        thread_id:VIRTUAL_PHONE_THREAD_ID,title:"Telefonprotokoll",preview:"",updated_at:null,
+        thread_id:VIRTUAL_PHONE_THREAD_ID,title:"Telefonprotokoll",preview:"",meta_lines:[],updated_at:null,
         channels:["PHONE"],channel_view:"PHONE",virtual_channel_thread:true
       },{
-        thread_id:VIRTUAL_EMAIL_THREAD_ID,title:"E-Mail-Protokoll",preview:"",updated_at:null,
+        thread_id:VIRTUAL_EMAIL_THREAD_ID,title:"E-Mail-Protokoll",preview:"",meta_lines:[],updated_at:null,
         channels:["EMAIL"],channel_view:"EMAIL",virtual_channel_thread:true
       }];
       if(selectFirst&&!activeThreadId)activeThreadId=primaryChatThreadId;
