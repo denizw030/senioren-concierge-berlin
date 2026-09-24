@@ -4324,8 +4324,8 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
           securityNudgeEyebrow.textContent = required ? "Kontoschutz erforderlich" : "Empfohlener Kontoschutz";
           securityNudgeTitle.textContent = required ? "Zwei-Faktor-Authentifizierung einrichten" : "Konto zusätzlich schützen";
           securityNudgeCopy.textContent = required
-            ? "Für neue NAHWERK-Zugänge ist eine zweite Bestätigung erforderlich. Richten Sie jetzt SMS-Code oder Authenticator-App ein, bevor Sie den Kundenbereich normal verwenden."
-            : "Ihr Zugang ist eingerichtet. Sie können jetzt eine zweite Bestätigung hinzufügen. Das ist freiwillig, erhöht den Schutz Ihres Kontos aber deutlich.";
+            ? "Für neue NAHWERK-Zugänge ist die Authenticator-App der Standard für die zweite Bestätigung. SMS kann optional zusätzlich eingerichtet werden, wenn eine geeignete Mobilnummer hinterlegt ist."
+            : "Ihr Zugang ist eingerichtet. Als zusätzliche Absicherung empfehlen wir die Authenticator-App. SMS bleibt optional, wenn eine geeignete Mobilnummer hinterlegt ist.";
           securityNudgeLater.hidden = required;
           securityNudgeSms.hidden = body?.mfa?.methods?.sms?.available !== true;
           securityNudgeTotp.hidden = body?.mfa?.methods?.totp?.available === false;
@@ -4393,12 +4393,8 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
             const enrollmentRequired = body?.enrollment_required === true;
             mfaStatus.textContent = enrollmentRequired ? "Erforderlich · Noch nicht aktiviert" : "Empfohlen · Noch nicht aktiviert";
             mfaMeta.textContent = enrollmentRequired
-              ? (smsMfaAvailable()
-                  ? "Für diesen neuen Zugang muss jetzt SMS-Code oder Authenticator-App eingerichtet werden. Erst danach ist der Kundenbereich vollständig freigeschaltet."
-                  : "Für diesen neuen Zugang muss jetzt die Authenticator-App eingerichtet werden. Erst danach ist der Kundenbereich vollständig freigeschaltet.")
-              : (smsMfaAvailable()
-                  ? "Wählen Sie zwischen SMS-Code und Authenticator-App. Die Aktivierung ist freiwillig; nach der Einrichtung wird der zweite Faktor bei der Anmeldung zwingend verlangt."
-                  : "Sie können Ihr Konto zusätzlich mit einer Authenticator-App schützen. SMS wird nur angeboten, wenn eine geeignete Mobilnummer sicher hinterlegt ist.");
+              ? "Für diesen neuen Zugang muss jetzt die Authenticator-App eingerichtet werden. Erst danach ist der Kundenbereich vollständig freigeschaltet. SMS kann später optional ergänzt werden."
+              : "Die Authenticator-App ist der empfohlene Standard. SMS wird nur als zusätzliche Alternative angeboten, wenn eine geeignete Mobilnummer sicher hinterlegt ist.";
             mfaEnableButton.hidden = false;
             mfaEnableButton.textContent = enrollmentRequired ? "Jetzt einrichten" : "Kontoschutz einrichten";
             mfaDisableButton.hidden = true;
@@ -4425,7 +4421,13 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
           await loadMfaStatus();
         }
 
-        mfaEnableButton.addEventListener("click", showMfaMethodChooser);
+        mfaEnableButton.addEventListener("click", () => {
+          if (totpMfaAvailable() && !totpMfaEnrolled()) {
+            beginMfaMethod("totp");
+            return;
+          }
+          showMfaMethodChooser();
+        });
         mfaMethodCancelButton.addEventListener("click", () => {
           resetMfaForms();
           setMfaFeedback("");
