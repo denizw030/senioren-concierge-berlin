@@ -50,6 +50,12 @@
   const VIRTUAL_EMAIL_THREAD_ID="00000000-0000-4000-8000-0000000000a4";
   const NORMAL_CHAT_CHANNELS=new Set(["WEB","APP"]);
 
+  function formatSidebarPhone(value){
+    const raw=String(value||"").trim().replace(/^whatsapp:/i,"");
+    if(/^\+49\d+$/.test(raw))return "0"+raw.slice(3);
+    return raw;
+  }
+
   function channelForThreadId(threadId){
     const id=String(threadId||"");
     if(id===VIRTUAL_WHATSAPP_THREAD_ID)return "WHATSAPP";
@@ -776,7 +782,13 @@
       const title=document.createElement("span");title.className="web-concierge-thread-title";
       const titleText=document.createElement("span");titleText.className="web-concierge-thread-title-text";titleText.textContent=thread.title||"Chat";
       if(b.dataset.chatScope==="CHANNEL")title.append(channelIcon(b.dataset.chatChannel),titleText);else title.append(titleText);
-      const preview=document.createElement("span");preview.className="web-concierge-thread-preview";preview.textContent=thread.preview||"";
+      const preview=document.createElement("span");preview.className="web-concierge-thread-preview";
+      const metaLines=Array.isArray(thread.meta_lines)?thread.meta_lines.map((value)=>String(value||"").trim()).filter(Boolean):[];
+      if(metaLines.length){
+        for(const value of metaLines){
+          const line=document.createElement("span");line.className="web-concierge-thread-preview-line";line.textContent=value;preview.appendChild(line);
+        }
+      }else preview.textContent=thread.preview||"";
       const date=document.createElement("span");date.className="web-concierge-thread-date";date.textContent=thread.updated_at?sidebarDate(thread.updated_at):"";
       b.append(title,preview,date);
       b.addEventListener("click",()=>{setMobileDrawer(false);void selectThread(thread.thread_id);});
@@ -868,11 +880,18 @@
         if(whatsappResult.status==="fulfilled"){
           next[1].preview=String(whatsappResult.value?.whatsapp_number||next[1].preview||"").trim();
         }
-        if(phoneResult.status==="fulfilled"&&phoneResult.value?.has_calls!==true){
-          next[2].preview="";
+        if(phoneResult.status==="fulfilled"){
+          const phone=formatSidebarPhone(phoneResult.value?.phone_number);
+          const customerNumber=String(phoneResult.value?.customer_number||"").trim();
+          next[2].meta_lines=[phone,customerNumber?`Kundennr. ${customerNumber}`:""].filter(Boolean);
+          next[2].preview=next[2].meta_lines.join(" · ");
         }
         if(emailResult.status==="fulfilled"){
-          next[3].preview=String(emailResult.value?.email_address||next[3].preview||"").trim();
+          const addresses=Array.isArray(emailResult.value?.email_addresses)
+            ? emailResult.value.email_addresses.map((value)=>String(value||"").trim()).filter(Boolean)
+            : [String(emailResult.value?.email_address||"").trim(),String(emailResult.value?.customer_email||"").trim()].filter(Boolean);
+          next[3].meta_lines=[...new Map(addresses.map((value)=>[value.toLowerCase(),value])).values()].slice(0,2);
+          next[3].preview=next[3].meta_lines.join(" · ");
         }
         threadCache=next;
         renderThreads();
