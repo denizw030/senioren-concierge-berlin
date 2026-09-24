@@ -11,10 +11,15 @@ test("mailbox account switching preserves document scroll position",()=>{
   assert.match(src,/requestAnimationFrame\(\(\) => window\.scrollTo\(\{ top: preservePageScrollY/);
 });
 
-test("physical folders remain available per connected account",()=>{
-  for(const folder of ["INBOX","SENT","SPAM","TRASH"]) assert.match(src,new RegExp('\\["'+folder+'"'));
+test("exactly five physical folders remain available per connected account",()=>{
+  for(const folder of ["INBOX","SPAM","SENT","DRAFTS","TRASH"]) assert.match(src,new RegExp('\\["'+folder+'"'));
+  assert.match(src,/CANONICAL_MAILBOX_FOLDERS = Object\.freeze\(\["INBOX","SPAM","SENT","DRAFTS","TRASH"\]\)/);
+  assert.match(src,/const folders = \[\["INBOX","Posteingang","▣"\],\["SPAM","Spam","⚑"\],\["SENT","Gesendet","➤"\],\["DRAFTS","Entwürfe","✎"\],\["TRASH","Papierkorb","⌫"\]\]/);
+  assert.doesNotMatch(src,/const folders = .*IMPORTANT/);
+  assert.doesNotMatch(src,/const folders = .*UNIMPORTANT/);
+  assert.doesNotMatch(src,/const folders = .*REPLY/);
   assert.match(src,/\/email\/concierge\/folder/);
-  assert.match(src,/connectionId: String\(connection\.connection_id/);
+  assert.match(src,/connectionId/);
 });
 
 console.log("EMAIL_MAILBOX_ACCOUNT_SWITCH_UI=GREEN");

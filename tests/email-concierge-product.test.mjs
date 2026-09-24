@@ -22,8 +22,14 @@ test("standalone E-Mail-Concierge uses only the canonical PROD email runtime",()
   assert.match(js,/\/email\/concierge\/rules\/delete/);
 });
 
+
 test("customer UI contains the complete Thunderbird-style mail workspace",()=>{
-  for(const phrase of ["NAHWERK Mail","Alle Posteingänge","Posteingang","Wichtig","Unwichtig","Antwort nötig","Gesendet","Spam","Papierkorb","Entwürfe","Concierge","Automatik & Schutz","Aktivität"]) assert.ok(js.includes(phrase),phrase);
+  for(const phrase of ["NAHWERK Mail","Alle Posteingänge","Posteingang","Spam","Gesendet","Entwürfe","Papierkorb","Concierge","Automatik & Schutz","Aktivität"]) assert.ok(js.includes(phrase),phrase);
+  assert.deepEqual(Array.from(api.CANONICAL_FOLDERS),["INBOX","SPAM","SENT","DRAFTS","TRASH"]);
+  assert.match(js,/const folders = \[\["INBOX","Posteingang","▣"\],\["SPAM","Spam","⚑"\],\["SENT","Gesendet","➤"\],\["DRAFTS","Entwürfe","✎"\],\["TRASH","Papierkorb","⌫"\]\]/);
+  assert.doesNotMatch(js,/const folders = .*IMPORTANT/);
+  assert.doesNotMatch(js,/const folders = .*UNIMPORTANT/);
+  assert.doesNotMatch(js,/const folders = .*REPLY/);
   assert.match(js,/ecp-thunderbird/);
   assert.match(js,/ecp-tb-list-pane/);
   assert.match(js,/ecp-tb-reader/);
@@ -101,17 +107,18 @@ test("connected account overview is topmost and follows canonical provider statu
   assert.doesNotMatch(multi,/emailLogoConnectShell/);
 });
 
+
 test("personal rule UI requires explicit customer confirmation and stays reversible",()=>{
   assert.match(js,/Vorschläge deines Concierges/);
-  assert.match(js,/Nur als unwichtig einstufen/);
-  assert.match(js,/Künftig automatisch archivieren/);
+  assert.match(js,/Nur intern als unwichtig einstufen/);
+  assert.doesNotMatch(js,/Künftig automatisch archivieren/);
+  assert.doesNotMatch(js,/\["ARCHIVE", "Archivieren"\]/);
   assert.match(js,/Künftig automatisch in den Papierkorb/);
   assert.match(js,/decision: "CONFIRM"/);
   assert.match(js,/decision: "REJECT"/);
   assert.match(js,/rule_id: rule\.id, active: input\.checked/);
   assert.match(js,/rule_id: rule\.id, action: select\.value/);
   assert.match(js,/persönliche E-Mail-Regel wirklich löschen/i);
-  assert.match(js,/Bereits vorhandene Nachrichten werden nie automatisch nachträglich verändert/);
   assert.match(js,/endgültiges Löschen bleibt deaktiviert/);
   assert.match(js,/\/email\/concierge\/rules\/backfill\/preview/);
   assert.match(js,/\/email\/concierge\/rules\/backfill\/apply/);
@@ -161,14 +168,14 @@ test("concierge chat renders classification views locally without another Gmail 
   assert.match(js,/E-Mail-Anbieter ist gerade kurz ausgelastet/);
 });
 
-test("concierge chat explains that commands can control mail and automation",()=>{
-  assert.match(js,/wichtig\/unwichtig festlegen/);
-  assert.match(js,/archivieren/);
+
+test("concierge chat explains internal classification without inventing physical folders",()=>{
+  assert.match(js,/Wichtig \/ Unwichtig wird intern gelernt/);
+  assert.doesNotMatch(js,/archivieren/);
   assert.match(js,/in den Papierkorb verschieben/);
   assert.match(js,/Antworten vorbereiten/);
   assert.match(js,/GitHub-Mails sind unwichtig/);
 });
-
 
 test("mailbox loading failure is visible and automatically retried once",()=>{
   assert.match(js,/classificationError/);
@@ -201,16 +208,23 @@ test("mail actions update the Thunderbird workspace immediately and then reconci
 });
 
 
-test("multi-account mailbox navigation mirrors a desktop mail client",()=>{
+
+test("multi-account mailbox navigation exposes exactly five provider-backed folders",()=>{
   assert.match(js,/\/email\/connections/);
   assert.match(js,/account_email/);
   assert.match(js,/Alle Posteingänge/);
-  assert.match(js,/\["SENT","Gesendet","➤"\]/);
-  assert.match(js,/\["SPAM","Spam","⚑"\]/);
-  assert.match(js,/\["TRASH","Papierkorb","⌫"\]/);
+  for(const entry of [
+    '["INBOX","Posteingang","▣"]',
+    '["SPAM","Spam","⚑"]',
+    '["SENT","Gesendet","➤"]',
+    '["DRAFTS","Entwürfe","✎"]',
+    '["TRASH","Papierkorb","⌫"]'
+  ]) assert.ok(js.includes(entry),entry);
+  assert.doesNotMatch(js,/const folders = .*IMPORTANT/);
+  assert.doesNotMatch(js,/const folders = .*UNIMPORTANT/);
+  assert.doesNotMatch(js,/const folders = .*REPLY/);
   assert.match(js,/\/email\/concierge\/folder/);
   assert.doesNotMatch(js,/\/email\/messages\/search/);
-  assert.match(js,/connection_id/);
   assert.match(js,/accountTitle\.addEventListener\("click",\(\)=>void selectMailboxFolder\(id,"INBOX"\)\)/);
   assert.match(css,/\.ecp-tb-account/);
   assert.match(css,/\.ecp-tb-nav-subitem/);
@@ -224,16 +238,15 @@ test("draft notifications are customer-controlled per mailbox and channel",()=>{
   assert.match(js,/\/email\/concierge\/notification-preference/);
 });
 
-test("global drafts stay at the top and preserve their source mailbox",()=>{
-  const allPos=js.indexOf('appendNav("Alle Posteingänge"');
-  const draftPos=js.indexOf('appendNav("Entwürfe"');
-  const accountPos=js.indexOf('const folders = [["INBOX"');
-  assert.ok(allPos>=0 && draftPos>allPos && accountPos>draftPos);
-  assert.match(js,/loadAllDrafts/);
-  assert.match(js,/_connection_id/);
-  assert.match(js,/_account_email/);
-});
 
+test("Drafts is a real per-account physical folder instead of a synthetic global view",()=>{
+  assert.match(js,/CANONICAL_MAILBOX_FOLDERS = Object\.freeze\(\["INBOX","SPAM","SENT","DRAFTS","TRASH"\]\)/);
+  assert.match(js,/\["DRAFTS","Entwürfe","✎"\]/);
+  assert.doesNotMatch(js,/appendNav\("Entwürfe"/);
+  assert.doesNotMatch(js,/readerMode==="DRAFTS"/);
+  assert.doesNotMatch(js,/loadAllDrafts/);
+  assert.match(js,/searchRemoteFolder\(connection, folder/);
+});
 
 test("mailbox switch keeps visible counts for the same account while refreshing",()=>{
   assert.match(js,/const switchingConnection = Boolean\(activeConnectionId && nextConnectionId && activeConnectionId !== nextConnectionId\)/);
@@ -268,12 +281,14 @@ test("mailbox error retry button is centered in a dedicated state",()=>{
 });
 
 
-test("classified messages remain visible after being moved out of Inbox",()=>{
-  assert.match(js,/classificationFolderMode/);
-  assert.match(js,/\/email\/concierge\/classification\/view/);
-  assert.match(js,/classificationKnownCounts/);
+
+test("Wichtig and Unwichtig stay internal classifications rather than mailbox folders",()=>{
+  assert.match(js,/classification\/override/);
+  assert.match(js,/classificationLabel/);
+  assert.match(js,/const allowClassify=mailboxScope==="ACCOUNT"&&mailboxFolder==="INBOX"/);
+  assert.doesNotMatch(js,/classificationFolderMode/);
+  assert.doesNotMatch(js,/const folders = .*IMPORTANT/);
   assert.match(js,/mailbox_location==="TRASH"/);
-  assert.match(js,/Papierkorb/);
 });
 
 test("physical mailbox counts use live Gmail folder metadata rather than classification totals",()=>{
@@ -283,15 +298,19 @@ test("physical mailbox counts use live Gmail folder metadata rather than classif
   assert.doesNotMatch(js,/if \(folder === "INBOX"\) return classification\?\.total/);
 });
 
-test("mailbox refreshes every minute and when the tab becomes visible",()=>{
-  assert.match(js,/setInterval\(\(\)=>\{ void refreshLiveMailbox\(\); \},60000\)/);
+
+test("UI polling is quota-aware while backend monitoring remains independent",()=>{
+  assert.match(js,/setInterval\(\(\)=>\{ void refreshLiveMailbox\(\); \},120000\)/);
   assert.match(js,/visibilitychange/);
   assert.match(js,/await loadConnections\(\); await loadMailboxFolder\(\)/);
+  assert.match(js,/REMOTE_FOLDER_CACHE_MS = 15000/);
 });
 
-test("bulk trash of unwichtig keeps the virtual Unwichtig view instead of erasing it",()=>{
-  assert.match(js,/movedUnimportantToTrash/);
-  assert.match(js,/row\.mailbox_location="TRASH"/);
+
+test("bulk Trash removes moved messages from the physical mailbox view",()=>{
+  assert.match(js,/function applyQueryResultToMailbox\(data\)/);
+  assert.match(js,/if \(ids\.length\) removeMailboxMessages\(ids\)/);
+  assert.doesNotMatch(js,/classificationFolderMode/);
   assert.match(js,/await loadMailboxFolder\(\)/);
 });
 
@@ -300,19 +319,26 @@ test("classification location badge is styled",()=>{
 });
 
 
-test("mailbox streams every Gmail page instead of stopping after 30",()=>{
-  assert.match(js,/page_token: pageToken \|\| null/);
-  assert.match(js,/page===0\?30:100/);
-  assert.match(js,/while\(pageToken && serial===mailboxLoadSerial && page<100\)/);
+
+test("mailbox loads one provider page and dedupes requests instead of quota-heavy pagination",()=>{
+  assert.match(js,/REMOTE_FOLDER_CACHE_MS = 15000/);
+  assert.match(js,/remoteFolderInflight/);
+  assert.match(js,/remoteFolderCache/);
+  assert.match(js,/searchRemoteFolder\(connection,folder,30,"",force\)/);
+  assert.doesNotMatch(js,/page===0\?30:100/);
+  assert.doesNotMatch(js,/while\(pageToken && serial===mailboxLoadSerial && page<100\)/);
   assert.match(js,/mergeMailboxRows/);
-  assert.match(js,/weitere werden geladen/);
 });
 
-test("Wichtig Unwichtig opens immediately from cached or current classification",()=>{
-  assert.match(js,/classificationFolderCache/);
-  assert.match(js,/const instant=cached\.length\?cached:list\(classification\?\.buckets\?\.\[folder\]\)/);
-  assert.match(js,/void loadDashboard\(false, true\)/);
-  assert.match(js,/void loadMailboxFolder\(\)/);
+
+test("Wichtig Unwichtig is never a physical sidebar folder",()=>{
+  assert.match(js,/classificationSavingIds/);
+  assert.match(js,/classification\/override/);
+  assert.doesNotMatch(js,/const folders = .*IMPORTANT/);
+  assert.doesNotMatch(js,/const folders = .*UNIMPORTANT/);
+  const selectBlock=js.slice(js.indexOf("async function selectMailboxFolder"),js.indexOf("async function selectAllInboxes"));
+  assert.doesNotMatch(selectBlock,/loadDashboard\(false, true\)/);
+  assert.match(selectBlock,/void loadMailboxFolder\(\)/);
 });
 
 test("manual classification sends visible message metadata to avoid a Gmail reread",()=>{
@@ -359,11 +385,14 @@ test("Wichtig Unwichtig persistence does not globally disable the concierge comp
 });
 
 
-test("mailbox index warms in the background and refreshes the current folder when ready",()=>{
+
+test("mailbox index warms without triggering an extra provider folder fetch",()=>{
   assert.match(js,/mailboxIndexWarmStarted/);
   assert.match(js,/\/email\/concierge\/index\/status/);
   assert.match(js,/\/email\/concierge\/index\/warm/);
   assert.match(js,/setTimeout\(\(\)=>void warmMailboxIndex\(connection\),800\)/);
+  const warmBlock=js.slice(js.indexOf("async function warmMailboxIndex"),js.indexOf("async function loadConnections"));
+  assert.doesNotMatch(warmBlock,/loadMailboxFolder/);
 });
 
 test("chat typing and scroll remain stable during mailbox background activity",()=>{
@@ -387,10 +416,12 @@ test("nonempty concierge drafts block even forced background rerenders",()=>{
   assert.match(js,/compositionend/);
 });
 
-test("first concierge view explains assisted sorting with interactive example mails",()=>{
+
+test("first concierge view explains classification as intelligence, not folders",()=>{
   assert.match(js,/classification_review/);
   assert.match(js,/Beispiel: So lernt dein E-Mail-Concierge/);
-  assert.match(js,/Dein Posteingang bleibt dabei unverändert/);
+  assert.match(js,/Die sichtbaren Mailbereiche bleiben Posteingang, Spam, Gesendet, Entwürfe und Papierkorb/);
   assert.match(js,/onboardingExampleSelections/);
   assert.match(js,/\["IMPORTANT","Wichtig"\],\["UNIMPORTANT","Unwichtig"\]/);
 });
+

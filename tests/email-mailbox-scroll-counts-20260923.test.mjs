@@ -18,11 +18,12 @@ test("left mailbox navigation preserves its own scroll state across every render
 });
 
 test("selected account header and inbox badge use the same canonical provider truth",()=>{
+  assert.match(src,/function folderProviderTruth/);
   assert.match(src,/function inboxProviderTruth/);
   assert.match(src,/messages_total:number\(data\?\.messages_total\?\?data\?\.folder_meta\?\.messages_total\)/);
   assert.match(src,/messages_unread:number\(data\?\.messages_unread\?\?data\?\.folder_meta\?\.messages_unread\)/);
-  assert.match(src,/mailboxFolderCounts\?\.\[String\(connectionId\|\|""\)\]\?\.INBOX/);
-  assert.match(src,/E-Mails insgesamt/);
+  assert.match(src,/mailboxFolderCounts\?\.\[String\(connectionId\|\|""\)\]\?\.\[folder\]/);
+  assert.match(src,/E-Mails in diesem Bereich/);
   assert.match(src,/ungelesen/);
   assert.match(src,/mailboxFolderCount\(value,id\)/);
   assert.match(src,/ecp-tb-live ecp-tb-provider-truth/);
@@ -30,8 +31,8 @@ test("selected account header and inbox badge use the same canonical provider tr
 });
 
 test("mailbox fix is cache-busted in account integration",()=>{
-  assert.match(integration,/email-concierge-product\.js\?v=20260923-3/);
-  assert.match(integration,/email-concierge-product\.css\?v=20260923-3/);
+  assert.match(integration,/email-concierge-product\.js\?v=20260924-5folder/);
+  assert.match(integration,/email-concierge-product\.css\?v=20260924-5folder/);
 });
 
 console.log("EMAIL_MAILBOX_SCROLL_COUNTS=GREEN");
