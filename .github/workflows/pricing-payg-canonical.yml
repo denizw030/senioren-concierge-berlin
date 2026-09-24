@@ -1,0 +1,52 @@
+name: Pricing and PAYG Canonical
+
+on:
+  pull_request:
+    paths:
+      - "pakete.html"
+      - "pakete/**"
+      - "agb.html"
+      - "agb/**"
+      - "nutzungsbedingungen/**"
+      - "payg.html"
+      - "payg/**"
+      - "tests/pricing-payg-canonical.test.mjs"
+      - ".github/workflows/pricing-payg-canonical.yml"
+  push:
+    branches: [main]
+    paths:
+      - "pakete.html"
+      - "pakete/**"
+      - "agb.html"
+      - "agb/**"
+      - "nutzungsbedingungen/**"
+      - "payg.html"
+      - "payg/**"
+      - "tests/pricing-payg-canonical.test.mjs"
+      - ".github/workflows/pricing-payg-canonical.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  canonical:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verify canonical pricing and PAYG path
+        run: node --test tests/pricing-payg-canonical.test.mjs
+      - name: Verify clean route still serves
+        run: |
+          python3 -m http.server 4173 >/tmp/nw-pricing-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill $server_pid' EXIT
+          for attempt in 1 2 3 4 5; do
+            curl -fsS "http://127.0.0.1:4173/pakete/" >/dev/null && break
+            sleep 1
+          done
+          curl -fsS "http://127.0.0.1:4173/pakete/" >/dev/null
+          curl -fsS "http://127.0.0.1:4173/payg/" >/dev/null
