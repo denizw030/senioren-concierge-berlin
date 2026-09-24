@@ -13,11 +13,13 @@ test("hidden registration rows cannot be forced visible by component CSS", () =>
   assert.match(html, /id="consentRow" hidden/);
 });
 
-test("self registration removes the third-party consent control", () => {
-  assert.match(onboarding, /consentRow\.hidden\s*=\s*self/);
-  assert.match(onboarding, /consent\.disabled\s*=\s*self/);
-  assert.match(onboarding, /consent\.required\s*=\s*!self/);
-  assert.match(onboarding, /if \(self\) consent\.checked\s*=\s*false/);
+test("WhatsApp is optional and consent is required only when a WhatsApp number is supplied", () => {
+  assert.match(onboarding, /\$\("ownerPhone"\)\.required\s*=\s*false/);
+  assert.match(onboarding, /\$\("recipientPhone"\)\.required\s*=\s*false/);
+  assert.match(onboarding, /recipientHasWhatsapp/);
+  assert.match(onboarding, /consent\.required\s*=\s*recipientHasWhatsapp/);
+  assert.match(html, /Deine WhatsApp-Telefonnummer[\s\S]*\(optional\)/);
+  assert.match(html, /WhatsApp-Telefonnummer der unterstützten Person[\s\S]*\(optional\)/);
 });
 
 test("registration contains an accessible in-flow plan switcher", () => {
