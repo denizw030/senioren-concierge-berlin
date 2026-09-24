@@ -67,7 +67,7 @@ test("both chat routes use the full consistent footer and complete legal links",
       assert.ok(page.includes(label), `missing footer link ${label}`);
     }
     assert.match(page, /assets\/site-ui\.js\?v=8/);
-    assert.match(page, /assets\/web-customer-concierge\.js\?v=51/);
+    assert.match(page, /assets\/web-customer-concierge\.js\?v=52/);
   }
   assert.doesNotMatch(cleanChat, /web-customer-concierge-thread-scope\.js/);
 });
@@ -75,7 +75,7 @@ test("both chat routes use the full consistent footer and complete legal links",
 test("theme work does not introduce a second chat transport or WhatsApp delivery path", () => {
   for (const page of chatSurfaces) {
     const scripts = [...page.matchAll(/<script\s+src="([^"]+)"/g)].map((match) => match[1]);
-    assert.ok(scripts.some((src) => src.includes("web-customer-concierge.js?v=51")));
+    assert.ok(scripts.some((src) => src.includes("web-customer-concierge.js?v=52")));
     assert.ok(!scripts.some((src) => /whatsapp|delivery|email/i.test(src)), `unexpected delivery script: ${scripts.join(", ")}`);
   }
   assert.doesNotMatch(siteUi, /\/web\/chat|\/web\/history|customer_delivery|sendWhatsApp|sendWhatsapp/);
