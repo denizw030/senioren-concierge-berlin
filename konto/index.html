@@ -2259,6 +2259,41 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
 
   
 
+
+  <style id="account-tab-icon-alignment-final-v1">
+    @media(min-width:761px){
+      body.account-premium-ui .account-tabs.account-tabs-modern .account-tab{
+        column-gap:3px!important;
+        align-items:center!important;
+      }
+      body.account-premium-ui .account-tabs.account-tabs-modern .account-tab-icon{
+        margin:0!important;
+        transform:translateY(1px)!important;
+      }
+      body.account-premium-ui #accountTabConcierge .account-tab-concierge-logo{
+        display:inline-block!important;
+        width:15px!important;
+        height:15px!important;
+        min-width:15px!important;
+        min-height:15px!important;
+        flex:0 0 15px!important;
+        margin:0!important;
+        background-color:transparent!important;
+        background-image:url("/assets/logos/NAHWERK-Goldmann-Logo.svg?v=1")!important;
+        background-repeat:no-repeat!important;
+        background-position:center!important;
+        background-size:contain!important;
+        filter:none!important;
+        transform:translateY(1px)!important;
+      }
+      body.account-premium-ui #accountTabConcierge:hover .account-tab-concierge-logo,
+      body.account-premium-ui #accountTabConcierge:focus-visible .account-tab-concierge-logo,
+      body.account-premium-ui #accountTabConcierge[aria-selected="true"] .account-tab-concierge-logo{
+        filter:none!important;
+        transform:translateY(1px)!important;
+      }
+    }
+  </style>
 </head>
   <body class="account-premium-ui">
     <script>
