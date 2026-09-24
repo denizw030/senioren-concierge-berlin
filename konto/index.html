@@ -2194,7 +2194,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
     }
   </style>
 
-    <link rel="stylesheet" href="assets/account-portal-text-nav-v1.css?v=15" />
+    <link rel="stylesheet" href="assets/account-portal-text-nav-v1.css?v=16" />
 
   <style id="konto-overview-ambient-final-v1">
     /* Overview only — ambient NAHWERK palette. Keep layout and all other tabs untouched. */
@@ -3469,8 +3469,11 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
             tab.tabIndex = active ? 0 : -1;
             if (active && focus) tab.focus({ preventScroll: true });
           });
+          document.body.dataset.accountActivePanel = validName;
           accountPanels.forEach((panel) => {
-            panel.hidden = panel.dataset.accountPanel !== validName;
+            const active = panel.dataset.accountPanel === validName;
+            panel.dataset.accountTabVisible = active ? "true" : "false";
+            panel.hidden = !active;
           });
           if (validName !== "safety") {
             setSafetyFormOpen(false);
@@ -6005,5 +6008,5 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
   <script src="assets/account-header-concierge.js?v=4"></script>
     <script src="assets/account-address-editor.js?v=1"></script>
   <script src="assets/account-response-channel.js?v=6"></script>
-  <script src="assets/site-ui.js?v=24"></script></body>
+  <script src="assets/site-ui.js?v=25"></script></body>
 </html>
