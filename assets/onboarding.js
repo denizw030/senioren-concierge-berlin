@@ -249,7 +249,7 @@
   function updateContextTexts() {
     const name = concierge();
     const ownerPhoneHint = $("ownerPhoneField")?.querySelector(".tiny");
-    if (ownerPhoneHint) ownerPhoneHint.textContent = `Nur nötig, wenn Sie ${name} selbst über WhatsApp nutzen.`;
+    if (ownerPhoneHint) ownerPhoneHint.textContent = `Optional. Sie können WhatsApp jetzt verbinden oder später im Kundenkonto ergänzen.`;
     const recipientHeading = $("recipientBlock")?.querySelector("h2");
     if (recipientHeading) recipientHeading.textContent = `Wen darf ${name} unterstützen?`;
     const noteLabel = document.querySelector('label[for="note"]');
@@ -285,15 +285,18 @@
     consentRow.hidden = self;
     consentRow.setAttribute("aria-hidden", String(self));
     $("ownerPhoneField").hidden = !self;
-    $("ownerPhone").required = self;
+    $("ownerPhone").required = false;
     $("ownerPhone").disabled = !self;
-    consent.required = !self;
     consent.disabled = self;
     recipientIds.forEach((id) => { $(id).disabled = self; });
     $("recipientFirstName").required = !self;
     $("recipientLastName").required = !self;
-    $("recipientPhone").required = !self;
-    if (self) consent.checked = false;
+    $("recipientPhone").required = false;
+    const recipientHasWhatsapp = !self && Boolean($("recipientPhone").value.trim());
+    consentRow.hidden = self || !recipientHasWhatsapp;
+    consentRow.setAttribute("aria-hidden", String(self || !recipientHasWhatsapp));
+    consent.required = recipientHasWhatsapp;
+    if (self || !recipientHasWhatsapp) consent.checked = false;
     render();
   }
 
@@ -478,7 +481,10 @@
   sessionStorage.setItem("nahwerk_product", product);
   $("productLabel").textContent = productLabel;
   document.title = `${productLabel} registrieren | NAHWERK`;
-  form.addEventListener("input", render);
+  form.addEventListener("input", (event) => {
+    if (event.target?.id === "recipientPhone") syncSelf();
+    else render();
+  });
   form.addEventListener("change", (event) => {
     if (event.target.name === "setupFor") syncSelf();
     if (event.target.id === "safetyEnabled") syncSafety();
@@ -530,7 +536,7 @@
         if (personal) parts.push(`Persönliche Nachricht der einrichtenden Person, die beim ersten Kontakt zusätzlich zur NAHWERK-Begrüßung übermittelt werden soll: "${personal}"`);
         return parts.join("\n\n");
       })(),
-      contact_consent: self || $("consent").checked, safety_enabled: safety, checkin_times: safety ? $("checkinTimes").value.trim() : "", trusted_contact_name: safety ? $("trustedContactName").value.trim() : "", trusted_contact_phone: safety ? $("trustedContactPhone").value.trim() : "",
+      contact_consent: self ? true : (Boolean(p.phone) ? $("consent").checked : false), safety_enabled: safety, checkin_times: safety ? $("checkinTimes").value.trim() : "", trusted_contact_name: safety ? $("trustedContactName").value.trim() : "", trusted_contact_phone: safety ? $("trustedContactPhone").value.trim() : "",
       account_holder_web_only: !self, web_password: password, web_password_repeat: password
     };
     const draft = { ...request, web_password: undefined, web_password_repeat: undefined, createdAt: new Date().toISOString(), source: "website" };
