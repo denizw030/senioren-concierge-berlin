@@ -230,7 +230,7 @@
            The lower four overview items now live in the same two-column grid model
            as Safety / Nutzung / PAYG / Web Concierge. Scoped to the overview only. */
         body.account-premium-ui .dash >
-        .account-overview-lower-highlights[data-account-panel="overview"]{
+        .account-overview-lower-highlights[data-account-panel="overview"]:not([hidden]){
           order:20!important;
           grid-column:1/-1!important;
           display:grid!important;
