@@ -3469,8 +3469,11 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
             tab.tabIndex = active ? 0 : -1;
             if (active && focus) tab.focus({ preventScroll: true });
           });
+          document.body.dataset.accountActivePanel = validName;
           accountPanels.forEach((panel) => {
-            panel.hidden = panel.dataset.accountPanel !== validName;
+            const active = panel.dataset.accountPanel === validName;
+            panel.dataset.accountTabVisible = active ? "true" : "false";
+            panel.hidden = !active;
           });
           if (validName !== "safety") {
             setSafetyFormOpen(false);
