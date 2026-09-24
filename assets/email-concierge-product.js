@@ -1164,6 +1164,7 @@
     const state=composeState,to=String(state.to||"").trim(),subject=String(state.subject||"").trim(),bodyText=String(state.body_text||"");
     if(!to.includes("@")){state.status="Bitte einen gültigen Empfänger eintragen.";render(true);return null}
     if(!bodyText.trim()){state.status="Bitte Nachrichtentext eingeben.";render(true);return null}
+    if(state.savedDraft && !state.dirty){state.status="Im echten Entwürfe-Ordner gespeichert.";return state.savedDraft}
     composeSaving=true;state.status="Entwurf wird gespeichert …";render(true);
     try{
       let data;
