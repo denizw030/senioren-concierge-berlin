@@ -1237,10 +1237,10 @@
         .top .links .nw-account-cluster-desktop{margin-left:8px!important}
       }
       @media(max-width:1280px){
-        .top .nav-toggle{top:16px!important;right:clamp(10px,3vw,28px)!important}
-        .top .nav>.nw-language,.home-reference .top .nav>.nw-language{top:16px!important;right:calc(clamp(10px,3vw,28px) + 58px)!important;margin:0!important}
+        .top .nav-toggle{top:50%!important;right:0!important;transform:translateY(-50%)!important}
+        .top .nav>.nw-language,.home-reference .top .nav>.nw-language{top:50%!important;right:58px!important;transform:translateY(-50%)!important;margin:0!important}
         .top .nav>.nw-language .nw-language-button,.home-reference .top .nav>.nw-language .nw-language-button{height:48px!important;min-height:48px!important;padding:0 12px!important}
-        .nw-account-cluster-mobile{top:16px!important;right:calc(clamp(10px,3vw,28px) + 144px)!important;transform:none!important;height:48px!important}
+        .nw-account-cluster-mobile{top:50%!important;right:144px!important;transform:translateY(-50%)!important;height:48px!important}
         .nw-account-mobile{height:48px!important;min-height:48px!important}
         .nw-account-cluster-mobile .nw-account-logout{width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important}
         html[data-nw-portal-theme="light"] body.nw-portal-light:not(.account-premium-ui) .top .links,
@@ -1263,7 +1263,7 @@
         .nw-theme-toggle{width:100%;justify-content:flex-end}
       }
       @media(max-width:620px){
-        .nw-account-cluster-mobile{right:calc(clamp(10px,3vw,28px) + 144px)!important}
+        .nw-account-cluster-mobile{right:144px!important}
         .nw-account-mobile{width:48px!important;min-width:48px!important;max-width:48px!important;padding:0!important;justify-content:center!important}
         .nw-account-mobile .nw-account-name{display:none!important}
         .nw-account-cluster-mobile .nw-account-logout{display:none!important}
