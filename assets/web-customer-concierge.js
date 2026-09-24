@@ -878,7 +878,13 @@
         if(generation!==threadsLoadGeneration)return;
         const next=[chatThread,{...whatsappThread},{...phoneThread},{...emailThread}];
         if(whatsappResult.status==="fulfilled"){
-          next[1].preview=String(whatsappResult.value?.whatsapp_number||next[1].preview||"").trim();
+          const customerWhatsapp=String(whatsappResult.value?.whatsapp_number||"").trim();
+          const conciergeWhatsapp=String(whatsappResult.value?.concierge_whatsapp_number||"").trim();
+          next[1].meta_lines=[
+            customerWhatsapp,
+            conciergeWhatsapp?("Concierge "+conciergeWhatsapp):""
+          ].filter(Boolean);
+          next[1].preview=next[1].meta_lines.join(" · ");
         }
         if(phoneResult.status==="fulfilled"){
           const phone=formatSidebarPhone(phoneResult.value?.phone_number);
