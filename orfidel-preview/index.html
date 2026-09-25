@@ -7,16 +7,17 @@
   <meta name="robots" content="noindex,nofollow" />
   <title>ORFIDEL — Fidel. Dein persönlicher KI-Concierge.</title>
   <meta name="description" content="ORFIDEL ist dein persönlicher KI-Concierge. Sag es Fidel. Er kümmert sich darum." />
-  <link rel="stylesheet" href="/assets/orfidel-preview.css?v=1" />
+  <link rel="stylesheet" href="/assets/orfidel-preview.css?v=2" />
 </head>
 <body class="orfidel-page">
   <canvas class="ambient-field" id="ambient-field" aria-hidden="true"></canvas>
   <div class="ambient-vignette" aria-hidden="true"></div>
+  <div class="page-progress" aria-hidden="true"><i data-page-progress></i></div>
 
   <header class="site-header" data-header>
     <a class="brand" href="#top" aria-label="ORFIDEL Startseite">
-      <img class="brand-crown" src="/assets/logos/crown-white-96.png" width="26" height="26" alt="" />
-      <span class="brand-word">ORFIDEL</span>
+      <img class="brand-crown" src="/assets/logos/orfidel-crown-white.svg" alt="" />
+      <img class="brand-wordmark" src="/assets/logos/orfidel-wordmark-white.svg" alt="ORFIDEL" />
     </a>
     <nav class="nav" aria-label="Hauptnavigation">
       <a href="#prinzip">Wie Fidel arbeitet</a>
@@ -31,8 +32,8 @@
   </header>
 
   <main id="top">
-    <section class="hero section-shell" aria-labelledby="hero-title">
-      <div class="hero-copy reveal">
+    <section class="hero section-shell" data-hero aria-labelledby="hero-title">
+      <div class="hero-copy reveal" data-hero-copy>
         <div class="eyebrow"><span></span> PERSONAL AI CONCIERGE</div>
         <h1 id="hero-title">
           Fidel.
@@ -54,13 +55,13 @@
         </div>
       </div>
 
-      <div class="fidel-stage" data-fidel-stage aria-label="Visualisierung von Fidel">
+      <div class="fidel-stage" data-fidel-stage data-hero-stage aria-label="Visualisierung von Fidel">
         <div class="orbit orbit--one" aria-hidden="true"></div>
         <div class="orbit orbit--two" aria-hidden="true"></div>
         <div class="fidel-surface" data-fidel-surface>
           <div class="surface-shine" aria-hidden="true"></div>
           <div class="surface-top">
-            <img src="/assets/logos/crown-white-96.png" width="40" height="40" alt="" />
+            <img src="/assets/logos/orfidel-crown-white.svg" width="42" height="34" alt="" />
             <span>FIDEL</span>
             <i>ONLINE</i>
           </div>
@@ -92,6 +93,73 @@
       </div>
 
       <div class="scroll-cue" aria-hidden="true"><span></span>Scroll</div>
+      <div class="hero-watermark" aria-hidden="true">
+        <img src="/assets/logos/orfidel-wordmark-white.svg" alt="" />
+      </div>
+    </section>
+
+    <section class="cinematic-journey" data-cinematic aria-label="Fidels Arbeitsweise">
+      <div class="journey-sticky">
+        <div class="journey-grid" aria-hidden="true"></div>
+        <div class="journey-beam journey-beam--a" aria-hidden="true"></div>
+        <div class="journey-beam journey-beam--b" aria-hidden="true"></div>
+
+        <div class="journey-brand" aria-hidden="true">
+          <img src="/assets/logos/orfidel-wordmark-white.svg" alt="" />
+        </div>
+
+        <div class="journey-object" aria-hidden="true">
+          <div class="journey-halo"></div>
+          <div class="journey-device">
+            <div class="journey-device-head">
+              <img src="/assets/logos/orfidel-crown-white.svg" alt="" />
+              <span>FIDEL</span>
+              <i></i>
+            </div>
+            <div class="journey-message">„Kümmere dich darum.“</div>
+            <div class="journey-core"><b></b><b></b><b></b><em></em></div>
+            <div class="journey-actions">
+              <span class="journey-action journey-action--search">RECHERCHE</span>
+              <span class="journey-action journey-action--mail">E-MAIL</span>
+              <span class="journey-action journey-action--call">ANRUF</span>
+              <span class="journey-action journey-action--done">ERLEDIGT</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="journey-copy section-shell">
+          <article class="journey-scene is-active" data-journey-scene="0">
+            <p class="micro-label">01 · Sag es Fidel</p>
+            <h2>Eine Nachricht reicht.</h2>
+            <p>Du beschreibst dein Ziel so, wie du es einem Menschen sagen würdest.</p>
+          </article>
+          <article class="journey-scene" data-journey-scene="1">
+            <p class="micro-label">02 · Kontext</p>
+            <h2>Fidel versteht, was wirklich gemeint ist.</h2>
+            <p>Ziel, Vorlieben, offene Aufgaben und notwendige Freigaben werden zusammengeführt.</p>
+          </article>
+          <article class="journey-scene" data-journey-scene="2">
+            <p class="micro-label">03 · Aktion</p>
+            <h2>Dann passiert etwas.</h2>
+            <p>Fidel recherchiert, schreibt, ruft an oder organisiert — über denselben Concierge Core.</p>
+          </article>
+          <article class="journey-scene" data-journey-scene="3">
+            <p class="micro-label">04 · Dranbleiben</p>
+            <h2>Der Vorgang bleibt lebendig.</h2>
+            <p>Rückfragen und Ergebnisse verschwinden nicht zwischen einzelnen Chats.</p>
+          </article>
+          <article class="journey-scene" data-journey-scene="4">
+            <p class="micro-label">05 · Ergebnis</p>
+            <h2>Erledigt.</h2>
+            <p>Du bekommst das Ergebnis — nicht nur eine Antwort darüber, wie du es selbst tun könntest.</p>
+          </article>
+        </div>
+
+        <div class="journey-index" aria-hidden="true">
+          <span class="is-active">01</span><span>02</span><span>03</span><span>04</span><span>05</span>
+        </div>
+      </div>
+      <div class="journey-spacer" aria-hidden="true"></div>
     </section>
 
     <section class="statement section-shell reveal">
@@ -204,7 +272,7 @@
         </div>
         <div class="channel-orbit reveal" aria-label="Kanäle zu Fidel">
           <div class="channel-center">
-            <img src="/assets/logos/crown-white-96.png" alt="" width="48" height="48" />
+            <img src="/assets/logos/orfidel-crown-white.svg" alt="" width="48" height="48" />
             <strong>FIDEL</strong>
           </div>
           <div class="channel-node node--web"><span>WEB</span></div>
@@ -255,16 +323,18 @@
     <section class="finale">
       <div class="finale-glow" aria-hidden="true"></div>
       <div class="section-shell finale-inner reveal">
-        <img src="/assets/logos/crown-white-96.png" width="46" height="46" alt="" />
+        <img src="/assets/logos/orfidel-crown-white.svg" width="46" height="46" alt="" />
         <p class="micro-label">ORFIDEL</p>
-        <h2>Du brauchst keine weitere App.<br /><span>Du brauchst jemanden, der es erledigt.</span></h2>
+        <h2>Du brauchst keinen weiteren Chat.<br /><span>Du brauchst Fidel.</span></h2>
         <a class="pill pill--large" href="/web-concierge">Meet Fidel <span aria-hidden="true">↗</span></a>
       </div>
     </section>
   </main>
 
   <footer class="site-footer section-shell">
-    <a class="brand brand--footer" href="#top"><span class="brand-word">ORFIDEL</span></a>
+    <a class="brand brand--footer" href="#top" aria-label="ORFIDEL">
+      <img class="brand-wordmark brand-wordmark--footer" src="/assets/logos/orfidel-wordmark-white.svg" alt="ORFIDEL" />
+    </a>
     <p>Personal AI Concierge</p>
     <div>
       <a href="/impressum">Impressum</a>
@@ -273,6 +343,6 @@
     </div>
   </footer>
 
-  <script src="/assets/orfidel-preview.js?v=1" defer></script>
+  <script src="/assets/orfidel-preview.js?v=2" defer></script>
 </body>
 </html>
