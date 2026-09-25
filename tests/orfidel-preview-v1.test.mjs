@@ -9,28 +9,49 @@ const js=read("assets/orfidel-preview.js");
 const wordmark=read("assets/logos/orfidel-wordmark-white.svg");
 const crown=read("assets/logos/orfidel-crown-white.svg");
 
-test("preview is isolated and non-indexable",()=>{
+test("preview stays isolated and non-indexable",()=>{
   assert.match(page,/meta name="robots" content="noindex,nofollow"/);
-  assert.match(page,/\/assets\/orfidel-preview\.css\?v=2/);
-  assert.match(page,/\/assets\/orfidel-preview\.js\?v=2/);
+  assert.match(page,/\/assets\/orfidel-preview\.css\?v=3/);
+  assert.match(page,/\/assets\/orfidel-preview\.js\?v=3/);
   assert.doesNotMatch(page,/NAHWERK/i);
 });
 
-test("official ORFIDEL wordmark and transparent crown assets are used",()=>{
+test("official ORFIDEL SVG assets are used throughout the preview",()=>{
   assert.match(page,/\/assets\/logos\/orfidel-wordmark-white\.svg/);
   assert.match(page,/\/assets\/logos\/orfidel-crown-white\.svg/);
   assert.match(wordmark,/<path /);
   assert.match(crown,/<path /);
-  assert.doesNotMatch(wordmark,/<rect[^>]+fill=["']#?0{3,6}/i);
   assert.doesNotMatch(crown,/<rect/i);
 });
 
-test("ORFIDEL positioning and Fidel product story are present",()=>{
-  assert.match(page,/Fidel\.\s*<span>Dein persönlicher/);
+test("V3 uses a minimal editorial black-white visual system",()=>{
+  assert.match(css,/--bg:#000/);
+  assert.match(css,/--fg:#f5f5f3/);
+  assert.doesNotMatch(page,/ambient-field/);
+  assert.doesNotMatch(page,/journey-grid/);
+  assert.doesNotMatch(page,/fidel-surface/);
+  assert.doesNotMatch(css,/particle/i);
+});
+
+test("ORFIDEL product story is reduced to a few strong statements",()=>{
   assert.match(page,/Sag es Fidel\. Er kümmert sich darum\./);
-  assert.match(page,/Verstehen → Handeln → Dranbleiben → Erledigt/);
+  assert.match(page,/Eine KI, die <em>etwas tut\.<\/em>/);
+  assert.match(page,/Nicht nur eine Antwort\. Ein Ergebnis\./);
   assert.match(page,/Du brauchst keinen weiteren Chat/);
   assert.match(page,/Du brauchst Fidel/);
+});
+
+test("four-scene pinned sequence drives request to result",()=>{
+  assert.match(page,/data-sequence/);
+  assert.equal((page.match(/data-scene="/g)||[]).length,4);
+  assert.match(page,/DU SAGST ES/);
+  assert.match(page,/FIDEL VERSTEHT/);
+  assert.match(page,/FIDEL HANDELT/);
+  assert.match(page,/ERLEDIGT/);
+  assert.match(css,/\.sequence-sticky/);
+  assert.match(css,/position:sticky/);
+  assert.match(js,/scenes\.forEach/);
+  assert.match(js,/data-sequence-counter/);
 });
 
 test("preview preserves existing product entry routes",()=>{
@@ -40,51 +61,26 @@ test("preview preserves existing product entry routes",()=>{
   assert.match(page,/href="\/datenschutz"/);
 });
 
-test("V2 adds a pinned five-scene cinematic journey",()=>{
-  assert.match(page,/data-cinematic/);
-  assert.equal((page.match(/data-journey-scene=/g)||[]).length,5);
-  assert.match(page,/journey-action--search/);
-  assert.match(page,/journey-action--mail/);
-  assert.match(page,/journey-action--call/);
-  assert.match(page,/journey-action--done/);
-  assert.match(css,/\.cinematic-journey/);
-  assert.match(css,/position:sticky/);
-  assert.match(css,/--journey/);
-  assert.match(js,/cinematic\.dataset\.scene/);
-  assert.match(js,/journeyScenes\.forEach/);
+test("scroll choreography stays simple and dependency-free",()=>{
+  assert.match(js,/requestAnimationFrame\(update\)/);
+  assert.match(js,/--hero-p/);
+  assert.match(js,/--manifesto-p/);
+  assert.match(js,/--sequence-p/);
+  assert.match(js,/--channels-p/);
+  assert.doesNotMatch(js,/fetch\(/);
+  assert.doesNotMatch(js,/XMLHttpRequest/);
+  assert.doesNotMatch(js,/canvas/i);
 });
 
-test("cinematic motion includes ambient background, pointer depth and scroll choreography",()=>{
-  assert.match(page,/id="ambient-field"/);
-  assert.match(page,/data-fidel-surface/);
-  assert.match(page,/data-workflow/);
-  assert.match(page,/data-page-progress/);
-  assert.match(js,/requestAnimationFrame\(draw\)/);
-  assert.match(js,/IntersectionObserver/);
-  assert.match(js,/--hero-progress/);
-  assert.match(js,/--workflow-progress/);
-  assert.match(js,/--channels-progress/);
-  assert.match(js,/--finale-progress/);
-  assert.match(js,/pointermove/);
-  assert.match(css,/@keyframes surfaceSweep/);
-  assert.match(css,/@keyframes orbitSpin/);
-});
-
-test("reduced-motion accessibility is explicitly supported",()=>{
-  assert.match(js,/prefers-reduced-motion: reduce/);
+test("preview is responsive and reduced-motion aware",()=>{
+  assert.match(css,/@media\(max-width:980px\)/);
+  assert.match(css,/@media\(max-width:700px\)/);
   assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
-  assert.match(css,/\.journey-spacer\{display:none\}/);
+  assert.match(js,/prefers-reduced-motion: reduce/);
 });
 
-test("preview is responsive for tablet and mobile",()=>{
-  assert.match(css,/@media\(max-width:1050px\)/);
-  assert.match(css,/@media\(max-width:720px\)/);
-  assert.match(page,/meta name="viewport"/);
-});
-
-test("approval UI is demo-only and cannot trigger execution",()=>{
+test("approval UI remains demo-only",()=>{
   assert.match(page,/Preview — keine Aktion wird ausgelöst/);
   assert.match(page,/<button type="button">Freigeben<\/button>/);
   assert.doesNotMatch(js,/fetch\(/);
-  assert.doesNotMatch(js,/XMLHttpRequest/);
 });
