@@ -172,20 +172,19 @@
     );
 
     nodes.forEach((node, i) => {
-      gsap.fromTo(node,
-        { left: "50%", top: "50%", opacity: 0, scale: .7 },
-        {
-          opacity: 1,
-          scale: 1,
-          ease: "none",
-          scrollTrigger: {
-            trigger: channels,
-            start: () => (7 + i * 4) + "% top",
-            end: () => (42 + i * 5) + "% top",
-            scrub: 1
-          }
+      gsap.from(node, {
+        left: "50%",
+        top: "50%",
+        opacity: 0,
+        scale: .7,
+        ease: "none",
+        scrollTrigger: {
+          trigger: channels,
+          start: () => (7 + i * 4) + "% top",
+          end: () => (42 + i * 5) + "% top",
+          scrub: 1
         }
-      );
+      });
     });
 
     gsap.to(".channel-stage", {
