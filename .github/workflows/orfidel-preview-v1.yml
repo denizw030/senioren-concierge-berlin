@@ -19,11 +19,13 @@ jobs:
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - name: ORFIDEL preview contract
         run: node --test tests/orfidel-preview-v1.test.mjs
       - name: No production route replacement
         run: |
           set -euo pipefail
-          git diff --name-only origin/main...HEAD | tee /tmp/changed
+          git diff --name-only HEAD^1 HEAD | tee /tmp/changed
           ! grep -Eq '^(index\.html|de/index\.html|konto\.html|konto/|web-concierge\.html|web-concierge/)' /tmp/changed
           echo ORFIDEL_PREVIEW_PROD_ISOLATION=GREEN
