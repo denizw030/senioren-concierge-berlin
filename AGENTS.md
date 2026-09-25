@@ -1,13 +1,23 @@
-# NAHWERK Website Repository Contract
+# Customer Website Repository Contract
 
-This repository is the canonical customer-facing website and account UI for nahwerkconcierge.com.
+This repository is the canonical customer-facing website and account UI for the current legacy production site. It is the technical foundation for the transition to ORFIDEL and later STEWARO/MyParentGuard.
+
+## Brand architecture guard
+- Target operating-company/consumer structure is documented in `docs/BRAND-AND-DEPLOYMENT-ARCHITECTURE.md`.
+- ORFIDEL is a consumer brand; Fidel is its concierge identity.
+- STEWARO is a separate consumer brand for older users.
+- MyParentGuard is a STEWARO relative/sponsor acquisition and onboarding surface, not a separate concierge runtime.
+- ODYSX is a separate corporate/holding website. Never merge ODYSX public pages, assets, navigation or brand styling into ORFIDEL/STEWARO/MyParentGuard surfaces.
+- NAHWERK is legacy naming. Do not introduce new public-facing NAHWERK branding.
+- Do not mass-rename internal legacy identifiers while doing visual/brand work.
 
 ## Production authority
-- `main` is production and is published by GitHub Pages.
+- `main` is current production and is published by GitHub Pages.
 - Never make task work directly on `main`.
 - Start every task from the current `main` SHA on a new task-specific branch.
 - One task = one branch. Never reuse an old feature/fix branch for unrelated work.
 - Preview or temporary deployments must never become the production authority.
+- `snapshot/20260925-pre-orfidel-migration` is the brand-migration recovery baseline and is immutable.
 
 ## Safe change flow
 1. Read current `main` immediately before editing.
@@ -17,6 +27,7 @@ This repository is the canonical customer-facing website and account UI for nahw
 5. Open a PR. Merge only after the relevant checks are green.
 6. For larger UI changes, integrate through `staging/website-canonical` before `main`.
 7. Never remove an existing customer surface merely to hide a runtime/load bug. Fix or disable the failing runtime while preserving the last stable UI.
+8. ORFIDEL public-site work must not overwrite or fork account, billing, auth, Web Concierge or backend integration behavior.
 
 ## Critical mirrored routes
 The repository intentionally contains clean-route mirrors.
@@ -32,6 +43,7 @@ For these pairs, both files must remain equivalent except for the clean-route `<
 - Do not deploy from stale branches.
 - Do not mix account overview, Web Concierge, email UI, registration, and global theme work in one branch unless the task genuinely spans them.
 - Cache-bust changes must stay scoped to the asset actually changed.
+- ORFIDEL, STEWARO and MyParentGuard must remain distinct public brand experiences even when they share code/components.
 
 ## Preservation
 - Branches named `snapshot/*` are recovery points and must not be modified.
