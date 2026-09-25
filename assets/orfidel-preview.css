@@ -143,7 +143,7 @@ main,.topbar,.footer{position:relative;z-index:1}
   padding-left:52vw;padding-right:18vw;will-change:transform
 }
 .work-card{
-  width:min(42vw,520px);height:58vh;min-height:440px;padding:30px;border:1px solid var(--line);
+  position:relative;width:min(42vw,520px);height:58vh;min-height:440px;padding:30px;border:1px solid var(--line);
   background:#050505;display:flex;flex-direction:column;justify-content:flex-end
 }
 .work-card>span{position:absolute;margin-top:-46vh;font-size:10px;color:#555}
@@ -246,4 +246,25 @@ main,.topbar,.footer{position:relative;z-index:1}
   .story-progress,.story-index{display:none}
   .work{min-height:auto;padding:120px 15px}.work-intro{position:relative;height:auto;padding:0 0 60px}.work-track-wrap{position:relative;inset:auto;overflow:visible}.work-track{position:relative;height:auto;display:grid;width:auto;padding:0;transform:none!important}.work-card{width:100%;height:auto;min-height:360px}
   .channels{height:auto}.channels-pin{position:relative;height:auto;min-height:900px}
+}
+
+
+.motion-fallback .fidel-canvas{display:none}
+.motion-fallback .hero-crown{opacity:.2}
+.motion-fallback .hero-copy,.motion-fallback .hero-caption{opacity:1;transform:none}
+.motion-fallback .hero-logo{opacity:.82}
+.motion-fallback .story{height:auto;padding:120px max(24px,calc((100vw - 1280px)/2))}
+.motion-fallback .story-pin{position:relative;height:auto;display:block;padding:0}
+.motion-fallback .story-scene{position:relative;left:auto;right:auto;top:auto;opacity:1;transform:none;margin:0 0 100px}
+.motion-fallback .story-progress,.motion-fallback .story-index{display:none}
+.motion-fallback .work{min-height:auto;padding:120px max(24px,calc((100vw - 1280px)/2))}
+.motion-fallback .work-intro{position:relative;height:auto;padding:0 0 70px}
+.motion-fallback .work-track-wrap{position:relative;inset:auto;overflow:visible}
+.motion-fallback .work-track{position:relative;height:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:auto;padding:0;transform:none!important}
+.motion-fallback .work-card{width:auto;height:auto;min-height:360px}
+.motion-fallback .channels{height:auto}
+.motion-fallback .channels-pin{position:relative;height:auto;min-height:900px}
+@media(max-width:700px){
+  .motion-fallback .story,.motion-fallback .work{padding-left:15px;padding-right:15px}
+  .motion-fallback .work-track{grid-template-columns:1fr}
 }
