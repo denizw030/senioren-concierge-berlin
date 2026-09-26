@@ -4,7 +4,7 @@
   const CHAT_URL = "/web-concierge";
   const SESSION_KEY = "scb_web_session";
   const LEGACY_ONBOARDING_KEY = "scb_onboarding";
-  const GATEWAY_ENDPOINT = "https://ta832v8wah.execute-api.eu-central-1.amazonaws.com/prod/v1/web";
+  const GATEWAY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway";
   const selector = '[data-account-tab="concierge"],[data-open-account-tab="concierge"]';
 
   function session() {
@@ -92,7 +92,7 @@
     const current = session();
     if (!current?.session_token) return false;
     try {
-      const response = await fetch(`${GATEWAY_ENDPOINT}/me`, {
+      const response = await fetch(`${GATEWAY_ENDPOINT}/web/me`, {
         method: "GET",
         headers: { Authorization: `Bearer ${current.session_token}` },
         cache: "no-store",
