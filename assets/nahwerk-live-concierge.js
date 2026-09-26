@@ -125,6 +125,10 @@ export function mountNahwerkLiveConcierge({
   const muteBtn=q(".nw-live-mute"),endBtn=q(".nw-live-end"),closeBtn=q(".nw-live-close");
 
   let pc=null,dc=null,micStream=null,micMeter=null,outMeter=null,raf=0,inputFlushTimer=0,outputFlushTimer=0,transcriptSeq=0,userTurnSeq=0,assistantTurnSeq=0,maxSessionTimer=0;
+  // LIVE_PARALLEL_EXECUTION_V1_20260926
+  const activeDelegations=new Map();
+  const parallelExecutionResults=[];
+  let parallelResultTimer=0,parallelResultSpeaking=false,lastInputActivityAt=0;
   // LIVE_TRANSCRIPT_TERMINAL_FLUSH_V3_20260922
   const transcriptWrites=new Set();
   const transcriptMirror=[];
@@ -345,9 +349,46 @@ export function mountNahwerkLiveConcierge({
       if(end!==null)lastAssistantPersistedEndMs=end;
     }
   };
+  const scheduleParallelResultFlush=(delay=420)=>{
+    if(parallelResultTimer||!parallelExecutionResults.length||ending)return;
+    parallelResultTimer=setTimeout(()=>{
+      parallelResultTimer=0;
+      flushParallelExecutionResult();
+    },Math.max(120,Number(delay)||420));
+  };
+  const flushParallelExecutionResult=()=>{
+    if(!parallelExecutionResults.length||ending||dc?.readyState!=="open")return;
+    const quietFor=Date.now()-lastInputActivityAt;
+    if(responseActive||inputSpeechActive||parallelResultSpeaking||quietFor<700){
+      scheduleParallelResultFlush(Math.max(220,700-quietFor));
+      return;
+    }
+    const result=parallelExecutionResults.shift();
+    if(!result)return;
+    parallelResultSpeaking=true;
+    setStatus("Ergebnis ist da …");
+    sendEvent({
+      type:"response.create",
+      response:{
+        instructions:[
+          "Ein parallel ausgeführter Concierge-Auftrag ist jetzt abgeschlossen.",
+          "Teile dem Kunden das folgende verifizierte Ergebnis kurz, natürlich und ohne interne Technikbegriffe mit.",
+          "Verwende ausschließlich dieses Ergebnis und erfinde nichts.",
+          String(result.commentary||"").slice(0,5000)
+        ].join("\n")
+      }
+    });
+  };
+  const queueParallelExecutionResult=(delegationId,commentary,responseState="ANSWER")=>{
+    const text=String(commentary||"").trim();
+    if(!text)return;
+    parallelExecutionResults.push({delegation_id:delegationId,commentary:text,response_state:responseState});
+    state("execution_result_ready",{delegation_id:delegationId,response_state:responseState});
+    scheduleParallelResultFlush(260);
+  };
   const handleDelegation=async(event)=>{
-    const id=event?.delegation?.id;
-    if(!id||event?.delegation?.target!=="client")return;
+    const id=String(event?.delegation?.id||"");
+    if(!id||event?.delegation?.target!=="client"||activeDelegations.has(id))return;
     await wait(120);
     const transcript=inputTranscript.trim()||lastUserTurnText;
     if(inputTranscript.trim())await flushUserTranscript();
@@ -355,13 +396,38 @@ export function mountNahwerkLiveConcierge({
       sendEvent({type:"session.commentary.append",delegation_id:id,content:"Ich konnte die letzte Äußerung nicht sicher transkribieren. Bitte frage kurz nach.",event_id:"nw-"+uid()});
       return;
     }
-    setStatus("Prüft …");
-    try{
-      const d=await post("/delegation",{session_id:sessionId,delegation_id:id,transcript,last_assistant_utterance:(outputTranscript.trim()||lastAssistantTurnText).slice(0,2000),source_message_id:"live-"+uid()});
-      sendEvent({type:"session.commentary.append",delegation_id:id,content:d.commentary,event_id:"nw-"+uid()});
-    }catch{
-      sendEvent({type:"session.commentary.append",delegation_id:id,content:"Die sichere Prüfung ist gerade nicht verfügbar. Behaupte keinen Erfolg und bitte kurz darum, es erneut zu versuchen.",event_id:"nw-"+uid()});
-    }
+
+    sendEvent({
+      type:"session.commentary.append",
+      delegation_id:id,
+      content:"Der Auftrag läuft jetzt im Hintergrund. Sag dem Kunden kurz, dass du dich darum kümmerst und dass ihr währenddessen weiterreden könnt. Behaupte noch kein Ergebnis.",
+      event_id:"nw-"+uid()
+    });
+    state("executing",{delegation_id:id});
+    setStatus("Erledigt im Hintergrund …");
+
+    const task=(async()=>{
+      try{
+        const d=await post("/delegation",{
+          session_id:sessionId,
+          delegation_id:id,
+          transcript,
+          last_assistant_utterance:(outputTranscript.trim()||lastAssistantTurnText).slice(0,2000),
+          source_message_id:"live-"+uid()
+        });
+        queueParallelExecutionResult(id,d.commentary,d.response_state||"ANSWER");
+      }catch{
+        queueParallelExecutionResult(
+          id,
+          "Die sichere Ausführung konnte gerade nicht abgeschlossen werden. Sage das knapp und behaupte keinen Erfolg.",
+          "ERROR"
+        );
+      }finally{
+        activeDelegations.delete(id);
+        state("execution_finished",{delegation_id:id});
+      }
+    })();
+    activeDelegations.set(id,task);
   };
   const handleEvent=async(raw)=>{
     let e; try{e=JSON.parse(raw.data);}catch{return;}
@@ -377,7 +443,7 @@ export function mountNahwerkLiveConcierge({
       }
       return;
     }
-    if(e.type==="input_audio_buffer.speech_started"){inputSpeechActive=true;noteTranscriptEvent();return;}
+    if(e.type==="input_audio_buffer.speech_started"){inputSpeechActive=true;lastInputActivityAt=Date.now();noteTranscriptEvent();return;}
     if(e.type==="response.created"||e.type==="response.in_progress"){responseActive=true;noteTranscriptEvent();}
     if(e.type==="session.input_transcript.delta"||e.type==="conversation.item.input_audio_transcription.delta"){
       noteTranscriptEvent();
@@ -428,29 +494,31 @@ export function mountNahwerkLiveConcierge({
       return;
     }
     if(e.type==="input_audio_buffer.speech_stopped"){
-      inputSpeechActive=false;noteTranscriptEvent();
+      inputSpeechActive=false;lastInputActivityAt=Date.now();noteTranscriptEvent();
       if(inputFlushTimer)clearTimeout(inputFlushTimer);
       inputFlushTimer=setTimeout(()=>{void flushUserTranscript();},800);
       return;
     }
     if(e.type==="response.done"){
       responseActive=false;noteTranscriptEvent();
+      if(parallelResultSpeaking)parallelResultSpeaking=false;
       if(outputFlushTimer)clearTimeout(outputFlushTimer);
       outputFlushTimer=setTimeout(()=>{void flushAssistantTranscript();},450);
+      scheduleParallelResultFlush(240);
       return;
     }
     if(e.type==="response.event"&&e.event){
       await handleEvent({data:JSON.stringify(e.event)});
       return;
     }
-        if(e.type==="session.delegation.created"){await handleDelegation(e);return;}
+    if(e.type==="session.delegation.created"){void handleDelegation(e);return;}
     if(e.type==="session.closed"){await flushUserTranscript();await flushAssistantTranscript();await stop({notifyBackend:true});return;}
     if(e.type==="error"){state("error",{error:e?.error?.code||"LIVE_SESSION_ERROR"});}
   };
 
   async function start(){
     if(pc)return;
-    ending=false;started=false;responseActive=false;inputSpeechActive=false;liveThreadId="";initialGreeting="";startWithGreeting=false;initialGreetingSent=false;inputTranscript="";outputTranscript="";lastUserTurnText="";lastAssistantTurnText="";inputStartMs=null;inputEndMs=null;outputStartMs=null;outputEndMs=null;lastUserPersistedEndMs=null;lastAssistantPersistedEndMs=null;lastTranscriptEventAt=Date.now();transcriptSeq=0;userTurnSeq=0;assistantTurnSeq=0;transcriptWrites.clear();transcriptMirror.length=0;
+    ending=false;started=false;responseActive=false;inputSpeechActive=false;parallelResultSpeaking=false;lastInputActivityAt=0;activeDelegations.clear();parallelExecutionResults.length=0;if(parallelResultTimer)clearTimeout(parallelResultTimer);parallelResultTimer=0;liveThreadId="";initialGreeting="";startWithGreeting=false;initialGreetingSent=false;inputTranscript="";outputTranscript="";lastUserTurnText="";lastAssistantTurnText="";inputStartMs=null;inputEndMs=null;outputStartMs=null;outputEndMs=null;lastUserPersistedEndMs=null;lastAssistantPersistedEndMs=null;lastTranscriptEventAt=Date.now();transcriptSeq=0;userTurnSeq=0;assistantTurnSeq=0;transcriptWrites.clear();transcriptMirror.length=0;
     stopCallTimer();if(duration){duration.textContent="0:00";duration.hidden=true;}
     ui.hidden=false;document.documentElement.classList.add("nw-live-open");
     setPersona(currentPersonaFromPage());
@@ -574,7 +642,7 @@ export function mountNahwerkLiveConcierge({
     micStream?.getTracks()?.forEach(t=>t.stop());
     micMeter?.close?.();outMeter?.close?.();
     remoteAudio.pause();remoteAudio.srcObject=null;
-    pc=null;dc=null;micStream=null;micMeter=null;outMeter=null;sessionId="";liveThreadId="";initialGreeting="";started=false;muted=false;responseActive=false;inputSpeechActive=false;startWithGreeting=false;initialGreetingSent=false;
+    pc=null;dc=null;micStream=null;micMeter=null;outMeter=null;sessionId="";liveThreadId="";initialGreeting="";started=false;muted=false;responseActive=false;inputSpeechActive=false;parallelResultSpeaking=false;activeDelegations.clear();parallelExecutionResults.length=0;if(parallelResultTimer)clearTimeout(parallelResultTimer);parallelResultTimer=0;startWithGreeting=false;initialGreetingSent=false;
     muteBtn.classList.remove("is-muted");
     const endDetail={session_id:endedSessionId||null,thread_id:endedThreadId||null,transcript_finalized:true};
     if(!keepVisible){

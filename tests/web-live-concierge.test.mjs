@@ -12,7 +12,7 @@ test("web chat mounts Live Concierge on the right without replacing voice memo",
     const html=read(page);
     assert.match(html,/assets\/web-voice-memo\.js\?v=10/);
     assert.match(html,/assets\/web-customer-concierge\.js\?v=56/);
-    assert.match(html,/assets\/web-live-concierge\.js\?v=23/);
+    assert.match(html,/assets\/web-live-concierge\.js\?v=24/);
     assert.match(html,/assets\/nahwerk-live-concierge\.css\?v=4/);
   }
   const boot=read("assets/web-live-concierge.js");
@@ -259,6 +259,21 @@ test("Live waits for transcript quiescence and terminal transcript writes before
   assert.ok(stopIndex>=0&&quiescenceIndex>stopIndex&&drainIndex>quiescenceIndex&&endIndex>drainIndex&&closeIndex>endIndex);
 });
 
+
+test("Live keeps talking while delegated work executes in parallel",()=>{
+  const client=read("assets/nahwerk-live-concierge.js");
+  assert.match(client,/LIVE_PARALLEL_EXECUTION_V1_20260926/);
+  assert.match(client,/activeDelegations=new Map/);
+  assert.match(client,/parallelExecutionResults/);
+  assert.match(client,/Der Auftrag läuft jetzt im Hintergrund/);
+  assert.match(client,/execution_result_ready/);
+  assert.match(client,/session\.delegation\.created"\)\{void handleDelegation\(e\)/);
+  assert.match(client,/type:"response\.create"/);
+  assert.match(client,/responseActive\|\|inputSpeechActive\|\|parallelResultSpeaking/);
+  const acknowledge=client.indexOf('content:"Der Auftrag läuft jetzt im Hintergrund');
+  const execute=client.indexOf('const d=await post("/delegation"',acknowledge);
+  assert.ok(acknowledge>=0&&execute>acknowledge,"Live must acknowledge before waiting for Core execution");
+});
 
 test("Live carries the last spoken assistant turn into delegated Core follow-ups",()=>{
   const client=read("assets/nahwerk-live-concierge.js");
