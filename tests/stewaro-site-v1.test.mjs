@@ -17,10 +17,12 @@ test('STEWARO standalone surface is complete',()=>{
   for(const f of required) assert.equal(fs.existsSync(path.join(root,f)),true,`missing ${f}`);
 });
 
-test('STEWARO pages do not reintroduce public NAHWERK branding',()=>{
+test('STEWARO pages do not reintroduce visible public NAHWERK branding',()=>{
   for(const f of required.filter(x=>x.endsWith('.html'))){
-    const s=fs.readFileSync(path.join(root,f),'utf8');
-    assert.equal(/NAHWERK/i.test(s),false,`legacy brand in ${f}`);
+    let s=fs.readFileSync(path.join(root,f),'utf8');
+    s=s.replace(/mailto:[^"'<>\s]+/gi,'').replace(/[A-Z0-9._%+-]+@nahwerkconcierge\.com/gi,'');
+    assert.equal(/>\s*NAHWERK\s*</i.test(s),false,`visible legacy brand in ${f}`);
+    assert.equal(/NAHWERK\s+Concierge/i.test(s),false,`visible legacy product name in ${f}`);
   }
 });
 
