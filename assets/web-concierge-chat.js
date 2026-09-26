@@ -92,7 +92,7 @@
     const current = session();
     if (!current?.session_token) return false;
     try {
-      const response = await fetch(`${GATEWAY_ENDPOINT}/web/me`, {
+      const response = await fetch(`${GATEWAY_ENDPOINT}/me`, {
         method: "GET",
         headers: { Authorization: `Bearer ${current.session_token}` },
         cache: "no-store",
