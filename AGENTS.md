@@ -2,12 +2,16 @@
 
 This repository is the canonical customer-facing website and account UI for the current legacy production site. It is the technical foundation for the transition to ORFIDEL and later STEWARO/MyParentGuard.
 
+## Canonical brand authority
+- Before any brand, domain, navigation, website or routing task, read `docs/BRAND-AND-DEPLOYMENT-ARCHITECTURE.md`.
+- The cross-platform canonical authority is `denizw030/nahwerk-platform/docs/PLATFORM-SOURCE-OF-TRUTH.md` plus `config/brands.yaml`. This repository must mirror that authority and must not reintroduce superseded brand rules.
+
 ## Brand architecture guard
-- Target operating-company/consumer structure is documented in `docs/BRAND-AND-DEPLOYMENT-ARCHITECTURE.md`.
-- ORFIDEL is a consumer brand; Fidel is its concierge identity.
-- STEWARO is a separate consumer brand for older users.
-- MyParentGuard is a STEWARO relative/sponsor acquisition and onboarding surface, not a separate concierge runtime.
-- ODYSX is a separate corporate/holding website. Never merge ODYSX public pages, assets, navigation or brand styling into ORFIDEL/STEWARO/MyParentGuard surfaces.
+- ORFIDEL is the operating/company umbrella for ORFIDEL.com and STEWARO.com. ORFIDEL.com is also a modern public concierge experience for older people who discover it themselves and for relatives.
+- STEWARO is its own concierge brand/site within the ORFIDEL company structure.
+- MyParentGuard, GuardMyParents and ParentGuard24 belong to STEWARO as relative/sponsor acquisition surfaces. They are not separate concierge runtimes.
+- MyParentGuard.com redirects to STEWARO.com while acquisition attribution is preserved.
+- ODYSX is a separate corporate/holding website unless a newer canonical owner decision explicitly supersedes that role. Never merge ODYSX public pages, assets, navigation or brand styling into ORFIDEL/STEWARO surfaces.
 - NAHWERK is legacy naming. Do not introduce new public-facing NAHWERK branding.
 - Do not mass-rename internal legacy identifiers while doing visual/brand work.
 
@@ -43,7 +47,7 @@ For these pairs, both files must remain equivalent except for the clean-route `<
 - Do not deploy from stale branches.
 - Do not mix account overview, Web Concierge, email UI, registration, and global theme work in one branch unless the task genuinely spans them.
 - Cache-bust changes must stay scoped to the asset actually changed.
-- ORFIDEL, STEWARO and MyParentGuard must remain distinct public brand experiences even when they share code/components.
+- ORFIDEL and STEWARO must remain distinct public brand experiences even when they share code/components. MyParentGuard, GuardMyParents and ParentGuard24 are STEWARO acquisition surfaces, not additional concierge runtimes.
 
 ## Preservation
 - Branches named `snapshot/*` are recovery points and must not be modified.
