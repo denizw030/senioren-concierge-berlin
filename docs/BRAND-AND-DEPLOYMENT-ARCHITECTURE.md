@@ -9,25 +9,37 @@ No production runtime is renamed or deleted by this document. Existing productio
 ## Target company and brand model
 
 ```text
-ODYSX
-└── corporate / holding identity and website
+ORFIDEL
+= operating company / umbrella structure
+│
+├── ORFIDEL.com
+│   └── modern public concierge experience for
+│       older people who discover it themselves
+│       and for relatives
+│
+└── STEWARO.com
+    └── independent concierge brand/site
+        within the ORFIDEL company structure
+        │
+        ├── MyParentGuard
+        ├── GuardMyParents
+        └── ParentGuard24
+            = relative/sponsor acquisition surfaces
+              that resolve into STEWARO
 
-ORFIDEL GmbH (target operating company)
-├── ORFIDEL
-│   └── Fidel — personal AI concierge for the younger/general consumer audience
-└── STEWARO
-    ├── direct product for older users who choose their own personal AI concierge
-    └── MyParentGuard
-        └── acquisition/onboarding surface for relatives who set up STEWARO for a loved one
+ODYSX
+= separate holding/corporate identity unless a newer canonical owner decision supersedes that role
 ```
 
 ### Rules
 
-- ORFIDEL and STEWARO are separate consumer brands.
-- Fidel is the concierge identity inside ORFIDEL.
-- MyParentGuard is not a separate concierge runtime. It is a STEWARO acquisition and sponsor/onboarding surface.
+- ORFIDEL is the operating/company umbrella for ORFIDEL.com and STEWARO.com.
+- ORFIDEL.com is also a public concierge experience aimed at older people who discover the service themselves and at relatives.
+- STEWARO is a distinct concierge brand/site within the ORFIDEL company structure.
+- MyParentGuard, GuardMyParents and ParentGuard24 belong to STEWARO and are not separate concierge runtimes.
+- MyParentGuard.com redirects to STEWARO.com while preserving acquisition attribution.
 - STEWARO must remain attractive, modern and non-stigmatizing; its public presentation must not frame the user as old, frail or in need of "senior software".
-- ODYSX stays separate from all consumer-brand websites.
+- ODYSX remains separate unless a newer canonical owner decision explicitly supersedes that role.
 - NAHWERK is a legacy public/internal name and must not be introduced into new public brand work.
 
 ## Current production authorities
@@ -62,13 +74,13 @@ Target surfaces:
 
 | Domain | Public role | Shared runtime |
 | --- | --- | --- |
-| `orfidel.com` | ORFIDEL premium consumer website and Fidel entry | Shared Concierge Platform |
+| `orfidel.com` | ORFIDEL public company/concierge website for self-discovering older users and relatives | Shared Concierge Platform |
 | `orfidel.de` | German ORFIDEL entry/redirect as decided at cutover | Shared Concierge Platform |
-| `stewaro.com` | STEWARO direct consumer website | Shared Concierge Platform |
+| `stewaro.com` | STEWARO concierge website within ORFIDEL | Shared Concierge Platform |
 | `stewaro.de` | German STEWARO entry/redirect | Shared Concierge Platform |
-| `myparentguard.com` | Relative/sponsor acquisition and onboarding into STEWARO | STEWARO product/runtime |
-| `myparentguard.de` | German MyParentGuard entry/redirect | STEWARO product/runtime |
-| `parentguard24.*`, `guardmyparents.*` | defensive/acquisition redirects | Redirect to MyParentGuard |
+| `myparentguard.com` | Relative/sponsor acquisition entry belonging to STEWARO | Redirect/entry into STEWARO |
+| `myparentguard.de` | German MyParentGuard acquisition entry | Redirect/entry into STEWARO |
+| `parentguard24.*`, `guardmyparents.*` | STEWARO relative/sponsor acquisition surfaces | Route into STEWARO with source attribution preserved |
 | legacy NAHWERK/NAHWORK domains | transition only | Redirect/retire later after explicit decision |
 
 ## ORFIDEL website direction
@@ -92,11 +104,13 @@ The current public landing page may be replaced by ORFIDEL only after a recovery
 
 STEWARO reuses the technical website/platform components but gets an independent brand experience.
 
-MyParentGuard:
-- addresses the relative/sponsor
-- creates or sponsors a STEWARO relationship for the beneficiary
-- must not create a second duplicate concierge engine
-- hands the beneficiary into STEWARO branding after setup
+MyParentGuard / GuardMyParents / ParentGuard24:
+- address the relative/sponsor
+- belong to STEWARO
+- preserve acquisition source internally
+- create or sponsor a STEWARO relationship for the beneficiary
+- must not create duplicate concierge engines
+- hand the beneficiary into STEWARO branding
 
 ## Shared platform target
 
@@ -131,7 +145,7 @@ Internal functions and repository paths that currently contain `nahwerk` are leg
 1. ODYSX corporate website and assets never become part of ORFIDEL/STEWARO/MyParentGuard public pages.
 2. ORFIDEL design work must not overwrite customer-account, Web Concierge, billing or runtime behavior.
 3. STEWARO must be a separate brand experience, not a visual clone of ORFIDEL.
-4. MyParentGuard must route into STEWARO product semantics rather than creating a fourth product runtime.
+4. MyParentGuard, GuardMyParents and ParentGuard24 must route into STEWARO product semantics rather than creating additional runtimes.
 5. No new public-facing NAHWERK branding is added.
 6. Existing legacy identifiers remain until their replacement is tested.
 7. Every broad migration gets a fresh branch, staging verification and recovery snapshot before production.
@@ -153,5 +167,5 @@ These branches are immutable recovery points.
 5. Verify account, billing, Web Concierge, email, voice and task continuity.
 6. Cut over `orfidel.com` only after acceptance.
 7. Build STEWARO as a separate brand surface using shared components.
-8. Build MyParentGuard as the sponsor/acquisition flow into STEWARO.
+8. Build MyParentGuard, GuardMyParents and ParentGuard24 as sponsor/acquisition flows into STEWARO.
 9. Retire public NAHWERK branding only after all replacement routes are proven.
