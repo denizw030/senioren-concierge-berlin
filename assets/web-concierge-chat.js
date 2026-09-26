@@ -4,7 +4,7 @@
   const CHAT_URL = "/web-concierge";
   const SESSION_KEY = "scb_web_session";
   const LEGACY_ONBOARDING_KEY = "scb_onboarding";
-  const GATEWAY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway";
+  const GATEWAY_ENDPOINT = "https://ta832v8wah.execute-api.eu-central-1.amazonaws.com/prod/v1/web";
   const selector = '[data-account-tab="concierge"],[data-open-account-tab="concierge"]';
 
   function session() {
