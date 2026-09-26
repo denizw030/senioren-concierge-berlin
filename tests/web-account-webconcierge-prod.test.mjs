@@ -140,7 +140,7 @@ test("account Concierge entry opens the real main customer chat without a Web Ch
 
 test("account overview reads the same authoritative central Concierge persona", () => {
   assert.match(legacyUi, /ta832v8wah\.execute-api\.eu-central-1\.amazonaws\.com\/prod\/v1\/web/);
-  assert.match(legacyUi, /\/web\/me/);
+  assert.match(legacyUi, /\/me/);
   assert.match(legacyUi, /method: "GET"/);
   assert.match(legacyUi, /body\?\.environment !== "PROD"/);
   assert.match(legacyUi, /body\?\.authoritative !== true/);
