@@ -23,8 +23,8 @@ test("client requires server greeting contract before proactive response",()=>{
 });
 
 test("Web and App bust cache to the proactive greeting client",()=>{
-  assert.match(boot,/nahwerk-live-concierge\.js\?v=23/);
-  assert.match(webLegacy,/web-live-concierge\.js\?v=23/);
-  assert.match(webClean,/web-live-concierge\.js\?v=23/);
-  assert.match(app,/nahwerk-live-concierge\.js\?v=23/);
+  assert.match(boot,/nahwerk-live-concierge\.js\?v=24/);
+  assert.match(webLegacy,/web-live-concierge\.js\?v=24/);
+  assert.match(webClean,/web-live-concierge\.js\?v=24/);
+  assert.match(app,/nahwerk-live-concierge\.js\?v=24/);
 });
