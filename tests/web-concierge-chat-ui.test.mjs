@@ -6,7 +6,7 @@ const source = readFileSync(new URL("../assets/web-concierge-chat.js", import.me
 const konto = readFileSync(new URL("../konto.html", import.meta.url), "utf8");
 
 test("legacy compatibility asset may remain loaded for the account entry", () => {
-  assert.match(konto, /assets\/web-concierge-chat\.js\?v=4/);
+  assert.match(konto, /assets\/web-concierge-chat\.js\?v=3/);
 });
 
 test("legacy Shadow chat UI and transport remain permanently disabled", () => {
@@ -19,8 +19,8 @@ test("legacy Shadow chat UI and transport remain permanently disabled", () => {
 });
 
 test("account helper performs only authenticated central persona read plus local rendering", () => {
-  assert.match(source, /ta832v8wah\.execute-api\.eu-central-1\.amazonaws\.com\/prod\/v1\/web/);
-  assert.match(source, /\/me/);
+  assert.match(source, /nahwerk-web-gateway/);
+  assert.match(source, /\/web\/me/);
   assert.match(source, /method: "GET"/);
   assert.match(source, /renderOverviewPersona\(body\.persona\)/);
   assert.match(source, /overviewConcierge/);
