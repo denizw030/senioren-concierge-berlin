@@ -2,8 +2,8 @@
   "use strict";
 
   const SESSION_KEY = "scb_web_session";
-  const ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway/web/audio-message";
-  const HEALTH_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway/health";
+  const ENDPOINT = "https://ta832v8wah.execute-api.eu-central-1.amazonaws.com/prod/v1/web/audio-message";
+  const HEALTH_ENDPOINT = "https://ta832v8wah.execute-api.eu-central-1.amazonaws.com/prod/v1/web/health";
   const MAX_DURATION_MS = 120000;
   const HEALTH_TIMEOUT_MS = 5000;
   const TRANSCRIBE_TIMEOUT_MS = 50000;
@@ -32,7 +32,7 @@
 
   function reportClientDiagnostic(code) {
     try{
-      const u=new URL("https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway/client-diagnostic");
+      const u=new URL("https://ta832v8wah.execute-api.eu-central-1.amazonaws.com/prod/v1/web/client-diagnostic");
       u.searchParams.set("source","VOICE_MEMO_CLIENT");
       u.searchParams.set("code",String(code||"VOICE_MEMO_CLIENT_ERROR").slice(0,180));
       fetch(u.href,{method:"GET",cache:"no-store",credentials:"omit"}).catch(()=>{});
