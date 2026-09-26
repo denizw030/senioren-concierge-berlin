@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const WEB_CONCIERGE_CLIENT_VERSION = 56;
+  const WEB_CONCIERGE_CLIENT_VERSION = 57;
   const WEB_CONCIERGE_RUNTIME_KEY = "__nahwerkWebCustomerConciergeRuntime";
   if(window[WEB_CONCIERGE_RUNTIME_KEY]?.active===true)return;
   const runtimeToken=crypto.randomUUID();
@@ -16,8 +16,8 @@
   const GUEST_RESUME_KEY = "nw_guest_resume_request_v1";
   const CORE_CONTRACT_VERSION = "core-v1";
   const GATEWAY_CONTRACT_VERSION = "web-gateway-v1";
-  const GATEWAY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway";
-  const HISTORY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway/web/history";
+  const GATEWAY_ENDPOINT = "https://ta832v8wah.execute-api.eu-central-1.amazonaws.com/prod/v1/web";
+  const HISTORY_ENDPOINT = "https://ta832v8wah.execute-api.eu-central-1.amazonaws.com/prod/v1/web/history";
   const RESPONSE_DELIVERY_ENDPOINT = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-email-runtime";
   const HISTORY_CONTRACT_VERSION = "canonical-core-receipts-v1";
   const HISTORY_PAGE_SIZE = 60;
@@ -265,8 +265,8 @@
     try {
       const url = new URL(GATEWAY_ENDPOINT);
       if (url.protocol !== "https:") return null;
-      if (url.hostname !== "djicahhmnnamtjuqedqd.supabase.co") return null;
-      if (url.pathname !== "/functions/v1/nahwerk-web-gateway") return null;
+      if (url.hostname !== "ta832v8wah.execute-api.eu-central-1.amazonaws.com") return null;
+      if (url.pathname !== "/prod/v1/web") return null;
       if (/staging|shadow/i.test(url.href)) return null;
       return url.href.replace(/\/$/,"");
     } catch { return null; }
@@ -275,8 +275,8 @@
   function configuredHistoryEndpoint() {
     try {
       const url = new URL(HISTORY_ENDPOINT);
-      if (url.protocol !== "https:" || url.hostname !== "djicahhmnnamtjuqedqd.supabase.co") return null;
-      if (url.pathname !== "/functions/v1/nahwerk-web-gateway/web/history") return null;
+      if (url.protocol !== "https:" || url.hostname !== "ta832v8wah.execute-api.eu-central-1.amazonaws.com") return null;
+      if (url.pathname !== "/prod/v1/web/history") return null;
       return url.href.replace(/\/$/,"");
     } catch { return null; }
   }
@@ -723,12 +723,19 @@
     return fetch(url,{...options,signal:controller.signal}).finally(()=>clearTimeout(timer));
   }
 
+  function awsGatewayPath(path){
+    const value=String(path||"");
+    if(value==="/health")return "/health";
+    if(value==="/web")return "";
+    if(value.startsWith("/web/"))return value.slice(4);
+    return value;
+  }
   async function gatewayRequest(path,{method="GET",body=null,auth=true}={}) {
     const endpoint=configuredEndpoint();if(!endpoint)throw new Error("gateway_not_configured");const headers={};
     if(auth){const token=sessionToken();if(!token)throw new Error("session_required");headers.Authorization=`Bearer ${token}`;}
     if(body!==null)headers["Content-Type"]="application/json";
     const timeoutMs=path==="/health"?8000:path==="/web/me"?20000:path==="/web/chat"?45000:CLIENT_FETCH_TIMEOUT_MS;
-    const response=await fetchWithTimeout(`${endpoint}${path}`,{method,headers,body:body===null?undefined:JSON.stringify(body),cache:"no-store",credentials:"omit"},timeoutMs);
+    const response=await fetchWithTimeout(`${endpoint}${awsGatewayPath(path)}`,{method,headers,body:body===null?undefined:JSON.stringify(body),cache:"no-store",credentials:"omit"},timeoutMs);
     const payload=await response.json().catch(()=>({}));if(!response.ok||payload?.ok===false)throw new Error(String(payload?.error||`http_${response.status}`));return payload;
   }
   async function responseDeliveryRequest(path,{method="GET",body=null}={}){

@@ -10,9 +10,9 @@ const read=(p)=>readFileSync(new URL("../"+p,import.meta.url),"utf8");
 test("web chat mounts Live Concierge on the right without replacing voice memo",()=>{
   for(const page of ["web-concierge.html","web-concierge/index.html"]){
     const html=read(page);
-    assert.match(html,/assets\/web-voice-memo\.js\?v=10/);
-    assert.match(html,/assets\/web-customer-concierge\.js\?v=56/);
-    assert.match(html,/assets\/web-live-concierge\.js\?v=24/);
+    assert.match(html,/assets\/web-voice-memo\.js\?v=11/);
+    assert.match(html,/assets\/web-customer-concierge\.js\?v=57/);
+    assert.match(html,/assets\/web-live-concierge\.js\?v=25/);
     assert.match(html,/assets\/nahwerk-live-concierge\.css\?v=4/);
   }
   const boot=read("assets/web-live-concierge.js");
@@ -20,6 +20,18 @@ test("web chat mounts Live Concierge on the right without replacing voice memo",
   assert.match(boot,/channel:"WEB"/);
   assert.match(boot,/getThreadId/);
   assert.match(boot,/isAllowed/);
+});
+
+
+test("Web voice and Live gateway traffic is pinned to AWS PROD ingress",()=>{
+  const memo=read("assets/web-voice-memo.js");
+  const boot=read("assets/web-live-concierge.js");
+  const live=read("assets/nahwerk-live-concierge.js");
+  const aws=/ta832v8wah\.execute-api\.eu-central-1\.amazonaws\.com\/prod\/v1\/web/;
+  assert.match(memo,aws);
+  assert.match(boot,aws);
+  assert.match(live,aws);
+  for(const source of [memo,boot,live])assert.doesNotMatch(source,/djicahhmnnamtjuqedqd\.supabase\.co\/functions\/v1\/nahwerk-web-gateway/);
 });
 
 test("Live client uses WebRTC, central delegation and active concierge portrait",()=>{

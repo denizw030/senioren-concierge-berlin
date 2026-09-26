@@ -30,7 +30,7 @@ test("Web Gateway contract is exact, PROD-only and browser identity has zero aut
 
 test("browser implementation is pinned to the active PROD Web Gateway", () => {
   assert.match(webClient,/GATEWAY_CONTRACT_VERSION = "web-gateway-v1"/);
-  assert.match(webClient,/\/functions\/v1\/nahwerk-web-gateway/);
+  assert.match(webClient,/ta832v8wah\.execute-api\.eu-central-1\.amazonaws\.com\/prod\/v1\/web/);
   assert.match(webClient,/web_route_authoritative === true/);
   assert.match(webClient,/cao_web_authoritative === true/);
   assert.match(webClient,/delivery\.shadow === false/);

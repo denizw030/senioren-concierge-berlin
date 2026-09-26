@@ -1,5 +1,5 @@
 // NAHWERK LIVE CONCIERGE WEB CLIENT V1
-const DEFAULT_API="https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway/live";
+const DEFAULT_API="https://ta832v8wah.execute-api.eu-central-1.amazonaws.com/prod/v1/web/live";
 // LIVE_AUTHENTICATED_PRICE_QUOTE_V2_20260920
 
 const wait=(ms)=>new Promise(r=>setTimeout(r,ms));
