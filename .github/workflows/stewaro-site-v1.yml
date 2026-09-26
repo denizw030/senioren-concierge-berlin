@@ -1,0 +1,28 @@
+name: STEWARO Site V1
+
+on:
+  pull_request:
+    paths:
+      - 'stewaro-site/**'
+      - 'tests/stewaro-site-v1.test.mjs'
+      - '.github/workflows/stewaro-site-v1.yml'
+  push:
+    branches:
+      - 'feature/stewaro-site-v1-20260926'
+    paths:
+      - 'stewaro-site/**'
+      - 'tests/stewaro-site-v1.test.mjs'
+      - '.github/workflows/stewaro-site-v1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/stewaro-site-v1.test.mjs
