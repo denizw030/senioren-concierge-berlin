@@ -25,8 +25,8 @@ test("authenticated Web Concierge is a customer messenger and remains fail close
 
 test("Web Concierge is pinned to the exact active PROD gateway and never STAGING", () => {
   assert.match(client, /GATEWAY_CONTRACT_VERSION = "web-gateway-v1"/);
-  assert.match(client, /https:\/\/djicahhmnnamtjuqedqd\.supabase\.co\/functions\/v1\/nahwerk-web-gateway/);
-  assert.match(client, /url\.pathname !== "\/functions\/v1\/nahwerk-web-gateway"/);
+  assert.match(client, /https:\/\/ta832v8wah\.execute-api\.eu-central-1\.amazonaws\.com\/prod\/v1\/web/);
+  assert.match(client, /url\.pathname !== "\/prod\/v1\/web"/);
   assert.match(client, /staging\|shadow/i);
   assert.doesNotMatch(client, /web-concierge-gateway/);
   assert.doesNotMatch(client, /customer-portal-staging/);
@@ -97,10 +97,10 @@ test("initial webchat hydration does not wait for readiness or optional channel 
 });
 
 test("persisted chat history is authenticated, paginated and reuses the canonical PROD web gateway", () => {
-  assert.match(client, /HISTORY_ENDPOINT = "https:\/\/djicahhmnnamtjuqedqd\.supabase\.co\/functions\/v1\/nahwerk-web-gateway\/web\/history"/);
+  assert.match(client, /HISTORY_ENDPOINT = "https:\/\/ta832v8wah\.execute-api\.eu-central-1\.amazonaws\.com\/prod\/v1\/web\/history"/);
   assert.match(client, /HISTORY_CONTRACT_VERSION = "canonical-core-receipts-v1"/);
   assert.match(client, /HISTORY_PAGE_SIZE = 60/);
-  assert.match(client, /url\.pathname !== "\/functions\/v1\/nahwerk-web-gateway\/web\/history"/);
+  assert.match(client, /url\.pathname !== "\/prod\/v1\/web\/history"/);
   assert.match(client, /payload\?\.history_contract!==HISTORY_CONTRACT_VERSION/);
   assert.match(client, /headers:\{Authorization:`Bearer \$\{token\}`\}/);
   assert.match(client, /historyRequest\(threadId,\{limit:HISTORY_PAGE_SIZE\}\)/);
@@ -229,7 +229,7 @@ test("legacy and clean routes expose the same end-customer messenger", () => {
     assert.match(surface, /Neuer Chat/);
     assert.match(surface, /Deine Chats/);
     assert.match(surface, /aria-label="Chatverlauf"/);
-    assert.match(surface, /assets\/web-customer-concierge\.js\?v=56/);
+    assert.match(surface, /assets\/web-customer-concierge\.js\?v=57/);
     assert.doesNotMatch(surface, /web-customer-concierge-thread-scope\.js/);
     assert.doesNotMatch(surface, /PROD|autoritativ|Core-v1|web-gateway-v1|Fail-closed|Shadow-Antworten|kanonische Kundenidentität/i);
   }

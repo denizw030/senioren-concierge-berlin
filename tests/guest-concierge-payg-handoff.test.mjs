@@ -69,7 +69,7 @@ test("clean auth and PAYG routes remain mirrored",()=>{
 });
 
 test("guest flow loads the refreshed assets only on the touched product surfaces",()=>{
-  assert.match(registration,/assets\/onboarding\.js\?v=25/);
+  assert.match(registration,/assets\/onboarding\.js\?v=26/);
   assert.match(payg,/assets\/payg-account-shell\.js\?v=2/);
   assert.match(payg,/assets\/payg-account-shell\.css\?v=2/);
 });

@@ -1,7 +1,7 @@
 // WEB_CONCIERGE_LIVE_BOOT_V1_20260919
-import { mountNahwerkLiveConcierge } from "./nahwerk-live-concierge.js?v=24";
+import { mountNahwerkLiveConcierge } from "./nahwerk-live-concierge.js?v=25";
 
-const GATEWAY="https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway";
+const GATEWAY="https://ta832v8wah.execute-api.eu-central-1.amazonaws.com/prod/v1/web";
 
 function bridge(){
   return window.NAHWERKWebCustomerConciergeLiveBridge||null;

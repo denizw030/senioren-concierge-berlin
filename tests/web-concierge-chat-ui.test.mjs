@@ -20,7 +20,7 @@ test("legacy Shadow chat UI and transport remain permanently disabled", () => {
 
 test("account helper performs only authenticated central persona read plus local rendering", () => {
   assert.match(source, /nahwerk-web-gateway/);
-  assert.match(source, /\/web\/me/);
+  assert.match(source, /\/me/);
   assert.match(source, /method: "GET"/);
   assert.match(source, /renderOverviewPersona\(body\.persona\)/);
   assert.match(source, /overviewConcierge/);

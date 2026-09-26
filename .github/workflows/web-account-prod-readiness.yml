@@ -100,7 +100,7 @@ jobs:
           assert core.get("concierge_cross_channel_interruption_resume_v1") is True
           assert core.get("concierge_cross_channel_side_query_preserves_task_v1") is True
           assert core.get("concierge_cross_channel_deferred_state_write_v1") is True
-          assert regression.get("green") is True and regression.get("total") == 10
+          assert regression.get("green") is True and regression.get("total") == 12
 
           assert web.get("ok") is True and web.get("service") == "nahwerk-web-gateway"
           assert web.get("production") is True and web.get("fail_safe") == "closed"
