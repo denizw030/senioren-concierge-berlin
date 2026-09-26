@@ -38,7 +38,7 @@ test('legacy Web Concierge Shadow path is removed; account helper only reads cen
   assert.match(shadow, /shadow_only: false/);
   assert.match(shadow, /customer_delivery: false/);
   assert.match(shadow, /web_prod_gateway_required/);
-  assert.match(chat, /nahwerk-web-gateway/);
+  assert.match(chat, /ta832v8wah\.execute-api\.eu-central-1\.amazonaws\.com\/prod\/v1\/web/);
   assert.match(chat, /\/web\/me/);
   assert.match(chat, /method: "GET"/);
   assert.doesNotMatch(chat, /method:\s*"POST"|method:\s*"PUT"|method:\s*"PATCH"|method:\s*"DELETE"/);
