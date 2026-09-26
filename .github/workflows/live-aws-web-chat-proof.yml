@@ -1,0 +1,102 @@
+name: Live AWS Web Chat Proof
+
+on:
+  push:
+    branches:
+      - tmp/live-aws-chat-proof-20260926
+    paths:
+      - '.github/workflows/live-aws-web-chat-proof.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  browser-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Install Playwright
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/nw-live-proof
+          cd /tmp/nw-live-proof
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright@1.55.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+
+      - name: Prove live page sends chat through AWS
+        run: |
+          set -euo pipefail
+          cd /tmp/nw-live-proof
+          node <<'NODE'
+          const { chromium } = require('playwright');
+
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+            const page = await browser.newPage();
+            const expectedHost = 'ta832v8wah.execute-api.eu-central-1.amazonaws.com';
+
+            await page.goto('https://nahwerkconcierge.com/web-concierge', {
+              waitUntil: 'domcontentloaded',
+              timeout: 60000
+            });
+
+            const input = page.locator('#webConciergeInput');
+            const send = page.locator('#webConciergeSend');
+
+            await input.waitFor({ state: 'visible', timeout: 30000 });
+            await page.waitForFunction(() => {
+              const el = document.getElementById('webConciergeInput');
+              return el && !el.disabled;
+            }, null, { timeout: 30000 });
+
+            await input.fill('AWS Test 3');
+
+            const responsePromise = page.waitForResponse((res) => {
+              const req = res.request();
+              try {
+                const u = new URL(req.url());
+                return req.method() === 'POST'
+                  && u.hostname === expectedHost
+                  && u.pathname.startsWith('/prod/v1/web/');
+              } catch {
+                return false;
+              }
+            }, { timeout: 60000 });
+
+            await send.click();
+            const response = await responsePromise;
+            const request = response.request();
+            const u = new URL(request.url());
+
+            console.log('LIVE_CHAT_REQUEST_METHOD=' + request.method());
+            console.log('LIVE_CHAT_REQUEST_URL=' + request.url());
+            console.log('LIVE_CHAT_RESPONSE_STATUS=' + response.status());
+
+            if (u.hostname !== expectedHost) throw new Error('live chat did not use AWS host');
+            if (!u.pathname.startsWith('/prod/v1/web/')) throw new Error('live chat did not use AWS web route');
+            if (request.method() !== 'POST') throw new Error('live chat request was not POST');
+            if (response.status() < 200 || response.status() >= 300) {
+              throw new Error('live AWS chat returned non-2xx: ' + response.status());
+            }
+
+            let payload = {};
+            try { payload = await response.json(); } catch {}
+            console.log('LIVE_CHAT_ENVIRONMENT=' + String(payload.environment || ''));
+            console.log('LIVE_CHAT_AUTHORITATIVE=' + String(payload.authoritative ?? ''));
+            console.log('LIVE_CHAT_GUEST=' + String(payload.guest ?? ''));
+
+            if (payload.environment && payload.environment !== 'PROD') {
+              throw new Error('live chat environment is not PROD');
+            }
+            if (payload.authoritative === false) {
+              throw new Error('live chat is not authoritative');
+            }
+
+            console.log('LIVE_AWS_WEB_CHAT_GREEN');
+            await browser.close();
+          })().catch((err) => {
+            console.error(err);
+            process.exit(1);
+          });
+          NODE
