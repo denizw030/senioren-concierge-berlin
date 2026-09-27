@@ -158,14 +158,27 @@ Brand migration baseline created before ORFIDEL work:
 
 These branches are immutable recovery points.
 
+## Current website execution priority — owner decision 2026-09-27
+
+STEWARO is the first replacement surface being executed now.
+
+- The existing production website/customer-account code remains the technical base.
+- `stewaro-site/` is frozen as a reference-only prototype; do not keep building a second STEWARO runtime/site stack there.
+- Reuse registration, login, customer account, Web Concierge, E-Mail, usage, Safety, Voice/phone and Billing.
+- Apply STEWARO branding, navigation, target-group language, pricing and legal presentation on top of that shared implementation.
+- ORFIDEL public website execution is paused. Preserve `feature/orfidel-preview-v4-cinematic` without mutation.
+- See `docs/STEWARO-MIGRATION-MATRIX-20260927.md` for page-by-page disposition.
+
 ## Execution order
 
-1. Freeze and document current architecture.
-2. Introduce neutral brand context without changing existing behavior.
-3. Build ORFIDEL public experience on the existing website foundation in staging.
-4. Wire ORFIDEL to the shared existing runtime.
-5. Verify account, billing, Web Concierge, email, voice and task continuity.
-6. Cut over `orfidel.com` only after acceptance.
-7. Build STEWARO as a separate brand surface using shared components.
-8. Build MyParentGuard, GuardMyParents and ParentGuard24 as sponsor/acquisition flows into STEWARO.
-9. Retire public NAHWERK branding only after all replacement routes are proven.
+1. Freeze the standalone `stewaro-site/` prototype and use it only as reference.
+2. Build the STEWARO brand shell on the existing website/customer-account foundation.
+3. Integrate the approved STEWARO public landing experience into that shared base.
+4. Migrate login, registration and customer-account presentation to STEWARO without forking runtime contracts.
+5. Migrate Web Concierge, E-Mail, Safety, Voice/phone, usage and Billing presentation.
+6. Migrate relatives/sponsor/access-transfer flows into STEWARO semantics.
+7. Synchronize STEWARO legal pages with actual production data flows.
+8. Verify responsive, route-parity and full critical E2E.
+9. Cut over `stewaro.com` only after explicit acceptance and DNS/mail preservation.
+10. Retire public NAHWERK branding/routes only after the STEWARO replacement path is proven and observed.
+11. Resume ORFIDEL public website work only after a new explicit owner decision.
