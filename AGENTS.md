@@ -30,6 +30,8 @@ This repository is the canonical customer-facing website and account UI for the 
 - Protected ORFIDEL work must not be overwritten by STEWARO tasks.
 - Known protected ORFIDEL branch: `feature/orfidel-preview-v4-cinematic`.
 - STEWARO work should stay inside clearly scoped STEWARO files/surfaces whenever possible.
+- Current owner decision: `stewaro-site/` is frozen as reference-only. Do not expand its runtime or treat it as the target architecture.
+- STEWARO website implementation must reuse the existing website/customer-account technical foundation; see `docs/STEWARO-MIGRATION-MATRIX-20260927.md`.
 
 ## Production authority
 - `main` is current production website authority.
