@@ -242,7 +242,7 @@
       errorCard(
         "Mikrofon nicht verfügbar",
         denied
-          ? "Bitte erlaube NAHWERK den Mikrofonzugriff in deinen Browser-Einstellungen."
+          ? "Bitte erlaube STEWARO den Mikrofonzugriff in deinen Browser-Einstellungen."
           : "Die Aufnahme konnte gerade nicht gestartet werden."
       );
     }
