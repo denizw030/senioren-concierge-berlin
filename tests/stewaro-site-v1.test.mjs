@@ -50,3 +50,10 @@ test('sitemap targets canonical STEWARO domain',()=>{
   assert.match(s,/https:\/\/stewaro\.com\/datenschutz\//);
   assert.match(s,/https:\/\/stewaro\.com\/datenloeschung\//);
 });
+
+
+test('STEWARO does not persist acquisition attribution in browser storage',()=>{
+  const js=fs.readFileSync(path.join(root,'assets/site.js'),'utf8');
+  assert.doesNotMatch(js,/sessionStorage|localStorage/);
+  assert.match(js,/data-preserve-source/);
+});
