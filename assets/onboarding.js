@@ -151,7 +151,7 @@
     });
 
     if (plan.bookable) {
-      $("planSelectionNote").innerHTML = "<strong>Direkt registrierbar.</strong><br>FREE wird ohne Zahlungsdaten angelegt. Berechtigungen und Kontingente kommen aus dem zentralen NAHWERK-Konto und werden nach Login unter Nutzung angezeigt.";
+      $("planSelectionNote").innerHTML = "<strong>Direkt registrierbar.</strong><br>FREE wird ohne Zahlungsdaten angelegt. Berechtigungen und Kontingente kommen aus dem zentralen STEWARO-Konto und werden nach Login unter Nutzung angezeigt.";
       submit.disabled = false;
       submit.removeAttribute("aria-disabled");
       submit.textContent = "Kostenlosen Zugang registrieren";
@@ -270,7 +270,7 @@
     const familyMessagePreview = familyMessage ? `<br><br><em>Persönliche Nachricht von ${escapeHtml(owner || "Ihrer Familie")}:</em><br>„${escapeHtml(familyMessage).replace(/\n/g,"<br>")}“` : "";
     updateContextTexts();
     const welcomeMessage = product === "senioren"
-      ? `<strong>${greeting} 👋</strong><br><br>Willkommen bei NAHWERK Concierge.${introduction}<br><br>Ich bin ${concierge()}, ${informal ? "dein" : "Ihr"} persönlicher KI-Concierge.<br><br>Ich helfe ${informal ? "dir" : "Ihnen"} dabei, Fragen verständlich zu klären, Technik Schritt für Schritt zu bedienen und wichtige Erinnerungen im Blick zu behalten.<br><br>Auf Wunsch erstelle ich Bilder, ordne Fotos ein, vergleiche Möglichkeiten und fasse Informationen übersichtlich zusammen.`
+      ? `<strong>${greeting} 👋</strong><br><br>Willkommen bei STEWARO Concierge.${introduction}<br><br>Ich bin ${concierge()}, ${informal ? "dein" : "Ihr"} persönlicher KI-Concierge.<br><br>Ich helfe ${informal ? "dir" : "Ihnen"} dabei, Fragen verständlich zu klären, Technik Schritt für Schritt zu bedienen und wichtige Erinnerungen im Blick zu behalten.<br><br>Auf Wunsch erstelle ich Bilder, ordne Fotos ein, vergleiche Möglichkeiten und fasse Informationen übersichtlich zusammen.`
       : `<strong>${greeting} 👋</strong><br><br>Willkommen bei ${productLabel}.${introduction}<br><br>Ich bin ${concierge()}, ${informal ? "dein" : "Ihr"} persönlicher KI-Concierge.<br><br>Ich erkläre die Bedienung verständlich und helfe ${informal ? "dir" : "Ihnen"} bei Organisation, Informationen, Dokumenten und vielem mehr.`;
     $("messagePreview").innerHTML = welcomeMessage + familyMessagePreview;
   }
@@ -480,7 +480,7 @@
   }
   sessionStorage.setItem("nahwerk_product", product);
   $("productLabel").textContent = productLabel;
-  document.title = `${productLabel} registrieren | NAHWERK`;
+  document.title = `${productLabel} registrieren | STEWARO`;
   form.addEventListener("input", (event) => {
     if (event.target?.id === "recipientPhone") syncSelf();
     else render();
@@ -533,7 +533,7 @@
         const personal = self ? "" : familyMessageValue();
         const parts = [];
         if (notes) parts.push(notes);
-        if (personal) parts.push(`Persönliche Nachricht der einrichtenden Person, die beim ersten Kontakt zusätzlich zur NAHWERK-Begrüßung übermittelt werden soll: "${personal}"`);
+        if (personal) parts.push(`Persönliche Nachricht der einrichtenden Person, die beim ersten Kontakt zusätzlich zur STEWARO-Begrüßung übermittelt werden soll: "${personal}"`);
         return parts.join("\n\n");
       })(),
       contact_consent: self ? true : (Boolean(p.phone) ? $("consent").checked : false), safety_enabled: safety, checkin_times: safety ? $("checkinTimes").value.trim() : "", trusted_contact_name: safety ? $("trustedContactName").value.trim() : "", trusted_contact_phone: safety ? $("trustedContactPhone").value.trim() : "",
