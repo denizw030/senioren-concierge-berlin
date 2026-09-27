@@ -111,6 +111,16 @@ unless the ORFIDEL workstream is explicitly reactivated.
 11. Only then prepare STEWARO production domain/DNS cutover.
 12. After observation, retire legacy public NAHWERK routes/branding according to an explicit cutover plan.
 
+## Block 2 implementation status — 2026-09-27
+
+- Shared-base STEWARO brand shell is implemented on isolated Draft PR #265.
+- The approved premium STEWARO homepage has been integrated into the existing website technical base.
+- Existing login, registration, account, Web Concierge, E-Mail callback, Safety, pricing/PAYG, phone, relatives, services, flow, FAQ, contact and concierge-settings surfaces remain on the existing runtime/contracts and receive the STEWARO presentation layer.
+- Clean-route mirrors changed by this block remain paired.
+- Dedicated `STEWARO Shared Base CI` is GREEN and verifies: frozen/protected path isolation, unchanged production CNAME, STEWARO contract, critical route parity and auth security.
+- `nahwerkconcierge.com`, website `main`, CNAME/DNS and Production traffic remain unchanged.
+- Broad legacy regression workflows still contain assertions for the old NAHWERK homepage/story/assets and therefore fail on this intentional replacement candidate. These checks have **not** been weakened or bypassed. PR #265 remains Draft and must not merge until migration-aware replacement coverage or equivalent acceptance closes this gate.
+
 ## Current gate
 
 **Documentation/inventory gate: complete when this matrix and the central canonical authority are merged.**
