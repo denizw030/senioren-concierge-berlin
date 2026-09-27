@@ -76,7 +76,7 @@
     const chatAvatar = document.getElementById("conciergeChatAvatar");
     const chatCard = document.getElementById("conciergeChatCard");
     if (chatName) chatName.textContent = persona?.name || "Dein Concierge";
-    if (chatAvatar) chatAvatar.style.backgroundImage = persona ? `url(\"${persona.image.replaceAll('"', "%22")}\")` : 'url("/assets/logos/NAHWERK-Goldmann-Logo.svg")';
+    if (chatAvatar) chatAvatar.style.backgroundImage = persona ? `url(\"${persona.image.replaceAll('"', "%22")}\")` : 'url("/assets/logos/STEWARO-Goldmann-Logo.svg")';
     if (chatCard) {
       chatCard.dataset.personaSource = persona ? "central" : "pending";
       chatCard.setAttribute("aria-label", persona ? `Mit ${persona.name} chatten` : "Persönlichen Concierge-Chat öffnen");
