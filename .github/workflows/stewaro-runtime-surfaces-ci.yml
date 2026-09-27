@@ -1,0 +1,117 @@
+name: STEWARO Runtime Surfaces CI
+
+on:
+  pull_request:
+    paths:
+      - "anmelden.html"
+      - "anmelden/**"
+      - "registrieren.html"
+      - "registrieren/**"
+      - "konto.html"
+      - "konto/**"
+      - "web-concierge.html"
+      - "web-concierge/**"
+      - "email-concierge.html"
+      - "safety.html"
+      - "safety/**"
+      - "telefonannahme.html"
+      - "telefonannahme/**"
+      - "pakete.html"
+      - "pakete/**"
+      - "payg.html"
+      - "payg/**"
+      - "concierge-anpassen.html"
+      - "concierge-anpassen/**"
+      - "assets/auth-nav.js"
+      - "assets/site-ui.js"
+      - "assets/acquisition-v1.js"
+      - "assets/concierge-carousel.js"
+      - "assets/owner-product-gaps.js"
+      - "assets/onboarding.js"
+      - "assets/email-account-integration.js"
+      - "assets/email-provider-logo-connect-v3.js"
+      - "assets/email-concierge-product.js"
+      - "assets/web-customer-concierge.js"
+      - "assets/web-voice-memo.js"
+      - "assets/web-concierge-chat.js"
+      - "assets/account-header-concierge.js"
+      - "assets/telephone-reception-product.js"
+      - "assets/payg-account.js"
+      - "assets/payg-consumer-rights-guard.js"
+      - "tests/stewaro-runtime-surfaces-v1.test.mjs"
+      - ".github/workflows/stewaro-runtime-surfaces-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  runtime-surfaces:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Verify isolated UI-only migration scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --depth=1
+          changed="$(git diff --name-only origin/main...HEAD)"
+          printf '%s\n' "$changed"
+          if printf '%s\n' "$changed" | grep -Eq '^(CNAME|api/|functions/|supabase/|stewaro-site/|.*orfidel.*)'; then
+            echo "Forbidden production/backend/frozen/protected path changed."
+            exit 1
+          fi
+
+      - name: Verify STEWARO Block 2 and Block 3 contracts
+        run: |
+          node --test             tests/stewaro-shared-base-brand-shell.test.mjs             tests/stewaro-runtime-surfaces-v1.test.mjs             tests/konto-clean-route-parity.test.mjs             tests/critical-route-parity.test.mjs             tests/auth-security.test.mjs
+
+      - name: Syntax-check migrated runtime modules
+        run: |
+          node --check assets/auth-nav.js
+          node --check assets/site-ui.js
+          node --check assets/acquisition-v1.js
+          node --check assets/concierge-carousel.js
+          node --check assets/owner-product-gaps.js
+          node --check assets/onboarding.js
+          node --check assets/email-account-integration.js
+          node --check assets/email-provider-logo-connect-v3.js
+          node --check assets/email-concierge-product.js
+          node --check assets/web-customer-concierge.js
+          node --check assets/web-voice-memo.js
+          node --check assets/web-concierge-chat.js
+          node --check assets/account-header-concierge.js
+          node --check assets/telephone-reception-product.js
+          node --check assets/payg-account.js
+          node --check assets/payg-consumer-rights-guard.js
+
+      - name: Static mobile and desktop surface smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          nohup python3 -m http.server 4173 >/tmp/stewaro-runtime-http.log 2>&1 &
+          for attempt in 1 2 3 4 5; do
+            curl -fsS http://127.0.0.1:4173/anmelden.html >/dev/null && break
+            sleep 1
+          done
+          for page in anmelden.html registrieren.html web-concierge.html safety.html telefonannahme.html pakete.html payg.html concierge-anpassen.html; do
+            curl -fsS "http://127.0.0.1:4173/$page" >/dev/null
+          done
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          for width in 1440 390; do
+            for page in anmelden.html registrieren.html safety.html telefonannahme.html pakete.html; do
+              key="$(printf '%s' "$page" | tr '.-' '__')-$width"
+              "$CHROME" --headless --no-sandbox --disable-gpu --window-size="$width,1100" --virtual-time-budget=2500 --dump-dom                 "http://127.0.0.1:4173/$page" > "/tmp/$key.html"
+              grep -q 'STEWARO' "/tmp/$key.html"
+            done
+          done
+          echo "STEWARO_RUNTIME_SURFACES_BROWSER_SMOKE=GREEN"
