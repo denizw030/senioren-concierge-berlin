@@ -1386,7 +1386,7 @@
     link.removeAttribute("aria-hidden");
     link.removeAttribute("tabindex");
     link.href = href;
-    link.textContent = label;
+    if (link.textContent !== label) link.textContent = label;
     link.dataset.stewaroNav = "1";
     return link;
   };
@@ -1443,11 +1443,17 @@
         });
 
         const ordered = targets.map(([href, label]) => ensureNavLink(nav, href, label));
-        const anchor = nav.querySelector(".auth-link,.nw-account-cluster");
-        ordered.forEach((link) => {
-          if (anchor) nav.insertBefore(link, anchor);
-          else nav.appendChild(link);
-        });
+        const desiredPaths = ordered.map((link) => normalizeNavPath(link.getAttribute("href")));
+        const currentPaths = Array.from(nav.querySelectorAll(":scope > a[data-stewaro-nav='1']"))
+          .filter((link) => !link.hidden)
+          .map((link) => normalizeNavPath(link.getAttribute("href")));
+        if (currentPaths.join("|") !== desiredPaths.join("|")) {
+          const anchor = nav.querySelector(".auth-link,.nw-account-cluster");
+          ordered.forEach((link) => {
+            if (anchor) nav.insertBefore(link, anchor);
+            else nav.appendChild(link);
+          });
+        }
       });
 
       document.querySelectorAll(".odysx-info-bar").forEach((element) => element.remove());
