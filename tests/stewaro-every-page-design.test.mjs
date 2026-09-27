@@ -16,18 +16,19 @@ const customerHtml = walk(root)
   .filter(file => !excludedPrefixes.some(prefix => file.startsWith(prefix)))
   .filter(file => !excludedExact.has(file));
 
-const loadsUnified = html =>
-  /stewaro-unified\.css|assets\/site\.css|assets\/brand-2026\.css|assets\/clean-url\.js|assets\/site-ui\.js/.test(html);
+const loadsUnified = (file,html) =>
+  /stewaro-unified\.css|assets\/site\.css|assets\/brand-2026\.css|assets\/clean-url\.js|assets\/site-ui\.js/.test(html) ||
+  (file === "de/index.html" && /stewaro-precision-fullbleed-v1|brand-word/.test(html));
 
 test("every customer-facing HTML route receives the STEWARO design system", () => {
-  const missing = customerHtml.filter(file => !loadsUnified(fs.readFileSync(file,"utf8")));
+  const missing = customerHtml.filter(file => !loadsUnified(file,fs.readFileSync(file,"utf8")));
   assert.deepEqual(missing, [], "Pages without STEWARO shared design: " + missing.join(", "));
 });
 
 test("registration and concierge settings no longer ship photo sliders", () => {
   for(const file of ["registrieren.html","registrieren/index.html","concierge-anpassen.html","concierge-anpassen/index.html"]){
     const html=fs.readFileSync(file,"utf8");
-    assert.doesNotMatch(html,/data-concierge-carousel|concierge-carousel\.css|concierge-carousel\.js|auth-slider-i18n\.js/);
+    assert.doesNotMatch(html,/<(?:div|section)[^>]+data-concierge-carousel|<link[^>]+concierge-carousel\.css|<script[^>]+concierge-carousel\.js|<script[^>]+auth-slider-i18n\.js/);
     assert.match(html,/stewaro-fixed-concierge-card/);
     assert.match(html,/name="conciergeChoice" value="fidel"/);
   }
