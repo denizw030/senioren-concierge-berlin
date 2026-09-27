@@ -4,6 +4,13 @@ on:
   pull_request:
     paths:
       - "de/index.html"
+      - "tests/stewaro-account-entry.test.mjs"
+      - "assets/stewaro-entry-routing.js"
+      - "assets/stewaro-account-flow.js"
+      - "assets/stewaro-account-entry.js"
+      - "assets/stewaro-account-entry.css"
+      - "zugang/**"
+      - "zugang.html"
       - "index.html"
       - "email-concierge.html"
       - "assets/site.css"
@@ -102,6 +109,9 @@ jobs:
 
       - name: Audit every STEWARO customer page
         run: node --test tests/stewaro-every-page-design.test.mjs
+
+      - name: Verify unified STEWARO account entry
+        run: node --test tests/stewaro-account-entry.test.mjs
 
       - name: Run critical route parity
         run: node --test tests/konto-clean-route-parity.test.mjs tests/critical-route-parity.test.mjs
