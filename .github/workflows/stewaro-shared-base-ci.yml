@@ -54,7 +54,7 @@ on:
       - "widerruf.html"
       - "widerruf/**"
       - "tests/stewaro-block4-launch-readiness.test.mjs"
-      - "tests/stewaro-unified-experience.test.mjs"
+      - "tests/stewaro-unified-experience.test.mjs"\n      - "tests/stewaro-every-page-design.test.mjs"
       - "concierge-anpassen.html"
       - "concierge-anpassen/**"
       - "tests/stewaro-shared-base-brand-shell.test.mjs"
@@ -98,6 +98,9 @@ jobs:
 
       - name: Run STEWARO unified experience contract
         run: node --test tests/stewaro-unified-experience.test.mjs
+
+      - name: Audit every STEWARO customer page
+        run: node --test tests/stewaro-every-page-design.test.mjs
 
       - name: Run critical route parity
         run: node --test tests/konto-clean-route-parity.test.mjs tests/critical-route-parity.test.mjs
