@@ -1361,11 +1361,20 @@
   let applying = false;
   let queued = false;
 
+  const normalizeNavPath = (raw) => {
+    try {
+      let path = new URL(raw || "/", location.href).pathname || "/";
+      path = path.replace(/\.html$/i, "").replace(/\/+$/, "") || "/";
+      if (path === "/de") path = "/de";
+      return path;
+    } catch (_) {
+      return String(raw || "").replace(/\.html(?=$|[?#])/i, "").replace(/\/+$/, "");
+    }
+  };
+
   const ensureNavLink = (nav, href, label) => {
-    let link = Array.from(nav.querySelectorAll(":scope > a")).find((item) => {
-      const raw = item.getAttribute("href") || "";
-      return raw === href || raw === href + "/" || raw.replace(/\.html(?=$|[?#])/, "") === href;
-    });
+    const targetPath = normalizeNavPath(href);
+    let link = Array.from(nav.querySelectorAll(":scope > a")).find((item) => normalizeNavPath(item.getAttribute("href")) === targetPath);
     if (!link) {
       link = document.createElement("a");
       link.href = href;
@@ -1373,6 +1382,10 @@
       if (anchor) nav.insertBefore(link, anchor);
       else nav.appendChild(link);
     }
+    link.hidden = false;
+    link.removeAttribute("aria-hidden");
+    link.removeAttribute("tabindex");
+    link.href = href;
     link.textContent = label;
     link.dataset.stewaroNav = "1";
     return link;
@@ -1407,26 +1420,34 @@
       });
 
       document.querySelectorAll("nav.links").forEach((nav) => {
+        const targets = [
+          ["/de/", "Übersicht"],
+          ["/prime-concierge", "Concierge"],
+          ["/angehoerige", "Für Angehörige"],
+          ["/safety", "Sicherheit"],
+          ["/telefonannahme", "Telefon"],
+          ["/leistungen", "Leistungen"],
+          ["/pakete", "Preise"],
+          ["/kontakt", "Kontakt"]
+        ];
+        const targetPaths = new Set(targets.map(([href]) => normalizeNavPath(href)));
+
         Array.from(nav.querySelectorAll(":scope > a")).forEach((link) => {
-          const href = (link.getAttribute("href") || "").replace(/\.html(?=$|[?#])/, "");
-          if (/\/concierges(?:$|[?#/])/.test(href) || /\/senioren-concierge(?:$|[?#/])/.test(href)) {
+          if (link.classList.contains("auth-link")) return;
+          const path = normalizeNavPath(link.getAttribute("href"));
+          if (!targetPaths.has(path)) {
             link.hidden = true;
             link.setAttribute("aria-hidden", "true");
             link.tabIndex = -1;
           }
-          if (href.includes("angehoerige")) {
-            link.hidden = false;
-            link.removeAttribute("aria-hidden");
-            link.removeAttribute("tabindex");
-            link.href = "/angehoerige";
-            link.textContent = "Für Angehörige";
-          }
-          if (/\/prime-concierge(?:$|[?#/])/.test(href)) link.textContent = "Concierge";
         });
-        ensureNavLink(nav, "/safety", "Sicherheit");
-        ensureNavLink(nav, "/leistungen", "Leistungen");
-        ensureNavLink(nav, "/pakete", "Preise");
-        ensureNavLink(nav, "/kontakt", "Kontakt");
+
+        const ordered = targets.map(([href, label]) => ensureNavLink(nav, href, label));
+        const anchor = nav.querySelector(".auth-link,.nw-account-cluster");
+        ordered.forEach((link) => {
+          if (anchor) nav.insertBefore(link, anchor);
+          else nav.appendChild(link);
+        });
       });
 
       document.querySelectorAll(".odysx-info-bar").forEach((element) => element.remove());
