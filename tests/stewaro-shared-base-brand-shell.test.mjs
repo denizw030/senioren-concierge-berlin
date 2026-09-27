@@ -16,8 +16,10 @@ test("STEWARO shared-base brand shell is wired without forking runtime", () => {
   assert.match(shellCss, /content:"STEWARO"/);
   assert.match(siteUi, /STEWARO_SHARED_BASE_BRAND_ADAPTER_V1/);
   assert.match(siteUi, /Presentation-only migration layer/);
-  assert.match(siteUi, /ensureNavLink\(nav, "\/safety", "Sicherheit"\)/);
-  assert.match(siteUi, /ensureNavLink\(nav, "\/pakete", "Preise"\)/);
+  assert.match(siteUi, /normalizeNavPath/);
+  assert.match(siteUi, /\["\/safety", "Sicherheit"\]/);
+  assert.match(siteUi, /\["\/pakete", "Preise"\]/);
+  assert.match(siteUi, /\["\/angehoerige", "Für Angehörige"\]/);
 
   assert.match(home, /<title>STEWARO — Persönlicher Concierge<\/title>/);
   assert.match(home, /Jemand, der sich kümmert\./);
@@ -45,5 +47,23 @@ test("changed clean routes remain exact mirrors of their canonical pages", () =>
     const canonical = read(`${name}.html`);
     const clean = read(`${name}/index.html`).replace('<head><base href="/">','<head>');
     assert.equal(clean, canonical, `${name} clean route diverged`);
+  }
+});
+
+
+test("migrated STEWARO surfaces have no static visible NAHWERK branding", () => {
+  const pages = [
+    "anmelden.html","registrieren.html","konto.html","web-concierge.html","safety.html",
+    "pakete.html","payg.html","telefonannahme.html","angehoerige.html","leistungen.html",
+    "ablauf.html","faq.html","kontakt.html","concierge-anpassen.html","de/index.html",
+    "email-concierge.html"
+  ];
+  for (const page of pages) {
+    const source = read(page)
+      .replace(/<script[\s\S]*?<\/script>/gi, " ")
+      .replace(/<style[\s\S]*?<\/style>/gi, " ")
+      .replace(/<!--([\s\S]*?)-->/g, " ")
+      .replace(/<[^>]+>/g, " ");
+    assert.doesNotMatch(source, /NAHWERK|Nahwerk/, `${page} exposes legacy branding in static visible content`);
   }
 });
