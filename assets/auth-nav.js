@@ -176,7 +176,7 @@
     }
     document.querySelectorAll("header.top .brand").forEach((brand) => {
       brand.href = "/de/";
-      brand.innerHTML = '<span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span>';
+      brand.innerHTML = '<span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>STEWARO</strong><span></span></span>';
     });
     document.querySelectorAll("nav.links").forEach((nav) => {
       nav.innerHTML = "";
