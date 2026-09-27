@@ -10,7 +10,14 @@
         stylesheet.dataset.stewaroUnified = 'true';
         document.head.appendChild(stylesheet);
       }
-      let icon = document.querySelector('link[rel~="icon"]');
+      if (!document.querySelector('script[data-stewaro-entry-routing]')) {
+      const routing = document.createElement('script');
+      routing.src = '/assets/stewaro-entry-routing.js?v=1';
+      routing.defer = true;
+      routing.dataset.stewaroEntryRouting = 'true';
+      document.head.appendChild(routing);
+    }
+    let icon = document.querySelector('link[rel~="icon"]');
       if (!icon) {
         icon = document.createElement('link');
         icon.rel = 'icon';
