@@ -650,7 +650,7 @@
       let url = raw;
       try { url = new URL(raw, location.href).href; } catch (_) {}
       if (/staging/i.test(url)) {
-        return Promise.reject(new TypeError("NAHWERK PROD web guard blocked a non-PROD endpoint."));
+        return Promise.reject(new TypeError("STEWARO web guard blocked a non-PROD endpoint."));
       }
 
       const method = String(init?.method || (input instanceof Request ? input.method : "GET") || "GET").toUpperCase();
