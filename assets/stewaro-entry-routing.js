@@ -1,5 +1,6 @@
 (() => {
   "use strict";
+  if(window.STEWAROEntryRouting)return;
   const ACCOUNT_ORIGIN="https://account.stewaro.com";
   const PARENT_ORIGIN="https://myparentguard.com";
   const host=String(location.hostname||"").toLowerCase();
