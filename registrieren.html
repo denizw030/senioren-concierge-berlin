@@ -17,6 +17,7 @@
     </style>
     <style id="registration-first-paint">html,body{margin:0;background:#f7f3eb;color-scheme:light}.family-message-field textarea{min-height:112px;resize:vertical}.family-message-field .tiny{display:block;margin-top:7px}</style>
     <link rel="stylesheet" href="assets/site.css?v=24" />
+    <link rel="stylesheet" href="/assets/stewaro-account-entry.css?v=1" />
     <style>
       .signup {
         display: grid;
@@ -741,17 +742,9 @@
               </div>
               <input type="hidden" name="conciergeChoice" value="fidel" />
             </section>
-            <div class="field">
-              <label>Für wen richtest du den Zugang ein?</label>
-              <div class="choice setup-choice">
-                <label
-                  ><input type="radio" name="setupFor" value="self" checked />
-                  Für mich selbst</label
-                ><label
-                  ><input type="radio" name="setupFor" value="other" /> Für
-                  jemand anderen</label
-                >
-              </div>
+            <div class="field" id="selfRegistrationScope">
+              <input type="radio" name="setupFor" value="self" checked hidden />
+              <p class="selfhint"><strong>Für Sie selbst.</strong> Wenn Sie STEWARO für eine andere Person einrichten möchten, nutzen Sie <a href="https://myparentguard.com/?source=stewaro-registration" style="color:var(--gold);font-weight:700">MyParentGuard</a>.</p>
             </div>
             <h2 style="font-size: 25px">Deine Angaben</h2>
             <p class="required-fields-hint"><span class="required-mark" aria-hidden="true">*</span> Pflichtfeld</p>
@@ -780,6 +773,10 @@
                   required
                 />
               </div>
+            </div>
+            <div class="field">
+              <label for="ownerPostalCode">Postleitzahl <span class="required-mark" aria-hidden="true">*</span></label>
+              <input id="ownerPostalCode" name="postalCode" inputmode="numeric" autocomplete="postal-code" pattern="[0-9]{5}" maxlength="5" placeholder="12345" required />
             </div>
             <div class="field">
               <label for="ownerEmail">E-Mail-Adresse für deinen Web-Zugang <span class="required-mark" aria-hidden="true">*</span></label
@@ -832,7 +829,7 @@
                 autocomplete="tel"
                 placeholder="z. B. +49 170 ..."
               /><span class="tiny" id="ownerPhoneHint"
-                >Nur nötig, wenn du Lena selbst über WhatsApp nutzt.</span
+                >Nur nötig, wenn Sie FIDEL selbst über WhatsApp nutzen.</span
               >
             </div>
             <div class="selfhint" id="selfHint">
@@ -888,7 +885,7 @@
             </section>
             <div id="recipientBlock" hidden>
               <h2 id="recipientHeading" style="font-size: 25px">
-                Wen darf Lena unterstützen?
+                Wen darf FIDEL unterstützen?
               </h2>
               <div class="row name">
                 <div class="field">
@@ -934,7 +931,7 @@
               <div class="field">
                 <label for="note"
                   ><span id="notePrompt"
-                    >Was sollte Lena am Anfang wissen?</span
+                    >Was sollte FIDEL am Anfang wissen?</span
                   >
                   <span class="tiny">(optional)</span></label
                 ><textarea
@@ -957,7 +954,7 @@
             </div>
             <div class="field">
               <label id="addressingLabel" for="addressing"
-                >Wie soll Lena den Klienten ansprechen?</label
+                >Wie soll FIDEL den Klienten ansprechen?</label
               ><select id="addressing">
                 <option value="du">Du – mit Vornamen</option>
                 <option value="sie">Sie – mit Anrede und Nachnamen</option>
@@ -967,7 +964,7 @@
               ><input type="checkbox" id="safetyEnabled" /><span
                 ><strong>Optionale Sicherheitsfunktion einrichten</strong
                 ><br />Standardmäßig deaktiviert.
-                <span id="safetyConciergeName">Lena</span> kann zu vereinbarten
+                <span id="safetyConciergeName">FIDEL</span> kann zu vereinbarten
                 Zeiten nachfragen, ob alles in Ordnung ist.</span
               ></label
             >
@@ -1130,6 +1127,7 @@
     <script src="assets/nahwerk-analytics.js?v=1"></script>
     <script src="assets/acquisition-v1.js?v=2"></script>
     <script src="assets/onboarding.js?v=26"></script>
+    <script src="/assets/stewaro-account-flow.js?v=1"></script>
     <script>
       const eye =
         '<svg class="eye-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.7"></circle></svg>';
