@@ -1,4 +1,22 @@
 (() => {
+  try {
+    if (!document.querySelector('link[data-stewaro-unified]')) {
+      const stylesheet = document.createElement('link');
+      stylesheet.rel = 'stylesheet';
+      stylesheet.href = '/assets/stewaro-unified.css?v=20260927-1';
+      stylesheet.dataset.stewaroUnified = 'true';
+      document.head.appendChild(stylesheet);
+    }
+    let icon = document.querySelector('link[rel~="icon"]');
+    if (!icon) {
+      icon = document.createElement('link');
+      icon.rel = 'icon';
+      document.head.appendChild(icon);
+    }
+    icon.type = 'image/svg+xml';
+    icon.href = '/assets/logos/stewaro-mark.svg?v=1';
+  } catch (_) {}
+
   const isCustomerAccount = /(?:^|\/)konto(?:\.html)?\/?$/.test(location.pathname);
   const isProdCustomerSurface = /(?:^|\/)(?:konto|payg|web-concierge|concierge-anpassen)(?:\.html)?\/?$/.test(location.pathname);
   const isPublicSeniorSurface = /(?:^|\/)(?:senioren-concierge|angehoerige)(?:\.html)?\/?$/.test(location.pathname) || Boolean(document.body?.classList?.contains('senior-product'));
@@ -17,7 +35,7 @@
 
   const readPortalTheme = () => {
     if (isPublicSeniorSurface && !isProdCustomerSurface) return 'light';
-    return readStoredPortalTheme() || 'dark';
+    return readStoredPortalTheme() || 'light';
   };
 
   const applyPortalTheme = (theme) => {
