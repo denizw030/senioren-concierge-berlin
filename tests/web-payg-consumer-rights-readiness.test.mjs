@@ -56,7 +56,7 @@ test("electronic withdrawal stays fail-closed until authoritative durable confir
 });
 
 test("withdrawal information contains current provider details and electronic-function link", () => {
-  assert.match(withdrawalInfo, /NAHWERK Concierge/);
+  assert.match(withdrawalInfo, /STEWARO/);
   assert.match(withdrawalInfo, /Deniz Wannenmacher/);
   assert.match(withdrawalInfo, /Osdorfer Straße 108/);
   assert.match(withdrawalInfo, /dw@nahwerkconcierge\.com/);
