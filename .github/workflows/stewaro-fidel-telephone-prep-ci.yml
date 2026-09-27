@@ -1,0 +1,21 @@
+name: STEWARO FIDEL Telephone Surface CI
+
+on:
+  pull_request:
+    paths:
+      - telefonannahme.html
+      - tests/stewaro-fidel-telephone-surface-v1.test.mjs
+      - .github/workflows/stewaro-fidel-telephone-prep-ci.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  telephone-surface:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify FIDEL telephone surface
+        run: node --test tests/stewaro-fidel-telephone-surface-v1.test.mjs
