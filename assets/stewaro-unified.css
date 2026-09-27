@@ -1,0 +1,401 @@
+/* STEWARO Unified Experience v1 — shared customer-facing design layer
+   Presentation only. Concierge Core/runtime contracts remain untouched. */
+:root{
+  --stewaro-bg:#f7f3eb;
+  --stewaro-bg-soft:#eee7dc;
+  --stewaro-paper:#fffdf9;
+  --stewaro-ink:#13251d;
+  --stewaro-green:#173126;
+  --stewaro-green-2:#244538;
+  --stewaro-muted:#6b716b;
+  --stewaro-gold:#c79a3d;
+  --stewaro-gold-deep:#87611f;
+  --stewaro-gold-light:#f0dca0;
+  --stewaro-line:rgba(19,37,29,.13);
+  --stewaro-shadow:0 24px 70px rgba(32,45,37,.09);
+  --stewaro-shadow-soft:0 12px 34px rgba(32,45,37,.06);
+}
+
+/* ---------- Universal STEWARO top bar ---------- */
+html body .top{
+  background:rgba(255,255,255,.965)!important;
+  background-image:none!important;
+  border-bottom:1px solid var(--stewaro-line)!important;
+  color:var(--stewaro-ink)!important;
+  box-shadow:0 10px 34px rgba(26,40,32,.055)!important;
+  backdrop-filter:blur(20px) saturate(145%)!important;
+  -webkit-backdrop-filter:blur(20px) saturate(145%)!important;
+}
+html body .top .nav{min-height:72px!important}
+html body .top .brand,
+html body .home-reference .top .brand{
+  display:flex!important;
+  align-items:center!important;
+  width:auto!important;height:auto!important;
+  min-width:0!important;
+  flex:0 0 auto!important;
+  gap:11px!important;
+  margin:0!important;
+  padding:0!important;
+  background:none!important;
+}
+html body .top .brand .mark,
+html body .top .brand .mark.nahwerk-mark,
+html body .home-reference .top .brand .mark,
+html body .home-reference .top .brand .mark.nahwerk-mark{
+  display:block!important;
+  width:38px!important;height:38px!important;flex:0 0 38px!important;
+  border:0!important;border-radius:0!important;
+  background:transparent center/contain no-repeat url("/assets/logos/stewaro-mark.svg")!important;
+  box-shadow:none!important;
+  transform:none!important;
+}
+html body .top .brand .brandtext,
+html body .home-reference .top .brand .brandtext{
+  display:block!important;
+  width:auto!important;height:auto!important;
+  background:none!important;
+}
+html body .top .brandtext strong,
+html body .home-reference .top .brandtext strong{
+  display:block!important;
+  font-size:0!important;
+  line-height:1!important;
+}
+html body .top .brandtext strong::before,
+html body .home-reference .top .brandtext strong::before{
+  content:"STEWARO"!important;
+  display:block!important;
+  font-family:Baskerville,"Iowan Old Style",Georgia,serif!important;
+  font-size:19px!important;
+  font-weight:600!important;
+  line-height:1!important;
+  letter-spacing:.18em!important;
+  margin-right:-.18em!important;
+  color:transparent!important;
+  background:linear-gradient(108deg,#75531c 0%,#b9842d 14%,#efd99b 31%,#fff1c5 41%,#c39337 54%,#ead089 68%,#8a611e 84%,#d8b65d 100%)!important;
+  background-size:220% 100%!important;
+  background-position:0% 50%!important;
+  -webkit-background-clip:text!important;
+  background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;
+  text-shadow:0 1px 0 rgba(255,255,255,.3),0 2px 8px rgba(110,80,24,.10)!important;
+}
+html body .top .brandtext span,
+html body .home-reference .top .brandtext span{display:none!important}
+html body .top .links,
+html body .top .links a,
+html body .top .nav :is(.nw-account-link,.nw-account-mobile,.nw-account-logout,.nw-language-button){
+  color:#314139!important;
+}
+html body .top .links a:hover,
+html body .top .links a.active,
+html body .top .links a[aria-current="page"]{
+  color:var(--stewaro-green)!important;
+  border-bottom-color:rgba(183,139,54,.75)!important;
+}
+html body .top .links .auth-link{
+  border:1px solid rgba(107,86,46,.20)!important;
+  background:#fff!important;
+  color:var(--stewaro-green)!important;
+  border-radius:999px!important;
+  box-shadow:none!important;
+}
+html body .top .links .auth-link.register-link{
+  background:linear-gradient(118deg,#b5822d 0%,#ead28b 47%,#c49638 100%)!important;
+  color:#142018!important;
+  border-color:rgba(124,91,30,.24)!important;
+  box-shadow:0 8px 22px rgba(111,80,24,.10)!important;
+}
+html body .top .nav-toggle,
+html body .top .nav-toggle span{color:var(--stewaro-green)!important}
+html body .top .nav-toggle span{background:var(--stewaro-green)!important}
+html body .top .links.is-open{
+  background:rgba(255,255,255,.99)!important;
+  border-color:var(--stewaro-line)!important;
+  box-shadow:0 24px 68px rgba(26,40,32,.13)!important;
+}
+
+/* ---------- Public page palette ---------- */
+html body:not(.account-premium-ui):not(.web-concierge-page){
+  background:var(--stewaro-bg)!important;
+  color:var(--stewaro-ink)!important;
+}
+html body:not(.account-premium-ui):not(.web-concierge-page) main{
+  background:
+    radial-gradient(820px 420px at 92% 0%,rgba(199,154,61,.10),transparent 72%),
+    linear-gradient(180deg,#fbf9f4 0%,var(--stewaro-bg) 55%,#f1eade 100%)!important;
+  color:var(--stewaro-ink)!important;
+}
+html body:not(.account-premium-ui):not(.web-concierge-page):not(.login-image-page) .hero{
+  background:
+    radial-gradient(760px 420px at 88% 8%,rgba(199,154,61,.17),transparent 68%),
+    linear-gradient(145deg,#fffdf9 0%,#f5efe4 100%)!important;
+  color:var(--stewaro-ink)!important;
+  border-bottom:1px solid var(--stewaro-line)!important;
+}
+html body:not(.account-premium-ui):not(.web-concierge-page):not(.login-image-page) .hero h1,
+html body:not(.account-premium-ui):not(.web-concierge-page):not(.login-image-page) .hero h2{
+  color:var(--stewaro-green)!important;
+}
+html body:not(.account-premium-ui):not(.web-concierge-page):not(.login-image-page) .hero p,
+html body:not(.account-premium-ui):not(.web-concierge-page):not(.login-image-page) .lead{
+  color:#657068!important;
+}
+html body .eyebrow,
+html body .eyebrow-home,
+html body .section-kicker,
+html body .story-kicker{
+  color:#9a7127!important;
+}
+html body .section.alt,
+html body .story-section--soft{
+  background:#efe8dd!important;
+  border-color:var(--stewaro-line)!important;
+}
+html body :is(.card,.product,.mini-plan,.step,.contactitem,.formcard,.preview,.logincard,.resetcard,.usagebox,.legalbox,.faq details,.price-card,.package-card,.story-compact-item,.story-principle){
+  border:1px solid var(--stewaro-line)!important;
+  background:rgba(255,253,249,.90)!important;
+  color:var(--stewaro-ink)!important;
+  box-shadow:var(--stewaro-shadow-soft)!important;
+}
+html body :is(.card,.product,.mini-plan,.step,.contactitem,.formcard,.preview,.logincard,.resetcard,.usagebox,.legalbox,.faq details,.price-card,.package-card) :is(h2,h3,h4,strong){
+  color:var(--stewaro-green)!important;
+}
+html body :is(.card,.product,.mini-plan,.step,.contactitem,.formcard,.preview,.logincard,.resetcard,.usagebox,.legalbox,.faq details,.price-card,.package-card) :is(p,li,small,.tiny){
+  color:#667068!important;
+}
+html body :is(input,select,textarea){
+  border-color:rgba(29,54,43,.18)!important;
+  background:#fff!important;
+  color:#17271f!important;
+  box-shadow:none!important;
+}
+html body :is(input,select,textarea):focus{
+  border-color:rgba(175,129,42,.72)!important;
+  outline:3px solid rgba(225,194,117,.20)!important;
+  outline-offset:1px!important;
+}
+html body :is(.btn.red,.ref-btn.primary,.story-btn--primary,.contact-button.primary){
+  background:linear-gradient(118deg,#af7d2a,#ead18b 46%,#bf8e33)!important;
+  border-color:rgba(126,91,28,.20)!important;
+  color:#142018!important;
+  box-shadow:0 10px 26px rgba(111,80,24,.12)!important;
+}
+html body :is(.btn.light,.ref-btn.secondary,.story-btn--secondary,.contact-button.secondary){
+  background:#fff!important;
+  border-color:rgba(23,49,38,.18)!important;
+  color:var(--stewaro-green)!important;
+}
+html body :is(.btn,.ref-btn,.story-btn,.contact-button):hover{transform:translateY(-2px)}
+
+/* ---------- Login: remove legacy red/blue person and use clean STEWARO composition ---------- */
+html body.login-image-page{
+  background:var(--stewaro-bg)!important;
+  color:var(--stewaro-ink)!important;
+}
+html body.login-image-page main{
+  display:block!important;
+  min-height:calc(100svh - 72px)!important;
+  padding:0!important;
+  overflow:visible!important;
+  background:
+    radial-gradient(800px 480px at 85% 4%,rgba(199,154,61,.15),transparent 70%),
+    linear-gradient(180deg,#fbf9f4 0%,#f3ece0 100%)!important;
+}
+html body.login-image-page main::after,
+html body.login-image-page main>.hero::after,
+html body.login-image-page .hero::after{
+  content:none!important;
+  display:none!important;
+  background:none!important;
+  background-image:none!important;
+}
+html body.login-image-page main>.hero{
+  display:block!important;
+  min-height:0!important;
+  padding:clamp(64px,8vw,108px) 20px 26px!important;
+  background:transparent!important;
+  border:0!important;
+  text-align:center!important;
+}
+html body.login-image-page main>.hero>.wrap{
+  width:min(100% - 32px,780px)!important;
+  max-width:780px!important;
+  margin:0 auto!important;
+  padding:0!important;
+}
+html body.login-image-page main>.hero h1{
+  color:var(--stewaro-green)!important;
+  font-family:Baskerville,"Iowan Old Style",Georgia,serif!important;
+  font-weight:500!important;
+  letter-spacing:-.035em!important;
+}
+html body.login-image-page main>.hero p{
+  max-width:660px!important;
+  margin-left:auto!important;margin-right:auto!important;
+  color:#657068!important;
+}
+html body.login-image-page main>.section{
+  padding:0 20px clamp(76px,9vw,120px)!important;
+  background:transparent!important;
+}
+html body.login-image-page .loginwrap{
+  width:min(100%,620px)!important;
+  max-width:620px!important;
+  margin:0 auto!important;
+  display:block!important;
+}
+html body.login-image-page .logincard{
+  width:100%!important;
+  padding:clamp(26px,4vw,40px)!important;
+  border-radius:24px!important;
+  background:rgba(255,255,255,.94)!important;
+  border:1px solid rgba(23,49,38,.12)!important;
+  color:var(--stewaro-ink)!important;
+  box-shadow:var(--stewaro-shadow)!important;
+}
+html body.login-image-page .logincard h2,
+html body.login-image-page .logincard label{color:var(--stewaro-green)!important}
+html body.login-image-page .logincard .tiny{color:#69726c!important}
+html body.login-image-page .logincard a{color:#936a22!important}
+html body.login-image-page .remember-row{
+  border-color:rgba(23,49,38,.12)!important;
+  background:#f8f4ec!important;
+  color:var(--stewaro-ink)!important;
+}
+
+/* Registration/auth family */
+html body.registration-page main,
+html body:has(.resetcard) main{
+  background:
+    radial-gradient(800px 440px at 88% 0%,rgba(199,154,61,.12),transparent 68%),
+    linear-gradient(180deg,#fbf9f4 0%,#f4ede2 100%)!important;
+}
+html body.registration-page .formcard,
+html body.registration-page .preview,
+html body .resetcard{background:#fff!important}
+
+/* ---------- Pricing / PAYG public presentation ---------- */
+html body.pricing-page{
+  background:var(--stewaro-bg)!important;
+  color:var(--stewaro-ink)!important;
+}
+html body.pricing-page main,
+html body.pricing-page .hero,
+html body.pricing-page .section{
+  background:transparent!important;
+  color:var(--stewaro-ink)!important;
+}
+html body.pricing-page .package-card,
+html body.pricing-page .package-card.featured{
+  background:#fffdf9!important;
+  border-color:var(--stewaro-line)!important;
+  color:var(--stewaro-ink)!important;
+  box-shadow:var(--stewaro-shadow-soft)!important;
+}
+html body.pricing-page .package-card.featured{
+  border-color:rgba(178,132,43,.42)!important;
+  box-shadow:0 22px 60px rgba(75,58,26,.10)!important;
+}
+html body.pricing-page :is(.package-card h3,.package-price){color:var(--stewaro-green)!important}
+html body.pricing-page :is(.package-card p,.package-card li,.package-price small,.package-card .whatsapp-label){color:#677069!important}
+html body.pricing-page :is(.package-usage,.status-pill){color:#8d6622!important}
+
+/* ---------- Story / Family surfaces ---------- */
+html body .story-subhero,
+html body .story-section,
+html body .story-final{color:var(--stewaro-ink)!important}
+html body .story-subhero{
+  background:
+    radial-gradient(700px 400px at 88% 8%,rgba(199,154,61,.15),transparent 70%),
+    #fbf8f2!important;
+}
+html body .story-final{
+  background:linear-gradient(145deg,#173126,#244538)!important;
+  color:#fff!important;
+}
+html body .story-final :is(h2,p,.story-lead){color:#fff!important}
+html body .story-family-media{
+  border-radius:26px!important;
+  overflow:hidden!important;
+  box-shadow:0 26px 70px rgba(32,45,37,.13)!important;
+}
+
+/* ---------- Customer account / concierge: default light STEWARO atmosphere ---------- */
+html[data-nw-portal-theme="light"] body.account-premium-ui,
+html[data-nw-portal-theme="light"] body.web-concierge-page,
+body.account-premium-ui.nw-portal-light,
+body.web-concierge-page.nw-portal-light{
+  background:var(--stewaro-bg)!important;
+  color:var(--stewaro-ink)!important;
+}
+html[data-nw-portal-theme="light"] body.account-premium-ui main,
+html[data-nw-portal-theme="light"] body.web-concierge-page main,
+body.account-premium-ui.nw-portal-light main,
+body.web-concierge-page.nw-portal-light main{
+  background:
+    radial-gradient(850px 460px at 90% 0%,rgba(199,154,61,.10),transparent 70%),
+    linear-gradient(180deg,#fbf9f4 0%,#f3ece1 100%)!important;
+}
+html body .web-concierge-avatar.nahwerk-mark,
+html body .nw-floating-concierge .nw-floating-concierge-icon{
+  background:transparent center/contain no-repeat url("/assets/logos/stewaro-mark.svg")!important;
+}
+
+/* ---------- Unified footer ---------- */
+html body footer.footer,
+html body .footer{
+  background:linear-gradient(145deg,#10251c 0%,#173126 100%)!important;
+  background-color:#173126!important;
+  background-image:linear-gradient(145deg,#10251c,#173126)!important;
+  border-top:1px solid rgba(232,207,145,.15)!important;
+  color:rgba(255,255,255,.84)!important;
+}
+html body .footer :is(p,a,span,small){color:rgba(255,255,255,.68)!important}
+html body .footer :is(h3,h4){color:#fff!important}
+html body .footer a:hover{color:#efd99b!important}
+html body .footer .brand{
+  display:flex!important;
+  align-items:center!important;
+  width:auto!important;height:auto!important;
+  min-width:0!important;
+  gap:11px!important;
+  background:none!important;
+}
+html body .footer .brand .mark,
+html body .footer .brand .mark.nahwerk-mark{
+  display:block!important;
+  width:38px!important;height:38px!important;flex:0 0 38px!important;
+  background:transparent center/contain no-repeat url("/assets/logos/stewaro-mark.svg")!important;
+}
+html body .footer .brand .brandtext{display:block!important}
+html body .footer .brandtext strong{display:block!important;font-size:0!important}
+html body .footer .brandtext strong::before{
+  content:"STEWARO"!important;
+  display:block!important;
+  font-family:Baskerville,"Iowan Old Style",Georgia,serif!important;
+  font-size:18px!important;font-weight:600!important;letter-spacing:.18em!important;
+  color:#e6c879!important;
+}
+html body .footer .brandtext span{display:none!important}
+
+/* ---------- Mobile ---------- */
+@media(max-width:900px){
+  html body .top .nav{min-height:66px!important}
+  html body .top .brand .mark,
+  html body .top .brand .mark.nahwerk-mark{width:34px!important;height:34px!important;flex-basis:34px!important}
+  html body .top .brandtext strong::before{font-size:16px!important}
+}
+@media(max-width:620px){
+  html body.login-image-page main>.hero{padding-top:48px!important}
+  html body.login-image-page main>.section{padding-left:14px!important;padding-right:14px!important}
+  html body.login-image-page .logincard{padding:24px 20px!important;border-radius:20px!important}
+}
+@media(prefers-reduced-motion:no-preference){
+  html body .top .brandtext strong::before{animation:stewaroUnifiedSheen 8s ease-in-out infinite alternate}
+}
+@media(prefers-reduced-motion:reduce){
+  html body .top .brandtext strong::before{animation:none!important}
+}
+@keyframes stewaroUnifiedSheen{from{background-position:0% 50%}to{background-position:100% 50%}}
