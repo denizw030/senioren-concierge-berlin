@@ -22,7 +22,7 @@
   height:52px!important;
   min-width:0!important;
   margin:0 0 10px!important;
-  background:transparent left center/contain no-repeat url("logos/NAHWERK-CONCIERGE-Website-Logo-Schrift.webp")!important;
+  background:none!important;
 }
 
 .footer .brand .mark,
@@ -605,3 +605,17 @@ html body .top{background:rgba(255,255,255,.965)!important;border-bottom:1px sol
 html body.login-image-page main::after,
 html body.login-image-page main>.hero::after,
 html body.login-image-page .hero::after{content:none!important;display:none!important;background:none!important;background-image:none!important}
+
+
+/* STEWARO_FOOTER_COMPAT_V1 */
+html body .footer .brand{
+  display:flex!important;align-items:center!important;width:auto!important;height:auto!important;min-width:0!important;gap:11px!important;background:none!important;
+}
+html body .footer .brand .mark,
+html body .footer .brand .mark.nahwerk-mark{
+  display:block!important;width:38px!important;height:38px!important;flex:0 0 38px!important;background:transparent center/contain no-repeat url("logos/stewaro-mark.svg")!important;
+}
+html body .footer .brand .brandtext{display:block!important}
+html body .footer .brandtext strong{display:block!important;font-size:0!important}
+html body .footer .brandtext strong:before{content:"STEWARO"!important;display:block!important;font-family:Baskerville,"Iowan Old Style",Georgia,serif!important;font-size:18px!important;font-weight:600!important;letter-spacing:.18em!important;color:#d7b65e!important}
+html body .footer .brandtext span{display:none!important}
