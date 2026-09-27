@@ -32,5 +32,5 @@ for (const provider of ['yahoo','icloud','gmx','webde','telekom','fastmail','zoh
 }
 assert.match(p, /id: "proton"[\s\S]*?mode: "unsupported"/);
 assert.match(p, /id: "tuta"[\s\S]*?mode: "unsupported"/);
-assert.match(p,/id: "proton"[\s\S]*?direkte serverseitige Verbindung zu NAHWERK wird derzeit nicht unterstützt/);
+assert.match(p,/id: "proton"[\s\S]*?direkte serverseitige Verbindung zu STEWARO wird derzeit nicht unterstützt/);
 console.log('EMAIL_PROVIDER_BUTTON_FREEZE_CONTRACT=GREEN');
