@@ -1,0 +1,81 @@
+name: STEWARO Shared Base CI
+
+on:
+  pull_request:
+    paths:
+      - "de/index.html"
+      - "index.html"
+      - "email-concierge.html"
+      - "assets/site.css"
+      - "assets/site-ui.js"
+      - "assets/stewaro-brand-shell.css"
+      - "assets/logos/stewaro-mark.svg"
+      - "anmelden.html"
+      - "anmelden/**"
+      - "registrieren.html"
+      - "registrieren/**"
+      - "konto.html"
+      - "konto/**"
+      - "web-concierge.html"
+      - "web-concierge/**"
+      - "safety.html"
+      - "safety/**"
+      - "pakete.html"
+      - "pakete/**"
+      - "payg.html"
+      - "payg/**"
+      - "telefonannahme.html"
+      - "telefonannahme/**"
+      - "angehoerige.html"
+      - "angehoerige/**"
+      - "leistungen.html"
+      - "leistungen/**"
+      - "ablauf.html"
+      - "ablauf/**"
+      - "faq.html"
+      - "faq/**"
+      - "kontakt.html"
+      - "kontakt/**"
+      - "concierge-anpassen.html"
+      - "concierge-anpassen/**"
+      - "tests/stewaro-shared-base-brand-shell.test.mjs"
+      - ".github/workflows/stewaro-shared-base-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  stewaro-shared-base:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify isolated migration scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --depth=1
+          changed="$(git diff --name-only origin/main...HEAD)"
+          printf '%s\n' "$changed"
+          if printf '%s\n' "$changed" | grep -Eq '^(CNAME|stewaro-site/|.*orfidel.*)'; then
+            echo "Forbidden production/frozen/protected path changed."
+            exit 1
+          fi
+
+      - name: Verify production domain remains NAHWERK during migration
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(tr -d '\r\n' < CNAME)" = "nahwerkconcierge.com"
+
+      - name: Run STEWARO shared-base contract
+        run: node --test tests/stewaro-shared-base-brand-shell.test.mjs
+
+      - name: Run critical route parity
+        run: node --test tests/konto-clean-route-parity.test.mjs tests/critical-route-parity.test.mjs
+
+      - name: Run auth security regression
+        run: node --test tests/auth-security.test.mjs
