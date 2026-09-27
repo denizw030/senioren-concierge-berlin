@@ -36,6 +36,20 @@ on:
       - "faq/**"
       - "kontakt.html"
       - "kontakt/**"
+      - "agb.html"
+      - "agb/**"
+      - "nutzungsbedingungen/**"
+      - "datenschutz.html"
+      - "datenschutz/**"
+      - "datenloeschung.html"
+      - "datenloeschung/**"
+      - "impressum.html"
+      - "impressum/**"
+      - "ki-transparenz.html"
+      - "ki-transparenz/**"
+      - "widerruf.html"
+      - "widerruf/**"
+      - "tests/stewaro-block4-launch-readiness.test.mjs"
       - "concierge-anpassen.html"
       - "concierge-anpassen/**"
       - "tests/stewaro-shared-base-brand-shell.test.mjs"
@@ -73,6 +87,9 @@ jobs:
 
       - name: Run STEWARO shared-base contract
         run: node --test tests/stewaro-shared-base-brand-shell.test.mjs
+
+      - name: Run STEWARO Block 4 launch-readiness contract
+        run: node --test tests/stewaro-block4-launch-readiness.test.mjs
 
       - name: Run critical route parity
         run: node --test tests/konto-clean-route-parity.test.mjs tests/critical-route-parity.test.mjs
