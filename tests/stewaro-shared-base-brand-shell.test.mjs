@@ -25,7 +25,7 @@ test("STEWARO shared-base brand shell is wired without forking runtime", () => {
   assert.match(home, /Unterstützt durch moderne KI\./);
 
   assert.match(matrix, /stewaro-site\/.*frozen/i);
-  assert.match(matrix, /existing website\/customer-account/i);
+  assert.match(matrix, /existing production website\/customer-account/i);
 
   // Legacy runtime identifiers must remain available during the migration.
   assert.match(siteUi, /nw_portal_theme_v1/);
@@ -33,6 +33,17 @@ test("STEWARO shared-base brand shell is wired without forking runtime", () => {
 
 test("production domain configuration is untouched by brand-shell block", () => {
   const cname = read("CNAME");
-  assert.ok(cname.trim().length > 0);
+  assert.equal(cname.trim(), "nahwerkconcierge.com");
   assert.doesNotMatch(read("assets/stewaro-brand-shell.css"), /CNAME|DNS|nameserver/i);
+});
+
+test("changed clean routes remain exact mirrors of their canonical pages", () => {
+  for (const name of [
+    "anmelden","registrieren","konto","web-concierge","safety","pakete","payg",
+    "telefonannahme","angehoerige","leistungen","ablauf","faq","kontakt","concierge-anpassen"
+  ]) {
+    const canonical = read(`${name}.html`);
+    const clean = read(`${name}/index.html`).replace('<head><base href="/">','<head>');
+    assert.equal(clean, canonical, `${name} clean route diverged`);
+  }
 });
