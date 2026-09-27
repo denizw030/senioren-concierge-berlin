@@ -31,6 +31,11 @@ test("STEWARO shared-base brand shell is wired without forking runtime", () => {
   assert.doesNotMatch(home, /<img class="hero-image"/);
   assert.match(home, /prefers-reduced-motion: reduce/);
   assert.match(home, /heroVideo\.pause\(\)/);
+  assert.match(home, /id="stewaro-precision-fullbleed-v1"/);
+  assert.match(home, /\.precision\{[\s\S]*min-height:clamp\(760px,92svh,980px\)!important/);
+  assert.match(home, /\.mechanism-frame\{[\s\S]*position:absolute!important;[\s\S]*inset:0!important;[\s\S]*width:100%!important;[\s\S]*height:100%!important/);
+  assert.match(home, /\.precision-copy\{[\s\S]*backdrop-filter:blur\(26px\) saturate\(130%\)!important/);
+  assert.match(home, /background:[\s\S]*rgba\(11,14,12,\.72\)[\s\S]*rgba\(4,6,5,\.68\)/);
   const heroVideo = fs.statSync("assets/media/stewaro-hero-pferd.mp4");
   assert.ok(heroVideo.size > 100_000 && heroVideo.size < 600_000, "hero video must stay web-optimized");
 
