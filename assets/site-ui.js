@@ -35,7 +35,7 @@
 
   const readPortalTheme = () => {
     if (isPublicSeniorSurface && !isProdCustomerSurface) return 'light';
-    return readStoredPortalTheme() || 'light';
+    return readStoredPortalTheme() || 'dark';
   };
 
   const applyPortalTheme = (theme) => {
