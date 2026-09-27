@@ -1384,6 +1384,13 @@
     try {
       document.documentElement.dataset.brand = "stewaro";
       document.body?.classList.add("brand-stewaro");
+      if (!document.querySelector('link[data-stewaro-brand-shell]')) {
+        const brandCss = document.createElement("link");
+        brandCss.rel = "stylesheet";
+        brandCss.href = "/assets/stewaro-brand-shell.css?v=20260927-1";
+        brandCss.dataset.stewaroBrandShell = "1";
+        document.head.appendChild(brandCss);
+      }
 
       if (document.title) document.title = replaceBrand(document.title);
       document.querySelectorAll('meta[name="description"],meta[property="og:title"],meta[property="og:description"]').forEach((meta) => {
