@@ -378,7 +378,7 @@
 
     const token = sessionToken();
     if (!token) {
-      setResult("Bitte anmelden", "Melden Sie sich bitte mit Ihrem NAHWERK Zugang an, um mit der Einrichtung fortzufahren.");
+      setResult("Bitte anmelden", "Melden Sie sich bitte mit Ihrem STEWARO Zugang an, um mit der Einrichtung fortzufahren.");
       return;
     }
 
@@ -398,7 +398,7 @@
     }
 
     if (outcome.kind === "endpoint_not_deployed") {
-      setResult("Einrichtung abstimmen", "Bitte kontaktieren Sie NAHWERK, damit wir die Einrichtung Ihrer Telefonannahme gemeinsam mit Ihnen abstimmen.");
+      setResult("Einrichtung abstimmen", "Bitte kontaktieren Sie STEWARO, damit wir die Einrichtung Ihrer Telefonannahme gemeinsam mit Ihnen abstimmen.");
       return;
     }
     if (outcome.kind === "number_submitted") {
@@ -406,22 +406,22 @@
       return;
     }
     if (outcome.kind === "idempotency_conflict") {
-      setResult("Einrichtung nicht abgeschlossen", "Der Vorgang konnte nicht sicher abgeschlossen werden. Bitte versuchen Sie es später erneut oder kontaktieren Sie NAHWERK.", "error");
+      setResult("Einrichtung nicht abgeschlossen", "Der Vorgang konnte nicht sicher abgeschlossen werden. Bitte versuchen Sie es später erneut oder kontaktieren Sie STEWARO.", "error");
       return;
     }
     if (outcome.kind === "number_already_submitted") {
-      setResult("Nummer bereits erfasst", "Für diese Rufnummer liegt bereits ein Einrichtungsstand vor. Bitte kontaktieren Sie NAHWERK, wenn Sie Unterstützung benötigen.");
+      setResult("Nummer bereits erfasst", "Für diese Rufnummer liegt bereits ein Einrichtungsstand vor. Bitte kontaktieren Sie STEWARO, wenn Sie Unterstützung benötigen.");
       return;
     }
     if (outcome.kind === "uncertain_network_error") {
-      setResult("Einrichtung nicht bestätigt", "Der Vorgang konnte nicht sicher bestätigt werden. Bitte versuchen Sie es später erneut oder kontaktieren Sie NAHWERK.", "error");
+      setResult("Einrichtung nicht bestätigt", "Der Vorgang konnte nicht sicher bestätigt werden. Bitte versuchen Sie es später erneut oder kontaktieren Sie STEWARO.", "error");
       return;
     }
     if (outcome.kind === "invalid_canonical_submit_response") {
-      setResult("Einrichtung nicht bestätigt", "Der Vorgang konnte nicht sicher bestätigt werden. Bitte kontaktieren Sie NAHWERK, bevor Sie fortfahren.", "error");
+      setResult("Einrichtung nicht bestätigt", "Der Vorgang konnte nicht sicher bestätigt werden. Bitte kontaktieren Sie STEWARO, bevor Sie fortfahren.", "error");
       return;
     }
-    setResult("Einrichtung nicht abgeschlossen", "Der Vorgang konnte nicht abgeschlossen werden. Bitte versuchen Sie es später erneut oder kontaktieren Sie NAHWERK.", "error");
+    setResult("Einrichtung nicht abgeschlossen", "Der Vorgang konnte nicht abgeschlossen werden. Bitte versuchen Sie es später erneut oder kontaktieren Sie STEWARO.", "error");
   });
 
   window.NAHWERKTelephoneReceptionContract = Object.freeze({
