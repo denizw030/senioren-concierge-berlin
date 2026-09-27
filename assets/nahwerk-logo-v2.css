@@ -6,7 +6,7 @@
   height:46px!important;
   min-width:46px!important;
   flex:0 0 46px!important;
-  background:transparent center/contain no-repeat url("logos/NAHWERK-Goldmann-Logo.svg")!important;
+  background:transparent center/contain no-repeat url("logos/stewaro-mark.svg")!important;
 }
 
 .top .brand .mark,
@@ -102,7 +102,7 @@
   html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main::after{
     border:1px solid rgba(212,175,55,.30)!important;
     background-color:#05070b!important;
-    background-image:url("prime/nahwerk-red-blue-hero-web-lossless.webp")!important;
+    background-image:none!important;
     background-position:center 18%!important;
     box-shadow:0 30px 80px rgba(0,0,0,.40),inset 0 1px 0 rgba(255,255,255,.025)!important;
   }
@@ -394,7 +394,7 @@
   html body.login-image-page:not(.senior-product):not([data-product="senioren"]) main > .hero::after{
     border:1px solid rgba(212,175,55,.26)!important;
     background-color:#05070b!important;
-    background-image:url("prime/nahwerk-red-blue-hero-web-lossless.webp")!important;
+    background-image:none!important;
     background-position:center 18%!important;
     box-shadow:0 24px 60px rgba(0,0,0,.34)!important;
   }
