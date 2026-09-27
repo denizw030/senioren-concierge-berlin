@@ -25,6 +25,14 @@ test("STEWARO shared-base brand shell is wired without forking runtime", () => {
   assert.match(home, /Jemand, der sich kümmert\./);
   assert.match(home, /Ihr persönlicher Concierge für Alltag, Organisation und alles, was erledigt werden muss\./);
   assert.match(home, /Unterstützt durch moderne KI\./);
+  assert.match(home, /<video class="hero-image hero-video" autoplay muted loop playsinline preload="metadata"/);
+  assert.match(home, /<source src="\/assets\/media\/stewaro-hero-pferd\.mp4" type="video\/mp4"/);
+  assert.match(home, /poster="data:image\/webp;base64,/);
+  assert.doesNotMatch(home, /<img class="hero-image"/);
+  assert.match(home, /prefers-reduced-motion: reduce/);
+  assert.match(home, /heroVideo\.pause\(\)/);
+  const heroVideo = fs.statSync("assets/media/stewaro-hero-pferd.mp4");
+  assert.ok(heroVideo.size > 100_000 && heroVideo.size < 600_000, "hero video must stay web-optimized");
 
   assert.match(matrix, /stewaro-site\/.*frozen/i);
   assert.match(matrix, /existing production website\/customer-account/i);
