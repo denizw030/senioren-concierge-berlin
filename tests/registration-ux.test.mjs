@@ -72,5 +72,3 @@ test("FIDEL is the registration default without carousel runtime", () => {
 test("registration no longer loads photo carousel or voice-preview assets", () => {
   assert.doesNotMatch(html, /concierge-carousel|concierge-voice-preview|auth-slider-i18n/);
 });
-
-
