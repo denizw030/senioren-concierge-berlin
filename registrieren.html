@@ -8,14 +8,14 @@
       name="description"
       content="Dauerhaft kostenlosen STEWARO-Concierge-Zugang registrieren."
     />
-    <meta name="theme-color" content="#070706" />
-    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#f7f3eb" />
+    <meta name="color-scheme" content="light dark" />
     <style id="registration-required-markers">
       .required-mark{color:#c7a24d;font-weight:800;margin-left:2px}
       .required-fields-hint{margin:-8px 0 16px;color:#aaa69d;font-size:12px;line-height:1.4}
       .required-fields-hint .required-mark{margin-left:0;margin-right:3px}
     </style>
-    <style id="registration-first-paint">html,body{margin:0;background:#070706;color-scheme:dark}.family-message-field textarea{min-height:112px;resize:vertical}.family-message-field .tiny{display:block;margin-top:7px}</style>
+    <style id="registration-first-paint">html,body{margin:0;background:#f7f3eb;color-scheme:light}.family-message-field textarea{min-height:112px;resize:vertical}.family-message-field .tiny{display:block;margin-top:7px}</style>
     <link rel="stylesheet" href="assets/site.css?v=24" />
     <style>
       .signup {
@@ -527,8 +527,6 @@
     <link rel="icon" type="image/svg+xml" href="/assets/logos/stewaro-mark.svg?v=1" />
     <link rel="stylesheet" href="assets/brand-2026.css?v=23" />
     <link rel="stylesheet" href="assets/nahwerk-logo-v2.css?v=9" />
-    <link rel="stylesheet" href="assets/concierge-voice-preview.css?v=9" />
-<link rel="stylesheet" href="assets/concierge-carousel.css?v=16" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="de_DE" />
     <meta property="og:title" content="STEWARO" />
@@ -734,29 +732,15 @@
       <section class="section">
         <div class="wrap signup">
           <form class="formcard" id="signupForm" data-nw-registration="v1">
-            <fieldset
-              class="field"
-              style="border: 0; padding: 0; margin-inline: 0"
-            >
-              <legend
-                style="
-                  font:700 25px/1.2 -apple-system,BlinkMacSystemFont,Arial,sans-serif;
-                "
-              >
-                Wer darf dich begleiten?
-              </legend>
-              <p class="concierge-intro">
-                Wähle den Concierge, dessen Auftreten und Kommunikationsstil am besten zu dir passt. Die grundlegenden Möglichkeiten bleiben bei allen Profilen gleich.
-              </p>
-              <div
-                class="concierge-choice"
-                data-concierge-carousel
-                data-variant="selection"
-                data-input-name="conciergeChoice"
-                data-selected="lena"
-                data-label="Persönlichen KI-Concierge auswählen"
-              ></div>
-            </fieldset>
+            <section class="field" aria-labelledby="registrationConciergeTitle">
+              <h2 id="registrationConciergeTitle" style="font-size:25px;margin:0">Ihr persönlicher Concierge</h2>
+              <p class="concierge-intro">STEWARO begleitet Sie mit FIDEL – ruhig, verständlich und verlässlich. Eine Fotoauswahl ist nicht mehr nötig.</p>
+              <div class="stewaro-fixed-concierge-card" aria-label="FIDEL ist Ihr persönlicher STEWARO Concierge">
+                <span class="stewaro-fixed-concierge-mark" aria-hidden="true"></span>
+                <span class="stewaro-fixed-concierge-copy"><strong>FIDEL</strong><span>Ihr persönlicher STEWARO Concierge</span></span>
+              </div>
+              <input type="hidden" name="conciergeChoice" value="fidel" />
+            </section>
             <div class="field">
               <label>Für wen richtest du den Zugang ein?</label>
               <div class="choice setup-choice">
@@ -1142,9 +1126,6 @@
         </div>
       </div>
     </footer>
-    <script src="assets/concierge-voice-preview.js?v=7"></script>
-<script src="/assets/concierge-locale-defaults.js?v=1"></script>
-    <script src="assets/concierge-carousel.js?v=23"></script>
     <script src="assets/auth-nav.js?v=40"></script>
     <script src="assets/nahwerk-analytics.js?v=1"></script>
     <script src="assets/acquisition-v1.js?v=2"></script>
@@ -1170,7 +1151,6 @@
     </script>
     <script src="assets/site-ui.js?v=5"></script>
       <script src="assets/auth-i18n.js?v=3"></script>
-    <script src="assets/auth-slider-i18n.js?v=2"></script>
     <script src="assets/locale-runtime.js?v=1"></script>
     <script src="assets/app-language-switcher.js?v=2"></script>
   </body>
