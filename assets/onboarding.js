@@ -119,15 +119,15 @@
   if (!Object.hasOwn(PLANS, currentPlanKey)) currentPlanKey = "free";
   const selectedPlan = () => PLANS[currentPlanKey];
   const planBookable = () => selectedPlan().bookable;
-  const conciergeProfiles = window.NAHWERKCarousel?.byKey || {};
+  const conciergeProfiles = window.NAHWERKCarousel?.byKey || { fidel:{ key:"fidel", name:"FIDEL" } };
   const recipientIds = ["recipientSalutation", "recipientFirstName", "recipientLastName", "relationship", "recipientPhone", "familyMessage"];
   const fullName = (first, last) => [first.trim(), last.trim()].filter(Boolean).join(" ");
   const isSelf = () => form.querySelector('input[name="setupFor"]:checked')?.value === "self";
   const conciergeValue = () => {
     const value = form.querySelector('[name="conciergeChoice"]')?.value;
-    return conciergeProfiles[value] ? value : "lena";
+    return conciergeProfiles[value] ? value : "fidel";
   };
-  const concierge = () => conciergeProfiles[conciergeValue()].name;
+  const concierge = () => conciergeProfiles[conciergeValue()]?.name || "FIDEL";
   const escapeHtml = (value) => String(value || "").replace(/[&<>"']/g, (char) => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[char]));
   const familyMessageValue = () => $("familyMessage")?.value.trim() || "";
 
@@ -221,7 +221,11 @@
 
   function setupConciergeSelection() {
     const choice = form.querySelector(".concierge-choice");
-    if (!choice) return;
+    if (!choice) {
+      const fixed = form.querySelector('[name="conciergeChoice"]');
+      if (fixed && !fixed.value) fixed.value = "fidel";
+      return;
+    }
     const requestedConcierge = params.get("concierge");
     if (conciergeProfiles[requestedConcierge]) choice.dataset.selected = requestedConcierge;
     const field = choice.closest(".field");
