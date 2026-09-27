@@ -1346,3 +1346,124 @@
     document.documentElement.dataset.nwPlanFacts="live";
   }).catch(()=>{});
 })();
+
+
+/* STEWARO_SHARED_BASE_BRAND_ADAPTER_V1
+   Presentation-only migration layer. Keeps legacy runtime keys, routes and backend contracts intact. */
+(() => {
+  const BRAND = "STEWARO";
+  const replaceBrand = (value) => String(value ?? "")
+    .replace(/NAHWERK Concierge/g, BRAND)
+    .replace(/Nahwerk Concierge/g, BRAND)
+    .replace(/NAHWERK/g, BRAND)
+    .replace(/Nahwerk/g, BRAND);
+
+  let applying = false;
+  let queued = false;
+
+  const ensureNavLink = (nav, href, label) => {
+    let link = Array.from(nav.querySelectorAll(":scope > a")).find((item) => {
+      const raw = item.getAttribute("href") || "";
+      return raw === href || raw === href + "/" || raw.replace(/\.html(?=$|[?#])/, "") === href;
+    });
+    if (!link) {
+      link = document.createElement("a");
+      link.href = href;
+      const anchor = nav.querySelector(".auth-link,.nw-account-cluster");
+      if (anchor) nav.insertBefore(link, anchor);
+      else nav.appendChild(link);
+    }
+    link.textContent = label;
+    link.dataset.stewaroNav = "1";
+    return link;
+  };
+
+  function apply() {
+    if (applying) return;
+    applying = true;
+    try {
+      document.documentElement.dataset.brand = "stewaro";
+      document.body?.classList.add("brand-stewaro");
+
+      if (document.title) document.title = replaceBrand(document.title);
+      document.querySelectorAll('meta[name="description"],meta[property="og:title"],meta[property="og:description"]').forEach((meta) => {
+        const value = meta.getAttribute("content");
+        if (value && /NAHWERK|Nahwerk/.test(value)) meta.setAttribute("content", replaceBrand(value));
+      });
+
+      document.querySelectorAll("header.top .brand,.footer .brand").forEach((brand) => {
+        brand.setAttribute("aria-label", "STEWARO – Startseite");
+        const strong = brand.querySelector(".brandtext strong");
+        const sub = brand.querySelector(".brandtext span");
+        if (strong && strong.textContent !== BRAND) strong.textContent = BRAND;
+        if (sub && sub.textContent) sub.textContent = "";
+      });
+
+      document.querySelectorAll("nav.links").forEach((nav) => {
+        Array.from(nav.querySelectorAll(":scope > a")).forEach((link) => {
+          const href = (link.getAttribute("href") || "").replace(/\.html(?=$|[?#])/, "");
+          if (/\/concierges(?:$|[?#/])/.test(href) || /\/senioren-concierge(?:$|[?#/])/.test(href)) {
+            link.hidden = true;
+            link.setAttribute("aria-hidden", "true");
+            link.tabIndex = -1;
+          }
+          if (href.includes("angehoerige")) {
+            link.hidden = false;
+            link.removeAttribute("aria-hidden");
+            link.removeAttribute("tabindex");
+            link.href = "/angehoerige";
+            link.textContent = "Für Angehörige";
+          }
+          if (/\/prime-concierge(?:$|[?#/])/.test(href)) link.textContent = "Concierge";
+        });
+        ensureNavLink(nav, "/safety", "Sicherheit");
+        ensureNavLink(nav, "/leistungen", "Leistungen");
+        ensureNavLink(nav, "/pakete", "Preise");
+        ensureNavLink(nav, "/kontakt", "Kontakt");
+      });
+
+      document.querySelectorAll(".odysx-info-bar").forEach((element) => element.remove());
+      document.querySelectorAll(".footbottom > span:first-child").forEach((element) => {
+        if (element.textContent !== "© 2026 STEWARO") element.textContent = "© 2026 STEWARO";
+      });
+
+      const root = document.body;
+      if (root) {
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          const parent = node.parentElement;
+          if (!parent || /^(SCRIPT|STYLE|NOSCRIPT|CODE|PRE|TEXTAREA)$/i.test(parent.tagName)) continue;
+          if (/NAHWERK|Nahwerk/.test(node.nodeValue || "")) nodes.push(node);
+        }
+        nodes.forEach((node) => { node.nodeValue = replaceBrand(node.nodeValue); });
+      }
+
+      document.querySelectorAll("[aria-label],[title],[alt]").forEach((element) => {
+        ["aria-label","title","alt"].forEach((name) => {
+          const value = element.getAttribute(name);
+          if (value && /NAHWERK|Nahwerk/.test(value)) element.setAttribute(name, replaceBrand(value));
+        });
+      });
+    } finally {
+      applying = false;
+    }
+  }
+
+  const queueApply = () => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => {
+      queued = false;
+      apply();
+    });
+  };
+
+  apply();
+  addEventListener("DOMContentLoaded", apply, { once:true });
+  addEventListener("load", apply, { once:true });
+
+  const observer = new MutationObserver(queueApply);
+  if (document.documentElement) observer.observe(document.documentElement, { childList:true, subtree:true });
+})();
