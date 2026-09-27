@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#f7f3eb">
+  <title>STEWARO Zugang</title>
+  <meta name="description" content="STEWARO anmelden oder Konto erstellen.">
+  <link rel="icon" type="image/svg+xml" href="/assets/logos/stewaro-mark.svg?v=1">
+  <link rel="stylesheet" href="/assets/stewaro-account-entry.css?v=1">
+  <link rel="canonical" href="https://account.stewaro.com/">
+</head>
+<body class="stewaro-access-page">
+  <div class="stewaro-access-shell" data-stewaro-access>
+    <a class="stewaro-access-brand" href="/de/" aria-label="Zur STEWARO Website">
+      <span class="stewaro-access-brand-mark" aria-hidden="true"></span>
+      <span class="stewaro-access-brand-word">STEWARO</span>
+    </a>
+    <main class="stewaro-access-main">
+      <section class="stewaro-access-panel" data-access-screen="audience">
+        <p class="stewaro-access-kicker">Persönlicher Zugang</p>
+        <h1>Für wen ist STEWARO gedacht?</h1>
+        <p class="stewaro-access-intro">Wir führen Sie nur durch die Schritte, die Sie wirklich brauchen.</p>
+        <div class="stewaro-access-actions">
+          <button class="stewaro-access-choice primary" type="button" data-access-self>
+            <strong>Für mich</strong>
+            <span>Eigenen STEWARO Zugang anmelden oder erstellen</span>
+          </button>
+          <button class="stewaro-access-choice" type="button" data-access-other>
+            <strong>Für eine andere Person</strong>
+            <span>Weiter zu MyParentGuard · powered by STEWARO</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="stewaro-access-panel" data-access-screen="email" hidden>
+        <p class="stewaro-access-kicker">Für mich</p>
+        <h1>Anmelden oder Konto erstellen.</h1>
+        <p class="stewaro-access-intro">Geben Sie Ihre E-Mail-Adresse ein. Danach geht es in einem ruhigen Schritt weiter.</p>
+        <form class="stewaro-access-form" id="stewaroEntryEmailForm">
+          <label for="stewaroEntryEmail">E-Mail-Adresse</label>
+          <input id="stewaroEntryEmail" name="email" type="email" autocomplete="email" inputmode="email" required autofocus>
+          <button class="stewaro-access-submit" type="submit">Weiter</button>
+        </form>
+        <button class="stewaro-access-back" type="button" data-access-back>Zurück</button>
+        <p class="stewaro-access-note">STEWARO zeigt an dieser Stelle nicht öffentlich an, ob zu einer E-Mail-Adresse bereits ein Konto besteht.</p>
+      </section>
+    </main>
+    <footer class="stewaro-access-footer">© 2026 STEWARO · Persönlicher Concierge</footer>
+  </div>
+  <script src="/assets/stewaro-account-entry.js?v=1"></script>
+</body>
+</html>
