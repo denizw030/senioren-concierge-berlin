@@ -110,7 +110,7 @@
       button.textContent = "Zahlungsmethode ändern";
     } else if (providerReady) {
       status.textContent = "Noch nicht hinterlegt";
-      meta.textContent = "Zahlungsmethoden werden auf einer sicheren Stripe-Seite hinterlegt. NAHWERK speichert keine vollständigen Kartendaten.";
+      meta.textContent = "Zahlungsmethoden werden auf einer sicheren Stripe-Seite hinterlegt. STEWARO speichert keine vollständigen Kartendaten.";
       button.textContent = "Zahlungsmethode hinterlegen";
     } else {
       status.textContent = "Stripe Live fehlt";
