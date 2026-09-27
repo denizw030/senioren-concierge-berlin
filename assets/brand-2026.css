@@ -74,7 +74,7 @@ body.login-image-page:not(.senior-product):not([data-product="senioren"]) .hero 
 body.login-image-page:not(.senior-product):not([data-product="senioren"]) .hero:after {
   width:min(360px,30vw);
   aspect-ratio:4/5;
-  background:#080706 center top/cover no-repeat url("prime/prime-concierge-odysx.png?v=14")!important;
+  background:radial-gradient(circle at 50% 38%,rgba(231,204,137,.18),transparent 44%),linear-gradient(145deg,#fffdf9,#efe7d9)!important;
   border:1px solid rgba(200,164,93,.38);
   border-radius:28px;
   clip-path:none!important;
