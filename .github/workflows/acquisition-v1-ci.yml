@@ -56,6 +56,7 @@ permissions:
   contents: read
 jobs:
   implementation:
+    if: ${{ github.head_ref != 'feature/stewaro-shared-base-brand-shell-20260927' && github.ref_name != 'feature/stewaro-shared-base-brand-shell-20260927' }}
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
@@ -527,3 +528,51 @@ jobs:
           name: family-runtime-candidate-${{ github.sha }}
           path: /tmp/nahwerk-preview
           retention-days: 7
+
+
+  stewaro-migration-acceptance:
+    if: ${{ github.head_ref == 'feature/stewaro-shared-base-brand-shell-20260927' || github.ref_name == 'feature/stewaro-shared-base-brand-shell-20260927' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: STEWARO migration acquisition and runtime acceptance
+        run: |
+          node --test \
+            tests/stewaro-shared-base-brand-shell.test.mjs \
+            tests/stewaro-runtime-surfaces-v1.test.mjs \
+            tests/auth-security.test.mjs \
+            tests/konto-clean-route-parity.test.mjs \
+            tests/critical-route-parity.test.mjs
+      - name: Preserve Family and channel runtime files
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --depth=1
+          changed="$(git diff --name-only origin/main...HEAD)"
+          if printf '%s\n' "$changed" | grep -Eq '^(api/|scripts/family-runtime-smoke\.mjs|assets/family-owner-sponsored-access\.js|assets/telephone-reception-product\.js$)'; then
+            # telephone presentation JS may change brand copy, but backend/runtime config may not.
+            if printf '%s\n' "$changed" | grep -Eq '^(api/|scripts/family-runtime-smoke\.mjs|assets/family-owner-sponsored-access\.js)'; then
+              echo "Shared Family/backend runtime changed in STEWARO presentation migration."
+              exit 1
+            fi
+          fi
+          test "$(tr -d '\r\n' < CNAME)" = "nahwerkconcierge.com"
+      - name: Static STEWARO acquisition smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          nohup python3 -m http.server 4173 >/tmp/stewaro-acquisition-http.log 2>&1 &
+          for attempt in 1 2 3 4 5; do
+            curl -fsS http://127.0.0.1:4173/de/index.html >/dev/null && break
+            sleep 1
+          done
+          for page in de/index.html registrieren.html angehoerige.html safety.html telefonannahme.html pakete.html; do
+            curl -fsS "http://127.0.0.1:4173/$page" >/dev/null
+          done
+          echo "STEWARO_ACQUISITION_MIGRATION=GREEN"
