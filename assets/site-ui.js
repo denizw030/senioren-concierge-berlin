@@ -980,9 +980,9 @@
 (() => {
   const normalizedPath = (location.pathname.replace(/\/+$/, '') || '/').toLowerCase();
   const localeByPath = {
-    '/de': { language: 'de-DE', serviceUrl: 'https://nahwerkconcierge.com/prime-concierge', serviceName: 'Persönlicher NAHWERK Concierge' },
-    '/en': { language: 'en-GB', serviceUrl: 'https://nahwerkconcierge.com/en/prime-concierge', serviceName: 'NAHWERK Personal Concierge' },
-    '/tr': { language: 'tr-TR', serviceUrl: 'https://nahwerkconcierge.com/tr/prime-concierge', serviceName: 'NAHWERK Kişisel Concierge' }
+    '/de': { language: 'de-DE', serviceUrl: 'https://nahwerkconcierge.com/prime-concierge', serviceName: 'Persönlicher STEWARO Concierge' },
+    '/en': { language: 'en-GB', serviceUrl: 'https://nahwerkconcierge.com/en/prime-concierge', serviceName: 'STEWARO Personal Concierge' },
+    '/tr': { language: 'tr-TR', serviceUrl: 'https://nahwerkconcierge.com/tr/prime-concierge', serviceName: 'STEWARO Kişisel Concierge' }
   };
   const locale = localeByPath[normalizedPath];
   if (!locale) return;
@@ -994,7 +994,7 @@
       {
         '@type': 'Organization',
         '@id': 'https://nahwerkconcierge.com/#organization',
-        name: 'NAHWERK Concierge',
+        name: 'STEWARO',
         url: 'https://nahwerkconcierge.com/',
         logo: {
           '@type': 'ImageObject',
@@ -1005,7 +1005,7 @@
         '@type': 'WebSite',
         '@id': 'https://nahwerkconcierge.com/#website',
         url: 'https://nahwerkconcierge.com/',
-        name: 'NAHWERK Concierge',
+        name: 'STEWARO',
         inLanguage: locale.language,
         publisher: { '@id': 'https://nahwerkconcierge.com/#organization' }
       },
@@ -1020,7 +1020,7 @@
       {
         '@type': 'SoftwareApplication',
         '@id': 'https://nahwerkconcierge.com/#software',
-        name: 'NAHWERK Concierge',
+        name: 'STEWARO',
         applicationCategory: 'LifestyleApplication',
         operatingSystem: 'Web, iOS, Android',
         url: locale.serviceUrl,
