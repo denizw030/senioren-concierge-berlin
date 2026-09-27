@@ -17,7 +17,7 @@ const customerHtml = walk(root)
   .filter(file => !excludedExact.has(file));
 
 const loadsUnified = (file,html) =>
-  /stewaro-unified\.css|assets\/site\.css|assets\/brand-2026\.css|assets\/clean-url\.js|assets\/site-ui\.js/.test(html) ||
+  /stewaro-unified\.css|stewaro-account-entry\.css|assets\/site\.css|assets\/brand-2026\.css|assets\/clean-url\.js|assets\/site-ui\.js/.test(html) ||
   (file === "de/index.html" && /stewaro-precision-fullbleed-v1|brand-word/.test(html));
 
 test("every customer-facing HTML route receives the STEWARO design system", () => {
