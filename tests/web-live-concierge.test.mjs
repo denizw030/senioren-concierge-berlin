@@ -63,7 +63,7 @@ test("Live visual surface has reactive FIDEL gold glass orb",()=>{
   assert.match(css,/\.nw-live-orb/);
   assert.match(css,/--nw-live-level/);
   assert.match(css,/FIDEL_GOLD_ORB/i);
-  assert.match(css,/rgba\(255,188,58/);
+  assert.match(css,/rgba\(255,187,66/);
   assert.match(css,/\.nw-fidel-orb-canvas/);
 });
 
