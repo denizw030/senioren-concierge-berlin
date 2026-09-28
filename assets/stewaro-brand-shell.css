@@ -28,7 +28,7 @@ html body .footer .brand .mark.nahwerk-mark{
 }
 html body .brandtext strong{display:block!important;font-size:0!important}
 html body .brandtext strong:before{
-  content:"STEWARO"!important;
+  content:""!important;
   display:block;
   font-family:Baskerville,"Iowan Old Style",Georgia,serif!important;
   font-size:20px!important;font-weight:600!important;line-height:1!important;
