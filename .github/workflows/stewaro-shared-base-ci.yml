@@ -119,3 +119,44 @@ jobs:
 
       - name: Run auth security regression
         run: node --test tests/auth-security.test.mjs
+
+      - name: Verify AWS CloudFront canonical brand preview
+        if: github.head_ref == 'feature/stewaro-shared-base-brand-shell-20260927'
+        shell: bash
+        run: |
+          set -euo pipefail
+          account="https://d23le2tjpjl7la.cloudfront.net"
+          website="https://d357yw2h09cpne.cloudfront.net"
+          ok=0
+          for attempt in $(seq 1 60); do
+            echo "CloudFront brand QA attempt $attempt/60"
+            login="$(curl -fsSL --max-time 20 "$account/anmelden?source=stewaro_account&email=qa%40example.com&qa=$GITHUB_SHA" || true)"
+            web="$(curl -fsSL --max-time 20 "$account/web-concierge?qa=$GITHUB_SHA" || true)"
+            flow="$(curl -fsSL --max-time 20 "$account/assets/stewaro-account-flow.js?qa=$GITHUB_SHA" || true)"
+            account_css="$(curl -fsSL --max-time 20 "$account/assets/stewaro-account-entry.css?qa=$GITHUB_SHA" || true)"
+            logo_css="$(curl -fsSL --max-time 20 "$account/assets/nahwerk-logo-v2.css?qa=$GITHUB_SHA" || true)"
+            website_css="$(curl -fsSL --max-time 20 "$website/assets/stewaro-unified.css?qa=$GITHUB_SHA" || true)"
+
+            if grep -q 'stewaro-account-entry.css?v=2' <<<"$login" &&
+               grep -q 'stewaro-icon.svg' <<<"$login" &&
+               ! grep -q 'stewaro-mark.svg' <<<"$login" &&
+               grep -q 'stewaro-account-flow-icon' <<<"$flow" &&
+               grep -q 'stewaro-account-flow-wordmark' <<<"$flow" &&
+               grep -q 'STEWARO_ACCOUNT_LOGIN_BRAND_AND_CENTER_20260928' <<<"$account_css" &&
+               grep -q 'justify-content:center!important' <<<"$account_css" &&
+               grep -q 'nahwerk-logo-v2.css?v=12' <<<"$web" &&
+               ! grep -q 'stewaro-mark.svg' <<<"$web" &&
+               grep -q 'STEWARO_CANONICAL_WORDMARK_GUARD_20260928' <<<"$logo_css" &&
+               grep -q 'stewaroCanonicalWordmarkSheen' <<<"$logo_css" &&
+               grep -q 'prefers-reduced-motion:reduce' <<<"$logo_css" &&
+               grep -q 'STEWARO_CANONICAL_WORDMARK_GUARD_20260928' <<<"$website_css"; then
+              ok=1
+              break
+            fi
+            sleep 10
+          done
+          test "$ok" = 1
+          echo "AWS CloudFront canonical STEWARO brand preview GREEN"
+
+
+# Final branch-only live verification. GitHub verifies; AWS remains deployment authority.
