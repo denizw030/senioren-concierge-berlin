@@ -15,7 +15,7 @@
       brand.className="stewaro-account-flow-brand";
       brand.href="/";
       brand.setAttribute("aria-label","STEWARO Zugang");
-      brand.innerHTML='<span class="mark" aria-hidden="true"></span><span class="word">STEWARO</span>';
+      brand.innerHTML='<img class="stewaro-account-flow-icon" src="/assets/logos/stewaro-icon.svg" alt="" aria-hidden="true"><img class="stewaro-account-flow-wordmark" src="/assets/logos/stewaro-wordmark.svg" alt="" aria-hidden="true">';
       card.prepend(brand);
     }
     if(h)h.textContent="Ihr Passwort";
