@@ -98,3 +98,20 @@ test("legacy NAH/WERK pseudo text cannot leak beside the STEWARO SVG wordmark", 
     assert.match(css, /stewaro-wordmark\.svg/);
   }
 });
+
+
+test("privacy page uses the STEWARO legal hub without false EU-only claims", () => {
+  const privacy = read("datenschutz/index.html");
+  assert.match(privacy, /id="stewaro-privacy-hub-v1"/);
+  assert.match(privacy, /class="privacy-docbar"/);
+  assert.match(privacy, /DSGVO als verbindlicher Maßstab/);
+  assert.match(privacy, /Drittlandübermittlungen/);
+  assert.match(privacy, /Amazon Web Services \(AWS\)/);
+  assert.match(privacy, /OpenAI/);
+  assert.match(privacy, /Meta\/WhatsApp/);
+  assert.match(privacy, /Sprach-, Bild- und Telefonverarbeitung/);
+  assert.doesNotMatch(privacy, /100\s*%\s*DSGVO|alle Daten[^<]*ausschließlich[^<]*EU|keinerlei Daten[^<]*Drittstaat/i);
+  for (const route of ["/datenschutz/","/nutzungsbedingungen/","/ki-transparenz","/datenloeschung","/impressum","/widerruf"]) {
+    assert.match(privacy, new RegExp(`href="${route.replace(/[.*+?^$\{\}()|[\]\\]/g, "\\$&")}"`));
+  }
+});
