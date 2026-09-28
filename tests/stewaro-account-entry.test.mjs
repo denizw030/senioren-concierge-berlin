@@ -11,6 +11,7 @@ const routing=fs.readFileSync("assets/stewaro-entry-routing.js","utf8");
 const entry=fs.readFileSync("assets/stewaro-account-entry.js","utf8");
 const flow=fs.readFileSync("assets/stewaro-account-flow.js","utf8");
 const onboarding=fs.readFileSync("assets/onboarding.js","utf8");
+const accountCss=fs.readFileSync("assets/stewaro-account-entry.css","utf8");
 
 test("unified STEWARO account entry is minimal and route-parity safe",()=>{
   assert.equal(accessClean,access);
@@ -32,6 +33,8 @@ test("loved-one entry belongs to MyParentGuard while self entry belongs to STEWA
 test("legacy public auth navigation converges on one account entry",()=>{
   assert.match(routing,/auth-link\.login-link,a\.auth-link\.register-link/);
   assert.match(routing,/a\.href=accountEntry/);
+  assert.match(routing,/d357yw2h09cpne\.cloudfront\.net/);
+  assert.match(routing,/https:\/\/d23le2tjpjl7la\.cloudfront\.net/);
 });
 
 test("self registration cannot create a loved-one STEWARO path",()=>{
@@ -59,4 +62,7 @@ test("unified account flow keeps one-field login and progressive registration pr
   assert.match(flow,/Schritt /);
   assert.match(flow,/ownerPostalCode/);
   assert.match(flow,/steps=\[/);
+  assert.match(flow,/stewaro-account-flow-brand/);
+  assert.match(accountCss,/STEWARO_ACCOUNT_FLOW_HARD_RESET_V2/);
+  assert.match(accountCss,/display:none!important;[\s\S]*\.hero/);
 });
