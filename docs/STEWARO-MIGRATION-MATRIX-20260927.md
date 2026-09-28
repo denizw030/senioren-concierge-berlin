@@ -152,3 +152,12 @@ Next implementation gate: **STEWARO brand shell on the existing website foundati
   - `ueber-mich`: owner content decision required.
 - PR #266 remains a telephone child branch of PR #265; this website cleanup intentionally avoids telephone implementation files.
 - No Production merge, CNAME/DNS change or runtime-authority change.
+
+
+## Owner website decisions · 2026-09-28
+
+- Brand model reaffirmed: **STEWARO is the public brand; FIDEL is the STEWARO KI-Concierge.**
+- `senioren-concierge` is retained as a STEWARO-targeted page/legacy SEO route. The route/file name is technical and does not define a separate brand or concierge. Public copy is migrated to STEWARO + FIDEL and legacy NAHWERK/persona framing is removed.
+- `concierges` / “STEWARO weltweit” is **not part of the initial launch**. German, English and Turkish route files are removed from the launch branch, sitemap entries are removed, and residual links are suppressed by the STEWARO shared stylesheet. International scope may be reintroduced only by a later explicit decision.
+- `ueber-mich` is retained as the technical route but rebuilt publicly as **Über STEWARO**, explaining STEWARO as the brand and FIDEL as the fixed KI-Concierge.
+- No Production merge, CNAME/DNS change or runtime-authority change is authorized by these content decisions.
