@@ -62,21 +62,24 @@ img { display: block; max-width: 100%; }
 }
 .brand-lockup { display: inline-flex; align-items: center; gap: 13px; min-width: 0; }
 .brand-icon { display: block; flex: 0 0 auto; width: 36px; height: 36px; }
-.brand-icon-light {
-  background: linear-gradient(145deg, #0a1812 0%, #173126 56%, #0b1d16 100%);
-  -webkit-mask: url("/assets/logos/stewaro-icon.svg") center / contain no-repeat;
-  mask: url("/assets/logos/stewaro-icon.svg") center / contain no-repeat;
-  filter: drop-shadow(0 2px 5px rgba(12,25,20,.10));
+.brand-icon-light,
+.brand-icon-dark {
+  background: transparent url("/assets/logos/stewaro-icon.svg") center / contain no-repeat;
+  -webkit-mask: none;
+  mask: none;
+  filter: drop-shadow(0 2px 5px rgba(110,80,24,.12));
 }
-.brand-icon-dark { background: url("/assets/logos/stewaro-icon.svg") center / contain no-repeat; }
 .brand-word {
-  font-family: Baskerville, "Iowan Old Style", Georgia, serif;
-  font-size: 20px;
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: .19em;
-  margin-right: -.19em;
-  color: #102019;
+  display:block;
+  width:148px;
+  height:22px;
+  flex:0 0 148px;
+  font-size:0;
+  line-height:0;
+  letter-spacing:0;
+  margin:0;
+  color:transparent;
+  background:transparent url("/assets/logos/stewaro-wordmark.svg") center / contain no-repeat;
 }
 .header-nav { display: flex; align-items: center; gap: 28px; font-size: 14px; color: #344039; }
 .header-nav a { opacity: .72; transition: opacity 180ms ease, transform 180ms ease; }
