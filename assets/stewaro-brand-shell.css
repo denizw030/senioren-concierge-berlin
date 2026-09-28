@@ -87,3 +87,22 @@ html body .odysx-info-bar{display:none!important}
 @media(prefers-reduced-motion:reduce){
   html body .brandtext strong:before{animation:none!important}
 }
+
+
+/* STEWARO_CANONICAL_WORDMARK_20260928 */
+html body .brandtext{
+  width:148px!important;
+  height:22px!important;
+  flex:0 0 148px!important;
+  background:transparent center/contain no-repeat url("logos/stewaro-wordmark.svg")!important;
+}
+html body .brandtext strong{
+  display:block!important;width:100%!important;height:100%!important;
+  font-size:0!important;line-height:0!important;color:transparent!important;background:none!important;
+}
+html body .brandtext strong:before{
+  content:""!important;display:none!important;animation:none!important;background:none!important;
+}
+@media(max-width:900px){
+  html body .brandtext{width:128px!important;height:18px!important;flex-basis:128px!important}
+}
