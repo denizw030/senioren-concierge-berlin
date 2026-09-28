@@ -387,13 +387,29 @@ img { display: block; max-width: 100%; }
 .contact-button.primary { background:#11231b; color:#f8f3e9; border:1px solid #11231b; }
 .contact-button.secondary { background:transparent; color:#1d1b17; border:1px solid rgba(29,27,23,.28); }
 
-.site-footer { background:#060806; color:rgba(242,236,225,.7); padding:46px 28px; border-top:1px solid rgba(214,190,141,.12); }
+.site-footer { background:#060806; color:rgba(242,236,225,.7); padding:46px 28px 30px; border-top:1px solid rgba(214,190,141,.12); }
 .footer-inner { width:min(1440px,100%); margin:0 auto; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:24px; font-size:13px; }
 .footer-word { color:#f0e7d7; }
 .footer-inner > p { margin:0; text-align:center; }
 .footer-links { display:flex; justify-content:flex-end; gap:22px; }
 .footer-links a { opacity:.66; }
 .footer-links a:hover { opacity:1; }
+.footer-legal {
+  grid-column:1 / -1;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px 18px;
+  width:100%;
+  margin-top:14px;
+  padding-top:22px;
+  border-top:1px solid rgba(214,190,141,.10);
+  font-size:12px;
+  color:rgba(242,236,225,.54);
+}
+.footer-legal a { opacity:.78; transition:opacity .2s ease; }
+.footer-legal a:hover { opacity:1; }
 
 .reveal { opacity:0; transform:translateY(28px); transition:opacity .9s cubic-bezier(.22,.61,.36,1), transform .9s cubic-bezier(.22,.61,.36,1); }
 .reveal.is-visible { opacity:1; transform:translateY(0); }
@@ -501,72 +517,53 @@ img { display: block; max-width: 100%; }
 </style>
 
 <style id="stewaro-gold-brand">
-  .brand-icon-light {
-    background:
-      linear-gradient(118deg,
-        #6f531e 0%,
-        #a97b2b 12%,
-        #e9cf83 28%,
-        #f3e2ae 39%,
-        #c99a3c 52%,
-        #ead28b 67%,
-        #9a6d23 82%,
-        #dfc173 100%) !important;
+  /*
+    Keep the canonical SVG artwork visible. The previous gradient background
+    replaced the SVG itself, which made the header mark/wordmark disappear.
+    The premium sheen now animates via filter only.
+  */
+  .brand-icon-light,
+  .brand-icon-dark {
+    background: transparent url("/assets/logos/stewaro-icon.svg") center / contain no-repeat !important;
     filter:
-      drop-shadow(0 1px 0 rgba(255,255,255,.52))
-      drop-shadow(0 2px 3px rgba(103,74,18,.16));
-    position: relative;
-    background-size: 230% 180% !important;
-    background-position: 0% 50%;
+      drop-shadow(0 1px 0 rgba(255,255,255,.34))
+      drop-shadow(0 2px 4px rgba(103,74,18,.18));
   }
 
   .brand-word {
-    color: transparent !important;
-    background:
-      linear-gradient(108deg,
-        #73531e 0%,
-        #b48630 14%,
-        #e9d18a 31%,
-        #f4e3af 40%,
-        #c79a3d 53%,
-        #ead18a 69%,
-        #8c641f 84%,
-        #d8b65e 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-size: 230% 100%;
-    background-position: 0% 50%;
-    text-shadow:
-      0 1px 0 rgba(255,255,255,.24),
-      0 2px 8px rgba(111,80,24,.10);
-    filter: drop-shadow(0 1px 1px rgba(99,70,17,.08));
+    color:transparent !important;
+    -webkit-text-fill-color:transparent !important;
+    background:transparent url("/assets/logos/stewaro-wordmark.svg") center / contain no-repeat !important;
+    -webkit-background-clip:border-box !important;
+    background-clip:border-box !important;
+    text-shadow:none !important;
+    filter:drop-shadow(0 1px 2px rgba(99,70,17,.12));
   }
 
-  .brand-lockup { isolation: isolate; }
+  .brand-lockup { isolation:isolate; }
 
   @media (prefers-reduced-motion: no-preference) {
-    .brand-word {
-      animation: stewaroGoldSheen 7.6s cubic-bezier(.42,0,.58,1) infinite alternate;
+    .site-header .brand-icon-light {
+      animation:stewaroLogoSheen 7.8s ease-in-out infinite alternate;
     }
-    .brand-icon-light {
-      animation: stewaroGoldIconSheen 8.2s cubic-bezier(.42,0,.58,1) infinite alternate;
+    .site-header .brand-word {
+      animation:stewaroWordmarkSheen 7.8s ease-in-out infinite alternate;
     }
   }
 
-  @keyframes stewaroGoldSheen {
-    from { background-position: 0% 50%; }
-    to   { background-position: 100% 50%; }
+  @keyframes stewaroLogoSheen {
+    from { filter:brightness(.94) drop-shadow(0 1px 0 rgba(255,255,255,.24)) drop-shadow(0 2px 4px rgba(103,74,18,.16)); }
+    to   { filter:brightness(1.14) drop-shadow(0 1px 0 rgba(255,255,255,.50)) drop-shadow(0 3px 7px rgba(103,74,18,.24)); }
   }
 
-  @keyframes stewaroGoldIconSheen {
-    from { background-position: 0% 50%; }
-    to   { background-position: 100% 50%; }
+  @keyframes stewaroWordmarkSheen {
+    from { filter:brightness(.96) drop-shadow(0 1px 2px rgba(99,70,17,.10)); }
+    to   { filter:brightness(1.10) drop-shadow(0 2px 4px rgba(99,70,17,.18)); }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .brand-word,
-    .brand-icon-light { animation: none !important; }
+    .site-header .brand-word,
+    .site-header .brand-icon-light { animation:none !important; }
   }
 </style>
 
@@ -1532,6 +1529,12 @@ img { display: block; max-width: 100%; }
       </a>
       <p>Jemand, der sich kümmert.</p>
       <div class="footer-links"><a href="#services">Leistungen</a><a href="#family">Für Angehörige</a><a href="/zugang" data-entry="self">Kennenlernen</a></div>
+      <nav class="footer-legal" aria-label="Rechtliches">
+        <a href="/impressum">Impressum</a>
+        <a href="/datenschutz">Datenschutz</a>
+        <a href="/nutzungsbedingungen">Nutzungsbedingungen</a>
+        <a href="/ki-transparenz">KI-Transparenz</a>
+      </nav>
     </div>
   </footer>
 
