@@ -1,5 +1,6 @@
-// WEB_CONCIERGE_LIVE_BOOT_V1_20260919
-import { mountNahwerkLiveConcierge } from "./nahwerk-live-concierge.js?v=25";
+// WEB_CONCIERGE_LIVE_BOOT_V2_20260928
+import { mountNahwerkLiveConcierge } from "./nahwerk-live-concierge.js?v=26";
+import { mountFidelGoldOrb } from "./fidel-gold-orb.js?v=1";
 
 const GATEWAY="https://ta832v8wah.execute-api.eu-central-1.amazonaws.com/prod/v1/web";
 
@@ -18,6 +19,25 @@ async function boot(){
   const input=document.getElementById("webConciergeInput");
   const send=document.getElementById("webConciergeSend");
   if(!(input instanceof HTMLTextAreaElement)||!(send instanceof HTMLButtonElement))return;
+
+  const headerOrbCanvas=document.querySelector(".web-concierge-avatar canvas[data-fidel-orb]");
+  const headerOrb=mountFidelGoldOrb(headerOrbCanvas,{state:"idle",interactive:true});
+  const headerState=(value)=>{
+    switch(String(value||"")){
+      case "quoting":
+      case "connecting":
+      case "pricing_locked": return "connecting";
+      case "executing":
+      case "execution_result_ready": return "thinking";
+      case "error": return "warning";
+      case "connected": return "listening";
+      case "execution_finished": return "listening";
+      case "disconnected":
+      case "price_declined":
+      case "ended": return "idle";
+      default: return null;
+    }
+  };
 
   const button=document.createElement("button");
   button.type="button";
@@ -42,9 +62,13 @@ async function boot(){
     },
     getThreadId:()=>bridge()?.threadId?.()||null,
     onStateChange:(state)=>{
+      const next=headerState(state?.state);
+      if(next)headerOrb?.setState(next);
+      if(state?.state==="connected")headerOrb?.pulse("success",520);
       window.dispatchEvent(new CustomEvent("nahwerk:live-state",{detail:state}));
     },
     onClose:(detail={})=>{
+      headerOrb?.setState("idle");
       window.dispatchEvent(new CustomEvent("nahwerk:live-ended",{detail}));
     }
   });
@@ -87,6 +111,7 @@ async function boot(){
   window.addEventListener("nahwerk:chat-channel-view",sync);
   window.addEventListener("pagehide",()=>{
     clearInterval(timer);
+    headerOrb?.destroy();
     controller.stop({notifyBackend:true}).catch(()=>{});
   },{once:true});
 }
