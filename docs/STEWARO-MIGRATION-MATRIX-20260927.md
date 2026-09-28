@@ -161,3 +161,18 @@ Next implementation gate: **STEWARO brand shell on the existing website foundati
 - `concierges` / “STEWARO weltweit” is **not part of the initial launch**. German, English and Turkish route files are removed from the launch branch, sitemap entries are removed, and residual links are suppressed by the STEWARO shared stylesheet. International scope may be reintroduced only by a later explicit decision.
 - `ueber-mich` is retained as the technical route but rebuilt publicly as **Über STEWARO**, explaining STEWARO as the brand and FIDEL as the fixed KI-Concierge.
 - No Production merge, CNAME/DNS change or runtime-authority change is authorized by these content decisions.
+
+
+## Datenschutz legal-hub redesign · 2026-09-28
+
+- STEWARO Datenschutz was redesigned as a clean European legal-document hub inspired by modern EU privacy UX patterns:
+  - large plain-language privacy heading and introduction;
+  - persistent legal-document navigation for Datenschutz, Nutzungsbedingungen, KI-Transparenz, Datenlöschung, Impressum and Widerruf;
+  - clear DSGVO summary card;
+  - readable long-form legal typography and mobile layout.
+- The existing substantive privacy sections remain the legal base and were not replaced with competitor copy.
+- STEWARO deliberately does **not** claim that all data stays exclusively in the EU. The public privacy page continues to disclose possible EEA-external processing and the corresponding DSGVO transfer mechanisms.
+- Migration-aware disclosures now cover AWS/n8n transition paths, OpenAI, Meta/WhatsApp, Supabase, relevant e-mail/payment/telephony provider classes and gated telephone processing.
+- The privacy page states STEWARO as the brand and FIDEL as the KI-Concierge.
+- Dedicated regression coverage prevents future introduction of absolute “100% EU only” claims unless separately proven and approved.
+- Production main, CNAME and DNS remain unchanged.
