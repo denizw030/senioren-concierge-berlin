@@ -64,5 +64,5 @@ test("unified account flow keeps one-field login and progressive registration pr
   assert.match(flow,/steps=\[/);
   assert.match(flow,/stewaro-account-flow-brand/);
   assert.match(accountCss,/STEWARO_ACCOUNT_FLOW_HARD_RESET_V2/);
-  assert.match(accountCss,/display:none!important;[\s\S]*\.hero/);
+  assert.match(accountCss,/body\.login-image-page\.stewaro-account-flow[\s\S]*\.hero[\s\S]*display:none!important/);
 });
