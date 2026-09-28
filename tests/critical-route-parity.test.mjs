@@ -20,7 +20,8 @@ for(const [canonicalPath,cleanPath] of [
   ["alltag-organisieren.html","alltag-organisieren/index.html"],
   ["dokumente-verstehen.html","dokumente-verstehen/index.html"],
   ["technik-verstehen.html","technik-verstehen/index.html"],
-  ["prime-concierge.html","prime-concierge/index.html"],
+  ["senioren-concierge.html","senioren-concierge/index.html"],
+  ["ueber-mich.html","ueber-mich/index.html"],
 ]){
   test(`${cleanPath} mirrors ${canonicalPath} except root base`,()=>{
     assert.equal(normalizeCleanRoute(read(cleanPath)),read(canonicalPath));
