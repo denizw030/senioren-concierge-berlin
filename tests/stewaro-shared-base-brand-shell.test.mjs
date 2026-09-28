@@ -12,8 +12,8 @@ test("STEWARO shared-base brand shell is wired without forking runtime", () => {
   const matrix = read("docs/STEWARO-MIGRATION-MATRIX-20260927.md");
 
   assert.match(siteCss, /stewaro-brand-shell\.css/);
-  assert.match(shellCss, /logos\/stewaro-mark\.svg/);
-  assert.match(shellCss, /content:"STEWARO"/);
+  assert.match(shellCss, /logos\/stewaro-icon\.svg/);
+  assert.match(shellCss, /stewaro-wordmark\.svg/);
   assert.match(siteUi, /STEWARO_SHARED_BASE_BRAND_ADAPTER_V1/);
   assert.match(siteUi, /Presentation-only migration layer/);
   assert.match(siteUi, /normalizeNavPath/);
