@@ -24,7 +24,7 @@ html body .footer .brand .mark,
 html body .footer .brand .mark.nahwerk-mark{
   width:39px!important;height:39px!important;flex:0 0 39px!important;
   border-radius:0!important;border:0!important;box-shadow:none!important;
-  background:transparent center/contain no-repeat url("logos/stewaro-mark.svg")!important;
+  background:transparent center/contain no-repeat url("logos/stewaro-icon.svg")!important;
 }
 html body .brandtext strong{display:block!important;font-size:0!important}
 html body .brandtext strong:before{
@@ -67,7 +67,7 @@ html body .top .links.is-open{
   box-shadow:0 22px 60px rgba(24,34,29,.12)!important;
 }
 html body .nw-floating-concierge .nw-floating-concierge-icon{
-  background:transparent center/contain no-repeat url("logos/stewaro-mark.svg")!important;
+  background:transparent center/contain no-repeat url("logos/stewaro-icon.svg")!important;
 }
 html body .odysx-info-bar{display:none!important}
 @media(prefers-reduced-motion:no-preference){
