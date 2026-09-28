@@ -80,3 +80,13 @@ test("migrated STEWARO surfaces have no static visible NAHWERK branding", () => 
     assert.doesNotMatch(source, /NAHWERK|Nahwerk/, `${page} exposes legacy branding in static visible content`);
   }
 });
+
+
+test("legacy NAH/WERK pseudo text cannot leak beside the STEWARO SVG wordmark", () => {
+  const unified = read("assets/stewaro-unified.css");
+  const legacyLogo = read("assets/nahwerk-logo-v2.css");
+  for (const css of [unified, legacyLogo]) {
+    assert.match(css, /brandtext strong::after[\s\S]*content:none!important/);
+    assert.match(css, /stewaro-wordmark\.svg/);
+  }
+});
