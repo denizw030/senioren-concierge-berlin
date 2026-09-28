@@ -599,7 +599,7 @@ html body .home-reference .top .brand .mark.nahwerk-mark{
 html body .top .brand .brandtext,
 html body .home-reference .top .brand .brandtext{display:block!important}
 html body .top .brandtext strong{display:block!important;font-size:0!important}
-html body .top .brandtext strong:before{content:"STEWARO"!important;display:block!important;font-family:Baskerville,"Iowan Old Style",Georgia,serif!important;font-size:19px!important;font-weight:600!important;letter-spacing:.18em!important;margin-right:-.18em!important;color:#b98931!important}
+html body .top .brandtext strong:before{content:""!important;display:block!important;font-family:Baskerville,"Iowan Old Style",Georgia,serif!important;font-size:19px!important;font-weight:600!important;letter-spacing:.18em!important;margin-right:-.18em!important;color:#b98931!important}
 html body .top .brandtext span{display:none!important}
 html body .top{background:rgba(255,255,255,.965)!important;border-bottom:1px solid rgba(19,37,29,.13)!important;color:#173126!important;box-shadow:0 10px 34px rgba(26,40,32,.055)!important}
 html body.login-image-page main::after,
@@ -617,7 +617,7 @@ html body .footer .brand .mark.nahwerk-mark{
 }
 html body .footer .brand .brandtext{display:block!important}
 html body .footer .brandtext strong{display:block!important;font-size:0!important}
-html body .footer .brandtext strong:before{content:"STEWARO"!important;display:block!important;font-family:Baskerville,"Iowan Old Style",Georgia,serif!important;font-size:18px!important;font-weight:600!important;letter-spacing:.18em!important;color:#d7b65e!important}
+html body .footer .brandtext strong:before{content:""!important;display:block!important;font-family:Baskerville,"Iowan Old Style",Georgia,serif!important;font-size:18px!important;font-weight:600!important;letter-spacing:.18em!important;color:#d7b65e!important}
 html body .footer .brandtext span{display:none!important}
 
 
