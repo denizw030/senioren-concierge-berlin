@@ -44,6 +44,8 @@ test("Live client uses WebRTC, central delegation and active concierge portrait"
   assert.match(client,/session\.commentary\.append/);
   assert.match(client,/assets\/concierges\/large/);
   assert.match(client,/--nw-live-level/);
+  assert.match(client,/mountFidelGoldOrb/);
+  assert.match(client,/setFidelOrbState\("speaking"\)/);
   assert.doesNotMatch(client,/OPENAI_API_KEY|sk-[A-Za-z0-9]/);
 });
 
@@ -56,12 +58,13 @@ test("native app Live page accepts token only in memory and uses APP channel",()
   assert.doesNotMatch(page,/location\\.(?:search|href).*token/i);
 });
 
-test("Live visual surface has reactive blue portrait orb",()=>{
+test("Live visual surface has reactive FIDEL gold glass orb",()=>{
   const css=read("assets/nahwerk-live-concierge.css");
   assert.match(css,/\.nw-live-orb/);
   assert.match(css,/--nw-live-level/);
-  assert.match(css,/#246bff/i);
-  assert.match(css,/\.nw-live-image/);
+  assert.match(css,/F1DE1|fidel/i);
+  assert.match(css,/rgba\(255,188,58/);
+  assert.match(css,/\.nw-fidel-orb-canvas/);
 });
 
 test("web chat exposes only current authenticated thread bridge to Live",()=>{
@@ -307,4 +310,25 @@ test("Live end refreshes the exact transcript thread after persistence settles",
   assert.match(chat,/LIVE_HISTORY_EVENTUAL_CONSISTENCY_V4_20260922/);
   assert.match(chat,/\[250,900,1800,3200\]/);
   assert.match(chat,/refreshThread\(exactThread,\{force:true,reset:true\}\)/);
+});
+
+
+test("FIDEL gold orb renderer is shared by Live and Web Concierge identity",()=>{
+  const orb=read("assets/fidel-gold-orb.js");
+  const boot=read("assets/web-live-concierge.js");
+  const legacy=read("web-concierge.html");
+  const clean=read("web-concierge/index.html");
+  assert.match(orb,/FIDEL GOLD GLASS ORB RUNTIME V1/);
+  assert.match(orb,/setAudio\(inLevel=0,outLevel=0\)/);
+  assert.match(orb,/case "listening"/);
+  assert.match(orb,/case "thinking"/);
+  assert.match(orb,/case "speaking"/);
+  assert.match(orb,/case "warning"/);
+  assert.match(orb,/case "success"/);
+  assert.match(boot,/mountFidelGoldOrb/);
+  for(const html of [legacy,clean]){
+    assert.match(html,/class="web-concierge-avatar fidel-orb-avatar"/);
+    assert.match(html,/data-fidel-orb/);
+    assert.match(html,/<h2 id="webConciergeTitle">FIDEL<\/h2>/);
+  }
 });
