@@ -105,6 +105,9 @@ jobs:
       - name: Run STEWARO Block 4 launch-readiness contract
         run: node --test tests/stewaro-block4-launch-readiness.test.mjs
 
+      - name: Run final STEWARO website launch-readiness contract
+        run: node --test tests/website-launch-readiness-final.test.mjs
+
       - name: Run STEWARO unified experience contract
         run: node --test tests/stewaro-unified-experience.test.mjs
 
