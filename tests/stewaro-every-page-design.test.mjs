@@ -60,6 +60,7 @@ test("migrated residual public routes expose STEWARO instead of legacy brand cop
     "alltag-organisieren.html","alltag-organisieren/index.html",
     "dokumente-verstehen.html","dokumente-verstehen/index.html",
     "technik-verstehen.html","technik-verstehen/index.html",
+    "prime-concierge.html","prime-concierge/index.html",
   ];
   for (const file of pages) {
     const visible = fs.readFileSync(file,"utf8")
