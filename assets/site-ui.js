@@ -21,7 +21,7 @@
       document.head.appendChild(icon);
     }
     icon.type = 'image/svg+xml';
-    icon.href = '/assets/logos/stewaro-mark.svg?v=1';
+    icon.href = '/assets/logos/stewaro-icon.svg?v=1';
   } catch (_) {}
 
   const isCustomerAccount = /(?:^|\/)konto(?:\.html)?\/?$/.test(location.pathname);
@@ -1023,7 +1023,7 @@
         url: 'https://nahwerkconcierge.com/',
         logo: {
           '@type': 'ImageObject',
-          url: 'https://nahwerkconcierge.com/assets/logos/nahwerk-concierge.png'
+          url: 'https://stewaro.com/assets/logos/stewaro-icon.svg'
         }
       },
       {
