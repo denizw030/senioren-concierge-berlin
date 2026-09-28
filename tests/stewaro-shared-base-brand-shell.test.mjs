@@ -25,7 +25,7 @@ test("STEWARO shared-base brand shell is wired without forking runtime", () => {
   assert.match(home, /Jemand, der sich kümmert\./);
   assert.match(home, /Ihr persönlicher Concierge für Alltag, Organisation und alles, was erledigt werden muss\./);
   assert.match(home, /Unterstützt durch moderne KI\./);
-  assert.match(home, /<video class="hero-image hero-video" autoplay muted loop playsinline preload="metadata"/);
+  assert.match(home, /<video class="hero-image hero-video" autoplay muted playsinline preload="auto"/);\n  assert.doesNotMatch(home, /<video class="hero-image hero-video"[^>]*\\bloop\\b/);
   assert.match(home, /<source src="\/assets\/media\/stewaro-hero-pferd\.mp4" type="video\/mp4"/);
   assert.match(home, /poster="data:image\/webp;base64,/);
   assert.doesNotMatch(home, /<img class="hero-image"/);
@@ -37,7 +37,7 @@ test("STEWARO shared-base brand shell is wired without forking runtime", () => {
   assert.match(home, /\.precision-copy\{[\s\S]*backdrop-filter:blur\(20px\) saturate\(125%\)!important/);
   assert.match(home, /background:[\s\S]*rgba\(11,14,12,\.56\)[\s\S]*rgba\(4,6,5,\.50\)/);
   const heroVideo = fs.statSync("assets/media/stewaro-hero-pferd.mp4");
-  assert.ok(heroVideo.size > 100_000 && heroVideo.size < 600_000, "hero video must stay web-optimized");
+  assert.ok(heroVideo.size > 100_000 && heroVideo.size < 6_000_000, "hero video must stay web-optimized while allowing the 1080p master replacement");
 
   assert.match(matrix, /stewaro-site\/.*frozen/i);
   assert.match(matrix, /existing production website\/customer-account/i);
