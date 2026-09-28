@@ -64,7 +64,7 @@ html body .home-reference .top .brandtext strong{
 }
 html body .top .brandtext strong::before,
 html body .home-reference .top .brandtext strong::before{
-  content:"STEWARO"!important;
+  content:""!important;
   display:block!important;
   font-family:Baskerville,"Iowan Old Style",Georgia,serif!important;
   font-size:19px!important;
@@ -372,7 +372,7 @@ html body .footer .brand .mark.nahwerk-mark{
 html body .footer .brand .brandtext{display:block!important}
 html body .footer .brandtext strong{display:block!important;font-size:0!important}
 html body .footer .brandtext strong::before{
-  content:"STEWARO"!important;
+  content:""!important;
   display:block!important;
   font-family:Baskerville,"Iowan Old Style",Georgia,serif!important;
   font-size:18px!important;font-weight:600!important;letter-spacing:.18em!important;
