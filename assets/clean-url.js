@@ -24,7 +24,7 @@
         document.head.appendChild(icon);
       }
       icon.type = 'image/svg+xml';
-      icon.href = '/assets/logos/stewaro-mark.svg?v=1';
+      icon.href = '/assets/logos/stewaro-icon.svg?v=1';
     } catch (_) {}
   };
   installStewaroUnifiedPresentation();
