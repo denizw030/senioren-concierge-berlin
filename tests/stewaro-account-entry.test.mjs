@@ -66,3 +66,15 @@ test("unified account flow keeps one-field login and progressive registration pr
   assert.match(accountCss,/STEWARO_ACCOUNT_FLOW_HARD_RESET_V2/);
   assert.match(accountCss,/body\.login-image-page\.stewaro-account-flow[\s\S]*\.hero[\s\S]*display:none!important/);
 });
+
+
+test("account password screen renders canonical icon and wordmark centered without legacy mark hooks",()=> {
+  assert.match(flow,/stewaro-account-flow-icon/);
+  assert.match(flow,/src="\/assets\/logos\/stewaro-icon\.svg"/);
+  assert.match(flow,/stewaro-account-flow-wordmark/);
+  assert.match(flow,/src="\/assets\/logos\/stewaro-wordmark\.svg"/);
+  assert.doesNotMatch(flow,/class="mark"[^>]*><\/span><span class="word"/);
+  assert.match(accountCss,/STEWARO_ACCOUNT_LOGIN_BRAND_AND_CENTER_20260928/);
+  assert.match(accountCss,/main>\.section\{[\s\S]*justify-content:center!important;[\s\S]*align-items:center!important/);
+  assert.match(accountCss,/\.loginwrap\{[\s\S]*margin-inline:auto!important/);
+});
