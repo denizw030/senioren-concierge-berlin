@@ -6,7 +6,7 @@
   height:46px!important;
   min-width:46px!important;
   flex:0 0 46px!important;
-  background:transparent center/contain no-repeat url("logos/stewaro-mark.svg")!important;
+  background:transparent center/contain no-repeat url("logos/stewaro-icon.svg")!important;
 }
 
 .top .brand .mark,
@@ -594,7 +594,7 @@ html body .top .brand .mark,
 html body .top .brand .mark.nahwerk-mark,
 html body .home-reference .top .brand .mark,
 html body .home-reference .top .brand .mark.nahwerk-mark{
-  display:block!important;width:38px!important;height:38px!important;flex:0 0 38px!important;background:transparent center/contain no-repeat url("logos/stewaro-mark.svg")!important;
+  display:block!important;width:38px!important;height:38px!important;flex:0 0 38px!important;background:transparent center/contain no-repeat url("logos/stewaro-icon.svg")!important;
 }
 html body .top .brand .brandtext,
 html body .home-reference .top .brand .brandtext{display:block!important}
@@ -613,7 +613,7 @@ html body .footer .brand{
 }
 html body .footer .brand .mark,
 html body .footer .brand .mark.nahwerk-mark{
-  display:block!important;width:38px!important;height:38px!important;flex:0 0 38px!important;background:transparent center/contain no-repeat url("logos/stewaro-mark.svg")!important;
+  display:block!important;width:38px!important;height:38px!important;flex:0 0 38px!important;background:transparent center/contain no-repeat url("logos/stewaro-icon.svg")!important;
 }
 html body .footer .brand .brandtext{display:block!important}
 html body .footer .brandtext strong{display:block!important;font-size:0!important}
