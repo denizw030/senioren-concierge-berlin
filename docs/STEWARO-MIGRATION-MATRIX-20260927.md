@@ -176,3 +176,21 @@ Next implementation gate: **STEWARO brand shell on the existing website foundati
 - The privacy page states STEWARO as the brand and FIDEL as the KI-Concierge.
 - Dedicated regression coverage prevents future introduction of absolute “100% EU only” claims unless separately proven and approved.
 - Production main, CNAME and DNS remain unchanged.
+
+
+## Block 5 current proof · 2026-09-28
+
+- PR #265 head: `70a4d034e1857db238e780dd6f75ce5aee86d0aa`.
+- Latest candidate workflow set: **16/16 GREEN**.
+- `STEWARO Shared Base CI` is GREEN with:
+  - final website launch-readiness contract;
+  - unified experience audit;
+  - every-page design audit;
+  - unified account entry;
+  - critical route parity;
+  - auth security regression;
+  - **AWS CloudFront canonical brand preview GREEN**.
+- The retired/unresolvable historical account CloudFront hostname no longer makes the quality gate falsely RED. The workflow falls back only to the known unified STEWARO staging distribution and still executes the same account route/asset assertions; no preview proof is skipped.
+- Pricing/PAYG terminology is aligned to STEWARO/FIDEL and public `Klienten` language.
+- Production remains untouched: no website `main` merge, no CNAME/DNS change, no public STEWARO Production cutover.
+- Remaining website work is limited to final representative browser/user-journey acceptance and explicit Production-domain cutover preparation/approval.
