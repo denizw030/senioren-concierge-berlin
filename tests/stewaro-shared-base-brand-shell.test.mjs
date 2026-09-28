@@ -33,6 +33,12 @@ test("STEWARO shared-base brand shell is wired without forking runtime", () => {
   assert.match(home, /prefers-reduced-motion: reduce/);
   assert.match(home, /heroVideo\.pause\(\)/);
   assert.match(home, /heroVideo\.addEventListener\('ended'/);
+  assert.match(home, /brand-icon-light[\s\S]*stewaro-icon\.svg/);
+  assert.match(home, /\.brand-word[\s\S]*stewaro-wordmark\.svg/);
+  assert.match(home, /<nav class="footer-legal" aria-label="Rechtliches">/);
+  for (const route of ["/impressum","/datenschutz","/nutzungsbedingungen","/ki-transparenz"]) {
+    assert.match(home, new RegExp(`href="${route}"`));
+  }
   assert.match(home, /id="stewaro-precision-fullbleed-v1"/);
   assert.match(home, /\.precision\{[\s\S]*min-height:clamp\(760px,92svh,980px\)!important/);
   assert.match(home, /\.mechanism-frame\{[\s\S]*position:absolute!important;[\s\S]*inset:0!important;[\s\S]*width:100%!important;[\s\S]*height:100%!important/);
