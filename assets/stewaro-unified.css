@@ -667,3 +667,43 @@ html body .status{
   .stewaro-fixed-concierge-card{grid-template-columns:46px minmax(0,1fr)!important;padding:16px!important}
   .stewaro-fixed-concierge-mark{width:46px!important;height:46px!important}
 }
+
+
+/* STEWARO_CANONICAL_BRAND_ASSETS_20260928 */
+html body .top .brand .brandtext,
+html body .home-reference .top .brand .brandtext,
+html body .footer .brand .brandtext{
+  display:block!important;
+  width:148px!important;
+  height:22px!important;
+  flex:0 0 148px!important;
+  background:transparent center/contain no-repeat url("/assets/logos/stewaro-wordmark.svg")!important;
+}
+html body .top .brandtext strong,
+html body .home-reference .top .brandtext strong,
+html body .footer .brandtext strong{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  font-size:0!important;
+  line-height:0!important;
+  color:transparent!important;
+  background:none!important;
+  text-shadow:none!important;
+}
+html body .top .brandtext strong::before,
+html body .home-reference .top .brandtext strong::before,
+html body .footer .brandtext strong::before{
+  content:""!important;
+  display:none!important;
+  animation:none!important;
+  background:none!important;
+}
+@media(max-width:900px){
+  html body .top .brand .brandtext,
+  html body .home-reference .top .brand .brandtext{
+    width:128px!important;
+    height:18px!important;
+    flex-basis:128px!important;
+  }
+}
