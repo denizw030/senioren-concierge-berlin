@@ -48,3 +48,28 @@ test("shared first-paint styles import STEWARO unified design", () => {
   assert.match(site,/stewaro-unified\.css\?v=20260928-3/);
   assert.match(brand,/stewaro-unified\.css\?v=20260928-3/);
 });
+
+
+test("migrated residual public routes expose STEWARO instead of legacy brand copy", () => {
+  const pages = [
+    "404.html",
+    "zugang-uebertragen.html","zugang-uebertragen/index.html",
+    "erster-schritt.html","erster-schritt/index.html",
+    "passwort-zuruecksetzen.html","passwort-zuruecksetzen/index.html",
+    "vertrag-widerrufen.html","vertrag-widerrufen/index.html",
+    "alltag-organisieren.html","alltag-organisieren/index.html",
+    "dokumente-verstehen.html","dokumente-verstehen/index.html",
+    "technik-verstehen.html","technik-verstehen/index.html",
+  ];
+  for (const file of pages) {
+    const visible = fs.readFileSync(file,"utf8")
+      .replace(/<script[\s\S]*?<\/script>/gi," ")
+      .replace(/<style[\s\S]*?<\/style>/gi," ")
+      .replace(/<!--([\s\S]*?)-->/g," ")
+      .replace(/https:\/\/nahwerkconcierge\.com/gi," ")
+      .replace(/assets\/nahwerk-[^"'\s>]*/gi," ")
+      .replace(/<[^>]+>/g," ");
+    assert.doesNotMatch(visible, /NAHWERK|Nahwerk/, `${file} exposes legacy public branding`);
+    assert.match(fs.readFileSync(file,"utf8"), /STEWARO/);
+  }
+});
