@@ -31,7 +31,7 @@
     nameNode.textContent = name;
     avatarNode.style.backgroundImage = backgroundImage && backgroundImage !== "none"
       ? backgroundImage
-      : 'url("/assets/logos/stewaro-mark.svg")';
+      : 'url("/assets/logos/stewaro-icon.svg")';
     link.setAttribute("aria-label", name + " öffnen und chatten");
     link.title = "Mit " + name + " chatten";
     link.hidden = false;
