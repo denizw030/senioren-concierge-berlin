@@ -43,13 +43,6 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://nahwerkconcierge.com/senioren-concierge" />
   </url>
   <url>
-    <loc>https://nahwerkconcierge.com/concierges</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://nahwerkconcierge.com/concierges" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://nahwerkconcierge.com/en/concierges" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://nahwerkconcierge.com/tr/concierges" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://nahwerkconcierge.com/concierges" />
-  </url>
-  <url>
     <loc>https://nahwerkconcierge.com/leistungen</loc>
     <xhtml:link rel="alternate" hreflang="de" href="https://nahwerkconcierge.com/leistungen" />
     <xhtml:link rel="alternate" hreflang="en" href="https://nahwerkconcierge.com/en/leistungen" />
@@ -218,13 +211,6 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://nahwerkconcierge.com/kontakt" />
   </url>
   <url>
-    <loc>https://nahwerkconcierge.com/en/concierges</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://nahwerkconcierge.com/concierges" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://nahwerkconcierge.com/en/concierges" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://nahwerkconcierge.com/tr/concierges" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://nahwerkconcierge.com/concierges" />
-  </url>
-  <url>
     <loc>https://nahwerkconcierge.com/en/senioren-concierge</loc>
     <xhtml:link rel="alternate" hreflang="de" href="https://nahwerkconcierge.com/senioren-concierge" />
     <xhtml:link rel="alternate" hreflang="en" href="https://nahwerkconcierge.com/en/senioren-concierge" />
@@ -328,13 +314,6 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://nahwerkconcierge.com/en/kontakt" />
     <xhtml:link rel="alternate" hreflang="tr" href="https://nahwerkconcierge.com/tr/kontakt" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://nahwerkconcierge.com/kontakt" />
-  </url>
-  <url>
-    <loc>https://nahwerkconcierge.com/tr/concierges</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://nahwerkconcierge.com/concierges" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://nahwerkconcierge.com/en/concierges" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://nahwerkconcierge.com/tr/concierges" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://nahwerkconcierge.com/concierges" />
   </url>
   <url>
     <loc>https://nahwerkconcierge.com/tr/senioren-concierge</loc>
