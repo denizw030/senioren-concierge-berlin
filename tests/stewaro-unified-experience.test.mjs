@@ -75,11 +75,11 @@ test("canonical STEWARO branding has no active legacy mark reference or generate
   const allowedExt = /\.(?:css|html|js|mjs|yml|yaml)$/i;
   const ignored = (path) =>
     path === ".git" ||
-    path.startsWith("./.git/") ||
-    path.startsWith("./stewaro-site/") ||
-    path.startsWith("./orfidel-preview/") ||
-    path.startsWith("./android-app/") ||
-    path.startsWith("./ios-app/") ||
+    path.startsWith(".git/") ||
+    path.startsWith("stewaro-site/") ||
+    path.startsWith("orfidel-preview/") ||
+    path.startsWith("android-app/") ||
+    path.startsWith("ios-app/") ||
     path.includes("/node_modules/");
 
   const files = [];
