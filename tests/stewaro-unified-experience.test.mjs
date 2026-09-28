@@ -9,8 +9,8 @@ test("STEWARO unified experience owns the customer-facing visual shell", () => {
   assert.match(css, /--stewaro-bg:#f7f3eb/);
   assert.match(css, /html body \.top\{/);
   assert.match(css, /background:rgba\(255,255,255,\.965\)!important/);
-  assert.match(css, /url\("\/assets\/logos\/stewaro-mark\.svg"\)/);
-  assert.match(css, /content:"STEWARO"!important/);
+  assert.match(css, /url\("\/assets\/logos\/stewaro-icon\.svg"\)/);
+  assert.match(css, /stewaro-wordmark\.svg/);
   assert.match(css, /linear-gradient\(108deg,#75531c/);
   assert.match(css, /body\.login-image-page main::after/);
   assert.match(css, /content:none!important/);
@@ -24,7 +24,7 @@ test("shared runtime loaders install STEWARO presentation and favicon without ch
   const ui = read("assets/site-ui.js");
   for (const source of [clean, ui]) {
     assert.match(source, /\/assets\/stewaro-unified\.css\?v=20260927-1/);
-    assert.match(source, /\/assets\/logos\/stewaro-mark\.svg\?v=1/);
+    assert.match(source, /\/assets\/logos\/stewaro-icon\.svg\?v=1/);
   }
   assert.match(ui, /return readStoredPortalTheme\(\) \|\| 'dark';/);
 });
@@ -41,6 +41,6 @@ test("login no longer references the legacy red-blue person artwork", () => {
 test("legacy shared logo hooks resolve to STEWARO instead of NAHWERK in visible header paths", () => {
   const siteCss = read("assets/site.css");
   const logoCss = read("assets/nahwerk-logo-v2.css");
-  assert.match(siteCss, /logos\/stewaro-mark\.svg/);
-  assert.match(logoCss, /logos\/stewaro-mark\.svg/);
+  assert.match(siteCss, /logos\/stewaro-icon\.svg/);
+  assert.match(logoCss, /logos\/stewaro-icon\.svg/);
 });
