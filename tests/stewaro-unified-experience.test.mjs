@@ -44,3 +44,21 @@ test("legacy shared logo hooks resolve to STEWARO instead of NAHWERK in visible 
   assert.match(siteCss, /logos\/stewaro-icon\.svg/);
   assert.match(logoCss, /logos\/stewaro-icon\.svg/);
 });
+
+
+test("canonical STEWARO brand assets are the only STEWARO SVG logo sources", () => {
+  const iconPath = "assets/logos/stewaro-icon.svg";
+  const wordmarkPath = "assets/logos/stewaro-wordmark.svg";
+  assert.equal(fs.existsSync(iconPath), true);
+  assert.equal(fs.existsSync(wordmarkPath), true);
+  assert.equal(fs.existsSync("assets/logos/stewaro-mark.svg"), false);
+
+  const icon = read(iconPath);
+  const wordmark = read(wordmarkPath);
+  assert.match(icon, /viewBox="0 0 553\.29 687\.49"/);
+  assert.match(icon, /#735320/);
+  assert.match(icon, /#fff1c9/);
+  assert.match(wordmark, /viewBox="0 0 720\.32 98\.58"/);
+  assert.match(wordmark, /#73531f/);
+  assert.match(wordmark, /#fff0c8/);
+});
