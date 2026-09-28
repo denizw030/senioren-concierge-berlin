@@ -1543,7 +1543,24 @@ img { display: block; max-width: 100%; }
     const heroVideo = document.querySelector('.hero-video');
     const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
 
+    let heroVideoFinished = false;
+    if (heroVideo) {
+      heroVideo.addEventListener('ended', () => {
+        heroVideoFinished = true;
+        heroVideo.pause();
+        try {
+          const holdAt = Math.max(0, heroVideo.duration - 0.04);
+          if (Number.isFinite(holdAt)) heroVideo.currentTime = holdAt;
+        } catch (_) {}
+      });
+    }
+
     const syncHeroVideoMotion = () => {
+      if (!heroVideo) return;
+      if (heroVideoFinished) {
+        heroVideo.pause();
+        return;
+      }
       if (!heroVideo) return;
       if (motionPreference.matches) {
         heroVideo.pause();
