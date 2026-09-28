@@ -10,11 +10,19 @@
     if(emailInput&&email){emailInput.value=email;emailInput.closest(".field")?.classList.add("account-flow-email-field");}
     const card=document.querySelector(".logincard");
     const h=card?.querySelector("h2");
+    if(card&&!card.querySelector(".stewaro-account-flow-brand")){
+      const brand=document.createElement("a");
+      brand.className="stewaro-account-flow-brand";
+      brand.href="/";
+      brand.setAttribute("aria-label","STEWARO Zugang");
+      brand.innerHTML='<span class="mark" aria-hidden="true"></span><span class="word">STEWARO</span>';
+      card.prepend(brand);
+    }
     if(h)h.textContent="Ihr Passwort";
     if(card&&email){
       const summary=document.createElement("div");
       summary.className="account-flow-email-summary";
-      summary.innerHTML='<span></span><a href="/zugang#email">Ändern</a>';
+      summary.innerHTML='<span></span><a href="/#email">Ändern</a>';
       summary.querySelector("span").textContent=email;
       h?.insertAdjacentElement("afterend",summary);
     }
