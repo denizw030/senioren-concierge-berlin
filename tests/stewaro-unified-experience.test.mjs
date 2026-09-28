@@ -51,7 +51,12 @@ test("canonical STEWARO brand assets are the only STEWARO SVG logo sources", () 
   const wordmarkPath = "assets/logos/stewaro-wordmark.svg";
   assert.equal(fs.existsSync(iconPath), true);
   assert.equal(fs.existsSync(wordmarkPath), true);
-  assert.equal(fs.existsSync("assets/logos/stewaro-mark.svg"), false);
+  const legacyMark = "stewaro-" + "mark.svg";
+  assert.equal(fs.existsSync("assets/logos/" + legacyMark), false);
+  assert.deepEqual(
+    fs.readdirSync("assets/logos").filter((name) => /^stewaro.*\.svg$/i.test(name)).sort(),
+    ["stewaro-icon.svg", "stewaro-wordmark.svg"]
+  );
 
   const icon = read(iconPath);
   const wordmark = read(wordmarkPath);
@@ -61,4 +66,43 @@ test("canonical STEWARO brand assets are the only STEWARO SVG logo sources", () 
   assert.match(wordmark, /viewBox="0 0 720\.32 98\.58"/);
   assert.match(wordmark, /#73531f/);
   assert.match(wordmark, /#fff0c8/);
+});
+
+
+test("canonical STEWARO branding has no active legacy mark reference or generated text wordmark", () => {
+  const legacyMark = "stewaro-" + "mark.svg";
+  const roots = [".github", "assets", "tests"];
+  const allowedExt = /\.(?:css|html|js|mjs|yml|yaml)$/i;
+  const ignored = (path) =>
+    path.startsWith("stewaro-site/") ||
+    path.startsWith("orfidel-preview/") ||
+    path.includes("/node_modules/");
+
+  const files = [];
+  const walk = (dir) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const path = dir === "." ? entry.name : dir + "/" + entry.name;
+      if (ignored(path)) continue;
+      if (entry.isDirectory()) walk(path);
+      else if (allowedExt.test(path)) files.push(path);
+    }
+  };
+  for (const root of roots) if (fs.existsSync(root)) walk(root);
+
+  const legacyRefs = files.filter((path) => read(path).includes(legacyMark));
+  assert.deepEqual(legacyRefs, [], "active files must not reference the superseded STEWARO mark");
+
+  for (const path of ["assets/stewaro-unified.css", "assets/stewaro-brand-shell.css", "assets/nahwerk-logo-v2.css"]) {
+    assert.doesNotMatch(read(path), /content:\s*["']STEWARO["']/);
+  }
+});
+
+test("header uses the exact SVG wordmark with sheen and reduced-motion protection", () => {
+  const css = read("assets/stewaro-unified.css");
+  assert.match(css, /STEWARO_CANONICAL_WORDMARK_GUARD_20260928/);
+  assert.match(css, /background:transparent center\/contain no-repeat url\("\/assets\/logos\/stewaro-wordmark\.svg"\)!important/);
+  assert.match(css, /mask:url\("\/assets\/logos\/stewaro-wordmark\.svg"\) center\/contain no-repeat!important/);
+  assert.match(css, /animation:stewaroCanonicalWordmarkSheen 7\.6s/);
+  assert.match(css, /@media\(prefers-reduced-motion:reduce\)[\s\S]*animation:none!important/);
+  assert.match(css, /brandtext strong::after[\s\S]*content:none!important/);
 });
