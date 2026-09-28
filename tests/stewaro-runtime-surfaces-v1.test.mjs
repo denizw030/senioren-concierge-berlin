@@ -84,8 +84,8 @@ test("Block 3 keeps canonical auth, Core gateway, email, phone and billing endpo
 });
 
 test("Block 3 uses the STEWARO mark for generic concierge fallbacks", () => {
-  assert.match(read("assets/web-concierge-chat.js"), /\/assets\/logos\/stewaro-mark\.svg/);
-  assert.match(read("assets/account-header-concierge.js"), /\/assets\/logos\/stewaro-mark\.svg/);
+  assert.match(read("assets/web-concierge-chat.js"), /\/assets\/logos\/stewaro-icon\.svg/);
+  assert.match(read("assets/account-header-concierge.js"), /\/assets\/logos\/stewaro-icon\.svg/);
   assert.doesNotMatch(read("konto.html"), /NAHWERK-Goldmann-(?:Icon|Logo)\.svg/);
 });
 
