@@ -61,6 +61,8 @@ test("migrated residual public routes expose STEWARO instead of legacy brand cop
     "dokumente-verstehen.html","dokumente-verstehen/index.html",
     "technik-verstehen.html","technik-verstehen/index.html",
     "prime-concierge.html","prime-concierge/index.html",
+    "senioren-concierge.html","senioren-concierge/index.html",
+    "ueber-mich.html","ueber-mich/index.html",
   ];
   for (const file of pages) {
     const visible = fs.readFileSync(file,"utf8")
@@ -72,5 +74,33 @@ test("migrated residual public routes expose STEWARO instead of legacy brand cop
       .replace(/<[^>]+>/g," ");
     assert.doesNotMatch(visible, /NAHWERK|Nahwerk/, `${file} exposes legacy public branding`);
     assert.match(fs.readFileSync(file,"utf8"), /STEWARO/);
+  }
+});
+
+
+test("international concierge route is intentionally absent from STEWARO launch", () => {
+  for (const file of [
+    "concierges.html","concierges/index.html",
+    "en/concierges.html","en/concierges/index.html",
+    "tr/concierges.html","tr/concierges/index.html"
+  ]) {
+    assert.equal(fs.existsSync(file), false, file + " must stay absent until international scope is approved");
+  }
+  const sitemap=fs.readFileSync("sitemap.xml","utf8");
+  assert.doesNotMatch(sitemap,/\/concierges(?:<|")/);
+  const css=fs.readFileSync("assets/stewaro-unified.css","utf8");
+  assert.match(css,/a\[href="\/concierges"\]/);
+});
+
+test("STEWARO senior and about surfaces keep FIDEL as the single concierge identity", () => {
+  for (const file of ["senioren-concierge.html","senioren-concierge/index.html","ueber-mich.html","ueber-mich/index.html"]) {
+    const html=fs.readFileSync(file,"utf8");
+    const visible=html
+      .replace(/<script[\s\S]*?<\/script>/gi," ")
+      .replace(/<style[\s\S]*?<\/style>/gi," ")
+      .replace(/<[^>]+>/g," ");
+    assert.match(visible,/STEWARO/);
+    assert.match(visible,/FIDEL/);
+    assert.doesNotMatch(visible,/NAHWERK|Nahwerk|Hartmut|Alexander|Nilo|Mira|ODYSX/);
   }
 });
