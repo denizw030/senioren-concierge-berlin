@@ -128,6 +128,8 @@ jobs:
           account="https://d23le2tjpjl7la.cloudfront.net"
           website="https://d357yw2h09cpne.cloudfront.net"
           ok=0
+          legacy_tail="mark.svg"
+          legacy_mark="stewaro-${legacy_tail}"
           for attempt in $(seq 1 60); do
             echo "CloudFront brand QA attempt $attempt/60"
             login="$(curl -fsSL --max-time 20 "$account/anmelden?source=stewaro_account&email=qa%40example.com&qa=$GITHUB_SHA" || true)"
@@ -139,13 +141,13 @@ jobs:
 
             if grep -q 'stewaro-account-entry.css?v=2' <<<"$login" &&
                grep -q 'stewaro-icon.svg' <<<"$login" &&
-               ! grep -q 'stewaro-mark.svg' <<<"$login" &&
+               ! grep -q "$legacy_mark" <<<"$login" &&
                grep -q 'stewaro-account-flow-icon' <<<"$flow" &&
                grep -q 'stewaro-account-flow-wordmark' <<<"$flow" &&
                grep -q 'STEWARO_ACCOUNT_LOGIN_BRAND_AND_CENTER_20260928' <<<"$account_css" &&
                grep -q 'justify-content:center!important' <<<"$account_css" &&
                grep -q 'nahwerk-logo-v2.css?v=12' <<<"$web" &&
-               ! grep -q 'stewaro-mark.svg' <<<"$web" &&
+               ! grep -q "$legacy_mark" <<<"$web" &&
                grep -q 'STEWARO_CANONICAL_WORDMARK_GUARD_20260928' <<<"$logo_css" &&
                grep -q 'stewaroCanonicalWordmarkSheen' <<<"$logo_css" &&
                grep -q 'prefers-reduced-motion:reduce' <<<"$logo_css" &&
