@@ -126,3 +126,29 @@ unless the ORFIDEL workstream is explicitly reactivated.
 **Documentation/inventory gate: complete when this matrix and the central canonical authority are merged.**
 
 Next implementation gate: **STEWARO brand shell on the existing website foundation**, with no production cutover.
+
+
+## Residual public-surface cleanup · 2026-09-28
+
+- Clear launch-facing legacy brand copy migrated to STEWARO on:
+  - `404.html`
+  - `zugang-uebertragen.html`
+  - `erster-schritt.html`
+  - `passwort-zuruecksetzen.html`
+  - `vertrag-widerrufen.html`
+  - `alltag-organisieren.html`
+  - `dokumente-verstehen.html`
+  - `technik-verstehen.html`
+  - `prime-concierge.html`
+  - corresponding clean-route mirrors where present
+- Public-facing `Kundenbereich` wording in the touched transfer/first-value surfaces is normalized to `Klientenbereich`.
+- First-value/document/Concierge channel copy is fail-closed and no longer presents WhatsApp as universally active before that channel is enabled for the relevant access.
+- `prime-concierge` now follows the canonical STEWARO persona decision: FIDEL is the fixed concierge and legacy persona-selection carousels are replaced by the static FIDEL presentation.
+- Clean-route parity regression coverage now includes the newly migrated route pairs.
+- Residual public-brand regression coverage prevents these routes from reintroducing visible NAHWERK copy while legacy technical identifiers and the current production canonical host remain untouched.
+- Intentionally unresolved routes remain unchanged pending their explicit gate:
+  - `senioren-concierge`: SEO/redirect decision required before fold/retirement.
+  - `concierges`: later international-scope gate.
+  - `ueber-mich`: owner content decision required.
+- PR #266 remains a telephone child branch of PR #265; this website cleanup intentionally avoids telephone implementation files.
+- No Production merge, CNAME/DNS change or runtime-authority change.
