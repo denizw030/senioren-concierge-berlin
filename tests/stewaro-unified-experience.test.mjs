@@ -71,11 +71,15 @@ test("canonical STEWARO brand assets are the only STEWARO SVG logo sources", () 
 
 test("canonical STEWARO branding has no active legacy mark reference or generated text wordmark", () => {
   const legacyMark = "stewaro-" + "mark.svg";
-  const roots = [".github", "assets", "tests"];
+  const roots = ["."];
   const allowedExt = /\.(?:css|html|js|mjs|yml|yaml)$/i;
   const ignored = (path) =>
-    path.startsWith("stewaro-site/") ||
-    path.startsWith("orfidel-preview/") ||
+    path === ".git" ||
+    path.startsWith("./.git/") ||
+    path.startsWith("./stewaro-site/") ||
+    path.startsWith("./orfidel-preview/") ||
+    path.startsWith("./android-app/") ||
+    path.startsWith("./ios-app/") ||
     path.includes("/node_modules/");
 
   const files = [];
