@@ -46,7 +46,7 @@ html body .home-reference .top .brand .mark.nahwerk-mark{
   display:block!important;
   width:38px!important;height:38px!important;flex:0 0 38px!important;
   border:0!important;border-radius:0!important;
-  background:transparent center/contain no-repeat url("/assets/logos/stewaro-mark.svg")!important;
+  background:transparent center/contain no-repeat url("/assets/logos/stewaro-icon.svg")!important;
   box-shadow:none!important;
   transform:none!important;
 }
@@ -340,7 +340,7 @@ body.web-concierge-page.nw-portal-light main{
 }
 html body .web-concierge-avatar.nahwerk-mark,
 html body .nw-floating-concierge .nw-floating-concierge-icon{
-  background:transparent center/contain no-repeat url("/assets/logos/stewaro-mark.svg")!important;
+  background:transparent center/contain no-repeat url("/assets/logos/stewaro-icon.svg")!important;
 }
 
 /* ---------- Unified footer ---------- */
@@ -367,7 +367,7 @@ html body .footer .brand .mark,
 html body .footer .brand .mark.nahwerk-mark{
   display:block!important;
   width:38px!important;height:38px!important;flex:0 0 38px!important;
-  background:transparent center/contain no-repeat url("/assets/logos/stewaro-mark.svg")!important;
+  background:transparent center/contain no-repeat url("/assets/logos/stewaro-icon.svg")!important;
 }
 html body .footer .brand .brandtext{display:block!important}
 html body .footer .brandtext strong{display:block!important;font-size:0!important}
@@ -533,7 +533,7 @@ html body.registration-page .choice.setup-choice label:has(input:checked){
 }
 .stewaro-fixed-concierge-mark{
   width:54px!important;height:54px!important;
-  background:transparent center/contain no-repeat url("/assets/logos/stewaro-mark.svg")!important;
+  background:transparent center/contain no-repeat url("/assets/logos/stewaro-icon.svg")!important;
 }
 .stewaro-fixed-concierge-copy strong{
   display:block!important;
