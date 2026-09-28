@@ -400,7 +400,9 @@
     const persona = normalizePersona(raw);
     const title = document.getElementById("webConciergeTitle");
     const avatar = document.querySelector(".web-concierge-avatar");
-    const name = persona?.name || "Dein Concierge";
+    const fidelSurface = avatar?.classList.contains("fidel-orb-avatar")===true;
+    const isFidel = fidelSurface || persona?.key==="fidel";
+    const name = isFidel ? "FIDEL" : (persona?.name || "Dein Concierge");
     if (title) {
       title.textContent = name;
       title.setAttribute("role","link");
@@ -423,7 +425,13 @@
       avatar.onkeydown = (event) => {
         if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openConciergeSettings(); }
       };
-      if (persona?.image) {
+      if (isFidel) {
+        avatar.classList.remove("nahwerk-mark");
+        avatar.classList.add("fidel-orb-avatar");
+        avatar.style.backgroundImage = "none";
+        avatar.style.backgroundSize = "";
+        avatar.style.backgroundPosition = "";
+      } else if (persona?.image) {
         avatar.classList.remove("nahwerk-mark");
         avatar.style.backgroundImage = `url("${persona.image.replaceAll('"','%22')}")`;
         avatar.style.backgroundSize = "cover";
