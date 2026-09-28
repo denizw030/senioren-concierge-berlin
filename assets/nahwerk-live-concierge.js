@@ -1,4 +1,5 @@
-// NAHWERK LIVE CONCIERGE WEB CLIENT V1
+// FIDEL LIVE CONCIERGE WEB CLIENT V2
+import { mountFidelGoldOrb } from "./fidel-gold-orb.js?v=1";
 const DEFAULT_API="https://ta832v8wah.execute-api.eu-central-1.amazonaws.com/prod/v1/web/live";
 // LIVE_AUTHENTICATED_PRICE_QUOTE_V2_20260920
 
@@ -60,7 +61,7 @@ function ensureOverlay(){
   root.hidden=true;
   root.innerHTML=`
     <div class="nw-live-backdrop"></div>
-    <section class="nw-live-panel" role="dialog" aria-modal="true" aria-label="NAHWERK Live Concierge">
+    <section class="nw-live-panel" role="dialog" aria-modal="true" aria-label="FIDEL Live Concierge">
       <div class="nw-live-top">
         <button class="nw-live-close" type="button" aria-label="Live-Gespräch schließen">×</button>
         <div class="nw-live-name"></div>
@@ -68,9 +69,10 @@ function ensureOverlay(){
       </div>
       <div class="nw-live-stage">
         <div class="nw-live-orb" style="--nw-live-level:0">
-          <div class="nw-live-avatar">
+          <div class="nw-live-avatar is-fidel-orb">
+            <canvas class="nw-fidel-orb-canvas" data-fidel-orb-state="idle" aria-hidden="true"></canvas>
             <img class="nw-live-image" alt="" hidden>
-            <span class="nw-live-initials">N</span>
+            <span class="nw-live-initials">F</span>
           </div>
         </div>
         <div class="nw-live-copy">
@@ -121,8 +123,17 @@ export function mountNahwerkLiveConcierge({
   const ui=ensureOverlay();
   const q=(s)=>ui.querySelector(s);
   const orb=q(".nw-live-orb"),status=q(".nw-live-status"),duration=q(".nw-live-duration"),name=q(".nw-live-name");
+  const avatar=q(".nw-live-avatar"),orbCanvas=q(".nw-fidel-orb-canvas");
   const image=q(".nw-live-image"),initials=q(".nw-live-initials"),remoteAudio=q(".nw-live-audio");
   const muteBtn=q(".nw-live-mute"),endBtn=q(".nw-live-end"),closeBtn=q(".nw-live-close");
+  const fidelOrb=mountFidelGoldOrb(orbCanvas,{state:"idle",interactive:false});
+  let fidelOrbState="idle";
+  const setFidelOrbState=(next)=>{
+    const value=String(next||"idle");
+    if(value===fidelOrbState)return;
+    fidelOrbState=value;
+    fidelOrb?.setState(value);
+  };
 
   let pc=null,dc=null,micStream=null,micMeter=null,outMeter=null,raf=0,inputFlushTimer=0,outputFlushTimer=0,transcriptSeq=0,userTurnSeq=0,assistantTurnSeq=0,maxSessionTimer=0;
   // LIVE_PARALLEL_EXECUTION_V1_20260926
@@ -138,7 +149,31 @@ export function mountNahwerkLiveConcierge({
   let sessionId="",liveThreadId="",initialGreeting="",inputTranscript="",outputTranscript="",lastUserTurnText="",lastAssistantTurnText="",started=false,muted=false,ending=false,startWithGreeting=false,initialGreetingSent=false;
   let inputStartMs=null,inputEndMs=null,outputStartMs=null,outputEndMs=null,callStartedAt=0,callTimer=0;
 
-  const state=(value,detail={})=>{onStateChange({state:value,...detail});};
+  const visualStateFor=(value)=>{
+    switch(String(value||"")){
+      case "quoting":
+      case "connecting":
+      case "pricing_locked": return "connecting";
+      case "executing":
+      case "execution_result_ready": return "thinking";
+      case "error": return "warning";
+      case "price_declined":
+      case "disconnected":
+      case "ended":
+      case "closed": return "idle";
+      default: return null;
+    }
+  };
+  const state=(value,detail={})=>{
+    const visual=visualStateFor(value);
+    if(visual)setFidelOrbState(visual);
+    if(value==="connected"){
+      setFidelOrbState("listening");
+      fidelOrb?.pulse("success",620);
+    }
+    if(value==="execution_finished")setFidelOrbState("listening");
+    onStateChange({state:value,...detail});
+  };
   const setStatus=(text)=>{status.textContent=text;};
   const callClock=(ms)=>{
     const total=Math.max(0,Math.floor(Number(ms||0)/1000));
@@ -161,19 +196,32 @@ export function mountNahwerkLiveConcierge({
   };
   const currentPersonaFromPage=()=>{
     const title=document.getElementById("webConciergeTitle");
-    const avatar=document.querySelector(".web-concierge-avatar");
-    const display=String(title?.textContent||"NAHWERK Concierge").trim();
+    const pageAvatar=document.querySelector(".web-concierge-avatar");
+    const rawDisplay=String(title?.textContent||"FIDEL").trim();
+    const isStewaro=/\b(?:STEWARO|FIDEL)\b/i.test(rawDisplay);
+    const display=isStewaro?"FIDEL":rawDisplay;
     let portrait="";
-    const inline=String(avatar?.style?.backgroundImage||"");
+    const inline=String(pageAvatar?.style?.backgroundImage||"");
     const match=inline.match(/url\(["']?(.*?)["']?\)/i);
     if(match?.[1])portrait=match[1];
-    return {display_name:display,portrait_url:portrait};
+    return {display_name:display,persona_key:isStewaro?"fidel":"",portrait_url:portrait};
   };
   const setPersona=(p)=>{
-    const display=p?.display_name||"NAHWERK Concierge";
+    const rawDisplay=String(p?.display_name||"FIDEL").trim();
+    const key=String(p?.persona_key||"").trim().toLowerCase();
+    const isFidel=key==="fidel"||/\b(?:FIDEL|STEWARO)\b/i.test(rawDisplay);
+    const display=isFidel?"FIDEL":rawDisplay;
     name.textContent=display;
     initials.textContent=p?.initials||display.slice(0,1).toUpperCase();
-    const key=String(p?.persona_key||"").trim().toLowerCase();
+    avatar?.classList.toggle("is-fidel-orb",isFidel);
+    if(isFidel){
+      image.hidden=true;
+      initials.hidden=true;
+      orbCanvas.hidden=false;
+      setFidelOrbState("idle");
+      return;
+    }
+    orbCanvas.hidden=true;
     const localPortrait=/^[a-z0-9_-]{1,64}$/.test(key)
       ? `${location.origin}/assets/concierges/large/${encodeURIComponent(key)}.webp`
       : "";
@@ -197,9 +245,21 @@ export function mountNahwerkLiveConcierge({
     const outLevel=rms(outMeter?.analyser);
     const level=Math.max(inLevel,outLevel);
     orb.style.setProperty("--nw-live-level",level.toFixed(3));
+    fidelOrb?.setAudio(inLevel,outLevel);
     if(started){
-      if(outLevel>.055)setStatus((name.textContent||"Concierge")+" spricht …");
-      else if(inLevel>.05)setStatus("Hört zu …");
+      if(outLevel>.055){
+        setFidelOrbState("speaking");
+        setStatus((name.textContent||"FIDEL")+" spricht …");
+      }else if(inLevel>.05){
+        setFidelOrbState("listening");
+        setStatus("Hört zu …");
+      }else if(responseActive){
+        setFidelOrbState("thinking");
+      }else if(inputSpeechActive){
+        setFidelOrbState("listening");
+      }else if(fidelOrbState==="speaking"||fidelOrbState==="thinking"||fidelOrbState==="connecting"){
+        setFidelOrbState("listening");
+      }
     }
     raf=requestAnimationFrame(animate);
   };
@@ -443,8 +503,8 @@ export function mountNahwerkLiveConcierge({
       }
       return;
     }
-    if(e.type==="input_audio_buffer.speech_started"){inputSpeechActive=true;lastInputActivityAt=Date.now();noteTranscriptEvent();return;}
-    if(e.type==="response.created"||e.type==="response.in_progress"){responseActive=true;noteTranscriptEvent();}
+    if(e.type==="input_audio_buffer.speech_started"){inputSpeechActive=true;lastInputActivityAt=Date.now();noteTranscriptEvent();setFidelOrbState("listening");return;}
+    if(e.type==="response.created"||e.type==="response.in_progress"){responseActive=true;noteTranscriptEvent();setFidelOrbState("thinking");}
     if(e.type==="session.input_transcript.delta"||e.type==="conversation.item.input_audio_transcription.delta"){
       noteTranscriptEvent();
       const delta=String(e.delta??"");
@@ -484,7 +544,7 @@ export function mountNahwerkLiveConcierge({
       if(end!==null){outputEndMs=end;lastAssistantPersistedEndMs=end;}
       mirrorTranscriptDelta("ASSISTANT",delta,start,end);
       void persistTranscript("ASSISTANT",delta,start,end,`delta:assistant:${String(e.event_id||uid())}`);
-      setStatus((name.textContent||"Concierge")+" spricht …");return;
+      setFidelOrbState("speaking");setStatus((name.textContent||"FIDEL")+" spricht …");return;
     }
     if(e.type==="session.output_transcript.done"||e.type==="response.audio_transcript.done"||e.type==="response.output_audio_transcript.done"){
       noteTranscriptEvent();
@@ -500,7 +560,7 @@ export function mountNahwerkLiveConcierge({
       return;
     }
     if(e.type==="response.done"){
-      responseActive=false;noteTranscriptEvent();
+      responseActive=false;noteTranscriptEvent();setFidelOrbState("listening");
       if(parallelResultSpeaking)parallelResultSpeaking=false;
       if(outputFlushTimer)clearTimeout(outputFlushTimer);
       outputFlushTimer=setTimeout(()=>{void flushAssistantTranscript();},450);
@@ -513,13 +573,14 @@ export function mountNahwerkLiveConcierge({
     }
     if(e.type==="session.delegation.created"){void handleDelegation(e);return;}
     if(e.type==="session.closed"){await flushUserTranscript();await flushAssistantTranscript();await stop({notifyBackend:true});return;}
-    if(e.type==="error"){state("error",{error:e?.error?.code||"LIVE_SESSION_ERROR"});}
+    if(e.type==="error"){setFidelOrbState("warning");state("error",{error:e?.error?.code||"LIVE_SESSION_ERROR"});}
   };
 
   async function start(){
     if(pc)return;
     ending=false;started=false;responseActive=false;inputSpeechActive=false;parallelResultSpeaking=false;lastInputActivityAt=0;activeDelegations.clear();parallelExecutionResults.length=0;if(parallelResultTimer)clearTimeout(parallelResultTimer);parallelResultTimer=0;liveThreadId="";initialGreeting="";startWithGreeting=false;initialGreetingSent=false;inputTranscript="";outputTranscript="";lastUserTurnText="";lastAssistantTurnText="";inputStartMs=null;inputEndMs=null;outputStartMs=null;outputEndMs=null;lastUserPersistedEndMs=null;lastAssistantPersistedEndMs=null;lastTranscriptEventAt=Date.now();transcriptSeq=0;userTurnSeq=0;assistantTurnSeq=0;transcriptWrites.clear();transcriptMirror.length=0;
     stopCallTimer();if(duration){duration.textContent="0:00";duration.hidden=true;}
+    fidelOrb?.setAudio(0,0);setFidelOrbState("idle");
     ui.hidden=false;document.documentElement.classList.add("nw-live-open");
     setPersona(currentPersonaFromPage());
     setStatus("Preis wird geprüft …");state("quoting");
