@@ -194,3 +194,22 @@ Next implementation gate: **STEWARO brand shell on the existing website foundati
 - Pricing/PAYG terminology is aligned to STEWARO/FIDEL and public `Klienten` language.
 - Production remains untouched: no website `main` merge, no CNAME/DNS change, no public STEWARO Production cutover.
 - Remaining website work is limited to final representative browser/user-journey acceptance and explicit Production-domain cutover preparation/approval.
+
+
+## FIDEL gold-glass orb · 2026-09-28
+
+Owner decision:
+- FIDEL uses a premium **gold-glass orb** as the primary animated visual identity for Web Concierge and Live Call instead of a humanoid avatar.
+- The orb must remain recognizably non-human and must not imply that FIDEL is a human employee.
+- Visual behavior is deliberately calm, elegant and trust-oriented: gold-only light language, subtle glass/refraction, no blue assistant glow.
+
+Implementation candidate:
+- stacked Draft PR #267 · `feature/stewaro-fidel-gold-orb-live-20260928`
+- shared renderer: `assets/fidel-gold-orb.js`
+- same renderer is used by Web Concierge and the Live Call overlay;
+- iOS and Android reuse the existing `app-live` WebView, so the same FIDEL orb runtime reaches native app Live without a second avatar implementation;
+- Live audio RMS drives internal energy/light movement;
+- conversation state drives `idle / listening / thinking / speaking / warning / success / connecting`;
+- WebRTC, pricing, transcript persistence, Core delegation, provider routing and Production authority remain unchanged.
+- Scope-specific Web Concierge, runtime, shared-base, account and integrity checks are GREEN on the candidate. A stacked-branch SEO check is RED for pre-existing parent-branch i18n parity assertions about the already-retired `concierges` route / old senior assets; the orb change does not touch those files.
+- No Production deployment/cutover is authorized by this visual-runtime change.
