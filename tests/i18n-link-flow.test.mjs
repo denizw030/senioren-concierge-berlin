@@ -6,7 +6,7 @@ import path from 'node:path';
 const root = process.cwd();
 const pages = [
   'index.html','prime-concierge.html','safety.html','angehoerige.html','telefonannahme.html',
-  'pakete.html','leistungen.html','ablauf.html','faq.html','kontakt.html','concierges.html',
+  'pakete.html','leistungen.html','ablauf.html','faq.html','kontakt.html',
   'senioren-concierge.html','alltag-organisieren.html','dokumente-verstehen.html',
   'technik-verstehen.html','ueber-mich.html'
 ];
@@ -33,7 +33,7 @@ for (const lang of ['en', 'tr']) {
       for (const rawHref of hrefs(html)) {
         const href = decodeHref(rawHref);
         if (!href || href.startsWith('#') || /^(?:https?:|mailto:|tel:|javascript:)/i.test(href)) continue;
-        const url = new URL(href, 'https://nahwerkconcierge.com/');
+        const url = new URL(href, 'https://stewaro.com/');
         const base = url.pathname.split('/').filter(Boolean).pop() || 'index.html';
         if (localized.has(base)) {
           assert.ok(url.pathname.startsWith(`/${lang}/`), `${lang}/${page} leaks localized link ${href} back to DE`);
@@ -49,7 +49,7 @@ for (const lang of ['en', 'tr']) {
     const html = read(`${lang}/prime-concierge.html`);
     const candidate = hrefs(html).map(decodeHref).find((href) => href.includes('/registrieren') && href.includes('produkt=prime') && href.includes('paket=free'));
     assert.ok(candidate, `${lang}/prime-concierge.html has no intact primary registration CTA`);
-    const url = new URL(candidate, 'https://nahwerkconcierge.com/');
+    const url = new URL(candidate, 'https://stewaro.com/');
     assert.equal(url.pathname, '/registrieren');
     assert.equal(url.searchParams.get('produkt'), 'prime');
     assert.equal(url.searchParams.get('paket'), 'free');
@@ -63,7 +63,6 @@ test('auth entry pages load locale and persistent language selector runtimes', (
     assert.match(html, /assets\/auth-i18n\.js\?v=\d+/, `${page} must load a versioned auth-i18n runtime`);
     assert.match(html, /assets\/app-language-switcher\.js\?v=\d+/, `${page} must keep a versioned language selector visible`);
   }
-  assert.match(read('registrieren.html'), /assets\/auth-slider-i18n\.js\?v=\d+/, 'registration must load a versioned slider locale runtime');
 });
 
 test('auth language selector switches directly without auth link rewriting', () => {
@@ -83,21 +82,11 @@ test('public and auth mobile language controls pin to the menu button geometry',
   }
 });
 
-test('auth slider locale runtime and catalogs cover visible carousel copy', () => {
-  const sliderI18n = read('assets/auth-slider-i18n.js');
-  const trAuth = read('locales/tr-auth4.json');
-  const enAuth = read('locales/en-auth4.json');
-  for (const copy of [
-    'Warm, ruhig, modern und strukturiert.',
-    'Die Hörprobe startet in der Herkunftssprache. Die Sprache können Sie direkt darunter wechseln.',
-    'Stimme anhören',
-    'Sprache',
-    'Ausgewählt'
-  ]) {
-    assert.ok(sliderI18n.includes(copy), `missing slider runtime localization source: ${copy}`);
-    assert.ok(trAuth.includes(copy), `missing Turkish auth catalog slider copy: ${copy}`);
-    assert.ok(enAuth.includes(copy), `missing English auth catalog slider copy: ${copy}`);
-  }
+test('registration keeps FIDEL fixed and ships no legacy photo slider', () => {
+  const registration = read('registrieren.html');
+  assert.match(registration, /stewaro-fixed-concierge-card/);
+  assert.match(registration, /name="conciergeChoice" value="fidel"/);
+  assert.doesNotMatch(registration, /data-concierge-carousel|auth-slider-i18n\.js/);
 });
 
 test('registration redirects preserve the active locale', () => {
