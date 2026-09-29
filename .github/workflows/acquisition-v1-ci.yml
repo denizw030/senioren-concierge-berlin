@@ -365,7 +365,10 @@ jobs:
           access_heading=re.search(r'<div class="account-panel-heading" data-account-panel="access"[\s\S]*?</div>\s*<article class="card wide access-panel"',src,re.I).group(0)
           access_heading=access_heading.rsplit('<article',1)[0]
           family_start=src.index('<div id="familyOwnerPanelSlot"')
-          family_end=src.index('<article class="card summary-card plan-summary"',family_start)
+          family_end=min(pos for pos in [
+            src.find('<article class="card summary-card status-summary"',family_start),
+            src.find('<article class="card summary-card plan-summary"',family_start)
+          ] if pos >= 0)
           family=src[family_start:family_end]
           family=re.sub(r'\s+hidden(?=[^>]*>)','',family)
           family=family.replace('Berechtigung wird serverseitig geprüft.','OWNER bestätigt · Personen und Kontingente autorisiert')
