@@ -424,12 +424,13 @@ jobs:
                   overflow:document.documentElement.dataset.overflow,
                   details:document.documentElement.dataset.overflowDetails,
                   mainWidth:document.querySelector('main').getBoundingClientRect().width,
-                  visibleCards:[...document.querySelectorAll('.summary-card')].filter(el=>el.getClientRects().length>0).length
+                  visibleCards:[...document.querySelectorAll('.summary-card')].filter(el=>el.getClientRects().length>0).length,
+                  requiredSummaries:['.plan-summary','.customer-number-summary'].every(selector=>{const el=document.querySelector(selector);return el&&el.getClientRects().length>0&&el.getBoundingClientRect().width>0;})
                 }));
                 fs.writeFileSync('/tmp/account-'+view+'-'+width+'.html',await page.content());
                 await page.screenshot({path:'/tmp/account-premium-visual/'+view+'-'+width+'.png',fullPage:true});
                 console.log('ACCOUNT_LAYOUT',width,view,JSON.stringify(layout));
-                if(layout.viewport!==width||layout.mainWidth<1||layout.overflow!=='none'||(view==='overview'&&layout.visibleCards!==4)){
+                if(layout.viewport!==width||layout.mainWidth<1||layout.overflow!=='none'||(view==='overview'&&!layout.requiredSummaries)){
                   throw Error('Account layout gate failed at actual viewport '+width+' / '+view);
                 }
                 await page.close();
