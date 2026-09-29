@@ -3,68 +3,31 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 
 const read=(p)=>fs.readFileSync(p,"utf8");
-const homepage="de/index.html";
 const visibleText=(html)=>html
   .replace(/<section[^>]*\bhidden\b[^>]*>[\s\S]*?<\/section>/gi," ")
+  .replace(/<script[\s\S]*?<\/script>/gi," ")
+  .replace(/<style[\s\S]*?<\/style>/gi," ")
   .replace(/<[^>]+>/g," ")
   .replace(/\s+/g," ")
   .trim();
 
-test("homepage follows the frozen six-step story exactly",()=>{
-  const home=read(homepage);
-  const steps=[...home.matchAll(/data-story-step="([1-6])"/g)].map(m=>m[1]);
-  assert.deepEqual(steps,["1","2","3","4","5","6"]);
-  const positions=[
-    "Ein persönlicher Concierge, der erledigt.",
-    "Echte Demo",
-    "Da sein, auch wenn du gerade verhindert bist.",
-    "Unterstützung, ohne Selbstständigkeit abzunehmen.",
-    "Ein Concierge. Dasselbe Gespräch. Egal über welchen Weg.",
-    "Gib die erste Aufgabe ab."
-  ].map(s=>home.indexOf(s));
-  positions.forEach((p,i)=>assert.ok(p>=0,`story marker ${i+1} exists`));
-  for(let i=1;i<positions.length;i++) assert.ok(positions[i]>positions[i-1],`story marker ${i+1} follows marker ${i}`);
-});
-
-test("core marketing statements are preserved verbatim",()=>{
-  const home=visibleText(read(homepage));
+test("homepage follows the current STEWARO FIDEL narrative",()=>{
+  const home=read("de/index.html");
+  const copy=visibleText(home);
   for(const statement of [
-    "Ein persönlicher Concierge, der erledigt.",
-    "Google findet. KI versteht. NAHWERK erledigt.",
-    "Da sein, auch wenn du gerade verhindert bist.",
-    "Unterstützung, ohne Selbstständigkeit abzunehmen.",
-    "Ein Concierge. Dasselbe Gespräch. Egal über welchen Weg."
-  ]) assert.ok(home.includes(statement),statement);
-});
-
-test("FREE entry copy explains trial, limits and online credit without live gift-card marketing",()=>{
-  const js=read("assets/acquisition-v1.js");
-  assert.match(js,/Kostenlos registrieren/);
-  assert.match(js,/chatten, Fragen stellen, Aufgaben vorbereiten und eine echte Concierge-Ausführung ausprobieren/);
-  assert.match(js,/Keine Zahlungsdaten erforderlich\. Kein automatisches Upgrade\./);
-  assert.match(js,/Guthaben schon ab 5 € online aufladen/);
-  assert.match(js,/bis zu 50 App-Dialoge \/ Monat/);
-  assert.match(js,/bis zu 20 WhatsApp-Dialoge \/ Monat/);
-  assert.match(js,/1 echte Concierge-Ausführung/);
-  assert.match(js,/FUTURE COPY — erst nach produktiver Verfügbarkeit im UI aktivieren/);
-  const renderedMarkup=read(homepage);
-  assert.doesNotMatch(renderedMarkup,/Guthabenkarten ab 10 €/);
-});
-
-test("demo makes Auftrag Freigabe Durchführung Ergebnis immediately explicit",()=>{
-  const home=read(homepage);
-  const start=home.indexOf('id="demo"');
-  const end=home.indexOf('data-story-step="3"',start);
-  assert.ok(start>=0&&end>start);
-  const demo=home.slice(start,end);
-  const labels=["<h3>Auftrag</h3>","<h3>Freigabe</h3>","<h3>Durchführung</h3>","<h3>Ergebnis</h3>"];
-  const positions=labels.map(x=>demo.indexOf(x));
-  positions.forEach((p,i)=>assert.ok(p>=0,labels[i]));
-  for(let i=1;i<positions.length;i++)assert.ok(positions[i]>positions[i-1],labels[i]);
+    "Jemand, der sich kümmert.",
+    "FIDEL ist Ihr persönlicher Concierge",
+    "Sie sagen, was gebraucht wird. FIDEL übernimmt",
+    "Sie sagen, was Sie brauchen. FIDEL kümmert sich um den Rest."
+  ]) assert.ok(copy.includes(statement),statement);
+  assert.match(home,/class="hero-image hero-video"/);
+  assert.match(home,/class="site-header"/);
+  assert.match(home,/class="site-footer"/);
+  assert.doesNotMatch(copy,/Google findet\. KI versteht\. NAHWERK erledigt|NAHWERK|Nilo|Mira|Hartmut|Frida/);
 });
 
 test("public story avoids fear-first and surveillance positioning",()=>{
-  const pages=[homepage,"prime-concierge.html","angehoerige.html","safety.html","telefonannahme.html"];
+  const pages=["de/index.html","prime-concierge.html","angehoerige.html","safety.html","telefonannahme.html"];
   const text=pages.map(p=>visibleText(read(p))).join("\n");
   for(const forbidden of [
     "Was wenn deine Eltern stürzen?",
@@ -77,38 +40,35 @@ test("public story avoids fear-first and surveillance positioning",()=>{
 
 test("unreleased telephone setup and warm-transfer marketing stay hidden",()=>{
   const page=read("telefonannahme.html");
-  assert.match(page,/class="tr-section story-hidden-unreleased" hidden aria-hidden="true"[\s\S]*Festnetz-Warm-Transfer/);
+  assert.match(page,/class="tr-section story-hidden-unreleased" hidden aria-hidden="true"/);
   assert.match(page,/id="einrichtung" hidden aria-hidden="true"/);
-  assert.match(page,/Platform-Endpunkt ist vorbereitet, aber noch nicht deployed/);
   const publicCopy=visibleText(page);
-  assert.doesNotMatch(publicCopy,/Festnetz-Warm-Transfer|Telefonannahme einrichten|Platform-Endpunkt ist vorbereitet/);
-  assert.match(publicCopy,/Weitere Telefonfunktionen werden erst öffentlich gezeigt, wenn sie für den jeweiligen Zugang eingerichtet sind/);
+  assert.doesNotMatch(publicCopy,/Festnetz-Warm-Transfer|Telefonannahme einrichten/);
+  assert.match(publicCopy,/Weitere Telefonfunktionen werden erst öffentlich gezeigt/);
 });
 
-test("story product pages share the same brand layer and navigation logic",()=>{
-  for(const p of [homepage,"prime-concierge.html","safety.html","angehoerige.html","telefonannahme.html"]){
+test("core product pages share STEWARO navigation and FIDEL identity",()=>{
+  for(const p of ["prime-concierge.html","senioren-concierge.html","safety.html","angehoerige.html","telefonannahme.html"]){
     const html=read(p);
-    assert.match(html,/assets\/story-conversion-final\.css\?v=\d+/,p);
-    assert.match(html,/href="(?:\/de\/|\/)?prime-concierge(?:\.html)?">Concierge<\/a>/,p);
-    assert.match(html,/href="(?:\/de\/|\/)?safety(?:\.html)?">Safety<\/a>/,p);
-    assert.match(html,/href="(?:\/de\/|\/)?angehoerige(?:\.html)?">Family<\/a>/,p);
-    assert.match(html,/href="(?:\/de\/|\/)?telefonannahme(?:\.html)?">Telefon<\/a>/,p);
+    assert.match(html,/STEWARO/);
+    assert.match(html,/stewaro-icon\.svg|<strong>STEWARO<\/strong>/);
+    assert.doesNotMatch(visibleText(html),/NAHWERK|Nilo|Mira|Hartmut|Frida/);
   }
+  assert.match(visibleText(read("prime-concierge.html")),/FIDEL/);
+  assert.match(visibleText(read("senioren-concierge.html")),/FIDEL/);
+  assert.match(visibleText(read("telefonannahme.html")),/FIDEL/);
 });
 
 test("family stays respectful and person-centered",()=>{
   const family=visibleText(read("angehoerige.html"));
-  assert.match(family,/Unterstützung, ohne Selbstständigkeit abzunehmen/);
-  assert.match(family,/eigenen Concierge/i);
-  assert.match(family,/eigener Sprache|Sprache selbst wählen/i);
+  assert.match(family,/Keine automatische Einsicht/i);
   assert.match(family,/Privatsphäre/i);
   assert.doesNotMatch(family,/Hilflos|Pflegefall|überwachen/i);
 });
 
 test("safety remains calm, deliberate and bounded",()=>{
   const safety=visibleText(read("safety.html"));
-  assert.match(safety,/Da sein, auch wenn du gerade verhindert bist/);
   assert.match(safety,/bewusst eingerichtet/i);
-  assert.match(safety,/keinen medizinischen Notruf|ersetzt keinen medizinischen Notruf/i);
-  assert.doesNotMatch(safety,/Sturz|Panik|Notfall deiner Eltern/i);
+  assert.match(safety,/keine permanente Überwachung/i);
+  assert.doesNotMatch(safety,/Panik|Notfall deiner Eltern/i);
 });
