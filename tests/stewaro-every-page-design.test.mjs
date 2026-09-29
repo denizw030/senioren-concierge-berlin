@@ -18,7 +18,7 @@ const customerHtml = walk(root)
 
 const loadsUnified = (file,html) =>
   /stewaro-unified\.css|stewaro-account-entry\.css|assets\/site\.css|assets\/brand-2026\.css|assets\/clean-url\.js|assets\/site-ui\.js/.test(html) ||
-  (file === "de/index.html" && /stewaro-precision-fullbleed-v1|brand-word/.test(html));
+  (["de/index.html","en/index.html","tr/index.html"].includes(file) && /stewaro-precision-fullbleed-v1|brand-word/.test(html));
 
 test("every customer-facing HTML route receives the STEWARO design system", () => {
   const missing = customerHtml.filter(file => !loadsUnified(file,fs.readFileSync(file,"utf8")));
