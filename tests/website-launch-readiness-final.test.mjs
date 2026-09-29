@@ -11,7 +11,7 @@ test('privacy notice publishes the STEWARO controller identity from the current 
   assert.match(privacy, /Deniz Wannenmacher/);
   assert.match(privacy, /Osdorfer Straße 108/);
   assert.match(privacy, /12207 Berlin/);
-  assert.match(privacy, /dw@stewaro\\.com/);
+  assert.match(privacy, /dw@stewaro\.com/);
   assert.doesNotMatch(privacy, /aria-label="Kontaktdaten des Verantwortlichen"/);
 });
 
