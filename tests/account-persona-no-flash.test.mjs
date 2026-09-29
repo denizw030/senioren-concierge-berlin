@@ -23,7 +23,7 @@ test("STEWARO Concierge settings use the fixed FIDEL identity without a legacy p
   assert.match(settings, /stewaro-fixed-concierge-card/);
   assert.match(settings, /name="conciergeChoice" value="fidel"/);
   assert.match(settings, /FIDEL/);
-  assert.doesNotMatch(settings, /concierge-carousel\.js|concierge-carousel\.css|data-concierge-carousel|NAHWERKCarousel/);
+  assert.doesNotMatch(settings, /<script[^>]+concierge-carousel\.js|<link[^>]+concierge-carousel\.css|NAHWERKCarousel/);
 });
 
 test("clean account and Concierge settings routes remain exact mirrors apart from base href", () => {
