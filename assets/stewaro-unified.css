@@ -783,3 +783,21 @@ html body a[href="/concierges/"],
 html body a[href$="/concierges"]{
   display:none!important;
 }
+
+/* Launch accessibility: match text to the shared cream/forest surfaces. */
+html body .top .nw-language-button span{color:#314139!important;opacity:1!important}
+html body:not(.account-premium-ui):not(.web-concierge-page) .lead{color:#4f5c53!important}
+html body .story-section:not(.story-final){background:#f7f3eb!important}
+html body .story-section:not(.story-final) :is(h2,h3,strong){color:#173126!important}
+html body .story-section:not(.story-final) :is(p,.story-lead){color:#4f5c53!important}
+html body .story-section:not(.story-final) .story-kicker{color:#76531b!important}
+html body .story-section .story-principle>span{color:#76531b!important}
+html body .story-section :is(.story-compact-item,.story-principle) :is(strong,p){color:#173126!important}
+html body.story-site .footer.story-page-footer{
+  background:#173126!important;background-image:none!important;color:#f1f3ef!important;
+}
+html body.story-site .footer.story-page-footer :is(h3,p,a,span){color:#f1f3ef!important;opacity:1!important}
+html body.pricing-page .package-card.featured :is(.package-price,.package-usage){color:#173126!important;opacity:1!important}
+html body.pricing-page .status-pill{background:#efe8dd!important;color:#674919!important;opacity:1!important}
+html body .tr-proof{background:#efe8dd!important;color:#173126!important}
+html body .tr-proof strong{color:#173126!important}

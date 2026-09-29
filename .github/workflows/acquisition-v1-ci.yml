@@ -221,7 +221,7 @@ jobs:
           panel_end=src.index('<div class="account-panel-heading" data-account-panel="usage"',panel_start)
           panel=src[panel_start:panel_end].strip()
           panel=re.sub(r'\s+hidden(?=[^>]*>)','',panel,count=2)
-          fixture=f'''<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>E-Mail-Konto | NAHWERK</title>{links}{style}</head><body><main><section class="section account-section"><div class="wrap"><h1>E-Mail-Konto</h1><nav class="account-tabs" role="tablist" aria-label="Kundenbereich E-Mail">{tab}</nav><div class="dash">{panel}</div></div></section></main></body></html>'''
+          fixture=f'''<!doctype html><html lang="de" data-nw-portal-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>E-Mail-Konto | STEWARO</title>{links}{style}</head><body class="account-premium-ui nw-portal-light"><main><section class="section account-section"><div class="wrap"><h1>E-Mail-Konto</h1><nav class="account-tabs" role="tablist" aria-label="Klientenbereich E-Mail">{tab}</nav><div class="dash">{panel}</div></div></section></main></body></html>'''
           Path("__email-account-a11y.html").write_text(fixture,encoding="utf-8")
           PY
       - name: Build inert family owner accessibility fixture
@@ -239,7 +239,7 @@ jobs:
           ] if pos >= 0)
           panel=src[start:end]
           panel=re.sub(r'\s+hidden(?=[^>]*>)','',panel,count=4)
-          fixture=f'''<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Personen & Zugänge | NAHWERK</title>{links}{style}</head><body><main><section class="section account-section"><div class="wrap"><h1>Kundenbereich</h1><h2>Personen & Zugänge</h2><div class="dash">{panel}</div></div></section></main></body></html>'''
+          fixture=f'''<!doctype html><html lang="de" data-nw-portal-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Personen & Zugänge | STEWARO</title>{links}{style}</head><body class="account-premium-ui nw-portal-light"><main><section class="section account-section"><div class="wrap"><h1>Klientenbereich</h1><h2>Personen & Zugänge</h2><div class="dash">{panel}</div></div></section></main></body></html>'''
           Path("__family-owner-a11y.html").write_text(fixture,encoding="utf-8")
           PY
       - name: Serve preview
