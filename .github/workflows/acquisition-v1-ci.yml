@@ -393,6 +393,9 @@ jobs:
             addEventListener("load",()=>{{requestAnimationFrame(()=>{{
               const bad=[...document.querySelectorAll("button:not(.account-tab),.card,.family-owner-person,.account-tabs-shell")].filter(el=>{{const r=el.getBoundingClientRect();return r.left<-1||r.right>innerWidth+1||r.width<1;}});
               document.documentElement.dataset.overflow=(document.documentElement.scrollWidth<=innerWidth+1&&bad.length===0)?"none":"present";
+              document.documentElement.dataset.overflowDetails=JSON.stringify(bad.map(el=>{{const r=el.getBoundingClientRect();return {{id:el.id,classes:el.className,left:r.left,right:r.right,width:r.width}};}}));
+              document.documentElement.dataset.viewportWidth=String(innerWidth);
+              document.documentElement.dataset.documentWidth=String(document.documentElement.scrollWidth);
               document.documentElement.dataset.visualReady="true";
             }})}});
             </script></body></html>'''
@@ -410,7 +413,7 @@ jobs:
               url="http://127.0.0.1:4173/__account-premium-$view.html"
               "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --window-size="$width,1100" --virtual-time-budget=1200 --dump-dom "$url" > "/tmp/account-$view-$width.html"
               grep -q 'data-visual-ready="true"' "/tmp/account-$view-$width.html"
-              grep -q 'data-overflow="none"' "/tmp/account-$view-$width.html"
+              grep -q 'data-overflow="none"' "/tmp/account-$view-$width.html" || { python3 -c 'import sys,re; s=open(sys.argv[1]).read(); print("ACCOUNT_LAYOUT_FAILURE",sys.argv[1],re.search(r"<html[^>]*>",s).group(0))' "/tmp/account-$view-$width.html"; exit 1; }
               "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --window-size="$width,1100" --virtual-time-budget=1200 --screenshot="/tmp/account-premium-visual/$view-$width.png" "$url" >/dev/null
             done
           done
