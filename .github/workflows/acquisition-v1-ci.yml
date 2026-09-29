@@ -330,16 +330,30 @@ jobs:
           mkdir -p /tmp/story-e2e-visual
           CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
           test -n "$CHROME"
-          for width in 1440 1024 768 390; do
-            for page in de/index.html prime-concierge.html safety.html angehoerige.html telefonannahme.html; do
-              key="$(printf '%s' "$page" | tr './-' '___')-$width"
-              url="http://127.0.0.1:4173/__story-browser-e2e.html?page=$page"
-              "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --window-size="$width,1100" --virtual-time-budget=3500 --dump-dom "$url" > "/tmp/story-$key.html"
-              grep -q 'data-story-e2e="green"' "/tmp/story-$key.html" || { cat "/tmp/story-$key.html"; exit 1; }
-              "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --window-size="$width,1100" --virtual-time-budget=2200 --screenshot="/tmp/story-e2e-visual/$key.png" "http://127.0.0.1:4173/$page" >/dev/null
-            done
-          done
-          echo "WEBSITE STORY BROWSER E2E GREEN — 20/20 viewport/page combinations"
+          npm install --no-save --ignore-scripts --package-lock=false playwright@1.56.1
+          CHROME_PATH="$CHROME" node --input-type=module - <<'NODE'
+          import { chromium } from 'playwright';
+          import fs from 'node:fs';
+          const browser=await chromium.launch({executablePath:process.env.CHROME_PATH,headless:true,args:['--no-sandbox']});
+          try {
+            for(const width of [1440,1024,768,390,360]){
+              for(const route of ['de/index.html','prime-concierge.html','safety.html','angehoerige.html','telefonannahme.html']){
+                const key=route.replace(/[./-]/g,'_')+'-'+width;
+                const page=await browser.newPage({viewport:{width,height:1100},deviceScaleFactor:1});
+                await page.goto('http://127.0.0.1:4173/__story-browser-e2e.html?page='+route,{waitUntil:'load'});
+                await page.waitForFunction(()=>Boolean(document.documentElement.dataset.storyE2e));
+                const result=await page.evaluate(()=>({viewport:innerWidth,...document.documentElement.dataset}));
+                console.log('STORY_LAYOUT',width,route,JSON.stringify(result));
+                fs.writeFileSync('/tmp/story-'+key+'.html',await page.content());
+                if(result.viewport!==width||result.storyE2e!=='green')throw Error('Story gate failed at actual viewport '+width+' / '+route);
+                await page.goto('http://127.0.0.1:4173/'+route,{waitUntil:'load'});
+                await page.screenshot({path:'/tmp/story-e2e-visual/'+key+'.png',fullPage:true});
+                await page.close();
+              }
+            }
+          } finally { await browser.close(); }
+          NODE
+          echo "WEBSITE STORY BROWSER E2E GREEN — 25/25 actual viewport/page combinations"
 
       - uses: actions/upload-artifact@v4
         with:
@@ -461,13 +475,15 @@ jobs:
           set +a
           test -x "$CHROMEDRIVER_TEST_PATH"
           pages=(index.html prime-concierge.html safety.html registrieren.html angehoerige.html leistungen.html pakete.html telefonannahme.html __email-account-a11y.html __family-owner-a11y.html)
+          failures=0
           for page in "${pages[@]}"; do
             echo "AXE $page"
             npx --yes @axe-core/cli@4.10.2 \
               --chromedriver-path "$CHROMEDRIVER_TEST_PATH" \
               "http://127.0.0.1:4173/$page" \
-              --exit
+              --exit || failures=$((failures+1))
           done
+          test "$failures" -eq 0
       - name: Lighthouse desktop
         run: |
           npx --yes lighthouse@13.4.1 http://127.0.0.1:4173/de/index.html \
