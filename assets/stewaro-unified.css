@@ -801,3 +801,34 @@ html body.pricing-page .package-card.featured :is(.package-price,.package-usage)
 html body.pricing-page .status-pill{background:#efe8dd!important;color:#674919!important;opacity:1!important}
 html body .tr-proof{background:#efe8dd!important;color:#173126!important}
 html body .tr-proof strong{color:#173126!important}
+
+/* Brand scope outranks the retained legacy public theme layers. */
+html body.brand-stewaro:not(.account-premium-ui):not(.web-concierge-page):not(.login-image-page) .top{
+  background:#fffdf9!important;background-image:none!important;color:#173126!important;
+}
+html body.brand-stewaro:not(.account-premium-ui):not(.web-concierge-page) .nw-language-button{
+  background:#fffdf9!important;color:#314139!important;
+}
+html body.brand-stewaro:not(.account-premium-ui):not(.web-concierge-page):not(.login-image-page) main>.section,
+html body.brand-stewaro:not(.account-premium-ui):not(.web-concierge-page):not(.login-image-page) main>.section.alt{
+  background:#f7f3eb!important;background-image:none!important;color:#173126!important;
+}
+html body.brand-stewaro:not(.account-premium-ui):not(.web-concierge-page) :is(.card,.package-card){
+  background:#fffdf9!important;background-image:none!important;color:#173126!important;
+}
+html body.brand-stewaro:not(.account-premium-ui):not(.web-concierge-page) :is(.lead,.card p,.card li){
+  color:#4f5c53!important;opacity:1!important;
+}
+html body.brand-stewaro.story-site .story-channel-label span{color:#76531b!important}
+html body.brand-stewaro.story-site.nw-family-page .footer.story-page-footer{
+  background:#173126!important;background-image:none!important;color:#f1f3ef!important;
+}
+html body.brand-stewaro.story-site.nw-family-page .footer.story-page-footer :is(h3,p,a,span){
+  color:#f1f3ef!important;opacity:1!important;
+}
+html body.brand-stewaro.pricing-page .package-card :is(.package-price,.package-usage,.whatsapp-label){
+  color:#173126!important;opacity:1!important;
+}
+html body.brand-stewaro.pricing-page .package-card .status-pill{
+  color:#674919!important;background:#efe8dd!important;opacity:1!important;
+}
