@@ -839,3 +839,23 @@ html body.brand-stewaro:not(.account-premium-ui):not(.web-concierge-page):not(.l
 html body.brand-stewaro:not(.account-premium-ui):not(.web-concierge-page):not(.login-image-page) main>.section :is(.eyebrow,.section-kicker){
   color:#76531b!important;
 }
+
+/* Telephone public sections use explicit paired surfaces at every viewport. */
+html body.brand-stewaro.telephone-reception-page .tr-hero,
+html body.brand-stewaro.telephone-reception-page .tr-section{
+ background:#f7f3eb!important;background-image:none!important;color:#173126!important;
+}
+html body.brand-stewaro.telephone-reception-page :is(.tr-hero,.tr-section) :is(h1,h2,h3){color:#173126!important}
+html body.brand-stewaro.telephone-reception-page :is(.tr-hero p,.tr-lead,.tr-risk-card p,.tr-calm-note span){color:#4f5c53!important;opacity:1!important}
+html body.brand-stewaro.telephone-reception-page .tr-kicker{color:#76531b!important}
+html body.brand-stewaro.telephone-reception-page .tr-section.alt{
+ background:#173126!important;color:#f1f3ef!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-section.alt :is(h2,.tr-lead){color:#f1f3ef!important}
+html body.brand-stewaro.telephone-reception-page .tr-section.alt .tr-kicker{color:#ecd49a!important}
+html body.brand-stewaro.telephone-reception-page :is(.tr-card,.tr-risk-card,.tr-calm-note){
+ background:#fffdf9!important;color:#173126!important;border-color:rgba(23,49,38,.18)!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-card :is(p,li){color:#4f5c53!important}
+html body.brand-stewaro.telephone-reception-page .tr-calm-note strong{color:#173126!important}
+html body.brand-stewaro.telephone-reception-page .tr-agent-card h3{color:#f1f3ef!important}

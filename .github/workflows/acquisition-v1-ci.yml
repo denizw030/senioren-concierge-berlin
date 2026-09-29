@@ -330,7 +330,7 @@ jobs:
           mkdir -p /tmp/story-e2e-visual
           CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
           test -n "$CHROME"
-          npm install --no-save --ignore-scripts --package-lock=false playwright@1.56.1
+          npm install --no-save --ignore-scripts --package-lock=false playwright@1.56.1 axe-core@4.10.3
           CHROME_PATH="$CHROME" node --input-type=module - <<'NODE'
           import { chromium } from 'playwright';
           import fs from 'node:fs';
@@ -403,7 +403,7 @@ jobs:
           family=re.sub(r'<section class="family-managed-detail"[\s\S]*?</section>','',family,count=1)
           family=re.sub(r'<article class="card wide access-panel"[\s\S]*?</article>','',family)
           def shell(body,title):
-            return f'''<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title>{links}{styles}</head><body class="account-premium-ui" data-product="prime"><main><section class="section account-section"><div class="wrap">{body}</div></section></main><script>
+            return f'''<!doctype html><html lang="de" data-nw-portal-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title>{links}{styles}</head><body class="account-premium-ui nw-portal-light" data-product="prime"><main><section class="section account-section"><div class="wrap">{body}</div></section></main><script>
             addEventListener("load",()=>{{requestAnimationFrame(()=>{{
               const bad=[...document.querySelectorAll("button:not(.account-tab),.card,.family-owner-person,.account-tabs-shell")].filter(el=>{{const cs=getComputedStyle(el);return cs.display!=="none"&&cs.visibility!=="hidden"&&el.getClientRects().length>0;}}).filter(el=>{{const r=el.getBoundingClientRect();return r.left<-1||r.right>innerWidth+1||r.width<1;}});
               document.documentElement.dataset.overflow=(document.documentElement.scrollWidth<=innerWidth+1&&bad.length===0)?"none":"present";
@@ -501,6 +501,32 @@ jobs:
               --exit || failures=$((failures+1))
           done
           test "$failures" -eq 0
+
+      - name: Mobile accessibility at actual viewports
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser)"
+          CHROME_PATH="$CHROME" node --input-type=module - <<'NODE'
+          import {chromium} from 'playwright';
+          import {createRequire} from 'node:module';
+          const require=createRequire(import.meta.url);
+          const browser=await chromium.launch({executablePath:process.env.CHROME_PATH,args:['--no-sandbox']});
+          const pages=['de/index.html','prime-concierge/index.html','safety.html','registrieren.html','angehoerige.html','leistungen.html','pakete.html','telefonannahme/index.html','__email-account-a11y.html','__family-owner-a11y.html','__account-premium-access.html'];
+          const failed=[];
+          try {
+            for(const width of [390,360]) for(const route of pages){
+              const page=await browser.newPage({viewport:{width,height:1000}});
+              await page.goto('http://127.0.0.1:4173/'+route,{waitUntil:'load'});
+              await page.addScriptTag({path:require.resolve('axe-core/axe.min.js')});
+              const result=await page.evaluate(async()=>({width:innerWidth,result:await axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}})}));
+              const violations=result.result.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))}));
+              console.log('MOBILE_AXE',width,route,JSON.stringify(violations));
+              if(result.width!==width||violations.length)failed.push({width,route,violations});
+              await page.close();
+            }
+          }finally{await browser.close();}
+          if(failed.length)throw Error('Mobile accessibility gate: '+JSON.stringify(failed));
+          NODE
+
       - name: Lighthouse desktop
         run: |
           npx --yes lighthouse@13.4.1 http://127.0.0.1:4173/de/index.html \
