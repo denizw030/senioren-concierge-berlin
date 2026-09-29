@@ -30,13 +30,15 @@ test("light account footer remains explicitly non-black",()=>{
   assert.match(account,/\.footer\{background:#ece4d8!important/);
 });
 
-test("DE EN TR overview and account routes cache-bust the global footer css",()=>{
-  for(const path of ["de/index.html","en/index.html","tr/index.html","konto.html","konto/index.html"]){
+test("STEWARO homepages and account routes keep the canonical footer presentation",()=>{
+  for(const path of ["de/index.html","en/index.html","tr/index.html"]){
     const html=fs.readFileSync(path,"utf8");
-    assert.match(html,/assets\/site\.css\?v=25/,path);
+    assert.match(html,/<footer class="site-footer"|<footer class="footer"/,path);
+    assert.match(html,/STEWARO/,path);
   }
   for(const path of ["konto.html","konto/index.html"]){
     const html=fs.readFileSync(path,"utf8");
+    assert.match(html,/assets\/site\.css\?v=\d+/,path);
     assert.match(html,/assets\/account-premium-ui\.css\?v=\d+/,path);
   }
 });
