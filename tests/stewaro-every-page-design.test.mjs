@@ -104,3 +104,52 @@ test("STEWARO senior and about surfaces keep FIDEL as the single concierge ident
     assert.doesNotMatch(visible,/NAHWERK|Nahwerk|Hartmut|Alexander|Nilo|Mira|ODYSX/);
   }
 });
+
+
+test("Gate 1 keeps public STEWARO identity on FIDEL and Klienten terminology", () => {
+  const registration=fs.readFileSync("registrieren.html","utf8");
+  assert.match(registration,/Ich bin FIDEL/);
+  assert.doesNotMatch(registration,/Ich bin Lena oder Mira/);
+
+  const account=fs.readFileSync("konto.html","utf8");
+  assert.match(account,/Klientenbereich/);
+  assert.match(account,/FIDEL · Stimme Konrad/);
+  assert.match(account,/FIDEL · Stimme Alexander/);
+  assert.doesNotMatch(account,/const conciergeNames = \{ nilo: "Nilo"/);
+
+  for (const file of ["email-concierge.html","payg.html"]) {
+    assert.doesNotMatch(fs.readFileSync(file,"utf8"),/Kundenkonto/);
+  }
+  for (const file of ["safety.html","concierge-anpassen.html","kontakt.html"]) {
+    assert.doesNotMatch(fs.readFileSync(file,"utf8"),/Kundenbereich/);
+  }
+  assert.doesNotMatch(fs.readFileSync("kontakt.html","utf8"),/Kundenservice|Bestehende Kunden|bereits Kunde/);
+
+  const phone=fs.readFileSync("telefonannahme.html","utf8");
+  assert.match(phone,/FIDEL am Telefon/);
+  assert.match(phone,/FIDEL Stimme/);
+  assert.doesNotMatch(phone,/Deine Telefonagenten|Wähle die Persönlichkeit/);
+
+  const web=fs.readFileSync("web-concierge.html","utf8");
+  assert.match(web,/<title>FIDEL \| STEWARO<\/title>/);
+  assert.match(web,/id="webConciergeTitle">FIDEL</);
+  assert.match(web,/data-fidel-orb/);
+
+  const app=fs.readFileSync("app-live.html","utf8");
+  assert.match(app,/<title>FIDEL Live \| STEWARO<\/title>/);
+  assert.match(app,/FIDEL wird vorbereitet/);
+
+  for (const file of ["senioren-concierge.html","prime-concierge.html"]) {
+    assert.match(fs.readFileSync(file,"utf8"),/stewaro-icon\.svg/);
+    assert.doesNotMatch(fs.readFileSync(file,"utf8"),/nahwerk-concierge-gold-transparent\.svg/);
+  }
+
+  for (const file of ["en/senioren-concierge.html","tr/senioren-concierge.html"]) {
+    const visible=fs.readFileSync(file,"utf8")
+      .replace(/<script[\s\S]*?<\/script>/gi," ")
+      .replace(/<style[\s\S]*?<\/style>/gi," ")
+      .replace(/<[^>]+>/g," ");
+    assert.match(visible,/FIDEL/);
+    assert.doesNotMatch(visible,/NAHWERK|Hartmut|Alexander/);
+  }
+});
