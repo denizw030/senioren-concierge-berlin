@@ -876,3 +876,7 @@ html[data-nw-portal-theme="light"] body.account-premium-ui .family-owner-panel .
 html[data-nw-portal-theme="light"] body.account-premium-ui :is(.family-owner-person-meta,.family-owner-person-state-copy){
  color:#4f5c53!important;opacity:1!important;
 }
+
+html[data-nw-portal-theme="light"] body.account-premium-ui .family-owner-person-meta span{
+ color:#4f5c53!important;opacity:1!important;
+}
