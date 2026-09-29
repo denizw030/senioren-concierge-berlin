@@ -391,7 +391,7 @@ jobs:
           def shell(body,title):
             return f'''<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title>{links}{styles}</head><body class="account-premium-ui" data-product="prime"><main><section class="section account-section"><div class="wrap">{body}</div></section></main><script>
             addEventListener("load",()=>{{requestAnimationFrame(()=>{{
-              const bad=[...document.querySelectorAll("button:not(.account-tab),.card,.family-owner-person,.account-tabs-shell")].filter(el=>{{const r=el.getBoundingClientRect();return r.left<-1||r.right>innerWidth+1||r.width<1;}});
+              const bad=[...document.querySelectorAll("button:not(.account-tab),.card,.family-owner-person,.account-tabs-shell")].filter(el=>{{const cs=getComputedStyle(el);return cs.display!=="none"&&cs.visibility!=="hidden"&&el.getClientRects().length>0;}}).filter(el=>{{const r=el.getBoundingClientRect();return r.left<-1||r.right>innerWidth+1||r.width<1;}});
               document.documentElement.dataset.overflow=(document.documentElement.scrollWidth<=innerWidth+1&&bad.length===0)?"none":"present";
               document.documentElement.dataset.overflowDetails=JSON.stringify(bad.map(el=>{{const r=el.getBoundingClientRect();return {{id:el.id,classes:el.className,left:r.left,right:r.right,width:r.width}};}}));
               document.documentElement.dataset.viewportWidth=String(innerWidth);
@@ -408,15 +408,35 @@ jobs:
           mkdir -p /tmp/account-premium-visual
           CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
           test -n "$CHROME"
-          for width in 1440 1280 1024 768 390 360; do
-            for view in overview access; do
-              url="http://127.0.0.1:4173/__account-premium-$view.html"
-              "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --window-size="$width,1100" --virtual-time-budget=1200 --dump-dom "$url" > "/tmp/account-$view-$width.html"
-              grep -q 'data-visual-ready="true"' "/tmp/account-$view-$width.html"
-              grep -q 'data-overflow="none"' "/tmp/account-$view-$width.html" || { python3 -c 'import sys,re; s=open(sys.argv[1]).read(); print("ACCOUNT_LAYOUT_FAILURE",sys.argv[1],re.search(r"<html[^>]*>",s).group(0))' "/tmp/account-$view-$width.html"; exit 1; }
-              "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --window-size="$width,1100" --virtual-time-budget=1200 --screenshot="/tmp/account-premium-visual/$view-$width.png" "$url" >/dev/null
-            done
-          done
+          npm install --no-save --ignore-scripts --package-lock=false playwright@1.56.1
+          CHROME_PATH="$CHROME" node --input-type=module - <<'NODE'
+          import { chromium } from 'playwright';
+          import fs from 'node:fs';
+          const browser=await chromium.launch({executablePath:process.env.CHROME_PATH,headless:true,args:['--no-sandbox']});
+          try {
+            for(const width of [1440,1280,1024,768,390,360]){
+              for(const view of ['overview','access']){
+                const page=await browser.newPage({viewport:{width,height:1100},deviceScaleFactor:1});
+                await page.goto('http://127.0.0.1:4173/__account-premium-'+view+'.html',{waitUntil:'load'});
+                await page.waitForFunction(()=>document.documentElement.dataset.visualReady==='true');
+                const layout=await page.evaluate(()=>({
+                  viewport:innerWidth,documentWidth:document.documentElement.scrollWidth,
+                  overflow:document.documentElement.dataset.overflow,
+                  details:document.documentElement.dataset.overflowDetails,
+                  mainWidth:document.querySelector('main').getBoundingClientRect().width,
+                  visibleCards:[...document.querySelectorAll('.summary-card')].filter(el=>el.getClientRects().length>0).length
+                }));
+                fs.writeFileSync('/tmp/account-'+view+'-'+width+'.html',await page.content());
+                await page.screenshot({path:'/tmp/account-premium-visual/'+view+'-'+width+'.png',fullPage:true});
+                console.log('ACCOUNT_LAYOUT',width,view,JSON.stringify(layout));
+                if(layout.viewport!==width||layout.mainWidth<1||layout.overflow!=='none'||(view==='overview'&&layout.visibleCards!==4)){
+                  throw Error('Account layout gate failed at actual viewport '+width+' / '+view);
+                }
+                await page.close();
+              }
+            }
+          } finally { await browser.close(); }
+          NODE
           grep -q "Hülya Cimen" /tmp/account-access-390.html
           grep -q "Mutter" /tmp/account-access-390.html
           grep -q "Türkisch" /tmp/account-access-390.html
