@@ -257,12 +257,12 @@ jobs:
           from pathlib import Path
           Path("__story-browser-e2e.html").write_text(r'''<!doctype html>
           <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-          <title>NAHWERK Story Browser Gate</title>
+          <title>STEWARO Story Browser Gate</title>
           <style>html,body{margin:0;width:100%;height:100%;overflow:hidden}iframe{display:block;width:100vw;height:100vh;border:0}</style>
           </head><body><iframe id="target" title="Website preview"></iframe><script>
           (() => {
             const params=new URLSearchParams(location.search);
-            const page=params.get("page")||"index.html";
+            const page=params.get("page")||"de/index.html";
             const frame=document.getElementById("target");
             frame.src="/"+page;
             frame.addEventListener("load",()=>{
@@ -299,9 +299,9 @@ jobs:
                   return !controlName(el);
                 });
                 let order=true;
-                if(page==="index.html"){
-                  const steps=[...doc.querySelectorAll("[data-story-step]")].map(el=>el.dataset.storyStep).join(",");
-                  order=steps==="1,2,3,4,5,6";
+                if(page==="de/index.html"){
+                  const markers=[...doc.querySelectorAll("main > section")].map(section=>section.querySelector("h1,h2")?.id||section.id||"").join(",");
+                  order=markers==="hero-title,for-you,care-title,leaf-title,precision-title,services-title,how-title,audience-title,trust-title,contact-title";
                 }
                 let telephoneReveal=true;
                 if(page==="telefonannahme.html"){
@@ -331,8 +331,8 @@ jobs:
           CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
           test -n "$CHROME"
           for width in 1440 1024 768 390; do
-            for page in index.html prime-concierge.html safety.html angehoerige.html telefonannahme.html; do
-              key="$(printf '%s' "$page" | tr '.-' '__')-$width"
+            for page in de/index.html prime-concierge.html safety.html angehoerige.html telefonannahme.html; do
+              key="$(printf '%s' "$page" | tr './-' '___')-$width"
               url="http://127.0.0.1:4173/__story-browser-e2e.html?page=$page"
               "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --window-size="$width,1100" --virtual-time-budget=3500 --dump-dom "$url" > "/tmp/story-$key.html"
               grep -q 'data-story-e2e="green"' "/tmp/story-$key.html" || { cat "/tmp/story-$key.html"; exit 1; }
