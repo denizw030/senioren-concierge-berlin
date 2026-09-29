@@ -3,47 +3,35 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const root = process.cwd();
-const read = p => fs.readFileSync(path.join(root, p), 'utf8');
+const root=process.cwd();
+const read=p=>fs.readFileSync(path.join(root,p),'utf8');
+const visible=html=>html.replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' ').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
 
-test('English defaults to Lukas with English voice and Turkish defaults to Leyla with Turkish voice', () => {
-  const js = read('assets/concierge-locale-defaults.js');
-  assert.match(js, /en:\s*\{\s*concierge:\s*'lukas',\s*voiceLanguage:\s*'en'\s*\}/);
-  assert.match(js, /tr:\s*\{\s*concierge:\s*'leyla',\s*voiceLanguage:\s*'tr'\s*\}/);
-  assert.match(js, /root\.dataset\.selected\s*=\s*defaults\.concierge/);
-  assert.match(js, /select\.value\s*=\s*desired/);
-  assert.match(js, /dispatchEvent\(new Event\('change'/);
-  assert.ok(fs.existsSync(path.join(root, 'assets/voice/samples/lukas-en.mp3')));
-  assert.ok(fs.existsSync(path.join(root, 'assets/voice/samples/leyla-tr.mp3')));
-});
-
-test('every page with a concierge carousel loads locale defaults before the carousel runtime', () => {
-  const walk = dir => fs.readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
-    const full = path.join(dir, entry.name);
-    return entry.isDirectory() ? walk(full) : [full];
-  });
-  for (const full of walk(root).filter(p => p.endsWith('.html') && !p.includes(`${path.sep}.git${path.sep}`))) {
-    const html = fs.readFileSync(full, 'utf8');
-    if (!html.includes('data-concierge-carousel') || !html.includes('concierge-carousel.js')) continue;
-    const defaultsAt = html.indexOf('/assets/concierge-locale-defaults.js?v=1');
-    const carouselAt = html.indexOf('concierge-carousel.js');
-    assert.ok(defaultsAt >= 0, `${path.relative(root, full)} is missing locale defaults runtime`);
-    assert.ok(carouselAt >= 0 && defaultsAt < carouselAt, `${path.relative(root, full)} loads locale defaults too late`);
-  }
-});
-
-test('localized source markup uses a valid fallback while locale runtime owns the final default', () => {
-  const catalog = read('assets/concierge-carousel.js');
-  for (const dir of ['en', 'tr']) {
-    for (const file of fs.readdirSync(path.join(root, dir)).filter(name => name.endsWith('.html'))) {
-      const html = read(`${dir}/${file}`);
-      if (!html.includes('data-concierge-carousel')) continue;
-      const selections = [...html.matchAll(/data-selected=["']([^"']+)["']/g)].map(match => match[1]);
-      assert.ok(selections.length > 0, `${dir}/${file} has no selected concierge`);
-      for (const value of selections) assert.ok(catalog.includes(`["${value}",`), `${dir}/${file} has unknown concierge ${value}`);
-      const defaultsAt = html.indexOf('/assets/concierge-locale-defaults.js?v=1');
-      const carouselAt = html.indexOf('concierge-carousel.js');
-      assert.ok(defaultsAt >= 0 && defaultsAt < carouselAt, `${dir}/${file} must let locale defaults run before carousel hydration`);
+test('STEWARO launch uses one FIDEL identity instead of locale-specific concierge personas',()=>{
+  for(const lang of ['en','tr']){
+    for(const page of ['prime-concierge.html','senioren-concierge.html']){
+      const html=read(`${lang}/${page}`);
+      assert.match(visible(html),/FIDEL/,`${lang}/${page}`);
+      assert.doesNotMatch(html,/<script[^>]+concierge-carousel\.js|<link[^>]+concierge-carousel\.css/,`${lang}/${page}`);
+      assert.doesNotMatch(visible(html),/Lukas|Leyla|Hartmut|Frida|Nilo|Mira/,`${lang}/${page}`);
     }
   }
+});
+
+test('fixed FIDEL product pages no longer load locale persona-default hydration',()=>{
+  for(const file of [
+    'prime-concierge.html','senioren-concierge.html',
+    'en/prime-concierge.html','en/senioren-concierge.html',
+    'tr/prime-concierge.html','tr/senioren-concierge.html'
+  ]){
+    const html=read(file);
+    assert.doesNotMatch(html,/concierge-locale-defaults\.js|concierge-carousel\.js/);
+  }
+});
+
+test('legacy locale-default asset remains non-authoritative compatibility code only',()=>{
+  const js=read('assets/concierge-locale-defaults.js');
+  assert.match(js,/en:/);
+  assert.match(js,/tr:/);
+  for(const file of ['de/index.html','en/index.html','tr/index.html']) assert.doesNotMatch(read(file),/concierge-locale-defaults\.js/);
 });
