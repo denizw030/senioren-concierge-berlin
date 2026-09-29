@@ -18,8 +18,8 @@
       limits:"FREE: bis zu 50 App-Dialoge / Monat · bis zu 20 WhatsApp-Dialoge / Monat · 1 echte Concierge-Ausführung.",
       twoTitle:"Aufgabe übergeben",
       twoBody:"Zum Beispiel einen Hautarzt finden, passende Optionen vergleichen oder den nächsten Schritt organisieren lassen.",
-      threeTitle:"STEWARO bleibt dran",
-      threeBody:"STEWARO recherchiert, organisiert, fragt bei nötigen Entscheidungen nach und meldet Ergebnis oder nächsten Schritt zurück."
+      threeTitle:"FIDEL bleibt dran",
+      threeBody:"FIDEL recherchiert, organisiert, fragt bei nötigen Entscheidungen nach und meldet Ergebnis oder nächsten Schritt zurück."
     },
     en:{
       aria:"Three steps to get started for free",
@@ -28,8 +28,8 @@
       limits:"FREE: up to 50 app conversations / month · up to 20 WhatsApp conversations / month · 1 real Concierge execution.",
       twoTitle:"Hand over a task",
       twoBody:"For example, find a dermatologist, compare suitable options or have the next step organised.",
-      threeTitle:"STEWARO stays on it",
-      threeBody:"STEWARO researches, organises, asks for approval when a decision is needed and reports back with the result or next step."
+      threeTitle:"FIDEL stays on it",
+      threeBody:"FIDEL researches, organises, asks for approval when a decision is needed and reports back with the result or next step."
     },
     tr:{
       aria:"Ücretsiz başlangıç için üç adım",
@@ -38,8 +38,8 @@
       limits:"FREE: ayda en fazla 50 uygulama görüşmesi · ayda en fazla 20 WhatsApp görüşmesi · 1 gerçek Concierge işlemi.",
       twoTitle:"Bir görev verin",
       twoBody:"Örneğin bir dermatolog bulun, uygun seçenekleri karşılaştırın veya sonraki adımı organize ettirin.",
-      threeTitle:"STEWARO takipte kalır",
-      threeBody:"STEWARO araştırır, organize eder, gerekli kararlarda onay ister ve sonucu ya da sonraki adımı size bildirir."
+      threeTitle:"FIDEL takipte kalır",
+      threeBody:"FIDEL araştırır, organize eder, gerekli kararlarda onay ister ve sonucu ya da sonraki adımı size bildirir."
     }
   };
   const journeyCopy=JOURNEY_COPY[locale]||JOURNEY_COPY.de;
