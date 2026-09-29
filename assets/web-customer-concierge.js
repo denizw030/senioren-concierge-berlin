@@ -878,7 +878,7 @@
     if(!force&&signature===sidebarRenderSignature&&box.childElementCount>0)return false;
     sidebarRenderSignature=signature;
     box.dataset.nwSidebarRenderer="single-writer-v5";
-    box.dataset.nwSidebarClient="56";
+    box.dataset.nwSidebarClient=String(WEB_CONCIERGE_CLIENT_VERSION);
     clearNode(box);
     if(!list.length){
       const e=document.createElement("div");e.className="web-concierge-threads-empty";e.textContent="Noch keine gespeicherten Chats.";box.appendChild(e);return true;
