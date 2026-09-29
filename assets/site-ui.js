@@ -1005,9 +1005,9 @@
 (() => {
   const normalizedPath = (location.pathname.replace(/\/+$/, '') || '/').toLowerCase();
   const localeByPath = {
-    '/de': { language: 'de-DE', serviceUrl: 'https://nahwerkconcierge.com/prime-concierge', serviceName: 'Persönlicher STEWARO Concierge' },
-    '/en': { language: 'en-GB', serviceUrl: 'https://nahwerkconcierge.com/en/prime-concierge', serviceName: 'STEWARO Personal Concierge' },
-    '/tr': { language: 'tr-TR', serviceUrl: 'https://nahwerkconcierge.com/tr/prime-concierge', serviceName: 'STEWARO Kişisel Concierge' }
+    '/de': { language: 'de-DE', serviceUrl: 'https://stewaro.com/prime-concierge', serviceName: 'Persönlicher STEWARO Concierge' },
+    '/en': { language: 'en-GB', serviceUrl: 'https://stewaro.com/en/prime-concierge', serviceName: 'STEWARO Personal Concierge' },
+    '/tr': { language: 'tr-TR', serviceUrl: 'https://stewaro.com/tr/prime-concierge', serviceName: 'STEWARO Kişisel Concierge' }
   };
   const locale = localeByPath[normalizedPath];
   if (!locale) return;
@@ -1018,9 +1018,9 @@
     '@graph': [
       {
         '@type': 'Organization',
-        '@id': 'https://nahwerkconcierge.com/#organization',
+        '@id': 'https://stewaro.com/#organization',
         name: 'STEWARO',
-        url: 'https://nahwerkconcierge.com/',
+        url: 'https://stewaro.com/',
         logo: {
           '@type': 'ImageObject',
           url: 'https://stewaro.com/assets/logos/stewaro-icon.svg'
@@ -1028,29 +1028,29 @@
       },
       {
         '@type': 'WebSite',
-        '@id': 'https://nahwerkconcierge.com/#website',
-        url: 'https://nahwerkconcierge.com/',
+        '@id': 'https://stewaro.com/#website',
+        url: 'https://stewaro.com/',
         name: 'STEWARO',
         inLanguage: locale.language,
-        publisher: { '@id': 'https://nahwerkconcierge.com/#organization' }
+        publisher: { '@id': 'https://stewaro.com/#organization' }
       },
       {
         '@type': 'Service',
-        '@id': 'https://nahwerkconcierge.com/#personal-concierge',
+        '@id': 'https://stewaro.com/#personal-concierge',
         name: locale.serviceName,
         serviceType: 'Personal Concierge',
         url: locale.serviceUrl,
-        provider: { '@id': 'https://nahwerkconcierge.com/#organization' }
+        provider: { '@id': 'https://stewaro.com/#organization' }
       },
       {
         '@type': 'SoftwareApplication',
-        '@id': 'https://nahwerkconcierge.com/#software',
+        '@id': 'https://stewaro.com/#software',
         name: 'STEWARO',
         applicationCategory: 'LifestyleApplication',
         operatingSystem: 'Web, iOS, Android',
         url: locale.serviceUrl,
         inLanguage: locale.language,
-        provider: { '@id': 'https://nahwerkconcierge.com/#organization' }
+        provider: { '@id': 'https://stewaro.com/#organization' }
       }
     ]
   };
@@ -1378,9 +1378,9 @@
 (() => {
   const BRAND = "STEWARO";
   const replaceBrand = (value) => String(value ?? "")
-    .replace(/NAHWERK Concierge/g, BRAND)
+    .replace(/STEWARO/g, BRAND)
     .replace(/Nahwerk Concierge/g, BRAND)
-    .replace(/NAHWERK/g, BRAND)
+    .replace(/STEWARO/g, BRAND)
     .replace(/Nahwerk/g, BRAND);
 
   let applying = false;
@@ -1433,7 +1433,7 @@
       if (document.title) document.title = replaceBrand(document.title);
       document.querySelectorAll('meta[name="description"],meta[property="og:title"],meta[property="og:description"]').forEach((meta) => {
         const value = meta.getAttribute("content");
-        if (value && /NAHWERK|Nahwerk/.test(value)) meta.setAttribute("content", replaceBrand(value));
+        if (value && /STEWARO|Nahwerk/.test(value)) meta.setAttribute("content", replaceBrand(value));
       });
 
       document.querySelectorAll("header.top .brand,.footer .brand").forEach((brand) => {
@@ -1494,7 +1494,7 @@
           const node = walker.currentNode;
           const parent = node.parentElement;
           if (!parent || /^(SCRIPT|STYLE|NOSCRIPT|CODE|PRE|TEXTAREA)$/i.test(parent.tagName)) continue;
-          if (/NAHWERK|Nahwerk/.test(node.nodeValue || "")) nodes.push(node);
+          if (/STEWARO|Nahwerk/.test(node.nodeValue || "")) nodes.push(node);
         }
         nodes.forEach((node) => { node.nodeValue = replaceBrand(node.nodeValue); });
       }
@@ -1502,7 +1502,7 @@
       document.querySelectorAll("[aria-label],[title],[alt]").forEach((element) => {
         ["aria-label","title","alt"].forEach((name) => {
           const value = element.getAttribute(name);
-          if (value && /NAHWERK|Nahwerk/.test(value)) element.setAttribute(name, replaceBrand(value));
+          if (value && /STEWARO|Nahwerk/.test(value)) element.setAttribute(name, replaceBrand(value));
         });
       });
     } finally {
