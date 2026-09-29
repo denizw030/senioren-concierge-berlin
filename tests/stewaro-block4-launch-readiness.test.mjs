@@ -3,7 +3,8 @@ import fs from "node:fs";
 import test from "node:test";
 
 const read = (path) => fs.readFileSync(new URL("../" + path, import.meta.url), "utf8");
-const CURRENT_PROD = "https://nahwerkconcierge.com";
+const CURRENT_PROD_HOST = "nahwerkconcierge.com";
+const STEWARO_CANDIDATE = "https://stewaro.com";
 
 test("Block 4 keeps pricing and Family ready for STEWARO", () => {
   const pricing = read("pakete.html");
@@ -40,12 +41,12 @@ test("Block 4 legal customer surfaces use STEWARO presentation", () => {
   }
 });
 
-test("Block 4 does not perform SEO or production cutover early", () => {
-  assert.equal(read("CNAME").trim(), "nahwerkconcierge.com");
-  assert.ok(read("robots.txt").includes(`Sitemap: ${CURRENT_PROD}/sitemap.xml`));
-  assert.ok(read("sitemap.xml").includes(`<loc>${CURRENT_PROD}/de/</loc>`));
+test("Block 4 prepares STEWARO SEO without performing the public DNS cutover", () => {
+  assert.equal(read("CNAME").trim(), CURRENT_PROD_HOST);
+  assert.ok(read("robots.txt").includes(`Sitemap: ${STEWARO_CANDIDATE}/sitemap.xml`));
+  assert.ok(read("sitemap.xml").includes(`<loc>${STEWARO_CANDIDATE}/de/</loc>`));
 
   for (const path of ["pakete.html", "angehoerige.html", "impressum.html", "datenschutz/index.html", "nutzungsbedingungen/index.html"]) {
-    assert.ok(read(path).includes(CURRENT_PROD), `${path} must keep current production SEO authority before cutover`);
+    assert.ok(read(path).includes(STEWARO_CANDIDATE), `${path} must be prepared for the STEWARO candidate domain`);
   }
 });
