@@ -51,7 +51,7 @@ test('legacy Web Concierge Shadow path is removed; account helper only reads cen
 test('PAYG customer surface uses only canonical PROD functions and no mocks or staging', () => {
   const payg = read('payg.html');
   const runtime = read('assets/payg-account.js');
-  assert.match(payg, /Kundenkonto · PAYG/);
+  assert.match(payg, /STEWARO-Konto · PAYG/);
   assert.match(payg, /assets\/payg-account\.js/);
   assert.match(payg, /id="paygActivate"/);
   assert.match(payg, /id="paymentManage"/);
