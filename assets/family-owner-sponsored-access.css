@@ -8,3 +8,27 @@
 body.senior-product .family-owner-form,body.senior-product .family-owner-person,body.senior-product .family-owner-field input,body.senior-product .family-owner-field select,body.senior-product .family-owner-field textarea,body.senior-product .family-quota-field input,body[data-product="senioren"] .family-owner-form,body[data-product="senioren"] .family-owner-person,body[data-product="senioren"] .family-owner-field input,body[data-product="senioren"] .family-owner-field select,body[data-product="senioren"] .family-owner-field textarea,body[data-product="senioren"] .family-quota-field input{background:rgba(255,255,255,.72);color:#181713;border-color:rgba(42,35,23,.18)}
 @media(max-width:900px){.family-owner-person{align-items:flex-start;display:grid}.family-owner-row-actions{justify-content:flex-start}.family-quota-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:680px){.family-owner-head,.family-owner-toolbar,.family-managed-detail-head{display:grid}.family-owner-grid,.family-quota-grid{grid-template-columns:1fr}.family-owner-field.is-wide{grid-column:auto}.family-owner-actions,.family-owner-row-actions{display:grid}.family-owner-actions .btn,.family-owner-row-actions .btn{width:100%}.family-usage-row{display:grid}.family-usage-row span{text-align:left}}
+
+/* Mobile containment hardening: keep Family/Access content inside narrow client viewports. */
+.family-owner-panel,
+.family-owner-head,
+.family-owner-toolbar,
+.family-owner-person,
+.family-owner-person-main,
+.family-owner-person-copy,
+.family-owner-row-actions,
+.family-managed-detail,
+.family-managed-detail-head{min-width:0;box-sizing:border-box}
+.family-owner-status,
+.family-owner-person-copy,
+.family-owner-person-copy strong,
+.family-owner-person-meta,
+.family-owner-person-state-copy,
+.family-owner-note{overflow-wrap:anywhere;word-break:break-word}
+@media(max-width:680px){
+  .family-owner-panel,
+  .family-owner-person,
+  .family-managed-detail{width:100%;max-width:100%;overflow:hidden}
+  .family-owner-status{max-width:100%}
+  .family-owner-row-actions .btn{max-width:100%;box-sizing:border-box;white-space:normal}
+}
