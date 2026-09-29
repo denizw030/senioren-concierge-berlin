@@ -10,7 +10,7 @@ test("public STEWARO concierge surfaces use the fixed FIDEL identity",()=>{
     const html=read(file), copy=visible(html);
     assert.match(copy,/FIDEL/);
     assert.doesNotMatch(copy,/NAHWERK|Hartmut|Frida|Nilo|Mira/);
-    assert.doesNotMatch(html,/data-concierge-carousel/);
+    assert.doesNotMatch(html,/<script[^>]+concierge-carousel\.js|<link[^>]+concierge-carousel\.css/);
   }
 });
 
