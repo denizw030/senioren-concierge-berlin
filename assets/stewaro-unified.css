@@ -859,3 +859,20 @@ html body.brand-stewaro.telephone-reception-page :is(.tr-card,.tr-risk-card,.tr-
 html body.brand-stewaro.telephone-reception-page .tr-card :is(p,li){color:#4f5c53!important}
 html body.brand-stewaro.telephone-reception-page .tr-calm-note strong{color:#173126!important}
 html body.brand-stewaro.telephone-reception-page .tr-agent-card h3{color:#f1f3ef!important}
+
+/* Sponsored access remains legible in the actual light portal theme. */
+html[data-nw-portal-theme="light"] body.account-premium-ui .family-owner-person{
+ background:#fffdf9!important;background-image:none!important;color:#173126!important;
+}
+html[data-nw-portal-theme="light"] body.account-premium-ui .family-owner-person-copy strong{
+ color:#173126!important;opacity:1!important;
+}
+html[data-nw-portal-theme="light"] body.account-premium-ui :is(.family-owner-status,.family-owner-person-status){
+ background:#f4eddf!important;background-image:none!important;color:#674919!important;opacity:1!important;
+}
+html[data-nw-portal-theme="light"] body.account-premium-ui .family-owner-panel .btn.red{
+ background:#f4eddf!important;background-image:none!important;color:#674919!important;opacity:1!important;
+}
+html[data-nw-portal-theme="light"] body.account-premium-ui :is(.family-owner-person-meta,.family-owner-person-state-copy){
+ color:#4f5c53!important;opacity:1!important;
+}
