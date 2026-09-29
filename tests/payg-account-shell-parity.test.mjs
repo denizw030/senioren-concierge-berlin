@@ -32,7 +32,7 @@ test("PAYG exposes the same header concierge source and canonical footer structu
   assert.match(payg, /assets\/web-concierge-chat\.js\?v=3/);
   assert.match(payg, /assets\/account-header-concierge\.js\?v=1/);
   assert.match(payg, /<div class="footergrid">/);
-  assert.match(payg, /<span class="brandtext"><strong>NAHWERK<\/strong><span>CONCIERGE<\/span><\/span>/);
+  assert.match(payg, /<span class="brandtext"><strong>STEWARO<\\/strong><span>CONCIERGE<\/span><\/span>/);
   assert.match(payg, /<div class="footbottom">/);
 });
 
