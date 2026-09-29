@@ -119,7 +119,10 @@ jobs:
           src=Path("konto.html").read_text(encoding="utf-8")
           tab=re.search(r'<button[^>]+id="accountTabAccess"[\s\S]*?</button>',src,re.I).group(0)
           start=src.index('<div id="familyOwnerPanelSlot"')
-          end=src.index('<article class="card summary-card plan-summary"',start)
+          end=min(pos for pos in [
+            src.find('<article class="card summary-card status-summary"',start),
+            src.find('<article class="card summary-card plan-summary"',start)
+          ] if pos >= 0)
           panel=src[start:end]
           fixture='''<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Family Pages Smoke</title></head><body>'''
           fixture+=tab+panel
@@ -130,7 +133,7 @@ jobs:
             const nativeFetch=window.fetch.bind(window);
             const state=window.__familyPagesSmoke={primary404:false,staticConfig:false,context:false,providerWrite:false};
             sessionStorage.setItem("scb_web_session",JSON.stringify({session_token:"r".repeat(40)}));
-            window.NAHWERK_CONCIERGES=[{key:"nilo",name:"Nilo"}];
+            window.NAHWERK_CONCIERGES=[{key:"fidel",name:"FIDEL"}];
             window.fetch=async(input,init={})=>{
               const raw=typeof input==="string"?input:input.url;
               const url=new URL(raw,location.href);
@@ -230,7 +233,10 @@ jobs:
           style=re.search(r"<style>[\s\S]*?</style>",src,re.I).group(0)
           links="\n".join(re.findall(r'<link[^>]+rel="stylesheet"[^>]*>',src,re.I))
           start=src.index('<div id="familyOwnerPanelSlot"')
-          end=src.index('<article class="card summary-card plan-summary"',start)
+          end=min(pos for pos in [
+            src.find('<article class="card summary-card status-summary"',start),
+            src.find('<article class="card summary-card plan-summary"',start)
+          ] if pos >= 0)
           panel=src[start:end]
           panel=re.sub(r'\s+hidden(?=[^>]*>)','',panel,count=4)
           fixture=f'''<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Personen & Zugänge | NAHWERK</title>{links}{style}</head><body><main><section class="section account-section"><div class="wrap"><h1>Kundenbereich</h1><h2>Personen & Zugänge</h2><div class="dash">{panel}</div></div></section></main></body></html>'''
@@ -251,12 +257,12 @@ jobs:
           from pathlib import Path
           Path("__story-browser-e2e.html").write_text(r'''<!doctype html>
           <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-          <title>NAHWERK Story Browser Gate</title>
+          <title>STEWARO Story Browser Gate</title>
           <style>html,body{margin:0;width:100%;height:100%;overflow:hidden}iframe{display:block;width:100vw;height:100vh;border:0}</style>
           </head><body><iframe id="target" title="Website preview"></iframe><script>
           (() => {
             const params=new URLSearchParams(location.search);
-            const page=params.get("page")||"index.html";
+            const page=params.get("page")||"de/index.html";
             const frame=document.getElementById("target");
             frame.src="/"+page;
             frame.addEventListener("load",()=>{
@@ -293,9 +299,9 @@ jobs:
                   return !controlName(el);
                 });
                 let order=true;
-                if(page==="index.html"){
-                  const steps=[...doc.querySelectorAll("[data-story-step]")].map(el=>el.dataset.storyStep).join(",");
-                  order=steps==="1,2,3,4,5,6";
+                if(page==="de/index.html"){
+                  const markers=[...doc.querySelectorAll("main > section")].map(section=>section.querySelector("h1,h2")?.id||section.id||"").join(",");
+                  order=markers==="hero-title,for-you,care-title,leaf-title,precision-title,services-title,how-title,audience-title,trust-title,contact-title";
                 }
                 let telephoneReveal=true;
                 if(page==="telefonannahme.html"){
@@ -325,8 +331,8 @@ jobs:
           CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
           test -n "$CHROME"
           for width in 1440 1024 768 390; do
-            for page in index.html prime-concierge.html safety.html angehoerige.html telefonannahme.html; do
-              key="$(printf '%s' "$page" | tr '.-' '__')-$width"
+            for page in de/index.html prime-concierge.html safety.html angehoerige.html telefonannahme.html; do
+              key="$(printf '%s' "$page" | tr './-' '___')-$width"
               url="http://127.0.0.1:4173/__story-browser-e2e.html?page=$page"
               "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --window-size="$width,1100" --virtual-time-budget=3500 --dump-dom "$url" > "/tmp/story-$key.html"
               grep -q 'data-story-e2e="green"' "/tmp/story-$key.html" || { cat "/tmp/story-$key.html"; exit 1; }
@@ -349,17 +355,22 @@ jobs:
           src=Path("konto.html").read_text(encoding="utf-8")
           links="\n".join(re.findall(r'<link[^>]+rel="stylesheet"[^>]*>',src,re.I))
           styles="\n".join(re.findall(r'<style[^>]*>[\s\S]*?</style>',src,re.I))
-          tabs=re.search(r'<div class="account-tabs-shell">[\s\S]*?</nav>\s*</div>',src,re.I).group(0)
+          tabs_start=src.index('<div class="account-tabs-shell">')
+          tabs_end=src.index('<div class="dash">',tabs_start)
+          tabs=src[tabs_start:tabs_end]
           setup=re.search(r'<div class="account-setup-by"[\s\S]*?</div>',src,re.I).group(0)
           summaries=[]
           for klass in ["plan-summary","status-summary","customer-number-summary","person-summary"]:
-            summaries.append(re.search(r'<article class="card summary-card [^"]*'+klass+r'"[\s\S]*?</article>',src,re.I).group(0))
+            summaries.append(re.search(r'<article class="[^"]*'+klass+r'[^"]*"[\s\S]*?</article>',src,re.I).group(0))
           highlights=re.search(r'<div class="account-overview-highlights"[\s\S]*?</div>\s*<div class="account-panel-heading" data-account-panel="concierge"',src,re.I).group(0)
           highlights=highlights.rsplit('<div class="account-panel-heading"',1)[0]
           access_heading=re.search(r'<div class="account-panel-heading" data-account-panel="access"[\s\S]*?</div>\s*<article class="card wide access-panel"',src,re.I).group(0)
           access_heading=access_heading.rsplit('<article',1)[0]
           family_start=src.index('<div id="familyOwnerPanelSlot"')
-          family_end=src.index('<article class="card summary-card plan-summary"',family_start)
+          family_end=min(pos for pos in [
+            src.find('<article class="card summary-card status-summary"',family_start),
+            src.find('<article class="card summary-card plan-summary"',family_start)
+          ] if pos >= 0)
           family=src[family_start:family_end]
           family=re.sub(r'\s+hidden(?=[^>]*>)','',family)
           family=family.replace('Berechtigung wird serverseitig geprüft.','OWNER bestätigt · Personen und Kontingente autorisiert')
@@ -367,7 +378,7 @@ jobs:
             '''<div class="family-owner-person" data-family-state="MESSAGE_PENDING">
               <div class="family-owner-person-main">
                 <div class="family-owner-person-headline">
-                  <div class="family-owner-person-copy"><strong>Hülya Cimen</strong><div class="family-owner-person-meta"><span>Mutter</span><span>Türkisch</span><span>Leyla</span></div></div>
+                  <div class="family-owner-person-copy"><strong>Hülya Cimen</strong><div class="family-owner-person-meta"><span>Mutter</span><span>Türkisch</span><span>FIDEL</span></div></div>
                   <span class="family-owner-person-status">Versand wird vorbereitet</span>
                 </div>
                 <p class="family-owner-person-state-copy">Einladung wird für WhatsApp vorbereitet.</p>
@@ -406,7 +417,7 @@ jobs:
           grep -q "Hülya Cimen" /tmp/account-access-390.html
           grep -q "Mutter" /tmp/account-access-390.html
           grep -q "Türkisch" /tmp/account-access-390.html
-          grep -q "Leyla" /tmp/account-access-390.html
+          grep -q "FIDEL" /tmp/account-access-390.html
           grep -q "Versand wird vorbereitet" /tmp/account-access-390.html
           echo "ACCOUNT PREMIUM VISUAL E2E GREEN"
       - uses: actions/upload-artifact@v4

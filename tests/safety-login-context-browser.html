@@ -8,7 +8,7 @@
 </head>
 <body>
   <div id="status" role="status">RUNNING</div>
-  <iframe id="target" title="NAHWERK context test"></iframe>
+  <iframe id="target" title="STEWARO context test"></iframe>
   <script>
     (() => {
       const frame = document.getElementById("target");
@@ -63,14 +63,14 @@
 
       async function run() {
         let doc = await open("/safety.html", null);
-        let links = [...doc.querySelectorAll("a")].filter((a) => a.textContent.trim() === "Zum Kundenbereich");
-        assert(links.length === 2, "fresh Safety: expected two customer-area links");
+        let links = [...doc.querySelectorAll("a")].filter((a) => a.textContent.trim() === "Zum Klientenbereich");
+        assert(links.length === 2, "fresh Safety: expected two client-area links");
         doc = await clickAndWait(links[links.length - 1]);
         assertAccountEntry(doc, "fresh Safety");
 
         doc = await open("/safety.html", "senioren");
-        links = [...doc.querySelectorAll("a")].filter((a) => a.textContent.trim() === "Zum Kundenbereich");
-        assert(links.length === 2, "stale Senior Safety: expected two customer-area links");
+        links = [...doc.querySelectorAll("a")].filter((a) => a.textContent.trim() === "Zum Klientenbereich");
+        assert(links.length === 2, "stale Senior Safety: expected two client-area links");
         doc = await clickAndWait(links[links.length - 1]);
         assertAccountEntry(doc, "stale Senior Safety");
 
