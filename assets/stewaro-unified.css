@@ -832,3 +832,10 @@ html body.brand-stewaro.pricing-page .package-card :is(.package-price,.package-u
 html body.brand-stewaro.pricing-page .package-card .status-pill{
   color:#674919!important;background:#efe8dd!important;opacity:1!important;
 }
+
+html body.brand-stewaro:not(.account-premium-ui):not(.web-concierge-page):not(.login-image-page) main>.section :is(h1,h2,h3){
+  color:#173126!important;
+}
+html body.brand-stewaro:not(.account-premium-ui):not(.web-concierge-page):not(.login-image-page) main>.section :is(.eyebrow,.section-kicker){
+  color:#76531b!important;
+}
