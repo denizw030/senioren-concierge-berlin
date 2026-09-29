@@ -4,8 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
   <script id="nw-theme-first-paint">(()=>{const r=document.documentElement,p=location.pathname;let t=null;try{t=localStorage.getItem("nw_portal_theme_v1")}catch(_){}if(t!=="light"&&t!=="dark")t=/(?:senioren-concierge|angehoerige)(?:\.html)?\/?$/.test(p)?"light":"dark";r.dataset.nwPortalTheme=t;r.classList.add("nw-theme-first-paint");r.style.backgroundColor=t==="light"?"#f7f3ea":"#030405";r.style.colorScheme=t;const s=document.createElement("style");s.id="nw-theme-first-paint-style";s.textContent='html.nw-theme-first-paint body{visibility:hidden!important}';document.head.appendChild(s);const done=()=>{r.classList.remove("nw-theme-first-paint");r.style.removeProperty("background-color");r.style.removeProperty("color-scheme")};addEventListener("DOMContentLoaded",done,{once:true});setTimeout(done,1800)})();</script>
-    <title>Kundenbereich | STEWARO</title>
-    <meta name="description" content="Persönlicher STEWARO-Kundenbereich für Tarif, Nutzung, Concierge- und Sicherheitseinstellungen." />
+    <title>Klientenbereich | STEWARO</title>
+    <meta name="description" content="Persönlicher STEWARO-Klientenbereich für Tarif, Nutzung, Concierge- und Sicherheitseinstellungen." />
     <link rel="stylesheet" href="assets/site.css?v=25" />
     <link rel="stylesheet" href="assets/email-account-integration.css?v=3" />
     <link rel="stylesheet" href="assets/email-provider-logo-connect-v3.css?v=20260922-1" />
@@ -2349,7 +2349,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
             <div class="actions" style="margin-top:12px"><a class="btn light" id="managedConciergeLink" href="concierge-anpassen">Concierge-Einstellungen dieser Person</a></div>
           </div>
           <div class="account-tabs-shell">
-            <nav class="account-tabs account-tabs-modern" role="tablist" aria-label="Kundenbereich">
+            <nav class="account-tabs account-tabs-modern" role="tablist" aria-label="Klientenbereich">
               <button class="account-tab" type="button" role="tab" id="accountTabOverview" aria-controls="accountPanelOverview" aria-selected="true" data-account-tab="overview"><span class="account-tab-icon account-tab-vector-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4.5 11.2 12 5l7.5 6.2"></path><path d="M6.5 10.4V19h11v-8.6"></path></svg></span><span>Übersicht</span></button>
               <button class="account-tab" type="button" role="tab" id="accountTabConcierge" aria-controls="accountPanelConcierge" aria-selected="false" data-account-tab="concierge"><span class="account-tab-icon account-tab-concierge-logo" aria-hidden="true"></span><span>Concierge</span></button>
               <button class="account-tab" type="button" role="tab" id="accountTabEmail" aria-controls="accountEmailCard" aria-selected="false" data-account-tab="email"><span class="account-tab-icon account-tab-vector-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="6.5" width="16" height="11" rx="1.5"></rect><path d="m5 8 7 5.5L19 8"></path></svg></span><span>E-Mail</span></button>
@@ -2534,7 +2534,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
                             <p class="muted" id="planMeta">Tarifdaten werden sicher geladen …</p>
                           </article>
               <article class="account-overview-link customer-number-summary" data-account-panel="overview">
-                            <div class="eyebrow">Kundennummer</div>
+                            <div class="eyebrow">Klientennummer</div>
                             <div class="value" id="customerNumber">Wird geladen …</div>
                             <p class="muted">Diese Nummer kannst du zur sicheren Verknüpfung deines Telefonzugangs verwenden.</p>
                           </article>
@@ -2548,7 +2548,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
                             <div class="owner-product-gap-shortcut-head">
                               <div>
                                 <div class="eyebrow">Produktentwicklung</div>
-                                <h3>Kundenwünsche & Produktlücken</h3>
+                                <h3>Klientenwünsche & Produktlücken</h3>
                               </div>
                               <span class="owner-product-gap-badge" id="ownerProductGapBadge">0 neu</span>
                             </div>
@@ -2679,8 +2679,8 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
                   <label class="reception-field">
                     <span>Telefon-Concierge</span>
                     <select id="receptionPersona">
-                      <option value="konrad">Konrad</option>
-                      <option value="james">Alexander</option>
+                      <option value="konrad">FIDEL · Stimme Konrad</option>
+                      <option value="james">FIDEL · Stimme Alexander</option>
                     </select>
                   </label>
                   <label class="reception-field">
@@ -2759,7 +2759,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
               <div class="recommend" id="recommendation">
                 <strong>Monatlicher Neustart</strong><br /><span class="muted"
                   >Die Dialogkontingente werden zu Beginn jedes Kalendermonats
-                  automatisch zurückgesetzt. Allgemeine Kundenservice- und
+                  automatisch zurückgesetzt. Allgemeine Klientenservice- und
                   Accountfragen belasten das Dialogkontingent nicht.</span
                 >
               </div>
@@ -3139,7 +3139,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
                 <div class="safety-summary-item"><span>Nächste Sicherheitsabfrage</span><strong id="safetySummaryNext">–</strong></div>
                 <div class="safety-summary-item"><span>Sicherheitsabfragen</span><strong id="safetySummaryTimes">–</strong></div>
                 <div class="safety-summary-item"><span>Antwortfrist</span><strong id="safetySummaryResponse">–</strong></div>
-                <div class="safety-summary-item"><span>Telefonische Prüfung</span><strong id="safetySummaryCalls">Bis zu 2 Kundenanrufe</strong></div>
+                <div class="safety-summary-item"><span>Telefonische Prüfung</span><strong id="safetySummaryCalls">Bis zu 2 Anrufe bei Ihnen</strong></div>
                 <div class="safety-summary-item"><span>Sicherheitskontakte</span><strong id="safetySummaryContacts">–</strong></div>
                 <div class="safety-summary-item"><span>Eskalation</span><strong id="safetySummaryEscalation">–</strong></div>
               </div>
@@ -3184,7 +3184,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
                       </div>
                     </label>
                     <label class="safety-field" for="safetyEmergencyDelay">
-                      <span>Nach erfolglosen Kundenanrufen warten</span>
+                      <span>Nach erfolglosen Anrufen warten</span>
                       <div class="safety-number-field">
                         <input id="safetyEmergencyDelay" type="number" min="1" max="60" step="1" value="3" inputmode="numeric" />
                         <span>Minuten</span>
@@ -3192,7 +3192,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
                     </label>
                   </div>
                   <div class="safety-call-rule">
-                    <strong>Kundenanruf</strong>
+                    <strong>Anruf bei Ihnen</strong>
                     <span>Wenn keine WhatsApp-Bestätigung vorliegt, versucht dein KI-Concierge, dich bis zu zweimal telefonisch zu erreichen. Jeder Versuch klingelt höchstens 20 Sekunden. Erst nach dem zweiten erfolglosen Versuch beginnt die Wartezeit zum Sicherheitskontakt.</span>
                   </div>
                 </section>
@@ -4399,7 +4399,7 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
             const enrollmentRequired = body?.enrollment_required === true;
             mfaStatus.textContent = enrollmentRequired ? "Erforderlich · Noch nicht aktiviert" : "Empfohlen · Noch nicht aktiviert";
             mfaMeta.textContent = enrollmentRequired
-              ? "Für diesen neuen Zugang muss jetzt die Authenticator-App eingerichtet werden. Erst danach ist der Kundenbereich vollständig freigeschaltet. SMS kann später optional ergänzt werden."
+              ? "Für diesen neuen Zugang muss jetzt die Authenticator-App eingerichtet werden. Erst danach ist der Klientenbereich vollständig freigeschaltet. SMS kann später optional ergänzt werden."
               : "Die Authenticator-App ist der empfohlene Standard. SMS wird nur als zusätzliche Alternative angeboten, wenn eine geeignete Mobilnummer sicher hinterlegt ist.";
             mfaEnableButton.hidden = false;
             mfaEnableButton.textContent = enrollmentRequired ? "Jetzt einrichten" : "Kontoschutz einrichten";
@@ -5412,11 +5412,11 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
             if (safetySummaryNext) safetySummaryNext.textContent = next || "Noch nicht geplant";
             if (safetySummaryTimes) safetySummaryTimes.textContent = times.length ? times.join(" · ") : "Keine Uhrzeit gespeichert";
             if (safetySummaryResponse) safetySummaryResponse.textContent = customerDelay + " Minuten";
-            if (safetySummaryCalls) safetySummaryCalls.textContent = "Bis zu 2 Kundenanrufe · je max. 20 Sekunden";
+            if (safetySummaryCalls) safetySummaryCalls.textContent = "Bis zu 2 Anrufe bei Ihnen · je max. 20 Sekunden";
             if (safetySummaryContacts) safetySummaryContacts.textContent = savedContactCount + (savedContactCount === 1 ? " Kontakt hinterlegt" : " Kontakte hinterlegt");
-            if (safetySummaryEscalation) safetySummaryEscalation.textContent = emergencyDelay + " Minuten nach dem 2. erfolglosen Kundenanruf";
+            if (safetySummaryEscalation) safetySummaryEscalation.textContent = emergencyDelay + " Minuten nach dem 2. erfolglosen Anruf bei Ihnen";
           }
-          if (safetyChainEscalation) safetyChainEscalation.textContent = "Bleiben beide Kundenanrufe ohne sichere persönliche Erreichbarkeit, wartet STEWARO " + emergencyDelay + " Minuten und beginnt anschließend mit Ihren Sicherheitskontakten.";
+          if (safetyChainEscalation) safetyChainEscalation.textContent = "Bleiben beide Anruf bei Ihnene ohne sichere persönliche Erreichbarkeit, wartet STEWARO " + emergencyDelay + " Minuten und beginnt anschließend mit Ihren Sicherheitskontakten.";
           const overviewSafety = document.getElementById("overviewSafety");
           const overviewSafetyMeta = document.getElementById("overviewSafetyMeta");
           if (overviewSafety) overviewSafety.textContent = enabled ? "Aktiviert" : "Deaktiviert";
@@ -5915,9 +5915,9 @@ body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,
             // A named Concierge may be rendered from onboarding data only before authentication.
             const selected = d.concierge_choice || d.conciergeChoice;
             if (selected && !sessionToken()) {
-              const conciergeNames = { nilo: "Nilo", mira: "Mira", lena: "Lena", lukas: "Lukas", zuri: "Zuri", jabari: "Jabari", sofia: "Sofia" };
+              const conciergeNames = { nilo: "FIDEL", mira: "FIDEL", lena: "FIDEL", lukas: "FIDEL", zuri: "FIDEL", jabari: "FIDEL", sofia: "FIDEL" };
               const key = String(selected).toLowerCase();
-              const conciergeName = conciergeNames[key] || String(selected).trim().replace(/[-_]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+              const conciergeName = conciergeNames[key] || "FIDEL";
               document.querySelector(".personalize .value").textContent = `${conciergeName} ist Ihr persönlicher KI-Concierge.`;
               const overviewConcierge = document.getElementById("overviewConcierge");
               if (overviewConcierge) overviewConcierge.textContent = conciergeName;
