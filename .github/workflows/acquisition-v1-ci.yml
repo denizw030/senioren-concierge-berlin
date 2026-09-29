@@ -475,6 +475,23 @@ jobs:
           set +a
           test -x "$CHROMEDRIVER_TEST_PATH"
           pages=(index.html prime-concierge.html safety.html registrieren.html angehoerige.html leistungen.html pakete.html telefonannahme.html __email-account-a11y.html __family-owner-a11y.html)
+          CHROME_PATH="$CHROME" node --input-type=module - <<'NODE'
+          import {chromium} from 'playwright';
+          const browser=await chromium.launch({executablePath:process.env.CHROME_PATH,args:['--no-sandbox']});
+          try {
+            for(const route of ['prime-concierge.html','angehoerige.html','leistungen.html','pakete.html']){
+              const page=await browser.newPage();
+              await page.goto('http://127.0.0.1:4173/'+route);
+              const colors=await page.evaluate(()=>[...document.querySelectorAll('.nw-language-button span,.footergrid,.footergrid p,.lead,.status-pill,.story-channel-label span,.whatsapp-label')].slice(0,35).map(el=>{
+                let node=el;const chain=[];
+                for(let i=0;node&&i<5;i++,node=node.parentElement){const c=getComputedStyle(node);chain.push({tag:node.tagName,cls:node.className,color:c.color,bg:c.backgroundColor,image:c.backgroundImage,opacity:c.opacity});}
+                return {text:el.textContent.slice(0,60),chain};
+              }));
+              console.log('CONTRAST_DIAGNOSTIC',route,JSON.stringify(colors));
+              await page.close();
+            }
+          }finally{await browser.close();}
+          NODE
           failures=0
           for page in "${pages[@]}"; do
             echo "AXE $page"
