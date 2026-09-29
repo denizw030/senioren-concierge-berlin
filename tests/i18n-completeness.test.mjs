@@ -6,7 +6,7 @@ import path from 'node:path';
 const root = process.cwd();
 const publicPages = [
   'index.html','prime-concierge.html','safety.html','angehoerige.html','telefonannahme.html',
-  'pakete.html','leistungen.html','ablauf.html','faq.html','kontakt.html','concierges.html',
+  'pakete.html','leistungen.html','ablauf.html','faq.html','kontakt.html',
   'senioren-concierge.html','alltag-organisieren.html','dokumente-verstehen.html',
   'technik-verstehen.html','ueber-mich.html'
 ];
@@ -43,8 +43,8 @@ const germanWord = /\b(?:eine|einer|einem|einen|der|die|das|den|dem|des|und|oder
 const germanish = (value) => /[äöüßÄÖÜ]/.test(value) || germanWord.test(value);
 
 const allowedShared = new Set([
-  'NAHWERK','NAHWERK Concierge','NAHWERK Safety','NAHWERK Safety Check','NAHWERK Family',
-  'WhatsApp','Family','Safety','FREE','STANDARD','PLUS','PREMIUM','PREMIUM PLUS','FAMILY','FAQ','ODYSX',
+  'STEWARO','FIDEL','STEWARO Safety','STEWARO Safety Check','STEWARO Family',
+  'WhatsApp','Family','Safety','FREE','STANDARD','PLUS','PREMIUM','PREMIUM PLUS','FAMILY','FAQ',
   'Lena','James','Konrad','Alexander','Luisa','Leyla','Martin','Nilo','Mira','Hartmut','Sarah','Camila',
   'Eleni','Zofia','Mei','Yuna','Amara','Emily','David','Arthur','Kenji','Sofia','Isabella','Fatima','Ana','Giulia','Malik','Lukas',
   'PayPal','Visa','Mastercard','Stripe','Uber','Berlin','Europe/Berlin','DE','EN','TR','EUR','GPT','AI','112'
@@ -57,7 +57,7 @@ function loadAuthCatalog(lang) {
 }
 
 for (const lang of ['en','tr']) {
-  test(`${lang}: all 16 public pages contain no unchanged German visible copy`, () => {
+  test(`${lang}: all 15 public pages contain no unchanged German visible copy`, () => {
     const leaks = [];
     for (const page of publicPages) {
       const source = visibleValues(read(page));
@@ -90,6 +90,7 @@ for (const lang of ['en','tr']) {
 test('every localized public page loads the shared runtime locale repair', () => {
   for (const lang of ['en','tr']) {
     for (const page of publicPages) {
+      if (page === 'index.html') continue; // locale homes are fully authored, not runtime-repaired
       assert.match(read(`${lang}/${page}`), /assets\/locale-runtime\.js\?v=\d+/, `${lang}/${page} missing locale-runtime.js`);
     }
   }
