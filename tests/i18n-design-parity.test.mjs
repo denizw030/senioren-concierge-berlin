@@ -76,7 +76,7 @@ for (const page of pages) {
     for (const lang of ['en', 'tr']) {
       const locale = read(`${lang}/${page}`);
       assert.doesNotMatch(locale, /international\.css/i, `${lang}/${page} must not use a separate locale design stylesheet`);
-      assert.match(locale, /class=["'][^"']*nahwerk-mark[^"']*["']/, `${lang}/${page} must use the current NAHWERK logo mark`);
+      assert.match(locale, /STEWARO|stewaro-icon\.svg/i, `${lang}/${page} must keep the canonical STEWARO identity`);
       assert.deepEqual(stylesheetRefs(locale), stylesheetRefs(de), `${lang}/${page} stylesheet stack changed`);
       assert.deepEqual(scriptRefs(locale), scriptRefs(de), `${lang}/${page} script stack changed`);
       assert.deepEqual(imageRefs(locale), imageRefs(de), `${lang}/${page} visual assets changed`);
