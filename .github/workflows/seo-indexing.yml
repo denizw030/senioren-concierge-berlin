@@ -59,7 +59,7 @@ jobs:
 
 
   stewaro-seo-transition:
-    if: ${{ github.head_ref == 'feature/stewaro-shared-base-brand-shell-20260927' || github.ref_name == 'feature/stewaro-shared-base-brand-shell-20260927' }}
+    if: ${{ github.head_ref == 'feature/stewaro-shared-base-brand-shell-20260927' || github.ref_name == 'feature/stewaro-shared-base-brand-shell-20260927' || github.head_ref == 'fix/stewaro-launch-mobile-overflow-20260929' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -73,11 +73,11 @@ jobs:
             tests/seo-indexing.test.mjs \
             tests/stewaro-shared-base-brand-shell.test.mjs \
             tests/stewaro-runtime-surfaces-v1.test.mjs
-      - name: Confirm production indexing authority is unchanged
+      - name: Confirm approved canonical host while production DNS authority is unchanged
         shell: bash
         run: |
           set -euo pipefail
           test "$(tr -d '\r\n' < CNAME)" = "nahwerkconcierge.com"
-          grep -q 'https://nahwerkconcierge.com/de/' de/index.html
-          grep -q 'Sitemap: https://nahwerkconcierge.com/sitemap.xml' robots.txt
+          grep -q 'https://stewaro.com/de/' de/index.html
+          grep -q 'Sitemap: https://stewaro.com/sitemap.xml' robots.txt
           echo "STEWARO_SEO_TRANSITION=GREEN"

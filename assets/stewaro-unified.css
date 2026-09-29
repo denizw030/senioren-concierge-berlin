@@ -783,3 +783,100 @@ html body a[href="/concierges/"],
 html body a[href$="/concierges"]{
   display:none!important;
 }
+
+/* Launch accessibility: match text to the shared cream/forest surfaces. */
+html body .top .nw-language-button span{color:#314139!important;opacity:1!important}
+html body:not(.account-premium-ui):not(.web-concierge-page) .lead{color:#4f5c53!important}
+html body .story-section:not(.story-final){background:#f7f3eb!important}
+html body .story-section:not(.story-final) :is(h2,h3,strong){color:#173126!important}
+html body .story-section:not(.story-final) :is(p,.story-lead){color:#4f5c53!important}
+html body .story-section:not(.story-final) .story-kicker{color:#76531b!important}
+html body .story-section .story-principle>span{color:#76531b!important}
+html body .story-section :is(.story-compact-item,.story-principle) :is(strong,p){color:#173126!important}
+html body.story-site .footer.story-page-footer{
+  background:#173126!important;background-image:none!important;color:#f1f3ef!important;
+}
+html body.story-site .footer.story-page-footer :is(h3,p,a,span){color:#f1f3ef!important;opacity:1!important}
+html body.pricing-page .package-card.featured :is(.package-price,.package-usage){color:#173126!important;opacity:1!important}
+html body.pricing-page .status-pill{background:#efe8dd!important;color:#674919!important;opacity:1!important}
+html body .tr-proof{background:#efe8dd!important;color:#173126!important}
+html body .tr-proof strong{color:#173126!important}
+
+/* Brand scope outranks the retained legacy public theme layers. */
+html body.brand-stewaro:not(.account-premium-ui):not(.web-concierge-page):not(.login-image-page) .top{
+  background:#fffdf9!important;background-image:none!important;color:#173126!important;
+}
+html body.brand-stewaro:not(.account-premium-ui):not(.web-concierge-page) .nw-language-button{
+  background:#fffdf9!important;color:#314139!important;
+}
+html body.brand-stewaro:not(.account-premium-ui):not(.web-concierge-page):not(.login-image-page) main>.section,
+html body.brand-stewaro:not(.account-premium-ui):not(.web-concierge-page):not(.login-image-page) main>.section.alt{
+  background:#f7f3eb!important;background-image:none!important;color:#173126!important;
+}
+html body.brand-stewaro:not(.account-premium-ui):not(.web-concierge-page) :is(.card,.package-card){
+  background:#fffdf9!important;background-image:none!important;color:#173126!important;
+}
+html body.brand-stewaro:not(.account-premium-ui):not(.web-concierge-page) :is(.lead,.card p,.card li){
+  color:#4f5c53!important;opacity:1!important;
+}
+html body.brand-stewaro.story-site .story-channel-label span{color:#76531b!important}
+html body.brand-stewaro.story-site.nw-family-page .footer.story-page-footer{
+  background:#173126!important;background-image:none!important;color:#f1f3ef!important;
+}
+html body.brand-stewaro.story-site.nw-family-page .footer.story-page-footer :is(h3,p,a,span){
+  color:#f1f3ef!important;opacity:1!important;
+}
+html body.brand-stewaro.pricing-page .package-card :is(.package-price,.package-usage,.whatsapp-label){
+  color:#173126!important;opacity:1!important;
+}
+html body.brand-stewaro.pricing-page .package-card .status-pill{
+  color:#674919!important;background:#efe8dd!important;opacity:1!important;
+}
+
+html body.brand-stewaro:not(.account-premium-ui):not(.web-concierge-page):not(.login-image-page) main>.section :is(h1,h2,h3){
+  color:#173126!important;
+}
+html body.brand-stewaro:not(.account-premium-ui):not(.web-concierge-page):not(.login-image-page) main>.section :is(.eyebrow,.section-kicker){
+  color:#76531b!important;
+}
+
+/* Telephone public sections use explicit paired surfaces at every viewport. */
+html body.brand-stewaro.telephone-reception-page .tr-hero,
+html body.brand-stewaro.telephone-reception-page .tr-section{
+ background:#f7f3eb!important;background-image:none!important;color:#173126!important;
+}
+html body.brand-stewaro.telephone-reception-page :is(.tr-hero,.tr-section) :is(h1,h2,h3){color:#173126!important}
+html body.brand-stewaro.telephone-reception-page :is(.tr-hero p,.tr-lead,.tr-risk-card p,.tr-calm-note span){color:#4f5c53!important;opacity:1!important}
+html body.brand-stewaro.telephone-reception-page .tr-kicker{color:#76531b!important}
+html body.brand-stewaro.telephone-reception-page .tr-section.alt{
+ background:#173126!important;color:#f1f3ef!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-section.alt :is(h2,.tr-lead){color:#f1f3ef!important}
+html body.brand-stewaro.telephone-reception-page .tr-section.alt .tr-kicker{color:#ecd49a!important}
+html body.brand-stewaro.telephone-reception-page :is(.tr-card,.tr-risk-card,.tr-calm-note){
+ background:#fffdf9!important;color:#173126!important;border-color:rgba(23,49,38,.18)!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-card :is(p,li){color:#4f5c53!important}
+html body.brand-stewaro.telephone-reception-page .tr-calm-note strong{color:#173126!important}
+html body.brand-stewaro.telephone-reception-page .tr-agent-card h3{color:#f1f3ef!important}
+
+/* Sponsored access remains legible in the actual light portal theme. */
+html[data-nw-portal-theme="light"] body.account-premium-ui .family-owner-person{
+ background:#fffdf9!important;background-image:none!important;color:#173126!important;
+}
+html[data-nw-portal-theme="light"] body.account-premium-ui .family-owner-person-copy strong{
+ color:#173126!important;opacity:1!important;
+}
+html[data-nw-portal-theme="light"] body.account-premium-ui :is(.family-owner-status,.family-owner-person-status){
+ background:#f4eddf!important;background-image:none!important;color:#674919!important;opacity:1!important;
+}
+html[data-nw-portal-theme="light"] body.account-premium-ui .family-owner-panel .btn.red{
+ background:#f4eddf!important;background-image:none!important;color:#674919!important;opacity:1!important;
+}
+html[data-nw-portal-theme="light"] body.account-premium-ui :is(.family-owner-person-meta,.family-owner-person-state-copy){
+ color:#4f5c53!important;opacity:1!important;
+}
+
+html[data-nw-portal-theme="light"] body.account-premium-ui .family-owner-person-meta span{
+ color:#4f5c53!important;opacity:1!important;
+}
