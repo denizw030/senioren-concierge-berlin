@@ -23,4 +23,4 @@ Disallow: /docs/
 Disallow: /scripts/
 Disallow: /tests/
 
-Sitemap: https://nahwerkconcierge.com/sitemap.xml
+Sitemap: https://stewaro.com/sitemap.xml
