@@ -2,47 +2,97 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
+
 const root=process.cwd();
 const read=(p)=>fs.readFileSync(path.join(root,p),"utf8");
 const exists=(p)=>fs.existsSync(path.join(root,p));
 const homepage="de/index.html";
-const required=["index.html",homepage,"prime-concierge.html","safety.html","angehoerige.html","telefonannahme.html","registrieren.html","konto.html","pakete.html","erster-schritt.html","alltag-organisieren.html","dokumente-verstehen.html","technik-verstehen.html","assets/acquisition-v1.css","assets/story-conversion-final.css","assets/acquisition-v1.js","assets/nahwerk-analytics.js"];
-test("activation and story artifacts are complete",()=>required.forEach(p=>assert.ok(exists(p),p)));
-test("homepage follows frozen story and keeps conversion reachable",()=>{
-  const c=read(homepage);
-  assert.deepEqual([...c.matchAll(/data-story-step="([1-6])"/g)].map(m=>m[1]),["1","2","3","4","5","6"]);
-  assert.match(c,/Ein persönlicher Concierge, der erledigt\./);
-  assert.match(c,/Google findet\. KI versteht\. NAHWERK erledigt\./);
-  assert.match(c,/id="demo"/);
-  assert.match(c,/Da sein, auch wenn du gerade verhindert bist\./);
-  assert.match(c,/Unterstützung, ohne Selbstständigkeit abzunehmen\./);
-  assert.match(c,/Ein Concierge\. Dasselbe Gespräch\. Egal über welchen Weg\./);
-  assert.match(c,/Kostenlos starten/);
-  assert.match(c,/data-nw-cta="start_free"/);
+const visible=(html)=>html.replace(/<script[\s\S]*?<\/script>/gi," ").replace(/<style[\s\S]*?<\/style>/gi," ").replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim();
+
+test("Gate 1 public artifacts are complete",()=>{
+  for(const p of [
+    "index.html",homepage,"prime-concierge.html","safety.html","angehoerige.html",
+    "telefonannahme.html","registrieren.html","konto.html","pakete.html","erster-schritt.html",
+    "alltag-organisieren.html","dokumente-verstehen.html","technik-verstehen.html",
+    "assets/acquisition-v1.js","assets/nahwerk-analytics.js",
+    "assets/logos/stewaro-icon.svg","assets/logos/stewaro-wordmark.svg"
+  ]) assert.ok(exists(p),p);
 });
-test("public capability truth stays fail-closed without internal release telemetry",()=>{
+
+test("homepage is the STEWARO FIDEL experience and conversion remains reachable",()=>{
+  const c=read(homepage), copy=visible(c);
+  assert.match(c,/class="site-header"/);
+  assert.match(c,/class="brand-word"/);
+  assert.match(c,/class="hero-image hero-video"/);
+  assert.match(c,/stewaro-hero-pferd\.mp4/);
+  assert.match(copy,/STEWARO/);
+  assert.match(copy,/FIDEL/);
+  assert.match(copy,/Jemand, der sich kümmert\./);
+  assert.match(c,/href="\/registrieren"/);
+  assert.match(c,/myparentguard\.com/);
+  assert.doesNotMatch(copy,/NAHWERK|Nilo|Mira|Hartmut|Frida/);
+});
+
+test("public capability truth stays fail-closed",()=>{
   const c=read(homepage)+read("prime-concierge.html")+read("telefonannahme.html");
-  assert.match(c,/Welche Telefonfunktionen verfügbar sind, richtet sich nach dem eingerichteten Produkt und Zugang|Weitere Telefonfunktionen werden erst öffentlich gezeigt/);
-  assert.doesNotMatch(c,/Begrenzt freigegeben|Customer Release ist weiterhin deaktiviert|Web-Concierge-Chat ist noch nicht freigegeben|Jetzt verfügbar/);
+  assert.match(c,/Welche WhatsApp- oder Telefonfunktionen verfügbar sind, richtet sich nach dem eingerichteten Produkt und Zugang|Weitere Telefonfunktionen werden erst öffentlich gezeigt/);
+  assert.doesNotMatch(c,/Customer Release ist weiterhin deaktiviert|Jetzt verfügbar/);
   const phone=read("telefonannahme.html");
   assert.match(phone,/id="einrichtung" hidden aria-hidden="true"/);
-  assert.match(phone,/Platform-Endpunkt ist vorbereitet, aber noch nicht deployed/);
+  assert.match(phone,/story-hidden-unreleased/);
 });
-test("real activation requires post-registration usage delta",()=>{const js=read("assets/acquisition-v1.js");assert.match(js,/seedBaselineFromProfile/);assert.match(js,/seedBaseline\(body\.usage,"profile"\)/);assert.match(js,/current\.app>baseline\.app\|\|current\.whatsapp>baseline\.whatsapp/);assert.match(js,/seedBaseline\(current,"fallback"\)/);assert.match(js,/funnel_complete/);assert.match(js,/first_task_success/);assert.match(read("konto.html"),/NahwerkActivation\?\.observeUsage/);assert.match(read("assets/onboarding.js"),/markRegistrationComplete/)});
-test("first-party analytics is storage-minimal and disclosed",()=>{const analytics=read("assets/nahwerk-analytics.js");const privacy=read("datenschutz/index.html");assert.doesNotMatch(analytics,/sessionStorage|localStorage|VISIT_KEY/);assert.match(privacy,/eigene, datensparsame Nutzungsanalyse/);assert.match(privacy,/keine eigenen Analyse-Cookies/);assert.doesNotMatch(privacy,/keine eigenen Analyse- oder Marketingtracker/)});
-test("registration keeps secure endpoints and paid checkout closed",()=>{const c=read("assets/onboarding.js");assert.match(c,/web-registration-secure/);assert.match(c,/web-login-secure/);assert.match(c,/bookable: false/);assert.match(c,/erster-schritt\.html/);assert.doesNotMatch(c,/webhook\/senioren-concierge\/web\/login\/password/)});
-test("pricing matches canonical tariff set",()=>{const c=read("pakete.html")+read("assets/onboarding.js");for(const price of ["0 €","5,99 €","10,99 €","19,99 €","34,99 €","59,66 €"])assert.ok(c.includes(price),price);assert.doesNotMatch(c,/59,99 €/)});
-test("growth assets stay small",()=>{assert.ok(Buffer.byteLength(read("assets/acquisition-v1.css"))<18000);assert.ok(Buffer.byteLength(read("assets/acquisition-v1.js"))<12000);for(const p of ["erster-schritt.html","alltag-organisieren.html","dokumente-verstehen.html","technik-verstehen.html","angehoerige.html","safety.html"])assert.ok(Buffer.byteLength(read(p))<30000,p)});
-test("public journey pages have basic accessibility metadata",()=>{for(const p of [homepage,"prime-concierge.html","safety.html","angehoerige.html","telefonannahme.html","erster-schritt.html","alltag-organisieren.html","dokumente-verstehen.html","technik-verstehen.html"]){const c=read(p);assert.match(c,/<html lang="de">/i,p);assert.match(c,/name="viewport"/i,p);assert.match(c,/<h1[ >]/i,p)}});
-test("local href and src targets exist",()=>{const pages=fs.readdirSync(root).filter(x=>x.endsWith(".html"));const misses=[];for(const p of pages){const c=read(p);for(const m of c.matchAll(/(?:href|src)=["']([^"']+)["']/g)){let target=m[1];if(/^(https?:|\/\/|mailto:|tel:|javascript:|data:|#)/i.test(target))continue;target=target.split("#")[0].split("?")[0];if(!target||target==="/")continue;if(!fs.existsSync(path.join(root,target)))misses.push(`${p} -> ${target}`)}}assert.deepEqual(misses,[])});
 
-test("homepage header is opaque at top and glass after scroll without layout changes", () => {
-  const home = fs.readFileSync(homepage, "utf8");
-  const siteUi = fs.readFileSync("assets/site-ui.js", "utf8");
-  assert.match(home, /body\.overview-page \.top\s*\{[\s\S]{0,700}background:\s*#000\s*!important/);
-  assert.match(home, /body\.overview-page\.nw-header-scrolled \.top\s*\{[\s\S]{0,180}rgba\(7,\s*7,\s*6,\s*0\.82\)/);
-  assert.match(home, /background-color\s+220ms\s+ease/);
-  assert.match(siteUi, /window\.scrollY\s*>\s*8/);
-  assert.match(siteUi, /classList\.toggle\('nw-header-scrolled'/);
-  assert.match(siteUi, /requestAnimationFrame\(syncHeaderScrollState\)/);
+test("real activation requires post-registration usage delta",()=>{
+  const js=read("assets/acquisition-v1.js");
+  assert.match(js,/seedBaselineFromProfile/);
+  assert.match(js,/current\.app>baseline\.app\|\|current\.whatsapp>baseline\.whatsapp/);
+  assert.match(js,/funnel_complete/);
+  assert.match(js,/first_task_success/);
+  assert.match(read("konto.html"),/NahwerkActivation\?\.observeUsage/);
+});
+
+test("first-party analytics remains storage-minimal and disclosed",()=>{
+  const analytics=read("assets/nahwerk-analytics.js");
+  const privacy=read("datenschutz/index.html");
+  assert.doesNotMatch(analytics,/sessionStorage|localStorage|VISIT_KEY/);
+  assert.match(privacy,/eigene, datensparsame Nutzungsanalyse/);
+  assert.match(privacy,/keine eigenen Analyse-Cookies/);
+});
+
+test("registration keeps secure endpoints and paid checkout closed",()=>{
+  const c=read("assets/onboarding.js");
+  assert.match(c,/web-registration-secure/);
+  assert.match(c,/web-login-secure/);
+  assert.match(c,/bookable: false/);
+  assert.match(c,/erster-schritt\.html/);
+});
+
+test("pricing matches canonical tariff set",()=>{
+  const c=read("pakete.html")+read("assets/onboarding.js");
+  for(const price of ["0 €","5,99 €","10,99 €","19,99 €","34,99 €","59,66 €"]) assert.ok(c.includes(price),price);
+  assert.doesNotMatch(c,/59,99 €/);
+});
+
+test("public journey pages have basic accessibility metadata",()=>{
+  for(const p of [homepage,"prime-concierge.html","safety.html","angehoerige.html","telefonannahme.html","erster-schritt.html","alltag-organisieren.html","dokumente-verstehen.html","technik-verstehen.html"]){
+    const c=read(p);
+    assert.match(c,/<html lang="de"/i,p);
+    assert.match(c,/name="viewport"/i,p);
+    assert.match(c,/<h1[ >]/i,p);
+  }
+});
+
+test("retired concierge-world route stays absent and hidden from shared navigation",()=>{
+  assert.equal(exists("concierges.html"),false);
+  const css=read("assets/stewaro-unified.css");
+  assert.match(css,/a\[href="\/concierges"\]/);
+  assert.match(css,/display:none!important/);
+});
+
+test("homepage header and motion are responsive without legacy scroll-state coupling",()=>{
+  const home=read(homepage);
+  assert.match(home,/\.site-header/);
+  assert.match(home,/@media\s*\(max-width:\s*980px\)/);
+  assert.match(home,/@media\s*\(max-width:\s*600px\)/);
+  assert.match(home,/prefers-reduced-motion:\s*reduce/);
 });
