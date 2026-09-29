@@ -221,7 +221,7 @@ jobs:
           panel_end=src.index('<div class="account-panel-heading" data-account-panel="usage"',panel_start)
           panel=src[panel_start:panel_end].strip()
           panel=re.sub(r'\s+hidden(?=[^>]*>)','',panel,count=2)
-          fixture=f'''<!doctype html><html lang="de" data-nw-portal-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>E-Mail-Konto | STEWARO</title>{links}{style}</head><body class="account-premium-ui nw-portal-light"><main><section class="section account-section"><div class="wrap"><h1>E-Mail-Konto</h1><nav class="account-tabs" role="tablist" aria-label="Klientenbereich E-Mail">{tab}</nav><div class="dash">{panel}</div></div></section></main></body></html>'''
+          fixture=f'''<!doctype html><html lang="de" data-nw-portal-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>E-Mail-Konto | STEWARO</title>{links}{style}<link rel="stylesheet" href="/assets/stewaro-unified.css"></head><body class="account-premium-ui nw-portal-light"><main><section class="section account-section"><div class="wrap"><h1>E-Mail-Konto</h1><nav class="account-tabs" role="tablist" aria-label="Klientenbereich E-Mail">{tab}</nav><div class="dash">{panel}</div></div></section></main></body></html>'''
           Path("__email-account-a11y.html").write_text(fixture,encoding="utf-8")
           PY
       - name: Build inert family owner accessibility fixture
@@ -239,7 +239,7 @@ jobs:
           ] if pos >= 0)
           panel=src[start:end]
           panel=re.sub(r'\s+hidden(?=[^>]*>)','',panel,count=4)
-          fixture=f'''<!doctype html><html lang="de" data-nw-portal-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Personen & Zugänge | STEWARO</title>{links}{style}</head><body class="account-premium-ui nw-portal-light"><main><section class="section account-section"><div class="wrap"><h1>Klientenbereich</h1><h2>Personen & Zugänge</h2><div class="dash">{panel}</div></div></section></main></body></html>'''
+          fixture=f'''<!doctype html><html lang="de" data-nw-portal-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Personen & Zugänge | STEWARO</title>{links}{style}<link rel="stylesheet" href="/assets/stewaro-unified.css"></head><body class="account-premium-ui nw-portal-light"><main><section class="section account-section"><div class="wrap"><h1>Klientenbereich</h1><h2>Personen & Zugänge</h2><div class="dash">{panel}</div></div></section></main></body></html>'''
           Path("__family-owner-a11y.html").write_text(fixture,encoding="utf-8")
           PY
       - name: Serve preview
@@ -403,7 +403,7 @@ jobs:
           family=re.sub(r'<section class="family-managed-detail"[\s\S]*?</section>','',family,count=1)
           family=re.sub(r'<article class="card wide access-panel"[\s\S]*?</article>','',family)
           def shell(body,title):
-            return f'''<!doctype html><html lang="de" data-nw-portal-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title>{links}{styles}</head><body class="account-premium-ui nw-portal-light" data-product="prime"><main><section class="section account-section"><div class="wrap">{body}</div></section></main><script>
+            return f'''<!doctype html><html lang="de" data-nw-portal-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title>{links}{styles}<link rel="stylesheet" href="/assets/stewaro-unified.css"></head><body class="account-premium-ui nw-portal-light" data-product="prime"><main><section class="section account-section"><div class="wrap">{body}</div></section></main><script>
             addEventListener("load",()=>{{requestAnimationFrame(()=>{{
               const bad=[...document.querySelectorAll("button:not(.account-tab),.card,.family-owner-person,.account-tabs-shell")].filter(el=>{{const cs=getComputedStyle(el);return cs.display!=="none"&&cs.visibility!=="hidden"&&el.getClientRects().length>0;}}).filter(el=>{{const r=el.getBoundingClientRect();return r.left<-1||r.right>innerWidth+1||r.width<1;}});
               document.documentElement.dataset.overflow=(document.documentElement.scrollWidth<=innerWidth+1&&bad.length===0)?"none":"present";
