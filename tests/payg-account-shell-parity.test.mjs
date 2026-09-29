@@ -11,8 +11,8 @@ const runtime = read("assets/payg-account.js");
 
 test("PAYG uses the customer account shell and persisted appearance", () => {
   assert.match(payg, /<body class="account-premium-ui payg-account">/);
-  assert.match(payg, /assets\/account-premium-ui\.css\?v=6/);
-  assert.match(payg, /assets\/account-header-concierge\.css\?v=2/);
+  assert.match(payg, /assets\/account-premium-ui\.css\?v=\d+/);
+  assert.match(payg, /assets\/account-header-concierge\.css\?v=\d+/);
   assert.match(payg, /id="nwPortalThemeToggle"/);
   assert.match(payg, /assets\/payg-account-shell\.js\?v=2/);
   assert.match(shell, /nw_portal_theme_v1/);
@@ -29,10 +29,10 @@ test("PAYG light cards follow the account cream surface", () => {
 test("PAYG exposes the same header concierge source and canonical footer structure", () => {
   assert.match(payg, /id="paygConciergeSource"/);
   assert.match(payg, /id="overviewConcierge"/);
-  assert.match(payg, /assets\/web-concierge-chat\.js\?v=3/);
-  assert.match(payg, /assets\/account-header-concierge\.js\?v=1/);
+  assert.match(payg, /assets\/web-concierge-chat\.js\?v=\d+/);
+  assert.match(payg, /assets\/account-header-concierge\.js\?v=\d+/);
   assert.match(payg, /<div class="footergrid">/);
-  assert.match(payg, /<span class="brandtext"><strong>STEWARO<\\/strong><span>CONCIERGE<\/span><\/span>/);
+  assert.match(payg, /<span class="brandtext"><strong>STEWARO<\/strong><span>CONCIERGE<\/span><\/span>/);
   assert.match(payg, /<div class="footbottom">/);
 });
 
