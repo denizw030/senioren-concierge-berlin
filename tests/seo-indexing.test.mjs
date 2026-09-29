@@ -6,7 +6,7 @@ import { dirname, resolve } from 'node:path';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (path) => readFileSync(resolve(root, path), 'utf8');
-const DOMAIN = 'https://nahwerkconcierge.com';
+const DOMAIN = 'https://stewaro.com';
 
 const blocked = [
   '/anmelden', '/registrieren', '/konto', '/payg',
@@ -65,7 +65,7 @@ test('German homepage publishes Open Graph and structured-data runtime', () => {
   const runtime = read('assets/site-ui.js');
   assert.match(runtime, /data-nw-structured-data/);
   assert.match(runtime, /https:\/\/schema\.org/);
-  assert.match(runtime, /NAHWERK Concierge/);
+  assert.match(runtime, /STEWARO/);
 });
 
 
@@ -83,7 +83,7 @@ test('known indexed legacy prime-concierge URLs are explicit noindex redirects',
     const html = read(file);
     assert.match(html, /name=["']robots["'][^>]*content=["']noindex,follow["']/i, file);
     assert.ok(html.includes('url=' + target), file + ': missing refresh target');
-    assert.ok(html.includes('https://nahwerkconcierge.com' + target), file + ': canonical target mismatch');
+    assert.ok(html.includes('https://stewaro.com' + target), file + ': canonical target mismatch');
   }
 });
 
@@ -91,12 +91,12 @@ test('sitemap publishes hreflang clusters without .html URLs', () => {
   const xml = read('sitemap.xml');
   assert.match(xml, /xmlns:xhtml=["']http:\/\/www\.w3\.org\/1999\/xhtml["']/);
   const hrefs = [
-    'https://nahwerkconcierge.com/de/',
-    'https://nahwerkconcierge.com/en/',
-    'https://nahwerkconcierge.com/tr/',
-    'https://nahwerkconcierge.com/prime-concierge',
-    'https://nahwerkconcierge.com/en/prime-concierge',
-    'https://nahwerkconcierge.com/tr/prime-concierge'
+    'https://stewaro.com/de/',
+    'https://stewaro.com/en/',
+    'https://stewaro.com/tr/',
+    'https://stewaro.com/prime-concierge',
+    'https://stewaro.com/en/prime-concierge',
+    'https://stewaro.com/tr/prime-concierge'
   ];
   for (const href of hrefs) assert.ok(xml.includes('href="' + href + '"'), 'missing hreflang href: ' + href);
   assert.ok(!/href=["'][^"']*\.html/i.test(xml), 'hreflang must not expose .html URLs');
