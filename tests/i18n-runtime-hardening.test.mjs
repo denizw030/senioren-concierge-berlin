@@ -40,7 +40,7 @@ test("localized public runtime repairs late-added asset references", () => {
 
 test("overview journey copy is authored in German English and Turkish", () => {
   const js = read("assets/acquisition-v1.js");
-  for (const phrase of ["Kostenlos registrieren","Register for free","Ücretsiz kayıt ol","NAHWERK stays on it","NAHWERK takipte kalır"]) {
+  for (const phrase of ["Kostenlos registrieren","Register for free","Ücretsiz kayıt ol","FIDEL stays on it","FIDEL takipte kalır"]) {
     assert.ok(js.includes(phrase), `missing ${phrase}`);
   }
 });
