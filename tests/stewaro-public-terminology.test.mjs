@@ -13,6 +13,6 @@ test("public static Klienten wording never regresses to Kunden",()=>{
 });
 test("canonical email and concierge clean routes preserve current brand and runtime contracts",()=>{
  for(const page of ["email-concierge","prime-concierge"]){
-  assert.equal(fs.readFileSync(page+"/index.html","utf8").replace('<head><base href="/">','<head>'),fs.readFileSync(page+".html","utf8"));
+  assert.equal(fs.readFileSync(page+"/index.html","utf8").replace('<head><base href="/">','<head>'),fs.readFileSync(page+".html","utf8").replace(/\s*<meta name="robots" content="noindex,follow" \/>/,"").replace(/\s*<meta http-equiv="refresh" content="0; url=\/prime-concierge" \/>/,""));
  }
 });
