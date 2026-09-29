@@ -13,7 +13,8 @@ const css = read("assets/web-customer-concierge.css");
 const authNav = read("assets/auth-nav.js");
 
 test("authenticated Web Concierge is a customer messenger and remains fail closed internally", () => {
-  assert.match(page, /Dein Concierge/);
+  assert.match(page, /<title>FIDEL \| STEWARO<\/title>/);
+  assert.match(page, /id="webConciergeTitle">FIDEL</);
   for (const id of ["webConciergeNewChat","webConciergeThreads","webConciergeLog","webConciergeInput","webConciergeSend"]) assert.ok(page.includes(`id="${id}"`));
   assert.match(page, /id="webConciergeInput"[^>]*disabled/);
   assert.match(page, /id="webConciergeSend"[^>]*disabled/);
