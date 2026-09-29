@@ -25,7 +25,7 @@ test("persistent selector is explicitly scoped to WhatsApp jobs",()=>{
 });
 
 test("WhatsApp option discloses the fee without repeating WhatsApp branding icons in the note",()=>{
-  assert.match(account,/Meta berechnet Unternehmen Gebühren für Antworten an Endkunden/);
+  assert.match(account,/Meta berechnet Unternehmen Gebühren für Antworten an Klienten/);
   assert.match(account,/Übermittlung einer Antwort über diesen Kanal[^<]*0,06 € pro Antwort/);
   const fee=account.match(/<small class="response-channel-fee-note">([^<]+)<\/small>/)?.[1]||"";
   assert.doesNotMatch(fee,/WhatsApp/i);
