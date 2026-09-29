@@ -422,7 +422,7 @@ jobs:
           mkdir -p /tmp/account-premium-visual
           CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
           test -n "$CHROME"
-          npm install --no-save --ignore-scripts --package-lock=false playwright@1.56.1
+          npm install --no-save --ignore-scripts --package-lock=false playwright@1.56.1 axe-core@4.10.3
           CHROME_PATH="$CHROME" node --input-type=module - <<'NODE'
           import { chromium } from 'playwright';
           import fs from 'node:fs';
@@ -510,12 +510,13 @@ jobs:
           import {createRequire} from 'node:module';
           const require=createRequire(import.meta.url);
           const browser=await chromium.launch({executablePath:process.env.CHROME_PATH,args:['--no-sandbox']});
-          const pages=['de/index.html','prime-concierge/index.html','safety.html','registrieren.html','angehoerige.html','leistungen.html','pakete.html','telefonannahme/index.html','__email-account-a11y.html','__family-owner-a11y.html','__account-premium-access.html'];
+          const pages=['de/index.html','prime-concierge/','safety.html','registrieren.html','angehoerige.html','leistungen.html','pakete.html','telefonannahme/','__email-account-a11y.html','__family-owner-a11y.html','__account-premium-access.html'];
           const failed=[];
           try {
             for(const width of [390,360]) for(const route of pages){
               const page=await browser.newPage({viewport:{width,height:1000}});
-              await page.goto('http://127.0.0.1:4173/'+route,{waitUntil:'load'});
+              const response=await page.goto('http://127.0.0.1:4173/'+route,{waitUntil:'load'});
+              if(response.status()!==200||!(await page.locator('main').count()))throw Error('Expected real rendered page: '+route);
               await page.addScriptTag({path:require.resolve('axe-core/axe.min.js')});
               const result=await page.evaluate(async()=>({width:innerWidth,result:await axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}})}));
               const violations=result.result.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))}));
