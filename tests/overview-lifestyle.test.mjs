@@ -34,7 +34,8 @@ test('DE EN TR homepages share the new full-bleed STEWARO design', () => {
 test('new homepage remains responsive and preserves reduced-motion handling', () => {
   for (const file of pages) {
     const html = read(file);
-    assert.match(html, /@media\s*\(max-width:\s*760px\)/, `${file}: missing mobile layout`);
+    assert.match(html, /@media\s*\(max-width:\s*980px\)/, `${file}: missing tablet layout`);
+    assert.match(html, /@media\s*\(max-width:\s*600px\)/, `${file}: missing mobile layout`);
     assert.match(html, /prefers-reduced-motion:\s*reduce/, `${file}: missing reduced-motion guard`);
   }
 });
