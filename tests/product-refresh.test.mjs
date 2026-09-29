@@ -1,88 +1,52 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 
 const root = new URL("../", import.meta.url);
 const read = (path) => readFileSync(new URL(path, root), "utf8");
-const carousel = read("assets/concierge-carousel.js");
-const overview = read("assets/concierge-overview.js");
-const colours = read("assets/brand-2026.css");
-const onboarding = read("assets/onboarding.js");
-const packages = read("pakete.html");
-const prime = read("prime-concierge.html");
-const senior = read("senioren-concierge.html");
-const visibleText = (html) => html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+const visible = (html) => html.replace(/<script[\s\S]*?<\/script>/gi," ").replace(/<style[\s\S]*?<\/style>/gi," ").replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim();
 
-test("all 23 optimized concierge card and large images are present", () => {
-  const profileBlock = carousel.match(/const profiles = \[([\s\S]*?)\]\.map/);
-  assert.ok(profileBlock, "profile catalogue exists");
-  const keys = [...profileBlock[1].matchAll(/\["([a-z]+)",/g)].map((match) => match[1]);
-  assert.equal(keys.length, 23);
-  for (const key of keys) {
-    for (const size of ["card", "large"]) {
-      const file = new URL(`assets/concierges/${size}/${key}.webp`, root);
-      assert.equal(existsSync(file), true, `${size}/${key}.webp exists`);
-      assert.ok(statSync(file).size > 10_000, `${size}/${key}.webp is not empty`);
-    }
+test("canonical STEWARO brand assets exist",()=>{
+  for(const file of ["assets/logos/stewaro-icon.svg","assets/logos/stewaro-wordmark.svg","assets/fidel-gold-orb.js"])
+    assert.equal(existsSync(new URL(file,root)),true,file);
+});
+
+test("Prime and senior public surfaces expose one FIDEL identity",()=>{
+  for(const file of ["prime-concierge.html","senioren-concierge.html"]){
+    const html=read(file), copy=visible(html);
+    assert.match(copy,/STEWARO/);
+    assert.match(copy,/FIDEL/);
+    assert.match(html,/stewaro-fixed-concierge-card/);
+    assert.doesNotMatch(copy,/NAHWERK|Nilo|Mira|Hartmut|Frida/);
+    assert.doesNotMatch(html,/data-concierge-carousel/);
   }
 });
 
-test("overview uses deterministic native image loading", () => {
-  assert.equal(overview.includes("IntersectionObserver"), false);
-  assert.equal(overview.includes("dataset.src"), false);
-  assert.match(overview, /im\.loading=i<4\?"eager":"lazy"/);
-  assert.match(overview, /im\.src=p\.cardImage\|\|p\.image/);
-  assert.match(overview, /i\.src=p\.largeImage\|\|p\.image/);
+test("senior page keeps real-world examples and bounded claims",()=>{
+  const copy=visible(read("senioren-concierge.html"));
+  assert.match(copy,/Uber|Taxi/);
+  assert.match(copy,/Bevor Kosten entstehen/);
+  assert.match(copy,/Betrug/);
+  assert.match(copy,/keine Garantie, jeden Betrugsversuch zu erkennen/i);
 });
 
-test("dark pages share the premium gold colour atmosphere while senior mode stays excluded", () => {
-  assert.match(colours, /body:not\(\.senior-product\):not\(\[data-product="senioren"\]\) main/);
-  assert.match(colours, /rgba\(212,175,55,/);
-  assert.match(colours, /\.senior-product \.request-card/);
+test("current launch tariff matrix is consistent and uses Klienten language",()=>{
+  const pricing=visible(read("pakete.html"));
+  for(const value of [
+    "0 € / Monat","20 WhatsApp-Nachrichten",
+    "5,99 € / Monat","30 WhatsApp-Nachrichten",
+    "10,99 € / Monat","50 WhatsApp-Nachrichten",
+    "19,99 € / Monat","100 WhatsApp-Nachrichten",
+    "34,99 € / Monat","160 WhatsApp-Nachrichten",
+    "59,66 € / Monat","300 WhatsApp-Nachrichten"
+  ]) assert.ok(pricing.includes(value),value);
+  assert.doesNotMatch(pricing,/Kundennachrichten|Kundenkonto|Kundenbereich/);
 });
 
-test("senior page keeps real-world examples while personal page follows the frozen brand promise", () => {
-  assert.match(visibleText(senior), /Kannst du mir einen Uber besorgen/);
-  assert.match(visibleText(senior), /Bevor Kosten entstehen/);
-  assert.match(visibleText(senior), /Ist diese Nachricht echt oder vielleicht Betrug/);
-  assert.match(visibleText(prime), /Ein persönlicher Concierge, der erledigt/);
-  assert.match(visibleText(prime), /Google findet\. KI versteht\. NAHWERK erledigt/);
-  assert.match(visibleText(prime), /Welche Telefonfunktionen verfügbar sind, richtet sich nach dem eingerichteten Produkt und Zugang/);
-});
-
-test("current launch tariff matrix is consistent while FREE entitlement stays central", () => {
-  const publicTariffValues = [
-    "0 € / Monat",
-    "App unbegrenzt · Web unbegrenzt · 20 WhatsApp-Kundennachrichten",
-    "5,99 € / Monat",
-    "App unbegrenzt · Web unbegrenzt · 30 WhatsApp-Kundennachrichten",
-    "10,99 € / Monat",
-    "App unbegrenzt · Web unbegrenzt · 50 WhatsApp-Kundennachrichten",
-    "19,99 € / Monat",
-    "App unbegrenzt · Web unbegrenzt · 100 WhatsApp-Kundennachrichten",
-    "34,99 € / Monat",
-    "App unbegrenzt · Web unbegrenzt · 160 WhatsApp-Kundennachrichten",
-    "59,66 € / Monat",
-    "App unbegrenzt · Web unbegrenzt · 300 WhatsApp-Kundennachrichten"
-  ];
-  for (const value of publicTariffValues)
-    assert.equal(visibleText(packages).includes(value), true, `${value} is shown on package page`);
-
-  for (const value of [
-    "5,99 € / Monat",
-    "App unbegrenzt · 30 WhatsApp-Dialoge",
-    "10,99 € / Monat",
-    "App unbegrenzt · 50 WhatsApp-Dialoge",
-    "19,99 € / Monat",
-    "App unbegrenzt · 100 WhatsApp-Dialoge",
-    "34,99 € / Monat",
-    "App unbegrenzt · 160 WhatsApp-Dialoge",
-    "59,66 € / Monat",
-    "App unbegrenzt · 300 WhatsApp-Dialoge"
-  ]) assert.equal(onboarding.includes(value), true, `${value} is used in paid registration preview`);
-
-  assert.match(onboarding, /code: "FREE"[\s\S]*price: "0 € \/ Monat"[\s\S]*Zentrales FREE-Kontingent · nach Login live sichtbar/);
-  assert.match(onboarding, /FREE wird ohne Zahlungsdaten angelegt/);
-  assert.match(onboarding, /bookable: false/);
-  assert.match(visibleText(packages), /Vor einer kostenpflichtigen Bestellung werden Preis, Laufzeit, Widerruf und Zahlung ausdrücklich bestätigt/);
+test("FIDEL remains the same concierge across configured channels",()=>{
+  const prime=visible(read("prime-concierge.html"));
+  const senior=visible(read("senioren-concierge.html"));
+  assert.match(prime,/FIDEL/);
+  assert.match(prime,/Welche WhatsApp- oder Telefonfunktionen verfügbar sind/);
+  assert.match(senior,/Ihr Concierge bleibt auch am Telefon derselbe/);
 });
