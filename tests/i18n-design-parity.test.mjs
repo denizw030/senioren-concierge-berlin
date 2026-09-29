@@ -15,7 +15,6 @@ const pages = [
   'ablauf.html',
   'faq.html',
   'kontakt.html',
-  'concierges.html',
   'senioren-concierge.html',
   'alltag-organisieren.html',
   'dokumente-verstehen.html',
