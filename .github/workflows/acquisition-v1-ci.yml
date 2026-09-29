@@ -133,7 +133,7 @@ jobs:
             const nativeFetch=window.fetch.bind(window);
             const state=window.__familyPagesSmoke={primary404:false,staticConfig:false,context:false,providerWrite:false};
             sessionStorage.setItem("scb_web_session",JSON.stringify({session_token:"r".repeat(40)}));
-            window.NAHWERK_CONCIERGES=[{key:"nilo",name:"Nilo"}];
+            window.NAHWERK_CONCIERGES=[{key:"fidel",name:"FIDEL"}];
             window.fetch=async(input,init={})=>{
               const raw=typeof input==="string"?input:input.url;
               const url=new URL(raw,location.href);
@@ -361,7 +361,7 @@ jobs:
           setup=re.search(r'<div class="account-setup-by"[\s\S]*?</div>',src,re.I).group(0)
           summaries=[]
           for klass in ["plan-summary","status-summary","customer-number-summary","person-summary"]:
-            summaries.append(re.search(r'<article class="card summary-card [^"]*'+klass+r'"[\s\S]*?</article>',src,re.I).group(0))
+            summaries.append(re.search(r'<article class="[^"]*'+klass+r'[^"]*"[\s\S]*?</article>',src,re.I).group(0))
           highlights=re.search(r'<div class="account-overview-highlights"[\s\S]*?</div>\s*<div class="account-panel-heading" data-account-panel="concierge"',src,re.I).group(0)
           highlights=highlights.rsplit('<div class="account-panel-heading"',1)[0]
           access_heading=re.search(r'<div class="account-panel-heading" data-account-panel="access"[\s\S]*?</div>\s*<article class="card wide access-panel"',src,re.I).group(0)
@@ -378,7 +378,7 @@ jobs:
             '''<div class="family-owner-person" data-family-state="MESSAGE_PENDING">
               <div class="family-owner-person-main">
                 <div class="family-owner-person-headline">
-                  <div class="family-owner-person-copy"><strong>Hülya Cimen</strong><div class="family-owner-person-meta"><span>Mutter</span><span>Türkisch</span><span>Leyla</span></div></div>
+                  <div class="family-owner-person-copy"><strong>Hülya Cimen</strong><div class="family-owner-person-meta"><span>Mutter</span><span>Türkisch</span><span>FIDEL</span></div></div>
                   <span class="family-owner-person-status">Versand wird vorbereitet</span>
                 </div>
                 <p class="family-owner-person-state-copy">Einladung wird für WhatsApp vorbereitet.</p>
@@ -417,7 +417,7 @@ jobs:
           grep -q "Hülya Cimen" /tmp/account-access-390.html
           grep -q "Mutter" /tmp/account-access-390.html
           grep -q "Türkisch" /tmp/account-access-390.html
-          grep -q "Leyla" /tmp/account-access-390.html
+          grep -q "FIDEL" /tmp/account-access-390.html
           grep -q "Versand wird vorbereitet" /tmp/account-access-390.html
           echo "ACCOUNT PREMIUM VISUAL E2E GREEN"
       - uses: actions/upload-artifact@v4
