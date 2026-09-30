@@ -48,7 +48,8 @@ test("app settings and account navigation leave app host safely",()=>{
 test("login and both registration completion paths preserve app handoff",()=>{
   assert.match(login,/ENTRY_APP_HANDOFF=ENTRY_PARAMS\.get\('next'\)==='app'/);
   assert.match(login,/action:'handoff_create'/);
-  assert.match(login,/app\\\.stewaro\\\.com/);\n  assert.match(login,/handoff_ready/);
+  assert.match(login,/app\\\.stewaro\\\.com/);
+  assert.match(login,/handoff_ready/);
   assert.match(onboarding,/const appHandoff = params\.get\("next"\) === "app"/);
   assert.match(onboarding,/action: "handoff_create"/);
   assert.ok((onboarding.match(/void handoffToApp\(loginResult\.session_token\)/g)||[]).length>=2);
