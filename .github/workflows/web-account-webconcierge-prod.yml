@@ -3,6 +3,10 @@ on:
   pull_request:
     paths:
       - "web-concierge.html"
+      - "index.html"
+      - "anmelden.html"
+      - "assets/onboarding.js"
+      - "assets/stewaro-app-bootstrap.js"
       - "assets/web-customer-concierge.js"
       - "assets/web-customer-concierge.css"
       - "assets/web-core-shadow.js"
@@ -11,6 +15,7 @@ on:
       - "tests/web-account-webconcierge-prod.test.mjs"
       - "tests/web-core-shadow-transport.test.mjs"
       - "tests/web-concierge-chat-ui.test.mjs"
+      - "tests/stewaro-app-launch-shell-v1.test.mjs"
       - ".github/workflows/web-account-webconcierge-prod.yml"
   workflow_dispatch:
 permissions:
@@ -25,10 +30,12 @@ jobs:
         with:
           node-version: "22"
       - name: Web Concierge PROD boundary tests
-        run: node --test tests/web-account-webconcierge-prod.test.mjs tests/web-core-shadow-transport.test.mjs tests/web-concierge-chat-ui.test.mjs
+        run: node --test tests/web-account-webconcierge-prod.test.mjs tests/web-core-shadow-transport.test.mjs tests/web-concierge-chat-ui.test.mjs tests/stewaro-app-launch-shell-v1.test.mjs
       - name: Runtime JavaScript syntax
         run: |
           node --check assets/web-customer-concierge.js
+          node --check assets/stewaro-app-bootstrap.js
+          node --check assets/onboarding.js
           node --check assets/web-core-shadow.js
           node --check assets/web-concierge-chat.js
           node --check assets/site-ui.js
