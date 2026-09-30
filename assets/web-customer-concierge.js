@@ -1226,13 +1226,16 @@
     topbar.innerHTML='<button type="button" class="web-concierge-mobile-exit" aria-label="Chat verlassen">‹</button><button type="button" class="web-concierge-mobile-chats" aria-label="Chats öffnen" aria-expanded="false">☰</button><div class="web-concierge-mobile-topbar-title">STEWARO Concierge</div><button type="button" class="web-concierge-mobile-new" aria-label="Neuer Chat">＋</button>';
     const backdrop=document.createElement("button");backdrop.type="button";backdrop.className="web-concierge-mobile-backdrop";backdrop.setAttribute("aria-label","Chatliste schließen");
     workspace.prepend(topbar);workspace.appendChild(backdrop);
-    topbar.querySelector(".web-concierge-mobile-exit")?.addEventListener("click",()=>{setMobileDrawer(false);location.href=guestMode?"/de/":"/konto";});
+    topbar.querySelector(".web-concierge-mobile-exit")?.addEventListener("click",()=>{setMobileDrawer(false);location.href=guestMode?"/de/":(location.hostname==="app.stewaro.com"?"https://account.stewaro.com/konto":"/konto");});
     topbar.querySelector(".web-concierge-mobile-chats")?.addEventListener("click",()=>setMobileDrawer(!workspace.classList.contains("is-mobile-sidebar-open")));
     topbar.querySelector(".web-concierge-mobile-new")?.addEventListener("click",()=>{setMobileDrawer(false);newChat();});
     backdrop.addEventListener("click",()=>setMobileDrawer(false));
   }
 
   async function boot() {
+    if(location.hostname==="app.stewaro.com"&&window.STEWARO_APP_AUTH_READY){
+      if(await window.STEWARO_APP_AUTH_READY!==true)return;
+    }
     initThemeToggle();
     initMobileDrawer();
     initDeleteAllChats();

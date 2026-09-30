@@ -3,6 +3,8 @@
   const APP_HOST="app.stewaro.com";
   if(location.hostname!==APP_HOST)return;
 
+  window.STEWARO_APP_AUTH_READY=Promise.resolve(true);
+
   const SESSION_KEY="scb_web_session";
   const SESSION_URL="https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-session-secure";
   const ACCOUNT_LOGIN="https://account.stewaro.com/anmelden?produkt=senioren&next=app";
@@ -60,7 +62,7 @@
   if(handoff){
     history.replaceState(null,"",location.pathname+location.search);
     const valid=/^hnd_[A-Za-z0-9_-]{40,120}$/.test(handoff);
-    if(!valid){accountLogin();return;}
+    if(!valid){window.STEWARO_APP_AUTH_READY=Promise.resolve(false);accountLogin();return;}
 
     document.documentElement.classList.add("stewaro-app-claiming");
     const shield=document.createElement("style");
@@ -68,7 +70,7 @@
     shield.textContent="html.stewaro-app-claiming body{visibility:hidden!important}";
     document.head.appendChild(shield);
 
-    fetch(SESSION_URL,{
+    window.STEWARO_APP_AUTH_READY=fetch(SESSION_URL,{
       method:"POST",
       headers:{"Content-Type":"application/json","Authorization":"Bearer "+handoff},
       body:JSON.stringify({action:"handoff_claim"}),
@@ -81,14 +83,17 @@
       }
       saveSession(body);
       location.replace(location.pathname+location.search);
+      return false;
     }).catch(()=>{
       try{sessionStorage.removeItem(SESSION_KEY)}catch{}
       accountLogin();
+      return false;
     });
     return;
   }
 
   if(!readSession()){
+    window.STEWARO_APP_AUTH_READY=Promise.resolve(false);
     accountLogin();
     return;
   }
