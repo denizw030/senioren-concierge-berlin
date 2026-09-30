@@ -14,7 +14,7 @@ test("app host root routes to authenticated FIDEL surface while public host rema
   assert.doesNotMatch(root,/http-equiv="refresh"/i);
   assert.match(root,/window\.location\.hostname === "app\.stewaro\.com"/);
   assert.match(root,/\/web-concierge/);
-  assert.match(root,/window\.location\.replace\("\/de\/"\)/);
+  assert.match(root,/window\.location\.replace\("\/de\/" \+ window\.location\.search \+ window\.location\.hash\)/);
 });
 
 test("FIDEL app surface is noindex and loads app bootstrap before runtime client",()=>{
@@ -56,3 +56,4 @@ test("login and both registration completion paths preserve app handoff",()=>{
 });
 
 console.log("STEWARO_APP_LAUNCH_SHELL_V1=GREEN");
+

@@ -33,7 +33,7 @@ test('root homepage routes public traffic to the canonical German locale and the
   assert.doesNotMatch(redirect, /http-equiv=["']refresh["']/i);
   assert.match(redirect, /window\.location\.hostname === "app\.stewaro\.com"/);
   assert.match(redirect, /window\.location\.replace\("\/web-concierge" \+ window\.location\.search \+ window\.location\.hash\)/);
-  assert.match(redirect, /window\.location\.replace\(["']\/de\/["']\)/);
+  assert.match(redirect, /window\.location\.replace\(["']\/de\/["'] \+ window\.location\.search \+ window\.location\.hash\)/);
   assert.ok(redirect.includes(`href="${DOMAIN}/de/"`));
 });
 
@@ -122,3 +122,4 @@ test('public search landing pages contain no ImageWhatsApp artifact', () => {
     assert.ok(!/Image\s*WhatsApp/i.test(html), file + ': ImageWhatsApp artifact found');
   }
 });
+

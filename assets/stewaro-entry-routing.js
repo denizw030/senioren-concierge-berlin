@@ -15,6 +15,12 @@
   const isAccountSurface=/(?:^|\/)(?:zugang|anmelden|registrieren)(?:\.html)?\/?$/.test(location.pathname);
 
   const rewrite=()=>{
+    // A root <base> is needed for shared assets, but it also sends fragment links
+    // to the homepage. Pin same-document anchors to the current document.
+    document.querySelectorAll('a[href^="#"]').forEach(a=>{
+      const fragment=a.getAttribute("href");
+      if(fragment)a.setAttribute("href",location.pathname+location.search+fragment);
+    });
     document.querySelectorAll('a[data-entry="self"]').forEach(a=>a.href=accountEntry);
     document.querySelectorAll('a[data-entry="loved-one"]').forEach(a=>a.href=parentEntry);
     document.querySelectorAll('a.auth-link.login-link,a.auth-link.register-link').forEach(a=>a.href=accountEntry);
@@ -26,3 +32,4 @@
   new MutationObserver(rewrite).observe(document.documentElement,{subtree:true,childList:true});
   window.STEWAROEntryRouting={accountEntry,parentEntry};
 })();
+
