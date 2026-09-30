@@ -5,7 +5,11 @@
   <meta http-equiv="refresh" content="0; url=/de/">
   <link rel="canonical" href="https://stewaro.com/de/">
   <script>
-    window.location.replace("/de/");
+    if (window.location.hostname === "app.stewaro.com") {
+      window.location.replace("/web-concierge" + window.location.search + window.location.hash);
+    } else {
+      window.location.replace("/de/");
+    }
   </script>
   <title>STEWARO</title>
   <script src="/assets/clean-url.js?v=1"></script>
