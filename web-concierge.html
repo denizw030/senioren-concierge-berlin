@@ -12,7 +12,8 @@
   <link rel="stylesheet" href="assets/site.css?v=24" />
   <link rel="stylesheet" href="assets/brand-2026.css?v=25" />
   <link rel="stylesheet" href="assets/nahwerk-logo-v2.css?v=12" />
-  <link rel="stylesheet" href="assets/web-customer-concierge.css?v=31" />  <link rel="stylesheet" href="assets/web-voice-memo.css?v=2" />
+  <link rel="stylesheet" href="assets/web-customer-concierge.css?v=31" />
+  <link rel="stylesheet" href="assets/stewaro-app.css?v=1" />  <link rel="stylesheet" href="assets/web-voice-memo.css?v=2" />
   <link rel="stylesheet" href="assets/nahwerk-live-concierge.css?v=5" />
   <link rel="icon" type="image/svg+xml" href="/assets/logos/stewaro-icon.svg?v=1" />
   <script src="/assets/clean-url.js?v=1"></script>
@@ -22,6 +23,209 @@
   <header class="top"><div class="wrap nav"><a class="brand" href="/de/" aria-label="STEWARO – Startseite"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>STEWARO</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Hauptnavigation"><a href="/de/">Übersicht</a><a href="/prime-concierge">Persönlicher Concierge</a><a href="/concierges">STEWARO weltweit</a><a href="/safety">Sicherheit</a><a href="/leistungen">Leistungen</a><a href="/kontakt">Kontakt</a></nav></div></header>
 
   <main id="main-content" class="web-concierge-shell">
+
+  <section class="stewaro-app-shell" id="stewaroAppShell" aria-label="STEWARO App" hidden>
+    <header class="stewaro-app-header">
+      <a class="stewaro-app-brand" href="https://stewaro.com" aria-label="STEWARO">
+        <img src="/assets/logos/stewaro-wordmark.svg?v=1" alt="STEWARO" />
+      </a>
+      <div class="stewaro-app-connection" id="stewaroAppConnection" aria-live="polite">
+        <span class="stewaro-app-connection-dot" aria-hidden="true"></span>
+        <span data-connection-label>Verbindung wird hergestellt</span>
+      </div>
+    </header>
+
+    <div class="stewaro-app-content" id="stewaroAppContent">
+      <section class="stewaro-app-panel is-active" data-stewaro-app-panel="overview" aria-labelledby="stewaroAppGreeting">
+        <p class="stewaro-app-kicker">STEWARO · FIDEL</p>
+        <h1 class="stewaro-app-title" id="stewaroAppGreeting">Guten Tag.</h1>
+        <p class="stewaro-app-subtitle">FIDEL ist dein persönlicher KI-Concierge. Hier siehst du nur Informationen, die aus deinem echten STEWARO-Konto geladen wurden.</p>
+
+        <article class="stewaro-app-hero-card">
+          <div class="stewaro-app-hero-copy">
+            <p class="stewaro-app-kicker">Dein Concierge</p>
+            <h2>Was darf FIDEL für dich erledigen?</h2>
+            <p>Schreib FIDEL direkt. Deine bestehenden Unterhaltungen und die Conversation-History bleiben über den vorhandenen STEWARO-Gateway- und Concierge-Core-Pfad erhalten.</p>
+          </div>
+          <div class="stewaro-app-hero-action">
+            <span class="stewaro-app-status-label">FIDEL ist bereit</span>
+            <button class="stewaro-app-primary" type="button" data-stewaro-open-tab="fidel">FIDEL öffnen</button>
+          </div>
+        </article>
+
+        <div class="stewaro-app-grid">
+          <article class="stewaro-app-card stewaro-app-card-wide">
+            <span class="stewaro-app-card-label">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><path d="M12 7v5l3 2"></path></svg>
+              Nutzung &amp; Guthaben
+            </span>
+            <strong id="stewaroAppUsage">Wird geladen …</strong>
+            <p id="stewaroAppUsageMeta">Aktuelle Kontodaten werden sicher geladen.</p>
+            <a class="stewaro-app-card-link" href="https://account.stewaro.com/konto">Im Account ansehen →</a>
+          </article>
+
+          <article class="stewaro-app-card">
+            <span class="stewaro-app-card-label">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.8 19 6.5v5.2c0 4.2-2.7 7.2-7 8.5-4.3-1.3-7-4.3-7-8.5V6.5Z"></path><path d="m9 12 2 2 4-4"></path></svg>
+              Sicherheit
+            </span>
+            <strong id="stewaroAppSafety">Wird geladen …</strong>
+            <p id="stewaroAppSafetyMeta">Aktueller Schutzstatus wird geladen.</p>
+            <button class="stewaro-app-card-link" type="button" data-stewaro-open-tab="safety">Sicherheit öffnen →</button>
+          </article>
+
+          <article class="stewaro-app-card">
+            <span class="stewaro-app-card-label">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="6.5" width="16" height="11" rx="2"></rect><path d="m5 8 7 5.5L19 8"></path></svg>
+              E-Mail
+            </span>
+            <strong id="stewaroAppEmail">Wird geladen …</strong>
+            <p id="stewaroAppEmailMeta">Kontostatus wird geladen.</p>
+            <a class="stewaro-app-card-link" href="https://account.stewaro.com/email-concierge">Verwalten →</a>
+          </article>
+
+          <article class="stewaro-app-card">
+            <span class="stewaro-app-card-label">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 18.5 6.2 15A7.5 7.5 0 1 1 9 18l-4 .5Z"></path><path d="M9.5 10.3c.8 1.7 2 2.9 3.8 3.7"></path></svg>
+              WhatsApp
+            </span>
+            <strong id="stewaroAppWhatsapp">Wird geladen …</strong>
+            <p id="stewaroAppWhatsappMeta">Kontostatus wird geladen.</p>
+            <a class="stewaro-app-card-link" href="https://account.stewaro.com/konto">Verwalten →</a>
+          </article>
+
+          <article class="stewaro-app-card">
+            <span class="stewaro-app-card-label">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.4 4.7 5.8 6.3c-.8.8-.5 3.1 1.4 6s3.9 4.8 5.7 5.6 3.5.7 4.1.1l1.5-1.5-3.6-3.1-1.7 1.1c-.8-.4-1.8-1.4-2.7-2.8s-1.4-2.6-1.4-3.5l1.7-1.2Z"></path></svg>
+              Telefon
+            </span>
+            <strong>Im Account verwalten</strong>
+            <p>Es wird hier kein Telefonstatus erfunden oder automatisch ein Anruf gestartet.</p>
+            <a class="stewaro-app-card-link" href="https://account.stewaro.com/telefonannahme">Telefon öffnen →</a>
+          </article>
+        </div>
+
+        <div class="stewaro-app-notice" id="stewaroAppDataNotice" hidden></div>
+        <button class="stewaro-app-secondary" id="stewaroAppRetryData" type="button" style="margin-top:12px">Kontodaten neu laden</button>
+      </section>
+
+      <section class="stewaro-app-panel" id="stewaroAppPanelFidel" data-stewaro-app-panel="fidel" aria-label="FIDEL" hidden>
+        <div id="stewaroAppFidelMount"></div>
+      </section>
+
+      <section class="stewaro-app-panel" data-stewaro-app-panel="safety" aria-labelledby="stewaroSafetyTitle" hidden>
+        <p class="stewaro-app-kicker">STEWARO Sicherheit</p>
+        <h1 class="stewaro-app-title" id="stewaroSafetyTitle">Sicherheit, die verständlich bleibt.</h1>
+        <p class="stewaro-app-subtitle">STEWARO zeigt den echten Schutzstatus deines Kontos. Ein verdächtiger Hinweis wird nur angezeigt, wenn ein angebundener Schutzpfad ihn tatsächlich meldet.</p>
+        <div class="stewaro-app-notice" id="stewaroSafetyUnavailable" hidden></div>
+
+        <div class="stewaro-safety-stage">
+          <article class="stewaro-safety-state" data-stewaro-safety-state="setup">
+            <div class="stewaro-safety-shield" aria-hidden="true">
+              <svg viewBox="0 0 64 74"><path d="M32 4 56 13v18c0 20-11 32-24 39C19 63 8 51 8 31V13Z"></path><path d="M22 37h20M32 27v20"></path></svg>
+            </div>
+            <h2>STEWARO Schutz einrichten</h2>
+            <p>Lege Sicherheitsabfragen und vertrauenswürdige Kontakte in deinem bestehenden STEWARO-Konto fest. FIDEL unterstützt dich beim Einordnen auffälliger Situationen.</p>
+            <div class="stewaro-safety-actions">
+              <a class="stewaro-app-primary" href="https://account.stewaro.com/konto">Schutz einrichten</a>
+            </div>
+            <p class="stewaro-safety-note">STEWARO kann Risiken reduzieren und Hinweise prüfen, aber keinen vollständigen Schutz vor jedem Betrugsversuch garantieren.</p>
+          </article>
+
+          <article class="stewaro-safety-state is-active" data-stewaro-safety-state="active" hidden>
+            <div class="stewaro-safety-shield" aria-hidden="true">
+              <svg viewBox="0 0 64 74"><path d="M32 4 56 13v18c0 20-11 32-24 39C19 63 8 51 8 31V13Z"></path><path d="m21 36 8 8 15-17"></path></svg>
+            </div>
+            <h2>Schutz aktiv</h2>
+            <p>Deine hinterlegten STEWARO-Sicherheitsfunktionen sind aktiviert.</p>
+            <div class="stewaro-safety-meta">
+              <strong id="stewaroSafetyActiveNext">Aktiv</strong>
+              <span id="stewaroSafetyActiveContacts">Sicherheitskontakte werden geladen.</span>
+            </div>
+            <div class="stewaro-safety-actions">
+              <a class="stewaro-app-secondary" href="https://account.stewaro.com/konto">Einstellungen ändern</a>
+            </div>
+          </article>
+
+          <article class="stewaro-safety-state is-blocked" data-stewaro-safety-state="blocked" hidden>
+            <div class="stewaro-safety-shield" aria-hidden="true">
+              <svg viewBox="0 0 64 74"><path d="M32 4 56 13v18c0 20-11 32-24 39C19 63 8 51 8 31V13Z"></path><path d="M32 23v19M32 51h.01"></path></svg>
+            </div>
+            <h2>STEWARO hat den verdächtigen Link blockiert.</h2>
+            <p id="stewaroSafetyBlockedReason">Der Link weist Merkmale eines möglichen Betrugsversuchs auf.</p>
+            <div class="stewaro-safety-meta">
+              <strong id="stewaroSafetyBlockedHost">Verdächtiger Link</strong>
+              <span>Öffne den Link nicht über einen anderen Weg. FIDEL kann dir helfen, den Hinweis zu prüfen.</span>
+            </div>
+            <div class="stewaro-safety-actions">
+              <button class="stewaro-app-primary" id="stewaroSafetyAskFidel" type="button">FIDEL prüfen lassen</button>
+              <a class="stewaro-app-secondary" href="https://account.stewaro.com/konto">Sicherheitskontakte öffnen</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="stewaro-app-panel" data-stewaro-app-panel="more" aria-labelledby="stewaroMoreTitle" hidden>
+        <p class="stewaro-app-kicker">STEWARO</p>
+        <h1 class="stewaro-app-title" id="stewaroMoreTitle">Mehr</h1>
+        <p class="stewaro-app-subtitle">Konto, Nutzung und verbundene Dienste bleiben in der bestehenden STEWARO-Account-Struktur.</p>
+        <div class="stewaro-app-more">
+          <a class="stewaro-app-more-link" href="https://account.stewaro.com/konto">
+            <span class="stewaro-app-more-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.3"></circle><path d="M5.5 19c.8-4 3-6 6.5-6s5.7 2 6.5 6"></path></svg></span>
+            <span class="stewaro-app-more-copy"><strong>Persönliche Daten</strong><span>Stammdaten im Account verwalten</span></span><span class="stewaro-app-more-chevron">›</span>
+          </a>
+          <a class="stewaro-app-more-link" href="https://account.stewaro.com/konto">
+            <span class="stewaro-app-more-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="4.5" width="14" height="15" rx="2"></rect><path d="M8 9h8M8 13h8"></path></svg></span>
+            <span class="stewaro-app-more-copy"><strong>Account</strong><span>Anmeldung und Kontozugang</span></span><span class="stewaro-app-more-chevron">›</span>
+          </a>
+          <a class="stewaro-app-more-link" href="https://account.stewaro.com/konto">
+            <span class="stewaro-app-more-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5"></circle><path d="M12 8v4l3 2"></path></svg></span>
+            <span class="stewaro-app-more-copy"><strong>Nutzung / Guthaben</strong><span>Tarif und aktuelle Nutzung</span></span><span class="stewaro-app-more-chevron">›</span>
+          </a>
+          <a class="stewaro-app-more-link" href="https://account.stewaro.com/email-concierge">
+            <span class="stewaro-app-more-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="6.5" width="16" height="11" rx="2"></rect><path d="m5 8 7 5.5L19 8"></path></svg></span>
+            <span class="stewaro-app-more-copy"><strong>E-Mail</strong><span>E-Mail-Concierge verwalten</span></span><span class="stewaro-app-more-chevron">›</span>
+          </a>
+          <a class="stewaro-app-more-link" href="https://account.stewaro.com/konto">
+            <span class="stewaro-app-more-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 18.5 6.2 15A7.5 7.5 0 1 1 9 18l-4 .5Z"></path></svg></span>
+            <span class="stewaro-app-more-copy"><strong>WhatsApp</strong><span>Verknüpfung und Nutzung</span></span><span class="stewaro-app-more-chevron">›</span>
+          </a>
+          <a class="stewaro-app-more-link" href="https://account.stewaro.com/telefonannahme">
+            <span class="stewaro-app-more-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7.4 4.7 5.8 6.3c-.8.8-.5 3.1 1.4 6s3.9 4.8 5.7 5.6 3.5.7 4.1.1l1.5-1.5-3.6-3.1-1.7 1.1"></path></svg></span>
+            <span class="stewaro-app-more-copy"><strong>Telefon</strong><span>Telefonannahme verwalten</span></span><span class="stewaro-app-more-chevron">›</span>
+          </a>
+          <button class="stewaro-app-more-link" type="button" data-stewaro-open-tab="safety">
+            <span class="stewaro-app-more-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.8 19 6.5v5.2c0 4.2-2.7 7.2-7 8.5-4.3-1.3-7-4.3-7-8.5V6.5Z"></path></svg></span>
+            <span class="stewaro-app-more-copy"><strong>Sicherheit</strong><span>Schutzstatus und Hinweise</span></span><span class="stewaro-app-more-chevron">›</span>
+          </button>
+          <a class="stewaro-app-more-link" href="https://account.stewaro.com/concierge-anpassen">
+            <span class="stewaro-app-more-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"></path><circle cx="16" cy="7" r="2"></circle><circle cx="8" cy="17" r="2"></circle></svg></span>
+            <span class="stewaro-app-more-copy"><strong>Einstellungen</strong><span>FIDEL und persönliche Vorgaben</span></span><span class="stewaro-app-more-chevron">›</span>
+          </a>
+          <button class="stewaro-app-more-link is-danger" id="stewaroAppLogout" type="button">
+            <span class="stewaro-app-more-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 5H5v14h5M14 8l4 4-4 4M8 12h10"></path></svg></span>
+            <span class="stewaro-app-more-copy"><strong>Logout</strong><span>Sicher abmelden</span></span><span class="stewaro-app-more-chevron">›</span>
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <nav class="stewaro-app-nav" aria-label="App-Navigation">
+      <button class="stewaro-app-nav-button" type="button" data-stewaro-app-tab="overview" aria-selected="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 11 12 4.8 19.5 11"></path><path d="M6.5 10.5V19h11v-8.5"></path></svg><span>Übersicht</span>
+      </button>
+      <button class="stewaro-app-nav-button" type="button" data-stewaro-app-tab="fidel" aria-selected="false" tabindex="-1">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7.5"></circle><path d="M8.5 13.5c1.5 2.1 5.5 2.1 7 0M9 9.5h.01M15 9.5h.01"></path></svg><span>FIDEL</span>
+      </button>
+      <button class="stewaro-app-nav-button" type="button" data-stewaro-app-tab="safety" aria-selected="false" tabindex="-1">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.8 19 6.5v5.2c0 4.2-2.7 7.2-7 8.5-4.3-1.3-7-4.3-7-8.5V6.5Z"></path><path d="m9 12 2 2 4-4"></path></svg><span>Sicherheit</span>
+      </button>
+      <button class="stewaro-app-nav-button" type="button" data-stewaro-app-tab="more" aria-selected="false" tabindex="-1">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6.5" cy="12" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="17.5" cy="12" r="1"></circle></svg><span>Mehr</span>
+      </button>
+    </nav>
+  </section>
+
     <div class="web-concierge-pagebar">
       <a class="web-concierge-back" href="/konto" aria-label="Zum Konto">Konto</a>
       <div class="web-concierge-page-actions">
@@ -102,6 +306,7 @@
     </div>
   </footer>
   <script src="assets/auth-nav.js?v=44"></script>
+  <script src="assets/stewaro-app-shell.js?v=1"></script>
   <script src="assets/site-ui.js?v=8"></script>
   <script src="assets/web-customer-concierge.js?v=59"></script>
   <script src="assets/web-voice-memo.js?v=11"></script>
