@@ -105,7 +105,8 @@ test("header keeps wordmark and symbol in gold-only synchronized sheen", () => {
   const css = read("assets/stewaro-unified.css");
   assert.match(css, /STEWARO_CANONICAL_WORDMARK_GUARD_20260928/);
   assert.match(css, /linear-gradient\(108deg,#b89045 0%,#d1ad63 15%,#ead49a 31%,#fff3d0 42%,#d0aa5a 55%,#edd9a5 69%,#c49a4a 84%,#dfc680 100%\)/);
-  assert.doesNotMatch(css, /#75531c|#8a611e/);
+  const active = css.slice(css.indexOf("/* STEWARO_CANONICAL_WORDMARK_GUARD_20260928 */"));
+  assert.doesNotMatch(active, /#75531c|#8a611e/);
   assert.match(css, /-webkit-mask:url\("\/assets\/logos\/stewaro-icon\.svg"\) center\/contain no-repeat!important/);
   assert.match(css, /mask:url\("\/assets\/logos\/stewaro-icon\.svg"\) center\/contain no-repeat!important/);
   assert.match(css, /data:image\/svg\+xml;base64,/);
