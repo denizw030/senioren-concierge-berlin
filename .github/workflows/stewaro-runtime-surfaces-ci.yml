@@ -125,3 +125,222 @@ jobs:
             done
           done
           echo "STEWARO_RUNTIME_SURFACES_BROWSER_SMOKE=GREEN"
+
+      - name: Authenticated App visual viewport QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          source = Path("web-concierge.html").read_text(encoding="utf-8")
+          source = re.sub(r"<script\b[^>]*>.*?</script>", "", source, flags=re.I | re.S)
+          qa = r"""
+          <script>
+          (() => {
+            const params = new URLSearchParams(location.search);
+            const view = params.get("view") || "overview";
+            document.documentElement.dataset.stewaroApp = "1";
+            const shell = document.getElementById("stewaroAppShell");
+            if (!shell) return;
+            shell.hidden = false;
+
+            const panelName = view.startsWith("safety-") ? "safety" : view;
+            document.querySelectorAll("[data-stewaro-app-panel]").forEach((panel) => {
+              panel.hidden = panel.getAttribute("data-stewaro-app-panel") !== panelName;
+            });
+            document.querySelectorAll("[data-stewaro-app-tab]").forEach((button) => {
+              button.setAttribute("aria-selected", button.getAttribute("data-stewaro-app-tab") === panelName ? "true" : "false");
+            });
+
+            const workspace = document.querySelector(".web-concierge-shell > .web-concierge-workspace");
+            const mount = document.getElementById("stewaroAppFidelMount");
+            if (workspace && mount) mount.appendChild(workspace);
+
+            if (panelName === "safety") {
+              const stateName = view.replace("safety-", "") || "setup";
+              document.querySelectorAll("[data-stewaro-safety-state]").forEach((node) => {
+                node.hidden = node.getAttribute("data-stewaro-safety-state") !== stateName;
+              });
+            }
+
+            const samples = {
+              stewaroAppGreeting: "Guten Tag, Anna.",
+              stewaroAppUsage: "42 App-Dialoge übrig",
+              stewaroAppUsageMeta: "8 von 50 genutzt · STANDARD",
+              stewaroAppSafety: "Schutz aktiv",
+              stewaroAppSafetyMeta: "Nächste Sicherheitsabfrage: 30.09.2026, 20:00",
+              stewaroAppEmail: "anna@beispiel.de",
+              stewaroAppEmailMeta: "Mit diesem STEWARO-Konto verknüpft.",
+              stewaroAppWhatsapp: "+49 … 1234",
+              stewaroAppWhatsappMeta: "12 von 20 Dialogen übrig"
+            };
+            for (const [id, value] of Object.entries(samples)) {
+              const node = document.getElementById(id);
+              if (node) node.textContent = value;
+            }
+
+            const audit = () => {
+              const visible = (node) => {
+                const rect = node.getBoundingClientRect();
+                const style = getComputedStyle(node);
+                return rect.width > 0 && rect.height > 0 && style.visibility !== "hidden" && style.display !== "none";
+              };
+              const doc = document.documentElement;
+              const nav = document.querySelector(".stewaro-app-nav");
+              const navRect = nav?.getBoundingClientRect();
+              const tapTargets = [...document.querySelectorAll(
+                ".stewaro-app-nav-button,.stewaro-app-primary,.stewaro-app-secondary,.stewaro-app-more-link,.stewaro-app-card-link"
+              )].filter(visible);
+              const tapsOk = tapTargets.every((node) => {
+                const rect = node.getBoundingClientRect();
+                return rect.width >= 44 && rect.height >= 44;
+              });
+              document.body.dataset.qaView = view;
+              document.body.dataset.qaOverflow = String(doc.scrollWidth <= innerWidth + 1);
+              document.body.dataset.qaNavVisible = String(Boolean(navRect && navRect.top >= -1 && navRect.bottom <= innerHeight + 1));
+              document.body.dataset.qaTapTargets = String(tapsOk);
+              document.body.dataset.qaWidth = String(innerWidth);
+            };
+            requestAnimationFrame(() => requestAnimationFrame(audit));
+          })();
+          </script>
+          """
+          Path("__stewaro_app_qa.html").write_text(source.replace("</body>", qa + "</body>"), encoding="utf-8")
+          PY
+
+          curl -fsS http://127.0.0.1:4173/__stewaro_app_qa.html >/dev/null || {
+            nohup python3 -m http.server 4173 >/tmp/stewaro-app-qa-http.log 2>&1 &
+            for attempt in 1 2 3 4 5; do
+              curl -fsS http://127.0.0.1:4173/__stewaro_app_qa.html >/dev/null && break
+              sleep 1
+            done
+          }
+
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          mkdir -p /tmp/stewaro-app-visual-qa
+          "$CHROME" --headless --no-sandbox --disable-gpu --remote-debugging-port=9222 --user-data-dir=/tmp/stewaro-app-cdp about:blank >/tmp/stewaro-app-cdp.log 2>&1 &
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            curl -fsS http://127.0.0.1:9222/json/version >/dev/null && break
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:9222/json/version >/dev/null
+
+          node <<'NODE'
+          const fs = require("node:fs");
+          const specs = [[390,844],[393,852],[1440,1000]];
+          const views = ["overview","fidel","safety-setup","safety-active","safety-blocked","more"];
+          const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+          async function createTarget() {
+            const response = await fetch("http://127.0.0.1:9222/json/new?about:blank", { method: "PUT" });
+            if (!response.ok) throw new Error("cdp_target_create_failed");
+            return response.json();
+          }
+
+          async function connect(url) {
+            return new Promise((resolve, reject) => {
+              const ws = new WebSocket(url);
+              ws.addEventListener("open", () => resolve(ws), { once: true });
+              ws.addEventListener("error", () => reject(new Error("cdp_websocket_failed")), { once: true });
+            });
+          }
+
+          async function audit(width, height, view) {
+            const target = await createTarget();
+            const ws = await connect(target.webSocketDebuggerUrl);
+            let seq = 0;
+            const pending = new Map();
+            const listeners = new Map();
+
+            ws.addEventListener("message", (event) => {
+              const message = JSON.parse(String(event.data));
+              if (message.id && pending.has(message.id)) {
+                const handler = pending.get(message.id);
+                pending.delete(message.id);
+                if (message.error) handler.reject(new Error(message.error.message || "cdp_error"));
+                else handler.resolve(message.result || {});
+                return;
+              }
+              const queue = listeners.get(message.method);
+              if (queue && queue.length) queue.shift()(message.params || {});
+            });
+
+            const send = (method, params = {}) => new Promise((resolve, reject) => {
+              const id = ++seq;
+              pending.set(id, { resolve, reject });
+              ws.send(JSON.stringify({ id, method, params }));
+            });
+            const waitEvent = (method) => new Promise((resolve) => {
+              const queue = listeners.get(method) || [];
+              queue.push(resolve);
+              listeners.set(method, queue);
+            });
+
+            await send("Page.enable");
+            await send("Emulation.setDeviceMetricsOverride", {
+              width,
+              height,
+              deviceScaleFactor: 1,
+              mobile: width < 600,
+              screenWidth: width,
+              screenHeight: height
+            });
+            const loaded = waitEvent("Page.loadEventFired");
+            await send("Page.navigate", {
+              url: "http://127.0.0.1:4173/__stewaro_app_qa.html?view=" + encodeURIComponent(view)
+            });
+            await loaded;
+            await sleep(150);
+
+            const expression = [
+              "(() => {",
+              " const visible = (node) => { const r=node.getBoundingClientRect(); const s=getComputedStyle(node); return r.width>0 && r.height>0 && s.visibility!=='hidden' && s.display!=='none'; };",
+              " const nav=document.querySelector('.stewaro-app-nav'); const nr=nav&&nav.getBoundingClientRect();",
+              " const taps=[...document.querySelectorAll('.stewaro-app-nav-button,.stewaro-app-primary,.stewaro-app-secondary,.stewaro-app-more-link,.stewaro-app-card-link')].filter(visible);",
+              " return { width:innerWidth, height:innerHeight, overflow:document.documentElement.scrollWidth<=innerWidth+1, navVisible:Boolean(nr&&nr.top>=-1&&nr.bottom<=innerHeight+1), tapsOk:taps.every((node)=>{const r=node.getBoundingClientRect();return r.width>=44&&r.height>=44;}), tapCount:taps.length };",
+              "})()"
+            ].join("\n");
+            const evaluated = await send("Runtime.evaluate", { expression, returnByValue: true });
+            const metrics = evaluated.result && evaluated.result.value;
+            if (!metrics) throw new Error("cdp_metrics_missing");
+
+            const shot = await send("Page.captureScreenshot", {
+              format: "png",
+              fromSurface: true,
+              captureBeyondViewport: false
+            });
+            fs.writeFileSync("/tmp/stewaro-app-visual-qa/" + view + "-" + width + ".png", Buffer.from(shot.data, "base64"));
+            console.log("STEWARO_APP_VISUAL_QA", JSON.stringify({ view, targetWidth: width, targetHeight: height, metrics }));
+
+            if (metrics.width !== width) throw new Error("viewport_width_mismatch:" + view + ":" + width + ":" + metrics.width);
+            if (!metrics.overflow) throw new Error("horizontal_overflow:" + view + ":" + width);
+            if (!metrics.navVisible) throw new Error("nav_not_visible:" + view + ":" + width);
+            if (!metrics.tapsOk) throw new Error("tap_target_too_small:" + view + ":" + width);
+            ws.close();
+          }
+
+          (async () => {
+            for (const [width,height] of specs) {
+              for (const view of views) await audit(width,height,view);
+            }
+            console.log("STEWARO_APP_VISUAL_VIEWPORT_QA=GREEN");
+          })().catch((error) => {
+            console.error("STEWARO_APP_VISUAL_QA_FAIL", error && error.stack ? error.stack : error);
+            process.exit(1);
+          });
+          NODE
+
+          ls -lh /tmp/stewaro-app-visual-qa/*.png
+
+      - name: Upload App visual QA screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stewaro-app-visual-qa
+          path: /tmp/stewaro-app-visual-qa/*.png
+          if-no-files-found: error
+          retention-days: 7
+
