@@ -226,8 +226,8 @@ jobs:
             width="$1"
             height="$2"
             for view in overview fidel safety-setup safety-active safety-blocked more; do
-              out="/tmp/stewaro-app-visual-qa/\${view}-\${width}.html"
-              png="/tmp/stewaro-app-visual-qa/\${view}-\${width}.png"
+              out="/tmp/stewaro-app-visual-qa/$view-$width.html"
+              png="/tmp/stewaro-app-visual-qa/$view-$width.png"
               "$CHROME" \
                 --headless --no-sandbox --disable-gpu \
                 --hide-scrollbars \
@@ -236,16 +236,20 @@ jobs:
                 --screenshot="$png" \
                 --dump-dom \
                 "http://127.0.0.1:4173/__stewaro_app_qa.html?view=$view" > "$out"
-              grep -q 'data-qa-overflow="true"' "$out"
-              grep -q 'data-qa-nav-visible="true"' "$out"
-              grep -q 'data-qa-tap-targets="true"' "$out"
-              grep -q "data-qa-width=\"$width\"" "$out"
+              for expected in 'data-qa-overflow="true"' 'data-qa-nav-visible="true"' 'data-qa-tap-targets="true"' "data-qa-width=\"$width\""; do
+                if ! grep -q "$expected" "$out"; then
+                  echo "STEWARO_APP_VISUAL_QA_FAIL view=$view width=$width expected=$expected"
+                  grep -o 'data-qa-[a-z-]*="[^"]*"' "$out" | tail -n 10 || true
+                  exit 1
+                fi
+              done
             done
           done
           echo "STEWARO_APP_VISUAL_VIEWPORT_QA=GREEN"
           ls -lh /tmp/stewaro-app-visual-qa/*.png
 
       - name: Upload App visual QA screenshots
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: stewaro-app-visual-qa
