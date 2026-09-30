@@ -11,7 +11,7 @@ test("STEWARO unified experience owns the customer-facing visual shell", () => {
   assert.match(css, /background:rgba\(255,255,255,\.965\)!important/);
   assert.match(css, /url\("\/assets\/logos\/stewaro-icon\.svg"\)/);
   assert.match(css, /stewaro-wordmark\.svg/);
-  assert.match(css, /linear-gradient\\(112deg,#c6a65f/);
+  assert.match(css, /linear-gradient\(112deg,#c6a65f/);
   assert.match(css, /body\.login-image-page main::after/);
   assert.match(css, /content:none!important/);
   assert.match(css, /body\.pricing-page/);
