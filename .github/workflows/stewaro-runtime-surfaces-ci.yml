@@ -125,3 +125,131 @@ jobs:
             done
           done
           echo "STEWARO_RUNTIME_SURFACES_BROWSER_SMOKE=GREEN"
+
+      - name: Authenticated App visual viewport QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          source = Path("web-concierge.html").read_text(encoding="utf-8")
+          source = re.sub(r"<script\b[^>]*>.*?</script>", "", source, flags=re.I | re.S)
+          qa = r"""
+          <script>
+          (() => {
+            const params = new URLSearchParams(location.search);
+            const view = params.get("view") || "overview";
+            document.documentElement.dataset.stewaroApp = "1";
+            const shell = document.getElementById("stewaroAppShell");
+            if (!shell) return;
+            shell.hidden = false;
+
+            const panelName = view.startsWith("safety-") ? "safety" : view;
+            document.querySelectorAll("[data-stewaro-app-panel]").forEach((panel) => {
+              panel.hidden = panel.getAttribute("data-stewaro-app-panel") !== panelName;
+            });
+            document.querySelectorAll("[data-stewaro-app-tab]").forEach((button) => {
+              button.setAttribute("aria-selected", button.getAttribute("data-stewaro-app-tab") === panelName ? "true" : "false");
+            });
+
+            const workspace = document.querySelector(".web-concierge-shell > .web-concierge-workspace");
+            const mount = document.getElementById("stewaroAppFidelMount");
+            if (workspace && mount) mount.appendChild(workspace);
+
+            if (panelName === "safety") {
+              const stateName = view.replace("safety-", "") || "setup";
+              document.querySelectorAll("[data-stewaro-safety-state]").forEach((node) => {
+                node.hidden = node.getAttribute("data-stewaro-safety-state") !== stateName;
+              });
+            }
+
+            const samples = {
+              stewaroAppGreeting: "Guten Tag, Anna.",
+              stewaroAppUsage: "42 App-Dialoge übrig",
+              stewaroAppUsageMeta: "8 von 50 genutzt · STANDARD",
+              stewaroAppSafety: "Schutz aktiv",
+              stewaroAppSafetyMeta: "Nächste Sicherheitsabfrage: 30.09.2026, 20:00",
+              stewaroAppEmail: "anna@beispiel.de",
+              stewaroAppEmailMeta: "Mit diesem STEWARO-Konto verknüpft.",
+              stewaroAppWhatsapp: "+49 … 1234",
+              stewaroAppWhatsappMeta: "12 von 20 Dialogen übrig"
+            };
+            for (const [id, value] of Object.entries(samples)) {
+              const node = document.getElementById(id);
+              if (node) node.textContent = value;
+            }
+
+            const audit = () => {
+              const visible = (node) => {
+                const rect = node.getBoundingClientRect();
+                const style = getComputedStyle(node);
+                return rect.width > 0 && rect.height > 0 && style.visibility !== "hidden" && style.display !== "none";
+              };
+              const doc = document.documentElement;
+              const nav = document.querySelector(".stewaro-app-nav");
+              const navRect = nav?.getBoundingClientRect();
+              const tapTargets = [...document.querySelectorAll(
+                ".stewaro-app-nav-button,.stewaro-app-primary,.stewaro-app-secondary,.stewaro-app-more-link,.stewaro-app-card-link"
+              )].filter(visible);
+              const tapsOk = tapTargets.every((node) => {
+                const rect = node.getBoundingClientRect();
+                return rect.width >= 44 && rect.height >= 44;
+              });
+              document.body.dataset.qaView = view;
+              document.body.dataset.qaOverflow = String(doc.scrollWidth <= innerWidth + 1);
+              document.body.dataset.qaNavVisible = String(Boolean(navRect && navRect.top >= -1 && navRect.bottom <= innerHeight + 1));
+              document.body.dataset.qaTapTargets = String(tapsOk);
+              document.body.dataset.qaWidth = String(innerWidth);
+            };
+            requestAnimationFrame(() => requestAnimationFrame(audit));
+          })();
+          </script>
+          """
+          Path("__stewaro_app_qa.html").write_text(source.replace("</body>", qa + "</body>"), encoding="utf-8")
+          PY
+
+          curl -fsS http://127.0.0.1:4173/__stewaro_app_qa.html >/dev/null || {
+            nohup python3 -m http.server 4173 >/tmp/stewaro-app-qa-http.log 2>&1 &
+            for attempt in 1 2 3 4 5; do
+              curl -fsS http://127.0.0.1:4173/__stewaro_app_qa.html >/dev/null && break
+              sleep 1
+            done
+          }
+
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          mkdir -p /tmp/stewaro-app-visual-qa
+          for spec in "390 844" "393 852" "1440 1000"; do
+            set -- $spec
+            width="$1"
+            height="$2"
+            for view in overview fidel safety-setup safety-active safety-blocked more; do
+              out="/tmp/stewaro-app-visual-qa/\${view}-\${width}.html"
+              png="/tmp/stewaro-app-visual-qa/\${view}-\${width}.png"
+              "$CHROME" \
+                --headless --no-sandbox --disable-gpu \
+                --hide-scrollbars \
+                --window-size="$width,$height" \
+                --virtual-time-budget=1600 \
+                --screenshot="$png" \
+                --dump-dom \
+                "http://127.0.0.1:4173/__stewaro_app_qa.html?view=$view" > "$out"
+              grep -q 'data-qa-overflow="true"' "$out"
+              grep -q 'data-qa-nav-visible="true"' "$out"
+              grep -q 'data-qa-tap-targets="true"' "$out"
+              grep -q "data-qa-width=\"$width\"" "$out"
+            done
+          done
+          echo "STEWARO_APP_VISUAL_VIEWPORT_QA=GREEN"
+          ls -lh /tmp/stewaro-app-visual-qa/*.png
+
+      - name: Upload App visual QA screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: stewaro-app-visual-qa
+          path: /tmp/stewaro-app-visual-qa/*.png
+          if-no-files-found: error
+          retention-days: 7
+
