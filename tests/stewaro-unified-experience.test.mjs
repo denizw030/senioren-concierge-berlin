@@ -101,15 +101,17 @@ test("canonical STEWARO branding has no active legacy mark reference or generate
   }
 });
 
-test("header restores the original STEWARO gold sheen on the uploaded wordmark geometry", () => {
+test("header keeps wordmark and symbol in gold-only synchronized sheen", () => {
   const css = read("assets/stewaro-unified.css");
   assert.match(css, /STEWARO_CANONICAL_WORDMARK_GUARD_20260928/);
-  assert.match(css, /linear-gradient\(108deg,#75531c 0%,#b9842d 14%,#efd99b 31%,#fff1c5 41%,#c39337 54%,#ead089 68%,#8a611e 84%,#d8b65d 100%\)/);
+  assert.match(css, /linear-gradient\(108deg,#b89045 0%,#d1ad63 15%,#ead49a 31%,#fff3d0 42%,#d0aa5a 55%,#edd9a5 69%,#c49a4a 84%,#dfc680 100%\)/);
+  assert.doesNotMatch(css, /#75531c|#8a611e/);
+  assert.match(css, /-webkit-mask:url\("\/assets\/logos\/stewaro-icon\.svg"\) center\/contain no-repeat!important/);
+  assert.match(css, /mask:url\("\/assets\/logos\/stewaro-icon\.svg"\) center\/contain no-repeat!important/);
   assert.match(css, /data:image\/svg\+xml;base64,/);
   assert.match(css, /mask-mode:alpha!important/);
-  assert.match(css, /drop-shadow\(0 1px 0 rgba\(255,255,255,\.30\)\)/);
+  assert.match(css, /filter:none!important/);
   assert.match(css, /animation:stewaroUnifiedSheen 8s ease-in-out infinite alternate!important/);
   assert.match(css, /@keyframes stewaroUnifiedSheen\{from\{background-position:0% 50%\}to\{background-position:100% 50%\}\}/);
-  assert.match(css, /brand \.brandtext::after[\s\S]*content:none!important/);
   assert.match(css, /@media\(prefers-reduced-motion:reduce\)[\s\S]*animation:none!important/);
 });
