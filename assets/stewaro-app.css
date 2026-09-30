@@ -703,3 +703,55 @@ html[data-stewaro-app="1"] .web-concierge-retry{
   .stewaro-app-panel.is-active{animation:none}
   .stewaro-app-primary,.stewaro-app-secondary{transition:none}
 }
+
+
+/* FIDEL_VOICE_SELECTION_V1 */
+.stewaro-fidel-voice-setting{
+  padding:18px;
+  border-bottom:1px solid rgba(23,49,38,.08);
+}
+.stewaro-fidel-voice-head{
+  display:grid;
+  grid-template-columns:42px minmax(0,1fr);
+  align-items:center;
+  gap:12px;
+}
+.stewaro-fidel-voice-options{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  margin:16px 0 0 54px;
+}
+.stewaro-fidel-voice-option{
+  position:relative;
+  display:block;
+  min-height:82px;
+  padding:14px;
+  border:1px solid rgba(23,49,38,.12);
+  border-radius:18px;
+  background:rgba(255,255,255,.66);
+  cursor:pointer;
+}
+.stewaro-fidel-voice-option input{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  cursor:pointer;
+}
+.stewaro-fidel-voice-option:has(input:checked){
+  border-color:rgba(199,154,61,.68);
+  box-shadow:0 0 0 2px rgba(199,154,61,.15);
+  background:rgba(239,231,215,.48);
+}
+.stewaro-fidel-voice-option span{display:grid;gap:6px;pointer-events:none}
+.stewaro-fidel-voice-option strong{color:var(--stewaro-forest);font-size:13px}
+.stewaro-fidel-voice-option small{color:var(--stewaro-muted);font-size:11px;line-height:1.4}
+.stewaro-fidel-voice-status{
+  margin:10px 0 0 54px;
+  color:var(--stewaro-muted);
+  font-size:11px;
+}
+@media(max-width:720px){
+  .stewaro-fidel-voice-options{grid-template-columns:1fr;margin-left:0}
+  .stewaro-fidel-voice-status{margin-left:0}
+}

@@ -12,7 +12,7 @@ test("web chat mounts Live Concierge on the right without replacing voice memo",
     const html=read(page);
     assert.match(html,/assets\/web-voice-memo\.js\?v=11/);
     assert.match(html,/assets\/web-customer-concierge\.js\?v=59/);
-    assert.match(html,/assets\/web-live-concierge\.js\?v=27/);
+    assert.match(html,/assets\/web-live-concierge\.js\?v=28/);
     assert.match(html,/assets\/nahwerk-live-concierge\.css\?v=5/);
   }
   const boot=read("assets/web-live-concierge.js");
@@ -340,4 +340,23 @@ test("FIDEL Live surface never yields to a legacy persona portrait",()=>{
   assert.match(client,/const key=forceFidel\?"fidel"/);
   assert.match(client,/image\.removeAttribute\("src"\)/);
   assert.match(client,/orbCanvas\.hidden=false/);
+});
+
+
+test("FIDEL Souverän mutes native Live audio and plays authenticated ONYX TTS",()=>{
+  const client=read("assets/nahwerk-live-concierge.js");
+  assert.match(client,/audioOutputMode==="tts_onyx"/);
+  assert.match(client,/remoteAudio\.muted=audioOutputMode==="tts_onyx"/);
+  assert.match(client,/postAudio\("\/tts"/);
+  assert.match(client,/stopHybridSpeech\(\)/);
+  assert.match(client,/hybridSpeaking/);
+});
+
+test("FIDEL voice selection stays voice-only and never changes FIDEL visual identity",()=>{
+  const shell=read("assets/stewaro-app-shell.js");
+  assert.match(shell,/FIDEL Souverän/);
+  assert.match(shell,/FIDEL Klar/);
+  assert.match(shell,/FIDEL Warm/);
+  assert.doesNotMatch(shell,/Konrad|Alexander|Leyla/);
+  assert.match(shell,/Name und Persönlichkeit bleiben gleich/);
 });

@@ -8,10 +8,11 @@
   const PROFILE_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-profile";
   const SAFETY_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-managed-safety-context";
   const SESSION_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-session-secure";
+  const LIVE_URL = "https://ta832v8wah.execute-api.eu-central-1.amazonaws.com/prod/v1/web/live";
   const ACCOUNT_ORIGIN = "https://account.stewaro.com";
   const LOGIN_URL = ACCOUNT_ORIGIN + "/anmelden?produkt=senioren&next=app";
 
-  const state = { profile: null, safety: null, currentTab: "overview" };
+  const state = { profile: null, safety: null, currentTab: "overview", fidelVoice: null };
 
   function session() {
     try { return JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null"); }
@@ -145,6 +146,85 @@
     }
   }
 
+
+  const FIDEL_VOICE_LABELS = Object.freeze({
+    fidel_souveraen:{name:"FIDEL Souverän",description:"Tief, markant und sehr präsent."},
+    fidel_klar:{name:"FIDEL Klar",description:"Ruhig, klar und klassisch männlich."},
+    fidel_warm:{name:"FIDEL Warm",description:"Warm, weich und weiblich."}
+  });
+
+  async function liveVoiceRequest(path,{method="GET",body=null}={}) {
+    const bearer=token();
+    if(!bearer)throw new Error("session_required");
+    const response=await fetch(LIVE_URL+path,{
+      method,
+      headers:{Authorization:"Bearer "+bearer,...(body?{"Content-Type":"application/json"}:{})},
+      body:body?JSON.stringify(body):undefined,
+      cache:"no-store",
+      signal:AbortSignal.timeout(9000)
+    });
+    const payload=await response.json().catch(()=>({}));
+    if(!response.ok||payload?.ok!==true)throw new Error(String(payload?.error||"voice_unavailable"));
+    return payload;
+  }
+
+  function mountFidelVoiceSelector() {
+    const host=document.querySelector(".stewaro-app-more");
+    if(!host||document.getElementById("stewaroFidelVoiceSetting"))return;
+    const section=document.createElement("section");
+    section.id="stewaroFidelVoiceSetting";
+    section.className="stewaro-fidel-voice-setting";
+    section.setAttribute("aria-labelledby","stewaroFidelVoiceTitle");
+    section.innerHTML=`
+      <div class="stewaro-fidel-voice-head">
+        <span class="stewaro-app-more-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 10v4M9 7v10M13 5v14M17 8v8M21 10v4"></path></svg></span>
+        <span class="stewaro-app-more-copy"><strong id="stewaroFidelVoiceTitle">FIDEL Stimme</strong><span>Wähle den Klang von FIDEL. Name und Persönlichkeit bleiben gleich.</span></span>
+      </div>
+      <div class="stewaro-fidel-voice-options" role="radiogroup" aria-labelledby="stewaroFidelVoiceTitle">
+        ${Object.entries(FIDEL_VOICE_LABELS).map(([key,value])=>`
+          <label class="stewaro-fidel-voice-option">
+            <input type="radio" name="stewaroFidelVoice" value="${key}">
+            <span><strong>${value.name}</strong><small>${value.description}</small></span>
+          </label>`).join("")}
+      </div>
+      <p class="stewaro-fidel-voice-status" id="stewaroFidelVoiceStatus" aria-live="polite">Stimme wird geladen …</p>`;
+    host.insertBefore(section,host.lastElementChild);
+    section.querySelectorAll('input[name="stewaroFidelVoice"]').forEach((input)=>{
+      input.addEventListener("change",async()=>{
+        if(!input.checked)return;
+        const all=[...section.querySelectorAll('input[name="stewaroFidelVoice"]')];
+        all.forEach(x=>x.disabled=true);
+        setText("stewaroFidelVoiceStatus","Stimme wird gespeichert …");
+        try{
+          const result=await liveVoiceRequest("/voice-preference",{method:"POST",body:{voice_variant:input.value}});
+          state.fidelVoice=String(result.selected||input.value);
+          setText("stewaroFidelVoiceStatus",(FIDEL_VOICE_LABELS[state.fidelVoice]?.name||"FIDEL")+" ist ausgewählt.");
+        }catch{
+          setText("stewaroFidelVoiceStatus","Die Stimme konnte gerade nicht gespeichert werden.");
+          void loadFidelVoicePreference();
+        }finally{
+          all.forEach(x=>x.disabled=false);
+        }
+      });
+    });
+  }
+
+  async function loadFidelVoicePreference() {
+    mountFidelVoiceSelector();
+    try{
+      const result=await liveVoiceRequest("/voice-options");
+      const selected=String(result.selected||"fidel_souveraen");
+      state.fidelVoice=selected;
+      const input=document.querySelector('input[name="stewaroFidelVoice"][value="'+CSS.escape(selected)+'"]');
+      if(input)input.checked=true;
+      setText("stewaroFidelVoiceStatus",(FIDEL_VOICE_LABELS[selected]?.name||"FIDEL")+" ist ausgewählt.");
+      return true;
+    }catch{
+      setText("stewaroFidelVoiceStatus","Stimmenauswahl ist gerade nicht verfügbar.");
+      return false;
+    }
+  }
+
   function showSafetyState(name) {
     document.querySelectorAll("[data-stewaro-safety-state]").forEach((node) => {
       node.hidden = node.getAttribute("data-stewaro-safety-state") !== name;
@@ -247,8 +327,9 @@
     });
     document.getElementById("stewaroSafetyAskFidel")?.addEventListener("click", prepareFidelSafetyQuestion);
     document.getElementById("stewaroAppLogout")?.addEventListener("click", logout);
+    mountFidelVoiceSelector();
     document.getElementById("stewaroAppRetryData")?.addEventListener("click", () => {
-      void Promise.allSettled([loadProfile(), loadSafety()]);
+      void Promise.allSettled([loadProfile(), loadSafety(), loadFidelVoicePreference()]);
     });
   }
 
@@ -266,7 +347,7 @@
     addEventListener("offline", apply);
     addEventListener("online", () => {
       setConnection("pending", "Verbindung wird hergestellt");
-      void Promise.allSettled([loadProfile(), loadSafety()]);
+      void Promise.allSettled([loadProfile(), loadSafety(), loadFidelVoicePreference()]);
       syncConnectionFromChat();
     });
     apply();
@@ -283,12 +364,12 @@
     syncConnectionFromChat();
     bindNetworkState();
     window.addEventListener("stewaro:safety-link-blocked", (event) => showSafetyAlert(event?.detail || {}));
-    void Promise.allSettled([loadProfile(), loadSafety()]);
+    void Promise.allSettled([loadProfile(), loadSafety(), loadFidelVoicePreference()]);
   }
 
   window.STEWAROAppShell = Object.freeze({
     selectTab,
-    refresh: () => Promise.allSettled([loadProfile(), loadSafety()]),
+    refresh: () => Promise.allSettled([loadProfile(), loadSafety(), loadFidelVoicePreference()]),
     showSafetyAlert
   });
 
