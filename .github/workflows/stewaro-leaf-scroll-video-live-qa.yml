@@ -153,11 +153,13 @@ jobs:
               const section = document.querySelector('.leaf-scene');
               const video = document.querySelector('.leaf-video');
               if (!section || !video) return null;
+              const rect = section.getBoundingClientRect();
+              const absoluteTop = scrollY + rect.top;
               const y = ${JSON.stringify(position)} === 'early'
-                ? section.offsetTop - innerHeight * 0.8
-                : section.offsetTop + section.offsetHeight * 0.55;
+                ? absoluteTop - innerHeight * 0.8
+                : absoluteTop + section.getBoundingClientRect().height * 0.55;
               window.scrollTo(0, Math.max(0, y));
-              return { requestedY: Math.max(0, y) };
+              return { requestedY: Math.max(0, y), absoluteTop };
             })()`);
 
             await sample('early');
