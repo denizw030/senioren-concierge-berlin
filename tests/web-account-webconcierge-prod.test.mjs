@@ -161,7 +161,7 @@ test("chat header displays only the authoritative central Concierge persona", ()
 });
 
 test("Concierge avatar and name open central Concierge settings", () => {
-  assert.match(client, /SETTINGS_URL = "\/concierge-anpassen"/);
+  assert.match(client, /SETTINGS_URL = location\.hostname==="app\.stewaro\.com" \? "https:\/\/account\.stewaro\.com\/concierge-anpassen" : "\/concierge-anpassen"/);
   assert.match(client, /title\.onclick = openConciergeSettings/);
   assert.match(client, /avatar\.onclick = openConciergeSettings/);
   assert.match(client, /title\.onkeydown/);
