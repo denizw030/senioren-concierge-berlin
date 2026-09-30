@@ -199,16 +199,27 @@ jobs:
               if (!target || target.requestedY > target.maxY + 1) {
                 throw new Error('mechanism_scroll_target_unreachable:' + spec.name + ':' + JSON.stringify(target));
               }
-              return evaluate(`(() => {
+              const command = await evaluate(`(() => {
                 const section = document.querySelector('.precision');
                 const rect = section.getBoundingClientRect();
                 const absoluteTop = scrollY + rect.top;
                 const y = ${JSON.stringify(position)} === 'early'
                   ? absoluteTop - innerHeight * 0.8
                   : absoluteTop + rect.height * 0.55;
-                window.scrollTo(0, Math.max(0, y));
+                document.documentElement.style.setProperty('scroll-behavior', 'auto', 'important');
+                if (document.body) document.body.style.setProperty('scroll-behavior', 'auto', 'important');
+                window.scrollTo({ top: Math.max(0, y), left: 0, behavior: 'instant' });
                 return { requestedY: Math.max(0, y), absoluteTop };
               })()`);
+              if (!command) return null;
+              for (let i = 0; i < 30; i++) {
+                const actualY = await evaluate('scrollY');
+                if (Math.abs(actualY - command.requestedY) < 2) return { ...command, actualY };
+                await sleep(50);
+              }
+              const actualY = await evaluate('scrollY');
+              throw new Error('mechanism_scroll_target_not_reached:' + spec.name + ':' +
+                JSON.stringify({ requestedY: command.requestedY, actualY }));
             };
             const waitForMechanismReady = async () => {
               for (let i = 0; i < 30; i++) {
