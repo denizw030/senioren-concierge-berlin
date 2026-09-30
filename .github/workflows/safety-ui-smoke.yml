@@ -1,6 +1,12 @@
 name: NAHWERK Safety UI Smoke
 
 on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "konto.html"
+      - "tests/account-usage.test.mjs"
+      - ".github/workflows/safety-ui-smoke.yml"
   push:
     branches: [main]
     paths:
@@ -42,9 +48,9 @@ jobs:
               'SAFETY_CONTACTS_URL',
               'customer_call_delay_minutes: customerDelay',
               'emergency_contact_delay_minutes: emergencyDelay',
-              'höchstens 20 Sekunden',
+              'je max. 20 Sekunden',
               'höchstens 5 Versuche',
-              'Bis zu 2 Kundenanrufe',
+              'Bis zu 2 Anrufe bei Ihnen',
               'id="safetySummaryGrid"',
               'id="safetySummaryCalls"',
               'id="safetyChainEscalation"',
