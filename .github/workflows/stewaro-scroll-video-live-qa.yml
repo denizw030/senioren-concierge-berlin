@@ -149,19 +149,67 @@ jobs:
             }
             if (!mediaReady) throw new Error('mechanism_video_metadata_not_ready:' + spec.name);
 
-            const sample = async (position) => evaluate(`(() => {
-              const section = document.querySelector('.precision');
-              const video = document.querySelector('.mechanism-video');
-              if (!section || !video) return null;
-              const rect = section.getBoundingClientRect();
-              const absoluteTop = scrollY + rect.top;
-              const y = ${JSON.stringify(position)} === 'early'
-                ? absoluteTop - innerHeight * 0.8
-                : absoluteTop + rect.height * 0.55;
-              window.scrollTo(0, Math.max(0, y));
-              return { requestedY: Math.max(0, y), absoluteTop };
-            })()`);
+            // The homepage contains large cinematic media above this section. On a cold
+            // browser run its document height can still grow briefly after load, which
+            // causes scrollTo() to be clamped before the mechanism section is reachable.
+            let stableLayoutReads = 0;
+            let previousLayout = null;
+            for (let i = 0; i < 50; i++) {
+              const layout = await evaluate(`(() => {
+                const section = document.querySelector('.precision');
+                if (!section) return null;
+                const rect = section.getBoundingClientRect();
+                return {
+                  scrollHeight: document.documentElement.scrollHeight,
+                  sectionTop: scrollY + rect.top,
+                  sectionHeight: rect.height
+                };
+              })()`);
+              if (!layout) throw new Error('mechanism_section_missing:' + spec.name);
+              const stable = previousLayout &&
+                Math.abs(layout.scrollHeight - previousLayout.scrollHeight) < 2 &&
+                Math.abs(layout.sectionTop - previousLayout.sectionTop) < 2 &&
+                Math.abs(layout.sectionHeight - previousLayout.sectionHeight) < 2;
+              stableLayoutReads = stable ? stableLayoutReads + 1 : 0;
+              previousLayout = layout;
+              if (stableLayoutReads >= 4) break;
+              await sleep(150);
+            }
+            if (stableLayoutReads < 4) throw new Error('mechanism_layout_not_stable:' + spec.name);
 
+            const sample = async (position) => {
+              let target = null;
+              for (let i = 0; i < 40; i++) {
+                target = await evaluate(`(() => {
+                  const section = document.querySelector('.precision');
+                  const video = document.querySelector('.mechanism-video');
+                  if (!section || !video) return null;
+                  const rect = section.getBoundingClientRect();
+                  const absoluteTop = scrollY + rect.top;
+                  const y = ${JSON.stringify(position)} === 'early'
+                    ? absoluteTop - innerHeight * 0.8
+                    : absoluteTop + rect.height * 0.55;
+                  const maxY = Math.max(0, document.documentElement.scrollHeight - innerHeight);
+                  return { requestedY: Math.max(0, y), maxY, absoluteTop };
+                })()`);
+                if (!target) return null;
+                if (target.requestedY <= target.maxY + 1) break;
+                await sleep(150);
+              }
+              if (!target || target.requestedY > target.maxY + 1) {
+                throw new Error('mechanism_scroll_target_unreachable:' + spec.name + ':' + JSON.stringify(target));
+              }
+              return evaluate(`(() => {
+                const section = document.querySelector('.precision');
+                const rect = section.getBoundingClientRect();
+                const absoluteTop = scrollY + rect.top;
+                const y = ${JSON.stringify(position)} === 'early'
+                  ? absoluteTop - innerHeight * 0.8
+                  : absoluteTop + rect.height * 0.55;
+                window.scrollTo(0, Math.max(0, y));
+                return { requestedY: Math.max(0, y), absoluteTop };
+              })()`);
+            };
             const waitForMechanismReady = async () => {
               for (let i = 0; i < 30; i++) {
                 const ready = await evaluate(`(() => {
