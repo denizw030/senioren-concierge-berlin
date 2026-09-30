@@ -13,6 +13,8 @@ on:
       - 'assets/site-ui.js'
       - 'assets/language-switcher.js'
       - 'assets/clean-url.js'
+      - 'assets/stewaro-entry-routing.js'
+      - 'tests/stewaro-fragment-navigation.test.mjs'
       - 'locales/*.json'
       - 'tests/seo-indexing.test.mjs'
       - 'tests/i18n-design-parity.test.mjs'
@@ -32,6 +34,8 @@ on:
       - 'assets/site-ui.js'
       - 'assets/language-switcher.js'
       - 'assets/clean-url.js'
+      - 'assets/stewaro-entry-routing.js'
+      - 'tests/stewaro-fragment-navigation.test.mjs'
       - 'locales/*.json'
       - 'tests/seo-indexing.test.mjs'
       - 'tests/i18n-design-parity.test.mjs'
@@ -55,7 +59,7 @@ jobs:
         with:
           node-version: '22'
       - name: Validate search-engine index surface and locale design parity
-        run: node --test tests/seo-indexing.test.mjs tests/i18n-design-parity.test.mjs
+        run: node --test tests/seo-indexing.test.mjs tests/i18n-design-parity.test.mjs tests/stewaro-fragment-navigation.test.mjs
 
 
   stewaro-seo-transition:
@@ -81,3 +85,4 @@ jobs:
           grep -q 'https://stewaro.com/de/' de/index.html
           grep -q 'Sitemap: https://stewaro.com/sitemap.xml' robots.txt
           echo "STEWARO_SEO_TRANSITION=GREEN"
+

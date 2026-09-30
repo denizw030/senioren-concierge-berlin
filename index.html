@@ -7,7 +7,7 @@
     if (window.location.hostname === "app.stewaro.com") {
       window.location.replace("/web-concierge" + window.location.search + window.location.hash);
     } else {
-      window.location.replace("/de/");
+      window.location.replace("/de/" + window.location.search + window.location.hash);
     }
   </script>
   <title>STEWARO</title>
@@ -17,3 +17,4 @@
   <a href="/de/">Weiter zu STEWARO</a>
 </body>
 </html>
+
