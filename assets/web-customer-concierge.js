@@ -25,9 +25,12 @@
   const PERSONA_SYNC_INTERVAL_MS = 3000;
   const CHANNEL_META_REFRESH_MS = 60000;
   const CLIENT_FETCH_TIMEOUT_MS = 40000;
-  const IS_CANONICAL_APP_HOST = location.hostname==="app.stewaro.com";
   const APP_LOGIN_URL = "https://account.stewaro.com/anmelden?produkt=senioren&next=app";
-  const SETTINGS_URL = IS_CANONICAL_APP_HOST ? "https://account.stewaro.com/concierge-anpassen" : "/concierge-anpassen";
+  const SETTINGS_URL = location.hostname==="app.stewaro.com" ? "https://account.stewaro.com/concierge-anpassen" : "/concierge-anpassen";
+  function redirectToLogin(){
+    if(location.hostname==="app.stewaro.com"){location.replace(APP_LOGIN_URL);return;}
+    location.replace("/anmelden");
+  }
   const PORTAL_THEME_KEY = "nw_portal_theme_v1";
   const isMobile=()=>window.matchMedia("(max-width:820px)").matches;
   const RESPONSE_STATES = new Set(["ANSWER","QUESTION","ACTION_STARTED","ACTION_PENDING","ACTION_RESULT","ERROR_RESPONSE","HANDOFF","SAFE_TERMINATION"]);
@@ -1145,7 +1148,7 @@
     const content=input.value.trim();if(!content||content.length>4000)return;
     if(guestMode)lastGuestUserMessage=content;
     if(!activeThreadId)activeThreadId=guestMode?guestThreadId():crypto.randomUUID();
-    if(!guestMode){try{await refreshSessionForWrite();}catch{window.SCBAuth?.clearLocalAuth?.();location.replace(IS_CANONICAL_APP_HOST?APP_LOGIN_URL:"/anmelden");return;}}
+    if(!guestMode){try{await refreshSessionForWrite();}catch{window.SCBAuth?.clearLocalAuth?.();redirectToLogin();return;}}
     const sourceMessageId=crypto.randomUUID(),clientId=`local:${sourceMessageId}`,now=new Date().toISOString();
     appendMessage("user",content,now,clientId,"WEB");input.value="";resizeInput();sending=true;setComposerReady(true);showTyping();
     try{
@@ -1195,7 +1198,7 @@
       reportClientDiagnostic(reason);
       if(!guestMode&&/session_(?:required|invalid)|http_401|http_403/i.test(reason)){
         window.SCBAuth?.clearLocalAuth?.();
-        location.replace(IS_CANONICAL_APP_HOST?APP_LOGIN_URL:"/anmelden");
+        redirectToLogin();
         return;
       }
       removeTyping();const row=document.querySelector(`[data-message-id="${CSS.escape(clientId)}"]`);row?.classList.add("is-failed");
