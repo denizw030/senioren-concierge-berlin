@@ -70,7 +70,7 @@ test("FIDEL remains the existing Web Gateway chat and adds an explicit safe retr
 });
 
 test("app-specific auth failures return to account.stewaro.com and never enable guest mode", () => {
-  assert.match(chat, /IS_CANONICAL_APP_HOST/);
+  assert.match(chat, /function redirectToLogin\(\)/);
   assert.match(chat, /https:\/\/account\.stewaro\.com\/anmelden\?produkt=senioren&next=app/);
   assert.match(chat, /canonicalAppHost&&guestMode/);
 });
