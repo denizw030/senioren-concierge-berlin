@@ -8,6 +8,7 @@ on:
       - "tr/index.html"
       - "tests/stewaro-scroll-video.test.mjs"
       - "tests/stewaro-leaf-scroll-video.test.mjs"
+      - "tests/stewaro-homepage-story-order.test.mjs"
       - "tests/stewaro-account-entry.test.mjs"
       - "assets/stewaro-entry-routing.js"
       - "assets/stewaro-account-flow.js"
@@ -111,6 +112,9 @@ jobs:
 
       - name: Run STEWARO leaf scroll-video contract
         run: node --test tests/stewaro-leaf-scroll-video.test.mjs
+
+      - name: Run STEWARO homepage story-order contract
+        run: node --test tests/stewaro-homepage-story-order.test.mjs
 
       - name: Run STEWARO Block 4 launch-readiness contract
         run: node --test tests/stewaro-block4-launch-readiness.test.mjs
