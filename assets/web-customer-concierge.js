@@ -25,7 +25,7 @@
   const PERSONA_SYNC_INTERVAL_MS = 3000;
   const CHANNEL_META_REFRESH_MS = 60000;
   const CLIENT_FETCH_TIMEOUT_MS = 40000;
-  const SETTINGS_URL = "/concierge-anpassen";
+  const SETTINGS_URL = location.hostname==="app.stewaro.com" ? "https://account.stewaro.com/concierge-anpassen" : "/concierge-anpassen";
   const PORTAL_THEME_KEY = "nw_portal_theme_v1";
   const isMobile=()=>window.matchMedia("(max-width:820px)").matches;
   const RESPONSE_STATES = new Set(["ANSWER","QUESTION","ACTION_STARTED","ACTION_PENDING","ACTION_RESULT","ERROR_RESPONSE","HANDOFF","SAFE_TERMINATION"]);
