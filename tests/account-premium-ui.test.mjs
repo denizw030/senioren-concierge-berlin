@@ -26,17 +26,18 @@ test("all seven account tabs and functional ids remain intact",()=>{
     assert.ok(konto.includes('id="'+id+'"'),id);
 });
 
-test("account tab icons stay tightly aligned and concierge uses the original Goldmann logo",()=>{
-  assert.match(theme,/account-tabs\.account-tabs-modern \.account-tab\{[\s\S]*gap:4px!important/);
-  assert.match(theme,/NAHWERK-Goldmann-Logo\.svg\?v=1/);
-  assert.match(theme,/#accountTabConcierge \.account-tab-concierge-logo\{[\s\S]*filter:none!important/);
+test("account tab icons stay tightly aligned and Concierge uses the canonical STEWARO identity",()=>{
+  assert.match(konto,/account-tabs account-tabs-modern/);
+  assert.match(konto,/stewaro-icon\.svg\?v=1/);
+  assert.match(konto,/#accountTabConcierge \.account-tab-concierge-logo\{[\s\S]*filter:none!important/);
+  assert.doesNotMatch(konto,/NAHWERK-Goldmann-Logo\.svg/);
 });
 
 test("context bar and access hierarchy use compact premium copy",()=>{
   assert.match(konto,/account-setup-context-label">Verwaltetes Profil</);
   assert.match(konto,/>Zugänge<\/div>/);
   assert.match(konto,/Verwalte unterstützte Personen und Zugriffsrechte\./);
-  assert.match(konto,/Personen, die du über NAHWERK unterstützt\./);
+  assert.match(konto,/Personen, die du über STEWARO unterstützt\./);
 });
 
 test("family list renderer is presentation-only enhanced with status pills and metadata",()=>{

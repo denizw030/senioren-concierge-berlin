@@ -7,7 +7,7 @@ const root = process.cwd();
 const read = p => fs.readFileSync(path.join(root,p),'utf8');
 const publicPages = [
   'index.html','prime-concierge.html','safety.html','angehoerige.html','telefonannahme.html',
-  'pakete.html','leistungen.html','ablauf.html','faq.html','kontakt.html','concierges.html',
+  'pakete.html','leistungen.html','ablauf.html','faq.html','kontakt.html',
   'senioren-concierge.html','alltag-organisieren.html','dokumente-verstehen.html',
   'technik-verstehen.html','ueber-mich.html'
 ];

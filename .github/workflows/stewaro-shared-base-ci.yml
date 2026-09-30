@@ -1,0 +1,179 @@
+name: STEWARO Shared Base CI
+
+on:
+  pull_request:
+    paths:
+      - "de/index.html"
+      - "tests/stewaro-account-entry.test.mjs"
+      - "assets/stewaro-entry-routing.js"
+      - "assets/stewaro-account-flow.js"
+      - "assets/stewaro-account-entry.js"
+      - "assets/stewaro-account-entry.css"
+      - "zugang/**"
+      - "zugang.html"
+      - "index.html"
+      - "email-concierge.html"
+      - "assets/site.css"
+      - "assets/site-ui.js"
+      - "assets/stewaro-brand-shell.css"
+      - "assets/stewaro-unified.css"
+      - "assets/brand-2026.css"
+      - "assets/nahwerk-logo-v2.css"
+      - "assets/clean-url.js"
+      - "assets/logos/stewaro-icon.svg"
+      - "assets/logos/stewaro-wordmark.svg"
+      - "anmelden.html"
+      - "anmelden/**"
+      - "registrieren.html"
+      - "registrieren/**"
+      - "konto.html"
+      - "konto/**"
+      - "web-concierge.html"
+      - "web-concierge/**"
+      - "safety.html"
+      - "safety/**"
+      - "pakete.html"
+      - "pakete/**"
+      - "payg.html"
+      - "payg/**"
+      - "telefonannahme.html"
+      - "telefonannahme/**"
+      - "angehoerige.html"
+      - "angehoerige/**"
+      - "leistungen.html"
+      - "leistungen/**"
+      - "ablauf.html"
+      - "ablauf/**"
+      - "faq.html"
+      - "faq/**"
+      - "kontakt.html"
+      - "kontakt/**"
+      - "agb.html"
+      - "agb/**"
+      - "nutzungsbedingungen/**"
+      - "datenschutz.html"
+      - "datenschutz/**"
+      - "datenloeschung.html"
+      - "datenloeschung/**"
+      - "impressum.html"
+      - "impressum/**"
+      - "ki-transparenz.html"
+      - "ki-transparenz/**"
+      - "widerruf.html"
+      - "widerruf/**"
+      - "tests/stewaro-block4-launch-readiness.test.mjs"
+      - "tests/stewaro-unified-experience.test.mjs"
+      - "tests/stewaro-every-page-design.test.mjs"
+      - "concierge-anpassen.html"
+      - "concierge-anpassen/**"
+      - "tests/stewaro-shared-base-brand-shell.test.mjs"
+      - ".github/workflows/stewaro-shared-base-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  stewaro-shared-base:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify isolated migration scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --depth=1
+          changed="$(git diff --name-only origin/main...HEAD)"
+          printf '%s\n' "$changed"
+          if printf '%s\n' "$changed" | grep -Eq '^(CNAME|stewaro-site/|.*orfidel.*)'; then
+            echo "Forbidden production/frozen/protected path changed."
+            exit 1
+          fi
+
+      - name: Verify production domain remains NAHWERK during migration
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(tr -d '\r\n' < CNAME)" = "nahwerkconcierge.com"
+
+      - name: Run STEWARO shared-base contract
+        run: node --test tests/stewaro-shared-base-brand-shell.test.mjs
+
+      - name: Run STEWARO Block 4 launch-readiness contract
+        run: node --test tests/stewaro-block4-launch-readiness.test.mjs
+
+      - name: Run final STEWARO website launch-readiness contract
+        run: node --test tests/website-launch-readiness-final.test.mjs
+
+      - name: Run STEWARO unified experience contract
+        run: node --test tests/stewaro-unified-experience.test.mjs
+
+      - name: Audit every STEWARO customer page
+        run: node --test tests/stewaro-every-page-design.test.mjs
+
+      - name: Verify unified STEWARO account entry
+        run: node --test tests/stewaro-account-entry.test.mjs
+
+      - name: Run critical route parity
+        run: node --test tests/konto-clean-route-parity.test.mjs tests/critical-route-parity.test.mjs
+
+      - name: Run auth security regression
+        run: node --test tests/auth-security.test.mjs
+
+      - name: Verify AWS CloudFront canonical brand preview
+        if: github.head_ref == 'feature/stewaro-shared-base-brand-shell-20260927'
+        shell: bash
+        run: |
+          set -euo pipefail
+          account_host="d23le2tjpjl7la.cloudfront.net"
+          website_host="d357yw2h09cpne.cloudfront.net"
+          account="https://$account_host"
+          website="https://$website_host"
+
+          # The historical account distribution may be retired/unresolvable while the
+          # unified STEWARO staging distribution is authoritative for the shared site.
+          # Fall back only to the known staging distribution, then run the exact same
+          # route/assets assertions there. This never turns the preview proof into a skip.
+          if ! getent hosts "$account_host" >/dev/null 2>&1; then
+            echo "::warning::Historical account CloudFront host is not resolvable; verifying account routes on unified STEWARO staging CloudFront."
+            account="$website"
+          fi
+
+          ok=0
+          legacy_tail="mark.svg"
+          legacy_mark="stewaro-${legacy_tail}"
+          for attempt in $(seq 1 60); do
+            echo "CloudFront brand QA attempt $attempt/60"
+            login="$(curl -fsSL --max-time 20 "$account/anmelden?source=stewaro_account&email=qa%40example.com&qa=$GITHUB_SHA" || true)"
+            web="$(curl -fsSL --max-time 20 "$account/web-concierge?qa=$GITHUB_SHA" || true)"
+            flow="$(curl -fsSL --max-time 20 "$account/assets/stewaro-account-flow.js?qa=$GITHUB_SHA" || true)"
+            account_css="$(curl -fsSL --max-time 20 "$account/assets/stewaro-account-entry.css?qa=$GITHUB_SHA" || true)"
+            logo_css="$(curl -fsSL --max-time 20 "$account/assets/nahwerk-logo-v2.css?qa=$GITHUB_SHA" || true)"
+            website_css="$(curl -fsSL --max-time 20 "$website/assets/stewaro-unified.css?qa=$GITHUB_SHA" || true)"
+
+            if grep -q 'stewaro-account-entry.css?v=2' <<<"$login" &&
+               grep -q 'stewaro-icon.svg' <<<"$login" &&
+               ! grep -q "$legacy_mark" <<<"$login" &&
+               grep -q 'stewaro-account-flow-icon' <<<"$flow" &&
+               grep -q 'stewaro-account-flow-wordmark' <<<"$flow" &&
+               grep -q 'STEWARO_ACCOUNT_LOGIN_BRAND_AND_CENTER_20260928' <<<"$account_css" &&
+               grep -q 'justify-content:center!important' <<<"$account_css" &&
+               grep -q 'nahwerk-logo-v2.css?v=12' <<<"$web" &&
+               ! grep -q "$legacy_mark" <<<"$web" &&
+               grep -q 'STEWARO_CANONICAL_WORDMARK_GUARD_20260928' <<<"$logo_css" &&
+               grep -q 'stewaroCanonicalWordmarkSheen' <<<"$logo_css" &&
+               grep -q 'prefers-reduced-motion:reduce' <<<"$logo_css" &&
+               grep -q 'STEWARO_CANONICAL_WORDMARK_GUARD_20260928' <<<"$website_css"; then
+              ok=1
+              break
+            fi
+            sleep 10
+          done
+          test "$ok" = 1
+          echo "AWS CloudFront canonical STEWARO brand preview GREEN"
+
+
+# Final branch-only live verification. GitHub verifies; AWS remains deployment authority.

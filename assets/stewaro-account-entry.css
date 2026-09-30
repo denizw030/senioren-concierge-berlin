@@ -1,0 +1,318 @@
+/* STEWARO account entry — intentionally minimal, account.stewaro.com ready */
+:root{
+  --sa-bg:#f7f3eb;--sa-paper:#fffdf9;--sa-ink:#13251d;--sa-muted:#6d746f;
+  --sa-green:#173126;--sa-gold:#b9852e;--sa-line:rgba(19,37,29,.14);
+}
+body.stewaro-access-page,body.stewaro-account-flow{
+  margin:0!important;background:var(--sa-bg)!important;color:var(--sa-ink)!important;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif!important;
+}
+.stewaro-access-shell{
+  min-height:100svh;display:grid;grid-template-rows:auto 1fr auto;background:
+  radial-gradient(900px 520px at 50% -100px,rgba(199,154,61,.10),transparent 70%),
+  linear-gradient(180deg,#fffdf9 0%,#f7f3eb 100%);
+}
+.stewaro-access-brand{
+  display:inline-grid;justify-items:center;gap:8px;margin:28px auto 0;padding:10px;text-decoration:none;color:var(--sa-green);
+}
+.stewaro-access-brand-mark{
+  display:block;width:42px;height:42px;background:center/contain no-repeat url("/assets/logos/stewaro-icon.svg");
+}
+.stewaro-access-brand-word{
+  font-family:Baskerville,"Iowan Old Style",Georgia,serif;font-size:22px;letter-spacing:.12em;
+  background:linear-gradient(110deg,#815d1d,#d6ad55 45%,#8a6420 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.stewaro-access-main{
+  width:min(100% - 32px,520px);margin:auto;display:grid;align-content:center;padding:56px 0 84px;
+}
+.stewaro-access-panel{display:grid;gap:24px}
+.stewaro-access-kicker{margin:0;color:var(--sa-gold);font-size:12px;font-weight:760;letter-spacing:.12em;text-transform:uppercase}
+.stewaro-access-panel h1{
+  margin:0;color:var(--sa-green);font:500 clamp(38px,6vw,58px)/1.02 Baskerville,"Iowan Old Style",Georgia,serif;
+  letter-spacing:-.035em;text-wrap:balance;
+}
+.stewaro-access-intro{margin:0;color:var(--sa-muted);font-size:17px;line-height:1.65}
+.stewaro-access-actions{display:grid;gap:12px;margin-top:4px}
+.stewaro-access-choice,.stewaro-access-submit{
+  width:100%;min-height:58px;padding:0 22px;border-radius:16px;border:1px solid var(--sa-line);
+  background:rgba(255,255,255,.76);color:var(--sa-green);font:700 16px/1.2 inherit;text-align:left;
+  cursor:pointer;box-shadow:0 10px 30px rgba(31,46,37,.045);transition:.18s ease;
+}
+.stewaro-access-choice strong{display:block;font-size:17px}
+.stewaro-access-choice span{display:block;margin-top:5px;color:var(--sa-muted);font-weight:450;font-size:13px;line-height:1.45}
+.stewaro-access-choice:hover{transform:translateY(-2px);border-color:rgba(185,133,46,.42);box-shadow:0 18px 42px rgba(31,46,37,.07)}
+.stewaro-access-choice.primary,.stewaro-access-submit{
+  text-align:center;background:var(--sa-green);color:#fff;border-color:var(--sa-green);
+}
+.stewaro-access-form{display:grid;gap:14px}
+.stewaro-access-form label{font-size:14px;font-weight:700;color:var(--sa-green)}
+.stewaro-access-form input{
+  width:100%;box-sizing:border-box;min-height:58px;padding:0 17px;border:1px solid rgba(23,49,38,.18);
+  border-radius:14px;background:#fff;color:#17271f;font:500 17px/1 inherit;outline:none;
+}
+.stewaro-access-form input:focus{border-color:rgba(185,133,46,.72);box-shadow:0 0 0 4px rgba(199,154,61,.12)}
+.stewaro-access-back,.stewaro-access-link{
+  justify-self:start;border:0;background:none;padding:0;color:#6b6f6c;font:600 13px/1.4 inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer;
+}
+.stewaro-access-note{margin:0;color:#838781;font-size:12px;line-height:1.55}
+.stewaro-access-footer{padding:0 20px 24px;text-align:center;color:#8a8d88;font-size:11px}
+.stewaro-access-panel[hidden]{display:none!important}
+
+/* Legacy login becomes one quiet password screen when entered from unified account flow. */
+body.stewaro-account-flow .top,
+body.stewaro-account-flow .hero,
+body.stewaro-account-flow .footer{display:none!important}
+body.stewaro-account-flow main{
+  min-height:100svh!important;display:grid!important;align-items:center!important;padding:24px!important;
+  background:radial-gradient(900px 520px at 50% -100px,rgba(199,154,61,.10),transparent 70%),linear-gradient(180deg,#fffdf9,#f7f3eb)!important;
+}
+body.stewaro-account-flow main>.section{background:transparent!important;padding:0!important}
+body.stewaro-account-flow .loginwrap{width:min(100%,520px)!important;max-width:520px!important}
+body.stewaro-account-flow .logincard{
+  padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;
+}
+body.stewaro-account-flow .logincard>h2{
+  margin:0 0 10px!important;font:500 clamp(38px,6vw,54px)/1.03 Baskerville,"Iowan Old Style",Georgia,serif!important;
+  color:var(--sa-green)!important;letter-spacing:-.035em;
+}
+body.stewaro-account-flow .account-flow-email-summary{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 34px;padding:12px 0;
+  border-bottom:1px solid var(--sa-line);color:var(--sa-muted);font-size:14px;
+}
+body.stewaro-account-flow .account-flow-email-field{display:none!important}
+body.stewaro-account-flow .field label{color:var(--sa-green)!important}
+body.stewaro-account-flow .field input{
+  min-height:58px!important;border:1px solid rgba(23,49,38,.18)!important;border-radius:14px!important;background:#fff!important;color:#17271f!important;
+}
+body.stewaro-account-flow .remember-row{margin-top:6px!important}
+body.stewaro-account-flow #loginSubmit{
+  width:100%!important;min-height:58px!important;border-radius:14px!important;background:var(--sa-green)!important;color:#fff!important;
+}
+body.stewaro-account-flow .split{justify-content:center!important;margin-top:22px!important}
+body.stewaro-account-flow .split>span{display:none!important}
+
+/* Progressive self-registration: one question per screen. */
+body.registration-page.stewaro-account-flow main{padding:0!important}
+body.registration-page.stewaro-account-flow main>.section{padding:0!important}
+body.registration-page.stewaro-account-flow .signup{width:min(100% - 32px,520px)!important;max-width:520px!important;display:block!important;margin:auto!important}
+body.registration-page.stewaro-account-flow .preview{display:none!important}
+body.registration-page.stewaro-account-flow #signupForm{
+  min-height:100svh;display:grid;align-content:center;padding:60px 0 84px!important;border:0!important;background:transparent!important;box-shadow:none!important;
+}
+body.registration-page.stewaro-account-flow #signupForm>*:not(.stewaro-registration-progressive){display:none!important}
+.stewaro-registration-progressive{display:grid;gap:24px}
+.stewaro-registration-progress{color:var(--sa-gold);font-size:12px;font-weight:760;letter-spacing:.08em;text-transform:uppercase}
+.stewaro-registration-progressive h1{
+  margin:0;color:var(--sa-green);font:500 clamp(38px,6vw,54px)/1.03 Baskerville,"Iowan Old Style",Georgia,serif;letter-spacing:-.035em;
+}
+.stewaro-registration-screen{display:grid;gap:16px}
+.stewaro-registration-screen[hidden]{display:none!important}
+.stewaro-registration-screen .field{margin:0!important}
+.stewaro-registration-screen :is(input,select){
+  width:100%!important;box-sizing:border-box!important;min-height:58px!important;border-radius:14px!important;
+  border:1px solid rgba(23,49,38,.18)!important;background:#fff!important;color:#17271f!important;
+}
+.stewaro-registration-screen .btn{
+  width:100%!important;min-height:56px!important;border-radius:14px!important;background:var(--sa-green)!important;color:#fff!important;
+}
+.stewaro-registration-legal{display:grid;gap:14px}
+.stewaro-registration-legal .check{margin:0!important;padding:14px 0;border-bottom:1px solid var(--sa-line)}
+.stewaro-registration-legal .check input{width:18px!important;height:18px!important;min-height:0!important}
+.stewaro-registration-nav{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.stewaro-registration-nav button{border:0;background:none;color:#737872;padding:0;font:650 13px/1.4 inherit;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+
+@media(max-width:620px){
+  .stewaro-access-brand{margin-top:18px}
+  .stewaro-access-main{width:min(100% - 28px,520px);padding:42px 0 62px}
+  .stewaro-access-panel h1{font-size:42px}
+  body.stewaro-account-flow main{padding:18px!important}
+}
+
+
+/* STEWARO_ACCOUNT_FLOW_HARD_RESET_V2 */
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]){
+  background:var(--sa-bg)!important;
+  color:var(--sa-ink)!important;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .top,
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .hero,
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .footer{
+  display:none!important;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) main,
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) main>.section{
+  min-height:100svh!important;
+  margin:0!important;
+  padding:0!important;
+  background:
+    radial-gradient(900px 520px at 50% -100px,rgba(199,154,61,.10),transparent 70%),
+    linear-gradient(180deg,#fffdf9 0%,#f7f3eb 100%)!important;
+  color:var(--sa-ink)!important;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) main{
+  display:grid!important;
+  place-items:center!important;
+  padding:28px!important;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .loginwrap{
+  width:min(100%,520px)!important;
+  max-width:520px!important;
+  margin:0 auto!important;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .logincard{
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .logincard>h2{
+  margin:0 0 8px!important;
+  color:var(--sa-green)!important;
+  font:500 clamp(42px,6vw,58px)/1.02 Baskerville,"Iowan Old Style",Georgia,serif!important;
+  letter-spacing:-.04em!important;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .field label{
+  color:var(--sa-green)!important;
+  font-weight:700!important;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .field input,
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .field input:-webkit-autofill,
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .field input:-webkit-autofill:hover,
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .field input:-webkit-autofill:focus{
+  min-height:58px!important;
+  border:1px solid rgba(23,49,38,.18)!important;
+  border-radius:14px!important;
+  background:#fff!important;
+  color:#17271f!important;
+  -webkit-text-fill-color:#17271f!important;
+  caret-color:#17271f!important;
+  -webkit-box-shadow:0 0 0 1000px #fff inset!important;
+  box-shadow:0 0 0 1000px #fff inset!important;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .remember-row{
+  display:none!important;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) #loginSubmit{
+  width:100%!important;
+  min-height:58px!important;
+  border:0!important;
+  border-radius:14px!important;
+  background:var(--sa-green)!important;
+  color:#fff!important;
+  box-shadow:none!important;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .status{
+  border:1px solid rgba(23,49,38,.12)!important;
+  border-left:4px solid var(--sa-gold)!important;
+  background:rgba(255,253,249,.92)!important;
+  color:var(--sa-ink)!important;
+  box-shadow:none!important;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .status strong{
+  color:var(--sa-green)!important;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .split{
+  display:grid!important;
+  justify-items:center!important;
+  gap:16px!important;
+  margin-top:24px!important;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .split a{
+  color:#7a6a4b!important;
+}
+.stewaro-account-flow-brand{
+  display:grid;
+  justify-items:center;
+  gap:8px;
+  margin:0 0 50px;
+  text-decoration:none;
+}
+.stewaro-account-flow-brand .mark{
+  width:44px;height:44px;
+  background:transparent center/contain no-repeat url("/assets/logos/stewaro-icon.svg");
+}
+.stewaro-account-flow-brand .word{
+  font-family:Baskerville,"Iowan Old Style",Georgia,serif;
+  font-size:22px;
+  letter-spacing:.12em;
+  background:linear-gradient(110deg,#815d1d,#d6ad55 45%,#8a6420 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+body.login-image-page.stewaro-account-flow .account-flow-email-summary{
+  margin:0 0 30px!important;
+}
+@media(max-width:620px){
+  body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) main{
+    padding:20px!important;
+  }
+  .stewaro-account-flow-brand{margin-bottom:38px}
+}
+
+
+/* STEWARO_CANONICAL_ACCOUNT_BRAND_20260928 */
+.stewaro-access-brand-word,
+.stewaro-account-flow-brand .word{
+  display:block!important;
+  width:174px!important;
+  height:24px!important;
+  font-size:0!important;
+  letter-spacing:0!important;
+  color:transparent!important;
+  background:transparent center/contain no-repeat url("/assets/logos/stewaro-wordmark.svg")!important;
+  -webkit-background-clip:initial!important;
+  background-clip:initial!important;
+}
+
+
+/* STEWARO_ACCOUNT_LOGIN_BRAND_AND_CENTER_20260928 */
+.stewaro-account-flow-brand{
+  width:100%!important;
+  display:grid!important;
+  justify-items:center!important;
+  align-items:center!important;
+}
+.stewaro-account-flow-brand .mark,
+.stewaro-account-flow-brand .word{display:none!important}
+.stewaro-account-flow-icon{
+  display:block!important;
+  width:44px!important;
+  height:55px!important;
+  object-fit:contain!important;
+}
+.stewaro-account-flow-wordmark{
+  display:block!important;
+  width:174px!important;
+  height:auto!important;
+  object-fit:contain!important;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) main{
+  width:100%!important;
+  box-sizing:border-box!important;
+  display:flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) main>.section{
+  width:100%!important;
+  min-height:0!important;
+  display:flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .loginwrap{
+  width:min(100%,520px)!important;
+  max-width:520px!important;
+  margin-inline:auto!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .logincard{
+  width:100%!important;
+  box-sizing:border-box!important;
+}
+@media(max-width:620px){
+  .stewaro-account-flow-icon{width:38px!important;height:47px!important}
+  .stewaro-account-flow-wordmark{width:154px!important}
+}

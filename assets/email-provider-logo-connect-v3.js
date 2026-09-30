@@ -6,8 +6,8 @@
   const RETURN_TO = "https://nahwerkconcierge.com/email-concierge.html";
   const CAPABILITIES = ["EMAIL_READ", "EMAIL_SEARCH", "EMAIL_ATTACHMENTS", "EMAIL_DRAFT", "EMAIL_MAILBOX", "EMAIL_SEND"];
   const PROVIDERS = Object.freeze([
-    { id: "google", name: "Gmail", mode: "google", logo: "gmail", secret: "", help: "Mit deinem Google-Konto anmelden und NAHWERK freigeben." },
-    { id: "microsoft", name: "Outlook", mode: "microsoft", logo: "microsoft", secret: "", help: "Mit deinem Microsoft-Konto anmelden und NAHWERK freigeben." },
+    { id: "google", name: "Gmail", mode: "google", logo: "gmail", secret: "", help: "Mit deinem Google-Konto anmelden und STEWARO freigeben." },
+    { id: "microsoft", name: "Outlook", mode: "microsoft", logo: "microsoft", secret: "", help: "Mit deinem Microsoft-Konto anmelden und STEWARO freigeben." },
     { id: "yahoo", name: "Yahoo Mail", mode: "manual", logo: "yahoo", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://login.yahoo.com/", helpAction: "Bei Yahoo Mail anmelden" },
     { id: "icloud", name: "iCloud Mail", mode: "manual", logo: "icloud", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://account.apple.com/", helpAction: "Bei iCloud anmelden" },
     { id: "gmx", name: "GMX", mode: "manual", logo: "gmx", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://auth.gmx.net/login?prompt=none&state=eyJpZCI6ImE1NzI4OGY4LTY4YzUtNDVmOC1hMGI3LWQ0Zjk5OGQyOGRhYiIsImNsaWVudElkIjoiZ214bmV0X2FsbGlnYXRvcl9saXZlIiwieFVpQXBwIjoiZ214bmV0LmFsbGlnYXRvci8yLjIuMSIsInBheWxvYWQiOiJleUowWVhKblpYUlZVa2tpT2lKb2RIUndjem92TDNkbFlteHBibXN1WjIxNExtNWxkQzl0WVdsc0wzTm9iM2RUZEdGeWRGWnBaWGNpTENKd2NtOWpaWE56U1dRaU9pSnZhVjl3YTJObE1TSjkifQ%3D%3D&authcode-context=u4lA8TiGpA", helpAction: "Bei GMX anmelden" },
@@ -25,8 +25,8 @@
     { id: "kabeldeutschland", name: "Kabel Deutschland Mail", mode: "manual", logo: "kabeldeutschland", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://mail.vodafone.de/", helpAction: "Bei Kabel Deutschland anmelden" },
     { id: "unitymedia", name: "Unitymedia Mail", mode: "manual", logo: "unitymedia", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://mail.vodafone.de/", helpAction: "Bei Unitymedia anmelden" },
     { id: "migadu", name: "Migadu", mode: "manual", logo: "migadu", secret: "Passwort", credentialKind: "password_first", helpUrl: "https://webmail.migadu.com/", helpAction: "Bei Migadu anmelden" },
-    { id: "proton", name: "Proton Mail", mode: "unsupported", logo: "proton", secret: "", help: "Proton Mail benötigt Proton Bridge auf einem lokalen Gerät. Eine direkte serverseitige Verbindung zu NAHWERK wird derzeit nicht unterstützt." },
-    { id: "tuta", name: "Tuta Mail", mode: "unsupported", logo: "tuta", secret: "", help: "Tuta bietet keinen normalen IMAP-Zugriff. Eine direkte Verbindung zu NAHWERK wird derzeit nicht unterstützt." }
+    { id: "proton", name: "Proton Mail", mode: "unsupported", logo: "proton", secret: "", help: "Proton Mail benötigt Proton Bridge auf einem lokalen Gerät. Eine direkte serverseitige Verbindung zu STEWARO wird derzeit nicht unterstützt." },
+    { id: "tuta", name: "Tuta Mail", mode: "unsupported", logo: "tuta", secret: "", help: "Tuta bietet keinen normalen IMAP-Zugriff. Eine direkte Verbindung zu STEWARO wird derzeit nicht unterstützt." }
   ]);
   const LOGOS = Object.freeze({
     gmail: '<span class="email-provider-logo email-provider-logo--gmail" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg></span>',
@@ -159,7 +159,7 @@
     const shell = document.createElement("div");
     shell.id = "emailLogoConnectShell";
     shell.className = "email-logo-connect-shell";
-    shell.innerHTML = '<div class="email-logo-connect-heading"><div><div class="eyebrow">E-Mail-Konto</div><h4>E-Mail-Adresse eingeben.</h4></div><p>NAHWERK erkennt den Anbieter automatisch und übernimmt Server, Ports und Verschlüsselung. Du musst keine technischen Daten kennen.</p></div><div class="email-provider-auto-connect"><label class="email-provider-connect-field"><span>E-Mail-Adresse</span><input id="emailAutoConnectEmail" type="email" inputmode="email" autocomplete="email" maxlength="320" placeholder="name@anbieter.de"></label><button class="email-provider-connect-primary" id="emailAutoConnectButton" type="button">E-Mail verbinden</button><p class="email-provider-auto-status" id="emailAutoConnectStatus" aria-live="polite"></p></div><div class="email-provider-divider"><span>Oder Anbieter direkt wählen</span></div><div class="email-logo-provider-grid" id="emailLogoProviderGrid" aria-label="E-Mail-Anbieter"></div>';
+    shell.innerHTML = '<div class="email-logo-connect-heading"><div><div class="eyebrow">E-Mail-Konto</div><h4>E-Mail-Adresse eingeben.</h4></div><p>STEWARO erkennt den Anbieter automatisch und übernimmt Server, Ports und Verschlüsselung. Du musst keine technischen Daten kennen.</p></div><div class="email-provider-auto-connect"><label class="email-provider-connect-field"><span>E-Mail-Adresse</span><input id="emailAutoConnectEmail" type="email" inputmode="email" autocomplete="email" maxlength="320" placeholder="name@anbieter.de"></label><button class="email-provider-connect-primary" id="emailAutoConnectButton" type="button">E-Mail verbinden</button><p class="email-provider-auto-status" id="emailAutoConnectStatus" aria-live="polite"></p></div><div class="email-provider-divider"><span>Oder Anbieter direkt wählen</span></div><div class="email-logo-provider-grid" id="emailLogoProviderGrid" aria-label="E-Mail-Anbieter"></div>';
     wrapper.insertBefore(shell, legacyGrid || null);
     document.getElementById("emailAutoConnectButton")?.addEventListener("click", () => void autoConnectEmail());
     document.getElementById("emailAutoConnectEmail")?.addEventListener("keydown", (event) => {
@@ -214,7 +214,7 @@
     } catch (error) {
       const code = String(error?.message || "EMAIL_REQUEST_FAILED");
       if (code === "email_provider_not_directly_supported") {
-        setText(status, "Dieser Anbieter unterstützt keine direkte Server-Verbindung mit NAHWERK.");
+        setText(status, "Dieser Anbieter unterstützt keine direkte Server-Verbindung mit STEWARO.");
       } else if (code === "email_provider_selection_required") {
         setText(status, "Anbieter konnte nicht eindeutig erkannt werden. Wähle ihn unten direkt aus.");
       } else if (code === "UNAUTHENTICATED") {
@@ -272,7 +272,7 @@
     backdrop.id = "emailProviderConnectBackdrop";
     backdrop.className = "email-provider-connect-backdrop";
     backdrop.hidden = true;
-    backdrop.innerHTML = '<section class="email-provider-connect-modal" role="dialog" aria-modal="true" aria-labelledby="emailProviderConnectTitle"><div class="email-provider-connect-head"><div class="email-provider-connect-identity"><span id="emailProviderConnectLogo"></span><div><h3 id="emailProviderConnectTitle">E-Mail verbinden</h3><p id="emailProviderConnectSubtitle">Sicher mit NAHWERK verbinden</p></div></div><button class="email-provider-connect-close" id="emailProviderConnectClose" type="button" aria-label="Schließen">×</button></div><p class="email-provider-connect-copy" id="emailProviderConnectCopy"></p><div class="email-provider-account-list" id="emailProviderAccountList"></div><button class="email-provider-add-account" id="emailProviderAddAccount" type="button" hidden>+ Weiteres Konto verbinden</button><div id="emailProviderCredentialFields"><label class="email-provider-connect-field"><span>E-Mail-Adresse</span><input id="emailProviderConnectEmail" type="email" inputmode="email" autocomplete="email" maxlength="320"></label><label class="email-provider-connect-field"><span id="emailProviderConnectSecretLabel">Passwort</span><input id="emailProviderConnectSecret" type="password" autocomplete="current-password" maxlength="512"></label><div id="emailProviderZohoOptions" hidden><label class="email-provider-connect-field"><span>Zoho-Rechenzentrum</span><select id="emailProviderZohoDc"><option value="com">Global (.com)</option><option value="eu">Europa (.eu)</option><option value="in">Indien (.in)</option><option value="com.au">Australien (.com.au)</option><option value="jp">Japan (.jp)</option><option value="ca">Kanada (.ca)</option><option value="sa">Saudi-Arabien (.sa)</option></select></label><label class="email-provider-connect-field"><span><input id="emailProviderZohoOrganization" type="checkbox"> Organisations-/Business-Postfach</span></label></div><button class="email-provider-connect-primary email-provider-connect-inline-submit" id="emailProviderConnectSubmit" type="button">Verbinden</button><div class="email-provider-webde-guide" id="emailProviderCredentialGuide" hidden><strong id="emailProviderCredentialGuideTitle"></strong><ol id="emailProviderCredentialGuideSteps"></ol><div class="email-provider-webde-guide-actions"><a class="email-provider-webde-login" id="emailProviderCredentialHelpLink" href="#" target="_blank" rel="noopener noreferrer" hidden></a></div><div class="email-provider-webde-video"><button class="email-provider-webde-video-toggle" id="emailProviderCredentialVideoToggle" type="button" disabled aria-expanded="false"><span class="email-provider-webde-video-play" aria-hidden="true">▶</span><span><strong>Video-Anleitung ansehen</strong><small id="emailProviderCredentialVideoHint">Video folgt</small></span></button><video id="emailProviderCredentialVideo" class="email-provider-webde-video-player" preload="none" playsinline muted controls hidden></video></div><span class="email-provider-webde-return" id="emailProviderCredentialReturn"></span></div><div class="email-provider-webde-guide" id="emailProviderWebdeGuide" hidden><strong>WEB.DE einmal freigeben</strong><ol><li>Bei WEB.DE anmelden.</li><li>E-Mail-Einstellungen → POP3/IMAP öffnen.</li><li>„POP3- und IMAP-Zugriff erlauben“ einschalten.</li></ol><div class="email-provider-webde-guide-actions"><button class="email-provider-connect-secondary" id="emailProviderWebdeSpeak" type="button">Lena anhören</button><a class="email-provider-webde-login" id="emailProviderWebdeLogin" href="https://auth.web.de/login?prompt=none&amp;state=eyJpZCI6IjczMWU1ZjhhLTgxNTItNGIyZC05YWQzLTlkZTkzZjM2YTY0MiIsImNsaWVudElkIjoid2ViZGVfYWxsaWdhdG9yX2xpdmUiLCJ4VWlBcHAiOiJ3ZWJkZS5hbGxpZ2F0b3IvMi4yLjEiLCJwYXlsb2FkIjoiZXlKMFlYSm5aWFJWVWtraU9pSm9kSFJ3Y3pvdkwzZGxZbXhwYm1zdWQyVmlMbVJsTDIxaGFXd3ZjMmh2ZDFOMFlYSjBWbWxsZHlJc0luQnliMk5sYzNOSlpDSTZJbTlwWDNCclkyVXhJbjA9In0%3D&amp;authcode-context=VD0Cgr9WhV" target="_blank" rel="noopener noreferrer">Bei WEB.DE anmelden</a></div><div class="email-provider-webde-video"><button class="email-provider-webde-video-toggle" id="emailProviderWebdeVideoToggle" type="button" aria-expanded="false"><span class="email-provider-webde-video-play" aria-hidden="true">▶</span><span><strong>Video-Anleitung ansehen</strong><small>So aktivierst du POP3/IMAP bei WEB.DE</small></span></button><video id="emailProviderWebdeVideo" class="email-provider-webde-video-player" preload="none" playsinline muted controls hidden></video></div><span class="email-provider-webde-return">Danach zu NAHWERK zurückkehren, Passwort eingeben und verbinden.</span></div><p class="email-provider-connect-help" id="emailProviderConnectHelp"></p><p class="email-provider-security-note">NAHWERK trägt Server, Ports und Verschlüsselung automatisch ein. Deine Zugangsdaten werden nicht im Browser dauerhaft gespeichert.</p></div><div class="email-provider-connect-message" id="emailProviderConnectMessage" aria-live="polite"></div><div class="email-provider-connect-actions" id="emailProviderConnectActions"><button class="email-provider-connect-secondary" id="emailProviderCancelAdd" type="button" hidden>Abbrechen</button></div></section>';
+    backdrop.innerHTML = '<section class="email-provider-connect-modal" role="dialog" aria-modal="true" aria-labelledby="emailProviderConnectTitle"><div class="email-provider-connect-head"><div class="email-provider-connect-identity"><span id="emailProviderConnectLogo"></span><div><h3 id="emailProviderConnectTitle">E-Mail verbinden</h3><p id="emailProviderConnectSubtitle">Sicher mit STEWARO verbinden</p></div></div><button class="email-provider-connect-close" id="emailProviderConnectClose" type="button" aria-label="Schließen">×</button></div><p class="email-provider-connect-copy" id="emailProviderConnectCopy"></p><div class="email-provider-account-list" id="emailProviderAccountList"></div><button class="email-provider-add-account" id="emailProviderAddAccount" type="button" hidden>+ Weiteres Konto verbinden</button><div id="emailProviderCredentialFields"><label class="email-provider-connect-field"><span>E-Mail-Adresse</span><input id="emailProviderConnectEmail" type="email" inputmode="email" autocomplete="email" maxlength="320"></label><label class="email-provider-connect-field"><span id="emailProviderConnectSecretLabel">Passwort</span><input id="emailProviderConnectSecret" type="password" autocomplete="current-password" maxlength="512"></label><div id="emailProviderZohoOptions" hidden><label class="email-provider-connect-field"><span>Zoho-Rechenzentrum</span><select id="emailProviderZohoDc"><option value="com">Global (.com)</option><option value="eu">Europa (.eu)</option><option value="in">Indien (.in)</option><option value="com.au">Australien (.com.au)</option><option value="jp">Japan (.jp)</option><option value="ca">Kanada (.ca)</option><option value="sa">Saudi-Arabien (.sa)</option></select></label><label class="email-provider-connect-field"><span><input id="emailProviderZohoOrganization" type="checkbox"> Organisations-/Business-Postfach</span></label></div><button class="email-provider-connect-primary email-provider-connect-inline-submit" id="emailProviderConnectSubmit" type="button">Verbinden</button><div class="email-provider-webde-guide" id="emailProviderCredentialGuide" hidden><strong id="emailProviderCredentialGuideTitle"></strong><ol id="emailProviderCredentialGuideSteps"></ol><div class="email-provider-webde-guide-actions"><a class="email-provider-webde-login" id="emailProviderCredentialHelpLink" href="#" target="_blank" rel="noopener noreferrer" hidden></a></div><div class="email-provider-webde-video"><button class="email-provider-webde-video-toggle" id="emailProviderCredentialVideoToggle" type="button" disabled aria-expanded="false"><span class="email-provider-webde-video-play" aria-hidden="true">▶</span><span><strong>Video-Anleitung ansehen</strong><small id="emailProviderCredentialVideoHint">Video folgt</small></span></button><video id="emailProviderCredentialVideo" class="email-provider-webde-video-player" preload="none" playsinline muted controls hidden></video></div><span class="email-provider-webde-return" id="emailProviderCredentialReturn"></span></div><div class="email-provider-webde-guide" id="emailProviderWebdeGuide" hidden><strong>WEB.DE einmal freigeben</strong><ol><li>Bei WEB.DE anmelden.</li><li>E-Mail-Einstellungen → POP3/IMAP öffnen.</li><li>„POP3- und IMAP-Zugriff erlauben“ einschalten.</li></ol><div class="email-provider-webde-guide-actions"><button class="email-provider-connect-secondary" id="emailProviderWebdeSpeak" type="button">Lena anhören</button><a class="email-provider-webde-login" id="emailProviderWebdeLogin" href="https://auth.web.de/login?prompt=none&amp;state=eyJpZCI6IjczMWU1ZjhhLTgxNTItNGIyZC05YWQzLTlkZTkzZjM2YTY0MiIsImNsaWVudElkIjoid2ViZGVfYWxsaWdhdG9yX2xpdmUiLCJ4VWlBcHAiOiJ3ZWJkZS5hbGxpZ2F0b3IvMi4yLjEiLCJwYXlsb2FkIjoiZXlKMFlYSm5aWFJWVWtraU9pSm9kSFJ3Y3pvdkwzZGxZbXhwYm1zdWQyVmlMbVJsTDIxaGFXd3ZjMmh2ZDFOMFlYSjBWbWxsZHlJc0luQnliMk5sYzNOSlpDSTZJbTlwWDNCclkyVXhJbjA9In0%3D&amp;authcode-context=VD0Cgr9WhV" target="_blank" rel="noopener noreferrer">Bei WEB.DE anmelden</a></div><div class="email-provider-webde-video"><button class="email-provider-webde-video-toggle" id="emailProviderWebdeVideoToggle" type="button" aria-expanded="false"><span class="email-provider-webde-video-play" aria-hidden="true">▶</span><span><strong>Video-Anleitung ansehen</strong><small>So aktivierst du POP3/IMAP bei WEB.DE</small></span></button><video id="emailProviderWebdeVideo" class="email-provider-webde-video-player" preload="none" playsinline muted controls hidden></video></div><span class="email-provider-webde-return">Danach zu STEWARO zurückkehren, Passwort eingeben und verbinden.</span></div><p class="email-provider-connect-help" id="emailProviderConnectHelp"></p><p class="email-provider-security-note">STEWARO trägt Server, Ports und Verschlüsselung automatisch ein. Deine Zugangsdaten werden nicht im Browser dauerhaft gespeichert.</p></div><div class="email-provider-connect-message" id="emailProviderConnectMessage" aria-live="polite"></div><div class="email-provider-connect-actions" id="emailProviderConnectActions"><button class="email-provider-connect-secondary" id="emailProviderCancelAdd" type="button" hidden>Abbrechen</button></div></section>';
     document.body.appendChild(backdrop);
     backdrop.addEventListener("click", (event) => { if (event.target === backdrop) closeModal(); });
     document.getElementById("emailProviderConnectClose")?.addEventListener("click", closeModal);
@@ -526,7 +526,7 @@
     if (logo) logo.innerHTML = LOGOS[selected.logo];
     setText(document.getElementById("emailProviderConnectTitle"), selected.name);
     setText(document.getElementById("emailProviderConnectSubtitle"), rows.length ? `${rows.length} Konto${rows.length === 1 ? "" : "en"} verbunden` : "Sicher verbinden");
-    setText(document.getElementById("emailProviderConnectCopy"), rows.length ? "Wähle das Konto, das du trennen möchtest. Weitere Konten kannst du jederzeit zusätzlich verbinden." : "Gib deine E-Mail-Adresse und dein normales Passwort ein. NAHWERK übernimmt Server, Ports und technische Einstellungen automatisch.");
+    setText(document.getElementById("emailProviderConnectCopy"), rows.length ? "Wähle das Konto, das du trennen möchtest. Weitere Konten kannst du jederzeit zusätzlich verbinden." : "Gib deine E-Mail-Adresse und dein normales Passwort ein. STEWARO übernimmt Server, Ports und technische Einstellungen automatisch.");
     setText(document.getElementById("emailProviderConnectSecretLabel"), "Passwort");
     setText(document.getElementById("emailProviderConnectHelp"), "");
     const guide = document.getElementById("emailProviderCredentialGuide");
@@ -645,8 +645,8 @@
   function oauthConnectErrorMessage(provider, error) {
     const code = String(error?.message || error || "EMAIL_REQUEST_FAILED");
     if (error?.name === "AbortError") return "Die Verbindung hat zu lange gedauert. Bitte versuche es erneut.";
-    if (code === "UNAUTHENTICATED") return "Deine Sitzung ist abgelaufen. Bitte melde dich erneut bei NAHWERK an.";
-    if (code === "EMAIL_IDENTITY_BINDING_FAILED") return "Dein NAHWERK-Konto konnte nicht eindeutig zugeordnet werden. Bitte melde dich erneut an.";
+    if (code === "UNAUTHENTICATED") return "Deine Sitzung ist abgelaufen. Bitte melde dich erneut bei STEWARO an.";
+    if (code === "EMAIL_IDENTITY_BINDING_FAILED") return "Dein STEWARO-Konto konnte nicht eindeutig zugeordnet werden. Bitte melde dich erneut an.";
     if (code === "EMAIL_PROVIDER_UNAVAILABLE") return provider?.id === "google"
       ? "Google konnte gerade nicht verbunden werden. Bitte versuche es erneut."
       : "Dieser Anbieter konnte gerade nicht verbunden werden. Bitte versuche es erneut.";
@@ -714,9 +714,9 @@
       return {
         code,
         title: "GMX Passwort prüfen",
-        steps: ["Bei GMX anmelden und prüfen, ob das normale Postfach-Passwort funktioniert.", "Das Passwort des GMX-Postfachs erneut bei NAHWERK eingeben.", "Falls Zwei-Faktor-Schutz die Anmeldung blockiert, die GMX-Sicherheitseinstellungen prüfen."],
+        steps: ["Bei GMX anmelden und prüfen, ob das normale Postfach-Passwort funktioniert.", "Das Passwort des GMX-Postfachs erneut bei STEWARO eingeben.", "Falls Zwei-Faktor-Schutz die Anmeldung blockiert, die GMX-Sicherheitseinstellungen prüfen."],
         videoHint: "So prüfst du deinen GMX Mail-Zugang",
-        returnText: "Danach zu NAHWERK zurückkehren und erneut verbinden."
+        returnText: "Danach zu STEWARO zurückkehren und erneut verbinden."
       };
     }
     const guides = {
@@ -752,17 +752,17 @@
       },
       ionos: {
         title: "IONOS Zugang prüfen",
-        steps: ["Bei IONOS Webmail anmelden.", "E-Mail-Adresse und Passwort dieses Postfachs prüfen.", "Danach mit demselben Postfach-Passwort bei NAHWERK erneut verbinden."],
+        steps: ["Bei IONOS Webmail anmelden.", "E-Mail-Adresse und Passwort dieses Postfachs prüfen.", "Danach mit demselben Postfach-Passwort bei STEWARO erneut verbinden."],
         videoHint: "So prüfst du deinen IONOS Mail-Zugang"
       },
       strato: {
         title: "STRATO Zugang prüfen",
-        steps: ["Bei STRATO Webmail anmelden.", "E-Mail-Adresse und Passwort dieses Postfachs prüfen.", "Danach mit demselben E-Mail-Passwort bei NAHWERK erneut verbinden."],
+        steps: ["Bei STRATO Webmail anmelden.", "E-Mail-Adresse und Passwort dieses Postfachs prüfen.", "Danach mit demselben E-Mail-Passwort bei STEWARO erneut verbinden."],
         videoHint: "So prüfst du deinen STRATO Mail-Zugang"
       },
       mailcom: {
         title: "mail.com IMAP-Zugriff prüfen",
-        steps: ["Bei mail.com anmelden.", "Prüfen, ob dein Tarif POP3/IMAP unterstützt – das ist eine Premium-Funktion.", "Bei Premium mit dem E-Mail-Passwort erneut bei NAHWERK verbinden."],
+        steps: ["Bei mail.com anmelden.", "Prüfen, ob dein Tarif POP3/IMAP unterstützt – das ist eine Premium-Funktion.", "Bei Premium mit dem E-Mail-Passwort erneut bei STEWARO verbinden."],
         videoHint: "So prüfst du POP3/IMAP bei mail.com"
       },
       freenet: {
@@ -777,27 +777,27 @@
       },
       vodafone: {
         title: "Vodafone Mail-Zugang prüfen",
-        steps: ["Bei Vodafone Mail anmelden.", "Vollständige E-Mail-Adresse und E-Mail-/IMAP-Passwort prüfen.", "Danach mit diesen Zugangsdaten bei NAHWERK erneut verbinden."],
+        steps: ["Bei Vodafone Mail anmelden.", "Vollständige E-Mail-Adresse und E-Mail-/IMAP-Passwort prüfen.", "Danach mit diesen Zugangsdaten bei STEWARO erneut verbinden."],
         videoHint: "So prüfst du deinen Vodafone Mail-Zugang"
       },
       arcor: {
         title: "Arcor Mail-Zugang prüfen",
-        steps: ["Bei Vodafone Mail für Arcor anmelden.", "Vollständige Arcor-Adresse und E-Mail-/IMAP-Passwort prüfen.", "Danach mit diesen Zugangsdaten bei NAHWERK erneut verbinden."],
+        steps: ["Bei Vodafone Mail für Arcor anmelden.", "Vollständige Arcor-Adresse und E-Mail-/IMAP-Passwort prüfen.", "Danach mit diesen Zugangsdaten bei STEWARO erneut verbinden."],
         videoHint: "So prüfst du deinen Arcor Mail-Zugang"
       },
       kabeldeutschland: {
         title: "Kabel Deutschland Mail-Zugang prüfen",
-        steps: ["Bei Vodafone Mail anmelden.", "Vollständige Kabel-Deutschland-Adresse und E-Mail-/IMAP-Passwort prüfen.", "Danach mit diesen Zugangsdaten bei NAHWERK erneut verbinden."],
+        steps: ["Bei Vodafone Mail anmelden.", "Vollständige Kabel-Deutschland-Adresse und E-Mail-/IMAP-Passwort prüfen.", "Danach mit diesen Zugangsdaten bei STEWARO erneut verbinden."],
         videoHint: "So prüfst du deinen Kabel Deutschland Mail-Zugang"
       },
       unitymedia: {
         title: "Unitymedia Mail-Zugang prüfen",
-        steps: ["Bei Vodafone Mail anmelden.", "Vollständige Unitymedia-Adresse und E-Mail-/IMAP-Passwort prüfen.", "Danach mit diesen Zugangsdaten bei NAHWERK erneut verbinden."],
+        steps: ["Bei Vodafone Mail anmelden.", "Vollständige Unitymedia-Adresse und E-Mail-/IMAP-Passwort prüfen.", "Danach mit diesen Zugangsdaten bei STEWARO erneut verbinden."],
         videoHint: "So prüfst du deinen Unitymedia Mail-Zugang"
       },
       migadu: {
         title: "Migadu Zugang prüfen",
-        steps: ["Bei Migadu Webmail anmelden.", "Vollständige Mailbox-Adresse und Mailbox-Passwort prüfen.", "Danach mit demselben Mailbox-Passwort bei NAHWERK erneut verbinden."],
+        steps: ["Bei Migadu Webmail anmelden.", "Vollständige Mailbox-Adresse und Mailbox-Passwort prüfen.", "Danach mit demselben Mailbox-Passwort bei STEWARO erneut verbinden."],
         videoHint: "So prüfst du deinen Migadu Mail-Zugang"
       }
     };
@@ -816,7 +816,7 @@
     };
     const guide = guides[id] || {
       title: `${name} Anmeldung prüfen`,
-      steps: codeFallbacks[code] || ["Beim Anbieter anmelden.", "E-Mail-Adresse und Passwort des Postfachs prüfen.", "Danach erneut bei NAHWERK verbinden."],
+      steps: codeFallbacks[code] || ["Beim Anbieter anmelden.", "E-Mail-Adresse und Passwort des Postfachs prüfen.", "Danach erneut bei STEWARO verbinden."],
       videoHint: `Anleitung für ${name} folgt`
     };
     return {
@@ -824,20 +824,20 @@
       title: guide.title,
       steps: guide.steps.slice(0, 3),
       videoHint: guide.videoHint,
-      returnText: "Danach zu NAHWERK zurückkehren und mit dem passenden Passwort erneut verbinden."
+      returnText: "Danach zu STEWARO zurückkehren und mit dem passenden Passwort erneut verbinden."
     };
   }
   function connectionErrorMessage(error) {
     const code = String(error?.message || error || "");
     const stage = String(error?.payload?.verification_stage || "").toUpperCase();
     if (selected?.id === "gmx") {
-      if (stage === "CREDENTIAL_LOAD") return "NAHWERK konnte die Zugangsdaten für die Prüfung nicht sicher laden. Bitte verbinde das GMX-Konto erneut.";
+      if (stage === "CREDENTIAL_LOAD") return "STEWARO konnte die Zugangsdaten für die Prüfung nicht sicher laden. Bitte verbinde das GMX-Konto erneut.";
       if (stage === "IMAP_CONNECT" && code === "provider_authentication_failed") return "GMX hat den IMAP-Zugriff nicht bestätigt. Prüfe bei GMX die POP3/IMAP-Freigabe und dein Passwort und versuche es erneut.";
       if (stage === "IMAP_INBOX") return "Die Anmeldung bei GMX hat funktioniert, aber der Posteingang konnte nicht geöffnet werden. Prüfe die POP3/IMAP-Freigabe bei GMX und versuche es erneut.";
       if (stage === "SMTP_VERIFY" && code === "provider_authentication_failed") return "Der GMX-Posteingang ist erreichbar, aber die Anmeldung zum Senden wurde nicht bestätigt. Prüfe dein GMX-Passwort und versuche es erneut.";
     }
     if (code === "provider_authentication_failed" && selected?.id === "webde") return "WEB.DE konnte die Anmeldung mit diesem Passwort nicht bestätigen. Prüfe zuerst, ob der Zugriff für E-Mail-Programme in WEB.DE aktiviert ist.";
-    if (code === "provider_authentication_failed") return "Die Anmeldung mit diesem Passwort wurde nicht bestätigt. NAHWERK zeigt dir jetzt den passenden nächsten Schritt.";
+    if (code === "provider_authentication_failed") return "Die Anmeldung mit diesem Passwort wurde nicht bestätigt. STEWARO zeigt dir jetzt den passenden nächsten Schritt.";
     if (code === "provider_tls_connection_failed") return "Die sichere Verbindung zum E-Mail-Anbieter konnte nicht hergestellt werden. Bitte versuche es später erneut.";
     if (code === "provider_connection_failed") return "Der E-Mail-Anbieter ist gerade nicht erreichbar. Bitte versuche es später erneut.";
     if (selected?.id === "webde") return "WEB.DE konnte die Anmeldung gerade nicht bestätigen. Prüfe E-Mail-Adresse und Passwort und versuche es erneut.";
@@ -986,12 +986,12 @@
     const settingsOverlay = makeOverlay(
       "emailSettingsOverlay",
       "Einstellungen",
-      "Lege fest, welche E-Mail-Funktionen dein persönlicher NAHWERK Concierge verwenden darf."
+      "Lege fest, welche E-Mail-Funktionen dein persönlicher STEWARO Concierge verwenden darf."
     );
     const connectOverlay = makeOverlay(
       "emailConnectOverlay",
       "E-Mail-Konto verbinden",
-      "Wähle einen von NAHWERK sicher unterstützten E-Mail-Anbietern."
+      "Wähle einen von STEWARO sicher unterstützten E-Mail-Anbietern."
     );
 
     const capabilities = root.querySelector(".email-capabilities");

@@ -1,6 +1,7 @@
 (() => {
   const WEBHOOK_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-registration-secure";
   const LOGIN_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-login-secure";
+  const SESSION_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-session-secure";
   const MFA_MANAGE_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-mfa-manage";
   const SESSION_KEY = "scb_web_session";
   const SECURITY_PROMPT_KEY = "nw_post_registration_security_prompt";
@@ -10,9 +11,12 @@
   const $ = (id) => document.getElementById(id);
   const params = new URLSearchParams(location.search);
   const guestChatHandoff = params.get("source") === "web_guest_chat";
+  const appHandoff = params.get("next") === "app";
   const requestedNext = params.get("next") === "/payg" ? "/payg" : "";
   const postAuthTarget = guestChatHandoff && requestedNext ? requestedNext : "";
-  const guestLoginHref = postAuthTarget ? "/anmelden?source=web_guest_chat&next=%2Fpayg" : "/anmelden";
+  const guestLoginHref = appHandoff
+    ? "/anmelden?produkt=senioren&next=app"
+    : postAuthTarget ? "/anmelden?source=web_guest_chat&next=%2Fpayg" : "/anmelden";
   const requestedProduct = params.get("produkt");
   const product = requestedProduct === "senioren" || (!requestedProduct && sessionStorage.getItem("nahwerk_product") === "senioren") ? "senioren" : "prime";
   const productLabel = product === "senioren" ? "Senioren Concierge" : "Persönlicher Concierge";
@@ -119,15 +123,15 @@
   if (!Object.hasOwn(PLANS, currentPlanKey)) currentPlanKey = "free";
   const selectedPlan = () => PLANS[currentPlanKey];
   const planBookable = () => selectedPlan().bookable;
-  const conciergeProfiles = window.NAHWERKCarousel?.byKey || {};
+  const conciergeProfiles = window.NAHWERKCarousel?.byKey || { fidel:{ key:"fidel", name:"FIDEL" } };
   const recipientIds = ["recipientSalutation", "recipientFirstName", "recipientLastName", "relationship", "recipientPhone", "familyMessage"];
   const fullName = (first, last) => [first.trim(), last.trim()].filter(Boolean).join(" ");
   const isSelf = () => form.querySelector('input[name="setupFor"]:checked')?.value === "self";
   const conciergeValue = () => {
     const value = form.querySelector('[name="conciergeChoice"]')?.value;
-    return conciergeProfiles[value] ? value : "lena";
+    return conciergeProfiles[value] ? value : "fidel";
   };
-  const concierge = () => conciergeProfiles[conciergeValue()].name;
+  const concierge = () => conciergeProfiles[conciergeValue()]?.name || "FIDEL";
   const escapeHtml = (value) => String(value || "").replace(/[&<>"']/g, (char) => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[char]));
   const familyMessageValue = () => $("familyMessage")?.value.trim() || "";
 
@@ -151,7 +155,7 @@
     });
 
     if (plan.bookable) {
-      $("planSelectionNote").innerHTML = "<strong>Direkt registrierbar.</strong><br>FREE wird ohne Zahlungsdaten angelegt. Berechtigungen und Kontingente kommen aus dem zentralen NAHWERK-Konto und werden nach Login unter Nutzung angezeigt.";
+      $("planSelectionNote").innerHTML = "<strong>Direkt registrierbar.</strong><br>FREE wird ohne Zahlungsdaten angelegt. Berechtigungen und Kontingente kommen aus dem zentralen STEWARO-Konto und werden nach Login unter Nutzung angezeigt.";
       submit.disabled = false;
       submit.removeAttribute("aria-disabled");
       submit.textContent = "Kostenlosen Zugang registrieren";
@@ -221,7 +225,11 @@
 
   function setupConciergeSelection() {
     const choice = form.querySelector(".concierge-choice");
-    if (!choice) return;
+    if (!choice) {
+      const fixed = form.querySelector('[name="conciergeChoice"]');
+      if (fixed && !fixed.value) fixed.value = "fidel";
+      return;
+    }
     const requestedConcierge = params.get("concierge");
     if (conciergeProfiles[requestedConcierge]) choice.dataset.selected = requestedConcierge;
     const field = choice.closest(".field");
@@ -270,7 +278,7 @@
     const familyMessagePreview = familyMessage ? `<br><br><em>Persönliche Nachricht von ${escapeHtml(owner || "Ihrer Familie")}:</em><br>„${escapeHtml(familyMessage).replace(/\n/g,"<br>")}“` : "";
     updateContextTexts();
     const welcomeMessage = product === "senioren"
-      ? `<strong>${greeting} 👋</strong><br><br>Willkommen bei NAHWERK Concierge.${introduction}<br><br>Ich bin ${concierge()}, ${informal ? "dein" : "Ihr"} persönlicher KI-Concierge.<br><br>Ich helfe ${informal ? "dir" : "Ihnen"} dabei, Fragen verständlich zu klären, Technik Schritt für Schritt zu bedienen und wichtige Erinnerungen im Blick zu behalten.<br><br>Auf Wunsch erstelle ich Bilder, ordne Fotos ein, vergleiche Möglichkeiten und fasse Informationen übersichtlich zusammen.`
+      ? `<strong>${greeting} 👋</strong><br><br>Willkommen bei STEWARO Concierge.${introduction}<br><br>Ich bin ${concierge()}, ${informal ? "dein" : "Ihr"} persönlicher KI-Concierge.<br><br>Ich helfe ${informal ? "dir" : "Ihnen"} dabei, Fragen verständlich zu klären, Technik Schritt für Schritt zu bedienen und wichtige Erinnerungen im Blick zu behalten.<br><br>Auf Wunsch erstelle ich Bilder, ordne Fotos ein, vergleiche Möglichkeiten und fasse Informationen übersichtlich zusammen.`
       : `<strong>${greeting} 👋</strong><br><br>Willkommen bei ${productLabel}.${introduction}<br><br>Ich bin ${concierge()}, ${informal ? "dein" : "Ihr"} persönlicher KI-Concierge.<br><br>Ich erkläre die Bedienung verständlich und helfe ${informal ? "dir" : "Ihnen"} bei Organisation, Informationen, Dokumenten und vielem mehr.`;
     $("messagePreview").innerHTML = welcomeMessage + familyMessagePreview;
   }
@@ -396,12 +404,18 @@
         window.NahwerkActivation?.markRegistrationComplete?.();
         localStorage.setItem("scb_onboarding_sent", "1");
         localStorage.setItem("scb_onboarding_result", JSON.stringify(body));
-        if (await login(request.email, password)) {
+        const loginResult = await login(request.email, password);
+        if (loginResult) {
+          if (appHandoff) {
+            show("<strong>Fertig.</strong><br>FIDEL wird jetzt sicher geöffnet.");
+            void handoffToApp(loginResult.session_token);
+            return;
+          }
           show("<strong>Fertig.</strong><br>Die WhatsApp-Identität wurde bestätigt und der Web-Zugang wurde angelegt. Sie werden zum Kundenbereich weitergeleitet.");
           return setTimeout(() => { location.href = postAuthTarget || window.NAHWERKLocale?.href("erster-schritt.html") || "erster-schritt.html"; }, 500);
         }
         show("<strong>Der Web-Zugang wurde angelegt.</strong><br>Bitte melden Sie sich jetzt mit Ihrer E-Mail-Adresse und Ihrem Passwort an.", true);
-        return setTimeout(() => { location.href = postAuthTarget ? guestLoginHref : (window.NAHWERKLocale?.href("anmelden.html") || "anmelden.html"); }, 1800);
+        return setTimeout(() => { location.href = (postAuthTarget || appHandoff) ? guestLoginHref : (window.NAHWERKLocale?.href("anmelden.html") || "anmelden.html"); }, 1800);
       }
 
       if (response.status === 401 && body.status === "verification_failed") {
@@ -453,6 +467,28 @@
     } catch (_) {}
   }
 
+  async function handoffToApp(sessionToken) {
+    try {
+      const response = await fetch(SESSION_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + sessionToken },
+        body: JSON.stringify({ action: "handoff_create" }),
+        cache: "no-store",
+        credentials: "omit"
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok || body?.ok !== true || body?.status !== "handoff_ready" || !/^https:\/\/app\.stewaro\.com\/#handoff=/.test(String(body?.target_url || ""))) {
+        throw new Error(String(body?.status || "handoff_create_failed"));
+      }
+      location.replace(String(body.target_url));
+      return true;
+    } catch (_) {
+      show("<strong>FIDEL konnte gerade nicht geöffnet werden.</strong><br>Der Zugang ist angelegt. Bitte öffnen Sie FIDEL anschließend über Ihr Konto.", true);
+      setTimeout(() => { location.href = "/konto"; }, 1800);
+      return false;
+    }
+  }
+
   async function login(email, password) {
     const response = await fetch(LOGIN_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }) });
     const body = await response.json().catch(() => ({}));
@@ -467,20 +503,20 @@
       product_context: body.product_context || (body.brand === "senioren_concierge" ? "senioren" : body.brand === "prime_concierge" ? "prime" : product)
     }));
     await initializeSecurityRecommendation(body.session_token);
-    return true;
+    return body;
   }
 
   ensureVerificationUi();
   setupConciergeSelection();
   setupPlanSelection();
-  if (postAuthTarget) {
+  if (postAuthTarget || appHandoff) {
     document.querySelectorAll('a[href="/anmelden"],a[href="anmelden.html"]').forEach((link) => {
       if (link instanceof HTMLAnchorElement) link.href = guestLoginHref;
     });
   }
   sessionStorage.setItem("nahwerk_product", product);
   $("productLabel").textContent = productLabel;
-  document.title = `${productLabel} registrieren | NAHWERK`;
+  document.title = `${productLabel} registrieren | STEWARO`;
   form.addEventListener("input", (event) => {
     if (event.target?.id === "recipientPhone") syncSelf();
     else render();
@@ -526,14 +562,14 @@
     const request = {
       product, concierge_profile: product === "senioren" ? "SENIOR_MARTIN" : "PRIME_MARTIN", concierge_choice: conciergeValue(), package: selectedPlan().code,
       registration_type: self ? "self" : "other", account_holder_name: fullName($("ownerFirstName").value, $("ownerLastName").value), account_holder_salutation: $("ownerSalutation").value,
-      account_holder_first_name: $("ownerFirstName").value.trim(), account_holder_last_name: $("ownerLastName").value.trim(), email: $("ownerEmail").value.trim(), phone: self ? $("ownerPhone").value.trim() : "",
+      account_holder_first_name: $("ownerFirstName").value.trim(), account_holder_last_name: $("ownerLastName").value.trim(), account_holder_postal_code: $("ownerPostalCode")?.value.trim() || "", postal_code: $("ownerPostalCode")?.value.trim() || "", email: $("ownerEmail").value.trim(), phone: self ? $("ownerPhone").value.trim() : "",
       supported_person_name: fullName(p.first, p.last), supported_person_salutation: p.sal, supported_person_first_name: p.first, supported_person_last_name: p.last,
       relationship: self ? "Ich selbst" : $("relationship").selectedOptions[0].textContent.trim(), supported_whatsapp: p.phone, form_of_address: $("addressing").value.toUpperCase(), initial_notes: (() => {
         const notes = $("note").value.trim();
         const personal = self ? "" : familyMessageValue();
         const parts = [];
         if (notes) parts.push(notes);
-        if (personal) parts.push(`Persönliche Nachricht der einrichtenden Person, die beim ersten Kontakt zusätzlich zur NAHWERK-Begrüßung übermittelt werden soll: "${personal}"`);
+        if (personal) parts.push(`Persönliche Nachricht der einrichtenden Person, die beim ersten Kontakt zusätzlich zur STEWARO-Begrüßung übermittelt werden soll: "${personal}"`);
         return parts.join("\n\n");
       })(),
       contact_consent: self ? true : (Boolean(p.phone) ? $("consent").checked : false), safety_enabled: safety, checkin_times: safety ? $("checkinTimes").value.trim() : "", trusted_contact_name: safety ? $("trustedContactName").value.trim() : "", trusted_contact_phone: safety ? $("trustedContactPhone").value.trim() : "",
@@ -557,12 +593,18 @@
         window.NahwerkActivation?.markRegistrationComplete?.();
         localStorage.setItem("scb_onboarding_sent", "1");
         localStorage.setItem("scb_onboarding_result", JSON.stringify(body));
-        if (await login(request.email, password)) {
+        const loginResult = await login(request.email, password);
+        if (loginResult) {
+          if (appHandoff) {
+            show("<strong>Fertig.</strong><br>FIDEL wird jetzt sicher geöffnet.");
+            void handoffToApp(loginResult.session_token);
+            return;
+          }
           show("<strong>Fertig.</strong><br>Der Zugang wurde angelegt. Sie werden zum Kundenbereich weitergeleitet.");
           return setTimeout(() => { location.href = postAuthTarget || window.NAHWERKLocale?.href("erster-schritt.html") || "erster-schritt.html"; }, 500);
         }
         show("<strong>Der Zugang wurde angelegt.</strong><br>Bitte melden Sie sich jetzt an.", true);
-        return setTimeout(() => { location.href = postAuthTarget ? guestLoginHref : (window.NAHWERKLocale?.href("anmelden.html") || "anmelden.html"); }, 1800);
+        return setTimeout(() => { location.href = (postAuthTarget || appHandoff) ? guestLoginHref : (window.NAHWERKLocale?.href("anmelden.html") || "anmelden.html"); }, 1800);
       }
       if (response.status === 409 && body.status === "email_in_use") return show(`<strong>Für diese E-Mail-Adresse besteht bereits ein Konto.</strong><br><a href="${guestLoginHref}">Zur Anmeldung</a>`, true);
       if (response.status === 400 || body.status === "validation_error") return show("<strong>Bitte prüfen Sie Ihre Angaben.</strong>", true);

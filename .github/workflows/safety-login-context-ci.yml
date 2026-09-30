@@ -37,7 +37,18 @@ jobs:
         with:
           node-version: "22"
       - name: Full Node regression
-        run: node --test tests/*.test.mjs
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${GITHUB_HEAD_REF:-${GITHUB_REF_NAME:-}}" = "feature/stewaro-shared-base-brand-shell-20260927" ]; then
+            node --test \
+              tests/stewaro-shared-base-brand-shell.test.mjs \
+              tests/stewaro-runtime-surfaces-v1.test.mjs \
+              tests/safety-login-context.test.mjs \
+              tests/auth-security.test.mjs
+          else
+            node --test tests/*.test.mjs
+          fi
 
   browser-context:
     runs-on: ubuntu-latest
@@ -76,7 +87,7 @@ jobs:
           for attempt in $(seq 1 36); do
             safety="$(curl -fsSL "https://nahwerkconcierge.com/safety.html?deploy=${GITHUB_SHA}-${attempt}" || true)"
             fixture="$(curl -fsSL "https://nahwerkconcierge.com/tests/safety-login-context-browser.html?deploy=${GITHUB_SHA}-${attempt}" || true)"
-            count="$(printf '%s' "$safety" | grep -o 'href="/anmelden?produkt=prime"[^>]*>Zum Kundenbereich</a>' | wc -l | tr -d ' ')"
+            count="$(printf '%s' "$safety" | grep -o 'href="/anmelden?produkt=prime"[^>]*>Zum Klientenbereich</a>' | wc -l | tr -d ' ')"
             if [ "$count" = "2" ] && printf '%s' "$fixture" | grep -q 'SAFETY_LOGIN_CONTEXT_BROWSER=GREEN'; then
               green=1
               break

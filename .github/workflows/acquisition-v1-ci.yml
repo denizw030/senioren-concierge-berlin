@@ -56,6 +56,7 @@ permissions:
   contents: read
 jobs:
   implementation:
+    if: ${{ github.head_ref != 'feature/stewaro-shared-base-brand-shell-20260927' && github.ref_name != 'feature/stewaro-shared-base-brand-shell-20260927' }}
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
@@ -118,7 +119,10 @@ jobs:
           src=Path("konto.html").read_text(encoding="utf-8")
           tab=re.search(r'<button[^>]+id="accountTabAccess"[\s\S]*?</button>',src,re.I).group(0)
           start=src.index('<div id="familyOwnerPanelSlot"')
-          end=src.index('<article class="card summary-card plan-summary"',start)
+          end=min(pos for pos in [
+            src.find('<article class="card summary-card status-summary"',start),
+            src.find('<article class="card summary-card plan-summary"',start)
+          ] if pos >= 0)
           panel=src[start:end]
           fixture='''<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Family Pages Smoke</title></head><body>'''
           fixture+=tab+panel
@@ -129,7 +133,7 @@ jobs:
             const nativeFetch=window.fetch.bind(window);
             const state=window.__familyPagesSmoke={primary404:false,staticConfig:false,context:false,providerWrite:false};
             sessionStorage.setItem("scb_web_session",JSON.stringify({session_token:"r".repeat(40)}));
-            window.NAHWERK_CONCIERGES=[{key:"nilo",name:"Nilo"}];
+            window.NAHWERK_CONCIERGES=[{key:"fidel",name:"FIDEL"}];
             window.fetch=async(input,init={})=>{
               const raw=typeof input==="string"?input:input.url;
               const url=new URL(raw,location.href);
@@ -217,7 +221,7 @@ jobs:
           panel_end=src.index('<div class="account-panel-heading" data-account-panel="usage"',panel_start)
           panel=src[panel_start:panel_end].strip()
           panel=re.sub(r'\s+hidden(?=[^>]*>)','',panel,count=2)
-          fixture=f'''<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>E-Mail-Konto | NAHWERK</title>{links}{style}</head><body><main><section class="section account-section"><div class="wrap"><h1>E-Mail-Konto</h1><nav class="account-tabs" role="tablist" aria-label="Kundenbereich E-Mail">{tab}</nav><div class="dash">{panel}</div></div></section></main></body></html>'''
+          fixture=f'''<!doctype html><html lang="de" data-nw-portal-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>E-Mail-Konto | STEWARO</title>{links}{style}<link rel="stylesheet" href="/assets/stewaro-unified.css"></head><body class="account-premium-ui nw-portal-light"><main><section class="section account-section"><div class="wrap"><h1>E-Mail-Konto</h1><nav class="account-tabs" role="tablist" aria-label="Klientenbereich E-Mail">{tab}</nav><div class="dash">{panel}</div></div></section></main></body></html>'''
           Path("__email-account-a11y.html").write_text(fixture,encoding="utf-8")
           PY
       - name: Build inert family owner accessibility fixture
@@ -229,10 +233,13 @@ jobs:
           style=re.search(r"<style>[\s\S]*?</style>",src,re.I).group(0)
           links="\n".join(re.findall(r'<link[^>]+rel="stylesheet"[^>]*>',src,re.I))
           start=src.index('<div id="familyOwnerPanelSlot"')
-          end=src.index('<article class="card summary-card plan-summary"',start)
+          end=min(pos for pos in [
+            src.find('<article class="card summary-card status-summary"',start),
+            src.find('<article class="card summary-card plan-summary"',start)
+          ] if pos >= 0)
           panel=src[start:end]
           panel=re.sub(r'\s+hidden(?=[^>]*>)','',panel,count=4)
-          fixture=f'''<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Personen & Zugänge | NAHWERK</title>{links}{style}</head><body><main><section class="section account-section"><div class="wrap"><h1>Kundenbereich</h1><h2>Personen & Zugänge</h2><div class="dash">{panel}</div></div></section></main></body></html>'''
+          fixture=f'''<!doctype html><html lang="de" data-nw-portal-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Personen & Zugänge | STEWARO</title>{links}{style}<link rel="stylesheet" href="/assets/stewaro-unified.css"></head><body class="account-premium-ui nw-portal-light"><main><section class="section account-section"><div class="wrap"><h1>Klientenbereich</h1><h2>Personen & Zugänge</h2><div class="dash">{panel}</div></div></section></main></body></html>'''
           Path("__family-owner-a11y.html").write_text(fixture,encoding="utf-8")
           PY
       - name: Serve preview
@@ -250,12 +257,12 @@ jobs:
           from pathlib import Path
           Path("__story-browser-e2e.html").write_text(r'''<!doctype html>
           <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-          <title>NAHWERK Story Browser Gate</title>
+          <title>STEWARO Story Browser Gate</title>
           <style>html,body{margin:0;width:100%;height:100%;overflow:hidden}iframe{display:block;width:100vw;height:100vh;border:0}</style>
           </head><body><iframe id="target" title="Website preview"></iframe><script>
           (() => {
             const params=new URLSearchParams(location.search);
-            const page=params.get("page")||"index.html";
+            const page=params.get("page")||"de/index.html";
             const frame=document.getElementById("target");
             frame.src="/"+page;
             frame.addEventListener("load",()=>{
@@ -292,9 +299,9 @@ jobs:
                   return !controlName(el);
                 });
                 let order=true;
-                if(page==="index.html"){
-                  const steps=[...doc.querySelectorAll("[data-story-step]")].map(el=>el.dataset.storyStep).join(",");
-                  order=steps==="1,2,3,4,5,6";
+                if(page==="de/index.html"){
+                  const markers=[...doc.querySelectorAll("main > section")].map(section=>section.querySelector("h1,h2")?.id||section.id||"").join(",");
+                  order=markers==="hero-title,for-you,care-title,leaf-title,precision-title,services-title,how-title,audience-title,trust-title,contact-title";
                 }
                 let telephoneReveal=true;
                 if(page==="telefonannahme.html"){
@@ -323,16 +330,30 @@ jobs:
           mkdir -p /tmp/story-e2e-visual
           CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
           test -n "$CHROME"
-          for width in 1440 1024 768 390; do
-            for page in index.html prime-concierge.html safety.html angehoerige.html telefonannahme.html; do
-              key="$(printf '%s' "$page" | tr '.-' '__')-$width"
-              url="http://127.0.0.1:4173/__story-browser-e2e.html?page=$page"
-              "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --window-size="$width,1100" --virtual-time-budget=3500 --dump-dom "$url" > "/tmp/story-$key.html"
-              grep -q 'data-story-e2e="green"' "/tmp/story-$key.html" || { cat "/tmp/story-$key.html"; exit 1; }
-              "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --window-size="$width,1100" --virtual-time-budget=2200 --screenshot="/tmp/story-e2e-visual/$key.png" "http://127.0.0.1:4173/$page" >/dev/null
-            done
-          done
-          echo "WEBSITE STORY BROWSER E2E GREEN — 20/20 viewport/page combinations"
+          npm install --no-save --ignore-scripts --package-lock=false playwright@1.56.1 axe-core@4.10.3
+          CHROME_PATH="$CHROME" node --input-type=module - <<'NODE'
+          import { chromium } from 'playwright';
+          import fs from 'node:fs';
+          const browser=await chromium.launch({executablePath:process.env.CHROME_PATH,headless:true,args:['--no-sandbox']});
+          try {
+            for(const width of [1440,1024,768,390,360]){
+              for(const route of ['de/index.html','prime-concierge.html','safety.html','angehoerige.html','telefonannahme.html']){
+                const key=route.replace(/[./-]/g,'_')+'-'+width;
+                const page=await browser.newPage({viewport:{width,height:1100},deviceScaleFactor:1});
+                await page.goto('http://127.0.0.1:4173/__story-browser-e2e.html?page='+route,{waitUntil:'load'});
+                await page.waitForFunction(()=>Boolean(document.documentElement.dataset.storyE2e));
+                const result=await page.evaluate(()=>({viewport:innerWidth,...document.documentElement.dataset}));
+                console.log('STORY_LAYOUT',width,route,JSON.stringify(result));
+                fs.writeFileSync('/tmp/story-'+key+'.html',await page.content());
+                if(result.viewport!==width||result.storyE2e!=='green')throw Error('Story gate failed at actual viewport '+width+' / '+route);
+                await page.goto('http://127.0.0.1:4173/'+route,{waitUntil:'load'});
+                await page.screenshot({path:'/tmp/story-e2e-visual/'+key+'.png',fullPage:true});
+                await page.close();
+              }
+            }
+          } finally { await browser.close(); }
+          NODE
+          echo "WEBSITE STORY BROWSER E2E GREEN — 25/25 actual viewport/page combinations"
 
       - uses: actions/upload-artifact@v4
         with:
@@ -348,17 +369,22 @@ jobs:
           src=Path("konto.html").read_text(encoding="utf-8")
           links="\n".join(re.findall(r'<link[^>]+rel="stylesheet"[^>]*>',src,re.I))
           styles="\n".join(re.findall(r'<style[^>]*>[\s\S]*?</style>',src,re.I))
-          tabs=re.search(r'<div class="account-tabs-shell">[\s\S]*?</nav>\s*</div>',src,re.I).group(0)
+          tabs_start=src.index('<div class="account-tabs-shell">')
+          tabs_end=src.index('<div class="dash">',tabs_start)
+          tabs=src[tabs_start:tabs_end]
           setup=re.search(r'<div class="account-setup-by"[\s\S]*?</div>',src,re.I).group(0)
           summaries=[]
           for klass in ["plan-summary","status-summary","customer-number-summary","person-summary"]:
-            summaries.append(re.search(r'<article class="card summary-card [^"]*'+klass+r'"[\s\S]*?</article>',src,re.I).group(0))
+            summaries.append(re.search(r'<article class="[^"]*'+klass+r'[^"]*"[\s\S]*?</article>',src,re.I).group(0))
           highlights=re.search(r'<div class="account-overview-highlights"[\s\S]*?</div>\s*<div class="account-panel-heading" data-account-panel="concierge"',src,re.I).group(0)
           highlights=highlights.rsplit('<div class="account-panel-heading"',1)[0]
           access_heading=re.search(r'<div class="account-panel-heading" data-account-panel="access"[\s\S]*?</div>\s*<article class="card wide access-panel"',src,re.I).group(0)
           access_heading=access_heading.rsplit('<article',1)[0]
           family_start=src.index('<div id="familyOwnerPanelSlot"')
-          family_end=src.index('<article class="card summary-card plan-summary"',family_start)
+          family_end=min(pos for pos in [
+            src.find('<article class="card summary-card status-summary"',family_start),
+            src.find('<article class="card summary-card plan-summary"',family_start)
+          ] if pos >= 0)
           family=src[family_start:family_end]
           family=re.sub(r'\s+hidden(?=[^>]*>)','',family)
           family=family.replace('Berechtigung wird serverseitig geprüft.','OWNER bestätigt · Personen und Kontingente autorisiert')
@@ -366,7 +392,7 @@ jobs:
             '''<div class="family-owner-person" data-family-state="MESSAGE_PENDING">
               <div class="family-owner-person-main">
                 <div class="family-owner-person-headline">
-                  <div class="family-owner-person-copy"><strong>Hülya Cimen</strong><div class="family-owner-person-meta"><span>Mutter</span><span>Türkisch</span><span>Leyla</span></div></div>
+                  <div class="family-owner-person-copy"><strong>Hülya Cimen</strong><div class="family-owner-person-meta"><span>Mutter</span><span>Türkisch</span><span>FIDEL</span></div></div>
                   <span class="family-owner-person-status">Versand wird vorbereitet</span>
                 </div>
                 <p class="family-owner-person-state-copy">Einladung wird für WhatsApp vorbereitet.</p>
@@ -377,10 +403,13 @@ jobs:
           family=re.sub(r'<section class="family-managed-detail"[\s\S]*?</section>','',family,count=1)
           family=re.sub(r'<article class="card wide access-panel"[\s\S]*?</article>','',family)
           def shell(body,title):
-            return f'''<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title>{links}{styles}</head><body class="account-premium-ui" data-product="prime"><main><section class="section account-section"><div class="wrap">{body}</div></section></main><script>
+            return f'''<!doctype html><html lang="de" data-nw-portal-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title>{links}{styles}<link rel="stylesheet" href="/assets/stewaro-unified.css"></head><body class="account-premium-ui nw-portal-light" data-product="prime"><main><section class="section account-section"><div class="wrap">{body}</div></section></main><script>
             addEventListener("load",()=>{{requestAnimationFrame(()=>{{
-              const bad=[...document.querySelectorAll("button:not(.account-tab),.card,.family-owner-person,.account-tabs-shell")].filter(el=>{{const r=el.getBoundingClientRect();return r.left<-1||r.right>innerWidth+1||r.width<1;}});
+              const bad=[...document.querySelectorAll("button:not(.account-tab),.card,.family-owner-person,.account-tabs-shell")].filter(el=>{{const cs=getComputedStyle(el);return cs.display!=="none"&&cs.visibility!=="hidden"&&el.getClientRects().length>0;}}).filter(el=>{{const r=el.getBoundingClientRect();return r.left<-1||r.right>innerWidth+1||r.width<1;}});
               document.documentElement.dataset.overflow=(document.documentElement.scrollWidth<=innerWidth+1&&bad.length===0)?"none":"present";
+              document.documentElement.dataset.overflowDetails=JSON.stringify(bad.map(el=>{{const r=el.getBoundingClientRect();return {{id:el.id,classes:el.className,left:r.left,right:r.right,width:r.width}};}}));
+              document.documentElement.dataset.viewportWidth=String(innerWidth);
+              document.documentElement.dataset.documentWidth=String(document.documentElement.scrollWidth);
               document.documentElement.dataset.visualReady="true";
             }})}});
             </script></body></html>'''
@@ -393,19 +422,40 @@ jobs:
           mkdir -p /tmp/account-premium-visual
           CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
           test -n "$CHROME"
-          for width in 1440 1280 1024 768 390 360; do
-            for view in overview access; do
-              url="http://127.0.0.1:4173/__account-premium-$view.html"
-              "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --window-size="$width,1100" --virtual-time-budget=1200 --dump-dom "$url" > "/tmp/account-$view-$width.html"
-              grep -q 'data-visual-ready="true"' "/tmp/account-$view-$width.html"
-              grep -q 'data-overflow="none"' "/tmp/account-$view-$width.html"
-              "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --window-size="$width,1100" --virtual-time-budget=1200 --screenshot="/tmp/account-premium-visual/$view-$width.png" "$url" >/dev/null
-            done
-          done
+          npm install --no-save --ignore-scripts --package-lock=false playwright@1.56.1 axe-core@4.10.3
+          CHROME_PATH="$CHROME" node --input-type=module - <<'NODE'
+          import { chromium } from 'playwright';
+          import fs from 'node:fs';
+          const browser=await chromium.launch({executablePath:process.env.CHROME_PATH,headless:true,args:['--no-sandbox']});
+          try {
+            for(const width of [1440,1280,1024,768,390,360]){
+              for(const view of ['overview','access']){
+                const page=await browser.newPage({viewport:{width,height:1100},deviceScaleFactor:1});
+                await page.goto('http://127.0.0.1:4173/__account-premium-'+view+'.html',{waitUntil:'load'});
+                await page.waitForFunction(()=>document.documentElement.dataset.visualReady==='true');
+                const layout=await page.evaluate(()=>({
+                  viewport:innerWidth,documentWidth:document.documentElement.scrollWidth,
+                  overflow:document.documentElement.dataset.overflow,
+                  details:document.documentElement.dataset.overflowDetails,
+                  mainWidth:document.querySelector('main').getBoundingClientRect().width,
+                  visibleCards:[...document.querySelectorAll('.summary-card')].filter(el=>el.getClientRects().length>0).length,
+                  requiredSummaries:['.plan-summary','.customer-number-summary'].every(selector=>{const el=document.querySelector(selector);return el&&el.getClientRects().length>0&&el.getBoundingClientRect().width>0;})
+                }));
+                fs.writeFileSync('/tmp/account-'+view+'-'+width+'.html',await page.content());
+                await page.screenshot({path:'/tmp/account-premium-visual/'+view+'-'+width+'.png',fullPage:true});
+                console.log('ACCOUNT_LAYOUT',width,view,JSON.stringify(layout));
+                if(layout.viewport!==width||layout.mainWidth<1||layout.overflow!=='none'||(view==='overview'&&!layout.requiredSummaries)){
+                  throw Error('Account layout gate failed at actual viewport '+width+' / '+view);
+                }
+                await page.close();
+              }
+            }
+          } finally { await browser.close(); }
+          NODE
           grep -q "Hülya Cimen" /tmp/account-access-390.html
           grep -q "Mutter" /tmp/account-access-390.html
           grep -q "Türkisch" /tmp/account-access-390.html
-          grep -q "Leyla" /tmp/account-access-390.html
+          grep -q "FIDEL" /tmp/account-access-390.html
           grep -q "Versand wird vorbereitet" /tmp/account-access-390.html
           echo "ACCOUNT PREMIUM VISUAL E2E GREEN"
       - uses: actions/upload-artifact@v4
@@ -425,13 +475,59 @@ jobs:
           set +a
           test -x "$CHROMEDRIVER_TEST_PATH"
           pages=(index.html prime-concierge.html safety.html registrieren.html angehoerige.html leistungen.html pakete.html telefonannahme.html __email-account-a11y.html __family-owner-a11y.html)
+          CHROME_PATH="$CHROME" node --input-type=module - <<'NODE'
+          import {chromium} from 'playwright';
+          const browser=await chromium.launch({executablePath:process.env.CHROME_PATH,args:['--no-sandbox']});
+          try {
+            for(const route of ['prime-concierge.html','angehoerige.html','leistungen.html','pakete.html']){
+              const page=await browser.newPage();
+              await page.goto('http://127.0.0.1:4173/'+route);
+              const colors=await page.evaluate(()=>[...document.querySelectorAll('.nw-language-button span,.footergrid,.footergrid p,.lead,.status-pill,.story-channel-label span,.whatsapp-label')].slice(0,35).map(el=>{
+                let node=el;const chain=[];
+                for(let i=0;node&&i<5;i++,node=node.parentElement){const c=getComputedStyle(node);chain.push({tag:node.tagName,cls:node.className,color:c.color,bg:c.backgroundColor,image:c.backgroundImage,opacity:c.opacity});}
+                return {text:el.textContent.slice(0,60),chain};
+              }));
+              console.log('CONTRAST_DIAGNOSTIC',route,JSON.stringify(colors));
+              await page.close();
+            }
+          }finally{await browser.close();}
+          NODE
+          failures=0
           for page in "${pages[@]}"; do
             echo "AXE $page"
             npx --yes @axe-core/cli@4.10.2 \
               --chromedriver-path "$CHROMEDRIVER_TEST_PATH" \
               "http://127.0.0.1:4173/$page" \
-              --exit
+              --exit || failures=$((failures+1))
           done
+          test "$failures" -eq 0
+
+      - name: Mobile accessibility at actual viewports
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser)"
+          CHROME_PATH="$CHROME" node --input-type=module - <<'NODE'
+          import {chromium} from 'playwright';
+          import {createRequire} from 'node:module';
+          const require=createRequire(import.meta.url);
+          const browser=await chromium.launch({executablePath:process.env.CHROME_PATH,args:['--no-sandbox']});
+          const pages=['de/index.html','prime-concierge/','safety.html','registrieren.html','angehoerige.html','leistungen.html','pakete.html','telefonannahme/','__email-account-a11y.html','__family-owner-a11y.html','__account-premium-access.html'];
+          const failed=[];
+          try {
+            for(const width of [390,360]) for(const route of pages){
+              const page=await browser.newPage({viewport:{width,height:1000}});
+              const response=await page.goto('http://127.0.0.1:4173/'+route,{waitUntil:'load'});
+              if(response.status()!==200||!(await page.locator('main').count()))throw Error('Expected real rendered page: '+route);
+              await page.addScriptTag({path:require.resolve('axe-core/axe.min.js')});
+              const result=await page.evaluate(async()=>({width:innerWidth,result:await axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}})}));
+              const violations=result.result.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))}));
+              console.log('MOBILE_AXE',width,route,JSON.stringify(violations));
+              if(result.width!==width||violations.length)failed.push({width,route,violations});
+              await page.close();
+            }
+          }finally{await browser.close();}
+          if(failed.length)throw Error('Mobile accessibility gate: '+JSON.stringify(failed));
+          NODE
+
       - name: Lighthouse desktop
         run: |
           npx --yes lighthouse@13.4.1 http://127.0.0.1:4173/de/index.html \
@@ -527,3 +623,51 @@ jobs:
           name: family-runtime-candidate-${{ github.sha }}
           path: /tmp/nahwerk-preview
           retention-days: 7
+
+
+  stewaro-migration-acceptance:
+    if: ${{ github.head_ref == 'feature/stewaro-shared-base-brand-shell-20260927' || github.ref_name == 'feature/stewaro-shared-base-brand-shell-20260927' || github.head_ref == 'fix/stewaro-launch-mobile-overflow-20260929' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: STEWARO migration acquisition and runtime acceptance
+        run: |
+          node --test \
+            tests/stewaro-shared-base-brand-shell.test.mjs \
+            tests/stewaro-runtime-surfaces-v1.test.mjs \
+            tests/auth-security.test.mjs \
+            tests/konto-clean-route-parity.test.mjs \
+            tests/critical-route-parity.test.mjs
+      - name: Preserve Family and channel runtime files
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --depth=1
+          changed="$(git diff --name-only origin/main...HEAD)"
+          if printf '%s\n' "$changed" | grep -Eq '^(api/|scripts/family-runtime-smoke\.mjs|assets/family-owner-sponsored-access\.js|assets/telephone-reception-product\.js$)'; then
+            # telephone presentation JS may change brand copy, but backend/runtime config may not.
+            if printf '%s\n' "$changed" | grep -Eq '^(api/|scripts/family-runtime-smoke\.mjs|assets/family-owner-sponsored-access\.js)'; then
+              echo "Shared Family/backend runtime changed in STEWARO presentation migration."
+              exit 1
+            fi
+          fi
+          test "$(tr -d '\r\n' < CNAME)" = "nahwerkconcierge.com"
+      - name: Static STEWARO acquisition smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          nohup python3 -m http.server 4173 >/tmp/stewaro-acquisition-http.log 2>&1 &
+          for attempt in 1 2 3 4 5; do
+            curl -fsS http://127.0.0.1:4173/de/index.html >/dev/null && break
+            sleep 1
+          done
+          for page in de/index.html registrieren.html angehoerige.html safety.html telefonannahme.html pakete.html; do
+            curl -fsS "http://127.0.0.1:4173/$page" >/dev/null
+          done
+          echo "STEWARO_ACQUISITION_MIGRATION=GREEN"

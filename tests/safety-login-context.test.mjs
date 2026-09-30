@@ -6,7 +6,7 @@ const read = (path) => fs.readFileSync(path, "utf8");
 
 test("Safety customer-area entry is explicitly Prime", () => {
   const safety = read("safety.html");
-  const customerAreaLinks = [...safety.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>Zum Kundenbereich<\/a>/g)].map((m) => m[1]);
+  const customerAreaLinks = [...safety.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>Zum Klientenbereich<\/a>/g)].map((m) => m[1]);
   assert.deepEqual(customerAreaLinks, ["/anmelden?produkt=prime", "/anmelden?produkt=prime"]);
 });
 

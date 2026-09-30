@@ -13,7 +13,8 @@ const css = read("assets/web-customer-concierge.css");
 const authNav = read("assets/auth-nav.js");
 
 test("authenticated Web Concierge is a customer messenger and remains fail closed internally", () => {
-  assert.match(page, /Dein Concierge/);
+  assert.match(page, /<title>FIDEL \| STEWARO<\/title>/);
+  assert.match(page, /id="webConciergeTitle">FIDEL</);
   for (const id of ["webConciergeNewChat","webConciergeThreads","webConciergeLog","webConciergeInput","webConciergeSend"]) assert.ok(page.includes(`id="${id}"`));
   assert.match(page, /id="webConciergeInput"[^>]*disabled/);
   assert.match(page, /id="webConciergeSend"[^>]*disabled/);
@@ -160,7 +161,7 @@ test("chat header displays only the authoritative central Concierge persona", ()
 });
 
 test("Concierge avatar and name open central Concierge settings", () => {
-  assert.match(client, /SETTINGS_URL = "\/concierge-anpassen"/);
+  assert.match(client, /SETTINGS_URL = location\.hostname==="app\.stewaro\.com" \? "https:\/\/account\.stewaro\.com\/concierge-anpassen" : "\/concierge-anpassen"/);
   assert.match(client, /title\.onclick = openConciergeSettings/);
   assert.match(client, /avatar\.onclick = openConciergeSettings/);
   assert.match(client, /title\.onkeydown/);
@@ -229,7 +230,7 @@ test("legacy and clean routes expose the same end-customer messenger", () => {
     assert.match(surface, /Neuer Chat/);
     assert.match(surface, /Deine Chats/);
     assert.match(surface, /aria-label="Chatverlauf"/);
-    assert.match(surface, /assets\/web-customer-concierge\.js\?v=57/);
+    assert.match(surface, /assets\/web-customer-concierge\.js\?v=58/);
     assert.doesNotMatch(surface, /web-customer-concierge-thread-scope\.js/);
     assert.doesNotMatch(surface, /PROD|autoritativ|Core-v1|web-gateway-v1|Fail-closed|Shadow-Antworten|kanonische Kundenidentität/i);
   }

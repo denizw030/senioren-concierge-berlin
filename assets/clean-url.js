@@ -1,6 +1,34 @@
 (() => {
   'use strict';
 
+  const installStewaroUnifiedPresentation = () => {
+    try {
+      if (!document.querySelector('link[data-stewaro-unified]')) {
+        const stylesheet = document.createElement('link');
+        stylesheet.rel = 'stylesheet';
+        stylesheet.href = '/assets/stewaro-unified.css?v=20260927-1';
+        stylesheet.dataset.stewaroUnified = 'true';
+        document.head.appendChild(stylesheet);
+      }
+      if (!document.querySelector('script[data-stewaro-entry-routing]')) {
+      const routing = document.createElement('script');
+      routing.src = '/assets/stewaro-entry-routing.js?v=1';
+      routing.defer = true;
+      routing.dataset.stewaroEntryRouting = 'true';
+      document.head.appendChild(routing);
+    }
+    let icon = document.querySelector('link[rel~="icon"]');
+      if (!icon) {
+        icon = document.createElement('link');
+        icon.rel = 'icon';
+        document.head.appendChild(icon);
+      }
+      icon.type = 'image/svg+xml';
+      icon.href = '/assets/logos/stewaro-icon.svg?v=1';
+    } catch (_) {}
+  };
+  installStewaroUnifiedPresentation();
+
   const cleanPath = (pathname) => {
     if (!pathname) return pathname;
     if (pathname === '/index.html') return '/de/';

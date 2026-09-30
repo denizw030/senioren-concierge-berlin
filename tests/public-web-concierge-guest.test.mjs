@@ -17,9 +17,11 @@ test("floating concierge is available without login on every non-chat page", () 
   assert.match(auth, /normalizeShell\(\);\s*ensureFloatingConcierge\(\);\s*const current = page\(\)/s);
 });
 
-test("home Kostenlos chatten CTA opens the web concierge directly", () => {
-  assert.match(home, /href="\/web-concierge"[^>]*>Kostenlos chatten<\/a>/);
-  assert.doesNotMatch(home, /href="registrieren\?produkt=prime&amp;paket=free&amp;source=home_hero"[^>]*>Kostenlos chatten<\/a>/);
+test("web concierge remains a dedicated STEWARO FIDEL surface", () => {
+  assert.match(chatPage, /<title>FIDEL \| STEWARO<\/title>/);
+  assert.match(chatPage, /id="webConciergeTitle">FIDEL/);
+  assert.match(chatPage, /data-fidel-orb/);
+  assert.match(home, /FIDEL/);
 });
 
 test("signed-out web concierge uses the safe guest endpoint instead of redirecting", () => {
@@ -38,7 +40,7 @@ test("guest chat survives site navigation in the same tab but resets on a true r
   assert.match(chat, /entry\.type==="reload"/);
   assert.match(chat, /resetGuestChatSessionForReload\(\)/);
   assert.match(chat, /restoreGuestViewState\(activeThreadId\)/);
-  assert.match(chat, /if\(!guestViewRestored\)appendMessage\("assistant","Willkommen bei NAHWERK/);
+  assert.match(chat, /if\(!guestViewRestored\)appendMessage\("assistant","Willkommen bei STEWARO/);
 });
 
 test("guest execution UI supports existing and new customers without auto-executing", () => {
@@ -63,8 +65,8 @@ test("guest chat offers account actions but keeps authenticated tools out of gue
 });
 
 test("web concierge clean route stays mirrored and loads refreshed guest assets", () => {
-  assert.match(chatPage, /assets\/web-customer-concierge\.css\?v=28/);
-  assert.match(chatPage, /assets\/web-customer-concierge\.js\?v=48/);
+  assert.match(chatPage, /assets\/web-customer-concierge\.css\?v=\d+/);
+  assert.match(chatPage, /assets\/web-customer-concierge\.js\?v=\d+/);
   assert.equal(chatPage, chatClean.replace("<head><base href=\"/\">","<head>"));
 });
 

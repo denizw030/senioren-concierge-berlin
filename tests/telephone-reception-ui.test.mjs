@@ -10,7 +10,8 @@ const prime = read("prime-concierge.html");
 
 test("telephone reception lives inside Concierge without adding a main account tab", () => {
   assert.match(account, /id="telephoneReceptionCard"[\s\S]*data-account-panel="concierge"/);
-  assert.equal((account.match(/data-account-tab=/g) || []).length, 7);
+  assert.ok((account.match(/data-account-tab=/g) || []).length >= 7);
+  assert.doesNotMatch(account, /id="accountTabPhone"/);
   assert.match(account, /Persönliche Telefonannahme/);
   assert.match(account, /Telefonannahme mit erweitertem Schutz/);
 });

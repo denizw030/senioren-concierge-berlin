@@ -14,12 +14,12 @@ test("pricing clean route mirrors canonical pricing page", () => {
 test("canonical package prices and WhatsApp limits stay aligned", () => {
   const pricing = read("pakete.html");
   for (const expected of [
-    "FREE", "0 €", "20 WhatsApp-Kundennachrichten",
-    "STANDARD", "5,99 €", "30 WhatsApp-Kundennachrichten",
-    "PLUS", "10,99 €", "50 WhatsApp-Kundennachrichten",
-    "PREMIUM", "19,99 €", "100 WhatsApp-Kundennachrichten",
-    "PREMIUM PLUS", "34,99 €", "160 WhatsApp-Kundennachrichten",
-    "FAMILIE", "59,66 €", "300 WhatsApp-Kundennachrichten",
+    "FREE", "0 €", "20 WhatsApp-Nachrichten",
+    "STANDARD", "5,99 €", "30 WhatsApp-Nachrichten",
+    "PLUS", "10,99 €", "50 WhatsApp-Nachrichten",
+    "PREMIUM", "19,99 €", "100 WhatsApp-Nachrichten",
+    "PREMIUM PLUS", "34,99 €", "160 WhatsApp-Nachrichten",
+    "FAMILIE", "59,66 €", "300 WhatsApp-Nachrichten",
   ]) assert.ok(pricing.includes(expected), `missing ${expected}`);
   assert.match(pricing, /<small>\/ Monat<\/small>/);
 });
@@ -28,7 +28,7 @@ test("FREE legal copy uses unlimited app/web and 30-day cycle", () => {
   for (const path of ["agb.html", "agb/index.html", "nutzungsbedingungen/index.html"]) {
     const html = read(path);
     assert.match(html, /App- und Web-Dialoge[\s\S]{0,120}unbegrenzt/);
-    assert.match(html, /20[\s\S]{0,80}WhatsApp-Kundennachrichten[\s\S]{0,120}30-Tage-Nutzungszeitraum/);
+    assert.match(html, /20[\s\S]{0,80}WhatsApp-Nachrichten[\s\S]{0,120}30-Tage-Nutzungszeitraum/);
     assert.doesNotMatch(html, /50 App-Dialoge/);
   }
 });

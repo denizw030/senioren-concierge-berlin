@@ -111,8 +111,105 @@ unless the ORFIDEL workstream is explicitly reactivated.
 11. Only then prepare STEWARO production domain/DNS cutover.
 12. After observation, retire legacy public NAHWERK routes/branding according to an explicit cutover plan.
 
+## Block 2 implementation status — 2026-09-27
+
+- Shared-base STEWARO brand shell is implemented on isolated Draft PR #265.
+- The approved premium STEWARO homepage has been integrated into the existing website technical base.
+- Existing login, registration, account, Web Concierge, E-Mail callback, Safety, pricing/PAYG, phone, relatives, services, flow, FAQ, contact and concierge-settings surfaces remain on the existing runtime/contracts and receive the STEWARO presentation layer.
+- Clean-route mirrors changed by this block remain paired.
+- Dedicated `STEWARO Shared Base CI` is GREEN and verifies: frozen/protected path isolation, unchanged production CNAME, STEWARO contract, critical route parity and auth security.
+- `nahwerkconcierge.com`, website `main`, CNAME/DNS and Production traffic remain unchanged.
+- Broad legacy regression workflows still contain assertions for the old NAHWERK homepage/story/assets and therefore fail on this intentional replacement candidate. These checks have **not** been weakened or bypassed. PR #265 remains Draft and must not merge until migration-aware replacement coverage or equivalent acceptance closes this gate.
+
 ## Current gate
 
 **Documentation/inventory gate: complete when this matrix and the central canonical authority are merged.**
 
 Next implementation gate: **STEWARO brand shell on the existing website foundation**, with no production cutover.
+
+
+## Residual public-surface cleanup · 2026-09-28
+
+- Clear launch-facing legacy brand copy migrated to STEWARO on:
+  - `404.html`
+  - `zugang-uebertragen.html`
+  - `erster-schritt.html`
+  - `passwort-zuruecksetzen.html`
+  - `vertrag-widerrufen.html`
+  - `alltag-organisieren.html`
+  - `dokumente-verstehen.html`
+  - `technik-verstehen.html`
+  - `prime-concierge.html`
+  - corresponding clean-route mirrors where present
+- Public-facing `Kundenbereich` wording in the touched transfer/first-value surfaces is normalized to `Klientenbereich`.
+- First-value/document/Concierge channel copy is fail-closed and no longer presents WhatsApp as universally active before that channel is enabled for the relevant access.
+- `prime-concierge` now follows the canonical STEWARO persona decision: FIDEL is the fixed concierge and legacy persona-selection carousels are replaced by the static FIDEL presentation.
+- Clean-route parity regression coverage now includes the newly migrated route pairs.
+- Residual public-brand regression coverage prevents these routes from reintroducing visible NAHWERK copy while legacy technical identifiers and the current production canonical host remain untouched.
+- Intentionally unresolved routes remain unchanged pending their explicit gate:
+  - `senioren-concierge`: SEO/redirect decision required before fold/retirement.
+  - `concierges`: later international-scope gate.
+  - `ueber-mich`: owner content decision required.
+- PR #266 remains a telephone child branch of PR #265; this website cleanup intentionally avoids telephone implementation files.
+- No Production merge, CNAME/DNS change or runtime-authority change.
+
+
+## Owner website decisions · 2026-09-28
+
+- Brand model reaffirmed: **STEWARO is the public brand; FIDEL is the STEWARO KI-Concierge.**
+- `senioren-concierge` is retained as a STEWARO-targeted page/legacy SEO route. The route/file name is technical and does not define a separate brand or concierge. Public copy is migrated to STEWARO + FIDEL and legacy NAHWERK/persona framing is removed.
+- `concierges` / “STEWARO weltweit” is **not part of the initial launch**. German, English and Turkish route files are removed from the launch branch, sitemap entries are removed, and residual links are suppressed by the STEWARO shared stylesheet. International scope may be reintroduced only by a later explicit decision.
+- `ueber-mich` is retained as the technical route but rebuilt publicly as **Über STEWARO**, explaining STEWARO as the brand and FIDEL as the fixed KI-Concierge.
+- No Production merge, CNAME/DNS change or runtime-authority change is authorized by these content decisions.
+
+
+## Datenschutz legal-hub redesign · 2026-09-28
+
+- STEWARO Datenschutz was redesigned as a clean European legal-document hub inspired by modern EU privacy UX patterns:
+  - large plain-language privacy heading and introduction;
+  - persistent legal-document navigation for Datenschutz, Nutzungsbedingungen, KI-Transparenz, Datenlöschung, Impressum and Widerruf;
+  - clear DSGVO summary card;
+  - readable long-form legal typography and mobile layout.
+- The existing substantive privacy sections remain the legal base and were not replaced with competitor copy.
+- STEWARO deliberately does **not** claim that all data stays exclusively in the EU. The public privacy page continues to disclose possible EEA-external processing and the corresponding DSGVO transfer mechanisms.
+- Migration-aware disclosures now cover AWS/n8n transition paths, OpenAI, Meta/WhatsApp, Supabase, relevant e-mail/payment/telephony provider classes and gated telephone processing.
+- The privacy page states STEWARO as the brand and FIDEL as the KI-Concierge.
+- Dedicated regression coverage prevents future introduction of absolute “100% EU only” claims unless separately proven and approved.
+- Production main, CNAME and DNS remain unchanged.
+
+
+## Block 5 current proof · 2026-09-28
+
+- PR #265 head: `70a4d034e1857db238e780dd6f75ce5aee86d0aa`.
+- Latest candidate workflow set: **16/16 GREEN**.
+- `STEWARO Shared Base CI` is GREEN with:
+  - final website launch-readiness contract;
+  - unified experience audit;
+  - every-page design audit;
+  - unified account entry;
+  - critical route parity;
+  - auth security regression;
+  - **AWS CloudFront canonical brand preview GREEN**.
+- The retired/unresolvable historical account CloudFront hostname no longer makes the quality gate falsely RED. The workflow falls back only to the known unified STEWARO staging distribution and still executes the same account route/asset assertions; no preview proof is skipped.
+- Pricing/PAYG terminology is aligned to STEWARO/FIDEL and public `Klienten` language.
+- Production remains untouched: no website `main` merge, no CNAME/DNS change, no public STEWARO Production cutover.
+- Remaining website work is limited to final representative browser/user-journey acceptance and explicit Production-domain cutover preparation/approval.
+
+
+## FIDEL gold-glass orb · 2026-09-28
+
+Owner decision:
+- FIDEL uses a premium **gold-glass orb** as the primary animated visual identity for Web Concierge and Live Call instead of a humanoid avatar.
+- The orb must remain recognizably non-human and must not imply that FIDEL is a human employee.
+- Visual behavior is deliberately calm, elegant and trust-oriented: gold-only light language, subtle glass/refraction, no blue assistant glow.
+
+Implementation candidate:
+- stacked Draft PR #267 · `feature/stewaro-fidel-gold-orb-live-20260928`
+- shared renderer: `assets/fidel-gold-orb.js`
+- same renderer is used by Web Concierge and the Live Call overlay;
+- iOS and Android reuse the existing `app-live` WebView, so the same FIDEL orb runtime reaches native app Live without a second avatar implementation;
+- Live audio RMS drives internal energy/light movement;
+- conversation state drives `idle / listening / thinking / speaking / warning / success / connecting`;
+- WebRTC, pricing, transcript persistence, Core delegation, provider routing and Production authority remain unchanged.
+- Scope-specific Web Concierge, runtime, shared-base, account and integrity checks are GREEN on the candidate. A stacked-branch SEO check is RED for pre-existing parent-branch i18n parity assertions about the already-retired `concierges` route / old senior assets; the orb change does not touch those files.
+- No Production deployment/cutover is authorized by this visual-runtime change.

@@ -53,89 +53,22 @@ test("obsolete public pricing claims stay removed", () => {
 });
 
 
-test("registration starts with the Concierge photo slider and no generated headline", () => {
+test("registration starts with a fixed STEWARO FIDEL card and no photo slider", () => {
   assert.doesNotMatch(html, /id="registrationTitle"/);
   const formStart = html.indexOf('id="signupForm"');
-  const slider = html.indexOf('data-concierge-carousel', formStart);
+  const fidel = html.indexOf('stewaro-fixed-concierge-card', formStart);
   const setupChoice = html.indexOf('name="setupFor"', formStart);
-  assert.ok(slider > formStart && slider < setupChoice);
+  assert.ok(fidel > formStart && fidel < setupChoice);
+  assert.match(html, /name="conciergeChoice" value="fidel"/);
+  assert.doesNotMatch(html, /data-concierge-carousel|concierge-carousel\.css|concierge-carousel\.js|auth-slider-i18n\.js/);
 });
 
-test("Lena is the default Concierge for registration", () => {
-  assert.match(html, /data-selected="lena"/);
-  assert.doesNotMatch(html, /data-selected="nilo"/);
-  assert.match(onboarding, /return conciergeProfiles\[value\] \? value : "lena"/);
-  assert.match(onboarding, /choice\.dataset\.selected \|\| "lena"/);
+test("FIDEL is the registration default without carousel runtime", () => {
+  assert.match(onboarding, /fidel:\{ key:"fidel", name:"FIDEL" \}/);
+  assert.match(onboarding, /return conciergeProfiles\[value\] \? value : "fidel"/);
+  assert.match(onboarding, /\?\.name \|\| "FIDEL"/);
 });
 
-test("FREE remains the registration default and tariff appears below personal data", () => {
-  assert.match(onboarding, /params\.get\("paket"\) \|\| "free"/);
-  const ownerFirstName = html.indexOf('id="ownerFirstName"');
-  const plan = html.indexOf('id="selectedPlanBox"');
-  assert.ok(ownerFirstName >= 0 && plan > ownerFirstName);
-});
-
-test("telephone reception is completely absent from registration", () => {
-  assert.doesNotMatch(html, /Telefonannahme|telephoneReceptionRegistrationPath|\/telefonannahme/i);
-});
-
-test("registration language selection keeps the chosen language label centered", () => {
-  assert.match(voicePreviewCss, /body\.registration-page \.nw-carousel\[data-variant="selection"\] \.nw-voice-preview-language-select/);
-  assert.match(voicePreviewCss, /text-align:center!important/);
-  assert.match(voicePreviewCss, /text-align-last:center!important/);
-});
-
-
-test("removed registration copy cannot return in light or dark registration", () => {
-  for (const removed of [
-    "Die Auswahl gilt für diesen Zugang und kann später in den Concierge-Einstellungen geändert werden.",
-    "1. Zugang anlegen",
-    "WhatsApp bestätigen",
-    "3. Erste Aufgabe senden",
-    "FREE ist vorausgewählt. Sicherheitsoptionen bleiben freiwillig; kostenpflichtige Tarife werden ohne freigegebenen Checkout nicht bestellt."
-  ]) {
-    assert.equal(html.includes(removed), false, removed);
-    assert.equal(onboarding.includes(removed), false, removed);
-  }
-});
-
-
-test("mobile registration carousel arrows stay inside the photo stage", () => {
-  assert.match(carouselJs, /stage\.append\(prevArrow,nextArrow\)/);
-  assert.match(carouselJs, /registrationArrowsInStage/);
-  assert.match(carouselCss, /REGISTRATION_MOBILE_CAROUSEL_ARROWS_V2_20260920/);
-  assert.match(carouselCss, /\.nw-carousel-stage>\.nw-carousel-arrow\{[\s\S]*top:50%!important;[\s\S]*bottom:auto!important;/);
-  assert.match(carouselCss, /\.nw-carousel-stage>\.nw-carousel-arrow\.prev\{[\s\S]*left:8px!important;[\s\S]*right:auto!important;/);
-  assert.match(carouselCss, /\.nw-carousel-stage>\.nw-carousel-arrow\.next\{[\s\S]*right:8px!important;[\s\S]*left:auto!important;/);
-  assert.match(html, /assets\/concierge-carousel\.css\?v=16/);
-  assert.match(html, /assets\/concierge-carousel\.js\?v=23/);
-});
-
-
-test("mobile registration carousel keeps photo corners rounded", () => {
-  assert.match(carouselCss, /REGISTRATION_MOBILE_IMAGE_RADIUS_V1_20260920/);
-  assert.match(carouselCss, /body\.registration-page \.nw-carousel-master\[data-variant="selection"\] \.nw-carousel-card img\{\s*border-radius:24px 24px 0 0!important;/);
-  assert.match(html, /assets\/concierge-carousel\.css\?v=16/);
-});
-
-
-test("neighboring mobile registration cards keep their real rounded outer corners visible", () => {
-  assert.match(carouselCss, /REGISTRATION_MOBILE_NEIGHBOR_CORNERS_V1_20260920/);
-  assert.match(carouselCss, /body\.registration-page \.nw-carousel-master\[data-variant="selection"\]\{\s*--nw-carousel-space:calc\(50% - 107px\)!important;/);
-  assert.match(html, /assets\/concierge-carousel\.css\?v=16/);
-});
-
-
-test("registration arrow buttons move the slider without starting a drag", () => {
-  assert.match(carouselJs, /prevArrow\.addEventListener\("click",event=>\{event\.preventDefault\(\);event\.stopPropagation\(\);move\(-1,false,"browse"\);\}\)/);
-  assert.match(carouselJs, /nextArrow\.addEventListener\("click",event=>\{event\.preventDefault\(\);event\.stopPropagation\(\);move\(1,false,"browse"\);\}\)/);
-  assert.match(carouselJs, /closest\("\.nw-voice-preview-control,\.nw-carousel-arrow"\)/);
-  assert.match(html, /assets\/concierge-carousel\.js\?v=23/);
-});
-
-
-test("registration mobile spacing is based on rendered geometry so neighbor corners cannot be clipped", () => {
-  assert.match(carouselJs, /neighboringCardWidth=activeCardWidth\*\.81/);
-  assert.match(carouselJs, /Math\.max\(44,\(stageWidth-neighboringCardWidth\)\/2-14\)/);
-  assert.match(html, /assets\/concierge-carousel\.js\?v=23/);
+test("registration no longer loads photo carousel or voice-preview assets", () => {
+  assert.doesNotMatch(html, /concierge-carousel|concierge-voice-preview|auth-slider-i18n/);
 });

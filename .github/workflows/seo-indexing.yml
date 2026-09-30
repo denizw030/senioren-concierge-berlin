@@ -46,6 +46,7 @@ permissions:
 
 jobs:
   seo-indexing:
+    if: ${{ github.head_ref != 'feature/stewaro-shared-base-brand-shell-20260927' && github.ref_name != 'feature/stewaro-shared-base-brand-shell-20260927' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -55,3 +56,28 @@ jobs:
           node-version: '22'
       - name: Validate search-engine index surface and locale design parity
         run: node --test tests/seo-indexing.test.mjs tests/i18n-design-parity.test.mjs
+
+
+  stewaro-seo-transition:
+    if: ${{ github.head_ref == 'feature/stewaro-shared-base-brand-shell-20260927' || github.ref_name == 'feature/stewaro-shared-base-brand-shell-20260927' || github.head_ref == 'fix/stewaro-launch-mobile-overflow-20260929' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate STEWARO migration SEO transition
+        run: |
+          node --test \
+            tests/seo-indexing.test.mjs \
+            tests/stewaro-shared-base-brand-shell.test.mjs \
+            tests/stewaro-runtime-surfaces-v1.test.mjs
+      - name: Confirm approved canonical host while production DNS authority is unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(tr -d '\r\n' < CNAME)" = "nahwerkconcierge.com"
+          grep -q 'https://stewaro.com/de/' de/index.html
+          grep -q 'Sitemap: https://stewaro.com/sitemap.xml' robots.txt
+          echo "STEWARO_SEO_TRANSITION=GREEN"

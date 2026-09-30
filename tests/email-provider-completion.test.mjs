@@ -10,7 +10,7 @@ assert.ok(ui.includes('CREATE_YAHOO_APP_PASSWORD'));
 assert.ok(ui.includes('/email/connect/auto/web'));
 assert.ok(ui.includes('emailAutoConnectEmail'));
 assert.ok(ui.includes('Anbieter wird erkannt'));
-assert.ok(ui.includes('NAHWERK erkennt den Anbieter automatisch'));
+assert.ok(ui.includes('STEWARO erkennt den Anbieter automatisch'));
 assert.ok(ui.includes('CREDENTIALS_REQUIRED'));
 assert.ok(ui.includes('email_provider_selection_required'));
 const slash = String.fromCharCode(92);
@@ -142,7 +142,7 @@ assert.ok(ui.includes('provider_connection_failed'));
 
 assert.match(ui, /id: "proton"[\s\S]*mode: "unsupported"[\s\S]*Proton Bridge/);
 assert.match(ui, /id: "tuta"[\s\S]*mode: "unsupported"[\s\S]*kein(?:en)? normalen IMAP-Zugriff/);
-assert.match(ui,/id: "tuta"[\s\S]*?Eine direkte Verbindung zu NAHWERK wird derzeit nicht unterstützt/);
+assert.match(ui,/id: "tuta"[\s\S]*?Eine direkte Verbindung zu STEWARO wird derzeit nicht unterstützt/);
 assert.ok(ui.includes('provider.mode === "unsupported"'));
 assert.equal(ui.includes('imap_host'), false);
 assert.equal(ui.includes('smtp_host'), false);

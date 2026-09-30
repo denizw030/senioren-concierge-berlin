@@ -24,7 +24,7 @@ test("standalone E-Mail-Concierge uses only the canonical PROD email runtime",()
 
 
 test("customer UI contains the complete Thunderbird-style mail workspace",()=>{
-  for(const phrase of ["NAHWERK Mail","Alle Posteingänge","Posteingang","Spam","Gesendet","Entwürfe","Papierkorb","Concierge","Automatik & Schutz","Aktivität"]) assert.ok(js.includes(phrase),phrase);
+  for(const phrase of ["STEWARO Mail","Alle Posteingänge","Posteingang","Spam","Gesendet","Entwürfe","Papierkorb","Concierge","Automatik & Schutz","Aktivität"]) assert.ok(js.includes(phrase),phrase);
   assert.deepEqual(Array.from(api.CANONICAL_FOLDERS),["INBOX","SPAM","SENT","DRAFTS","TRASH"]);
   assert.match(js,/const folders = \[\["INBOX","Posteingang","▣"\],\["SPAM","Spam","⚑"\],\["SENT","Gesendet","➤"\],\["DRAFTS","Entwürfe","✎"\],\["TRASH","Papierkorb","⌫"\]\]/);
   assert.doesNotMatch(js,/const folders = .*IMPORTANT/);
@@ -348,7 +348,7 @@ test("manual classification sends visible message metadata to avoid a Gmail rere
   assert.match(js,/snippet: message\.snippet \|\| ""/);
 });
 
-test("NAHWERK Mail uses a high-contrast white SVG envelope",()=>{
+test("STEWARO Mail uses a high-contrast white SVG envelope",()=>{
   assert.match(js,/document\.createElementNS\(svgNs,"svg"\)/);
   assert.match(css,/\.ecp-tb-brandmark svg/);
   assert.match(css,/stroke:#fff/);

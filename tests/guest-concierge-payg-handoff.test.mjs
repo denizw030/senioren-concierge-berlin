@@ -80,7 +80,7 @@ test("explicit account CTA stays non-PAYG while execution CTA supports both auth
   assert.match(chat,/signIn\.href=accountOnly/);
   assert.match(chat,/create\.href=accountOnly/);
   assert.match(chat,/if\(!accountOnly\)\{/);
-  assert.match(chat,/Wenn du bereits ein NAHWERK Konto hast/);
+  assert.match(chat,/Wenn du bereits ein STEWARO Konto hast/);
   assert.match(chat,/saveGuestExecutionHandoff/);
   assert.match(chat,/renderGuestAccountActions\(\[\{type:"CREATE_ACCOUNT",purpose:"ACCOUNT_REQUEST"/);
 });

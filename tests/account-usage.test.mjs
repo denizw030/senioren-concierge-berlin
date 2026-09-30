@@ -11,12 +11,12 @@ const packageText = packages.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
 const freeRegistrationPlan = onboarding.match(/free:\s*\{([\s\S]*?)\n    \},\n    standard:/)?.[1] || "";
 
 const packageMatrix = [
-  ["FREE", "0 € / Monat", "App unbegrenzt · Web unbegrenzt · 20 WhatsApp-Kundennachrichten"],
-  ["STANDARD", "5,99 € / Monat", "App unbegrenzt · Web unbegrenzt · 30 WhatsApp-Kundennachrichten"],
-  ["PLUS", "10,99 € / Monat", "App unbegrenzt · Web unbegrenzt · 50 WhatsApp-Kundennachrichten"],
-  ["PREMIUM", "19,99 € / Monat", "App unbegrenzt · Web unbegrenzt · 100 WhatsApp-Kundennachrichten"],
-  ["PREMIUM PLUS", "34,99 € / Monat", "App unbegrenzt · Web unbegrenzt · 160 WhatsApp-Kundennachrichten"],
-  ["FAMILIE", "59,66 € / Monat", "App unbegrenzt · Web unbegrenzt · 300 WhatsApp-Kundennachrichten"]
+  ["FREE", "0 € / Monat", "App unbegrenzt · Web unbegrenzt · 20 WhatsApp-Nachrichten"],
+  ["STANDARD", "5,99 € / Monat", "App unbegrenzt · Web unbegrenzt · 30 WhatsApp-Nachrichten"],
+  ["PLUS", "10,99 € / Monat", "App unbegrenzt · Web unbegrenzt · 50 WhatsApp-Nachrichten"],
+  ["PREMIUM", "19,99 € / Monat", "App unbegrenzt · Web unbegrenzt · 100 WhatsApp-Nachrichten"],
+  ["PREMIUM PLUS", "34,99 € / Monat", "App unbegrenzt · Web unbegrenzt · 160 WhatsApp-Nachrichten"],
+  ["FAMILIE", "59,66 € / Monat", "App unbegrenzt · Web unbegrenzt · 300 WhatsApp-Nachrichten"]
 ];
 
 const paidRegistrationMatrix = [

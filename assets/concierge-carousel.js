@@ -96,7 +96,7 @@
       }
       selectButton.className="nw-carousel-select";
       selectButton.setAttribute("aria-label",registerUrl?`${profile.name} auswählen und registrieren`:`${profile.name} anzeigen`);
-      selectButton.innerHTML=`<img alt="Portrait von ${profile.name}, NAHWERK Concierge" width="480" height="722" decoding="async"><span>${profile.name}</span>`;
+      selectButton.innerHTML=`<img alt="Portrait von ${profile.name}, STEWARO Concierge" width="480" height="722" decoding="async"><span>${profile.name}</span>`;
       card.appendChild(selectButton);
       const image=selectButton.querySelector("img");
       image.dataset.src=profile.cardImage;

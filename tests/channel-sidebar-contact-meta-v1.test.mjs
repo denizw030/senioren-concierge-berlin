@@ -12,7 +12,7 @@ test("channel sidebar renders multiple metadata lines",()=>{
 });
 
 test("phone sidebar shows local phone plus customer number",()=>{
-  assert.match(client,/function formatSidebarPhone/);
+  assert.match(client,/const customerPhone=String\(phoneResult\.value\?\.phone_number/);
   assert.match(client,/Kundennr\. \$\{customerNumber\}/);
   assert.match(client,/phoneResult\.value\?\.phone_number/);
   assert.match(client,/phoneResult\.value\?\.customer_number/);

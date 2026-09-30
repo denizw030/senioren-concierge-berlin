@@ -111,8 +111,8 @@ test("canonical OAuth return page is private from indexing and returns to real c
 
 test("customer-facing Gmail copy keeps approval semantics without internal architecture terms",()=>{
   assert.equal(hooks.CUSTOMER_COPY.capabilityHeading,"Deine E-Mail-Funktionen");
-  assert.equal(hooks.CUSTOMER_COPY.dataUse,"NAHWERK verwendet deine Google-Daten nur für die Funktionen, die du aktiviert hast.");
-  assert.match(hooks.CUSTOMER_COPY.continuity,/NAHWERK-Konto/);
+  assert.equal(hooks.CUSTOMER_COPY.dataUse,"STEWARO verwendet deine Google-Daten nur für die Funktionen, die du aktiviert hast.");
+  assert.match(hooks.CUSTOMER_COPY.continuity,/STEWARO-Konto/);
   assert.match(hooks.CUSTOMER_COPY.continuity,/nur nach deiner Freigabe gesendet/);
   assert.doesNotMatch(Object.values(hooks.CUSTOMER_COPY).join(" "),/\b(?:PROD|Gateway|Core|CAO|person_id|Authority|serverseitig)\b/i);
   assert.match(js,/applyCustomerCopy\(\);/);

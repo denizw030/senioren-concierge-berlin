@@ -765,7 +765,7 @@
     if (!hasUserMessage && !chatMessages.length) {
       const intro=el("div","ecp-chat-empty");
       intro.append(el("strong","","Beispiel: So lernt dein E-Mail-Concierge."));
-      intro.append(el("div","","NAHWERK erkennt intern, was wichtig oder unwichtig ist. Du kannst die Einschätzung korrigieren, E-Mails in den Papierkorb verschieben oder Antworten vorbereiten. Die sichtbaren Mailbereiche bleiben Posteingang, Spam, Gesendet, Entwürfe und Papierkorb."));
+      intro.append(el("div","","STEWARO erkennt intern, was wichtig oder unwichtig ist. Du kannst die Einschätzung korrigieren, E-Mails in den Papierkorb verschieben oder Antworten vorbereiten. Die sichtbaren Mailbereiche bleiben Posteingang, Spam, Gesendet, Entwürfe und Papierkorb."));
       log.append(intro);
       const examples=list(dashboard?.classification_review?.examples);
       examples.forEach((example,index)=>{
@@ -1155,8 +1155,8 @@
   function classificationDigest(s) {
     if (!classification) return s.text;
     const c = classification.counts;
-    if (classification.complete) return `${classification.total} E-Mails insgesamt im Posteingang. NAHWERK hat sie in dieser Übersicht in ${c.IMPORTANT} wichtig, ${c.UNIMPORTANT} unwichtig und ${c.MARKETING} Werbung / Spam eingeordnet. ${s.unread} sind ungelesen, ${s.today} heute eingegangen.`;
-    return `${classification.total} E-Mails insgesamt im Posteingang. Von den ${classification.sorted_count} neuesten hat NAHWERK ${c.IMPORTANT} als wichtig, ${c.UNIMPORTANT} als unwichtig und ${c.MARKETING} als Werbung / Spam eingeordnet. ${s.unread} sind ungelesen, ${s.today} heute eingegangen.`;
+    if (classification.complete) return `${classification.total} E-Mails insgesamt im Posteingang. STEWARO hat sie in dieser Übersicht in ${c.IMPORTANT} wichtig, ${c.UNIMPORTANT} unwichtig und ${c.MARKETING} Werbung / Spam eingeordnet. ${s.unread} sind ungelesen, ${s.today} heute eingegangen.`;
+    return `${classification.total} E-Mails insgesamt im Posteingang. Von den ${classification.sorted_count} neuesten hat STEWARO ${c.IMPORTANT} als wichtig, ${c.UNIMPORTANT} als unwichtig und ${c.MARKETING} als Werbung / Spam eingeordnet. ${s.unread} sind ungelesen, ${s.today} heute eingegangen.`;
   }
   function composeAddresses(value) {
     return [...new Set((String(value || "").match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi) || []).map((v)=>v.toLowerCase()))];
@@ -1309,7 +1309,7 @@
     mailSvg.setAttribute("viewBox","0 0 24 24");mailSvg.setAttribute("focusable","false");mailSvg.setAttribute("aria-hidden","true");
     mailRect.setAttribute("x","3.25");mailRect.setAttribute("y","5.25");mailRect.setAttribute("width","17.5");mailRect.setAttribute("height","13.5");mailRect.setAttribute("rx","2.25");
     mailPath.setAttribute("d","M4.5 7.25 12 13l7.5-5.75");mailSvg.append(mailRect,mailPath);mark.append(mailSvg);
-    brandCopy.append(el("strong", "", "NAHWERK Mail"), el("span", "", emailConnections.length === 1 ? "1 Postfach verbunden" : `${emailConnections.length} Postfächer verbunden`)); brand.append(mark, brandCopy); side.append(brand);
+    brandCopy.append(el("strong", "", "STEWARO Mail"), el("span", "", emailConnections.length === 1 ? "1 Postfach verbunden" : `${emailConnections.length} Postfächer verbunden`)); brand.append(mark, brandCopy); side.append(brand);
     const composeButton=button("＋ Neue Nachricht","ecp-tb-compose-button");composeButton.addEventListener("click",()=>startComposer("NEW"));side.append(composeButton);
     const nav = el("nav", "ecp-tb-nav"); nav.setAttribute("aria-label", "E-Mail-Bereiche");
     nav.addEventListener("scroll",()=>{mailboxSidebarScrollTop=nav.scrollTop;mailboxSidebarScrollLeft=nav.scrollLeft;},{passive:true});
@@ -1464,7 +1464,7 @@
     const workspace = el("section","ecp-thunderbird"); workspace.setAttribute("aria-label","E-Mail-Arbeitsbereich");
     if(readerMode==="COMPOSE")workspace.classList.add("is-compose");
     const toolbar = el("div","ecp-tb-toolbar"), left=el("div","ecp-tb-toolbar-title"), searchWrap=el("label","ecp-tb-search");
-    left.append(el("strong","","E-Mail"),el("span","","NAHWERK Concierge"));
+    left.append(el("strong","","E-Mail"),el("span","","STEWARO Concierge"));
     const search=el("input","");search.type="search";search.value=mailboxSearch;search.placeholder="Suchen …";search.setAttribute("aria-label","E-Mails durchsuchen");
     search.addEventListener("change",()=>{mailboxSearch=search.value;render(true);});
     search.addEventListener("keydown",(ev)=>{if(ev.key==="Enter"){ev.preventDefault();mailboxSearch=search.value;render(true);}});

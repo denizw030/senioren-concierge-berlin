@@ -7,9 +7,9 @@
   const STATES = ["DISCONNECTED", "CONNECTING", "CONNECTED", "REAUTH_REQUIRED", "SCOPE_REQUIRED", "ERROR"];
   const CUSTOMER_COPY = Object.freeze({
     capabilityHeading: "Deine E-Mail-Funktionen",
-    dataUse: "NAHWERK verwendet deine Google-Daten nur für die Funktionen, die du aktiviert hast.",
-    initialMeta: "Deine Verbindung wird sicher deinem NAHWERK-Konto zugeordnet.",
-    continuity: "Deine Gmail-Verbindung steht dir in deinem NAHWERK-Konto über die unterstützten Zugänge zur Verfügung. E-Mails werden nur nach deiner Freigabe gesendet.",
+    dataUse: "STEWARO verwendet deine Google-Daten nur für die Funktionen, die du aktiviert hast.",
+    initialMeta: "Deine Verbindung wird sicher deinem STEWARO-Konto zugeordnet.",
+    continuity: "Deine Gmail-Verbindung steht dir in deinem STEWARO-Konto über die unterstützten Zugänge zur Verfügung. E-Mails werden nur nach deiner Freigabe gesendet.",
     sendApproval: "E-Mails werden nur nach deiner Freigabe gesendet."
   });
   const ERROR_COPY = {
@@ -306,7 +306,7 @@
           ? "Deine E-Mail-Funktionen werden geladen …"
           : savingPreferences
             ? "Einstellungen werden sicher gespeichert …"
-            : "Änderungen gelten für deinen verbundenen Gmail-Zugang bei NAHWERK.";
+            : "Änderungen gelten für deinen verbundenen Gmail-Zugang bei STEWARO.";
     }
   }
 
@@ -353,7 +353,7 @@
     if (state === "CONNECTED") {
       selectedProvider = "GOOGLE";
       statusBadge.textContent = "Verbunden";
-      stateTitle.textContent = "Google ist mit NAHWERK verbunden.";
+      stateTitle.textContent = "Google ist mit STEWARO verbunden.";
       stateMeta.textContent = connection?.scope_required
         ? "Gmail ist bereits nutzbar. Für Kalender und Kontakte fehlen noch Google-Berechtigungen."
         : "Gmail, Kalender und Kontakte stehen über dieselbe Google-Verbindung bereit. " + CUSTOMER_COPY.sendApproval;
@@ -381,7 +381,7 @@
     if (state === "REAUTH_REQUIRED" || state === "SCOPE_REQUIRED") {
       selectedProvider = "GOOGLE";
       statusBadge.textContent = "Nicht verbunden";
-      stateTitle.textContent = "Google mit NAHWERK verbinden";
+      stateTitle.textContent = "Google mit STEWARO verbinden";
       stateMeta.textContent = "Melde dich bei Google an, um Gmail, Kalender und Kontakte über eine zentrale Verbindung freizugeben.";
       renderProviders();
       showConnectButton();
@@ -391,7 +391,7 @@
 
     if (state === "ERROR") {
       statusBadge.textContent = "Nicht verbunden";
-      stateTitle.textContent = "Google mit NAHWERK verbinden";
+      stateTitle.textContent = "Google mit STEWARO verbinden";
       stateMeta.textContent = "Wähle Gmail aus und starte die Verbindung erneut.";
       renderProviders();
       showConnectButton();
@@ -400,7 +400,7 @@
     }
 
     statusBadge.textContent = "Nicht verbunden";
-    stateTitle.textContent = "Gmail mit NAHWERK verbinden";
+    stateTitle.textContent = "Gmail mit STEWARO verbinden";
     stateMeta.textContent = selectedProvider === "GOOGLE"
       ? "Google ist ausgewählt. Starte jetzt die sichere Verbindung für Gmail, Kalender und Kontakte."
       : "Wähle oben Google aus.";
@@ -414,9 +414,9 @@
     resetActions();
     const code = error instanceof Error ? error.message : "EMAIL_PROVIDER_UNAVAILABLE";
     statusBadge.textContent = code === "UNAUTHENTICATED" ? "Sitzung abgelaufen" : "Nicht verbunden";
-    stateTitle.textContent = ERROR_COPY[code] || "Gmail mit NAHWERK verbinden";
+    stateTitle.textContent = ERROR_COPY[code] || "Gmail mit STEWARO verbinden";
     stateMeta.textContent = code === "UNAUTHENTICATED"
-      ? "Bitte melde dich erneut bei NAHWERK an."
+      ? "Bitte melde dich erneut bei STEWARO an."
       : "Wähle Gmail aus und starte die Verbindung erneut. Es wurde keine E-Mail gesendet.";
     accountHint.textContent = "";
     renderProviders();

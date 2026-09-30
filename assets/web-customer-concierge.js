@@ -25,7 +25,7 @@
   const PERSONA_SYNC_INTERVAL_MS = 3000;
   const CHANNEL_META_REFRESH_MS = 60000;
   const CLIENT_FETCH_TIMEOUT_MS = 40000;
-  const SETTINGS_URL = "/concierge-anpassen";
+  const SETTINGS_URL = location.hostname==="app.stewaro.com" ? "https://account.stewaro.com/concierge-anpassen" : "/concierge-anpassen";
   const PORTAL_THEME_KEY = "nw_portal_theme_v1";
   const isMobile=()=>window.matchMedia("(max-width:820px)").matches;
   const RESPONSE_STATES = new Set(["ANSWER","QUESTION","ACTION_STARTED","ACTION_PENDING","ACTION_RESULT","ERROR_RESPONSE","HANDOFF","SAFE_TERMINATION"]);
@@ -400,7 +400,9 @@
     const persona = normalizePersona(raw);
     const title = document.getElementById("webConciergeTitle");
     const avatar = document.querySelector(".web-concierge-avatar");
-    const name = persona?.name || "Dein Concierge";
+    const fidelSurface = avatar?.classList.contains("fidel-orb-avatar")===true;
+    const isFidel = fidelSurface || persona?.key==="fidel";
+    const name = isFidel ? "FIDEL" : (persona?.name || "Dein Concierge");
     if (title) {
       title.textContent = name;
       title.setAttribute("role","link");
@@ -423,7 +425,13 @@
       avatar.onkeydown = (event) => {
         if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openConciergeSettings(); }
       };
-      if (persona?.image) {
+      if (isFidel) {
+        avatar.classList.remove("nahwerk-mark");
+        avatar.classList.add("fidel-orb-avatar");
+        avatar.style.backgroundImage = "none";
+        avatar.style.backgroundSize = "";
+        avatar.style.backgroundPosition = "";
+      } else if (persona?.image) {
         avatar.classList.remove("nahwerk-mark");
         avatar.style.backgroundImage = `url("${persona.image.replaceAll('"','%22')}")`;
         avatar.style.backgroundSize = "cover";
@@ -585,7 +593,7 @@
     if(url.searchParams.get("integration")!=="connected")return false;
     const provider=String(url.searchParams.get("provider")||"").toLowerCase();
     const label=provider==="google"?"Google":provider==="microsoft"?"Microsoft 365":"Der Dienst";
-    addRuntimeCard("Verbunden",label+" ist jetzt mit NAHWERK verbunden.","is-connection is-connected");
+    addRuntimeCard("Verbunden",label+" ist jetzt mit STEWARO verbunden.","is-connection is-connected");
     url.searchParams.delete("integration");url.searchParams.delete("provider");
     const query=url.searchParams.toString();
     history.replaceState(history.state,"",url.pathname+(query?"?"+query:"")+url.hash);
@@ -630,7 +638,7 @@
     const handoffRequest=String(request||lastGuestUserMessage||"").trim().slice(0,4000);
     const title=accountOnly?"Anmelden oder Konto erstellen":"Auftrag sicher fortsetzen";
     const body=accountOnly
-      ?"Wenn du bereits ein NAHWERK Konto hast, kannst du dich direkt anmelden. Sonst erstellst du in wenigen Schritten ein neues Konto."
+      ?"Wenn du bereits ein STEWARO Konto hast, kannst du dich direkt anmelden. Sonst erstellst du in wenigen Schritten ein neues Konto."
       :"Melde dich an oder erstelle ein Konto. Danach kannst du PAYG-Guthaben ab 5 € aufladen. Dein Auftrag wird nicht automatisch ausgeführt: Du siehst vorher den Preis und gibst die Ausführung ausdrücklich frei.";
     const card=addRuntimeCard(title,body,"is-guest-account");
     if(!card)return null;
@@ -870,7 +878,7 @@
     if(!force&&signature===sidebarRenderSignature&&box.childElementCount>0)return false;
     sidebarRenderSignature=signature;
     box.dataset.nwSidebarRenderer="single-writer-v5";
-    box.dataset.nwSidebarClient="56";
+    box.dataset.nwSidebarClient=String(WEB_CONCIERGE_CLIENT_VERSION);
     clearNode(box);
     if(!list.length){
       const e=document.createElement("div");e.className="web-concierge-threads-empty";e.textContent="Noch keine gespeicherten Chats.";box.appendChild(e);return true;
@@ -1215,16 +1223,19 @@
     const workspace=document.querySelector(".web-concierge-workspace");if(!workspace)return;
     mobileDrawerReady=true;
     const topbar=document.createElement("div");topbar.className="web-concierge-mobile-topbar";
-    topbar.innerHTML='<button type="button" class="web-concierge-mobile-exit" aria-label="Chat verlassen">‹</button><button type="button" class="web-concierge-mobile-chats" aria-label="Chats öffnen" aria-expanded="false">☰</button><div class="web-concierge-mobile-topbar-title">NAHWERK Concierge</div><button type="button" class="web-concierge-mobile-new" aria-label="Neuer Chat">＋</button>';
+    topbar.innerHTML='<button type="button" class="web-concierge-mobile-exit" aria-label="Chat verlassen">‹</button><button type="button" class="web-concierge-mobile-chats" aria-label="Chats öffnen" aria-expanded="false">☰</button><div class="web-concierge-mobile-topbar-title">STEWARO Concierge</div><button type="button" class="web-concierge-mobile-new" aria-label="Neuer Chat">＋</button>';
     const backdrop=document.createElement("button");backdrop.type="button";backdrop.className="web-concierge-mobile-backdrop";backdrop.setAttribute("aria-label","Chatliste schließen");
     workspace.prepend(topbar);workspace.appendChild(backdrop);
-    topbar.querySelector(".web-concierge-mobile-exit")?.addEventListener("click",()=>{setMobileDrawer(false);location.href=guestMode?"/de/":"/konto";});
+    topbar.querySelector(".web-concierge-mobile-exit")?.addEventListener("click",()=>{setMobileDrawer(false);location.href=guestMode?"/de/":(location.hostname==="app.stewaro.com"?"https://account.stewaro.com/konto":"/konto");});
     topbar.querySelector(".web-concierge-mobile-chats")?.addEventListener("click",()=>setMobileDrawer(!workspace.classList.contains("is-mobile-sidebar-open")));
     topbar.querySelector(".web-concierge-mobile-new")?.addEventListener("click",()=>{setMobileDrawer(false);newChat();});
     backdrop.addEventListener("click",()=>setMobileDrawer(false));
   }
 
   async function boot() {
+    if(location.hostname==="app.stewaro.com"&&window.STEWARO_APP_AUTH_READY){
+      if(await window.STEWARO_APP_AUTH_READY!==true)return;
+    }
     initThemeToggle();
     initMobileDrawer();
     initDeleteAllChats();
@@ -1249,6 +1260,11 @@ syncIosVisualViewport();
 
     const token=sessionToken();
     guestMode=!token;
+    const canonicalAppHost=location.hostname==="app.stewaro.com";
+    if(canonicalAppHost&&guestMode){
+      location.replace("https://account.stewaro.com/anmelden?produkt=senioren&next=app");
+      return;
+    }
     document.body.classList.toggle("web-concierge-guest",guestMode);
     if(guestMode){
       if(isChatPageReload())resetGuestChatSessionForReload();
@@ -1298,7 +1314,7 @@ syncIosVisualViewport();
     await initialHistoryPromise.catch(()=>false);
     if(ready){
       if(guestMode){
-        if(!guestViewRestored)appendMessage("assistant","Willkommen bei NAHWERK. Sag mir einfach, wobei du Unterstützung suchst. Ich kann dir zeigen, was NAHWERK für dich oder einen Angehörigen übernehmen kann, Funktionen und Preise erklären oder gemeinsam mit dir den passenden Einstieg finden. Fragen und Beratung sind hier kostenlos und ohne Anmeldung möglich. Ein Konto brauchst du erst, wenn ich wirklich etwas für dich ausführen soll.",new Date().toISOString(),"guest:welcome","WEB");
+        if(!guestViewRestored)appendMessage("assistant","Willkommen bei STEWARO. Sag mir einfach, wobei du Unterstützung suchst. Ich kann dir zeigen, was STEWARO für dich oder einen Angehörigen übernehmen kann, Funktionen und Preise erklären oder gemeinsam mit dir den passenden Einstieg finden. Fragen und Beratung sind hier kostenlos und ohne Anmeldung möglich. Ein Konto brauchst du erst, wenn ich wirklich etwas für dich ausführen soll.",new Date().toISOString(),"guest:welcome","WEB");
       }else{
         renderIntegrationReturnNotice();
         void refreshPersona(true).then(async()=>{await loadThreads();renderThreads();}).catch(()=>{});

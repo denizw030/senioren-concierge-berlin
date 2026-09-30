@@ -8,7 +8,7 @@
 </head>
 <body>
   <div id="status" role="status">RUNNING</div>
-  <iframe id="target" title="NAHWERK context test"></iframe>
+  <iframe id="target" title="STEWARO context test"></iframe>
   <script>
     (() => {
       const frame = document.getElementById("target");
@@ -30,6 +30,15 @@
 
       function isLoginPath() {
         return /\/anmelden(?:\.html)?\/?$/.test(frame.contentWindow.location.pathname);
+      }
+
+      function isAccountEntryPath() {
+        return /\/zugang(?:\.html)?\/?$/.test(frame.contentWindow.location.pathname);
+      }
+
+      function assertAccountEntry(doc, label) {
+        assert(isAccountEntryPath(), `${label}: not on unified STEWARO account entry`);
+        assert(doc.querySelector("[data-stewaro-access]"), `${label}: unified account entry missing`);
       }
 
       function assertPrimeLogin(doc, label) {
@@ -54,28 +63,28 @@
 
       async function run() {
         let doc = await open("/safety.html", null);
-        let links = [...doc.querySelectorAll("a")].filter((a) => a.textContent.trim() === "Zum Kundenbereich");
-        assert(links.length === 2, "fresh Safety: expected two customer-area links");
+        let links = [...doc.querySelectorAll("a")].filter((a) => a.textContent.trim() === "Zum Klientenbereich");
+        assert(links.length === 2, "fresh Safety: expected two client-area links");
         doc = await clickAndWait(links[links.length - 1]);
-        assertPrimeLogin(doc, "fresh Safety");
+        assertAccountEntry(doc, "fresh Safety");
 
         doc = await open("/safety.html", "senioren");
-        links = [...doc.querySelectorAll("a")].filter((a) => a.textContent.trim() === "Zum Kundenbereich");
-        assert(links.length === 2, "stale Senior Safety: expected two customer-area links");
+        links = [...doc.querySelectorAll("a")].filter((a) => a.textContent.trim() === "Zum Klientenbereich");
+        assert(links.length === 2, "stale Senior Safety: expected two client-area links");
         doc = await clickAndWait(links[links.length - 1]);
-        assertPrimeLogin(doc, "stale Senior Safety");
+        assertAccountEntry(doc, "stale Senior Safety");
 
         doc = await open("/senioren-concierge.html", null);
         let login = doc.querySelector("a.login-link");
         assert(login, "Senior page: login link missing");
         doc = await clickAndWait(login);
-        assertSeniorLogin(doc, "Senior page");
+        assertAccountEntry(doc, "Senior page");
 
         doc = await open("/prime-concierge.html", "senioren");
         login = doc.querySelector("a.login-link");
         assert(login, "Prime page: login link missing");
         doc = await clickAndWait(login);
-        assertPrimeLogin(doc, "Prime page");
+        assertAccountEntry(doc, "Prime page");
 
         doc = await open("/anmelden.html?produkt=prime", "senioren");
         assertPrimeLogin(doc, "direct Prime login");

@@ -1,0 +1,108 @@
+/* STEWARO shared-base brand shell — branch-only migration layer.
+   Runtime/backend contracts remain unchanged. */
+:root{
+  --stewaro-cream:#f7f3eb;
+  --stewaro-cream-2:#eee7dc;
+  --stewaro-ink:#102019;
+  --stewaro-green:#173126;
+  --stewaro-gold:#c79a3d;
+  --stewaro-gold-light:#f1dda2;
+  --stewaro-line:rgba(16,32,25,.14);
+}
+html body .top{
+  background:rgba(247,243,235,.94)!important;
+  border-bottom:1px solid var(--stewaro-line)!important;
+  box-shadow:0 8px 28px rgba(24,34,29,.035)!important;
+  backdrop-filter:blur(18px)!important;
+  -webkit-backdrop-filter:blur(18px)!important;
+}
+html body .top .brand,
+html body .footer .brand{gap:12px!important}
+html body .top .brand .mark,
+html body .top .brand .mark.nahwerk-mark,
+html body .footer .brand .mark,
+html body .footer .brand .mark.nahwerk-mark{
+  width:39px!important;height:39px!important;flex:0 0 39px!important;
+  border-radius:0!important;border:0!important;box-shadow:none!important;
+  background:transparent center/contain no-repeat url("logos/stewaro-icon.svg")!important;
+}
+html body .brandtext strong{display:block!important;font-size:0!important}
+html body .brandtext strong:before{
+  content:""!important;
+  display:block;
+  font-family:Baskerville,"Iowan Old Style",Georgia,serif!important;
+  font-size:20px!important;font-weight:600!important;line-height:1!important;
+  letter-spacing:.19em!important;margin-right:-.19em!important;
+  color:transparent!important;
+  background:linear-gradient(108deg,#73531e 0%,#b48630 14%,#e9d18a 31%,#f4e3af 40%,#c79a3d 53%,#ead18a 69%,#8c641f 84%,#d8b65e 100%)!important;
+  background-size:230% 100%!important;background-position:0% 50%!important;
+  -webkit-background-clip:text!important;background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;
+  text-shadow:0 1px 0 rgba(255,255,255,.24),0 2px 8px rgba(111,80,24,.10)!important;
+}
+html body .brandtext span{display:none!important}
+html body .top .links{color:#2d3a34!important}
+html body .top .links a{color:#2d3a34!important;border-bottom-color:transparent!important}
+html body .top .links a:hover,
+html body .top .links a.active{color:#12241c!important;border-bottom-color:rgba(183,139,54,.72)!important}
+html body .top .links .auth-link{
+  color:#173126!important;border-color:rgba(117,87,30,.28)!important;
+  background:rgba(255,255,255,.54)!important;border-radius:999px!important;
+}
+html body .top .links .auth-link.register-link{
+  color:#102019!important;
+  background:linear-gradient(118deg,#b18231,#ead28b 45%,#c39438)!important;
+  border-color:rgba(124,91,30,.30)!important;
+  box-shadow:0 8px 24px rgba(111,80,24,.12)!important;
+}
+html body .top .nav-toggle{color:#173126!important}
+html body .top .nav .nw-account-link,
+html body .top .nav .nw-account-mobile,
+html body .top .nav .nw-account-logout{
+  color:#173126!important;
+}
+html body .top .links.is-open{
+  background:rgba(247,243,235,.985)!important;
+  border-color:var(--stewaro-line)!important;
+  box-shadow:0 22px 60px rgba(24,34,29,.12)!important;
+}
+html body .nw-floating-concierge .nw-floating-concierge-icon{
+  background:transparent center/contain no-repeat url("logos/stewaro-icon.svg")!important;
+}
+html body .odysx-info-bar{display:none!important}
+@media(prefers-reduced-motion:no-preference){
+  html body .brandtext strong:before{
+    animation:stewaroSharedGoldSheen 7.6s cubic-bezier(.42,0,.58,1) infinite alternate;
+  }
+}
+@keyframes stewaroSharedGoldSheen{
+  from{background-position:0% 50%}
+  to{background-position:100% 50%}
+}
+@media(max-width:620px){
+  html body .top .brand .mark,
+  html body .top .brand .mark.nahwerk-mark{width:35px!important;height:35px!important;flex-basis:35px!important}
+  html body .brandtext strong:before{font-size:17px!important;letter-spacing:.16em!important;margin-right:-.16em!important}
+}
+@media(prefers-reduced-motion:reduce){
+  html body .brandtext strong:before{animation:none!important}
+}
+
+
+/* STEWARO_CANONICAL_WORDMARK_20260928 */
+html body .brandtext{
+  width:148px!important;
+  height:22px!important;
+  flex:0 0 148px!important;
+  background:transparent center/contain no-repeat url("logos/stewaro-wordmark.svg")!important;
+}
+html body .brandtext strong{
+  display:block!important;width:100%!important;height:100%!important;
+  font-size:0!important;line-height:0!important;color:transparent!important;background:none!important;
+}
+html body .brandtext strong:before{
+  content:""!important;display:none!important;animation:none!important;background:none!important;
+}
+@media(max-width:900px){
+  html body .brandtext{width:128px!important;height:18px!important;flex-basis:128px!important}
+}

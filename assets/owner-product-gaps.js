@@ -73,7 +73,7 @@
     const items=Array.isArray(data.items)?data.items:[];
     if(!items.length){const empty=document.createElement("div");empty.className="owner-gap-empty";empty.textContent="Aktuell sind keine Produktlücken erfasst.";list.appendChild(empty);return}
     items.forEach(x=>list.appendChild(itemNode(x)));
-    const pending=Number(data.pending_count||0);document.title=(pending?("("+pending+") "):"")+"Produktlücken | NAHWERK";
+    const pending=Number(data.pending_count||0);document.title=(pending?("("+pending+") "):"")+"Produktlücken | STEWARO";
   }
   async function loadFull(){
     const status=document.getElementById("ownerGapStatus");if(status)status.textContent="Wird aktualisiert …";

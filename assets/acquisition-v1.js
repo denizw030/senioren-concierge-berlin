@@ -14,32 +14,32 @@
     de:{
       aria:"In drei Schritten zum kostenlosen Einstieg",
       oneTitle:"Kostenlos registrieren",
-      oneBody:"Lernen Sie NAHWERK kostenlos kennen: chatten, Fragen stellen, Aufgaben vorbereiten und eine echte Concierge-Ausführung ausprobieren. Keine Zahlungsdaten erforderlich. Kein automatisches Upgrade. Danach können Sie Guthaben schon ab 5 € online aufladen.",
+      oneBody:"Lernen Sie STEWARO kostenlos kennen: chatten, Fragen stellen, Aufgaben vorbereiten und eine echte Concierge-Ausführung ausprobieren. Keine Zahlungsdaten erforderlich. Kein automatisches Upgrade. Danach können Sie Guthaben schon ab 5 € online aufladen.",
       limits:"FREE: bis zu 50 App-Dialoge / Monat · bis zu 20 WhatsApp-Dialoge / Monat · 1 echte Concierge-Ausführung.",
       twoTitle:"Aufgabe übergeben",
       twoBody:"Zum Beispiel einen Hautarzt finden, passende Optionen vergleichen oder den nächsten Schritt organisieren lassen.",
-      threeTitle:"NAHWERK bleibt dran",
-      threeBody:"NAHWERK recherchiert, organisiert, fragt bei nötigen Entscheidungen nach und meldet Ergebnis oder nächsten Schritt zurück."
+      threeTitle:"FIDEL bleibt dran",
+      threeBody:"FIDEL recherchiert, organisiert, fragt bei nötigen Entscheidungen nach und meldet Ergebnis oder nächsten Schritt zurück."
     },
     en:{
       aria:"Three steps to get started for free",
       oneTitle:"Register for free",
-      oneBody:"Get to know NAHWERK for free: chat, ask questions, prepare tasks and try one real Concierge execution. No payment details required. No automatic upgrade. Afterwards, you can top up credit online from €5.",
+      oneBody:"Get to know STEWARO for free: chat, ask questions, prepare tasks and try one real Concierge execution. No payment details required. No automatic upgrade. Afterwards, you can top up credit online from €5.",
       limits:"FREE: up to 50 app conversations / month · up to 20 WhatsApp conversations / month · 1 real Concierge execution.",
       twoTitle:"Hand over a task",
       twoBody:"For example, find a dermatologist, compare suitable options or have the next step organised.",
-      threeTitle:"NAHWERK stays on it",
-      threeBody:"NAHWERK researches, organises, asks for approval when a decision is needed and reports back with the result or next step."
+      threeTitle:"FIDEL stays on it",
+      threeBody:"FIDEL researches, organises, asks for approval when a decision is needed and reports back with the result or next step."
     },
     tr:{
       aria:"Ücretsiz başlangıç için üç adım",
       oneTitle:"Ücretsiz kayıt ol",
-      oneBody:"NAHWERK'i ücretsiz deneyin: sohbet edin, sorular sorun, görevleri hazırlayın ve gerçek bir Concierge işlemini deneyin. Ödeme bilgisi gerekmez. Otomatik yükseltme yoktur. Sonrasında çevrim içi olarak 5 €'dan başlayan bakiye yükleyebilirsiniz.",
+      oneBody:"STEWARO'i ücretsiz deneyin: sohbet edin, sorular sorun, görevleri hazırlayın ve gerçek bir Concierge işlemini deneyin. Ödeme bilgisi gerekmez. Otomatik yükseltme yoktur. Sonrasında çevrim içi olarak 5 €'dan başlayan bakiye yükleyebilirsiniz.",
       limits:"FREE: ayda en fazla 50 uygulama görüşmesi · ayda en fazla 20 WhatsApp görüşmesi · 1 gerçek Concierge işlemi.",
       twoTitle:"Bir görev verin",
       twoBody:"Örneğin bir dermatolog bulun, uygun seçenekleri karşılaştırın veya sonraki adımı organize ettirin.",
-      threeTitle:"NAHWERK takipte kalır",
-      threeBody:"NAHWERK araştırır, organize eder, gerekli kararlarda onay ister ve sonucu ya da sonraki adımı size bildirir."
+      threeTitle:"FIDEL takipte kalır",
+      threeBody:"FIDEL araştırır, organize eder, gerekli kararlarda onay ister ve sonucu ya da sonraki adımı size bildirir."
     }
   };
   const journeyCopy=JOURNEY_COPY[locale]||JOURNEY_COPY.de;

@@ -1,4 +1,5 @@
-@import url("./site-base.css?v=20260917-final");
+@import url("/assets/stewaro-unified.css?v=20260928-3");
+@import url("./site-base.css?v=20260917-final");\n@import url("./stewaro-brand-shell.css?v=20260927-1");
 
 /* NAHWERK TOPBAR + FLOATING CONCIERGE + DARK FOOTER FINAL — 2026-09-17 */
 
@@ -153,7 +154,7 @@ html body .nw-floating-concierge .nw-floating-concierge-icon {
   width: 30px !important;
   height: 30px !important;
   border-radius: 0 !important;
-  background: transparent center / contain no-repeat url("logos/NAHWERK-Goldmann-Logo.svg") !important;
+  background: transparent center / contain no-repeat url("logos/stewaro-icon.svg") !important;
   box-shadow: none !important;
 }
 html body .nw-floating-concierge .nw-floating-concierge-icon svg {

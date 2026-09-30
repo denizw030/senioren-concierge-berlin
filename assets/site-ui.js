@@ -1,4 +1,29 @@
 (() => {
+  try {
+    if (!document.querySelector('link[data-stewaro-unified]')) {
+      const stylesheet = document.createElement('link');
+      stylesheet.rel = 'stylesheet';
+      stylesheet.href = '/assets/stewaro-unified.css?v=20260927-1';
+      stylesheet.dataset.stewaroUnified = 'true';
+      document.head.appendChild(stylesheet);
+    }
+    if (!document.querySelector('script[data-stewaro-entry-routing]')) {
+      const routing = document.createElement('script');
+      routing.src = '/assets/stewaro-entry-routing.js?v=1';
+      routing.defer = true;
+      routing.dataset.stewaroEntryRouting = 'true';
+      document.head.appendChild(routing);
+    }
+    let icon = document.querySelector('link[rel~="icon"]');
+    if (!icon) {
+      icon = document.createElement('link');
+      icon.rel = 'icon';
+      document.head.appendChild(icon);
+    }
+    icon.type = 'image/svg+xml';
+    icon.href = '/assets/logos/stewaro-icon.svg?v=1';
+  } catch (_) {}
+
   const isCustomerAccount = /(?:^|\/)konto(?:\.html)?\/?$/.test(location.pathname);
   const isProdCustomerSurface = /(?:^|\/)(?:konto|payg|web-concierge|concierge-anpassen)(?:\.html)?\/?$/.test(location.pathname);
   const isPublicSeniorSurface = /(?:^|\/)(?:senioren-concierge|angehoerige)(?:\.html)?\/?$/.test(location.pathname) || Boolean(document.body?.classList?.contains('senior-product'));
@@ -650,7 +675,7 @@
       let url = raw;
       try { url = new URL(raw, location.href).href; } catch (_) {}
       if (/staging/i.test(url)) {
-        return Promise.reject(new TypeError("NAHWERK PROD web guard blocked a non-PROD endpoint."));
+        return Promise.reject(new TypeError("STEWARO PROD web guard blocked a non-PROD endpoint."));
       }
 
       const method = String(init?.method || (input instanceof Request ? input.method : "GET") || "GET").toUpperCase();
@@ -980,9 +1005,9 @@
 (() => {
   const normalizedPath = (location.pathname.replace(/\/+$/, '') || '/').toLowerCase();
   const localeByPath = {
-    '/de': { language: 'de-DE', serviceUrl: 'https://nahwerkconcierge.com/prime-concierge', serviceName: 'Persönlicher NAHWERK Concierge' },
-    '/en': { language: 'en-GB', serviceUrl: 'https://nahwerkconcierge.com/en/prime-concierge', serviceName: 'NAHWERK Personal Concierge' },
-    '/tr': { language: 'tr-TR', serviceUrl: 'https://nahwerkconcierge.com/tr/prime-concierge', serviceName: 'NAHWERK Kişisel Concierge' }
+    '/de': { language: 'de-DE', serviceUrl: 'https://stewaro.com/prime-concierge', serviceName: 'Persönlicher STEWARO Concierge' },
+    '/en': { language: 'en-GB', serviceUrl: 'https://stewaro.com/en/prime-concierge', serviceName: 'STEWARO Personal Concierge' },
+    '/tr': { language: 'tr-TR', serviceUrl: 'https://stewaro.com/tr/prime-concierge', serviceName: 'STEWARO Kişisel Concierge' }
   };
   const locale = localeByPath[normalizedPath];
   if (!locale) return;
@@ -993,39 +1018,39 @@
     '@graph': [
       {
         '@type': 'Organization',
-        '@id': 'https://nahwerkconcierge.com/#organization',
-        name: 'NAHWERK Concierge',
-        url: 'https://nahwerkconcierge.com/',
+        '@id': 'https://stewaro.com/#organization',
+        name: 'STEWARO',
+        url: 'https://stewaro.com/',
         logo: {
           '@type': 'ImageObject',
-          url: 'https://nahwerkconcierge.com/assets/logos/nahwerk-concierge.png'
+          url: 'https://stewaro.com/assets/logos/stewaro-icon.svg'
         }
       },
       {
         '@type': 'WebSite',
-        '@id': 'https://nahwerkconcierge.com/#website',
-        url: 'https://nahwerkconcierge.com/',
-        name: 'NAHWERK Concierge',
+        '@id': 'https://stewaro.com/#website',
+        url: 'https://stewaro.com/',
+        name: 'STEWARO',
         inLanguage: locale.language,
-        publisher: { '@id': 'https://nahwerkconcierge.com/#organization' }
+        publisher: { '@id': 'https://stewaro.com/#organization' }
       },
       {
         '@type': 'Service',
-        '@id': 'https://nahwerkconcierge.com/#personal-concierge',
+        '@id': 'https://stewaro.com/#personal-concierge',
         name: locale.serviceName,
         serviceType: 'Personal Concierge',
         url: locale.serviceUrl,
-        provider: { '@id': 'https://nahwerkconcierge.com/#organization' }
+        provider: { '@id': 'https://stewaro.com/#organization' }
       },
       {
         '@type': 'SoftwareApplication',
-        '@id': 'https://nahwerkconcierge.com/#software',
-        name: 'NAHWERK Concierge',
+        '@id': 'https://stewaro.com/#software',
+        name: 'STEWARO',
         applicationCategory: 'LifestyleApplication',
         operatingSystem: 'Web, iOS, Android',
         url: locale.serviceUrl,
         inLanguage: locale.language,
-        provider: { '@id': 'https://nahwerkconcierge.com/#organization' }
+        provider: { '@id': 'https://stewaro.com/#organization' }
       }
     ]
   };
@@ -1345,4 +1370,159 @@
     });
     document.documentElement.dataset.nwPlanFacts="live";
   }).catch(()=>{});
+})();
+
+
+/* STEWARO_SHARED_BASE_BRAND_ADAPTER_V1
+   Presentation-only migration layer. Keeps legacy runtime keys, routes and backend contracts intact. */
+(() => {
+  const BRAND = "STEWARO";
+  const replaceBrand = (value) => String(value ?? "")
+    .replace(/STEWARO/g, BRAND)
+    .replace(/Nahwerk Concierge/g, BRAND)
+    .replace(/STEWARO/g, BRAND)
+    .replace(/Nahwerk/g, BRAND);
+
+  let applying = false;
+  let queued = false;
+
+  const normalizeNavPath = (raw) => {
+    try {
+      let path = new URL(raw || "/", location.href).pathname || "/";
+      path = path.replace(/\.html$/i, "").replace(/\/+$/, "") || "/";
+      if (path === "/de") path = "/de";
+      return path;
+    } catch (_) {
+      return String(raw || "").replace(/\.html(?=$|[?#])/i, "").replace(/\/+$/, "");
+    }
+  };
+
+  const ensureNavLink = (nav, href, label) => {
+    const targetPath = normalizeNavPath(href);
+    let link = Array.from(nav.querySelectorAll(":scope > a")).find((item) => normalizeNavPath(item.getAttribute("href")) === targetPath);
+    if (!link) {
+      link = document.createElement("a");
+      link.href = href;
+      const anchor = nav.querySelector(".auth-link,.nw-account-cluster");
+      if (anchor) nav.insertBefore(link, anchor);
+      else nav.appendChild(link);
+    }
+    link.hidden = false;
+    link.removeAttribute("aria-hidden");
+    link.removeAttribute("tabindex");
+    link.href = href;
+    if (link.textContent !== label) link.textContent = label;
+    link.dataset.stewaroNav = "1";
+    return link;
+  };
+
+  function apply() {
+    if (applying) return;
+    applying = true;
+    try {
+      document.documentElement.dataset.brand = "stewaro";
+      document.body?.classList.add("brand-stewaro");
+      if (!document.querySelector('link[data-stewaro-brand-shell]')) {
+        const brandCss = document.createElement("link");
+        brandCss.rel = "stylesheet";
+        brandCss.href = "/assets/stewaro-brand-shell.css?v=20260927-1";
+        brandCss.dataset.stewaroBrandShell = "1";
+        document.head.appendChild(brandCss);
+      }
+
+      if (document.title) document.title = replaceBrand(document.title);
+      document.querySelectorAll('meta[name="description"],meta[property="og:title"],meta[property="og:description"]').forEach((meta) => {
+        const value = meta.getAttribute("content");
+        if (value && /STEWARO|Nahwerk/.test(value)) meta.setAttribute("content", replaceBrand(value));
+      });
+
+      document.querySelectorAll("header.top .brand,.footer .brand").forEach((brand) => {
+        brand.setAttribute("aria-label", "STEWARO – Startseite");
+        const strong = brand.querySelector(".brandtext strong");
+        const sub = brand.querySelector(".brandtext span");
+        if (strong && strong.textContent !== BRAND) strong.textContent = BRAND;
+        if (sub && sub.textContent) sub.textContent = "";
+      });
+
+      document.querySelectorAll("nav.links").forEach((nav) => {
+        const targets = [
+          ["/de/", "Übersicht"],
+          ["/prime-concierge", "Concierge"],
+          ["/angehoerige", "Für Angehörige"],
+          ["/safety", "Sicherheit"],
+          ["/telefonannahme", "Telefon"],
+          ["/leistungen", "Leistungen"],
+          ["/pakete", "Preise"],
+          ["/kontakt", "Kontakt"]
+        ];
+        const targetPaths = new Set(targets.map(([href]) => normalizeNavPath(href)));
+
+        Array.from(nav.querySelectorAll(":scope > a")).forEach((link) => {
+          if (link.classList.contains("auth-link")) return;
+          const path = normalizeNavPath(link.getAttribute("href"));
+          if (!targetPaths.has(path)) {
+            link.hidden = true;
+            link.setAttribute("aria-hidden", "true");
+            link.tabIndex = -1;
+          }
+        });
+
+        const ordered = targets.map(([href, label]) => ensureNavLink(nav, href, label));
+        const desiredPaths = ordered.map((link) => normalizeNavPath(link.getAttribute("href")));
+        const currentPaths = Array.from(nav.querySelectorAll(":scope > a[data-stewaro-nav='1']"))
+          .filter((link) => !link.hidden)
+          .map((link) => normalizeNavPath(link.getAttribute("href")));
+        if (currentPaths.join("|") !== desiredPaths.join("|")) {
+          const anchor = nav.querySelector(".auth-link,.nw-account-cluster");
+          ordered.forEach((link) => {
+            if (anchor) nav.insertBefore(link, anchor);
+            else nav.appendChild(link);
+          });
+        }
+      });
+
+      document.querySelectorAll(".odysx-info-bar").forEach((element) => element.remove());
+      document.querySelectorAll(".footbottom > span:first-child").forEach((element) => {
+        if (element.textContent !== "© 2026 STEWARO") element.textContent = "© 2026 STEWARO";
+      });
+
+      const root = document.body;
+      if (root) {
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          const parent = node.parentElement;
+          if (!parent || /^(SCRIPT|STYLE|NOSCRIPT|CODE|PRE|TEXTAREA)$/i.test(parent.tagName)) continue;
+          if (/STEWARO|Nahwerk/.test(node.nodeValue || "")) nodes.push(node);
+        }
+        nodes.forEach((node) => { node.nodeValue = replaceBrand(node.nodeValue); });
+      }
+
+      document.querySelectorAll("[aria-label],[title],[alt]").forEach((element) => {
+        ["aria-label","title","alt"].forEach((name) => {
+          const value = element.getAttribute(name);
+          if (value && /STEWARO|Nahwerk/.test(value)) element.setAttribute(name, replaceBrand(value));
+        });
+      });
+    } finally {
+      applying = false;
+    }
+  }
+
+  const queueApply = () => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => {
+      queued = false;
+      apply();
+    });
+  };
+
+  apply();
+  addEventListener("DOMContentLoaded", apply, { once:true });
+  addEventListener("load", apply, { once:true });
+
+  const observer = new MutationObserver(queueApply);
+  if (document.documentElement) observer.observe(document.documentElement, { childList:true, subtree:true });
 })();

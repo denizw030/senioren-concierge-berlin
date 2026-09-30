@@ -53,12 +53,12 @@ const success201={
 };
 const replay200={...success201,duplicate:true};
 
-test("telephone reception remains a separate product without invented prices",()=>{
-  assert.match(page,/NAHWERK geht für dich ans Telefon/);
+test("telephone reception presents FIDEL without invented prices",()=>{
+  assert.match(page,/STEWARO geht für dich ans Telefon/);
+  assert.match(page,/FIDEL am Telefon/);
   assert.match(page,/Telefonannahme Standalone/);
   assert.match(page,/Concierge \+ Telefonannahme/);
-  assert.match(page,/Abo/);
-  assert.match(page,/Pay as you go/);
+  assert.match(page,/FIDEL Stimme/);
   assert.doesNotMatch(page,/\b\d+[,.]\d{2}\s*€/);
 });
 
@@ -232,13 +232,12 @@ test("prepared fixed-line markup stays inert while shared-context story is prese
   assert.match(page,/Hausverwaltung/);
 });
 
-test("product integration, pricing, hero and header regressions stay intact",()=>{
-  for(const body of [home,services,pricing,registration]) assert.match(body,/href="(?:\/)?telefonannahme(?:\.html)?"/);
-  assert.match(home,/assets\/prime\/nahwerk-hero-blue-red-goldmann\.webp\?v=2/);
-  assert.match(home,/Ein persönlicher Concierge, der erledigt\./);
-  assert.deepEqual([...home.matchAll(/data-story-step="([1-6])"/g)].map(m=>m[1]),["1","2","3","4","5","6"]);
-  assert.match(home,/body\.overview-page\.nw-header-scrolled \.top/);
-  assert.match(home,/rgba\(7,\s*7,\s*6,\s*0\.82\)/);
+test("product integration keeps the new STEWARO homepage and pricing intact",()=>{
+  assert.match(home,/stewaro-hero-pferd\.mp4/);
+  assert.match(home,/Jemand, der sich kümmert\./);
+  assert.match(home,/FIDEL/);
+  assert.match(home,/@media\s*\(max-width:\s*600px\)/);
   assert.match(pricing,/59,66 €/);
   assert.match(pricing,/FREE/);
+  assert.match(page,/href="\/pakete"/);
 });

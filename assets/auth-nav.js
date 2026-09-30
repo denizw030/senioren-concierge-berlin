@@ -18,7 +18,7 @@
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(remembered));
     }
   } catch (_) {}
-  const NAV = [["/de/", "Übersicht"], ["/prime-concierge", "Persönlicher Concierge"], ["/concierges", "NAHWERK weltweit"], ["/senioren-concierge", "Senioren Concierge"], ["/senioren-concierge#angehoerige", "Für Angehörige"], ["/leistungen", "Leistungen"], ["/kontakt", "Kontakt"]];
+  const NAV = [["/de/", "Übersicht"], ["/prime-concierge", "Concierge"], ["/angehoerige", "Für Angehörige"], ["/safety", "Sicherheit"], ["/telefonannahme", "Telefon"], ["/leistungen", "Leistungen"], ["/pakete", "Preise"], ["/kontakt", "Kontakt"]];
   let sessionValidated = false;
   let validatedSession = null;
   let validationPromise = null;
@@ -167,7 +167,7 @@
     document.body.dataset.product = product;
     document.body.classList.toggle("senior-product", product === "senioren");
     if (current === "pakete.html" && product === "senioren") {
-      document.title = "Senioren-Concierge Tarife | NAHWERK";
+      document.title = "Senioren-Concierge Tarife | STEWARO";
       document.querySelectorAll('[href^="registrieren.html"],[href^="/registrieren"]').forEach((link) => {
         const url = new URL(link.getAttribute("href"), location.href);
         url.searchParams.set("produkt", "senioren");
@@ -176,7 +176,7 @@
     }
     document.querySelectorAll("header.top .brand").forEach((brand) => {
       brand.href = "/de/";
-      brand.innerHTML = '<span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>NAHWERK</strong><span>CONCIERGE</span></span>';
+      brand.innerHTML = '<span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>STEWARO</strong><span></span></span>';
     });
     document.querySelectorAll("nav.links").forEach((nav) => {
       nav.innerHTML = "";
@@ -246,7 +246,7 @@
     queueMicrotask(() => {
       try { window.NWLanguageSwitcherRefresh?.(); } catch (_) {}
     });
-    document.querySelectorAll(".footbottom > span:first-child").forEach((element) => { element.textContent = "© 2026 Nahwerk Concierge"; });
+    document.querySelectorAll(".footbottom > span:first-child").forEach((element) => { element.textContent = "© 2026 STEWARO Concierge"; });
     document.querySelectorAll('.footer a[href="anmelden.html"],.footer a[href="/anmelden"],.footer a[href="registrieren.html"],.footer a[href="/registrieren"]').forEach((link) => { if (hasRenderableSession()) link.remove(); });
   }
   function updateNav() {
@@ -371,9 +371,10 @@
       node.replaceWith(fragment);
     });
   }
-  // NAHWERK CLEAN ROUTES + FLOATING CONCIERGE 2026-09-16
+  // STEWARO CLEAN ROUTES + FLOATING CONCIERGE 2026-09-16
   const FLOATING_CONCIERGE_EXCLUDE = new Set(["web-concierge.html"]);
   function removeFloatingConcierge() {
+    document.getElementById("nwFloatingConciergeRegion")?.remove();
     document.getElementById("nwFloatingConcierge")?.remove();
   }
   function ensureFloatingConcierge() {
@@ -383,9 +384,13 @@
     link.id = "nwFloatingConcierge";
     link.className = "nw-floating-concierge";
     link.href = "/web-concierge";
-    link.setAttribute("aria-label", "Persönlichen NAHWERK Concierge öffnen");
+    link.setAttribute("aria-label", "Persönlichen STEWARO Concierge öffnen");
     link.innerHTML = '<span class="nw-floating-concierge-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 6.8A2.8 2.8 0 0 1 7.8 4h8.4A2.8 2.8 0 0 1 19 6.8v5.9a2.8 2.8 0 0 1-2.8 2.8h-4.7L7 19v-3.5A2.8 2.8 0 0 1 5 12.8Z"></path><path d="M9 9h6M9 12h4"></path></svg></span><span>Concierge</span>';
-    document.body.appendChild(link);
+    const region = document.createElement("aside");
+    region.id = "nwFloatingConciergeRegion";
+    region.setAttribute("aria-label", "Persönlicher Concierge");
+    region.appendChild(link);
+    document.body.appendChild(region);
   }
 
   document.addEventListener("DOMContentLoaded", async () => {
