@@ -207,15 +207,19 @@ export function mountNahwerkLiveConcierge({
     return {display_name:display,persona_key:isStewaro?"fidel":"",portrait_url:portrait};
   };
   const setPersona=(p)=>{
-    const rawDisplay=String(p?.display_name||"FIDEL").trim();
-    const key=String(p?.persona_key||"").trim().toLowerCase();
-    const isFidel=key==="fidel"||/\b(?:FIDEL|STEWARO)\b/i.test(rawDisplay);
+    const pagePersona=currentPersonaFromPage();
+    const forceFidel=String(pagePersona?.persona_key||"").toLowerCase()==="fidel";
+    const rawDisplay=forceFidel?"FIDEL":String(p?.display_name||"FIDEL").trim();
+    const key=forceFidel?"fidel":String(p?.persona_key||"").trim().toLowerCase();
+    const isFidel=forceFidel||key==="fidel"||/\b(?:FIDEL|STEWARO)\b/i.test(rawDisplay);
     const display=isFidel?"FIDEL":rawDisplay;
     name.textContent=display;
-    initials.textContent=p?.initials||display.slice(0,1).toUpperCase();
+    initials.textContent=isFidel?"F":(p?.initials||display.slice(0,1).toUpperCase());
     avatar?.classList.toggle("is-fidel-orb",isFidel);
     if(isFidel){
       image.hidden=true;
+      image.alt="";
+      image.removeAttribute("src");
       initials.hidden=true;
       orbCanvas.hidden=false;
       setFidelOrbState("idle");
