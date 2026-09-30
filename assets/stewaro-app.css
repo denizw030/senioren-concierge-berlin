@@ -285,13 +285,19 @@ html[data-stewaro-app="1"] .stewaro-app-shell{
   line-height:1.55;
 }
 .stewaro-app-card-link{
-  margin-top:15px;
+  min-height:44px;
+  margin-top:10px;
   display:inline-flex;
   align-items:center;
+  padding:0;
+  border:0;
+  background:transparent;
   color:#6f5a2e;
+  font:inherit;
   font-size:13px;
   font-weight:720;
   text-decoration:none;
+  cursor:pointer;
 }
 
 .stewaro-app-notice{
