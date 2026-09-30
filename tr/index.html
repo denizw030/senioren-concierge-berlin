@@ -519,52 +519,57 @@ img { display: block; max-width: 100%; }
 
 <style id="stewaro-gold-brand">
   /*
-    Keep the canonical SVG artwork visible. The previous gradient background
-    replaced the SVG itself, which made the header mark/wordmark disappear.
-    The premium sheen now animates via filter only.
+    STEWARO premium gold lockup.
+    The SVG files provide geometry only. Visible colour is generated here so
+    no embedded brown/red artwork can leak into the logo at any animation phase.
   */
   .brand-icon-light,
+  .brand-icon-dark,
+  .brand-word {
+    background:linear-gradient(112deg,#c6a65f 0%,#dcc489 18%,#f2e3bb 33%,#d2b16a 46%,#fff6dc 51%,#d5b66f 57%,#ead8a8 72%,#caaa64 100%) !important;
+    background-size:260% 100% !important;
+    background-position:0% 50% !important;
+    filter:none !important;
+    box-shadow:none !important;
+    text-shadow:none !important;
+    will-change:background-position;
+  }
+
+  .brand-icon-light,
   .brand-icon-dark {
-    background: transparent url("/assets/logos/stewaro-icon.svg") center / contain no-repeat !important;
-    filter:
-      drop-shadow(0 1px 0 rgba(255,255,255,.34))
-      drop-shadow(0 2px 4px rgba(103,74,18,.18));
+    -webkit-mask:url("/assets/logos/stewaro-icon.svg") center / contain no-repeat !important;
+    mask:url("/assets/logos/stewaro-icon.svg") center / contain no-repeat !important;
   }
 
   .brand-word {
     color:transparent !important;
     -webkit-text-fill-color:transparent !important;
-    background:transparent url("/assets/logos/stewaro-wordmark.svg") center / contain no-repeat !important;
+    -webkit-mask:url("/assets/logos/stewaro-wordmark.svg") center / contain no-repeat !important;
+    mask:url("/assets/logos/stewaro-wordmark.svg") center / contain no-repeat !important;
     -webkit-background-clip:border-box !important;
     background-clip:border-box !important;
-    text-shadow:none !important;
-    filter:drop-shadow(0 1px 2px rgba(99,70,17,.12));
   }
 
   .brand-lockup { isolation:isolate; }
 
   @media (prefers-reduced-motion: no-preference) {
-    .site-header .brand-icon-light {
-      animation:stewaroLogoSheen 7.8s ease-in-out infinite alternate;
-    }
+    .site-header .brand-icon-light,
     .site-header .brand-word {
-      animation:stewaroWordmarkSheen 7.8s ease-in-out infinite alternate;
+      animation:stewaroPremiumGold 8.2s cubic-bezier(.42,0,.58,1) infinite alternate;
     }
   }
 
-  @keyframes stewaroLogoSheen {
-    from { filter:brightness(.94) drop-shadow(0 1px 0 rgba(255,255,255,.24)) drop-shadow(0 2px 4px rgba(103,74,18,.16)); }
-    to   { filter:brightness(1.14) drop-shadow(0 1px 0 rgba(255,255,255,.50)) drop-shadow(0 3px 7px rgba(103,74,18,.24)); }
-  }
-
-  @keyframes stewaroWordmarkSheen {
-    from { filter:brightness(.96) drop-shadow(0 1px 2px rgba(99,70,17,.10)); }
-    to   { filter:brightness(1.10) drop-shadow(0 2px 4px rgba(99,70,17,.18)); }
+  @keyframes stewaroPremiumGold {
+    0%,18% { background-position:0% 50%; }
+    78%,100% { background-position:100% 50%; }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .site-header .brand-word,
-    .site-header .brand-icon-light { animation:none !important; }
+    .site-header .brand-icon-light {
+      animation:none !important;
+      background-position:50% 50% !important;
+    }
   }
 </style>
 
