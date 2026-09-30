@@ -28,9 +28,11 @@ test('robots exposes sitemap and protects non-search PROD surfaces', () => {
   }
 });
 
-test('root homepage redirects to the canonical German locale', () => {
+test('root homepage routes public traffic to the canonical German locale and the app host to FIDEL', () => {
   const redirect = read('index.html');
-  assert.match(redirect, /http-equiv=["']refresh["'][^>]*url=\/de\//i);
+  assert.doesNotMatch(redirect, /http-equiv=["']refresh["']/i);
+  assert.match(redirect, /window\.location\.hostname === "app\.stewaro\.com"/);
+  assert.match(redirect, /window\.location\.replace\("\/web-concierge" \+ window\.location\.search \+ window\.location\.hash\)/);
   assert.match(redirect, /window\.location\.replace\(["']\/de\/["']\)/);
   assert.ok(redirect.includes(`href="${DOMAIN}/de/"`));
 });
