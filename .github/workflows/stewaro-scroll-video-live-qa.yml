@@ -153,14 +153,29 @@ jobs:
               const section = document.querySelector('.precision');
               const video = document.querySelector('.mechanism-video');
               if (!section || !video) return null;
+              const rect = section.getBoundingClientRect();
+              const absoluteTop = scrollY + rect.top;
               const y = ${JSON.stringify(position)} === 'early'
-                ? section.offsetTop - innerHeight * 0.8
-                : section.offsetTop + section.offsetHeight * 0.55;
+                ? absoluteTop - innerHeight * 0.8
+                : absoluteTop + rect.height * 0.55;
               window.scrollTo(0, Math.max(0, y));
-              return { requestedY: Math.max(0, y) };
+              return { requestedY: Math.max(0, y), absoluteTop };
             })()`);
 
+            const waitForMechanismReady = async () => {
+              for (let i = 0; i < 30; i++) {
+                const ready = await evaluate(`(() => {
+                  const v = document.querySelector('.mechanism-video');
+                  return Boolean(v && v.readyState >= 1 && Number.isFinite(v.duration) && v.duration > 0);
+                })()`);
+                if (ready) return;
+                await sleep(100);
+              }
+              throw new Error('mechanism_video_not_ready_after_scroll:' + spec.name);
+            };
+
             await sample('early');
+            await waitForMechanismReady();
             await sleep(350);
             const early = await evaluate(`(() => {
               const section = document.querySelector('.precision');
@@ -170,6 +185,7 @@ jobs:
             })()`);
 
             await sample('late');
+            await waitForMechanismReady();
             await sleep(350);
             const late = await evaluate(`(() => {
               const section = document.querySelector('.precision');
@@ -182,6 +198,7 @@ jobs:
             fs.writeFileSync('/tmp/stewaro-scroll-video-live-qa/' + spec.name + '-late.png', Buffer.from(shot.data, 'base64'));
 
             await sample('early');
+            await waitForMechanismReady();
             await sleep(350);
             const reverse = await evaluate(`(() => {
               const section = document.querySelector('.precision');
