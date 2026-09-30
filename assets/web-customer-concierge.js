@@ -1257,6 +1257,11 @@ syncIosVisualViewport();
 
     const token=sessionToken();
     guestMode=!token;
+    const canonicalAppHost=location.hostname==="app.stewaro.com";
+    if(canonicalAppHost&&guestMode){
+      location.replace("https://account.stewaro.com/anmelden?produkt=senioren&next=app");
+      return;
+    }
     document.body.classList.toggle("web-concierge-guest",guestMode);
     if(guestMode){
       if(isChatPageReload())resetGuestChatSessionForReload();
