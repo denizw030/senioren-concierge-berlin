@@ -22,6 +22,8 @@ on:
       - "payg/**"
       - "concierge-anpassen.html"
       - "concierge-anpassen/**"
+      - "assets/stewaro-app-bootstrap.js"
+      - "tests/stewaro-app-auth-ready.test.mjs"
       - "assets/auth-nav.js"
       - "assets/site-ui.js"
       - "assets/acquisition-v1.js"
@@ -73,6 +75,9 @@ jobs:
       - name: Verify STEWARO Block 2 and Block 3 contracts
         run: |
           node --test             tests/stewaro-shared-base-brand-shell.test.mjs             tests/stewaro-runtime-surfaces-v1.test.mjs             tests/konto-clean-route-parity.test.mjs             tests/critical-route-parity.test.mjs             tests/auth-security.test.mjs
+
+      - name: App handoff bootstrap behavior
+        run: node --test tests/stewaro-app-launch-shell-v1.test.mjs tests/stewaro-app-auth-ready.test.mjs
 
       - name: Syntax-check migrated runtime modules
         run: |

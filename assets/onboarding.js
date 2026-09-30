@@ -1,6 +1,7 @@
 (() => {
   const WEBHOOK_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-registration-secure";
   const LOGIN_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-login-secure";
+  const SESSION_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-session-secure";
   const MFA_MANAGE_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-mfa-manage";
   const SESSION_KEY = "scb_web_session";
   const SECURITY_PROMPT_KEY = "nw_post_registration_security_prompt";
@@ -10,9 +11,12 @@
   const $ = (id) => document.getElementById(id);
   const params = new URLSearchParams(location.search);
   const guestChatHandoff = params.get("source") === "web_guest_chat";
+  const appHandoff = params.get("next") === "app";
   const requestedNext = params.get("next") === "/payg" ? "/payg" : "";
   const postAuthTarget = guestChatHandoff && requestedNext ? requestedNext : "";
-  const guestLoginHref = postAuthTarget ? "/anmelden?source=web_guest_chat&next=%2Fpayg" : "/anmelden";
+  const guestLoginHref = appHandoff
+    ? "/anmelden?produkt=senioren&next=app"
+    : postAuthTarget ? "/anmelden?source=web_guest_chat&next=%2Fpayg" : "/anmelden";
   const requestedProduct = params.get("produkt");
   const product = requestedProduct === "senioren" || (!requestedProduct && sessionStorage.getItem("nahwerk_product") === "senioren") ? "senioren" : "prime";
   const productLabel = product === "senioren" ? "Senioren Concierge" : "Persönlicher Concierge";
@@ -400,12 +404,18 @@
         window.NahwerkActivation?.markRegistrationComplete?.();
         localStorage.setItem("scb_onboarding_sent", "1");
         localStorage.setItem("scb_onboarding_result", JSON.stringify(body));
-        if (await login(request.email, password)) {
+        const loginResult = await login(request.email, password);
+        if (loginResult) {
+          if (appHandoff) {
+            show("<strong>Fertig.</strong><br>FIDEL wird jetzt sicher geöffnet.");
+            void handoffToApp(loginResult.session_token);
+            return;
+          }
           show("<strong>Fertig.</strong><br>Die WhatsApp-Identität wurde bestätigt und der Web-Zugang wurde angelegt. Sie werden zum Kundenbereich weitergeleitet.");
           return setTimeout(() => { location.href = postAuthTarget || window.NAHWERKLocale?.href("erster-schritt.html") || "erster-schritt.html"; }, 500);
         }
         show("<strong>Der Web-Zugang wurde angelegt.</strong><br>Bitte melden Sie sich jetzt mit Ihrer E-Mail-Adresse und Ihrem Passwort an.", true);
-        return setTimeout(() => { location.href = postAuthTarget ? guestLoginHref : (window.NAHWERKLocale?.href("anmelden.html") || "anmelden.html"); }, 1800);
+        return setTimeout(() => { location.href = (postAuthTarget || appHandoff) ? guestLoginHref : (window.NAHWERKLocale?.href("anmelden.html") || "anmelden.html"); }, 1800);
       }
 
       if (response.status === 401 && body.status === "verification_failed") {
@@ -457,6 +467,28 @@
     } catch (_) {}
   }
 
+  async function handoffToApp(sessionToken) {
+    try {
+      const response = await fetch(SESSION_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + sessionToken },
+        body: JSON.stringify({ action: "handoff_create" }),
+        cache: "no-store",
+        credentials: "omit"
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok || body?.ok !== true || body?.status !== "handoff_ready" || !/^https:\/\/app\.stewaro\.com\/#handoff=/.test(String(body?.target_url || ""))) {
+        throw new Error(String(body?.status || "handoff_create_failed"));
+      }
+      location.replace(String(body.target_url));
+      return true;
+    } catch (_) {
+      show("<strong>FIDEL konnte gerade nicht geöffnet werden.</strong><br>Der Zugang ist angelegt. Bitte öffnen Sie FIDEL anschließend über Ihr Konto.", true);
+      setTimeout(() => { location.href = "/konto"; }, 1800);
+      return false;
+    }
+  }
+
   async function login(email, password) {
     const response = await fetch(LOGIN_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }) });
     const body = await response.json().catch(() => ({}));
@@ -471,13 +503,13 @@
       product_context: body.product_context || (body.brand === "senioren_concierge" ? "senioren" : body.brand === "prime_concierge" ? "prime" : product)
     }));
     await initializeSecurityRecommendation(body.session_token);
-    return true;
+    return body;
   }
 
   ensureVerificationUi();
   setupConciergeSelection();
   setupPlanSelection();
-  if (postAuthTarget) {
+  if (postAuthTarget || appHandoff) {
     document.querySelectorAll('a[href="/anmelden"],a[href="anmelden.html"]').forEach((link) => {
       if (link instanceof HTMLAnchorElement) link.href = guestLoginHref;
     });
@@ -561,12 +593,18 @@
         window.NahwerkActivation?.markRegistrationComplete?.();
         localStorage.setItem("scb_onboarding_sent", "1");
         localStorage.setItem("scb_onboarding_result", JSON.stringify(body));
-        if (await login(request.email, password)) {
+        const loginResult = await login(request.email, password);
+        if (loginResult) {
+          if (appHandoff) {
+            show("<strong>Fertig.</strong><br>FIDEL wird jetzt sicher geöffnet.");
+            void handoffToApp(loginResult.session_token);
+            return;
+          }
           show("<strong>Fertig.</strong><br>Der Zugang wurde angelegt. Sie werden zum Kundenbereich weitergeleitet.");
           return setTimeout(() => { location.href = postAuthTarget || window.NAHWERKLocale?.href("erster-schritt.html") || "erster-schritt.html"; }, 500);
         }
         show("<strong>Der Zugang wurde angelegt.</strong><br>Bitte melden Sie sich jetzt an.", true);
-        return setTimeout(() => { location.href = postAuthTarget ? guestLoginHref : (window.NAHWERKLocale?.href("anmelden.html") || "anmelden.html"); }, 1800);
+        return setTimeout(() => { location.href = (postAuthTarget || appHandoff) ? guestLoginHref : (window.NAHWERKLocale?.href("anmelden.html") || "anmelden.html"); }, 1800);
       }
       if (response.status === 409 && body.status === "email_in_use") return show(`<strong>Für diese E-Mail-Adresse besteht bereits ein Konto.</strong><br><a href="${guestLoginHref}">Zur Anmeldung</a>`, true);
       if (response.status === 400 || body.status === "validation_error") return show("<strong>Bitte prüfen Sie Ihre Angaben.</strong>", true);
