@@ -1,0 +1,210 @@
+name: STEWARO scroll video live QA
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "de/index.html"
+      - "en/index.html"
+      - "tr/index.html"
+      - ".github/workflows/stewaro-scroll-video-live-qa.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-scroll-video:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Wait for deployed STEWARO scroll-video source
+        shell: bash
+        run: |
+          set -euo pipefail
+          live_url="https://nahwerkconcierge.com/de/"
+          ok=0
+          for attempt in $(seq 1 60); do
+            html="$(curl -fsSL --max-time 20 -H 'Cache-Control: no-cache' "${live_url}?qa=${GITHUB_SHA}&attempt=${attempt}" || true)"
+            if grep -q 'mechanism-video' <<<"$html" &&
+               grep -q 'd2ol7oe51mr4n9.cloudfront.net' <<<"$html" &&
+               grep -q 'updateMechanismVideo' <<<"$html"; then
+              ok=1
+              echo "STEWARO_SCROLL_VIDEO_LIVE_SOURCE=GREEN attempt=$attempt"
+              break
+            fi
+            sleep 5
+          done
+          test "$ok" = "1"
+
+      - name: Desktop and mobile bidirectional scroll QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          mkdir -p /tmp/stewaro-scroll-video-live-qa
+          "$CHROME" --headless --no-sandbox --disable-gpu --remote-debugging-port=9222 --user-data-dir=/tmp/stewaro-scroll-cdp about:blank >/tmp/stewaro-scroll-cdp.log 2>&1 &
+          for attempt in $(seq 1 15); do
+            curl -fsS http://127.0.0.1:9222/json/version >/dev/null && break
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:9222/json/version >/dev/null
+
+          node <<'NODE'
+          const fs = require('node:fs');
+          const specs = [
+            { name: 'desktop', width: 1440, height: 1000, mobile: false },
+            { name: 'mobile', width: 390, height: 844, mobile: true }
+          ];
+          const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+          async function createTarget() {
+            const response = await fetch('http://127.0.0.1:9222/json/new?about:blank', { method: 'PUT' });
+            if (!response.ok) throw new Error('cdp_target_create_failed');
+            return response.json();
+          }
+
+          async function connect(url) {
+            return new Promise((resolve, reject) => {
+              const ws = new WebSocket(url);
+              ws.addEventListener('open', () => resolve(ws), { once: true });
+              ws.addEventListener('error', () => reject(new Error('cdp_websocket_failed')), { once: true });
+            });
+          }
+
+          async function audit(spec) {
+            const target = await createTarget();
+            const ws = await connect(target.webSocketDebuggerUrl);
+            let seq = 0;
+            const pending = new Map();
+            const listeners = new Map();
+
+            ws.addEventListener('message', (event) => {
+              const message = JSON.parse(String(event.data));
+              if (message.id && pending.has(message.id)) {
+                const handler = pending.get(message.id);
+                pending.delete(message.id);
+                if (message.error) handler.reject(new Error(message.error.message || 'cdp_error'));
+                else handler.resolve(message.result || {});
+                return;
+              }
+              const queue = listeners.get(message.method);
+              if (queue && queue.length) queue.shift()(message.params || {});
+            });
+
+            const send = (method, params = {}) => new Promise((resolve, reject) => {
+              const id = ++seq;
+              pending.set(id, { resolve, reject });
+              ws.send(JSON.stringify({ id, method, params }));
+            });
+            const waitEvent = (method) => new Promise((resolve) => {
+              const queue = listeners.get(method) || [];
+              queue.push(resolve);
+              listeners.set(method, queue);
+            });
+            const evaluate = async (expression) => {
+              const result = await send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true });
+              return result.result && result.result.value;
+            };
+
+            await send('Page.enable');
+            await send('Runtime.enable');
+            await send('Emulation.setDeviceMetricsOverride', {
+              width: spec.width,
+              height: spec.height,
+              deviceScaleFactor: 1,
+              mobile: spec.mobile,
+              screenWidth: spec.width,
+              screenHeight: spec.height
+            });
+
+            const loaded = waitEvent('Page.loadEventFired');
+            await send('Page.navigate', {
+              url: 'https://nahwerkconcierge.com/de/?qa=' + encodeURIComponent(process.env.GITHUB_SHA || '') + '&viewport=' + spec.name
+            });
+            await loaded;
+            await sleep(500);
+
+            let mediaReady = false;
+            for (let i = 0; i < 40; i++) {
+              mediaReady = await evaluate(`(() => {
+                const v = document.querySelector('.mechanism-video');
+                return Boolean(v && v.readyState >= 1 && Number.isFinite(v.duration) && v.duration > 0);
+              })()`);
+              if (mediaReady) break;
+              await sleep(250);
+            }
+            if (!mediaReady) throw new Error('mechanism_video_metadata_not_ready:' + spec.name);
+
+            const sample = async (position) => evaluate(`(() => {
+              const section = document.querySelector('.precision');
+              const video = document.querySelector('.mechanism-video');
+              if (!section || !video) return null;
+              const y = ${JSON.stringify(position)} === 'early'
+                ? section.offsetTop - innerHeight * 0.8
+                : section.offsetTop + section.offsetHeight * 0.55;
+              window.scrollTo(0, Math.max(0, y));
+              return { requestedY: Math.max(0, y) };
+            })()`);
+
+            await sample('early');
+            await sleep(350);
+            const early = await evaluate(`(() => {
+              const section = document.querySelector('.precision');
+              const video = document.querySelector('.mechanism-video');
+              const rect = section.getBoundingClientRect();
+              return { currentTime: video.currentTime, duration: video.duration, paused: video.paused, rectTop: rect.top, scrollY };
+            })()`);
+
+            await sample('late');
+            await sleep(350);
+            const late = await evaluate(`(() => {
+              const section = document.querySelector('.precision');
+              const video = document.querySelector('.mechanism-video');
+              const rect = section.getBoundingClientRect();
+              return { currentTime: video.currentTime, duration: video.duration, paused: video.paused, rectTop: rect.top, scrollY };
+            })()`);
+
+            const shot = await send('Page.captureScreenshot', { format: 'png', fromSurface: true, captureBeyondViewport: false });
+            fs.writeFileSync('/tmp/stewaro-scroll-video-live-qa/' + spec.name + '-late.png', Buffer.from(shot.data, 'base64'));
+
+            await sample('early');
+            await sleep(350);
+            const reverse = await evaluate(`(() => {
+              const section = document.querySelector('.precision');
+              const video = document.querySelector('.mechanism-video');
+              const rect = section.getBoundingClientRect();
+              return { currentTime: video.currentTime, duration: video.duration, paused: video.paused, rectTop: rect.top, scrollY };
+            })()`);
+
+            console.log('STEWARO_SCROLL_VIDEO_LIVE_QA', JSON.stringify({ spec, early, late, reverse }));
+
+            if (!early || !late || !reverse) throw new Error('scroll_sample_missing:' + spec.name);
+            if (!(late.currentTime > early.currentTime + 0.05)) throw new Error('scroll_forward_failed:' + spec.name);
+            if (!(reverse.currentTime < late.currentTime - 0.05)) throw new Error('scroll_reverse_failed:' + spec.name);
+            if (!early.paused || !late.paused || !reverse.paused) throw new Error('unexpected_autoplay:' + spec.name);
+            if (!(late.duration > 0 && late.duration <= 12)) throw new Error('unexpected_duration:' + spec.name + ':' + late.duration);
+
+            ws.close();
+          }
+
+          (async () => {
+            for (const spec of specs) await audit(spec);
+            console.log('STEWARO_SCROLL_VIDEO_LIVE_DESKTOP_MOBILE=GREEN');
+          })().catch((error) => {
+            console.error('STEWARO_SCROLL_VIDEO_LIVE_QA_FAIL', error && error.stack ? error.stack : error);
+            process.exit(1);
+          });
+          NODE
+
+      - name: Upload live QA screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stewaro-scroll-video-live-qa
+          path: /tmp/stewaro-scroll-video-live-qa/*.png
+          if-no-files-found: warn
+          retention-days: 7
