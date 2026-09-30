@@ -11,7 +11,7 @@ test("STEWARO unified experience owns the customer-facing visual shell", () => {
   assert.match(css, /background:rgba\(255,255,255,\.965\)!important/);
   assert.match(css, /url\("\/assets\/logos\/stewaro-icon\.svg"\)/);
   assert.match(css, /stewaro-wordmark\.svg/);
-  assert.match(css, /linear-gradient\(108deg,#75531c/);
+  assert.match(css, /linear-gradient\(112deg,#c6a65f/);
   assert.match(css, /body\.login-image-page main::after/);
   assert.match(css, /content:none!important/);
   assert.match(css, /body\.pricing-page/);
@@ -64,8 +64,8 @@ test("canonical STEWARO brand assets are the only STEWARO SVG logo sources", () 
   assert.match(icon, /#735320/);
   assert.match(icon, /#fff1c9/);
   assert.match(wordmark, /viewBox="0 0 720\.32 98\.58"/);
-  assert.match(wordmark, /#73531f/);
-  assert.match(wordmark, /#fff0c8/);
+  assert.match(wordmark, /fill:\s*#000000/);
+  assert.doesNotMatch(wordmark, /linearGradient|stop-color|#73531f|#fff0c8/);
 });
 
 
@@ -101,12 +101,17 @@ test("canonical STEWARO branding has no active legacy mark reference or generate
   }
 });
 
-test("header uses the exact SVG wordmark with sheen and reduced-motion protection", () => {
+test("header uses supplied transparent wordmark geometry with synchronized premium gold animation", () => {
   const css = read("assets/stewaro-unified.css");
-  assert.match(css, /STEWARO_CANONICAL_WORDMARK_GUARD_20260928/);
-  assert.match(css, /background:transparent center\/contain no-repeat url\("\/assets\/logos\/stewaro-wordmark\.svg"\)!important/);
+  const wordmark = read("assets/logos/stewaro-wordmark.svg");
+  assert.match(wordmark, /viewBox="0 0 720\.32 98\.58"/);
+  assert.match(wordmark, /Source geometry: user-supplied STEWARO-Schrift\.svg/);
+  assert.match(wordmark, /fill:\s*#000000/);
+  assert.doesNotMatch(wordmark, /linearGradient|stop-color/);
+  assert.match(css, /linear-gradient\(112deg,#c6a65f 0%,#dcc489 18%,#f2e3bb 33%,#d2b16a 46%,#fff6dc 51%,#d5b66f 57%,#ead8a8 72%,#caaa64 100%\)/);
   assert.match(css, /mask:url\("\/assets\/logos\/stewaro-wordmark\.svg"\) center\/contain no-repeat!important/);
-  assert.match(css, /animation:stewaroCanonicalWordmarkSheen 7\.6s/);
-  assert.match(css, /@media\(prefers-reduced-motion:reduce\)[\s\S]*animation:none!important/);
-  assert.match(css, /brandtext strong::after[\s\S]*content:none!important/);
+  assert.match(css, /mask:url\("\/assets\/logos\/stewaro-icon\.svg"\) center\/contain no-repeat!important/);
+  assert.match(css, /animation:stewaroPremiumGold 8\.2s cubic-bezier\(\.42,0,\.58,1\) infinite alternate!important/);
+  assert.match(css, /@keyframes stewaroPremiumGold/);
+  assert.doesNotMatch(css.slice(css.indexOf("/* STEWARO_CANONICAL_WORDMARK_GUARD_20260928 */")), /#75531c|#8a611e|rgba\(99,70,17/);
 });

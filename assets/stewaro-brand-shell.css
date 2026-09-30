@@ -94,7 +94,11 @@ html body .brandtext{
   width:148px!important;
   height:22px!important;
   flex:0 0 148px!important;
-  background:transparent center/contain no-repeat url("logos/stewaro-wordmark.svg")!important;
+  background:linear-gradient(112deg,#c6a65f 0%,#dcc489 18%,#f2e3bb 33%,#d2b16a 46%,#fff6dc 51%,#d5b66f 57%,#ead8a8 72%,#caaa64 100%)!important;
+  background-size:260% 100%!important;
+  background-position:50% 50%!important;
+  -webkit-mask:url("logos/stewaro-wordmark.svg") center/contain no-repeat!important;
+  mask:url("logos/stewaro-wordmark.svg") center/contain no-repeat!important;
 }
 html body .brandtext strong{
   display:block!important;width:100%!important;height:100%!important;
