@@ -46,12 +46,21 @@ jobs:
           CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
           test -n "$CHROME"
           mkdir -p /tmp/stewaro-scroll-video-live-qa
-          "$CHROME" --headless --no-sandbox --disable-gpu --remote-debugging-port=9222 --user-data-dir=/tmp/stewaro-scroll-cdp about:blank >/tmp/stewaro-scroll-cdp.log 2>&1 &
-          for attempt in $(seq 1 15); do
-            curl -fsS http://127.0.0.1:9222/json/version >/dev/null && break
+          "$CHROME" --headless --no-sandbox --disable-gpu --remote-debugging-port=0 --user-data-dir=/tmp/stewaro-scroll-cdp about:blank >/tmp/stewaro-scroll-cdp.log 2>&1 &
+          for attempt in $(seq 1 20); do
+            test -s /tmp/stewaro-scroll-cdp/DevToolsActivePort && break
             sleep 1
           done
-          curl -fsS http://127.0.0.1:9222/json/version >/dev/null
+          if ! test -s /tmp/stewaro-scroll-cdp/DevToolsActivePort; then
+            cat /tmp/stewaro-scroll-cdp.log || true
+            exit 1
+          fi
+          CDP_PORT="$(head -n 1 /tmp/stewaro-scroll-cdp/DevToolsActivePort)"
+          export CDP_PORT
+          if ! curl -fsS "http://127.0.0.1:${CDP_PORT}/json/version" >/dev/null; then
+            cat /tmp/stewaro-scroll-cdp.log || true
+            exit 1
+          fi
 
           node <<'NODE'
           const fs = require('node:fs');
@@ -60,9 +69,10 @@ jobs:
             { name: 'mobile', width: 390, height: 844, mobile: true }
           ];
           const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+          const cdpBase = 'http://127.0.0.1:' + process.env.CDP_PORT;
 
           async function createTarget() {
-            const response = await fetch('http://127.0.0.1:9222/json/new?about:blank', { method: 'PUT' });
+            const response = await fetch(cdpBase + '/json/new?about:blank', { method: 'PUT' });
             if (!response.ok) throw new Error('cdp_target_create_failed');
             return response.json();
           }
