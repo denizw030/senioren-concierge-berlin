@@ -1,8 +1,9 @@
+import { homepageSource } from './helpers/homepage-source.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-const html = fs.readFileSync('de/index.html', 'utf8');
+const html = homepageSource('de/index.html');
 
 test('STEWARO reliability scene uses the scroll-controlled mechanism video', () => {
   const precision = html.match(/<section class="precision[\s\S]*?<\/section>/)?.[0] || '';

@@ -1,3 +1,4 @@
+import { homepageSource } from './helpers/homepage-source.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -6,7 +7,7 @@ const locales = ['de', 'en', 'tr'];
 const leafSource = 'e54f2b64-7398-4d9e-95e4-245b1cec8abb.mp4';
 
 for (const locale of locales) {
-  const html = fs.readFileSync(`${locale}/index.html`, 'utf8');
+  const html = homepageSource(`${locale}/index.html`);
 
   test(`${locale}: Ruhe section uses web-optimized scroll-controlled leaf video`, () => {
     const leaf = html.match(/<section class="cinematic leaf-scene"[\s\S]*?<\/section>/)?.[0] || '';
@@ -27,7 +28,7 @@ for (const locale of locales) {
 }
 
 test('leaf integration preserves the clockwork scroll video', () => {
-  const html = fs.readFileSync('de/index.html', 'utf8');
+  const html = homepageSource('de/index.html');
   assert.match(html, /class="mechanism-image mechanism-video"/);
   assert.match(html, /const updateMechanismVideo = \(\) => \{/);
 });

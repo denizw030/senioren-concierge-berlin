@@ -1,0 +1,161 @@
+
+  /* Nähe / Fürsorge — editorial luxury refinement. Gold sphere untouched. */
+  .care-section {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    padding: clamp(132px, 11vw, 176px) 28px;
+    background:
+      radial-gradient(ellipse at 17% 36%, rgba(202,171,105,.105) 0%, rgba(202,171,105,.045) 21%, transparent 51%),
+      radial-gradient(ellipse at 88% 74%, rgba(61,104,84,.27) 0%, transparent 49%),
+      linear-gradient(118deg, #0b2118 0%, #0a251a 47%, #081d15 100%) !important;
+  }
+
+  .care-section::before,
+  .care-section::after {
+    content: "";
+    position: absolute;
+    left: max(28px, calc((100% - 1220px) / 2));
+    right: max(28px, calc((100% - 1220px) / 2));
+    height: 1px;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgba(211,185,127,.24) 18%, rgba(211,185,127,.10) 72%, transparent);
+  }
+  .care-section::before { top: 42px; }
+  .care-section::after  { bottom: 42px; opacity: .7; }
+
+  .care-glow-one {
+    width: 44vw;
+    height: 44vw;
+    left: -19vw;
+    top: -16vw;
+    background: #b99a5e;
+    opacity: .095;
+    filter: blur(90px);
+  }
+  .care-glow-two {
+    width: 38vw;
+    height: 38vw;
+    right: -15vw;
+    bottom: -17vw;
+    background: #3a7459;
+    opacity: .16;
+    filter: blur(100px);
+  }
+
+  .care-inner {
+    width: min(1180px, 100%);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: .82fr 1.18fr;
+    gap: clamp(72px, 8vw, 118px);
+    align-items: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  .care-mark {
+    position: relative;
+    margin: 0 auto;
+  }
+  .care-mark::before {
+    content: "";
+    position: absolute;
+    inset: -22%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(222,192,129,.075) 0%, rgba(199,165,99,.032) 33%, transparent 68%);
+    filter: blur(8px);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .care-copy {
+    position: relative;
+    padding-left: clamp(0px, 1vw, 14px);
+  }
+  .care-copy .section-kicker {
+    margin-bottom: 24px;
+    color: rgba(225,205,163,.79);
+    letter-spacing: .20em;
+  }
+  .care-copy h2 {
+    max-width: 790px;
+    font-size: clamp(48px, 5vw, 76px);
+    line-height: .99;
+    letter-spacing: -.043em;
+    color: #f7f2e8;
+    text-shadow: 0 1px 0 rgba(255,255,255,.025);
+  }
+  .care-copy > p:not(.section-kicker):not(.care-emphasis) {
+    margin: 34px 0 0;
+    max-width: 660px;
+    color: rgba(246,240,229,.70);
+    font-size: 19px;
+    line-height: 1.72;
+    letter-spacing: -.005em;
+  }
+  .care-emphasis {
+    position: relative;
+    margin: 32px 0 0;
+    max-width: 650px;
+    padding: 3px 0 3px 24px;
+    color: rgba(249,244,234,.94);
+    font-size: 18px;
+    line-height: 1.68;
+  }
+  .care-emphasis::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 2px;
+    bottom: 2px;
+    width: 1px;
+    background: linear-gradient(180deg, rgba(238,211,154,.18), rgba(238,211,154,.82), rgba(238,211,154,.18));
+    box-shadow: 0 0 20px rgba(217,183,116,.12);
+  }
+
+  @media (max-width: 980px) {
+    .care-section { padding-top: 122px; padding-bottom: 132px; }
+    .care-inner { grid-template-columns: 1fr; gap: 72px; }
+    .care-copy { width: min(760px, 100%); margin: 0 auto; padding-left: 0; }
+    .care-mark { width: min(300px, 64vw); }
+    .care-section::before { top: 30px; }
+    .care-section::after { bottom: 30px; }
+  }
+
+  @media (max-width: 600px) {
+    .care-section {
+      padding: 104px 20px 112px;
+      background:
+        radial-gradient(ellipse at 50% 18%, rgba(202,171,105,.09) 0%, transparent 37%),
+        radial-gradient(ellipse at 86% 84%, rgba(61,104,84,.19) 0%, transparent 46%),
+        linear-gradient(152deg, #0b2118 0%, #081d15 100%) !important;
+    }
+    .care-section::before,
+    .care-section::after {
+      left: 20px;
+      right: 20px;
+    }
+    .care-section::before { top: 24px; }
+    .care-section::after { bottom: 24px; }
+    .care-inner { gap: 60px; }
+    .care-mark { width: min(276px, 72vw); }
+    .care-copy .section-kicker { margin-bottom: 18px; }
+    .care-copy h2 {
+      font-size: clamp(43px, 12.1vw, 58px);
+      line-height: .985;
+      max-width: 100%;
+    }
+    .care-copy > p:not(.section-kicker):not(.care-emphasis) {
+      margin-top: 26px;
+      font-size: 17px;
+      line-height: 1.7;
+    }
+    .care-emphasis {
+      margin-top: 26px;
+      padding-left: 18px;
+      font-size: 17px;
+      line-height: 1.66;
+    }
+  }
