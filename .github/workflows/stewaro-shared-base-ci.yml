@@ -98,11 +98,11 @@ jobs:
             exit 1
           fi
 
-      - name: Verify production domain remains NAHWERK during migration
+      - name: Verify canonical STEWARO production domain
         shell: bash
         run: |
           set -euo pipefail
-          test "$(tr -d '\r\n' < CNAME)" = "nahwerkconcierge.com"
+          test "$(tr -d '\r\n' < CNAME)" = "stewaro.com"
 
       - name: Run STEWARO shared-base contract
         run: node --test tests/stewaro-shared-base-brand-shell.test.mjs

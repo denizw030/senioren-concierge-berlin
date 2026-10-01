@@ -54,9 +54,9 @@ test("STEWARO shared-base brand shell is wired without forking runtime", () => {
   assert.match(siteUi, /nw_portal_theme_v1/);
 });
 
-test("production domain configuration is untouched by brand-shell block", () => {
+test("production domain configuration uses canonical STEWARO host", () => {
   const cname = read("CNAME");
-  assert.equal(cname.trim(), "nahwerkconcierge.com");
+  assert.equal(cname.trim(), "stewaro.com");
   assert.doesNotMatch(read("assets/stewaro-brand-shell.css"), /CNAME|DNS|nameserver/i);
 });
 
