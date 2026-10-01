@@ -9,6 +9,9 @@ on:
       - "en/index.html"
       - "tr/index.html"
       - ".github/workflows/stewaro-scroll-video-live-qa.yml"
+  pull_request:
+    paths:
+      - ".github/workflows/stewaro-scroll-video-live-qa.yml"
   workflow_dispatch:
 
 permissions:
@@ -24,7 +27,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          live_url="https://nahwerkconcierge.com/de/"
+          live_url="https://stewaro.com/de/"
           ok=0
           for attempt in $(seq 1 60); do
             html="$(curl -fsSL --max-time 20 -H 'Cache-Control: no-cache' "${live_url}?qa=${GITHUB_SHA}&attempt=${attempt}" || true)"
@@ -133,7 +136,7 @@ jobs:
 
             const loaded = waitEvent('Page.loadEventFired');
             await send('Page.navigate', {
-              url: 'https://nahwerkconcierge.com/de/?qa=' + encodeURIComponent(process.env.GITHUB_SHA || '') + '&viewport=' + spec.name
+              url: 'https://stewaro.com/de/?qa=' + encodeURIComponent(process.env.GITHUB_SHA || '') + '&viewport=' + spec.name
             });
             await loaded;
             await sleep(500);
