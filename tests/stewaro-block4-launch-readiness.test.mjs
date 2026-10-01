@@ -3,7 +3,7 @@ import fs from "node:fs";
 import test from "node:test";
 
 const read = (path) => fs.readFileSync(new URL("../" + path, import.meta.url), "utf8");
-const CURRENT_PROD_HOST = "nahwerkconcierge.com";
+const CURRENT_PROD_HOST = "stewaro.com";
 const STEWARO_CANDIDATE = "https://stewaro.com";
 
 test("Block 4 keeps pricing and Family ready for STEWARO", () => {
