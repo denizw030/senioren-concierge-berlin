@@ -67,5 +67,5 @@ test("withdrawal information contains current provider details and electronic-fu
 
 test("one-off PAYG legal surface does not invent subscription cancellation semantics", () => {
   assert.match(withdrawalInfo, /einzelnen PAYG-Auftrag/);
-  assert.match(withdrawalInfo, /keine zusätzliche Abo- oder Dauerschuldlogik/);
+  assert.match(withdrawalInfo, /kein zusätzliches Abonnement und keine wiederkehrende Zahlungspflicht/);
 });
