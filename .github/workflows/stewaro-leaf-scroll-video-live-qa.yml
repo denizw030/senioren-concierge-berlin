@@ -8,6 +8,8 @@ on:
       - "de/index.html"
       - "en/index.html"
       - "tr/index.html"
+      - "assets/stewaro-home-de*.css"
+      - "assets/stewaro-home-de.js"
       - ".github/workflows/stewaro-leaf-scroll-video-live-qa.yml"
   pull_request:
     paths:
@@ -30,7 +32,14 @@ jobs:
           live_url="https://stewaro.com/de/"
           ok=0
           for attempt in $(seq 1 60); do
-            html="$(curl -fsSL --max-time 20 -H 'Cache-Control: no-cache' "${live_url}?qa=${GITHUB_SHA}&attempt=${attempt}" || true)"
+            curl -fsSL --max-time 20 -H 'Cache-Control: no-cache' "${live_url}?qa=${GITHUB_SHA}&attempt=${attempt}" -o /tmp/stewaro-home-live.html || continue
+            expected_html="$(sha256sum de/index.html | cut -d ' ' -f 1)"
+            actual_html="$(sha256sum /tmp/stewaro-home-live.html | cut -d ' ' -f 1)"
+            if test "$actual_html" != "$expected_html"; then
+              sleep 5
+              continue
+            fi
+            html="$(cat /tmp/stewaro-home-live.html)"
             runtime="$html"
             if grep -q 'src="/assets/stewaro-home-de.js?v=1"' <<<"$runtime"; then
               curl -fsSL --max-time 20 -H 'Cache-Control: no-cache' "https://stewaro.com/assets/stewaro-home-de.js?v=1&qa=${GITHUB_SHA}&attempt=${attempt}" -o /tmp/stewaro-home-live-runtime.js || continue
