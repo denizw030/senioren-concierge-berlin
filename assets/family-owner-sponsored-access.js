@@ -48,6 +48,7 @@
     return FAMILY_GATEWAY_BASE;
   }
   const PENDING_INVITE_KEY="nw_family_owner_invite_pending_v1";
+  const REGISTRATION_DRAFT_KEY="nw_family_registration_pending_v1";
   const INERT_MESSAGE="Diese Funktion wird derzeit vorbereitet.";
   const RELATIONSHIPS=Object.freeze({
     MOTHER:"Mutter",FATHER:"Vater",GRANDMOTHER:"Großmutter",GRANDFATHER:"Großvater",
@@ -339,8 +340,34 @@
     container.append(text,open,document.createTextNode(" "),copy);
   }
   function populateConcierges(){
-    const catalog=conciergeCatalogFrom(globalThis.NAHWERK_CONCIERGES);
+    const legacy=conciergeCatalogFrom(globalThis.NAHWERK_CONCIERGES).filter((item)=>item.key!=="fidel");
+    const catalog=[{key:"fidel",name:"FIDEL"},...legacy];
     conciergeSelect.innerHTML='<option value="">Concierge auswählen</option>'+catalog.map((item)=>'<option value="'+item.key+'">'+item.name+'</option>').join("");
+  }
+  function readRegistrationDraft(storage=globalThis.sessionStorage){
+    try{
+      const row=JSON.parse(storage?.getItem(REGISTRATION_DRAFT_KEY)||"null");
+      return row?.version===1&&row?.first_name&&row?.last_name?row:null;
+    }catch{return null}
+  }
+  function applyRegistrationDraft(){
+    const row=readRegistrationDraft();
+    if(!row)return false;
+    const set=(id,value)=>{const input=document.getElementById(id);if(input&&value!=null)input.value=String(value)};
+    set("familyFirstName",row.first_name);
+    set("familyLastName",row.last_name);
+    set("familyRelationship",row.relationship||"OTHER");
+    set("familyWhatsappNumber",row.whatsapp_number||"");
+    set("familyPreferredLanguage",row.preferred_language||"de");
+    set("familyFormOfAddress",row.form_of_address||"DU");
+    set("familyConciergeChoice","fidel");
+    consent.checked=row.contact_consent_attested===true;
+    setFormOpen(true);
+    const safety=String(row.checkin_time||"").trim();
+    setStatus(row.safety_enabled===true&&safety
+      ?"Angaben übernommen. Der gewünschte Safety-Check-in ("+safety+" Uhr) wird erst nach der Bestätigung der unterstützten Person eingerichtet."
+      :"Angaben übernommen. Bitte prüfe sie kurz und bereite anschließend die Einladung vor.");
+    return true;
   }
   function quotaValuesFrom(container){
     const values={};
@@ -484,7 +511,12 @@
     operatorBody=result.data;panel.hidden=false;
     document.getElementById("familyQuotaSection").hidden=!canManageEntitlements(operatorBody);
     ownerStatus.textContent=canManageEntitlements(operatorBody)?"OWNER bestätigt · Personen und Kontingente autorisiert":"OWNER bestätigt · Kontingentverwaltung nicht freigegeben";
-    await loadPeople();return operatorBody;
+    await loadPeople();
+    if(new URLSearchParams(location.search).get("family_setup")==="1"){
+      accessTab.click();
+      applyRegistrationDraft();
+    }
+    return operatorBody;
   }
 
   languageSelect.addEventListener("change",()=>{customLanguageWrap.hidden=languageSelect.value!=="__custom__"});
@@ -499,6 +531,7 @@
     const outcome=await createInvitation({base:FAMILY_GATEWAY_BASE,token:sessionToken(),input:payload,fetchImpl:globalThis.fetch,storage:globalThis.sessionStorage,cryptoImpl:globalThis.crypto});
     submit.disabled=false;
     if(!outcome.ok){setStatus(outcome.kind==="runtime_inert"?INERT_MESSAGE:"Die Einladung konnte nicht sicher bestätigt werden. Es wurde kein lokaler Erfolgsstatus erzeugt.",true);return}
+    globalThis.sessionStorage?.removeItem(REGISTRATION_DRAFT_KEY);
     renderInviteDelivery(outcome.outbound);
     setFormOpen(false);await loadPeople();
   });
