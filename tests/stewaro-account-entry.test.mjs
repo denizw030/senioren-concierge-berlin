@@ -32,13 +32,18 @@ test("audience choices stay visually symmetric and text-only",()=>{
   assert.match(accountCss,/\.stewaro-access-choice,\.stewaro-access-submit\{[\s\S]*min-height:64px[\s\S]*text-align:center/);
 });
 
-test("loved-one entry belongs to MyParentGuard while self entry belongs to STEWARO account",()=>{
-  assert.match(entry,/https:\/\/myparentguard\.com\/\?source=stewaro-account/);
+test("loved-one entry stays on the verified STEWARO Family surface until MyParentGuard public cutover",()=>{
+  assert.match(entry,/PARENT="\/angehoerige\?source=stewaro-account"/);
   assert.doesNotMatch(routing,/ACCOUNT_ORIGIN="https:\/\/account\.stewaro\.com"/);
   assert.match(routing,/accountEntry=isAccount\?"\/"\:\(isWebsitePreview\?STAGING_ACCOUNT_ORIGIN\+"\/"\:"\/zugang"\)/);
-  assert.match(routing,/https:\/\/myparentguard\.com/);
+  assert.match(homepage,/href="#family"/);
   assert.match(homepage,/href="\/zugang" data-entry="self"/);
   assert.match(homepage,/myparentguard\.com\/\?source=stewaro/);
+});
+
+test("account entry cache-busts the repaired loved-one redirect",()=>{
+  assert.match(access,/stewaro-account-entry\.js\?v=2/);
+  assert.match(accessClean,/stewaro-account-entry\.js\?v=2/);
 });
 
 test("legacy public auth navigation converges on one account entry",()=>{
