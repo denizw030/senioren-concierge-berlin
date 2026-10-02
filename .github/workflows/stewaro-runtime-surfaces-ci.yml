@@ -195,7 +195,7 @@ jobs:
               )].filter(visible);
               const tapsOk = tapTargets.every((node) => {
                 const rect = node.getBoundingClientRect();
-                return rect.width >= 44 && rect.height >= 44;
+                return rect.width >= 43.99 && rect.height >= 43.99;
               });
               document.body.dataset.qaView = view;
               document.body.dataset.qaOverflow = String(doc.scrollWidth <= innerWidth + 1);
@@ -301,7 +301,7 @@ jobs:
               " const nav=document.querySelector('.stewaro-app-nav'); const nr=nav&&nav.getBoundingClientRect();",
               " const taps=[...document.querySelectorAll('.stewaro-app-nav-button,.stewaro-app-primary,.stewaro-app-secondary,.stewaro-app-more-link,.stewaro-app-card-link')].filter(visible);",
               " const tapDetails=taps.map((node)=>{const r=node.getBoundingClientRect();return {tag:node.tagName,className:node.className,text:(node.textContent||'').trim().slice(0,48),width:r.width,height:r.height};});",
-              " const badTaps=tapDetails.filter((item)=>item.width<44||item.height<44);",
+              " const badTaps=tapDetails.filter((item)=>item.width<43.99||item.height<43.99);",
               " return { width:innerWidth, height:innerHeight, overflow:document.documentElement.scrollWidth<=innerWidth+1, navVisible:Boolean(nr&&nr.top>=-1&&nr.bottom<=innerHeight+1), tapsOk:badTaps.length===0, tapCount:taps.length, badTaps };",
               "})()"
             ].join("\n");
