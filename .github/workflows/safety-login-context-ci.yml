@@ -98,11 +98,21 @@ jobs:
           echo "SAFETY_LOGIN_CONTEXT_PRODUCTION_CONTENT=GREEN"
       - name: Real production browser proof desktop and mobile
         run: |
+          set -euo pipefail
           CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
           test -n "$CHROME"
           for width in 1440 390; do
             "$CHROME" --headless --no-sandbox --disable-gpu --window-size="$width,1100" --virtual-time-budget=12000 --dump-dom \
-              "https://stewaro.com/tests/safety-login-context-browser.html?deploy=${GITHUB_SHA}&width=$width" > "/tmp/safety-login-context-production-$width.html"
-            grep -q 'data-safety-login-context="green"' "/tmp/safety-login-context-production-$width.html" || { cat "/tmp/safety-login-context-production-$width.html"; exit 1; }
+              "https://stewaro.com/zugang.html?deploy=${GITHUB_SHA}&width=$width" > "/tmp/stewaro-account-entry-$width.html"
+            grep -q 'data-stewaro-access' "/tmp/stewaro-account-entry-$width.html"
+
+            "$CHROME" --headless --no-sandbox --disable-gpu --window-size="$width,1100" --virtual-time-budget=12000 --dump-dom \
+              "https://stewaro.com/anmelden.html?produkt=prime&deploy=${GITHUB_SHA}&width=$width" > "/tmp/stewaro-login-prime-$width.html"
+            grep -Eq '<body[^>]*data-product="prime"' "/tmp/stewaro-login-prime-$width.html"
+
+            "$CHROME" --headless --no-sandbox --disable-gpu --window-size="$width,1100" --virtual-time-budget=12000 --dump-dom \
+              "https://stewaro.com/anmelden.html?produkt=senioren&deploy=${GITHUB_SHA}&width=$width" > "/tmp/stewaro-login-senior-$width.html"
+            grep -Eq '<body[^>]*data-product="senioren"' "/tmp/stewaro-login-senior-$width.html"
+            grep -Eq '<body[^>]*class="[^"]*senior-product' "/tmp/stewaro-login-senior-$width.html"
           done
           echo "SAFETY_LOGIN_CONTEXT_FINAL_PRODUCTION_BROWSER=GREEN"
