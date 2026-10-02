@@ -31,9 +31,17 @@ jobs:
           ok=0
           for attempt in $(seq 1 60); do
             html="$(curl -fsSL --max-time 20 -H 'Cache-Control: no-cache' "${live_url}?qa=${GITHUB_SHA}&attempt=${attempt}" || true)"
+            runtime="$html"
+            if grep -q 'src="/assets/stewaro-home-de.js?v=1"' <<<"$runtime"; then
+              curl -fsSL --max-time 20 -H 'Cache-Control: no-cache' "https://stewaro.com/assets/stewaro-home-de.js?v=1&qa=${GITHUB_SHA}&attempt=${attempt}" -o /tmp/stewaro-home-live-runtime.js || continue
+              runtime="$(cat /tmp/stewaro-home-live-runtime.js)"
+              expected_runtime="$(sha256sum assets/stewaro-home-de.js | cut -d ' ' -f 1)"
+              actual_runtime="$(sha256sum /tmp/stewaro-home-live-runtime.js | cut -d ' ' -f 1)"
+              test "$actual_runtime" = "$expected_runtime" || continue
+            fi
             if grep -q 'leaf-video' <<<"$html" &&
                grep -q 'd2ol7oe51mr4n9.cloudfront.net' <<<"$html" &&
-               grep -q 'updateLeafVideo' <<<"$html"; then
+               grep -q 'updateLeafVideo' <<<"$runtime"; then
               ok=1
               echo "STEWARO_LEAF_SCROLL_VIDEO_LIVE_SOURCE=GREEN attempt=$attempt"
               break
