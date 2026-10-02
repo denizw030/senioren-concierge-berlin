@@ -153,3 +153,49 @@ body.story-site .footer h3,body.story-site .footer h4{color:#fff!important}
   html{scroll-behavior:auto}
   .story-btn{transition:none}
 }
+
+/* PR298 accessibility gate closure: explicit solid fallbacks and AA text on story surfaces. */
+body.story-site .story-section--soft{
+  background-color:#080809!important;
+}
+body.story-site .story-section--soft .story-kicker,
+body.story-site .story-section--soft .story-title,
+body.story-site .story-section--soft .story-compact-item strong{
+  color:#fff!important;
+  opacity:1!important;
+}
+body.story-site .story-section--soft .story-lead,
+body.story-site .story-section--soft .story-compact-item p{
+  color:#d8d4cc!important;
+  opacity:1!important;
+}
+body.story-site .story-principle span{
+  color:#f0d58d!important;
+  opacity:1!important;
+}
+body.story-site .story-principle strong{
+  color:#fff!important;
+  opacity:1!important;
+}
+body.story-site .story-principle p{
+  color:#d8d4cc!important;
+  opacity:1!important;
+}
+body.story-site .nw-language-button>span{
+  color:#fff!important;
+  opacity:1!important;
+}
+body.story-site footer.footer{
+  background:#030304!important;
+  background-color:#030304!important;
+  background-image:none!important;
+}
+body.story-site footer.footer p,
+body.story-site footer.footer a,
+body.story-site footer.footer span,
+body.story-site footer.footer h3,
+body.story-site footer.footer h4{
+  color:#fff!important;
+  opacity:1!important;
+  filter:none!important;
+}
