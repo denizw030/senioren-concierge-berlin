@@ -134,6 +134,9 @@
 
   const shell=document.createElement("div");
   shell.className="stewaro-registration-progressive";
+  const parking=document.createElement("div");
+  parking.className="stewaro-wizard-parking";
+  parking.hidden=true;
   const top=document.createElement("div");
   top.className="stewaro-registration-top";
   const progressText=document.createElement("div");
@@ -154,8 +157,20 @@
   back.className="stewaro-wizard-back";
   back.textContent="Zurück";
   nav.append(back);
-  shell.append(top,title,intro,stage,nav);
+  shell.append(top,title,intro,stage,nav,parking);
   form.append(shell);
+
+  const movableNodes=[
+    fieldNode(emailInput),fieldNode(ownerFirst),fieldNode(ownerLast),fieldNode(postal),
+    fieldNode(password),fieldNode(ownerPhone),fieldNode(recipientFirst),fieldNode(recipientLast),
+    fieldNode(recipientPhone),fieldNode(relationship),safetyFields,privacyRow,termsRow,consentRow,
+    submit,status
+  ].filter(Boolean);
+  const parkCurrentFields=()=>{
+    for(const node of movableNodes){
+      if(stage.contains(node))parking.append(node);
+    }
+  };
 
   const screens=[];
   const add=(screen)=>screens.push(screen);
@@ -372,6 +387,7 @@
     track.querySelector("span").style.width=((index+1)/list.length*100)+"%";
     title.textContent=step.title;
     intro.textContent=step.intro||"";
+    parkCurrentFields();
     stage.replaceChildren(step.render());
     back.hidden=index===0;
     if(!step.final&&!stage.querySelector(".stewaro-wizard-choice")){
