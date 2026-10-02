@@ -297,10 +297,10 @@ export function mountFidelLiveRoom(host,{enabled=true}={}){
     if(!running)return;
     const dt=Math.min(.05,Math.max(.001,(now-last)/1000||.016));last=now;
     const speakingLong=state==="speaking"&&now-speakingAt>520;
-    let targetApproach=speakingLong?.82:0;
+    let targetApproach=speakingLong ? .82 : 0;
     if(state==="thinking")targetApproach=.08;
     if(reduced)targetApproach=Math.min(targetApproach,.18);
-    const targetStand=(state==="speaking"||state==="thinking")?.88:0;
+    const targetStand=(state==="speaking"||state==="thinking") ? .88 : 0;
     approach+= (targetApproach-approach)*Math.min(1,dt*(reduced?3.5:1.75));
     stand+= (targetStand-stand)*Math.min(1,dt*(reduced?4.5:2.4));
 
