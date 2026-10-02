@@ -270,3 +270,56 @@ html body.nw-family-page.story-site footer.footer h4{
   filter:none!important;
   text-shadow:none!important;
 }
+
+/* PR298 deterministic solid contrast surfaces for axe/WCAG. */
+html body.story-site .story-section--soft .story-compact-item{
+  background:#080809!important;
+  background-color:#080809!important;
+  background-image:none!important;
+  opacity:1!important;
+}
+html body.story-site .story-section--soft .story-compact-item strong{
+  color:#fff!important;
+}
+html body.story-site .story-section--soft .story-compact-item p{
+  color:#e2ded6!important;
+}
+html body.nw-family-page.story-site .top{
+  background:#050504!important;
+  background-color:#050504!important;
+  background-image:none!important;
+}
+html body.nw-family-page.story-site .top .nw-language-button > span,
+html body.nw-family-page.story-site .top .links a{
+  color:#fff!important;
+  opacity:1!important;
+  filter:none!important;
+}
+html body.nw-family-page.story-site .story-principle{
+  background:#030304!important;
+  background-color:#030304!important;
+  background-image:none!important;
+  opacity:1!important;
+}
+html body.nw-family-page.story-site .story-principle > span{
+  color:#f4d98f!important;
+}
+html body.nw-family-page.story-site .story-principle strong{
+  color:#fff!important;
+}
+html body.nw-family-page.story-site .story-principle p{
+  color:#e2ded6!important;
+}
+html body.nw-family-page.story-site footer.footer .footergrid > div,
+html body.nw-family-page.story-site footer.footer .footergrid a,
+html body.nw-family-page.story-site footer.footer .footergrid p,
+html body.nw-family-page.story-site footer.footer .footergrid h3,
+html body.nw-family-page.story-site footer.footer .footergrid h4,
+html body.nw-family-page.story-site footer.footer .footbottom,
+html body.nw-family-page.story-site footer.footer .footbottom span{
+  background-color:#050504!important;
+  color:#fff!important;
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
