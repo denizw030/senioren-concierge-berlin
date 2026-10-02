@@ -1,0 +1,327 @@
+/* STEWARO registration wizard v2 — calm, single-decision onboarding */
+body.registration-page.stewaro-registration-wizard-active{
+  background:#f8f5ee!important;
+  color:#173126!important;
+}
+body.registration-page.stewaro-registration-wizard-active .top,
+body.registration-page.stewaro-registration-wizard-active .footer,
+body.registration-page.stewaro-registration-wizard-active .preview,
+body.registration-page.stewaro-registration-wizard-active .signup>h1{
+  display:none!important;
+}
+body.registration-page.stewaro-registration-wizard-active main,
+body.registration-page.stewaro-registration-wizard-active main>.section{
+  min-height:100svh!important;
+  margin:0!important;
+  padding:0!important;
+  background:
+    radial-gradient(900px 520px at 50% -140px,rgba(199,154,61,.10),transparent 70%),
+    linear-gradient(180deg,#fffdf9 0%,#f7f3eb 100%)!important;
+}
+body.registration-page.stewaro-registration-wizard-active .signup{
+  width:min(100% - 32px,560px)!important;
+  max-width:560px!important;
+  margin:0 auto!important;
+  padding:0!important;
+  display:block!important;
+}
+body.registration-page.stewaro-registration-wizard-active #signupForm{
+  width:100%!important;
+  min-height:100svh!important;
+  box-sizing:border-box!important;
+  padding:28px 0 72px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  display:grid!important;
+  align-content:start!important;
+}
+body.registration-page.stewaro-registration-wizard-active #signupForm>*:not(.stewaro-registration-progressive){
+  display:none!important;
+}
+.stewaro-registration-progressive{
+  display:grid!important;
+  gap:0!important;
+  width:100%;
+  margin:0 auto;
+}
+.stewaro-registration-top{
+  display:grid;
+  gap:22px;
+  margin-bottom:clamp(54px,9vh,92px);
+}
+.stewaro-registration-brand{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  justify-self:center;
+  gap:13px;
+  min-height:58px;
+  text-decoration:none;
+}
+.stewaro-registration-brand img:first-child{
+  width:38px;
+  height:48px;
+  object-fit:contain;
+}
+.stewaro-registration-brand img:last-child{
+  width:154px;
+  height:auto;
+  object-fit:contain;
+}
+.stewaro-registration-progress{
+  margin-top:4px;
+  color:#9b7b45;
+  font-size:11px;
+  font-weight:760;
+  letter-spacing:.11em;
+  text-align:center;
+  text-transform:uppercase;
+}
+.stewaro-registration-track{
+  width:min(100%,340px);
+  height:2px;
+  justify-self:center;
+  border-radius:999px;
+  overflow:hidden;
+  background:rgba(23,49,38,.09);
+}
+.stewaro-registration-track>span{
+  display:block;
+  width:0;
+  height:100%;
+  border-radius:inherit;
+  background:linear-gradient(90deg,#b9852e,#d7b66f);
+  transition:width 260ms cubic-bezier(.2,.8,.2,1);
+}
+.stewaro-registration-progressive>h1{
+  margin:0!important;
+  color:#142b21!important;
+  font:500 clamp(36px,8vw,54px)/1.02 Baskerville,"Iowan Old Style",Georgia,serif!important;
+  letter-spacing:-.038em!important;
+  text-align:center;
+  text-wrap:balance;
+}
+.stewaro-registration-progressive>.stewaro-access-intro{
+  width:min(100%,450px);
+  margin:16px auto 34px!important;
+  color:#747a74!important;
+  font-size:16px!important;
+  line-height:1.55!important;
+  text-align:center;
+  text-wrap:balance;
+}
+.stewaro-registration-screen{
+  display:grid!important;
+  gap:14px!important;
+  width:100%;
+}
+.stewaro-wizard-fields{
+  display:grid;
+  gap:14px;
+}
+.stewaro-registration-screen .field{
+  margin:0!important;
+}
+.stewaro-registration-screen .field label{
+  display:block;
+  margin:0 0 9px!important;
+  color:#243a30!important;
+  font-size:13px!important;
+  font-weight:680!important;
+}
+.stewaro-registration-screen :is(input:not([type="checkbox"]):not([type="radio"]),select,textarea){
+  width:100%!important;
+  min-height:60px!important;
+  box-sizing:border-box!important;
+  padding:0 18px!important;
+  border:1px solid rgba(23,49,38,.14)!important;
+  border-radius:16px!important;
+  background:rgba(255,255,255,.86)!important;
+  color:#182a22!important;
+  font:500 17px/1.2 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif!important;
+  outline:none!important;
+  box-shadow:0 10px 34px rgba(31,46,37,.035)!important;
+}
+.stewaro-registration-screen textarea{
+  min-height:118px!important;
+  padding-top:16px!important;
+  resize:vertical;
+}
+.stewaro-registration-screen :is(input,select,textarea):focus{
+  border-color:rgba(185,133,46,.68)!important;
+  box-shadow:0 0 0 4px rgba(199,154,61,.10)!important;
+}
+.stewaro-wizard-choices{
+  display:grid;
+  gap:11px;
+}
+.stewaro-wizard-choice{
+  width:100%;
+  min-height:72px;
+  display:grid;
+  align-content:center;
+  justify-items:center;
+  gap:4px;
+  padding:13px 18px;
+  border:1px solid rgba(23,49,38,.13);
+  border-radius:18px;
+  background:rgba(255,255,255,.78);
+  color:#173126;
+  box-shadow:0 12px 34px rgba(31,46,37,.035);
+  cursor:pointer;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;
+  transition:transform 160ms ease,border-color 160ms ease,background 160ms ease,box-shadow 160ms ease;
+}
+.stewaro-wizard-choice strong{
+  font-size:17px;
+  line-height:1.2;
+  font-weight:720;
+}
+.stewaro-wizard-choice span{
+  color:#777c77;
+  font-size:12px;
+  font-weight:500;
+}
+.stewaro-wizard-choice:hover,
+.stewaro-wizard-choice:focus-visible{
+  transform:translateY(-1px);
+  border-color:rgba(185,133,46,.42);
+  background:#fff;
+  box-shadow:0 16px 40px rgba(31,46,37,.06);
+  outline:none;
+}
+.stewaro-flow-next,
+.stewaro-registration-screen .stewaro-access-submit{
+  width:100%!important;
+  min-height:60px!important;
+  margin-top:6px!important;
+  border:0!important;
+  border-radius:16px!important;
+  background:#173126!important;
+  color:#fff!important;
+  font:700 16px/1.2 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif!important;
+  box-shadow:none!important;
+}
+.stewaro-registration-nav{
+  min-height:32px;
+  margin-top:20px;
+  display:flex!important;
+  justify-content:flex-start!important;
+}
+.stewaro-wizard-back{
+  border:0;
+  background:none;
+  padding:6px 0;
+  color:#7a7f7a;
+  font:650 13px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;
+  text-decoration:underline;
+  text-underline-offset:4px;
+  cursor:pointer;
+}
+.stewaro-wizard-back[hidden]{display:none!important}
+.stewaro-wizard-summary{
+  display:grid;
+  gap:0;
+  margin-bottom:8px;
+  padding:4px 0;
+  border-top:1px solid rgba(23,49,38,.10);
+}
+.stewaro-wizard-summary>div{
+  min-height:54px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  border-bottom:1px solid rgba(23,49,38,.10);
+}
+.stewaro-wizard-summary span{
+  color:#7a7f7a;
+  font-size:13px;
+}
+.stewaro-wizard-summary strong{
+  color:#173126;
+  font-size:14px;
+  font-weight:680;
+  text-align:right;
+}
+.stewaro-registration-legal{
+  display:grid!important;
+  gap:10px!important;
+}
+.stewaro-registration-legal .check{
+  display:grid!important;
+  grid-template-columns:22px 1fr!important;
+  gap:10px!important;
+  align-items:start!important;
+  margin:0!important;
+  padding:13px 0!important;
+  border:0!important;
+  border-bottom:1px solid rgba(23,49,38,.09)!important;
+  color:#656c67!important;
+  font-size:12px!important;
+  line-height:1.45!important;
+  background:transparent!important;
+}
+.stewaro-registration-legal .check input{
+  width:18px!important;
+  height:18px!important;
+  min-height:0!important;
+  margin:1px 0 0!important;
+}
+.stewaro-registration-screen .progressive-panel{
+  display:grid!important;
+  gap:14px!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+}
+.stewaro-registration-screen .progressive-panel>.row{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:14px!important;
+}
+.stewaro-registration-screen .tiny{
+  color:#8a8e89!important;
+  font-size:11px!important;
+  line-height:1.45!important;
+}
+.stewaro-registration-screen .status{
+  margin-top:8px!important;
+}
+.stewaro-registration-screen .password-wrap{
+  position:relative;
+}
+.stewaro-registration-screen .password-toggle{
+  position:absolute!important;
+  right:9px!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+}
+@media(max-width:620px){
+  body.registration-page.stewaro-registration-wizard-active .signup{
+    width:min(100% - 28px,560px)!important;
+  }
+  body.registration-page.stewaro-registration-wizard-active #signupForm{
+    padding:20px 0 54px!important;
+  }
+  .stewaro-registration-top{
+    gap:17px;
+    margin-bottom:48px;
+  }
+  .stewaro-registration-brand img:first-child{width:34px;height:43px}
+  .stewaro-registration-brand img:last-child{width:142px}
+  .stewaro-registration-progressive>h1{
+    font-size:clamp(36px,10.5vw,46px)!important;
+  }
+  .stewaro-registration-progressive>.stewaro-access-intro{
+    margin-top:14px!important;
+    margin-bottom:28px!important;
+    font-size:15px!important;
+  }
+  .stewaro-wizard-choice{min-height:68px;border-radius:16px}
+}
+@media(prefers-reduced-motion:reduce){
+  .stewaro-registration-track>span,.stewaro-wizard-choice{transition:none!important}
+}
