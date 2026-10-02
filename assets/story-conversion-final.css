@@ -199,3 +199,74 @@ body.story-site footer.footer h4{
   opacity:1!important;
   filter:none!important;
 }
+
+/* PR298 final WCAG AA contrast closure after live axe diagnostics. */
+html body.story-site .top .nw-language-button > span:nth-child(2){
+  color:#fff!important;
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
+html body.story-site .story-section--soft{
+  background:#080809!important;
+  background-color:#080809!important;
+  background-image:none!important;
+}
+html body.story-site .story-section--soft .story-kicker,
+html body.story-site .story-section--soft .story-title,
+html body.story-site .story-section--soft .story-compact-item strong{
+  color:#fff!important;
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
+html body.story-site .story-section--soft .story-lead,
+html body.story-site .story-section--soft .story-compact-item p{
+  color:#d8d4cc!important;
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
+html body.nw-family-page.story-site .story-section:not(.story-section--soft),
+html body.nw-family-page.story-site .story-final{
+  background:#030304!important;
+  background-color:#030304!important;
+}
+html body.nw-family-page.story-site .story-section:not(.story-section--soft) .story-kicker,
+html body.nw-family-page.story-site .story-section:not(.story-section--soft) .story-title,
+html body.nw-family-page.story-site .story-section:not(.story-section--soft) .story-principle strong,
+html body.nw-family-page.story-site .story-final .story-kicker,
+html body.nw-family-page.story-site .story-final .story-title{
+  color:#fff!important;
+  opacity:1!important;
+  filter:none!important;
+}
+html body.nw-family-page.story-site .story-section:not(.story-section--soft) .story-lead,
+html body.nw-family-page.story-site .story-section:not(.story-section--soft) .story-principle p,
+html body.nw-family-page.story-site .story-final .story-lead{
+  color:#d8d4cc!important;
+  opacity:1!important;
+  filter:none!important;
+}
+html body.nw-family-page.story-site .story-principle > span{
+  color:#f3d98f!important;
+  opacity:1!important;
+  filter:none!important;
+}
+html body.nw-family-page.story-site footer.footer,
+html body.nw-family-page.story-site footer.footer .footergrid,
+html body.nw-family-page.story-site footer.footer .footbottom{
+  background:#050504!important;
+  background-color:#050504!important;
+  background-image:none!important;
+}
+html body.nw-family-page.story-site footer.footer p,
+html body.nw-family-page.story-site footer.footer a,
+html body.nw-family-page.story-site footer.footer span,
+html body.nw-family-page.story-site footer.footer h3,
+html body.nw-family-page.story-site footer.footer h4{
+  color:#fff!important;
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
