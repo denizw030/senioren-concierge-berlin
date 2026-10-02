@@ -1,16 +1,16 @@
 (() => {
   "use strict";
   if(window.STEWAROEntryRouting)return;
-  const ACCOUNT_ORIGIN="https://account.stewaro.com";
   const PARENT_ORIGIN="https://myparentguard.com";
   const host=String(location.hostname||"").toLowerCase();
   const STAGING_WEBSITE_HOST="d357yw2h09cpne.cloudfront.net";
   const STAGING_ACCOUNT_ORIGIN="https://d23le2tjpjl7la.cloudfront.net";
   const STAGING_ACCOUNT_HOST="d23le2tjpjl7la.cloudfront.net";
-  const isStewaroPublic=host==="stewaro.com"||host==="www.stewaro.com"||host==="stewaro.de"||host==="www.stewaro.de";
   const isWebsitePreview=host===STAGING_WEBSITE_HOST;
   const isAccount=host==="account.stewaro.com"||host===STAGING_ACCOUNT_HOST;
-  const accountEntry=isAccount?"/":(isWebsitePreview?STAGING_ACCOUNT_ORIGIN+"/":(isStewaroPublic?ACCOUNT_ORIGIN+"/":"/zugang"));
+  // Keep the public website on its working same-origin access route until
+  // account.stewaro.com has a verified public DNS/CloudFront cutover.
+  const accountEntry=isAccount?"/":(isWebsitePreview?STAGING_ACCOUNT_ORIGIN+"/":"/zugang");
   const parentEntry=PARENT_ORIGIN+"/?source=stewaro";
   const isAccountSurface=/(?:^|\/)(?:zugang|anmelden|registrieren)(?:\.html)?\/?$/.test(location.pathname);
 
