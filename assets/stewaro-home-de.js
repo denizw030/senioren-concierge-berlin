@@ -9,39 +9,6 @@
     const mechanismVideo = document.querySelector('.mechanism-video');
     const precisionSection = document.querySelector('.precision');
     const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const mobileMenuToggle = document.querySelector('.header-menu-toggle');
-    const mobileMenu = document.getElementById('stewaro-mobile-menu');
-
-    const setMobileMenu = (open) => {
-      if (!mobileMenuToggle || !mobileMenu) return;
-      const next = Boolean(open);
-      mobileMenu.hidden = !next;
-      mobileMenuToggle.classList.toggle('is-open', next);
-      mobileMenuToggle.setAttribute('aria-expanded', String(next));
-      mobileMenuToggle.setAttribute('aria-label', next ? 'Menü schließen' : 'Menü öffnen');
-    };
-    if (mobileMenuToggle && mobileMenu) {
-      mobileMenuToggle.addEventListener('click', (event) => {
-        event.stopPropagation();
-        setMobileMenu(mobileMenuToggle.getAttribute('aria-expanded') !== 'true');
-      });
-      mobileMenu.addEventListener('click', (event) => {
-        if (event.target.closest('a')) setMobileMenu(false);
-      });
-      document.addEventListener('click', (event) => {
-        if (mobileMenu.hidden) return;
-        if (!event.target.closest('.site-header')) setMobileMenu(false);
-      });
-      document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && !mobileMenu.hidden) {
-          setMobileMenu(false);
-          mobileMenuToggle.focus();
-        }
-      });
-      window.addEventListener('resize', () => {
-        if (window.innerWidth > 980) setMobileMenu(false);
-      }, { passive: true });
-    }
 
     let heroVideoFinished = false;
     if (heroVideo) {
