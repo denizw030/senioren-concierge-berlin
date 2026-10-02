@@ -101,3 +101,27 @@ body.nw-growth-page[data-product="senioren"] .odysx-info-bar strong{color:#f4d47
 .nw-growth-page .nw-growth-section:not(.nw-growth-section-light) h2{
   color:#fff!important;
 }
+
+/* PR298 pricing accessibility closure. */
+html body.pricing-page .package-card.featured .status-pill{
+  background:#173d2f!important;
+  color:#fff!important;
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
+html body.pricing-page .package-card.featured .package-price,
+html body.pricing-page .package-card.featured .package-price small,
+html body.pricing-page .package-card.featured .package-usage{
+  color:#26372f!important;
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
+html body.pricing-page #telefonannahme-modelle .lead,
+html body.pricing-page #telefonannahme-modelle .card p{
+  color:#d8d4cc!important;
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
