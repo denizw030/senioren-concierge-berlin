@@ -725,3 +725,11 @@ body:not(.senior-product):not([data-product="senioren"]).concierge-overview-page
 }
 
 /* SENIOR_LOGIN_GENERIC_BRAND_RULES_SCOPED_V1 */
+
+/* PR298 services-page accessibility closure. */
+html body.services-page main > .section:not(.services-hero) .lead{
+  color:#d8d4cc!important;
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
