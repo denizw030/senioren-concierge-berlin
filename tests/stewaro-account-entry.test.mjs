@@ -22,6 +22,16 @@ test("unified STEWARO account entry is minimal and route-parity safe",()=>{
   assert.doesNotMatch(access,/type="password"|ownerFirstName|ownerLastName|Tarif auswählen/);
 });
 
+test("audience choices stay visually symmetric and text-only",()=>{
+  assert.match(access,/stewaro-account-entry\.css\?v=2/);
+  assert.match(access,/<button class="stewaro-access-choice primary"[^>]*data-access-self>[\s\S]*?<strong>Für mich<\/strong>[\s\S]*?<\/button>/);
+  assert.match(access,/<button class="stewaro-access-choice"[^>]*data-access-other>[\s\S]*?<strong>Für eine andere Person<\/strong>[\s\S]*?<\/button>/);
+  assert.doesNotMatch(access,/Eigenen STEWARO Zugang anmelden oder erstellen/);
+  assert.doesNotMatch(access,/Weiter zu MyParentGuard · powered by STEWARO/);
+  assert.match(accountCss,/\.stewaro-access-choice\{[\s\S]*display:flex;align-items:center;justify-content:center/);
+  assert.match(accountCss,/\.stewaro-access-choice,\.stewaro-access-submit\{[\s\S]*min-height:64px[\s\S]*text-align:center/);
+});
+
 test("loved-one entry belongs to MyParentGuard while self entry belongs to STEWARO account",()=>{
   assert.match(entry,/https:\/\/myparentguard\.com\/\?source=stewaro-account/);
   assert.doesNotMatch(routing,/ACCOUNT_ORIGIN="https:\/\/account\.stewaro\.com"/);
