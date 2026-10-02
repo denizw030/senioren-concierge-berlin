@@ -125,3 +125,19 @@ html body.pricing-page #telefonannahme-modelle .card p{
   filter:none!important;
   text-shadow:none!important;
 }
+
+/* PR298 deterministic pricing-card heading contrast. */
+html body.pricing-page #telefonannahme-modelle .card{
+  background:#11110f!important;
+  background-color:#11110f!important;
+  background-image:none!important;
+}
+html body.pricing-page #telefonannahme-modelle .card h3{
+  color:#fff!important;
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
+html body.pricing-page #telefonannahme-modelle .card p{
+  color:#e2ded6!important;
+}
