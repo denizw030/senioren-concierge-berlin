@@ -72,10 +72,10 @@ jobs:
         run: |
           green=0
           for attempt in $(seq 1 48); do
-            fixture="$(curl -fsSL "https://nahwerkconcierge.com/tests/theme-footer-production-browser.html?deploy=${GITHUB_SHA}-${attempt}" || true)"
-            siteui="$(curl -fsSL "https://nahwerkconcierge.com/assets/site-ui.js?deploy=${GITHUB_SHA}-${attempt}" || true)"
-            chat="$(curl -fsSL "https://nahwerkconcierge.com/web-concierge.html?deploy=${GITHUB_SHA}-${attempt}" || true)"
-            senior="$(curl -fsSL "https://nahwerkconcierge.com/senioren-concierge.html?deploy=${GITHUB_SHA}-${attempt}" || true)"
+            fixture="$(curl -fsSL "https://stewaro.com/tests/theme-footer-production-browser.html?deploy=${GITHUB_SHA}-${attempt}" || true)"
+            siteui="$(curl -fsSL "https://stewaro.com/assets/site-ui.js?deploy=${GITHUB_SHA}-${attempt}" || true)"
+            chat="$(curl -fsSL "https://stewaro.com/web-concierge.html?deploy=${GITHUB_SHA}-${attempt}" || true)"
+            senior="$(curl -fsSL "https://stewaro.com/senioren-concierge.html?deploy=${GITHUB_SHA}-${attempt}" || true)"
             if printf '%s' "$fixture" | grep -q 'THEME_FOOTER_PRODUCTION_BROWSER' \
               && printf '%s' "$siteui" | grep -q 'nw_portal_theme_v1' \
               && printf '%s' "$siteui" | grep -q 'body.nw-portal-light .web-concierge-shell' \
@@ -95,7 +95,7 @@ jobs:
           test -n "$CHROME"
           for width in 1440 390; do
             "$CHROME" --headless --no-sandbox --disable-gpu --window-size="$width,1100" --virtual-time-budget=18000 --dump-dom \
-              "https://nahwerkconcierge.com/tests/theme-footer-production-browser.html?deploy=${GITHUB_SHA}&width=$width" > "/tmp/theme-footer-production-$width.html"
+              "https://stewaro.com/tests/theme-footer-production-browser.html?deploy=${GITHUB_SHA}&width=$width" > "/tmp/theme-footer-production-$width.html"
             grep -q 'data-theme-footer-e2e="green"' "/tmp/theme-footer-production-$width.html" || { cat "/tmp/theme-footer-production-$width.html"; exit 1; }
           done
           echo "THEME_FOOTER_FINAL_PRODUCTION_BROWSER=GREEN"
