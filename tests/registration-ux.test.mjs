@@ -22,6 +22,14 @@ test("WhatsApp is optional and consent is required only when a WhatsApp number i
   assert.match(html, /WhatsApp-Telefonnummer der unterstützten Person[\s\S]*\(optional\)/);
 });
 
+test("explicit Family links reveal recipient setup without a second audience chooser", () => {
+  assert.match(html, /name="setupFor" value="other" hidden data-family-setup-mode/);
+  assert.match(onboarding, /params\.get\("fuer"\) === "andere"/);
+  assert.match(onboarding, /otherSetup\.checked = true/);
+  assert.match(onboarding, /\$\("recipientBlock"\)\.hidden = self/);
+  assert.match(onboarding, /selfScope\.hidden = !self/);
+});
+
 test("registration contains an accessible in-flow plan switcher", () => {
   assert.match(html, /id="planChangeButton"/);
   assert.match(html, /aria-controls="registrationPlanPicker"/);
