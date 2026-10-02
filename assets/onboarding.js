@@ -193,31 +193,6 @@
     if (!planBookable()) setPlanPicker(true);
   }
 
-  function injectConciergeStyles() {
-    if ($("conciergeSelectionStyles")) return;
-    const style = document.createElement("style");
-    style.id = "conciergeSelectionStyles";
-    style.textContent = `
-      .concierge-choice { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin:14px 0 10px; }
-      .concierge-choice .concierge-option { position:relative; display:block; min-width:0; cursor:pointer; }
-      .concierge-choice .concierge-option > input { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
-      .concierge-card-content { height:100%; overflow:hidden; border:1px solid var(--line,#ddd4ca); border-radius:14px; background:rgba(255,255,255,.72); transition:border-color .18s ease,box-shadow .18s ease,background .18s ease,transform .18s ease; }
-      .concierge-card-content img { display:block; width:100%; aspect-ratio:4/3; object-fit:cover; object-position:center top; background:#eee8e0; }
-      .concierge-card-copy { position:relative; padding:15px 44px 16px 16px; min-height:92px; }
-      .concierge-card-copy strong { display:block; margin:0 0 5px; font-size:18px; line-height:1.2; color:var(--ink,#201d19); }
-      .concierge-card-copy span { display:block; font-size:13px; line-height:1.45; color:var(--muted,#6e6861); }
-      .concierge-check { position:absolute; right:14px; top:14px; width:24px; height:24px; border-radius:50%; display:grid; place-items:center; border:1px solid rgba(173,132,42,.5); color:transparent; background:rgba(255,255,255,.9); font-weight:900; }
-      .concierge-option:hover .concierge-card-content { transform:translateY(-1px); box-shadow:0 10px 28px rgba(44,35,24,.08); }
-      .concierge-option > input:checked + .concierge-card-content { border:2px solid var(--gold,#b68b32); background:rgba(182,139,50,.08); box-shadow:0 0 0 2px rgba(182,139,50,.12); }
-      .concierge-option > input:checked + .concierge-card-content .concierge-check { color:#fff; background:var(--gold,#b68b32); border-color:var(--gold,#b68b32); }
-      .concierge-option > input:focus-visible + .concierge-card-content { outline:3px solid rgba(182,139,50,.42); outline-offset:3px; }
-      .concierge-selection-title { display:block; margin-bottom:6px; font-weight:800; font-size:18px; line-height:1.3; }
-      .concierge-selection-intro { margin:0 0 6px; color:var(--muted,#6e6861); font-size:13px; line-height:1.55; }
-      @media (max-width:700px) { .concierge-choice { grid-template-columns:1fr; } .concierge-card-content { display:grid; grid-template-columns:112px 1fr; } .concierge-card-content img { height:100%; min-height:120px; aspect-ratio:auto; } }
-    `;
-    document.head.appendChild(style);
-  }
-
   function setupConciergeSelection() {
     // FIDEL is the STEWARO identity. Voice variants are configured separately and
     // never change the concierge name or brand.
@@ -272,9 +247,7 @@
     const familyMessage = !isSelf() ? familyMessageValue() : "";
     const familyMessagePreview = familyMessage ? `<br><br><em>Persönliche Nachricht von ${escapeHtml(owner || "Ihrer Familie")}:</em><br>„${escapeHtml(familyMessage).replace(/\n/g,"<br>")}“` : "";
     updateContextTexts();
-    const welcomeMessage = product === "senioren"
-      ? `<strong>${greeting} 👋</strong><br><br>Willkommen bei STEWARO Concierge.${introduction}<br><br>Ich bin ${concierge()}, ${informal ? "dein" : "Ihr"} persönlicher KI-Concierge.<br><br>Ich helfe ${informal ? "dir" : "Ihnen"} dabei, Fragen verständlich zu klären, Technik Schritt für Schritt zu bedienen und wichtige Erinnerungen im Blick zu behalten.<br><br>Auf Wunsch erstelle ich Bilder, ordne Fotos ein, vergleiche Möglichkeiten und fasse Informationen übersichtlich zusammen.`
-      : `<strong>${greeting} 👋</strong><br><br>Willkommen bei ${productLabel}.${introduction}<br><br>Ich bin ${concierge()}, ${informal ? "dein" : "Ihr"} persönlicher KI-Concierge.<br><br>Ich erkläre die Bedienung verständlich und helfe ${informal ? "dir" : "Ihnen"} bei Organisation, Informationen, Dokumenten und vielem mehr.`;
+    const welcomeMessage = `<strong>${greeting} 👋</strong><br><br>Willkommen bei STEWARO Concierge.${introduction}<br><br>Ich bin FIDEL, ${informal ? "dein" : "Ihr"} persönlicher KI-Concierge.<br><br>Ich helfe ${informal ? "dir" : "Ihnen"} verständlich bei Organisation, Informationen, Dokumenten, Erinnerungen und weiteren Alltagsaufgaben.`;
     $("messagePreview").innerHTML = welcomeMessage + familyMessagePreview;
   }
 
