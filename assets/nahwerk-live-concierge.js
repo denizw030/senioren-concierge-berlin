@@ -1,5 +1,6 @@
 // FIDEL LIVE CONCIERGE WEB CLIENT V2
 import { mountFidelGoldOrb } from "./fidel-gold-orb.js?v=1";
+import { mountFidelLiveRoom } from "./fidel-live-room.js?v=1";
 const DEFAULT_API="https://ta832v8wah.execute-api.eu-central-1.amazonaws.com/prod/v1/web/live";
 // LIVE_AUTHENTICATED_PRICE_QUOTE_V2_20260920
 
@@ -68,6 +69,7 @@ function ensureOverlay(){
         <div class="nw-live-spacer"></div>
       </div>
       <div class="nw-live-stage">
+        <div class="nw-fidel-room" hidden aria-hidden="true"></div>
         <div class="nw-live-orb" style="--nw-live-level:0">
           <div class="nw-live-avatar is-fidel-orb">
             <canvas class="nw-fidel-orb-canvas" data-fidel-orb-state="idle" aria-hidden="true"></canvas>
@@ -99,7 +101,8 @@ export function mountNahwerkLiveConcierge({
   apiBase=DEFAULT_API,
   onStateChange=()=>{},
   onClose=()=>{},
-  bindTrigger=true
+  bindTrigger=true,
+  fidelRoom=false
 }={}){
   if(typeof getAuthToken!=="function")throw new Error("getAuthToken is required");
   const ch=String(channel||"WEB").toUpperCase();
@@ -123,16 +126,21 @@ export function mountNahwerkLiveConcierge({
   const ui=ensureOverlay();
   const q=(s)=>ui.querySelector(s);
   const orb=q(".nw-live-orb"),status=q(".nw-live-status"),duration=q(".nw-live-duration"),name=q(".nw-live-name");
-  const avatar=q(".nw-live-avatar"),orbCanvas=q(".nw-fidel-orb-canvas");
+  const avatar=q(".nw-live-avatar"),orbCanvas=q(".nw-fidel-orb-canvas"),roomHost=q(".nw-fidel-room");
   const image=q(".nw-live-image"),initials=q(".nw-live-initials"),remoteAudio=q(".nw-live-audio");
   const muteBtn=q(".nw-live-mute"),endBtn=q(".nw-live-end"),closeBtn=q(".nw-live-close");
   const fidelOrb=mountFidelGoldOrb(orbCanvas,{state:"idle",interactive:false});
+  const fidelRoomSurface=fidelRoom?mountFidelLiveRoom(roomHost,{enabled:true}):null;
+  const fidelRoomActive=Boolean(fidelRoomSurface?.supported);
+  ui.classList.toggle("is-fidel-room",fidelRoomActive);
+  if(fidelRoomActive)roomHost.hidden=false;
   let fidelOrbState="idle";
   const setFidelOrbState=(next)=>{
     const value=String(next||"idle");
     if(value===fidelOrbState)return;
     fidelOrbState=value;
     fidelOrb?.setState(value);
+    fidelRoomSurface?.setState(value);
   };
 
   let pc=null,dc=null,micStream=null,micMeter=null,outMeter=null,raf=0,inputFlushTimer=0,outputFlushTimer=0,transcriptSeq=0,userTurnSeq=0,assistantTurnSeq=0,maxSessionTimer=0;
@@ -253,6 +261,7 @@ export function mountNahwerkLiveConcierge({
     const level=hybridSpeaking?Math.max(inLevel,.18):Math.max(inLevel,outLevel);
     orb.style.setProperty("--nw-live-level",level.toFixed(3));
     fidelOrb?.setAudio(inLevel,outLevel);
+    fidelRoomSurface?.setAudio(inLevel,hybridSpeaking?Math.max(outLevel,.18):outLevel);
     if(started){
       if(hybridSpeaking){
         setFidelOrbState("speaking");
@@ -660,6 +669,7 @@ export function mountNahwerkLiveConcierge({
     stopCallTimer();if(duration){duration.textContent="0:00";duration.hidden=true;}
     fidelOrb?.setAudio(0,0);setFidelOrbState("idle");
     ui.hidden=false;document.documentElement.classList.add("nw-live-open");
+    fidelRoomSurface?.start();
     setPersona(currentPersonaFromPage());
     setStatus("Preis wird geprüft …");state("quoting");
     try{
@@ -777,6 +787,7 @@ export function mountNahwerkLiveConcierge({
     stopHybridSpeech();
     remoteAudio.muted=false;
     cancelAnimationFrame(raf);
+    fidelRoomSurface?.stop();
     if(notifyBackend&&sessionId){
       await post("/end",{session_id:sessionId,transcript_finalized:true,transcript_snapshot:transcriptSnapshot()}).catch(()=>{});
       await wait(700);
