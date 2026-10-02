@@ -755,14 +755,3 @@ html[data-stewaro-app="1"] .web-concierge-retry{
   .stewaro-fidel-voice-options{grid-template-columns:1fr;margin-left:0}
   .stewaro-fidel-voice-status{margin-left:0}
 }
-
-/* PR298 mobile target floor: keep all audited App controls at WCAG-friendly size. */
-.stewaro-app-nav-button,
-.stewaro-app-primary,
-.stewaro-app-secondary,
-.stewaro-app-more-link,
-.stewaro-app-card-link{
-  min-width:44px;
-  min-height:44px;
-  box-sizing:border-box;
-}
