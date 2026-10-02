@@ -1,0 +1,5 @@
+
+    html,body{margin:0;min-height:100%;background:#030405;color:#fff}
+    #appLiveStart{position:fixed;inset:50% auto auto 50%;transform:translate(-50%,-50%);opacity:0;pointer-events:none}
+    #appLiveBoot{position:fixed;inset:0;display:grid;place-items:center;font:500 16px -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;color:rgba(255,255,255,.68)}
+  

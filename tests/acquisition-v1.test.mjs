@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import fs from "node:fs";
+import fs from './helpers/effective-source-fs.mjs';
 import path from "node:path";
 
 const root=process.cwd();

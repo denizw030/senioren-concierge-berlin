@@ -1,0 +1,21 @@
+
+      .mfa-panel .safety-card-head{align-items:flex-start}
+      .mfa-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+      .mfa-form,.mfa-setup{margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}
+      .mfa-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;max-width:760px}
+      .mfa-form .field{margin:0}
+      .mfa-setup-grid{display:grid;grid-template-columns:220px minmax(0,1fr);gap:22px;align-items:start}
+      .mfa-qr-wrap{background:#fff;border-radius:16px;padding:14px;width:220px;min-height:220px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 28px rgba(0,0,0,.12)}
+      .mfa-qr{display:block;width:192px;height:192px;object-fit:contain}
+      .mfa-secret{display:inline-block;margin-top:8px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;font:600 13px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;word-break:break-all;user-select:all}
+      .mfa-code{max-width:220px;letter-spacing:.24em;text-align:center;font-variant-numeric:tabular-nums;font-size:20px}
+      .mfa-feedback{margin-top:14px;font-size:13px;line-height:1.55;min-height:20px}
+      .mfa-feedback.is-error{color:#b55353}
+      .mfa-feedback.is-success{color:#3f7c59}
+      .mfa-inline-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+      .mfa-step-copy{margin:0 0 14px}
+      @media(max-width:720px){
+        .mfa-setup-grid,.mfa-form-grid{grid-template-columns:1fr}
+        .mfa-qr-wrap{width:100%;max-width:260px}
+      }
+    

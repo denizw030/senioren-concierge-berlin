@@ -1,4 +1,4 @@
-import fs from 'node:fs';
+import fs from './effective-source-fs.mjs';
 
 // Keep existing rendering/runtime assertions independent of inline versus external storage.
 export function homepageSource(path) {

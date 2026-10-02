@@ -246,6 +246,26 @@
     <!-- NW-I18N-END -->
   <script src="/assets/locale-runtime.js?v=1" defer></script>
     <script src="/assets/clean-url.js?v=1"></script>
+<style>
+/* PR298 accessibility gate closure: pricing contrast. */
+body.pricing-page .status-pill,
+body.pricing-page .featured .package-price,
+body.pricing-page .featured .package-usage{
+  color:#fff!important;
+  opacity:1!important;
+  filter:none!important;
+}
+body.pricing-page .lead,
+body.pricing-page #telefonannahme-modelle .card p{
+  color:#d8d4cc!important;
+  opacity:1!important;
+  filter:none!important;
+}
+body.pricing-page #telefonannahme-modelle .card{
+  background:#11110f!important;
+  background-color:#11110f!important;
+}
+</style>
 </head>
   <body class="pricing-page">
     <header class="top"><div class="wrap nav"><a class="brand" href="/de/" aria-label="STEWARO Concierge — ana sayfa"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>STEWARO</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Ana navigasyon"><a href="/de/">Genel bakış</a><a href="/prime-concierge">Kişisel Concierge</a><a href="/concierges">Dünya çapında STEWARO</a><a href="/telefonannahme">Telefon karşılama</a><a href="/senioren-concierge">İleri yaş Concierge</a><a href="/angehoerige">Yakınlar için</a><a href="/leistungen">Hizmetler</a><a class="active" href="/pakete" aria-current="page">Paketler</a><a href="/kontakt">İletişim</a><a class="auth-link login-link" href="/anmelden?lang=tr">Giriş yap</a><a class="auth-link register-link" href="/registrieren?lang=tr">Kayıt ol</a></nav></div></header>

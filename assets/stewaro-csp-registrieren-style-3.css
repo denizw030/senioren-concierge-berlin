@@ -1,0 +1,503 @@
+
+      .signup {
+        display: grid;
+        grid-template-columns: 1.18fr 0.72fr;
+        gap: 30px;
+        align-items: start;
+      }
+      .formcard,
+      .preview {
+        padding: 30px;
+      }
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .row.name {
+        grid-template-columns: 0.72fr 1fr 1fr;
+      }
+      .password-single-row {
+        grid-template-columns: 1fr;
+      }
+      .recipient-contact-row .field {
+        display: flex;
+        flex-direction: column;
+      }
+      .recipient-contact-row .field > label {
+        display: flex;
+        min-height: 46px;
+        align-items: flex-end;
+      }
+      .recipient-contact-row :is(select, input) {
+        box-sizing: border-box;
+        height: 54px;
+      }
+      .field {
+        margin: 0 0 17px;
+      }
+      .field input,
+      .field select,
+      .field textarea {
+        padding: 13px 14px;
+        font: inherit;
+      }
+      .field textarea {
+        min-height: 96px;
+        resize: vertical;
+      }
+      #ownerSalutation,
+      #recipientSalutation {
+        appearance: none;
+        -webkit-appearance: none;
+        padding-right: 46px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23c7a24d' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: right 16px center !important;
+        background-size: 16px !important;
+      }
+      .choice {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin: 10px 0 24px;
+      }
+      .choice label {
+        border-radius: 11px;
+        padding: 16px;
+        cursor: pointer;
+        transition: 0.18s ease;
+      }
+      .setup-choice label {
+        display: grid;
+        min-height: 62px;
+        place-items: center;
+        padding: 16px 20px;
+        text-align: center;
+        font-weight: 700;
+      }
+      .setup-choice input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+      }
+      .setup-choice label:has(input:focus-visible) {
+        outline: 3px solid rgba(191, 143, 40, 0.38);
+        outline-offset: 3px;
+      }
+      .concierge-intro {
+        margin: 8px 0 18px;
+        color: #66635d;
+        line-height: 1.6;
+      }
+      .concierge-choice {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        margin: 14px 0 15px;
+      }
+      .concierge-choice .concierge-card {
+        position: relative;
+        display: block;
+        min-width: 0;
+        overflow: hidden;
+        border: 1px solid rgba(26, 25, 22, 0.12);
+        border-radius: 24px;
+        background: #090909;
+        box-shadow: 0 12px 34px rgba(37, 31, 19, 0.08);
+        cursor: pointer;
+        transition:
+          transform 180ms ease,
+          border-color 180ms ease,
+          box-shadow 180ms ease,
+          background 180ms ease;
+      }
+      .concierge-choice .concierge-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(192, 145, 49, 0.48);
+        box-shadow: 0 18px 42px rgba(37, 31, 19, 0.12);
+      }
+      .concierge-choice .concierge-card:has(input:focus-visible) {
+        outline: 3px solid rgba(191, 143, 40, 0.38);
+        outline-offset: 3px;
+      }
+      .concierge-choice .concierge-card.selected,
+      .concierge-choice .concierge-card:has(input:checked) {
+        border-color: #bd8f2f;
+        background: #090909;
+        box-shadow:
+          0 0 0 2px rgba(189, 143, 47, 0.16),
+          0 18px 44px rgba(86, 62, 14, 0.14);
+      }
+      .concierge-card input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .concierge-image {
+        display: block;
+        width: 100%;
+        aspect-ratio: 4 / 4.25;
+        object-fit: cover;
+        object-position: center 18%;
+        background: #eeeae2;
+      }
+      .concierge-card-body {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 28px;
+        gap: 10px;
+        align-items: start;
+        padding: 16px 16px 18px;
+      }
+      .concierge-choice .concierge-copy strong {
+        display: block;
+        margin-bottom: 5px;
+        color: #fff;
+        font-size: 19px;
+      }
+      .concierge-choice .concierge-copy span {
+        display: block;
+        color: #c9c9c5;
+        font-size: 13px;
+        line-height: 1.45;
+      }
+      .concierge-check {
+        display: grid;
+        place-items: center;
+        width: 28px;
+        height: 28px;
+        border: 1px solid rgba(222, 222, 218, 0.58);
+        border-radius: 50%;
+        color: transparent;
+        background: transparent;
+        font-weight: 800;
+        transition: 180ms ease;
+      }
+      .concierge-card.selected .concierge-check,
+      .concierge-card:has(input:checked) .concierge-check {
+        border-color: #bd8f2f;
+        color: #fff;
+        background: #bd8f2f;
+      }
+      .check {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        font-size: 13px;
+        line-height: 1.5;
+        margin: 14px 0;
+      }
+      #signupForm [hidden] {
+        display: none !important;
+      }
+      .preview h3 {
+        font-size: 23px;
+        margin: 8px 0 16px;
+      }
+      .preview .msg {
+        border-radius: 13px;
+        padding: 22px;
+        line-height: 1.6;
+        font-size: 15px;
+        color: #fff !important;
+        background: #090909 !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+      }
+      .preview .msg strong {
+        color: #fff;
+      }
+      body[data-product="senioren"] .preview .msg,
+      body.senior-product .preview .msg {
+        color: #2a2317 !important;
+        background: #fbf8f1 !important;
+        border-color: rgba(112, 87, 39, 0.2) !important;
+        box-shadow: 0 12px 32px rgba(83, 64, 27, 0.08);
+      }
+      body[data-product="senioren"] .preview .msg strong,
+      body.senior-product .preview .msg strong {
+        color: #17130d !important;
+      }
+      .status {
+        display: none;
+        margin-top: 16px;
+        padding: 14px;
+        border-radius: 9px;
+        line-height: 1.5;
+      }
+      .tiny {
+        font-size: 12px;
+        line-height: 1.5;
+      }
+      .planbox-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+      }
+      .planbox-kicker {
+        display: block;
+        margin-bottom: 6px;
+        color: #aaa69d;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .planbox strong {
+        display: block;
+        font-size: 18px;
+        letter-spacing: 0.3px;
+      }
+      .planbox .plan-sub {
+        display: block;
+        margin-top: 3px;
+        color: #f5f0df;
+        font-weight: 700;
+      }
+      .plan-change-button {
+        min-height: 42px;
+        flex: 0 0 auto;
+        padding: 0 17px;
+        border: 1px solid rgba(230, 180, 58, 0.48);
+        border-radius: 999px;
+        color: #f4d98f;
+        background: rgba(255, 255, 255, 0.04);
+        font:
+          750 13px/1 -apple-system,
+          BlinkMacSystemFont,
+          "SF Pro Text",
+          "Helvetica Neue",
+          Arial,
+          sans-serif;
+        cursor: pointer;
+        transition:
+          transform 180ms ease,
+          border-color 180ms ease,
+          background 180ms ease;
+      }
+      .plan-change-button:hover {
+        transform: translateY(-1px);
+        border-color: #e6b43a;
+        background: rgba(230, 180, 58, 0.1);
+      }
+      .plan-picker {
+        margin-top: 18px;
+        padding-top: 18px;
+        border: 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+      }
+      .plan-picker legend {
+        margin-bottom: 6px;
+        color: #fff;
+        font-size: 18px;
+        font-weight: 760;
+      }
+      .plan-picker-intro {
+        margin: 0 0 14px;
+        color: #aaa69d;
+        font-size: 13px;
+        line-height: 1.55;
+      }
+      .plan-options {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+      .plan-option {
+        position: relative;
+        display: block;
+        min-width: 0;
+        cursor: pointer;
+      }
+      .plan-option input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .plan-option-card {
+        display: grid;
+        min-height: 108px;
+        align-content: start;
+        gap: 6px;
+        padding: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.025);
+        transition:
+          transform 180ms ease,
+          border-color 180ms ease,
+          background 180ms ease,
+          box-shadow 180ms ease;
+      }
+      .plan-option:hover .plan-option-card {
+        transform: translateY(-2px);
+        border-color: rgba(230, 180, 58, 0.52);
+      }
+      .plan-option input:checked + .plan-option-card {
+        border-color: #e6b43a;
+        background: rgba(24, 55, 101, 0.2);
+        box-shadow: 0 0 0 2px rgba(121, 151, 194, 0.1);
+      }
+      .plan-option input:focus-visible + .plan-option-card {
+        outline: 3px solid rgba(230, 180, 58, 0.38);
+        outline-offset: 3px;
+      }
+      .plan-option-name {
+        color: #fff;
+        font-size: 15px;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+      }
+      .plan-option-price {
+        color: #e6b43a;
+        font-size: 14px;
+        font-weight: 760;
+      }
+      .plan-option-usage {
+        color: #aaa69d;
+        font-size: 12px;
+        line-height: 1.4;
+      }
+      .plan-option-state {
+        justify-self: start;
+        margin-top: 2px;
+        padding: 4px 7px;
+        border-radius: 999px;
+        color: #d7d3ca;
+        background: rgba(255, 255, 255, 0.08);
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .plan-selection-note a {
+        color: #f4d98f;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+      body[data-product="senioren"] .plan-picker,
+      body.senior-product .plan-picker {
+        border-top-color: rgba(112, 87, 39, 0.2);
+      }
+      body[data-product="senioren"] .plan-picker :is(legend, .plan-option-name),
+      body.senior-product .plan-picker :is(legend, .plan-option-name) {
+        color: #211f1a;
+      }
+      body[data-product="senioren"] .plan-picker-intro,
+      body[data-product="senioren"] .plan-option-usage,
+      body.senior-product .plan-picker-intro,
+      body.senior-product .plan-option-usage {
+        color: #6e685f;
+      }
+      body[data-product="senioren"] .plan-option-card,
+      body.senior-product .plan-option-card {
+        border-color: #ded2bc;
+        background: rgba(255, 255, 255, 0.76);
+      }
+      body[data-product="senioren"]
+        .plan-option
+        input:checked
+        + .plan-option-card,
+      body.senior-product .plan-option input:checked + .plan-option-card {
+        border-color: #c99b2d;
+        background: #fff5dc;
+      }
+      body[data-product="senioren"] .plan-change-button,
+      body.senior-product .plan-change-button {
+        color: #5d481e;
+        border-color: #d8bd7d;
+        background: #fff;
+      }
+      .benefits {
+        margin: 12px 0 0;
+      }
+      .benefits li {
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      .selfhint {
+        border-radius: 8px;
+        padding: 14px 16px;
+        margin: 0 0 18px;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+      .passwordhint {
+        margin-top: 7px;
+      }
+      .password-wrap {
+        position: relative;
+      }
+      .password-wrap input {
+        padding-right: 54px;
+      }
+      .password-toggle {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 38px;
+        height: 38px;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .preview-note {
+        font-size: 13px;
+        color: #a8a8a4;
+        line-height: 1.55;
+        margin-top: 14px;
+      }
+      .trustline svg {
+        flex: 0 0 auto;
+      }
+      @media (max-width: 900px) {
+        .signup {
+          grid-template-columns: 1fr;
+        }
+        .preview {
+          position: static;
+        }
+      }
+      @media (max-width: 700px) {
+        .row,
+        .row.name,
+        .choice {
+          grid-template-columns: 1fr;
+        }
+        .formcard,
+        .preview {
+          padding: 22px;
+        }
+        .concierge-choice {
+          grid-template-columns: 1fr;
+        }
+        .concierge-image {
+          aspect-ratio: 4 / 3.35;
+          object-position: center 20%;
+        }
+        .recipient-contact-row .field > label {
+          min-height: 0;
+        }
+        .planbox-head {
+          align-items: stretch;
+          flex-direction: column;
+        }
+        .plan-change-button {
+          width: 100%;
+        }
+        .plan-options {
+          grid-template-columns: 1fr;
+        }
+      }
+    

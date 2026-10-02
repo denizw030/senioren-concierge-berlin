@@ -30,7 +30,8 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           import re
-          html=Path("konto.html").read_text(encoding="utf-8")
+          import subprocess
+          html=subprocess.check_output(["node", "--input-type=module", "-e", "import fs from './tests/helpers/effective-source-fs.mjs'; process.stdout.write(fs.readFileSync('konto.html','utf8'));"], text=True)
 
           # Old wheel is fully gone.
           for stale in ("safetyTimePicker","safetyHourWheel","safetyMinuteWheel","setSafetyWheelTime","buildSafetyTimeWheel"):

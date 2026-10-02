@@ -6,43 +6,12 @@
   <meta name="robots" content="noindex,nofollow">
   <title>FIDEL Live | STEWARO</title>
   <link rel="stylesheet" href="/assets/nahwerk-live-concierge.css?v=5">
-  <style>
-    html,body{margin:0;min-height:100%;background:#030405;color:#fff}
-    #appLiveStart{position:fixed;inset:50% auto auto 50%;transform:translate(-50%,-50%);opacity:0;pointer-events:none}
-    #appLiveBoot{position:fixed;inset:0;display:grid;place-items:center;font:500 16px -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;color:rgba(255,255,255,.68)}
-  </style>
+  <link rel="stylesheet" href="/assets/stewaro-csp-app-live-style-1.css?v=1">
   <script src="/assets/clean-url.js?v=1"></script>
 </head>
 <body>
   <div id="appLiveBoot">FIDEL wird vorbereitet …</div>
   <button id="appLiveStart" type="button" aria-label="Live starten"></button>
-  <script type="module">
-    import { mountNahwerkLiveConcierge } from "/assets/nahwerk-live-concierge.js?v=28";
-    let token="";
-    let controller=null;
-    const notifyClose=()=>{
-      try{window.webkit?.messageHandlers?.nahwerkLiveClose?.postMessage("close");}catch{}
-      try{window.NAHWERKAndroidLive?.close?.();}catch{}
-    };
-    window.startNahwerkAppLive=async(sessionToken)=>{
-      if(typeof sessionToken!=="string"||sessionToken.length<32)return false;
-      token=sessionToken;
-      document.getElementById("appLiveBoot")?.remove();
-      if(!controller){
-        controller=mountNahwerkLiveConcierge({
-          button:"#appLiveStart",
-          channel:"APP",
-          getAuthToken:()=>token,
-          onClose:notifyClose
-        });
-      }
-      await controller.start();
-      return true;
-    };
-    window.stopNahwerkAppLive=async()=>{
-      if(controller)await controller.stop();
-      return true;
-    };
-  </script>
+  <script type="module" src="/assets/stewaro-csp-app-live-script-1.js?v=1"></script>
 </body>
 </html>

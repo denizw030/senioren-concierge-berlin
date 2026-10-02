@@ -116,7 +116,8 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import re
-          src=Path("konto.html").read_text(encoding="utf-8")
+          import subprocess
+          src=subprocess.check_output(["node", "--input-type=module", "-e", "import fs from './tests/helpers/effective-source-fs.mjs'; process.stdout.write(fs.readFileSync('konto.html','utf8'));"], text=True)
           tab=re.search(r'<button[^>]+id="accountTabAccess"[\s\S]*?</button>',src,re.I).group(0)
           start=src.index('<div id="familyOwnerPanelSlot"')
           end=min(pos for pos in [
@@ -212,7 +213,8 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import re
-          src=Path("konto.html").read_text(encoding="utf-8")
+          import subprocess
+          src=subprocess.check_output(["node", "--input-type=module", "-e", "import fs from './tests/helpers/effective-source-fs.mjs'; process.stdout.write(fs.readFileSync('konto.html','utf8'));"], text=True)
           style=re.search(r"<style>[\s\S]*?</style>",src,re.I).group(0)
           links="\n".join(re.findall(r'<link[^>]+rel="stylesheet"[^>]*>',src,re.I))
           tab=re.search(r'<button[^>]+id="accountTabEmail"[\s\S]*?</button>',src,re.I).group(0)
@@ -229,7 +231,8 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import re
-          src=Path("konto.html").read_text(encoding="utf-8")
+          import subprocess
+          src=subprocess.check_output(["node", "--input-type=module", "-e", "import fs from './tests/helpers/effective-source-fs.mjs'; process.stdout.write(fs.readFileSync('konto.html','utf8'));"], text=True)
           style=re.search(r"<style>[\s\S]*?</style>",src,re.I).group(0)
           links="\n".join(re.findall(r'<link[^>]+rel="stylesheet"[^>]*>',src,re.I))
           start=src.index('<div id="familyOwnerPanelSlot"')
@@ -301,7 +304,7 @@ jobs:
                 let order=true;
                 if(page==="de/index.html"){
                   const markers=[...doc.querySelectorAll("main > section")].map(section=>section.querySelector("h1,h2")?.id||section.id||"").join(",");
-                  order=markers==="hero-title,for-you,care-title,leaf-title,precision-title,services-title,how-title,audience-title,trust-title,contact-title";
+                  order=markers==="hero-title,for-you,care-title,leaf-title,services-title,how-title,audience-title,precision-title,trust-title,contact-title";
                 }
                 let telephoneReveal=true;
                 if(page==="telefonannahme.html"){
@@ -366,7 +369,8 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import re
-          src=Path("konto.html").read_text(encoding="utf-8")
+          import subprocess
+          src=subprocess.check_output(["node", "--input-type=module", "-e", "import fs from './tests/helpers/effective-source-fs.mjs'; process.stdout.write(fs.readFileSync('konto.html','utf8'));"], text=True)
           links="\n".join(re.findall(r'<link[^>]+rel="stylesheet"[^>]*>',src,re.I))
           styles="\n".join(re.findall(r'<style[^>]*>[\s\S]*?</style>',src,re.I))
           tabs_start=src.index('<div class="account-tabs-shell">')

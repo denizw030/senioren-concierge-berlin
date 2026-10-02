@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import fs from "node:fs";
+import fs from './helpers/effective-source-fs.mjs';
 
 const read=(p)=>fs.readFileSync(p,"utf8");
 const root=read("index.html");

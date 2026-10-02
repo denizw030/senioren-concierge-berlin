@@ -1,0 +1,132 @@
+{
+  "web-concierge-1": {
+    "declarations": "margin-top:12px",
+    "original": " style=\"margin-top:12px\"",
+    "page": "web-concierge.html"
+  },
+  "anmelden-1": {
+    "declarations": "font-size:29px",
+    "original": " style=\"font-size:29px\"",
+    "page": "anmelden.html"
+  },
+  "anmelden-2": {
+    "declarations": "display:grid;gap:10px",
+    "original": " style=\"display:grid;gap:10px\"",
+    "page": "anmelden.html"
+  },
+  "anmelden-3": {
+    "declarations": "display:grid;gap:10px",
+    "original": " style=\"display:grid;gap:10px\"",
+    "page": "anmelden.html"
+  },
+  "anmelden-4": {
+    "declarations": "display:grid;gap:10px",
+    "original": " style=\"display:grid;gap:10px\"",
+    "page": "anmelden.html"
+  },
+  "anmelden-5": {
+    "declarations": "color:var(--gold);text-decoration:underline",
+    "original": " style=\"color:var(--gold);text-decoration:underline\"",
+    "page": "anmelden.html"
+  },
+  "anmelden-6": {
+    "declarations": "color:var(--gold);text-decoration:underline;font-weight:700",
+    "original": " style=\"color:var(--gold);text-decoration:underline;font-weight:700\"",
+    "page": "anmelden.html"
+  },
+  "registrieren-1": {
+    "declarations": "font-size:28px;color:#173126",
+    "original": " style=\"font-size:28px;color:#173126\"",
+    "page": "registrieren.html"
+  },
+  "registrieren-2": {
+    "declarations": "font-size:25px;margin:0",
+    "original": " style=\"font-size:25px;margin:0\"",
+    "page": "registrieren.html"
+  },
+  "registrieren-3": {
+    "declarations": "color:var(--gold);font-weight:700",
+    "original": " style=\"color:var(--gold);font-weight:700\"",
+    "page": "registrieren.html"
+  },
+  "registrieren-4": {
+    "declarations": "font-size: 25px",
+    "original": " style=\"font-size: 25px\"",
+    "page": "registrieren.html"
+  },
+  "registrieren-5": {
+    "declarations": "font-size: 25px",
+    "original": " style=\"font-size: 25px\"",
+    "page": "registrieren.html"
+  },
+  "registrieren-6": {
+    "declarations": "color: var(--gold); text-decoration: underline",
+    "original": " style=\"color: var(--gold); text-decoration: underline\"",
+    "page": "registrieren.html"
+  },
+  "registrieren-7": {
+    "declarations": "color: var(--gold); text-decoration: underline",
+    "original": " style=\"color: var(--gold); text-decoration: underline\"",
+    "page": "registrieren.html"
+  },
+  "registrieren-8": {
+    "declarations": "color: var(--gold); text-decoration: underline",
+    "original": " style=\"color: var(--gold); text-decoration: underline\"",
+    "page": "registrieren.html"
+  },
+  "registrieren-9": {
+    "declarations": "\n                  color: var(--gold);\n                  text-decoration: underline;\n                  font-weight: 700;\n                ",
+    "original": " style=\"\n                  color: var(--gold);\n                  text-decoration: underline;\n                  font-weight: 700;\n                \"",
+    "page": "registrieren.html"
+  },
+  "konto-1": {
+    "declarations": "margin-top:12px",
+    "original": " style=\"margin-top:12px\"",
+    "page": "konto.html"
+  },
+  "konto-2": {
+    "declarations": "margin:4px 0 8px",
+    "original": " style=\"margin:4px 0 8px\"",
+    "page": "konto.html"
+  },
+  "konto-3": {
+    "declarations": "margin:4px 0 8px",
+    "original": " style=\"margin:4px 0 8px\"",
+    "page": "konto.html"
+  },
+  "konto-4": {
+    "declarations": "margin-top:0",
+    "original": " style=\"margin-top:0\"",
+    "page": "konto.html"
+  },
+  "konto-5": {
+    "declarations": "margin-top:18px",
+    "original": " style=\"margin-top:18px\"",
+    "page": "konto.html"
+  },
+  "konto-6": {
+    "declarations": "margin-top:0",
+    "original": " style=\"margin-top:0\"",
+    "page": "konto.html"
+  },
+  "konto-7": {
+    "declarations": "margin-top:18px",
+    "original": " style=\"margin-top:18px\"",
+    "page": "konto.html"
+  },
+  "konto-8": {
+    "declarations": "margin-top:0",
+    "original": " style=\"margin-top:0\"",
+    "page": "konto.html"
+  },
+  "konto-9": {
+    "declarations": "white-space:pre-wrap;word-break:break-word;padding:16px;border:1px solid var(--line);border-radius:12px;font:600 14px/1.75 ui-monospace,SFMono-Regular,Menlo,monospace",
+    "original": " style=\"white-space:pre-wrap;word-break:break-word;padding:16px;border:1px solid var(--line);border-radius:12px;font:600 14px/1.75 ui-monospace,SFMono-Regular,Menlo,monospace\"",
+    "page": "konto.html"
+  },
+  "konto-10": {
+    "declarations": "margin:16px 0 0",
+    "original": " style=\"margin:16px 0 0\"",
+    "page": "konto.html"
+  }
+}

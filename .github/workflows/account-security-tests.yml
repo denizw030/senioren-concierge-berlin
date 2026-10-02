@@ -42,7 +42,10 @@ jobs:
         run: node --test tests/password-policy.test.mjs tests/auth-security.test.mjs
       - name: Verify live login client is deployed
         run: |
-          curl -fsS "https://nahwerkconcierge.com/anmelden.html?sha=${GITHUB_SHA}" -o /tmp/live-login.html
+          curl -fsS "https://stewaro.com/anmelden.html?sha=${GITHUB_SHA}" -o /tmp/live-login.html
+          if grep -q 'src="/assets/stewaro-csp-anmelden-script-1.js?v=1"' /tmp/live-login.html; then
+            curl -fsS "https://stewaro.com/assets/stewaro-csp-anmelden-script-1.js?v=1&sha=${GITHUB_SHA}" >> /tmp/live-login.html
+          fi
           grep -q "functions/v1/web-login-secure" /tmp/live-login.html
           grep -q "functions/v1/web-password-recovery-request-secure" /tmp/live-login.html
           ! grep -q "webhook/senioren-concierge/web/login/password" /tmp/live-login.html

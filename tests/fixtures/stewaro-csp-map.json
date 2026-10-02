@@ -1,0 +1,283 @@
+{
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-app-live-style-1.css?v=1\">": {
+    "asset": "assets/stewaro-csp-app-live-style-1.css",
+    "opening": "<style>",
+    "closing": "</style>"
+  },
+  "<script type=\"module\" src=\"/assets/stewaro-csp-app-live-script-1.js?v=1\"></script>": {
+    "asset": "assets/stewaro-csp-app-live-script-1.js",
+    "opening": "<script type=\"module\">",
+    "closing": "</script>"
+  },
+  "<script id=\"nw-theme-first-paint\" src=\"/assets/stewaro-csp-web-concierge-script-1.js?v=1\"></script>": {
+    "asset": "assets/stewaro-csp-web-concierge-script-1.js",
+    "opening": "<script id=\"nw-theme-first-paint\">",
+    "closing": "</script>"
+  },
+  " data-stewaro-csp-style=\"web-concierge-1\"": {
+    "original": " style=\"margin-top:12px\""
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-web-concierge-attributes.css?v=1\">\n": {
+    "original": ""
+  },
+  " data-stewaro-csp-submit=\"prevent\"": {
+    "original": " onsubmit=\"return false\""
+  },
+  "<script src=\"/assets/stewaro-csp-web-concierge-submit.js?v=1\"></script>\n": {
+    "original": ""
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-anmelden-style-1.css?v=1\">": {
+    "asset": "assets/stewaro-csp-anmelden-style-1.css",
+    "opening": "<style>",
+    "closing": "</style>"
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-anmelden-style-2.css?v=1\">": {
+    "asset": "assets/stewaro-csp-anmelden-style-2.css",
+    "opening": "<style>",
+    "closing": "</style>"
+  },
+  "<script src=\"/assets/stewaro-csp-anmelden-script-1.js?v=1\"></script>": {
+    "asset": "assets/stewaro-csp-anmelden-script-1.js",
+    "opening": "<script>",
+    "closing": "</script>"
+  },
+  " data-stewaro-csp-style=\"anmelden-1\"": {
+    "original": " style=\"font-size:29px\""
+  },
+  " data-stewaro-csp-style=\"anmelden-2\"": {
+    "original": " style=\"display:grid;gap:10px\""
+  },
+  " data-stewaro-csp-style=\"anmelden-3\"": {
+    "original": " style=\"display:grid;gap:10px\""
+  },
+  " data-stewaro-csp-style=\"anmelden-4\"": {
+    "original": " style=\"display:grid;gap:10px\""
+  },
+  " data-stewaro-csp-style=\"anmelden-5\"": {
+    "original": " style=\"color:var(--gold);text-decoration:underline\""
+  },
+  " data-stewaro-csp-style=\"anmelden-6\"": {
+    "original": " style=\"color:var(--gold);text-decoration:underline;font-weight:700\""
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-anmelden-attributes.css?v=1\">\n": {
+    "original": ""
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-impressum-style-1.css?v=1\">": {
+    "asset": "assets/stewaro-csp-impressum-style-1.css",
+    "opening": "<style>",
+    "closing": "</style>"
+  },
+  "<script src=\"/assets/stewaro-csp-datenschutz-script-1.js?v=1\"></script>": {
+    "asset": "assets/stewaro-csp-datenschutz-script-1.js",
+    "opening": "<script>",
+    "closing": "</script>"
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-registrieren-style-1.css?v=1\" id=\"registration-required-markers\">": {
+    "asset": "assets/stewaro-csp-registrieren-style-1.css",
+    "opening": "<style id=\"registration-required-markers\">",
+    "closing": "</style>"
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-registrieren-style-2.css?v=1\" id=\"registration-first-paint\">": {
+    "asset": "assets/stewaro-csp-registrieren-style-2.css",
+    "opening": "<style id=\"registration-first-paint\">",
+    "closing": "</style>"
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-registrieren-style-3.css?v=1\">": {
+    "asset": "assets/stewaro-csp-registrieren-style-3.css",
+    "opening": "<style>",
+    "closing": "</style>"
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-registrieren-style-4.css?v=1\">": {
+    "asset": "assets/stewaro-csp-registrieren-style-4.css",
+    "opening": "<style>",
+    "closing": "</style>"
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-registrieren-style-5.css?v=1\" id=\"registration-whatsapp-step-premium\">": {
+    "asset": "assets/stewaro-csp-registrieren-style-5.css",
+    "opening": "<style id=\"registration-whatsapp-step-premium\">",
+    "closing": "</style>"
+  },
+  "<script src=\"/assets/stewaro-csp-registrieren-script-1.js?v=1\"></script>": {
+    "asset": "assets/stewaro-csp-registrieren-script-1.js",
+    "opening": "<script>",
+    "closing": "</script>"
+  },
+  " data-stewaro-csp-style=\"registrieren-1\"": {
+    "original": " style=\"font-size:28px;color:#173126\""
+  },
+  " data-stewaro-csp-style=\"registrieren-2\"": {
+    "original": " style=\"font-size:25px;margin:0\""
+  },
+  " data-stewaro-csp-style=\"registrieren-3\"": {
+    "original": " style=\"color:var(--gold);font-weight:700\""
+  },
+  " data-stewaro-csp-style=\"registrieren-4\"": {
+    "original": " style=\"font-size: 25px\""
+  },
+  " data-stewaro-csp-style=\"registrieren-5\"": {
+    "original": " style=\"font-size: 25px\""
+  },
+  " data-stewaro-csp-style=\"registrieren-6\"": {
+    "original": " style=\"color: var(--gold); text-decoration: underline\""
+  },
+  " data-stewaro-csp-style=\"registrieren-7\"": {
+    "original": " style=\"color: var(--gold); text-decoration: underline\""
+  },
+  " data-stewaro-csp-style=\"registrieren-8\"": {
+    "original": " style=\"color: var(--gold); text-decoration: underline\""
+  },
+  " data-stewaro-csp-style=\"registrieren-9\"": {
+    "original": " style=\"\n                  color: var(--gold);\n                  text-decoration: underline;\n                  font-weight: 700;\n                \""
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-registrieren-attributes.css?v=1\">\n": {
+    "original": ""
+  },
+  "<script id=\"nw-theme-first-paint\" src=\"/assets/stewaro-csp-konto-script-1.js?v=1\"></script>": {
+    "asset": "assets/stewaro-csp-konto-script-1.js",
+    "opening": "<script id=\"nw-theme-first-paint\">",
+    "closing": "</script>"
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-konto-style-1.css?v=1\">": {
+    "asset": "assets/stewaro-csp-konto-style-1.css",
+    "opening": "<style>",
+    "closing": "</style>"
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-konto-style-2.css?v=1\">": {
+    "asset": "assets/stewaro-csp-konto-style-2.css",
+    "opening": "<style>",
+    "closing": "</style>"
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-konto-style-3.css?v=1\" id=\"konto-premium-2026\">": {
+    "asset": "assets/stewaro-csp-konto-style-3.css",
+    "opening": "<style id=\"konto-premium-2026\">",
+    "closing": "</style>"
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-konto-style-4.css?v=1\">": {
+    "asset": "assets/stewaro-csp-konto-style-4.css",
+    "opening": "<style>",
+    "closing": "</style>"
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-konto-style-5.css?v=1\">": {
+    "asset": "assets/stewaro-csp-konto-style-5.css",
+    "opening": "<style>",
+    "closing": "</style>"
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-konto-style-6.css?v=1\" id=\"persons-access-2026\">": {
+    "asset": "assets/stewaro-csp-konto-style-6.css",
+    "opening": "<style id=\"persons-access-2026\">",
+    "closing": "</style>"
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-konto-style-7.css?v=1\" id=\"family-access-2026\">": {
+    "asset": "assets/stewaro-csp-konto-style-7.css",
+    "opening": "<style id=\"family-access-2026\">",
+    "closing": "</style>"
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-konto-style-8.css?v=1\" id=\"account-mobile-tabs-final-v3\">": {
+    "asset": "assets/stewaro-csp-konto-style-8.css",
+    "opening": "<style id=\"account-mobile-tabs-final-v3\">",
+    "closing": "</style>"
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-konto-style-9.css?v=1\" id=\"account-tabs-apple-control-v4\">": {
+    "asset": "assets/stewaro-csp-konto-style-9.css",
+    "opening": "<style id=\"account-tabs-apple-control-v4\">",
+    "closing": "</style>"
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-konto-style-10.css?v=1\" id=\"account-tabs-symmetric-v5\">": {
+    "asset": "assets/stewaro-csp-konto-style-10.css",
+    "opening": "<style id=\"account-tabs-symmetric-v5\">",
+    "closing": "</style>"
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-konto-style-11.css?v=1\" id=\"account-mobile-scroll-unlock-v6\">": {
+    "asset": "assets/stewaro-csp-konto-style-11.css",
+    "opening": "<style id=\"account-mobile-scroll-unlock-v6\">",
+    "closing": "</style>"
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-konto-style-12.css?v=1\" id=\"account-overview-actions-equal-v1\">": {
+    "asset": "assets/stewaro-csp-konto-style-12.css",
+    "opening": "<style id=\"account-overview-actions-equal-v1\">",
+    "closing": "</style>"
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-konto-style-13.css?v=1\" id=\"fraud-protection-ui\">": {
+    "asset": "assets/stewaro-csp-konto-style-13.css",
+    "opening": "<style id=\"fraud-protection-ui\">",
+    "closing": "</style>"
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-konto-style-14.css?v=1\" id=\"konto-overview-compact-v2\">": {
+    "asset": "assets/stewaro-csp-konto-style-14.css",
+    "opening": "<style id=\"konto-overview-compact-v2\">",
+    "closing": "</style>"
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-konto-style-15.css?v=1\" id=\"konto-concierge-chat-footer-v1\">": {
+    "asset": "assets/stewaro-csp-konto-style-15.css",
+    "opening": "<style id=\"konto-concierge-chat-footer-v1\">",
+    "closing": "</style>"
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-konto-style-16.css?v=1\" id=\"konto-overview-ambient-final-v1\">": {
+    "asset": "assets/stewaro-csp-konto-style-16.css",
+    "opening": "<style id=\"konto-overview-ambient-final-v1\">",
+    "closing": "</style>"
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-konto-style-17.css?v=1\" id=\"account-tab-icon-alignment-final-v1\">": {
+    "asset": "assets/stewaro-csp-konto-style-17.css",
+    "opening": "<style id=\"account-tab-icon-alignment-final-v1\">",
+    "closing": "</style>"
+  },
+  "<script src=\"/assets/stewaro-csp-konto-script-2.js?v=1\"></script>": {
+    "asset": "assets/stewaro-csp-konto-script-2.js",
+    "opening": "<script>",
+    "closing": "</script>"
+  },
+  "<script src=\"/assets/stewaro-csp-konto-script-3.js?v=1\"></script>": {
+    "asset": "assets/stewaro-csp-konto-script-3.js",
+    "opening": "<script>",
+    "closing": "</script>"
+  },
+  "<script src=\"/assets/stewaro-csp-konto-script-4.js?v=1\"></script>": {
+    "asset": "assets/stewaro-csp-konto-script-4.js",
+    "opening": "<script>",
+    "closing": "</script>"
+  },
+  " data-stewaro-csp-style=\"konto-1\"": {
+    "original": " style=\"margin-top:12px\""
+  },
+  " data-stewaro-csp-style=\"konto-2\"": {
+    "original": " style=\"margin:4px 0 8px\""
+  },
+  " data-stewaro-csp-style=\"konto-3\"": {
+    "original": " style=\"margin:4px 0 8px\""
+  },
+  " data-stewaro-csp-style=\"konto-4\"": {
+    "original": " style=\"margin-top:0\""
+  },
+  " data-stewaro-csp-style=\"konto-5\"": {
+    "original": " style=\"margin-top:18px\""
+  },
+  " data-stewaro-csp-style=\"konto-6\"": {
+    "original": " style=\"margin-top:0\""
+  },
+  " data-stewaro-csp-style=\"konto-7\"": {
+    "original": " style=\"margin-top:18px\""
+  },
+  " data-stewaro-csp-style=\"konto-8\"": {
+    "original": " style=\"margin-top:0\""
+  },
+  " data-stewaro-csp-style=\"konto-9\"": {
+    "original": " style=\"white-space:pre-wrap;word-break:break-word;padding:16px;border:1px solid var(--line);border-radius:12px;font:600 14px/1.75 ui-monospace,SFMono-Regular,Menlo,monospace\""
+  },
+  " data-stewaro-csp-style=\"konto-10\"": {
+    "original": " style=\"margin:16px 0 0\""
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-konto-attributes.css?v=1\">\n": {
+    "original": ""
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-kontakt-style-1.css?v=1\">": {
+    "asset": "assets/stewaro-csp-kontakt-style-1.css",
+    "opening": "<style>",
+    "closing": "</style>"
+  },
+  "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-datenschutz-style-1.css?v=1\" id=\"stewaro-privacy-hub-v1\">": {
+    "asset": "assets/stewaro-csp-datenschutz-style-1.css",
+    "opening": "<style id=\"stewaro-privacy-hub-v1\">",
+    "closing": "</style>"
+  }
+}

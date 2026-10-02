@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import fs from "node:fs";
+import fs from './helpers/effective-source-fs.mjs';
 
 const read = (path) => fs.readFileSync(path, "utf8");
 const visibleText = (source) => source
@@ -105,7 +105,7 @@ test("Block 3 shared navigation is STEWARO-first and legacy public brand routes 
   assert.doesNotMatch(nav, /"\/senioren-concierge",/);
 });
 
-test("Block 3 production domain remains isolated", () => {
-  assert.equal(read("CNAME").trim(), "nahwerkconcierge.com");
+test("public domain follows canonical STEWARO authority", () => {
+  assert.equal(read("CNAME").trim(), "stewaro.com");
   assert.match(read("assets/site.css"), /stewaro-brand-shell\.css/);
 });

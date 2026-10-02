@@ -1,0 +1,42 @@
+
+.safety-hub{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.safety-hub[hidden]{display:none!important}
+.safety-hub-card{width:100%;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;text-align:left;padding:22px;border:1px solid var(--line);border-radius:18px;background:var(--paper,#fff);color:inherit;cursor:pointer;font:inherit;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.safety-hub-card:hover,.safety-hub-card:focus-visible{transform:translateY(-3px);border-color:rgba(173,139,74,.62);box-shadow:0 16px 38px rgba(0,0,0,.11);outline:none}
+.safety-hub-card strong{display:block;font-size:18px;margin-bottom:5px}
+.safety-hub-card small{display:block;color:var(--muted);font-size:13px;line-height:1.5}
+.safety-hub-icon{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(173,139,74,.35);font-size:20px}
+.safety-hub-arrow{font-size:28px;color:var(--muted)}
+[data-safety-detail][hidden]{display:none!important}
+.safety-detail-top{display:flex;justify-content:flex-start;margin-bottom:18px}
+.fraud-protection-card,.safety-card{grid-column:1/-1}
+.fraud-protection-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}
+.fraud-protection-grid>div{display:flex;flex-direction:column;gap:5px;padding:16px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.45)}
+.fraud-protection-grid>div.fraud-featured{grid-column:1/-1;padding:22px;border-color:rgba(173,139,74,.44)}
+.fraud-protection-grid>div.fraud-featured strong{font-size:18px}
+.fraud-protection-grid span{font-size:13px;line-height:1.5;color:var(--muted)}
+.account-password-card{grid-column:1/-1}
+.fraud-situation-check,.fraud-channel-section,.fraud-final-note{margin-top:18px;padding:20px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.025)}
+.fraud-situation-check h4,.fraud-channel-section h4{margin:4px 0 10px;font-size:20px}
+.fraud-situation-check p,.fraud-channel-section p{margin:8px 0;line-height:1.6}
+.fraud-example{display:flex;flex-direction:column;gap:7px;margin-top:15px;padding:16px;border:1px solid rgba(173,139,74,.32);border-radius:14px;background:rgba(173,139,74,.055)}
+.fraud-example span,.fraud-check-note,.fraud-final-note span{font-size:13px;line-height:1.6;color:var(--muted)}
+.fraud-channel-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:15px}
+.fraud-channel-item{display:flex;flex-direction:column;gap:6px;padding:14px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.025)}
+.fraud-channel-item span{font-size:12.5px;line-height:1.5;color:var(--muted)}
+.fraud-channel-phone{border-color:rgba(173,139,74,.38)}
+.fraud-section-title{margin:26px 0 -5px;padding-top:4px}
+.fraud-section-title span{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.fraud-final-note{display:flex;flex-direction:column;gap:7px;margin-top:24px}
+body.account-premium-ui.nw-portal-dark .fraud-situation-check,
+body.account-premium-ui.nw-portal-dark .fraud-channel-section,
+body.account-premium-ui.nw-portal-dark .fraud-final-note,
+body.account-premium-ui.nw-portal-dark .fraud-channel-item{background:rgba(9,13,18,.70);border-color:rgba(169,187,211,.11)}
+body.account-premium-ui.nw-portal-dark .fraud-example{background:rgba(214,182,107,.045);border-color:rgba(214,182,107,.22)}
+body.account-premium-ui.nw-portal-light .fraud-situation-check,
+body.account-premium-ui.nw-portal-light .fraud-channel-section,
+body.account-premium-ui.nw-portal-light .fraud-final-note,
+body.account-premium-ui.nw-portal-light .fraud-channel-item{background:rgba(255,255,255,.72);border-color:rgba(112,87,39,.14)}
+@media(max-width:1100px){.fraud-channel-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.fraud-channel-phone{grid-column:1/-1}}
+@media(max-width:720px){.fraud-channel-grid{grid-template-columns:1fr}.fraud-channel-phone{grid-column:auto}}
+@media(max-width:720px){.safety-hub,.fraud-protection-grid{grid-template-columns:1fr}.fraud-protection-grid>div.fraud-featured{grid-column:auto}}
