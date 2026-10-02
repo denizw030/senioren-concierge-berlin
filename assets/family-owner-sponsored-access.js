@@ -365,7 +365,7 @@
     setFormOpen(true);
     const safety=String(row.checkin_time||"").trim();
     setStatus(row.safety_enabled===true&&safety
-      ?"Angaben übernommen. Der gewünschte Safety-Check-in ("+safety+" Uhr) wird erst nach der Bestätigung der unterstützten Person eingerichtet."
+      ?"Angaben übernommen. Safety-Check-in: "+safety+" Uhr. Er kann erst nach der Bestätigung der unterstützten Person aktiviert werden."
       :"Angaben übernommen. Bitte prüfe sie kurz und bereite anschließend die Einladung vor.");
     return true;
   }
