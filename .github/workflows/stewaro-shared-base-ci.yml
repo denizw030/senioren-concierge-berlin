@@ -4,6 +4,10 @@ on:
   pull_request:
     paths:
       - "de/index.html"
+      - "assets/stewaro-home-de*.css"
+      - "assets/stewaro-home-de.js"
+      - "tests/helpers/homepage-source.mjs"
+      - "tests/stewaro-homepage-csp.test.mjs"
       - "en/index.html"
       - "tr/index.html"
       - "tests/stewaro-scroll-video.test.mjs"
@@ -106,6 +110,9 @@ jobs:
 
       - name: Run STEWARO shared-base contract
         run: node --test tests/stewaro-shared-base-brand-shell.test.mjs
+
+      - name: Verify homepage CSP preparation
+        run: node --test tests/stewaro-homepage-csp.test.mjs
 
       - name: Run STEWARO scroll-video contract
         run: node --test tests/stewaro-scroll-video.test.mjs

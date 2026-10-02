@@ -1,0 +1,192 @@
+
+  /* Blatt / Ruhe — quiet cinematic luxury. Scoped to this section only. */
+  .leaf-scene {
+    min-height: 96svh;
+    align-items: flex-end;
+    background: #07100c;
+  }
+
+  .leaf-scene::before,
+  .leaf-scene::after {
+    content: "";
+    position: absolute;
+    left: max(28px, calc((100vw - 1440px) / 2));
+    right: max(28px, calc((100vw - 1440px) / 2));
+    height: 1px;
+    z-index: 4;
+    pointer-events: none;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(215,193,151,.20) 12%,
+      rgba(215,193,151,.48) 50%,
+      rgba(215,193,151,.20) 88%,
+      transparent 100%);
+  }
+  .leaf-scene::before { top: 32px; }
+  .leaf-scene::after { bottom: 32px; opacity: .72; }
+
+  .leaf-scene .cinematic-media {
+    background: #07100c;
+  }
+
+  .leaf-scene .leaf-image {
+    width: 110%;
+    height: 114%;
+    inset: -7% -5%;
+    object-position: 58% 50%;
+    filter: brightness(.68) saturate(.78) contrast(1.09);
+    transform-origin: 58% 48%;
+    animation: leafStillness 20s cubic-bezier(.45,.05,.55,.95) infinite alternate;
+  }
+
+  .leaf-scene .leaf-video {
+    animation: none !important;
+    pointer-events: none;
+    will-change: contents;
+  }
+
+  .leaf-scene .cinematic-shade {
+    background:
+      linear-gradient(90deg,
+        rgba(3,9,6,.92) 0%,
+        rgba(3,9,6,.78) 30%,
+        rgba(3,9,6,.38) 56%,
+        rgba(3,9,6,.08) 76%,
+        rgba(3,9,6,.22) 100%),
+      linear-gradient(0deg,
+        rgba(2,7,5,.84) 0%,
+        rgba(2,7,5,.30) 38%,
+        rgba(2,7,5,.06) 70%,
+        rgba(2,7,5,.24) 100%);
+  }
+
+  .leaf-scene .cinematic-media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse at 76% 32%, rgba(226,198,143,.14), transparent 28%),
+      radial-gradient(ellipse at 55% 52%, transparent 28%, rgba(0,0,0,.15) 75%, rgba(0,0,0,.34) 100%);
+    mix-blend-mode: screen, normal;
+  }
+
+  .leaf-scene .cinematic-light {
+    inset: -24%;
+    background: radial-gradient(ellipse at 72% 35%, rgba(239,215,166,.15), transparent 24%);
+    opacity: .72;
+    animation: leafLight 16s cubic-bezier(.45,.05,.55,.95) infinite alternate;
+  }
+
+  .leaf-scene .cinematic-content {
+    width: min(1440px, calc(100% - 56px));
+    margin: 0 auto;
+    padding: 150px 0 150px;
+    position: relative;
+    z-index: 5;
+  }
+
+  .leaf-scene .cinematic-content::before {
+    content: "";
+    display: block;
+    width: 54px;
+    height: 1px;
+    margin-bottom: 24px;
+    background: linear-gradient(90deg, #d6bd8c, rgba(214,189,140,.16));
+  }
+
+  .leaf-scene .section-kicker {
+    margin-bottom: 19px;
+    color: rgba(226,207,169,.82);
+    letter-spacing: .22em;
+  }
+
+  .leaf-scene .cinematic-content h2 {
+    max-width: 760px;
+    font-size: clamp(50px, 5.6vw, 86px);
+    line-height: .99;
+    letter-spacing: -.045em;
+    text-shadow: 0 2px 28px rgba(0,0,0,.22);
+  }
+
+  .leaf-scene .cinematic-content > p:last-child {
+    max-width: 610px;
+    margin-top: 31px;
+    color: rgba(250,247,239,.73);
+    font-size: 19px;
+    line-height: 1.72;
+  }
+
+  @keyframes leafStillness {
+    from { transform: translate3d(-.3%, -0.2%, 0) scale(1.042); }
+    to   { transform: translate3d(.45%, .35%, 0) scale(1.062); }
+  }
+
+  @keyframes leafLight {
+    from { transform: translate3d(-1.4%, .6%, 0) scale(1.01); opacity: .56; }    to   { transform: translate3d(1.6%, -1%, 0) scale(1.06); opacity: .78; }
+  }
+
+  @media (max-width: 980px) {
+    .leaf-scene { min-height: 90svh; }
+    .leaf-scene .cinematic-content { padding: 128px 0 118px; }
+    .leaf-scene .leaf-image { object-position: 65% 50%; }
+  }
+
+  @media (max-width: 600px) {
+    .leaf-scene {
+      min-height: 88svh;
+      align-items: flex-end;
+    }
+    .leaf-scene::before,
+    .leaf-scene::after {
+      left: 20px;
+      right: 20px;
+    }
+    .leaf-scene::before { top: 24px; }
+    .leaf-scene::after { bottom: 24px; }
+
+    .leaf-scene .leaf-image {
+      width: 122%;
+      height: 112%;
+      inset: -6% -11%;
+      object-position: 69% 48%;
+      filter: brightness(.62) saturate(.76) contrast(1.08);
+    }
+    .leaf-scene .cinematic-shade {
+      background:
+        linear-gradient(0deg,
+          rgba(3,9,6,.94) 0%,
+          rgba(3,9,6,.72) 37%,
+          rgba(3,9,6,.28) 68%,
+          rgba(3,9,6,.12) 100%),
+        linear-gradient(90deg, rgba(3,9,6,.48), rgba(3,9,6,.06));
+    }
+    .leaf-scene .cinematic-content {
+      width: calc(100% - 40px);
+      padding: 110px 0 92px;
+    }
+    .leaf-scene .cinematic-content::before {
+      width: 42px;
+      margin-bottom: 19px;
+    }
+    .leaf-scene .section-kicker { margin-bottom: 17px; }
+    .leaf-scene .cinematic-content h2 {
+      max-width: 100%;
+      font-size: clamp(43px, 12.2vw, 61px);
+      line-height: .99;
+    }
+    .leaf-scene .cinematic-content > p:last-child {
+      margin-top: 25px;
+      max-width: 94%;
+      font-size: 17px;
+      line-height: 1.68;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .leaf-scene .leaf-image,
+    .leaf-scene .cinematic-light {
+      animation: none !important;
+      transform: none !important;
+    }
+  }

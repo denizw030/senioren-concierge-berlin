@@ -1,3 +1,4 @@
+import { homepageSource } from './helpers/homepage-source.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -45,7 +46,24 @@ function normalizeInlineCss(css) {
 
 function stylesheetRefs(html) {
   return [...html.matchAll(/<link\b[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["'][^>]*>/gi)]
-    .map((m) => normalizeAsset(m[1]));
+    .map((m) => normalizeAsset(m[1]))
+    .filter((href) => !/^\/assets\/stewaro-home-de-/.test(href));
+}
+
+function effectiveStyleBlocks(html) {
+  const blocks = [];
+  const token = /<style\b[^>]*>([\s\S]*?)<\/style>|<link\b[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["'][^>]*>/gi;
+  for (const match of html.matchAll(token)) {
+    if (match[1] !== undefined) {
+      blocks.push(normalizeInlineCss(match[1]));
+      continue;
+    }
+    const href = normalizeAsset(match[2]).replace(/[?#].*$/, '');
+    if (/^\/assets\/stewaro-home-de-/.test(href)) {
+      blocks.push(normalizeInlineCss(read(href.replace(/^\//, ''))));
+    }
+  }
+  return blocks;
 }
 
 function scriptRefs(html) {
@@ -70,17 +88,17 @@ function bodyClass(html) {
 
 for (const page of pages) {
   test(`${page}: EN/TR keep exact German PROD visual structure`, () => {
-    const de = read(germanSource(page));
+    const de = homepageSource(germanSource(page));
     assert.doesNotMatch(de, /international\.css/i);
 
     for (const lang of ['en', 'tr']) {
-      const locale = read(`${lang}/${page}`);
+      const locale = homepageSource(`${lang}/${page}`);
       assert.doesNotMatch(locale, /international\.css/i, `${lang}/${page} must not use a separate locale design stylesheet`);
       assert.match(locale, /STEWARO|stewaro-icon\.svg/i, `${lang}/${page} must keep the canonical STEWARO identity`);
       assert.deepEqual(stylesheetRefs(locale), stylesheetRefs(de), `${lang}/${page} stylesheet stack changed`);
       assert.deepEqual(scriptRefs(locale), scriptRefs(de), `${lang}/${page} script stack changed`);
       assert.deepEqual(imageRefs(locale), imageRefs(de), `${lang}/${page} visual assets changed`);
-      assert.deepEqual(styleBlocks(locale), styleBlocks(de), `${lang}/${page} inline visual CSS changed`);
+      assert.deepEqual(effectiveStyleBlocks(locale), effectiveStyleBlocks(de), `${lang}/${page} effective visual CSS changed`);
       assert.equal(bodyClass(locale), bodyClass(de), `${lang}/${page} body layout classes changed`);
     }
   });

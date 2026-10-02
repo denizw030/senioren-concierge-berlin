@@ -1,3 +1,4 @@
+import { homepageSource } from './helpers/homepage-source.mjs';
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -8,7 +9,7 @@ test("STEWARO shared-base brand shell is wired without forking runtime", () => {
   const siteCss = read("assets/site.css");
   const shellCss = read("assets/stewaro-brand-shell.css");
   const siteUi = read("assets/site-ui.js");
-  const home = read("de/index.html");
+  const home = homepageSource("de/index.html");
   const matrix = read("docs/STEWARO-MIGRATION-MATRIX-20260927.md");
 
   assert.match(siteCss, /stewaro-brand-shell\.css/);

@@ -1,0 +1,7 @@
+
+  /* Customer content is visible by default. Motion is enhancement only. */
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  #app { min-height: 100vh; }

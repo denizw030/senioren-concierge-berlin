@@ -1,3 +1,4 @@
+import { homepageSource } from './helpers/homepage-source.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -18,7 +19,7 @@ const markers = [
 
 for (const locale of locales) {
   test(`${locale}: homepage follows conversion story order`, () => {
-    const html = fs.readFileSync(`${locale}/index.html`, 'utf8');
+    const html = homepageSource(`${locale}/index.html`);
     const positions = markers.map(([name, marker]) => [name, html.indexOf(marker)]);
     for (const [name, pos] of positions) assert.ok(pos >= 0, `${locale}: missing ${name}`);
     for (let i = 0; i < positions.length - 1; i++) {
@@ -28,7 +29,7 @@ for (const locale of locales) {
   });
 
   test(`${locale}: leaf and clockwork animations remain present after reorder`, () => {
-    const html = fs.readFileSync(`${locale}/index.html`, 'utf8');
+    const html = homepageSource(`${locale}/index.html`);
     assert.match(html, /class="cinematic-image leaf-image leaf-video"/);
     assert.match(html, /class="mechanism-image mechanism-video"/);
     assert.match(html, /const updateLeafVideo = \(\) => \{/);
