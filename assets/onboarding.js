@@ -375,13 +375,8 @@
         window.NahwerkActivation?.markRegistrationComplete?.();
         localStorage.setItem("scb_onboarding_sent", "1");
         localStorage.setItem("scb_onboarding_result", JSON.stringify(body));
-        const loginResult = await login(submissionRequest.email, password);
+        const loginResult = await login(request.email, password);
         if (loginResult) {
-          if (familySetup && familyDraft) {
-            sessionStorage.setItem(FAMILY_REGISTRATION_DRAFT_KEY, JSON.stringify(familyDraft));
-            show("<strong>Dein Zugang ist angelegt.</strong><br>Die Angaben für die unterstützte Person werden jetzt sicher in den Family-Einladungsweg übernommen.");
-            return setTimeout(() => { location.href = "/konto?family_setup=1"; }, 450);
-          }
           if (appHandoff) {
             show("<strong>Fertig.</strong><br>FIDEL wird jetzt sicher geöffnet.");
             void handoffToApp(loginResult.session_token);
@@ -598,6 +593,9 @@
     } : request;
     const draft = { ...request, web_password: undefined, web_password_repeat: undefined, createdAt: new Date().toISOString(), source: "website" };
     localStorage.setItem("scb_onboarding", JSON.stringify(draft));
+    if (familySetup && familyDraft) {
+      sessionStorage.setItem(FAMILY_REGISTRATION_DRAFT_KEY, JSON.stringify(familyDraft));
+    }
     const submit = form.querySelector('button[type="submit"]');
     submit.disabled = true;
     submit.textContent = "Zugang wird angelegt …";
@@ -607,7 +605,7 @@
       const body = await response.json().catch(() => ({}));
       if (response.ok && body.ok === true && body.status === "verification_required" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(body.request_id || ""))) {
         if (familySetup) {
-          return show("<strong>Für diese E-Mail besteht bereits eine Identität.</strong><br>Bitte melde dich mit deinem bestehenden STEWARO-Zugang an und richte die unterstützte Person anschließend unter „Unterstützte Personen“ ein.", true);
+          return show('<strong>Für diese E-Mail besteht bereits eine Identität.</strong><br>Bitte melde dich mit deinem bestehenden STEWARO-Zugang an. Deine Angaben zur unterstützten Person bleiben für den sicheren Family-Einladungsweg erhalten.<br><a href="/anmelden">Zur Anmeldung</a>', true);
         }
         beginVerification(body, submissionRequest, password);
         return;
@@ -617,8 +615,12 @@
         window.NahwerkActivation?.markRegistrationComplete?.();
         localStorage.setItem("scb_onboarding_sent", "1");
         localStorage.setItem("scb_onboarding_result", JSON.stringify(body));
-        const loginResult = await login(request.email, password);
+        const loginResult = await login(submissionRequest.email, password);
         if (loginResult) {
+          if (familySetup && familyDraft) {
+            show("<strong>Dein Zugang ist angelegt.</strong><br>Die Angaben für die unterstützte Person werden jetzt sicher in den Family-Einladungsweg übernommen.");
+            return setTimeout(() => { location.href = "/konto?family_setup=1"; }, 450);
+          }
           if (appHandoff) {
             show("<strong>Fertig.</strong><br>FIDEL wird jetzt sicher geöffnet.");
             void handoffToApp(loginResult.session_token);
