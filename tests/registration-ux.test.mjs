@@ -6,6 +6,7 @@ const html = readFileSync(new URL("../registrieren.html", import.meta.url), "utf
 const onboarding = readFileSync(new URL("../assets/onboarding.js", import.meta.url), "utf8");
 const accountFlow = readFileSync(new URL("../assets/stewaro-account-flow.js", import.meta.url), "utf8");
 const wizardCss = readFileSync(new URL("../assets/stewaro-registration-wizard.css", import.meta.url), "utf8");
+const authNav = readFileSync(new URL("../assets/auth-nav.js", import.meta.url), "utf8");
 const voicePreviewCss = readFileSync(new URL("../assets/concierge-voice-preview.css", import.meta.url), "utf8");
 const carouselCss = readFileSync(new URL("../assets/concierge-carousel.css", import.meta.url), "utf8");
 const carouselJs = readFileSync(new URL("../assets/concierge-carousel.js", import.meta.url), "utf8");
@@ -88,8 +89,8 @@ test("registration no longer loads photo carousel or voice-preview assets", () =
 
 test("registration uses one calm canonical step flow for self and Family entry", () => {
   assert.match(html, /stewaro-registration-wizard\.css\?v=1/);
-  assert.match(html, /stewaro-account-flow\.js\?v=2/);
-  assert.match(html, /assets\/onboarding\.js\?v=28/);
+  assert.match(html, /stewaro-account-flow\.js\?v=3/);
+  assert.match(html, /assets\/onboarding\.js\?v=29/);
   assert.match(accountFlow, /if\(!document\.body\.classList\.contains\("registration-page"\)\)return/);
   assert.doesNotMatch(accountFlow, /registration-page"\)\|\|source!==/);
   assert.match(accountFlow, /familyMode=params\.get\("fuer"\)==="andere"/);
@@ -128,4 +129,34 @@ test("wizard includes optional Safety without exposing a large legacy form", () 
   assert.match(accountFlow, /Ein Check-in und eine Vertrauensperson reichen für den Start\./);
   assert.match(wizardCss, /#signupForm>\*:not\(\.stewaro-registration-progressive\)/);
   assert.match(wizardCss, /\.stewaro-registration-progressive>h1/);
+});
+
+
+test("wizard keeps WhatsApp branding restrained in the main question", () => {
+  assert.match(authNav, /\.stewaro-registration-progressive>h1/);
+  assert.match(accountFlow, /title:"Welche WhatsApp-Nummer sollen wir verbinden\?"/);
+});
+
+test("review summary does not duplicate WhatsApp and shows the selected Safety time", () => {
+  assert.match(accountFlow, /preferredContact\.value==="WHATSAPP"\?"WhatsApp":\(whatsappEnabled\.value==="true"\?"App · WhatsApp zusätzlich":"App"\)/);
+  assert.doesNotMatch(accountFlow, /WhatsApp aktiv/);
+  assert.match(accountFlow, /"Täglich um "\+checkinValue\+" Uhr"/);
+  assert.match(html, /id="checkinTimes"[\s\S]*type="time"[\s\S]*value="09:00"/);
+});
+
+test("Family registration creates the account holder first and preserves verified consent authority", () => {
+  assert.match(onboarding, /FAMILY_REGISTRATION_DRAFT_KEY = "nw_family_registration_pending_v1"/);
+  assert.match(onboarding, /const familySetup = !self/);
+  assert.match(onboarding, /registration_type: "self"/);
+  assert.match(onboarding, /family_setup_pending: true/);
+  assert.match(onboarding, /sessionStorage\.setItem\(FAMILY_REGISTRATION_DRAFT_KEY/);
+  assert.match(onboarding, /location\.href = "\/konto\?family_setup=1"/);
+  assert.doesNotMatch(onboarding, /registration_type: "other"[\s\S]*submissionRequest/);
+});
+
+test("registration surfaces server validation details instead of a generic dead end", () => {
+  assert.match(onboarding, /Array\.isArray\(body\.errors\)/);
+  assert.match(onboarding, /Einige Angaben müssen noch geprüft werden/);
+  assert.match(onboarding, /Die WhatsApp-Telefonnummer ist nicht vollständig oder nicht gültig/);
+  assert.doesNotMatch(onboarding, /return show\("<strong>Bitte prüfen Sie Ihre Angaben\.<\/strong>", true\)/);
 });
