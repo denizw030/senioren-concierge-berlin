@@ -35,15 +35,17 @@ body.stewaro-access-page,body.stewaro-account-flow{
 .stewaro-access-intro{margin:0;color:var(--sa-muted);font-size:17px;line-height:1.65}
 .stewaro-access-actions{display:grid;gap:12px;margin-top:4px}
 .stewaro-access-choice,.stewaro-access-submit{
-  width:100%;min-height:58px;padding:0 22px;border-radius:16px;border:1px solid var(--sa-line);
-  background:rgba(255,255,255,.76);color:var(--sa-green);font:700 16px/1.2 inherit;text-align:left;
+  width:100%;min-height:64px;padding:0 22px;border-radius:16px;border:1px solid var(--sa-line);
+  background:rgba(255,255,255,.76);color:var(--sa-green);font:700 16px/1.2 inherit;text-align:center;
   cursor:pointer;box-shadow:0 10px 30px rgba(31,46,37,.045);transition:.18s ease;
 }
-.stewaro-access-choice strong{display:block;font-size:17px}
-.stewaro-access-choice span{display:block;margin-top:5px;color:var(--sa-muted);font-weight:450;font-size:13px;line-height:1.45}
+.stewaro-access-choice{
+  display:flex;align-items:center;justify-content:center;
+}
+.stewaro-access-choice strong{display:block;font-size:17px;line-height:1.2}
 .stewaro-access-choice:hover{transform:translateY(-2px);border-color:rgba(185,133,46,.42);box-shadow:0 18px 42px rgba(31,46,37,.07)}
 .stewaro-access-choice.primary,.stewaro-access-submit{
-  text-align:center;background:var(--sa-green);color:#fff;border-color:var(--sa-green);
+  background:var(--sa-green);color:#fff;border-color:var(--sa-green);
 }
 .stewaro-access-form{display:grid;gap:14px}
 .stewaro-access-form label{font-size:14px;font-weight:700;color:var(--sa-green)}
