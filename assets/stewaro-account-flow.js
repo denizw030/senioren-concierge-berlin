@@ -68,6 +68,14 @@
   };
   const preferredContact=ensureHidden("preferredContactChannel","APP");
   const whatsappEnabled=ensureHidden("whatsappEnabled","false");
+  const setWhatsappEnabled=(enabled)=>{
+    const on=Boolean(enabled);
+    whatsappEnabled.value=on?"true":"false";
+    const selfPhone=document.getElementById("ownerPhone");
+    const familyPhone=document.getElementById("recipientPhone");
+    if(selfPhone)selfPhone.required=on&&!familyMode;
+    if(familyPhone)familyPhone.required=on&&familyMode;
+  };
 
   const fieldNode=el=>el?.closest(".field");
   const ownerFirst=$("ownerFirstName");
@@ -208,7 +216,7 @@
         {label:"WhatsApp",value:"WHATSAPP",description:"Direkt im gewohnten Chat"}
       ],value=>{
         preferredContact.value=value;
-        whatsappEnabled.value=value==="WHATSAPP"?"true":"false";
+        setWhatsappEnabled(value==="WHATSAPP");
         if(value==="WHATSAPP")goNext();
         else goNext();
       });
@@ -226,7 +234,7 @@
         {label:"Ja, zusätzlich",value:"yes"},
         {label:"Nein, nur App",value:"no"}
       ],value=>{
-        whatsappEnabled.value=value==="yes"?"true":"false";
+        setWhatsappEnabled(value==="yes");
         goNext();
       });
     },
@@ -375,7 +383,7 @@
       stage.append(next);
     }
     setTimeout(()=>step.focus?.focus(),0);
-    window.scrollTo({top:0,behavior:"instant"});
+    window.scrollTo({top:0,behavior:"auto"});
   };
 
   function goNext(){
@@ -400,7 +408,6 @@
     }
   });
 
-  if(ownerPhone)ownerPhone.required=false;
-  if(recipientPhone)recipientPhone.required=false;
+  setWhatsappEnabled(false);
   render();
 })();
