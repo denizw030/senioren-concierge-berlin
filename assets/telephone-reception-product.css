@@ -104,3 +104,19 @@ body.telephone-reception-page .footer.reveal{
   transition:none!important;
   filter:none!important;
 }
+
+
+/* PR298 accessibility gate closure: telephone proof contrast. */
+body.telephone-reception-page .tr-proof{
+  background:#11110f!important;
+  background-color:#11110f!important;
+  color:#fff!important;
+  opacity:1!important;
+  filter:none!important;
+}
+body.telephone-reception-page .tr-proof,
+body.telephone-reception-page .tr-proof *{
+  color:#fff!important;
+  opacity:1!important;
+  filter:none!important;
+}
