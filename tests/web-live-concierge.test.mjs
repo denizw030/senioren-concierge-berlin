@@ -12,8 +12,8 @@ test("web chat mounts Live Concierge on the right without replacing voice memo",
     const html=read(page);
     assert.match(html,/assets\/web-voice-memo\.js\?v=11/);
     assert.match(html,/assets\/web-customer-concierge\.js\?v=59/);
-    assert.match(html,/assets\/web-live-concierge\.js\?v=28/);
-    assert.match(html,/assets\/nahwerk-live-concierge\.css\?v=5/);
+    assert.match(html,/assets\/web-live-concierge\.js\?v=29/);
+    assert.match(html,/assets\/nahwerk-live-concierge\.css\?v=6/);
   }
   const boot=read("assets/web-live-concierge.js");
   assert.match(boot,/send\.after\(button\)/);
