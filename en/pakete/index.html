@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-  <head><base href="/en/">
+  <head><base href="/">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Plans &amp; Pricing | STEWARO</title>
@@ -238,17 +238,37 @@
     </style>
   <link rel="stylesheet" href="/assets/acquisition-v1.css?v=1" />
     <!-- NW-I18N-START -->
-    <link rel="alternate" hreflang="de" href="/pakete" />
-    <link rel="alternate" hreflang="en" href="/en/pakete" />
-    <link rel="alternate" hreflang="tr" href="/tr/pakete" />
-    <link rel="alternate" hreflang="x-default" href="/pakete" />
+    <link rel="alternate" hreflang="de" href="https://stewaro.com/pakete" />
+    <link rel="alternate" hreflang="en" href="https://stewaro.com/en/pakete" />
+    <link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/pakete" />
+    <link rel="alternate" hreflang="x-default" href="https://stewaro.com/pakete" />
     <script src="/assets/language-switcher.js?v=12" defer></script>
     <!-- NW-I18N-END -->
   <script src="/assets/locale-runtime.js?v=1" defer></script>
     <script src="/assets/clean-url.js?v=1"></script>
+<style>
+/* PR298 accessibility gate closure: pricing contrast. */
+body.pricing-page .status-pill,
+body.pricing-page .featured .package-price,
+body.pricing-page .featured .package-usage{
+  color:#fff!important;
+  opacity:1!important;
+  filter:none!important;
+}
+body.pricing-page .lead,
+body.pricing-page #telefonannahme-modelle .card p{
+  color:#d8d4cc!important;
+  opacity:1!important;
+  filter:none!important;
+}
+body.pricing-page #telefonannahme-modelle .card{
+  background:#11110f!important;
+  background-color:#11110f!important;
+}
+</style>
 </head>
   <body class="pricing-page">
-    <header class="top"><div class="wrap nav"><a class="brand" href="/en/" aria-label="STEWARO Concierge — homepage"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>STEWARO</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Main navigation"><a href="/en/">Overview</a><a href="/en/prime-concierge">Personal Concierge</a><a href="/en/concierges">STEWARO worldwide</a><a href="/en/telefonannahme">Phone reception</a><a href="/en/senioren-concierge">Senior Concierge</a><a href="/en/angehoerige">For relatives</a><a href="/en/leistungen">Services</a><a class="active" href="/en/pakete" aria-current="page">Plans</a><a href="/en/kontakt">Contact</a><a class="auth-link login-link" href="/anmelden?lang=en">Sign in</a><a class="auth-link register-link" href="/registrieren?lang=en">Register</a></nav></div></header>
+    <header class="top"><div class="wrap nav"><a class="brand" href="/de/" aria-label="STEWARO Concierge — homepage"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>STEWARO</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Main navigation"><a href="/de/">Overview</a><a href="/prime-concierge">Personal Concierge</a><a href="/concierges">STEWARO worldwide</a><a href="/telefonannahme">Phone reception</a><a href="/senioren-concierge">Senior Concierge</a><a href="/angehoerige">For relatives</a><a href="/leistungen">Services</a><a class="active" href="/pakete" aria-current="page">Plans</a><a href="/kontakt">Contact</a><a class="auth-link login-link" href="/anmelden?lang=en">Sign in</a><a class="auth-link register-link" href="/registrieren?lang=en">Register</a></nav></div></header>
     <main>
       <section class="hero">
         <div class="wrap">
@@ -258,7 +278,7 @@
             Six clear plans — from the permanently free entry plan to a shared family allowance. You can compare and change the plan directly during registration.
           </p>
           <div class="actions">
-            <a class="btn red" href="/registrieren?paket=free&amp;source=pricing_free&amp;lang=en" data-nw-cta="start_free" data-nw-step="pricing"
+            <a class="btn red" href="/registrieren?paket=free&amp;source=pricing_free&lang=en" data-nw-cta="start_free" data-nw-step="pricing"
               >Start free</a
             ><a class="btn light" href="#paketvergleich">Compare plans</a>
           </div>
@@ -271,7 +291,7 @@
             <article class="package-card">
               <h3>FREE</h3>
               <span class="package-price">0 € <small>/ month</small></span
-              ><span class="package-usage">50 app conversations · 20 WhatsApp conversations</span>
+              ><span class="package-usage">App unlimited · Web unlimited · 20 WhatsApp customer messages</span>
               <p>For getting to know STEWARO and occasional support.</p>
               <ul>
                 <li>WhatsApp with text and voice messages</li>
@@ -280,7 +300,7 @@
                 <li>No automatic conversion to a paid plan</li>
               </ul>
               <div class="actions">
-                <a class="btn red" href="/registrieren?paket=free&amp;source=pricing_free&amp;lang=en" data-nw-cta="start_free" data-nw-step="pricing"
+                <a class="btn red" href="/registrieren?paket=free&amp;source=pricing_free&lang=en" data-nw-cta="start_free" data-nw-step="pricing"
                   >Choose FREE</a
                 >
               </div>
@@ -288,7 +308,7 @@
             <article class="package-card">
               <h3>STANDARD</h3>
               <span class="package-price">5,99 € <small>/ month</small></span
-              ><span class="package-usage">100 app conversations · 30 WhatsApp conversations</span>
+              ><span class="package-usage">App unlimited · Web unlimited · 30 WhatsApp customer messages</span>
               <p>
                 For regular help with everyday life, research and organisation.
               </p>
@@ -298,7 +318,7 @@
                 <li>Plan selectable during registration</li>
               </ul>
               <div class="actions">
-                <a class="btn light" href="/registrieren?paket=standard&amp;lang=en"
+                <a class="btn light" href="/registrieren?paket=standard&lang=en"
                   >Choose STANDARD</a
                 >
               </div>
@@ -307,7 +327,7 @@
               <span class="status-pill">Popular choice</span>
               <h3>PLUS</h3>
               <span class="package-price">10,99 € <small>/ month</small></span
-              ><span class="package-usage">180 app conversations · 50 WhatsApp conversations</span>
+              ><span class="package-usage">App unlimited · Web unlimited · 50 WhatsApp customer messages</span>
               <p>
                 For intensive use and a concierge that thinks along more often.
               </p>
@@ -317,7 +337,7 @@
                 <li>Plan selectable during registration</li>
               </ul>
               <div class="actions">
-                <a class="btn light" href="/registrieren?paket=plus&amp;lang=en"
+                <a class="btn light" href="/registrieren?paket=plus&lang=en"
                   >Choose PLUS</a
                 >
               </div>
@@ -325,7 +345,7 @@
             <article class="package-card">
               <h3>PREMIUM</h3>
               <span class="package-price">19,99 € <small>/ month</small></span
-              ><span class="package-usage">400 app conversations · 100 WhatsApp conversations</span>
+              ><span class="package-usage">App unlimited · Web unlimited · 100 WhatsApp customer messages</span>
               <p>For extensive personal concierge support.</p>
               <ul>
                 <li>Generous separate monthly allowances</li>
@@ -333,7 +353,7 @@
                 <li>Plan selectable during registration</li>
               </ul>
               <div class="actions">
-                <a class="btn light" href="/registrieren?paket=premium&amp;lang=en"
+                <a class="btn light" href="/registrieren?paket=premium&lang=en"
                   >Choose PREMIUM</a
                 >
               </div>
@@ -341,7 +361,7 @@
             <article class="package-card">
               <h3>PREMIUM PLUS</h3>
               <span class="package-price">34,99 € <small>/ month</small></span
-              ><span class="package-usage">750 app conversations · 160 WhatsApp conversations</span>
+              ><span class="package-usage">App unlimited · Web unlimited · 160 WhatsApp customer messages</span>
               <p>For particularly intensive personal concierge use.</p>
               <ul>
                 <li>Very large monthly allowance</li>
@@ -349,7 +369,7 @@
                 <li>Plan selectable during registration</li>
               </ul>
               <div class="actions">
-                <a class="btn light" href="/registrieren?paket=premium_plus&amp;lang=en"
+                <a class="btn light" href="/registrieren?paket=premium_plus&lang=en"
                   >Choose PREMIUM PLUS</a
                 >
               </div>
@@ -357,7 +377,7 @@
             <article class="package-card">
               <h3>FAMILIE</h3>
               <span class="package-price">59,66 € <small>/ month</small></span
-              ><span class="package-usage">1,200 app conversations · 300 WhatsApp conversations</span>
+              ><span class="package-usage">App unlimited · Web unlimited · 300 WhatsApp customer messages</span>
               <p>
                 For families who want to share a larger allowance.
               </p>
@@ -367,7 +387,7 @@
                 <li>Privacy and permissions remain important</li>
               </ul>
               <div class="actions">
-                <a class="btn light" href="/registrieren?paket=familie&amp;lang=en"
+                <a class="btn light" href="/registrieren?paket=familie&lang=en"
                   >Choose FAMILY</a
                 >
               </div>
@@ -387,7 +407,7 @@
             <article class="card"><h3>Standalone phone reception</h3><p>Can be used without a personal concierge. A specialised phone agent handles incoming calls for you.</p></article>
             <article class="card"><h3>Concierge + phone reception</h3><p>When used together, phone reception and your personal concierge can use the same context you have approved.</p></article>
           </div>
-          <div class="actions"><a class="btn light" href="/en/telefonannahme#einrichtung">Prepare setup</a></div>
+          <div class="actions"><a class="btn light" href="/telefonannahme#einrichtung">Prepare setup</a></div>
         </div>
       </section>
       <section class="section alt">
@@ -415,7 +435,7 @@
       <div class="wrap">
         <div class="footergrid">
           <div>
-            <a class="brand" href="/en/" aria-label="STEWARO Concierge — homepage">
+            <a class="brand" href="/de/" aria-label="STEWARO Concierge — homepage">
               <span class="mark nahwerk-mark" aria-hidden="true"></span>
               <span class="brandtext"><strong>STEWARO</strong><span>CONCIERGE</span></span>
             </a>
@@ -423,19 +443,19 @@
           </div>
           <div>
             <h3>Offering</h3>
-            <a href="/en/prime-concierge">Personal Concierge</a>
-            <a href="/en/telefonannahme">Phone reception</a>
-            <a href="/en/concierges">STEWARO worldwide</a>
-            <a href="/en/senioren-concierge">For seniors</a>
-            <a href="/en/angehoerige">For relatives</a>
-            <a href="/en/pakete">Plans</a>
+            <a href="/prime-concierge">Personal Concierge</a>
+            <a href="/telefonannahme">Phone reception</a>
+            <a href="/concierges">STEWARO worldwide</a>
+            <a href="/senioren-concierge">For seniors</a>
+            <a href="/angehoerige">For relatives</a>
+            <a href="/pakete">Plans</a>
           </div>
           <div>
             <h3>Service</h3>
-            <a href="/en/leistungen">Services</a>
-            <a href="/en/ablauf">How it works</a>
-            <a href="/en/faq">FAQ</a>
-            <a href="/en/kontakt">Contact</a>
+            <a href="/leistungen">Services</a>
+            <a href="/ablauf">How it works</a>
+            <a href="/faq">FAQ</a>
+            <a href="/kontakt">Contact</a>
           </div>
           <div>
             <h3>Legal</h3>
@@ -455,5 +475,5 @@
     </footer>
     <script src="/assets/auth-nav.js?v=40"></script>
     <script src="/assets/site-ui.js?v=5"></script>
-  <script src="/assets/nahwerk-analytics.js?v=1"></script><script src="/assets/acquisition-v1.js?v=2"></script></body>
+  <script src="/assets/nahwerk-analytics.js?v=1"></script><script src="/assets/acquisition-v1.js?v=2"></script>\n</body>
 </html>
