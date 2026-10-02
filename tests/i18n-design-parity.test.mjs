@@ -1,3 +1,4 @@
+import { homepageSource } from './helpers/homepage-source.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -87,11 +88,11 @@ function bodyClass(html) {
 
 for (const page of pages) {
   test(`${page}: EN/TR keep exact German PROD visual structure`, () => {
-    const de = read(germanSource(page));
+    const de = homepageSource(germanSource(page));
     assert.doesNotMatch(de, /international\.css/i);
 
     for (const lang of ['en', 'tr']) {
-      const locale = read(`${lang}/${page}`);
+      const locale = homepageSource(`${lang}/${page}`);
       assert.doesNotMatch(locale, /international\.css/i, `${lang}/${page} must not use a separate locale design stylesheet`);
       assert.match(locale, /STEWARO|stewaro-icon\.svg/i, `${lang}/${page} must keep the canonical STEWARO identity`);
       assert.deepEqual(stylesheetRefs(locale), stylesheetRefs(de), `${lang}/${page} stylesheet stack changed`);
