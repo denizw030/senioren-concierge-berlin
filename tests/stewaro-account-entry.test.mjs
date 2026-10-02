@@ -32,13 +32,15 @@ test("audience choices stay visually symmetric and text-only",()=>{
   assert.match(accountCss,/\.stewaro-access-choice,\.stewaro-access-submit\{[\s\S]*min-height:64px[\s\S]*text-align:center/);
 });
 
-test("loved-one entry stays on the verified STEWARO Family surface until MyParentGuard public cutover",()=>{
+test("loved-one entry stays on the verified STEWARO Family surface",()=>{
   assert.match(entry,/PARENT="\/angehoerige\?source=stewaro-account"/);
   assert.doesNotMatch(routing,/ACCOUNT_ORIGIN="https:\/\/account\.stewaro\.com"/);
   assert.match(routing,/accountEntry=isAccount\?"\/"\:\(isWebsitePreview\?STAGING_ACCOUNT_ORIGIN\+"\/"\:"\/zugang"\)/);
+  assert.match(routing,/parentEntry="\/angehoerige\?source=stewaro"/);
   assert.match(homepage,/href="#family"/);
   assert.match(homepage,/href="\/zugang" data-entry="self"/);
-  assert.match(homepage,/myparentguard\.com\/\?source=stewaro/);
+  assert.match(homepage,/href="\/angehoerige\?source=stewaro" data-entry="loved-one"/);
+  assert.doesNotMatch(homepage,/myparentguard\.com/);
 });
 
 test("account entry cache-busts the repaired loved-one redirect",()=>{
@@ -53,10 +55,16 @@ test("legacy public auth navigation converges on one account entry",()=>{
   assert.match(routing,/https:\/\/d23le2tjpjl7la\.cloudfront\.net/);
 });
 
-test("self registration cannot create a loved-one STEWARO path",()=>{
+test("Family CTA activates the existing other-person registration mode without exposing a duplicate chooser",()=>{
   assert.match(register,/name="setupFor" value="self" checked hidden/);
-  assert.doesNotMatch(register,/name="setupFor" value="other"/);
-  assert.match(register,/myparentguard\.com\/\?source=stewaro-registration/);
+  assert.match(register,/name="setupFor" value="other" hidden data-family-setup-mode/);
+  assert.match(register,/href="\/angehoerige\?source=stewaro-registration"/);
+  assert.doesNotMatch(register,/myparentguard\.com/);
+  assert.match(onboarding,/params\.get\("fuer"\) === "andere"/);
+  assert.match(onboarding,/otherSetup\.checked = true/);
+  assert.match(onboarding,/selfRegistrationScope/);
+  assert.match(onboarding,/selfScope\.hidden = !self/);
+  assert.match(routing,/data-direct-registration/);
 });
 
 test("self registration captures required postal code and keeps FIDEL fixed",()=>{
