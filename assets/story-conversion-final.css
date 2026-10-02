@@ -323,3 +323,11 @@ html body.nw-family-page.story-site footer.footer .footbottom span{
   filter:none!important;
   text-shadow:none!important;
 }
+
+/* PR298 family light-header language contrast closure. */
+html body.nw-growth-page.nw-family-page.story-site.nw-portal-light header.top .nw-language-button > span{
+  color:#252119!important;
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
