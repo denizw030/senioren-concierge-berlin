@@ -15,11 +15,10 @@
   const requestedNext = params.get("next") === "/payg" ? "/payg" : "";
   const postAuthTarget = guestChatHandoff && requestedNext ? requestedNext : "";
   const guestLoginHref = appHandoff
-    ? "/anmelden?produkt=senioren&next=app"
+    ? "/anmelden?produkt=stewaro&next=app"
     : postAuthTarget ? "/anmelden?source=web_guest_chat&next=%2Fpayg" : "/anmelden";
-  const requestedProduct = params.get("produkt");
-  const product = requestedProduct === "senioren" || (!requestedProduct && sessionStorage.getItem("nahwerk_product") === "senioren") ? "senioren" : "prime";
-  const productLabel = product === "senioren" ? "Senioren Concierge" : "Persönlicher Concierge";
+  const product = "stewaro";
+  const productLabel = "STEWARO Concierge";
   const PLAN_ALIASES = {
     kostenlos: "free",
     "premium-plus": "premium_plus",
@@ -123,15 +122,11 @@
   if (!Object.hasOwn(PLANS, currentPlanKey)) currentPlanKey = "free";
   const selectedPlan = () => PLANS[currentPlanKey];
   const planBookable = () => selectedPlan().bookable;
-  const conciergeProfiles = window.NAHWERKCarousel?.byKey || { fidel:{ key:"fidel", name:"FIDEL" } };
   const recipientIds = ["recipientSalutation", "recipientFirstName", "recipientLastName", "relationship", "recipientPhone", "familyMessage"];
   const fullName = (first, last) => [first.trim(), last.trim()].filter(Boolean).join(" ");
   const isSelf = () => form.querySelector('input[name="setupFor"]:checked')?.value === "self";
-  const conciergeValue = () => {
-    const value = form.querySelector('[name="conciergeChoice"]')?.value;
-    return conciergeProfiles[value] ? value : "fidel";
-  };
-  const concierge = () => conciergeProfiles[conciergeValue()]?.name || "FIDEL";
+  const conciergeValue = () => "fidel";
+  const concierge = () => "FIDEL";
   const escapeHtml = (value) => String(value || "").replace(/[&<>"']/g, (char) => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[char]));
   const familyMessageValue = () => $("familyMessage")?.value.trim() || "";
 
@@ -224,28 +219,28 @@
   }
 
   function setupConciergeSelection() {
+    // FIDEL is the STEWARO identity. Voice variants are configured separately and
+    // never change the concierge name or brand.
+    const existing = [...form.querySelectorAll('[name="conciergeChoice"]')];
+    existing.forEach((input) => {
+      input.disabled = true;
+      if ("checked" in input) input.checked = false;
+    });
+    let fixed = form.querySelector('input[data-stewaro-fidel-authority]');
+    if (!fixed) {
+      fixed = document.createElement("input");
+      fixed.type = "hidden";
+      fixed.name = "conciergeChoice";
+      fixed.dataset.stewaroFidelAuthority = "true";
+      form.append(fixed);
+    }
+    fixed.value = "fidel";
     const choice = form.querySelector(".concierge-choice");
-    if (!choice) {
-      const fixed = form.querySelector('[name="conciergeChoice"]');
-      if (fixed && !fixed.value) fixed.value = "fidel";
-      return;
+    const field = choice?.closest(".field");
+    if (field) {
+      field.hidden = true;
+      field.setAttribute("aria-hidden", "true");
     }
-    const requestedConcierge = params.get("concierge");
-    if (conciergeProfiles[requestedConcierge]) choice.dataset.selected = requestedConcierge;
-    const field = choice.closest(".field");
-    const heading = field?.querySelector(":scope > legend, :scope > label");
-    if (heading) {
-      heading.classList.add("concierge-selection-title");
-      heading.textContent = "Wer darf Sie begleiten?";
-    }
-    let intro = field?.querySelector(".concierge-intro, .concierge-selection-intro");
-    if (!intro && field) {
-      intro = document.createElement("p");
-      intro.className = "concierge-intro concierge-selection-intro";
-      choice.before(intro);
-    }
-    if (intro) intro.textContent = "Wählen Sie den Concierge, dessen Auftreten und Kommunikationsstil am besten zu Ihnen passt. Die grundlegenden Möglichkeiten bleiben bei allen Profilen gleich.";
-    window.NAHWERKCarousel?.mount(choice, { variant: "selection", inputName: "conciergeChoice", selected: choice.dataset.selected || "lena" });
   }
 
   function person() {
@@ -500,7 +495,7 @@
       person_id: body.person_id,
       role: body.role,
       expires_at: body.expires_at,
-      product_context: body.product_context || (body.brand === "senioren_concierge" ? "senioren" : body.brand === "prime_concierge" ? "prime" : product)
+      product_context: body.product_context || (body.brand === "stewaro" ? "stewaro" : product)
     }));
     await initializeSecurityRecommendation(body.session_token);
     return body;
@@ -560,7 +555,7 @@
     const p = person();
     const safety = $("safetyEnabled").checked;
     const request = {
-      product, concierge_profile: product === "senioren" ? "SENIOR_MARTIN" : "PRIME_MARTIN", concierge_choice: conciergeValue(), package: selectedPlan().code,
+      product, concierge_profile: "FIDEL", concierge_choice: "fidel", package: selectedPlan().code,
       registration_type: self ? "self" : "other", account_holder_name: fullName($("ownerFirstName").value, $("ownerLastName").value), account_holder_salutation: $("ownerSalutation").value,
       account_holder_first_name: $("ownerFirstName").value.trim(), account_holder_last_name: $("ownerLastName").value.trim(), account_holder_postal_code: $("ownerPostalCode")?.value.trim() || "", postal_code: $("ownerPostalCode")?.value.trim() || "", email: $("ownerEmail").value.trim(), phone: self ? $("ownerPhone").value.trim() : "",
       supported_person_name: fullName(p.first, p.last), supported_person_salutation: p.sal, supported_person_first_name: p.first, supported_person_last_name: p.last,
