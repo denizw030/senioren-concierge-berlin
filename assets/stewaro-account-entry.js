@@ -2,7 +2,7 @@
   "use strict";
   const root=document.querySelector("[data-stewaro-access]");
   if(!root)return;
-  const PARENT="https://myparentguard.com/?source=stewaro-account";
+  const PARENT="/angehoerige?source=stewaro-account";
   const screens=[...root.querySelectorAll("[data-access-screen]")];
   const show=name=>{
     screens.forEach(s=>s.hidden=s.dataset.accessScreen!==name);
