@@ -24,7 +24,8 @@ test("unified STEWARO account entry is minimal and route-parity safe",()=>{
 
 test("loved-one entry belongs to MyParentGuard while self entry belongs to STEWARO account",()=>{
   assert.match(entry,/https:\/\/myparentguard\.com\/\?source=stewaro-account/);
-  assert.match(routing,/https:\/\/account\.stewaro\.com/);
+  assert.doesNotMatch(routing,/ACCOUNT_ORIGIN="https:\/\/account\.stewaro\.com"/);
+  assert.match(routing,/accountEntry=isAccount\?"\/"\:\(isWebsitePreview\?STAGING_ACCOUNT_ORIGIN\+"\/"\:"\/zugang"\)/);
   assert.match(routing,/https:\/\/myparentguard\.com/);
   assert.match(homepage,/href="\/zugang" data-entry="self"/);
   assert.match(homepage,/myparentguard\.com\/\?source=stewaro/);
