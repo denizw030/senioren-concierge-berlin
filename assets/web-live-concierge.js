@@ -1,5 +1,5 @@
 // WEB_CONCIERGE_LIVE_BOOT_V2_20260928
-import { mountNahwerkLiveConcierge } from "./nahwerk-live-concierge.js?v=28";
+import { mountNahwerkLiveConcierge } from "./nahwerk-live-concierge.js?v=29";
 import { mountFidelGoldOrb } from "./fidel-gold-orb.js?v=1";
 
 const GATEWAY="https://ta832v8wah.execute-api.eu-central-1.amazonaws.com/prod/v1/web";
@@ -56,6 +56,7 @@ async function boot(){
     input,
     channel:"WEB",
     bindTrigger:false,
+    fidelRoom:true,
     getAuthToken:()=>{
       void window.SCBAuth?.validateSession?.().catch(()=>false);
       return bridge()?.sessionToken?.()||"";
