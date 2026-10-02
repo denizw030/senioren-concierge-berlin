@@ -67,7 +67,7 @@ test("registration starts with a fixed STEWARO FIDEL card and no photo slider", 
 test("FIDEL is the registration authority without carousel runtime", () => {
   assert.match(onboarding, /const conciergeValue = \(\) => "fidel"/);
   assert.match(onboarding, /const concierge = \(\) => "FIDEL"/);
-  assert.match(onboarding, /data\.stewaroFidelAuthority = "true"/);
+  assert.match(onboarding, /dataset\.stewaroFidelAuthority = "true"/);
   assert.doesNotMatch(onboarding, /conciergeProfiles|NAHWERKCarousel\?\.mount/);
 });
 
