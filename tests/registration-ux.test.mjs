@@ -4,6 +4,8 @@ import test from "node:test";
 
 const html = readFileSync(new URL("../registrieren.html", import.meta.url), "utf8");
 const onboarding = readFileSync(new URL("../assets/onboarding.js", import.meta.url), "utf8");
+const accountFlow = readFileSync(new URL("../assets/stewaro-account-flow.js", import.meta.url), "utf8");
+const wizardCss = readFileSync(new URL("../assets/stewaro-registration-wizard.css", import.meta.url), "utf8");
 const voicePreviewCss = readFileSync(new URL("../assets/concierge-voice-preview.css", import.meta.url), "utf8");
 const carouselCss = readFileSync(new URL("../assets/concierge-carousel.css", import.meta.url), "utf8");
 const carouselJs = readFileSync(new URL("../assets/concierge-carousel.js", import.meta.url), "utf8");
@@ -81,4 +83,49 @@ test("FIDEL is the registration authority without carousel runtime", () => {
 
 test("registration no longer loads photo carousel or voice-preview assets", () => {
   assert.doesNotMatch(html, /concierge-carousel|concierge-voice-preview|auth-slider-i18n/);
+});
+
+
+test("registration uses one calm canonical step flow for self and Family entry", () => {
+  assert.match(html, /stewaro-registration-wizard\.css\?v=1/);
+  assert.match(html, /stewaro-account-flow\.js\?v=2/);
+  assert.match(html, /assets\/onboarding\.js\?v=28/);
+  assert.match(accountFlow, /if\(!document\.body\.classList\.contains\("registration-page"\)\)return/);
+  assert.doesNotMatch(accountFlow, /registration-page"\)\|\|source!==/);
+  assert.match(accountFlow, /familyMode=params\.get\("fuer"\)==="andere"/);
+});
+
+test("wizard asks only relevant questions and starts with email", () => {
+  const emailStep=accountFlow.indexOf('addInputStep("email"');
+  const ownerStep=accountFlow.indexOf('addInputStep(\n    "owner-name"');
+  const postalStep=accountFlow.indexOf('addInputStep("postal"');
+  const recipientStep=accountFlow.indexOf('addInputStep(\n      "recipient"');
+  const contactStep=accountFlow.indexOf('key:"contact"');
+  const safetyStep=accountFlow.indexOf('key:"safety"');
+  const passwordStep=accountFlow.indexOf('addInputStep("password"');
+  assert.ok(emailStep>=0 && ownerStep>emailStep && postalStep>ownerStep);
+  assert.ok(recipientStep>postalStep && contactStep>recipientStep);
+  assert.ok(safetyStep>contactStep && passwordStep>safetyStep);
+  assert.match(accountFlow, /conditional:\(\)=>preferredContact\.value==="APP"/);
+  assert.match(accountFlow, /conditional:\(\)=>whatsappEnabled\.value==="true"/);
+  assert.match(accountFlow, /conditional:\(\)=>safetyEnabled\.checked/);
+});
+
+test("wizard preserves real controls and forwards channel preferences", () => {
+  assert.match(accountFlow, /const parking=document\.createElement\("div"\)/);
+  assert.match(accountFlow, /if\(stage\.contains\(node\)\)parking\.append\(node\)/);
+  assert.match(accountFlow, /preferredContactChannel/);
+  assert.match(accountFlow, /whatsappEnabled/);
+  assert.match(onboarding, /preferred_contact_channel: \$\("preferredContactChannel"\)\?\.value \|\| "APP"/);
+  assert.match(onboarding, /whatsapp_enabled: \$\("whatsappEnabled"\)\?\.value === "true"/);
+  assert.match(onboarding, /onboarding_version: "stewaro_step_flow_v2"/);
+});
+
+test("wizard includes optional Safety without exposing a large legacy form", () => {
+  assert.match(accountFlow, /Soll ein Safety-Check-in eingerichtet werden\?/);
+  assert.match(accountFlow, /Nein, später/);
+  assert.match(accountFlow, /Ja, einrichten/);
+  assert.match(accountFlow, /Ein Check-in und eine Vertrauensperson reichen für den Start\./);
+  assert.match(wizardCss, /#signupForm>\*:not\(\.stewaro-registration-progressive\)/);
+  assert.match(wizardCss, /\.stewaro-registration-progressive>h1/);
 });
