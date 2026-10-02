@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync } from './helpers/effective-source-fs.mjs';
 import test from "node:test";
 
 const html = readFileSync(new URL("../registrieren.html", import.meta.url), "utf8");

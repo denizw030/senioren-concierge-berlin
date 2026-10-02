@@ -1,7 +1,7 @@
 // EMAIL_PERSONAL_LEARNING_UI_V1_GREEN_GATE
 import test from "node:test";
 import assert from "node:assert/strict";
-import fs from "node:fs";
+import fs from './helpers/effective-source-fs.mjs';
 import vm from "node:vm";
 
 const js=fs.readFileSync("assets/email-account-integration.js","utf8");

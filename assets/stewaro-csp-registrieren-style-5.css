@@ -1,0 +1,57 @@
+
+      /* Keep steps 1 and 3 on the same restrained corner geometry as step 2. */
+      body.registration-page .nw-registration-progress > strong,
+      body.registration-page .nw-registration-progress > span:not(.nw-registration-progress-whatsapp) {
+        border-radius: 11px;
+      }
+
+      /* Step 2 only: one restrained Apple-like status chip, no nested WhatsApp decoration. */
+      body.registration-page .nw-registration-progress > .nw-registration-progress-whatsapp {
+        box-sizing: border-box;
+        min-height: 42px;
+        padding: 0 12px;
+        gap: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.11);
+        border-radius: 11px;
+        background: rgba(255, 255, 255, 0.028);
+        color: #f4f4f1;
+        font-size: 0.79rem;
+        font-weight: 580;
+        line-height: 1;
+        letter-spacing: 0;
+        white-space: nowrap;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+        -webkit-backdrop-filter: blur(8px) saturate(108%);
+        backdrop-filter: blur(8px) saturate(108%);
+      }
+      body.registration-page .nw-registration-progress > .nw-registration-progress-whatsapp .nw-registration-progress-index {
+        display: inline;
+        width: auto;
+        height: auto;
+        flex: 0 0 auto;
+        margin: 0 1px 0 0;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.52);
+        font: 500 0.76rem/1 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+        letter-spacing: 0;
+      }
+      body.registration-page .nw-registration-progress > .nw-registration-progress-whatsapp .nw-registration-progress-whatsapp-icon {
+        display: block;
+        width: 15px;
+        height: 15px;
+        flex: 0 0 15px;
+        margin: 0;
+        object-fit: contain;
+      }
+      @media (max-width: 720px) {
+        body.registration-page .nw-registration-progress > .nw-registration-progress-whatsapp {
+          width: 100%;
+          min-height: 44px;
+          padding: 0 13px;
+          white-space: nowrap;
+        }
+      }
+    

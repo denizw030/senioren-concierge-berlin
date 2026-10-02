@@ -1,0 +1,1 @@
+location.replace("/datenschutz/"+location.search+location.hash)

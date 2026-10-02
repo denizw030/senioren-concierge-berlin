@@ -3,7 +3,7 @@
 <head><base href="/">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <script id="nw-theme-first-paint">(()=>{const r=document.documentElement,p=location.pathname;let t=null;try{t=localStorage.getItem("nw_portal_theme_v1")}catch(_){}if(t!=="light"&&t!=="dark")t=/(?:senioren-concierge|angehoerige)(?:\.html)?\/?$/.test(p)?"light":"dark";r.dataset.nwPortalTheme=t;r.classList.add("nw-theme-first-paint");r.style.backgroundColor=t==="light"?"#f7f3ea":"#030405";r.style.colorScheme=t;const s=document.createElement("style");s.id="nw-theme-first-paint-style";s.textContent='html.nw-theme-first-paint body{visibility:hidden!important}';document.head.appendChild(s);const done=()=>{r.classList.remove("nw-theme-first-paint");r.style.removeProperty("background-color");r.style.removeProperty("color-scheme")};addEventListener("DOMContentLoaded",done,{once:true});setTimeout(done,1800)})();</script>
+  <script id="nw-theme-first-paint" src="/assets/stewaro-csp-web-concierge-script-1.js?v=1"></script>
   <title>FIDEL | STEWARO</title>
   <meta name="description" content="FIDEL, dein persönlicher KI-Concierge im STEWARO-Konto." />
   <meta name="robots" content="noindex,nofollow" />
@@ -18,6 +18,7 @@
   <link rel="icon" type="image/svg+xml" href="/assets/logos/stewaro-icon.svg?v=1" />
   <script src="/assets/clean-url.js?v=1"></script>
   <script src="/assets/stewaro-app-bootstrap.js?v=3"></script>
+<link rel="stylesheet" href="/assets/stewaro-csp-web-concierge-attributes.css?v=1">
 </head>
 <body class="web-concierge-page">
   <header class="top"><div class="wrap nav"><a class="brand" href="/de/" aria-label="STEWARO – Startseite"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>STEWARO</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Hauptnavigation"><a href="/de/">Übersicht</a><a href="/prime-concierge">Persönlicher Concierge</a><a href="/concierges">STEWARO weltweit</a><a href="/safety">Sicherheit</a><a href="/leistungen">Leistungen</a><a href="/kontakt">Kontakt</a></nav></div></header>
@@ -106,7 +107,7 @@
         </div>
 
         <div class="stewaro-app-notice" id="stewaroAppDataNotice" hidden></div>
-        <button class="stewaro-app-secondary" id="stewaroAppRetryData" type="button" style="margin-top:12px">Kontodaten neu laden</button>
+        <button class="stewaro-app-secondary" id="stewaroAppRetryData" type="button" data-stewaro-csp-style="web-concierge-1">Kontodaten neu laden</button>
       </section>
 
       <section class="stewaro-app-panel" id="stewaroAppPanelFidel" data-stewaro-app-panel="fidel" aria-label="FIDEL" hidden>
@@ -255,7 +256,7 @@
           <div class="web-concierge-empty"><strong>Wie kann ich dir helfen?</strong><span>Schreib mir einfach, was du brauchst.</span></div>
         </div>
 
-        <form class="web-concierge-form" onsubmit="return false" aria-label="Nachricht an deinen Concierge">
+        <form class="web-concierge-form" data-stewaro-csp-submit="prevent" aria-label="Nachricht an deinen Concierge">
           <textarea id="webConciergeInput" rows="1" maxlength="4000" placeholder="Nachricht schreiben …" disabled aria-disabled="true"></textarea>
           <button class="web-concierge-send" id="webConciergeSend" type="submit" disabled aria-label="Nachricht senden">Senden</button>
         </form>
@@ -311,6 +312,7 @@
   <script src="assets/web-customer-concierge.js?v=59"></script>
   <script src="assets/web-voice-memo.js?v=11"></script>
   <script type="module" src="assets/web-live-concierge.js?v=28"></script>
+<script src="/assets/stewaro-csp-web-concierge-submit.js?v=1"></script>
 </body>
 </html>
 

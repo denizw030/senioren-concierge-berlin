@@ -1,0 +1,57 @@
+name: STEWARO Account App CSP compatibility
+on:
+  pull_request:
+    paths:
+      - 'assets/stewaro-csp-*'
+      - 'tests/**'
+      - 'scripts/stewaro-csp-browser-qa.mjs'
+      - '.github/workflows/stewaro-account-csp.yml'
+      - 'anmelden*'
+      - 'registrieren*'
+      - 'konto*'
+      - 'web-concierge*'
+      - 'app-live*'
+  push:
+    branches: [main]
+    paths:
+      - 'assets/stewaro-csp-*'
+      - 'tests/stewaro-account-csp.test.mjs'
+      - 'scripts/stewaro-csp-browser-qa.mjs'
+      - '.github/workflows/stewaro-account-csp.yml'
+permissions:
+  contents: read
+jobs:
+  source-and-anonymous-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: candidate
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: candidate
+      - uses: actions/checkout@v4
+        with:
+          path: baseline
+          ref: fd80963b0f245e4803e9fcb15cbe54cf976ee296
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Source security, route parity and unchanged auth contracts
+        run: node --test tests/*.test.mjs
+      - name: Anonymous CSS and runtime compatibility
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/stewaro-csp-candidate.log 2>&1 &
+          python3 -m http.server 8766 --bind 127.0.0.1 --directory ../baseline >/tmp/stewaro-csp-baseline.log 2>&1 &
+          CHROME="$(command -v google-chrome || command -v chromium)"
+          "$CHROME" --headless --no-sandbox --disable-gpu --remote-debugging-port=0 --user-data-dir=/tmp/stewaro-csp-cdp about:blank >/tmp/stewaro-csp-chrome.log 2>&1 &
+          for attempt in $(seq 1 20); do
+            test -s /tmp/stewaro-csp-cdp/DevToolsActivePort && break
+            sleep 1
+          done
+          test -s /tmp/stewaro-csp-cdp/DevToolsActivePort
+          export CDP_PORT="$(head -n 1 /tmp/stewaro-csp-cdp/DevToolsActivePort)"
+          node scripts/stewaro-csp-browser-qa.mjs

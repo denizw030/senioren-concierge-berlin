@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import fs from "node:fs";
+import fs from './helpers/effective-source-fs.mjs';
 
 const konto=fs.readFileSync("konto.html","utf8");
 const clean=fs.readFileSync("konto/index.html","utf8");

@@ -1,0 +1,108 @@
+
+      /* Page-scoped login colors aligned with the Prime registration/account surfaces. */
+      body.login-image-page:not(.senior-product):not([data-product="senioren"]) main{
+        background:
+          radial-gradient(920px 620px at 94% 7%,rgba(35,78,160,.18),transparent 64%),
+          radial-gradient(780px 540px at 5% 44%,rgba(50,62,110,.055),transparent 68%),
+          radial-gradient(720px 500px at 82% 86%,rgba(20,91,110,.035),transparent 70%),
+          linear-gradient(180deg,#05080d 0%,#08111c 52%,#05080c 100%)!important;
+      }
+      body.login-image-page:not(.senior-product):not([data-product="senioren"]) .hero{
+        background:
+          radial-gradient(700px 500px at 78% 28%,rgba(34,72,144,.13),transparent 64%),
+          radial-gradient(600px 430px at 12% 82%,rgba(44,58,104,.035),transparent 68%),
+          radial-gradient(520px 380px at 88% 70%,rgba(20,91,110,.025),transparent 67%),
+          linear-gradient(145deg,#070b11,#0b131d 58%,#06090d)!important;
+      }
+      body.login-image-page:not(.senior-product):not([data-product="senioren"]) .hero h1{
+        color:#fff!important;
+      }
+      body.login-image-page:not(.senior-product):not([data-product="senioren"]) .hero p{
+        color:#c9c9c5!important;
+      }
+      body.login-image-page:not(.senior-product):not([data-product="senioren"]) .hero .eyebrow{
+        color:var(--gold)!important;
+      }
+      body.login-image-page:not(.senior-product):not([data-product="senioren"]) main>.section{
+        background:
+          radial-gradient(760px 480px at 92% 10%,rgba(32,72,150,.15),transparent 67%),
+          radial-gradient(680px 430px at 8% 86%,rgba(44,58,104,.035),transparent 72%),
+          rgba(5,9,14,.99)!important;
+      }
+      body.login-image-page:not(.senior-product):not([data-product="senioren"]) .logincard{
+        border-color:rgba(126,148,178,.14)!important;
+        background:
+          radial-gradient(circle at 100% 0%,rgba(34,72,144,.13),transparent 42%),
+          radial-gradient(circle at 0% 100%,rgba(21,89,108,.025),transparent 52%),
+          linear-gradient(145deg,#0b1119,#080d14)!important;
+        box-shadow:
+          inset 0 1px 0 rgba(174,195,222,.03),
+          0 24px 64px rgba(0,0,0,.40)!important;
+      }
+      body.login-image-page:not(.senior-product):not([data-product="senioren"]) .field input{
+        border-color:rgba(124,146,174,.14)!important;
+        background:
+          radial-gradient(circle at 100% 0%,rgba(31,68,135,.055),transparent 48%),
+          #080d14!important;
+        color:#f3f3ef!important;
+        caret-color:#f3f3ef;
+        box-shadow:inset 0 1px 0 rgba(174,195,222,.018)!important;
+      }
+      body.login-image-page:not(.senior-product):not([data-product="senioren"]) .field input:-webkit-autofill,
+      body.login-image-page:not(.senior-product):not([data-product="senioren"]) .field input:-webkit-autofill:hover,
+      body.login-image-page:not(.senior-product):not([data-product="senioren"]) .field input:-webkit-autofill:focus{
+        -webkit-text-fill-color:#f3f3ef!important;
+        caret-color:#f3f3ef!important;
+        -webkit-box-shadow:0 0 0 1000px #080d14 inset!important;
+        box-shadow:0 0 0 1000px #080d14 inset!important;
+        border-color:rgba(124,146,174,.14)!important;
+        transition:background-color 9999s ease-out 0s;
+      }
+      body.login-image-page:not(.senior-product):not([data-product="senioren"]) .status{
+        border-color:rgba(124,146,174,.14)!important;
+        background:
+          radial-gradient(circle at 100% 0%,rgba(31,68,135,.08),transparent 48%),
+          linear-gradient(145deg,#0b1119,#080d14)!important;
+        box-shadow:0 12px 30px rgba(0,0,0,.16)!important;
+      }
+      body.login-image-page.senior-product .status,
+      body.login-image-page[data-product="senioren"] .status{
+        border:1px solid rgba(122,91,37,.18)!important;
+        border-left:4px solid #c99d43!important;
+        background:linear-gradient(145deg,#fffaf0,#f3ead8)!important;
+        color:#3a3329!important;
+        box-shadow:0 10px 26px rgba(91,67,27,.08)!important;
+      }
+      body.login-image-page.senior-product .status strong,
+      body.login-image-page[data-product="senioren"] .status strong{
+        color:#1d1913!important;
+      }
+      body.login-image-page a.btn:hover,
+      body.login-image-page button:not(:disabled):hover{
+        outline:1px solid rgba(212,175,55,.44);
+        outline-offset:1px;
+      }
+
+      /* NAHWERK login hero spacing refinement — page scoped, desktop only. */
+      @media(min-width:901px){
+        body.login-image-page:not(.senior-product):not([data-product="senioren"]) .hero{
+          min-height:590px;
+          padding-top:clamp(88px,7vw,112px);
+          padding-bottom:clamp(88px,7vw,112px);
+        }
+        body.login-image-page:not(.senior-product):not([data-product="senioren"]) .hero .wrap{
+          padding-right:0!important;
+        }
+        body.login-image-page:not(.senior-product):not([data-product="senioren"]) .hero .wrap>.eyebrow,
+        body.login-image-page:not(.senior-product):not([data-product="senioren"]) .hero .wrap>h1,
+        body.login-image-page:not(.senior-product):not([data-product="senioren"]) .hero .wrap>p{
+          width:min(720px,calc(100% - clamp(390px,39vw,500px)));
+          max-width:none!important;
+        }
+        body.login-image-page:not(.senior-product):not([data-product="senioren"]) .hero:after{
+          width:min(410px,33.5vw);
+          aspect-ratio:4/5;
+          right:max(4.5vw,42px);
+        }
+      }
+    
