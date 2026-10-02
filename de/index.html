@@ -14,7 +14,7 @@
     <meta property="og:url" content="https://stewaro.com/de/" />
     <meta property="og:image" content="https://stewaro.com/assets/logos/stewaro-icon.svg" />
     <link rel="icon" type="image/svg+xml" href="/assets/logos/stewaro-icon.svg?v=1" />
-    <link rel="stylesheet" href="/assets/stewaro-home-de-base-1.css?v=1">
+    <link rel="stylesheet" href="/assets/stewaro-home-de-base-1.css?v=2">
     <title>STEWARO — Persönlicher Concierge</title>
 
 <link rel="stylesheet" href="/assets/stewaro-home-de-stewaro-static-safety.css?v=1" id="stewaro-static-safety">
@@ -45,7 +45,25 @@
         <a href="#services">Was STEWARO tut</a>
         <a href="#for-you">Für Sie</a>
         <a href="#family">Für Angehörige</a>
+        <a class="header-login" href="/anmelden">Anmelden</a>
         <a class="header-cta" href="/zugang" data-entry="self">Kennenlernen</a>
+        <button class="header-menu-toggle" type="button" aria-expanded="false" aria-controls="stewaro-mobile-menu" aria-label="Menü öffnen">
+          <span></span><span></span><span></span>
+        </button>
+      </nav>
+    </div>
+    <div class="mobile-menu" id="stewaro-mobile-menu" hidden>
+      <nav class="mobile-menu-nav" aria-label="Mobile Navigation">
+        <a class="mobile-menu-login" href="/anmelden">
+          <span>Anmelden</span>
+          <small>Für bestehende Klienten</small>
+        </a>
+        <a href="#services">Was STEWARO tut</a>
+        <a href="#for-you">Für Sie</a>
+        <a href="#family">Für Angehörige</a>
+        <a href="/pakete">Preise</a>
+        <a href="/safety">Sicherheit</a>
+        <a href="/kontakt">Kontakt</a>
       </nav>
     </div>
   </header>
@@ -268,7 +286,7 @@
     </div>
   </footer>
 
-<script src="/assets/stewaro-home-de.js?v=1"></script>
+<script src="/assets/stewaro-home-de.js?v=2"></script>
 
   <script src="/assets/stewaro-entry-routing.js?v=2"></script>
 </body>
