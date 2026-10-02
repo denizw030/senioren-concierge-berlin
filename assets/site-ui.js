@@ -9,7 +9,7 @@
     }
     if (!document.querySelector('script[data-stewaro-entry-routing]')) {
       const routing = document.createElement('script');
-      routing.src = '/assets/stewaro-entry-routing.js?v=2';
+      routing.src = '/assets/stewaro-entry-routing.js?v=4';
       routing.defer = true;
       routing.dataset.stewaroEntryRouting = 'true';
       document.head.appendChild(routing);

@@ -29,7 +29,7 @@ test("homepage is the STEWARO FIDEL experience and conversion remains reachable"
   assert.match(copy,/FIDEL/);
   assert.match(copy,/Jemand, der sich kümmert\./);
   assert.match(c,/href="\/registrieren"/);
-  assert.match(c,/myparentguard\.com/);
+  assert.match(c,/href="\/angehoerige\?source=stewaro" data-entry="loved-one"/);
   assert.doesNotMatch(copy,/NAHWERK|Nilo|Mira|Hartmut|Frida/);
 });
 
