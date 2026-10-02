@@ -512,7 +512,7 @@
     document.getElementById("familyQuotaSection").hidden=!canManageEntitlements(operatorBody);
     ownerStatus.textContent=canManageEntitlements(operatorBody)?"OWNER bestätigt · Personen und Kontingente autorisiert":"OWNER bestätigt · Kontingentverwaltung nicht freigegeben";
     await loadPeople();
-    if(new URLSearchParams(location.search).get("family_setup")==="1"){
+    if(new URLSearchParams(location.search).get("family_setup")==="1"||readRegistrationDraft()){
       accessTab.click();
       applyRegistrationDraft();
     }
