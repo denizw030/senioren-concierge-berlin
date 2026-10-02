@@ -5,6 +5,7 @@
   const MFA_MANAGE_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-mfa-manage";
   const SESSION_KEY = "scb_web_session";
   const SECURITY_PROMPT_KEY = "nw_post_registration_security_prompt";
+  const FAMILY_REGISTRATION_DRAFT_KEY = "nw_family_registration_pending_v1";
   const form = document.getElementById("signupForm");
   if (!form) return;
 
@@ -518,7 +519,7 @@
       "nahwerkconcierge",
       "nahwerk concierge"
     ]);
-    const emailLocalPart = String($("email")?.value || "").trim().toLowerCase().split("@")[0] || "";
+    const emailLocalPart = String($("ownerEmail")?.value || "").trim().toLowerCase().split("@")[0] || "";
     if (passwordLength < 15 || passwordLength > 128) {
       return show("<strong>Bitte wählen Sie ein stärkeres Passwort.</strong><br>Das Passwort muss 15 bis 128 Zeichen lang sein.", true);
     }
@@ -549,17 +550,64 @@
       contact_consent: self ? true : (Boolean(p.phone) ? $("consent").checked : false), safety_enabled: safety, checkin_times: safety ? $("checkinTimes").value.trim() : "", trusted_contact_name: safety ? $("trustedContactName").value.trim() : "", trusted_contact_phone: safety ? $("trustedContactPhone").value.trim() : "",
       account_holder_web_only: !self, web_password: password, web_password_repeat: password
     };
+    const familySetup = !self;
+    const familyRelationshipMap = {
+      mutter:"MOTHER", vater:"FATHER", grossmutter:"GRANDMOTHER", grossvater:"GRANDFATHER",
+      partner:"PARTNER", angehoerige:"RELATIVE", andere:"OTHER"
+    };
+    const familyDraft = familySetup ? {
+      version: 1,
+      first_name: request.supported_person_first_name,
+      last_name: request.supported_person_last_name,
+      relationship: familyRelationshipMap[String($("relationship")?.value || "")] || "OTHER",
+      whatsapp_number: request.supported_whatsapp,
+      preferred_language: "de",
+      form_of_address: request.form_of_address,
+      contact_consent_attested: request.contact_consent === true,
+      safety_enabled: request.safety_enabled === true,
+      checkin_time: request.checkin_times,
+      trusted_contact_name: request.trusted_contact_name,
+      trusted_contact_phone: request.trusted_contact_phone,
+      created_at: new Date().toISOString()
+    } : null;
+    // For Family onboarding, create only the account holder first. The supported person
+    // remains pending until the existing Family invitation runtime verifies consent.
+    const submissionRequest = familySetup ? {
+      ...request,
+      registration_type: "self",
+      supported_person_name: request.account_holder_name,
+      supported_person_salutation: request.account_holder_salutation,
+      supported_person_first_name: request.account_holder_first_name,
+      supported_person_last_name: request.account_holder_last_name,
+      relationship: "Ich selbst",
+      supported_whatsapp: "",
+      phone: "",
+      form_of_address: "DU",
+      contact_consent: true,
+      safety_enabled: false,
+      checkin_times: "",
+      trusted_contact_name: "",
+      trusted_contact_phone: "",
+      account_holder_web_only: true,
+      family_setup_pending: true
+    } : request;
     const draft = { ...request, web_password: undefined, web_password_repeat: undefined, createdAt: new Date().toISOString(), source: "website" };
     localStorage.setItem("scb_onboarding", JSON.stringify(draft));
+    if (familySetup && familyDraft) {
+      sessionStorage.setItem(FAMILY_REGISTRATION_DRAFT_KEY, JSON.stringify(familyDraft));
+    }
     const submit = form.querySelector('button[type="submit"]');
     submit.disabled = true;
     submit.textContent = "Zugang wird angelegt …";
     show("<strong>Wird eingerichtet …</strong><br>Bitte lassen Sie diese Seite kurz geöffnet.");
     try {
-      const response = await fetch(WEBHOOK_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(request) });
+      const response = await fetch(WEBHOOK_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(submissionRequest) });
       const body = await response.json().catch(() => ({}));
       if (response.ok && body.ok === true && body.status === "verification_required" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(body.request_id || ""))) {
-        beginVerification(body, request, password);
+        if (familySetup) {
+          return show('<strong>Für diese E-Mail besteht bereits eine Identität.</strong><br>Bitte melde dich mit deinem bestehenden STEWARO-Zugang an. Deine Angaben zur unterstützten Person bleiben für den sicheren Family-Einladungsweg erhalten.<br><a href="/anmelden">Zur Anmeldung</a>', true);
+        }
+        beginVerification(body, submissionRequest, password);
         return;
       }
       if (response.status === 201 && body.ok) {
@@ -567,8 +615,12 @@
         window.NahwerkActivation?.markRegistrationComplete?.();
         localStorage.setItem("scb_onboarding_sent", "1");
         localStorage.setItem("scb_onboarding_result", JSON.stringify(body));
-        const loginResult = await login(request.email, password);
+        const loginResult = await login(submissionRequest.email, password);
         if (loginResult) {
+          if (familySetup && familyDraft) {
+            show("<strong>Dein Zugang ist angelegt.</strong><br>Die Angaben für die unterstützte Person werden jetzt sicher in den Family-Einladungsweg übernommen.");
+            return setTimeout(() => { location.href = "/konto?family_setup=1"; }, 450);
+          }
           if (appHandoff) {
             show("<strong>Fertig.</strong><br>FIDEL wird jetzt sicher geöffnet.");
             void handoffToApp(loginResult.session_token);
@@ -581,7 +633,21 @@
         return setTimeout(() => { location.href = (postAuthTarget || appHandoff) ? guestLoginHref : (window.NAHWERKLocale?.href("anmelden.html") || "anmelden.html"); }, 1800);
       }
       if (response.status === 409 && body.status === "email_in_use") return show(`<strong>Für diese E-Mail-Adresse besteht bereits ein Konto.</strong><br><a href="${guestLoginHref}">Zur Anmeldung</a>`, true);
-      if (response.status === 400 || body.status === "validation_error") return show("<strong>Bitte prüfen Sie Ihre Angaben.</strong>", true);
+      if (response.status === 400 || body.status === "validation_error") {
+        const rawErrors = Array.isArray(body.errors) ? body.errors.map((item) => String(item || "").trim()).filter(Boolean) : [];
+        const friendly = rawErrors.map((error) => {
+          if (error.includes("WhatsApp-Telefonnummer")) return "Die WhatsApp-Telefonnummer ist nicht vollständig oder nicht gültig.";
+          if (error.includes("Notfallkontakt-Telefonnummer")) return "Die Telefonnummer der Vertrauensperson ist nicht gültig.";
+          if (error.includes("Sicherheits-Check-ins") && error.includes("Notfallkontakt")) return "Für den Safety-Check-in fehlt eine gültige Vertrauensperson.";
+          if (error.includes("serverseitig verifizierten Zustimmungsweg")) return "Die unterstützte Person muss die Einrichtung sicher bestätigen, bevor ihr Zugang aktiviert wird.";
+          if (error.includes("account_holder_name")) return "Dein Name fehlt.";
+          if (error.includes("E-Mail")) return "Bitte prüfe die E-Mail-Adresse.";
+          if (error.includes("Passwort")) return error;
+          return error;
+        });
+        const detail = friendly.length ? "<br>" + friendly.slice(0, 3).map((item) => "• " + escapeHtml(item)).join("<br>") : "";
+        return show("<strong>Einige Angaben müssen noch geprüft werden.</strong>" + detail, true);
+      }
       throw new Error(`HTTP ${response.status}`);
     } catch (_) {
       show("<strong>Die Registrierung konnte gerade nicht übertragen werden.</strong><br>Bitte versuchen Sie es in Kürze erneut.", true);

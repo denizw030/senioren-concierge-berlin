@@ -37,3 +37,16 @@ test("entitlement update sends exact list and no usage manipulation",async()=>{l
 test("suspend resume revoke are path-only server transitions and revoke confirmation UI exists",async()=>{const id="00000000-0000-4000-8000-000000000501",calls=[];for(const op of ["suspend","resume","revoke"])await h.transition({base:"http://127.0.0.1/mock",token,id,operation:op,fetchImpl:async(u,i)=>{calls.push({u,i});return response(200,{ok:true,status:op==="suspend"?"SUSPENDED":op==="resume"?"ACTIVE":"REVOKED"})}});assert.deepEqual(calls.map(x=>new URL(x.u).pathname.split("/").pop()),["suspend","resume","revoke"]);for(const c of calls)assert.deepEqual(JSON.parse(c.i.body),{});assert.match(js,/Sponsored Access wirklich beenden/);assert.match(js,/Person und ihre Inhalte werden dadurch nicht gelöscht/)});
 test("privacy boundary excludes private content surfaces from OWNER panel",()=>{const start=konto.indexOf('id="familyOwnerPanel"'),end=konto.indexOf("</article>",start),slice=konto.slice(start,end);for(const term of ["WhatsApp-Nachrichten","Conversation","Memory","Tasks","E-Mails","Safety-Inhalte"])assert.doesNotMatch(slice,new RegExp(term,"i"));assert.match(slice,/keine privaten Kommunikationsinhalte/)});
 test("mobile desktop CSS and prior email telephone header remain unchanged",()=>{assert.match(css,/grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);assert.match(css,/@media\(max-width:680px\)/);assert.match(email,/WEBSITE_EMAIL_INTEGRATION_CONTRACT_V1/);assert.match(phone,/b9cae952e1c9cdae45a238d9cd902a9f2d798452/);assert.match(home,/class="site-header"/);assert.match(home,/@media\s*\(max-width:\s*600px\)/)});
+
+
+test("registration handoff prefills the verified Family invitation without bypassing authority",()=>{
+  assert.match(js,/REGISTRATION_DRAFT_KEY="nw_family_registration_pending_v1"/);
+  assert.match(js,/family_setup/);
+  assert.match(js,/applyRegistrationDraft/);
+  assert.match(js,/set\("familyConciergeChoice","fidel"\)/);
+  assert.match(js,/contact_consent_attested/);
+  assert.match(js,/sessionStorage\?\.removeItem\(REGISTRATION_DRAFT_KEY\)/);
+  assert.match(js,/Er kann erst nach der Bestätigung der unterstützten Person aktiviert werden/);
+  assert.match(konto,/assets\/family-owner-sponsored-access\.js\?v=3/);
+  assert.match(konto,/<option value="SIE">Sie<\/option>/);
+});

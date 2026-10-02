@@ -113,7 +113,7 @@ test("persisted chat history is authenticated, paginated and reuses the canonica
 });
 
 test("global WhatsApp decorator never injects a second brand logo into channel titles", () => {
-  assert.match(authNav, /parent\.closest\("\.web-concierge-thread,\.web-concierge-thread-title,\.web-concierge-thread-title-text,\.web-concierge-channel-icon"\)/);
+  assert.match(authNav, /parent\.closest\("\.web-concierge-thread,\.web-concierge-thread-title,\.web-concierge-thread-title-text,\.web-concierge-channel-icon,\.stewaro-registration-progressive>h1"\)/);
   assert.match(client, /channelIcon\(b\.dataset\.chatChannel\)/);
   assert.match(css, /\.web-concierge-thread\[data-chat-scope="CHANNEL"\] \.web-concierge-thread-title::before\{\s*content:none!important;\s*display:none!important;/);
 });
