@@ -1,5 +1,5 @@
 
-    import { mountNahwerkLiveConcierge } from "/assets/nahwerk-live-concierge.js?v=28";
+    import { mountNahwerkLiveConcierge } from "/assets/nahwerk-live-concierge.js?v=29";
     let token="";
     let controller=null;
     const notifyClose=()=>{
@@ -14,6 +14,7 @@
         controller=mountNahwerkLiveConcierge({
           button:"#appLiveStart",
           channel:"APP",
+          fidelRoom:true,
           getAuthToken:()=>token,
           onClose:notifyClose
         });
