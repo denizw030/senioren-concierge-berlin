@@ -120,3 +120,22 @@ body.telephone-reception-page .tr-proof *{
   opacity:1!important;
   filter:none!important;
 }
+
+/* PR298 final WCAG AA contrast closure after live axe diagnostics. */
+html body.telephone-reception-page .tr-proof{
+  background:#11110f!important;
+  background-color:#11110f!important;
+  background-image:none!important;
+  color:#fff!important;
+  opacity:1!important;
+  filter:none!important;
+}
+html body.telephone-reception-page .tr-proof,
+html body.telephone-reception-page .tr-proof strong,
+html body.telephone-reception-page .tr-proof p,
+html body.telephone-reception-page .tr-proof span{
+  color:#fff!important;
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
