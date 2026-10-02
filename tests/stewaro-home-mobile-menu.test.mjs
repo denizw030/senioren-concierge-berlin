@@ -19,7 +19,7 @@ test("German homepage runtime restores direct login and an accessible mobile men
 });
 
 test("direct login bypasses the public onboarding rewrite while other auth links keep canonical routing",()=>{
-  assert.match(routing,/if\(!a\.hasAttribute\("data-direct-login"\)\)a\.href=accountEntry/);
+  assert.match(routing,/if\(!a\.hasAttribute\("data-direct-login"\)&&!a\.hasAttribute\("data-direct-registration"\)\)a\.href=accountEntry/);
   assert.match(routing,/document\.querySelectorAll\('a\[data-entry="self"\]'\)/);
   assert.match(routing,/accountEntry/);
 });
@@ -35,7 +35,7 @@ test("mobile menu is compact, keyboard-safe and closes predictably",()=>{
 });
 
 test("locale homepages share the cache-busted routing adapter without changing localized content",()=>{
-  for(const html of [de,en,tr]) assert.match(html,/stewaro-entry-routing\.js\?v=3/);
+  for(const html of [de,en,tr]) assert.match(html,/stewaro-entry-routing\.js\?v=4/);
   assert.match(de,/lang="de"/);
   assert.match(en,/lang="en"/);
   assert.match(tr,/lang="tr"/);
