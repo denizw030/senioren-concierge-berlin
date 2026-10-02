@@ -360,3 +360,25 @@ test("FIDEL voice selection stays voice-only and never changes FIDEL visual iden
   assert.doesNotMatch(shell,/Konrad|Alexander|Leyla/);
   assert.match(shell,/Name und Persönlichkeit bleiben gleich/);
 });
+
+
+test("FIDEL Live room is an isolated progressive spatial layer",()=>{
+  const boot=read("assets/web-live-concierge.js");
+  const app=read("assets/stewaro-csp-app-live-script-1.js");
+  const client=read("assets/nahwerk-live-concierge.js");
+  const room=read("assets/fidel-live-room.js");
+  const css=read("assets/nahwerk-live-concierge.css");
+  assert.match(boot,/fidelRoom:true/);
+  assert.match(app,/fidelRoom:true/);
+  assert.match(client,/mountFidelLiveRoom/);
+  assert.match(client,/class="nw-fidel-room"/);
+  assert.match(client,/fidelRoomSurface\?\.setAudio/);
+  assert.match(client,/fidelRoomSurface\?\.stop/);
+  assert.match(client,/mountFidelGoldOrb/,"existing orb must remain available as fallback");
+  assert.match(room,/getContext\("webgl"/);
+  assert.match(room,/placeholder_model:true/);
+  assert.match(room,/prefers-reduced-motion/);
+  assert.match(css,/FIDEL_LIVE_ROOM_V1_20261002/);
+  assert.match(css,/creamy off-white spatial call surface/);
+  assert.doesNotThrow(()=>new Function(room.replace(/export\s+/g,"")),"room runtime must remain parse-safe");
+});
