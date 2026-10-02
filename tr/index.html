@@ -519,59 +519,135 @@ img { display: block; max-width: 100%; }
 </style>
 
 <style id="stewaro-gold-brand">
-  /*
-    STEWARO premium gold lockup.
-    The SVG files provide geometry only. Visible colour is generated here so
-    no embedded brown/red artwork can leak into the logo at any animation phase.
-  */
-  .brand-icon-light,
-  .brand-icon-dark,
-  .brand-word {
-    background:linear-gradient(112deg,#c6a65f 0%,#dcc489 18%,#f2e3bb 33%,#d2b16a 46%,#fff6dc 51%,#d5b66f 57%,#ead8a8 72%,#caaa64 100%) !important;
-    background-size:260% 100% !important;
-    background-position:0% 50% !important;
-    filter:none !important;
-    box-shadow:none !important;
-    text-shadow:none !important;
-    will-change:background-position;
-  }
+/*
+  STEWARO header gold lockup v2.
+  Base gold stays stable; only a separate specular light band moves.
+  This avoids brown/red phases and is GPU-friendly on mobile Safari.
+*/
+.brand-icon-light,
+.brand-icon-dark,
+.brand-word {
+  background:linear-gradient(108deg,#b18538 0%,#d0ae68 26%,#ead7a7 50%,#d5b573 72%,#b98e45 100%) !important;
+  background-size:100% 100% !important;
+  background-position:50% 50% !important;
+  filter:none !important;
+  box-shadow:none !important;
+  text-shadow:none !important;
+}
 
-  .brand-icon-light,
-  .brand-icon-dark {
-    -webkit-mask:url("/assets/logos/stewaro-icon.svg") center / contain no-repeat !important;
-    mask:url("/assets/logos/stewaro-icon.svg") center / contain no-repeat !important;
-  }
+.brand-icon-light,
+.brand-icon-dark {
+  -webkit-mask:url("/assets/logos/stewaro-icon.svg") center / contain no-repeat !important;
+  mask:url("/assets/logos/stewaro-icon.svg") center / contain no-repeat !important;
+}
 
-  .brand-word {
-    color:transparent !important;
-    -webkit-text-fill-color:transparent !important;
-    -webkit-mask:url("/assets/logos/stewaro-wordmark.svg") center / contain no-repeat !important;
-    mask:url("/assets/logos/stewaro-wordmark.svg") center / contain no-repeat !important;
-    -webkit-background-clip:border-box !important;
-    background-clip:border-box !important;
-  }
+.brand-word {
+  color:transparent !important;
+  -webkit-text-fill-color:transparent !important;
+  -webkit-mask:url("/assets/logos/stewaro-wordmark.svg") center / contain no-repeat !important;
+  mask:url("/assets/logos/stewaro-wordmark.svg") center / contain no-repeat !important;
+  -webkit-background-clip:border-box !important;
+  background-clip:border-box !important;
+}
 
-  .brand-lockup { isolation:isolate; }
+.site-header .brand-lockup {
+  --stewaro-logo-icon:36px;
+  --stewaro-logo-word-w:148px;
+  --stewaro-logo-word-h:22px;
+  position:relative;
+  isolation:isolate;
+}
 
-  @media (prefers-reduced-motion: no-preference) {
-    .site-header .brand-icon-light,
-    .site-header .brand-word {
-      animation:stewaroPremiumGold 8.2s cubic-bezier(.42,0,.58,1) infinite alternate;
-    }
-  }
+.site-header .brand-shine {
+  position:absolute;
+  inset:0;
+  z-index:3;
+  display:block;
+  overflow:hidden;
+  pointer-events:none;
+  -webkit-mask-image:url("/assets/logos/stewaro-icon.svg"),url("/assets/logos/stewaro-wordmark.svg");
+  -webkit-mask-repeat:no-repeat,no-repeat;
+  -webkit-mask-position:left center,right center;
+  -webkit-mask-size:var(--stewaro-logo-icon) var(--stewaro-logo-icon),var(--stewaro-logo-word-w) var(--stewaro-logo-word-h);
+  mask-image:url("/assets/logos/stewaro-icon.svg"),url("/assets/logos/stewaro-wordmark.svg");
+  mask-repeat:no-repeat,no-repeat;
+  mask-position:left center,right center;
+  mask-size:var(--stewaro-logo-icon) var(--stewaro-logo-icon),var(--stewaro-logo-word-w) var(--stewaro-logo-word-h);
+}
 
-  @keyframes stewaroPremiumGold {
-    0%,18% { background-position:0% 50%; }
-    78%,100% { background-position:100% 50%; }
-  }
+.site-header .brand-shine::before {
+  content:"";
+  position:absolute;
+  top:-28%;
+  bottom:-28%;
+  left:-38%;
+  width:34%;
+  opacity:0;
+  background:linear-gradient(
+    104deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,246,216,0) 18%,
+    rgba(255,244,211,.18) 34%,
+    rgba(255,250,232,.78) 47%,
+    rgba(255,255,248,.96) 50%,
+    rgba(255,239,196,.55) 56%,
+    rgba(255,245,216,.10) 70%,
+    rgba(255,255,255,0) 100%
+  );
+  transform:translate3d(0,0,0) skewX(-12deg);
+  will-change:transform,opacity;
+}
 
-  @media (prefers-reduced-motion: reduce) {
-    .site-header .brand-word,
-    .site-header .brand-icon-light {
-      animation:none !important;
-      background-position:50% 50% !important;
-    }
+@media (prefers-reduced-motion: no-preference) {
+  .site-header .brand-shine::before {
+    animation:stewaroHeaderGoldShine 9.4s cubic-bezier(.45,.03,.30,.98) infinite;
   }
+}
+
+@keyframes stewaroHeaderGoldShine {
+  0%,12% {
+    transform:translate3d(0,0,0) skewX(-12deg);
+    opacity:0;
+  }
+  17% { opacity:.70; }
+  42% {
+    transform:translate3d(525%,0,0) skewX(-12deg);
+    opacity:.88;
+  }
+  48% {
+    transform:translate3d(525%,0,0) skewX(-12deg);
+    opacity:0;
+  }
+  52% {
+    transform:translate3d(525%,0,0) skewX(-12deg);
+    opacity:0;
+  }
+  57% { opacity:.62; }
+  82% {
+    transform:translate3d(0,0,0) skewX(-12deg);
+    opacity:.80;
+  }
+  88%,100% {
+    transform:translate3d(0,0,0) skewX(-12deg);
+    opacity:0;
+  }
+}
+
+@media (max-width:600px) {
+  html[lang="de"] .site-header .brand-lockup {
+    --stewaro-logo-icon:32px;
+    --stewaro-logo-word-w:112px;
+    --stewaro-logo-word-h:18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header .brand-shine::before {
+    animation:none !important;
+    opacity:0 !important;
+    transform:none !important;
+  }
+}
 </style>
 
 
@@ -1327,6 +1403,7 @@ img { display: block; max-width: 100%; }
       <a class="brand-lockup" href="#top" aria-label="STEWARO Startseite">
         <span class="brand-icon brand-icon-light" aria-hidden="true"></span>
         <span class="brand-word">STEWARO</span>
+        <span class="brand-shine" aria-hidden="true"></span>
       </a>
       <nav class="header-nav" aria-label="Hauptnavigation">
         <a href="#services">STEWARO neler yapar</a>
