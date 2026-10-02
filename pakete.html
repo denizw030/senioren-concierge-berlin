@@ -460,3 +460,24 @@
     <script src="assets/site-ui.js?v=5"></script>
   <script src="assets/nahwerk-analytics.js?v=1"></script><script src="assets/acquisition-v1.js?v=2"></script>\n</body>
 </html>
+
+<style>
+/* PR298 accessibility gate closure: pricing contrast. */
+body.pricing-page .status-pill,
+body.pricing-page .featured .package-price,
+body.pricing-page .featured .package-usage{
+  color:#fff!important;
+  opacity:1!important;
+  filter:none!important;
+}
+body.pricing-page .lead,
+body.pricing-page #telefonannahme-modelle .card p{
+  color:#d8d4cc!important;
+  opacity:1!important;
+  filter:none!important;
+}
+body.pricing-page #telefonannahme-modelle .card{
+  background:#11110f!important;
+  background-color:#11110f!important;
+}
+</style>
