@@ -68,3 +68,17 @@ for (const page of ['zugang.html', 'anmelden.html', 'registrieren.html', 'web-co
   console.log('STEWARO_CSP_ANONYMOUS_RUNTIME_GREEN', page);
 }
 console.log('STEWARO_CSP_ANONYMOUS_BROWSER_GREEN');
+
+let violationCount = 0;
+for (const page of ['de/index.html', 'zugang.html', 'anmelden.html', 'registrieren.html', 'web-concierge.html', 'konto.html', 'app-live.html', 'impressum.html', 'kontakt.html']) {
+  const browser = await connect();
+  await browser.send('Page.addScriptToEvaluateOnNewDocument', { source: `window.__stewaroCspViolations = []; document.addEventListener('securitypolicyviolation', event => window.__stewaroCspViolations.push({ directive: event.effectiveDirective, blocked: event.blockedURI, source: event.sourceFile, line: event.lineNumber }));` });
+  await browser.send('Page.navigate', { url: `http://127.0.0.1:8767/${page}` });
+  await sleep(1500);
+  const violations = await browser.evaluate('window.__stewaroCspViolations || []');
+  violationCount += violations.length;
+  console.log('STEWARO_CSP_ENFORCED_FIXTURE_DIAGNOSTIC', JSON.stringify({ page, violations }));
+  browser.close();
+}
+// A diagnostic can finish successfully while explicitly proving enforcement still blocked.
+console.log('STEWARO_CSP_ENFORCEMENT_READINESS', violationCount === 0 ? 'ANONYMOUS_GREEN_AUTH_E2E_PENDING' : 'BLOCKED_RUNTIME_VIOLATIONS', violationCount);

@@ -46,6 +46,7 @@ jobs:
           set -euo pipefail
           python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/stewaro-csp-candidate.log 2>&1 &
           python3 -m http.server 8766 --bind 127.0.0.1 --directory ../baseline >/tmp/stewaro-csp-baseline.log 2>&1 &
+          python3 scripts/stewaro-csp-fixture-server.py >/tmp/stewaro-csp-enforced.log 2>&1 &
           CHROME="$(command -v google-chrome || command -v chromium)"
           "$CHROME" --headless --no-sandbox --disable-gpu --remote-debugging-port=0 --user-data-dir=/tmp/stewaro-csp-cdp about:blank >/tmp/stewaro-csp-chrome.log 2>&1 &
           for attempt in $(seq 1 20); do
