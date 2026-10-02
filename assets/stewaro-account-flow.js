@@ -334,9 +334,9 @@
       const summary=document.createElement("div");
       summary.className="stewaro-wizard-summary";
       const personName=familyMode?[recipientFirst?.value,recipientLast?.value].filter(Boolean).join(" "):[ownerFirst?.value,ownerLast?.value].filter(Boolean).join(" ");
-      const channel=preferredContact.value==="WHATSAPP"?"WhatsApp":"App";
-      const wa=whatsappEnabled.value==="true"?" · WhatsApp aktiv":"";
-      const safety=safetyEnabled.checked?"Ja":"Nein";
+      const channel=preferredContact.value==="WHATSAPP"?"WhatsApp":(whatsappEnabled.value==="true"?"App · WhatsApp zusätzlich":"App");
+      const checkinValue=String($("checkinTimes")?.value||"").trim();
+      const safety=safetyEnabled.checked?(checkinValue?/^\d{2}:\d{2}$/.test(checkinValue)?"Täglich um "+checkinValue+" Uhr":checkinValue:"Ja"):"Nein";
       summary.innerHTML=`
         <div><span>Für</span><strong></strong></div>
         <div><span>Hauptkontakt</span><strong></strong></div>
@@ -344,7 +344,7 @@
       `;
       const strongs=summary.querySelectorAll("strong");
       strongs[0].textContent=personName||"—";
-      strongs[1].textContent=channel+wa;
+      strongs[1].textContent=channel;
       strongs[2].textContent=safety;
       box.append(summary);
       const legal=document.createElement("div");
