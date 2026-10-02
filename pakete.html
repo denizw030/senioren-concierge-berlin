@@ -242,6 +242,26 @@
     <!-- NW-I18N-END -->
   <script src="/assets/locale-runtime.js?v=1" defer></script>
     <script src="/assets/clean-url.js?v=1"></script>
+<style>
+/* PR298 accessibility gate closure: pricing contrast. */
+body.pricing-page .status-pill,
+body.pricing-page .featured .package-price,
+body.pricing-page .featured .package-usage{
+  color:#fff!important;
+  opacity:1!important;
+  filter:none!important;
+}
+body.pricing-page .lead,
+body.pricing-page #telefonannahme-modelle .card p{
+  color:#d8d4cc!important;
+  opacity:1!important;
+  filter:none!important;
+}
+body.pricing-page #telefonannahme-modelle .card{
+  background:#11110f!important;
+  background-color:#11110f!important;
+}
+</style>
 </head>
   <body class="pricing-page">
     <header class="top"><div class="wrap nav"><a class="brand" href="/de/" aria-label="STEWARO – Startseite"><span class="mark nahwerk-mark" aria-hidden="true"></span><span class="brandtext"><strong>STEWARO</strong><span>CONCIERGE</span></span></a><nav class="links" aria-label="Hauptnavigation"><a href="/de/">Übersicht</a><a href="/prime-concierge">Persönlicher Concierge</a><a href="/concierges">STEWARO weltweit</a><a href="/telefonannahme">Telefonannahme</a><a href="/safety">Sicherheit</a><a href="/angehoerige">Für Angehörige</a><a href="/leistungen">Leistungen</a><a class="active" href="/pakete" aria-current="page">Tarife</a><a href="/kontakt">Kontakt</a><a class="auth-link login-link" href="/anmelden">Anmelden</a><a class="auth-link register-link" href="/registrieren">Registrieren</a></nav></div></header>
@@ -460,24 +480,3 @@
     <script src="assets/site-ui.js?v=5"></script>
   <script src="assets/nahwerk-analytics.js?v=1"></script><script src="assets/acquisition-v1.js?v=2"></script>\n</body>
 </html>
-
-<style>
-/* PR298 accessibility gate closure: pricing contrast. */
-body.pricing-page .status-pill,
-body.pricing-page .featured .package-price,
-body.pricing-page .featured .package-usage{
-  color:#fff!important;
-  opacity:1!important;
-  filter:none!important;
-}
-body.pricing-page .lead,
-body.pricing-page #telefonannahme-modelle .card p{
-  color:#d8d4cc!important;
-  opacity:1!important;
-  filter:none!important;
-}
-body.pricing-page #telefonannahme-modelle .card{
-  background:#11110f!important;
-  background-color:#11110f!important;
-}
-</style>
