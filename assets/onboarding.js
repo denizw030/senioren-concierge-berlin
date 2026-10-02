@@ -258,6 +258,8 @@
     form.querySelectorAll('.choice label').forEach((label) => label.classList.toggle("selected", label.querySelector("input")?.checked));
     $("recipientBlock").hidden = self;
     $("selfHint").hidden = !self;
+    const selfScope = $("selfRegistrationScope");
+    if (selfScope) selfScope.hidden = !self;
     consentRow.hidden = self;
     consentRow.setAttribute("aria-hidden", String(self));
     $("ownerPhoneField").hidden = !self;
