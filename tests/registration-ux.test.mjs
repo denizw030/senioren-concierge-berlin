@@ -30,10 +30,11 @@ test("registration contains an accessible in-flow plan switcher", () => {
   assert.match(onboarding, /history\.replaceState\(null, "", url\)/);
 });
 
-test("tariff and concierge selections remain independent", () => {
+test("tariff selection remains independent from the fixed FIDEL identity", () => {
   assert.match(onboarding, /name="planChoice"/);
-  assert.match(onboarding, /inputName:\s*"conciergeChoice"/);
-  assert.match(onboarding, /concierge_choice:\s*conciergeValue\(\),\s*package:\s*selectedPlan\(\)\.code/);
+  assert.match(onboarding, /const conciergeValue = \(\) => "fidel"/);
+  assert.match(onboarding, /concierge_profile: "FIDEL", concierge_choice: "fidel", package: selectedPlan\(\)\.code/);
+  assert.doesNotMatch(onboarding, /inputName:\s*"conciergeChoice"/);
 });
 
 test("unreleased paid plans cannot create a fake paid order", () => {
@@ -63,10 +64,11 @@ test("registration starts with a fixed STEWARO FIDEL card and no photo slider", 
   assert.doesNotMatch(html, /data-concierge-carousel|concierge-carousel\.css|concierge-carousel\.js|auth-slider-i18n\.js/);
 });
 
-test("FIDEL is the registration default without carousel runtime", () => {
-  assert.match(onboarding, /fidel:\{ key:"fidel", name:"FIDEL" \}/);
-  assert.match(onboarding, /return conciergeProfiles\[value\] \? value : "fidel"/);
-  assert.match(onboarding, /\?\.name \|\| "FIDEL"/);
+test("FIDEL is the registration authority without carousel runtime", () => {
+  assert.match(onboarding, /const conciergeValue = \(\) => "fidel"/);
+  assert.match(onboarding, /const concierge = \(\) => "FIDEL"/);
+  assert.match(onboarding, /dataset\.stewaroFidelAuthority = "true"/);
+  assert.doesNotMatch(onboarding, /conciergeProfiles|NAHWERKCarousel\?\.mount/);
 });
 
 test("registration no longer loads photo carousel or voice-preview assets", () => {

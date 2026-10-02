@@ -15,11 +15,10 @@
   const requestedNext = params.get("next") === "/payg" ? "/payg" : "";
   const postAuthTarget = guestChatHandoff && requestedNext ? requestedNext : "";
   const guestLoginHref = appHandoff
-    ? "/anmelden?produkt=senioren&next=app"
+    ? "/anmelden?produkt=stewaro&next=app"
     : postAuthTarget ? "/anmelden?source=web_guest_chat&next=%2Fpayg" : "/anmelden";
-  const requestedProduct = params.get("produkt");
-  const product = requestedProduct === "senioren" || (!requestedProduct && sessionStorage.getItem("nahwerk_product") === "senioren") ? "senioren" : "prime";
-  const productLabel = product === "senioren" ? "Senioren Concierge" : "Persönlicher Concierge";
+  const product = "stewaro";
+  const productLabel = "STEWARO Concierge";
   const PLAN_ALIASES = {
     kostenlos: "free",
     "premium-plus": "premium_plus",
@@ -123,15 +122,11 @@
   if (!Object.hasOwn(PLANS, currentPlanKey)) currentPlanKey = "free";
   const selectedPlan = () => PLANS[currentPlanKey];
   const planBookable = () => selectedPlan().bookable;
-  const conciergeProfiles = window.NAHWERKCarousel?.byKey || { fidel:{ key:"fidel", name:"FIDEL" } };
   const recipientIds = ["recipientSalutation", "recipientFirstName", "recipientLastName", "relationship", "recipientPhone", "familyMessage"];
   const fullName = (first, last) => [first.trim(), last.trim()].filter(Boolean).join(" ");
   const isSelf = () => form.querySelector('input[name="setupFor"]:checked')?.value === "self";
-  const conciergeValue = () => {
-    const value = form.querySelector('[name="conciergeChoice"]')?.value;
-    return conciergeProfiles[value] ? value : "fidel";
-  };
-  const concierge = () => conciergeProfiles[conciergeValue()]?.name || "FIDEL";
+  const conciergeValue = () => "fidel";
+  const concierge = () => "FIDEL";
   const escapeHtml = (value) => String(value || "").replace(/[&<>"']/g, (char) => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[char]));
   const familyMessageValue = () => $("familyMessage")?.value.trim() || "";
 
@@ -198,54 +193,29 @@
     if (!planBookable()) setPlanPicker(true);
   }
 
-  function injectConciergeStyles() {
-    if ($("conciergeSelectionStyles")) return;
-    const style = document.createElement("style");
-    style.id = "conciergeSelectionStyles";
-    style.textContent = `
-      .concierge-choice { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin:14px 0 10px; }
-      .concierge-choice .concierge-option { position:relative; display:block; min-width:0; cursor:pointer; }
-      .concierge-choice .concierge-option > input { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
-      .concierge-card-content { height:100%; overflow:hidden; border:1px solid var(--line,#ddd4ca); border-radius:14px; background:rgba(255,255,255,.72); transition:border-color .18s ease,box-shadow .18s ease,background .18s ease,transform .18s ease; }
-      .concierge-card-content img { display:block; width:100%; aspect-ratio:4/3; object-fit:cover; object-position:center top; background:#eee8e0; }
-      .concierge-card-copy { position:relative; padding:15px 44px 16px 16px; min-height:92px; }
-      .concierge-card-copy strong { display:block; margin:0 0 5px; font-size:18px; line-height:1.2; color:var(--ink,#201d19); }
-      .concierge-card-copy span { display:block; font-size:13px; line-height:1.45; color:var(--muted,#6e6861); }
-      .concierge-check { position:absolute; right:14px; top:14px; width:24px; height:24px; border-radius:50%; display:grid; place-items:center; border:1px solid rgba(173,132,42,.5); color:transparent; background:rgba(255,255,255,.9); font-weight:900; }
-      .concierge-option:hover .concierge-card-content { transform:translateY(-1px); box-shadow:0 10px 28px rgba(44,35,24,.08); }
-      .concierge-option > input:checked + .concierge-card-content { border:2px solid var(--gold,#b68b32); background:rgba(182,139,50,.08); box-shadow:0 0 0 2px rgba(182,139,50,.12); }
-      .concierge-option > input:checked + .concierge-card-content .concierge-check { color:#fff; background:var(--gold,#b68b32); border-color:var(--gold,#b68b32); }
-      .concierge-option > input:focus-visible + .concierge-card-content { outline:3px solid rgba(182,139,50,.42); outline-offset:3px; }
-      .concierge-selection-title { display:block; margin-bottom:6px; font-weight:800; font-size:18px; line-height:1.3; }
-      .concierge-selection-intro { margin:0 0 6px; color:var(--muted,#6e6861); font-size:13px; line-height:1.55; }
-      @media (max-width:700px) { .concierge-choice { grid-template-columns:1fr; } .concierge-card-content { display:grid; grid-template-columns:112px 1fr; } .concierge-card-content img { height:100%; min-height:120px; aspect-ratio:auto; } }
-    `;
-    document.head.appendChild(style);
-  }
-
   function setupConciergeSelection() {
+    // FIDEL is the STEWARO identity. Voice variants are configured separately and
+    // never change the concierge name or brand.
+    const existing = [...form.querySelectorAll('[name="conciergeChoice"]')];
+    existing.forEach((input) => {
+      input.disabled = true;
+      if ("checked" in input) input.checked = false;
+    });
+    let fixed = form.querySelector('input[data-stewaro-fidel-authority]');
+    if (!fixed) {
+      fixed = document.createElement("input");
+      fixed.type = "hidden";
+      fixed.name = "conciergeChoice";
+      fixed.dataset.stewaroFidelAuthority = "true";
+      form.append(fixed);
+    }
+    fixed.value = "fidel";
     const choice = form.querySelector(".concierge-choice");
-    if (!choice) {
-      const fixed = form.querySelector('[name="conciergeChoice"]');
-      if (fixed && !fixed.value) fixed.value = "fidel";
-      return;
+    const field = choice?.closest(".field");
+    if (field) {
+      field.hidden = true;
+      field.setAttribute("aria-hidden", "true");
     }
-    const requestedConcierge = params.get("concierge");
-    if (conciergeProfiles[requestedConcierge]) choice.dataset.selected = requestedConcierge;
-    const field = choice.closest(".field");
-    const heading = field?.querySelector(":scope > legend, :scope > label");
-    if (heading) {
-      heading.classList.add("concierge-selection-title");
-      heading.textContent = "Wer darf Sie begleiten?";
-    }
-    let intro = field?.querySelector(".concierge-intro, .concierge-selection-intro");
-    if (!intro && field) {
-      intro = document.createElement("p");
-      intro.className = "concierge-intro concierge-selection-intro";
-      choice.before(intro);
-    }
-    if (intro) intro.textContent = "Wählen Sie den Concierge, dessen Auftreten und Kommunikationsstil am besten zu Ihnen passt. Die grundlegenden Möglichkeiten bleiben bei allen Profilen gleich.";
-    window.NAHWERKCarousel?.mount(choice, { variant: "selection", inputName: "conciergeChoice", selected: choice.dataset.selected || "lena" });
   }
 
   function person() {
@@ -277,9 +247,7 @@
     const familyMessage = !isSelf() ? familyMessageValue() : "";
     const familyMessagePreview = familyMessage ? `<br><br><em>Persönliche Nachricht von ${escapeHtml(owner || "Ihrer Familie")}:</em><br>„${escapeHtml(familyMessage).replace(/\n/g,"<br>")}“` : "";
     updateContextTexts();
-    const welcomeMessage = product === "senioren"
-      ? `<strong>${greeting} 👋</strong><br><br>Willkommen bei STEWARO Concierge.${introduction}<br><br>Ich bin ${concierge()}, ${informal ? "dein" : "Ihr"} persönlicher KI-Concierge.<br><br>Ich helfe ${informal ? "dir" : "Ihnen"} dabei, Fragen verständlich zu klären, Technik Schritt für Schritt zu bedienen und wichtige Erinnerungen im Blick zu behalten.<br><br>Auf Wunsch erstelle ich Bilder, ordne Fotos ein, vergleiche Möglichkeiten und fasse Informationen übersichtlich zusammen.`
-      : `<strong>${greeting} 👋</strong><br><br>Willkommen bei ${productLabel}.${introduction}<br><br>Ich bin ${concierge()}, ${informal ? "dein" : "Ihr"} persönlicher KI-Concierge.<br><br>Ich erkläre die Bedienung verständlich und helfe ${informal ? "dir" : "Ihnen"} bei Organisation, Informationen, Dokumenten und vielem mehr.`;
+    const welcomeMessage = `<strong>${greeting} 👋</strong><br><br>Willkommen bei STEWARO Concierge.${introduction}<br><br>Ich bin FIDEL, ${informal ? "dein" : "Ihr"} persönlicher KI-Concierge.<br><br>Ich helfe ${informal ? "dir" : "Ihnen"} verständlich bei Organisation, Informationen, Dokumenten, Erinnerungen und weiteren Alltagsaufgaben.`;
     $("messagePreview").innerHTML = welcomeMessage + familyMessagePreview;
   }
 
@@ -500,7 +468,7 @@
       person_id: body.person_id,
       role: body.role,
       expires_at: body.expires_at,
-      product_context: body.product_context || (body.brand === "senioren_concierge" ? "senioren" : body.brand === "prime_concierge" ? "prime" : product)
+      product_context: body.product_context || (body.brand === "stewaro" ? "stewaro" : product)
     }));
     await initializeSecurityRecommendation(body.session_token);
     return body;
@@ -560,7 +528,7 @@
     const p = person();
     const safety = $("safetyEnabled").checked;
     const request = {
-      product, concierge_profile: product === "senioren" ? "SENIOR_MARTIN" : "PRIME_MARTIN", concierge_choice: conciergeValue(), package: selectedPlan().code,
+      product, concierge_profile: "FIDEL", concierge_choice: "fidel", package: selectedPlan().code,
       registration_type: self ? "self" : "other", account_holder_name: fullName($("ownerFirstName").value, $("ownerLastName").value), account_holder_salutation: $("ownerSalutation").value,
       account_holder_first_name: $("ownerFirstName").value.trim(), account_holder_last_name: $("ownerLastName").value.trim(), account_holder_postal_code: $("ownerPostalCode")?.value.trim() || "", postal_code: $("ownerPostalCode")?.value.trim() || "", email: $("ownerEmail").value.trim(), phone: self ? $("ownerPhone").value.trim() : "",
       supported_person_name: fullName(p.first, p.last), supported_person_salutation: p.sal, supported_person_first_name: p.first, supported_person_last_name: p.last,
