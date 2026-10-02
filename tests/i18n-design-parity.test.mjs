@@ -46,20 +46,20 @@ function normalizeInlineCss(css) {
 function stylesheetRefs(html) {
   return [...html.matchAll(/<link\b[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["'][^>]*>/gi)]
     .map((m) => normalizeAsset(m[1]))
-    .filter((href) => !/^\\/assets\\/stewaro-home-de-/.test(href));
+    .filter((href) => !/^\/assets\/stewaro-home-de-/.test(href));
 }
 
 function effectiveStyleBlocks(html) {
   const blocks = [];
-  const token = /<style\\b[^>]*>([\\s\\S]*?)<\\/style>|<link\b[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["'][^>]*>/gi;
+  const token = /<style\b[^>]*>([\s\S]*?)<\/style>|<link\b[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["'][^>]*>/gi;
   for (const match of html.matchAll(token)) {
     if (match[1] !== undefined) {
       blocks.push(normalizeInlineCss(match[1]));
       continue;
     }
     const href = normalizeAsset(match[2]).replace(/[?#].*$/, '');
-    if (/^\\/assets\\/stewaro-home-de-/.test(href)) {
-      blocks.push(normalizeInlineCss(read(href.replace(/^\\//, ''))));
+    if (/^\/assets\/stewaro-home-de-/.test(href)) {
+      blocks.push(normalizeInlineCss(read(href.replace(/^\//, ''))));
     }
   }
   return blocks;
