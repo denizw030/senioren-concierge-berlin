@@ -55,6 +55,19 @@ test("STEWARO shared-base brand shell is wired without forking runtime", () => {
   assert.match(siteUi, /nw_portal_theme_v1/);
 });
 
+test("header logo uses stable champagne gold with a mobile-safe specular sweep", () => {
+  const home = homepageSource("de/index.html");
+  const gold = read("assets/stewaro-home-de-stewaro-gold-brand-v2.css");
+  assert.match(home, /class="brand-shine" aria-hidden="true"/);
+  assert.match(gold, /background-size:100% 100% !important/);
+  assert.match(gold, /stewaroHeaderGoldShine/);
+  assert.match(gold, /translate3d\(525%,0,0\)/);
+  assert.match(gold, /will-change:transform,opacity/);
+  assert.match(gold, /html\[lang="de"\][\s\S]*--stewaro-logo-word-w:112px/);
+  assert.match(gold, /prefers-reduced-motion: reduce/);
+  assert.doesNotMatch(gold, /stewaroPremiumGold/);
+});
+
 test("production domain configuration uses canonical STEWARO host", () => {
   const cname = read("CNAME");
   assert.equal(cname.trim(), "stewaro.com");
