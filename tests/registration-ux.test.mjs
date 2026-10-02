@@ -160,3 +160,19 @@ test("registration surfaces server validation details instead of a generic dead 
   assert.match(onboarding, /Die WhatsApp-Telefonnummer ist nicht vollständig oder nicht gültig/);
   assert.doesNotMatch(onboarding, /return show\("<strong>Bitte prüfen Sie Ihre Angaben\.<\/strong>", true\)/);
 });
+
+
+test("OTP verification stays independent from the Family primary-submit variables", () => {
+  const start=onboarding.indexOf("async function submitVerification()");
+  const end=onboarding.indexOf("form.addEventListener",start);
+  const verification=onboarding.slice(start,end);
+  assert.ok(start>=0 && end>start);
+  assert.match(verification,/login\(request\.email, password\)/);
+  assert.doesNotMatch(verification,/submissionRequest|familySetup|familyDraft/);
+});
+
+test("pending Family setup survives a manual login in the same tab", () => {
+  const familyRuntime = readFileSync(new URL("../assets/family-owner-sponsored-access.js", import.meta.url), "utf8");
+  assert.match(onboarding,/sessionStorage\.setItem\(FAMILY_REGISTRATION_DRAFT_KEY, JSON\.stringify\(familyDraft\)\)/);
+  assert.match(familyRuntime,/new URLSearchParams\(location\.search\)\.get\("family_setup"\)==="1"\|\|readRegistrationDraft\(\)/);
+});
