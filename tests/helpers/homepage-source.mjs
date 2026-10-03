@@ -4,8 +4,8 @@ import fs from './effective-source-fs.mjs';
 export function homepageSource(path) {
   const html = fs.readFileSync(path, 'utf8');
   return html
-    .replace(/<link rel="stylesheet" href="\/(assets\/stewaro-home-de-[^"?]+\.css)\?v=1"(?: id="([^"]+)")?>/g,
+    .replace(/<link rel="stylesheet" href="\/(assets\/stewaro-home-de-[^"?]+\.css)\?v=\d+"(?: id="([^"]+)")?>/g,
       (_, asset, id) => '<style' + (id ? ' id="' + id + '"' : '') + '>' + fs.readFileSync(asset, 'utf8') + '</style>')
-    .replace('<script src="/assets/stewaro-home-de.js?v=1"></script>',
+    .replace(/<script src="\/assets\/stewaro-home-de\.js\?v=\d+"><\/script>/,
       () => '<script>' + fs.readFileSync('assets/stewaro-home-de.js', 'utf8') + '</script>');
 }
