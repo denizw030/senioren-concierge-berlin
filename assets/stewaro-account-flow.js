@@ -80,7 +80,8 @@
   const fieldNode=el=>el?.closest(".field");
   const ownerFirst=$("ownerFirstName");
   const ownerLast=$("ownerLastName");
-  const postal=$("ownerPostalCode");
+  const ownerPostal=$("ownerPostalCode");
+  const recipientPostal=$("recipientPostalCode");
   const password=$("webPassword");
   const ownerPhone=$("ownerPhone");
   const recipientFirst=$("recipientFirstName");
@@ -161,8 +162,8 @@
   form.append(shell);
 
   const movableNodes=[
-    fieldNode(emailInput),fieldNode(ownerFirst),fieldNode(ownerLast),fieldNode(postal),
-    fieldNode(password),fieldNode(ownerPhone),fieldNode(recipientFirst),fieldNode(recipientLast),
+    fieldNode(emailInput),fieldNode(ownerFirst),fieldNode(ownerLast),fieldNode(ownerPostal),
+    fieldNode(password),fieldNode(ownerPhone),fieldNode(recipientFirst),fieldNode(recipientLast),fieldNode(recipientPostal),
     fieldNode(recipientPhone),fieldNode(relationship),safetyFields,privacyRow,termsRow,consentRow,
     submit,status
   ].filter(Boolean);
@@ -198,8 +199,6 @@
     [ownerFirst,ownerLast]
   );
 
-  addInputStep("postal","Wie lautet deine Postleitzahl?","So kann FIDEL regionale Hilfe und Dienste passend einordnen.",[fieldNode(postal)],[postal]);
-
   if(familyMode){
     addInputStep(
       "recipient",
@@ -207,6 +206,13 @@
       "Nur der Name der Person, die FIDEL unterstützen soll.",
       [fieldNode(recipientFirst),fieldNode(recipientLast)],
       [recipientFirst,recipientLast]
+    );
+    addInputStep(
+      "recipient-postal",
+      "Wie lautet die Postleitzahl des Klienten?",
+      "So kann FIDEL regionale Hilfe und Dienste für den Klienten passend einordnen.",
+      [fieldNode(recipientPostal)],
+      [recipientPostal]
     );
     add({
       key:"relationship",
@@ -219,6 +225,14 @@
       focus:relationship,
       validate:()=>relationship?.reportValidity()!==false
     });
+  }else{
+    addInputStep(
+      "postal",
+      "Wie lautet deine Postleitzahl?",
+      "So kann FIDEL regionale Hilfe und Dienste passend einordnen.",
+      [fieldNode(ownerPostal)],
+      [ownerPostal]
+    );
   }
 
   add({
@@ -334,18 +348,21 @@
       const summary=document.createElement("div");
       summary.className="stewaro-wizard-summary";
       const personName=familyMode?[recipientFirst?.value,recipientLast?.value].filter(Boolean).join(" "):[ownerFirst?.value,ownerLast?.value].filter(Boolean).join(" ");
+      const postalCode=String((familyMode?recipientPostal:ownerPostal)?.value||"").trim();
       const channel=preferredContact.value==="WHATSAPP"?"WhatsApp":(whatsappEnabled.value==="true"?"App · WhatsApp zusätzlich":"App");
       const checkinValue=String($("checkinTimes")?.value||"").trim();
       const safety=safetyEnabled.checked?(checkinValue?/^\d{2}:\d{2}$/.test(checkinValue)?"Täglich um "+checkinValue+" Uhr":checkinValue:"Ja"):"Nein";
       summary.innerHTML=`
         <div><span>Für</span><strong></strong></div>
+        <div><span>${familyMode?"PLZ Klient":"PLZ"}</span><strong></strong></div>
         <div><span>Hauptkontakt</span><strong></strong></div>
         <div><span>Safety-Check-in</span><strong></strong></div>
       `;
       const strongs=summary.querySelectorAll("strong");
       strongs[0].textContent=personName||"—";
-      strongs[1].textContent=channel;
-      strongs[2].textContent=safety;
+      strongs[1].textContent=postalCode||"—";
+      strongs[2].textContent=channel;
+      strongs[3].textContent=safety;
       box.append(summary);
       const legal=document.createElement("div");
       legal.className="stewaro-registration-legal";
@@ -424,6 +441,8 @@
     }
   });
 
+  if(ownerPostal)ownerPostal.required=!familyMode;
+  if(recipientPostal)recipientPostal.required=familyMode;
   setWhatsappEnabled(false);
   render();
 })();
