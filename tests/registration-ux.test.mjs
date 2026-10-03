@@ -88,9 +88,9 @@ test("registration no longer loads photo carousel or voice-preview assets", () =
 
 
 test("registration uses one calm canonical step flow for self and Family entry", () => {
-  assert.match(html, /stewaro-registration-wizard\.css\?v=1/);
-  assert.match(html, /stewaro-account-flow\.js\?v=4/);
-  assert.match(html, /assets\/onboarding\.js\?v=30/);
+  assert.match(html, /stewaro-registration-wizard\.css\?v=2/);
+  assert.match(html, /stewaro-account-flow\.js\?v=5/);
+  assert.match(html, /assets\/onboarding\.js\?v=31/);
   assert.match(accountFlow, /if\(!document\.body\.classList\.contains\("registration-page"\)\)return/);
   assert.doesNotMatch(accountFlow, /registration-page"\)\|\|source!==/);
   assert.match(accountFlow, /familyMode=params\.get\("fuer"\)==="andere"/);
@@ -183,7 +183,7 @@ test("pending Family setup survives a manual login in the same tab", () => {
 test("Family wizard asks for the Klient postcode and never assigns it to the account holder", () => {
   assert.match(html, /id="recipientPostalCode"[\s\S]*pattern="\[0-9\]\{5\}"/);
   assert.match(accountFlow, /Wie lautet die Postleitzahl des Klienten\?/);
-  assert.match(accountFlow, /FIDEL regionale Hilfe und Dienste für den Klienten passend einordnen/);
+  assert.match(accountFlow, /Die PLZ reicht für die Region\. Die genaue Adresse kannst du im selben Schritt freiwillig ergänzen\./);
   assert.match(accountFlow, /ownerPostal\.required=!familyMode/);
   assert.match(accountFlow, /recipientPostal\.required=familyMode/);
   assert.match(onboarding, /account_holder_postal_code: self \?/);
@@ -195,4 +195,23 @@ test("Family wizard asks for the Klient postcode and never assigns it to the acc
 test("registration review identifies the Klient postcode separately", () => {
   assert.match(accountFlow, /familyMode\?"PLZ Klient":"PLZ"/);
   assert.match(accountFlow, /const postalCode=String\(\(familyMode\?recipientPostal:ownerPostal\)/);
+});
+
+
+test("postcode step offers a subtle optional address without adding another wizard step", () => {
+  assert.match(html, /id="ownerStreetAddress"[^>]*autocomplete="street-address"/);
+  assert.match(html, /id="recipientStreetAddress"[^>]*autocomplete="street-address"/);
+  assert.match(accountFlow, /const addPostalStep=/);
+  assert.match(accountFlow, /Adresse optional hinzufügen/);
+  assert.match(accountFlow, /tatsächlich nächsten Hausarzt/);
+  assert.doesNotMatch(accountFlow, /key:"address"/);
+  assert.match(onboarding, /street_address: self \?/);
+  assert.match(onboarding, /street_address: String\(\$\("recipientStreetAddress"\)\?\.value/);
+  assert.match(onboarding, /postal_code: "",\n      street_address: ""/);
+});
+
+test("Safety details remain inside the mobile wizard width", () => {
+  assert.match(wizardCss, /#safetyFields\{[\s\S]*width:100%!important;[\s\S]*max-width:100%!important;[\s\S]*padding:0!important;/);
+  assert.match(wizardCss, /#safetyFields :is\(input:not\(\[type="checkbox"\]\):not\(\[type="radio"\]\),select,textarea\)\{[\s\S]*max-width:100%!important;/);
+  assert.match(wizardCss, /#safetyFields input\[type="time"\]\{[\s\S]*min-inline-size:0!important;/);
 });
