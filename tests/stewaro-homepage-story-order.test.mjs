@@ -36,3 +36,10 @@ for (const locale of locales) {
     assert.match(html, /const updateMechanismVideo = \(\) => \{/);
   });
 }
+
+
+test("mobile hero keeps the horse face centered enough to remain fully visible", () => {
+  const html = homepageSource("de/index.html");
+  assert.match(html, /@media \(max-width: 600px\)[\s\S]*?\.hero-image \{ width:116%; height:110%; inset:-3% -8%; object-position:54% center; \}/);
+  assert.doesNotMatch(html, /object-position:46% center/);
+});
