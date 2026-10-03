@@ -76,6 +76,8 @@ test("registration assigns postal code to the correct person and keeps FIDEL fix
   assert.match(onboarding,/account_holder_postal_code: self \?/);
   assert.match(onboarding,/postal_code: self \?/);
   assert.match(onboarding,/recipientPostalCode/);
+  assert.match(register,/id="recipientStreetAddress"/);
+  assert.match(onboarding,/street_address: self \?/);
   assert.match(onboarding,/account_holder_postal_code: "",\n      postal_code: ""/);
 });
 
