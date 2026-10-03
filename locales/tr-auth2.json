@@ -35,5 +35,6 @@
   "Die tatsächliche Du-/Sie-Ansprache richtet sich nach der bei der Registrierung gewählten Einstellung.": "Gerçek hitap biçimi kayıt sırasında seçilen ayara göre belirlenir.",
   "Deine Daten sind bei uns sicher und DSGVO-konform geschützt.": "Verileriniz bizde güvenli ve GDPR'ye uygun şekilde korunur.",
   "Angebot": "Hizmetler",
-  "Tägliche Check-in-Zeit": "Günlük kontrol saati"
+  "Tägliche Check-in-Zeit": "Günlük kontrol saati",
+  "Postleitzahl des Klienten": "Klient posta kodu"
 }
