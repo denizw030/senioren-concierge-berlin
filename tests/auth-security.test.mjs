@@ -66,7 +66,7 @@ test("registration keeps the hardened passphrase policy and never persists the p
   assert.match(onboarding, /blockedPasswords = new Set/);
   assert.match(onboarding, /web_password: undefined/);
   assert.match(onboarding, /web_password_repeat: undefined/);
-  assert.match(registration, /assets\/onboarding\.js\?v=29/);
+  assert.match(registration, /assets\/onboarding\.js\?v=30/);
 });
 
 test("persistent web sessions require explicit remember-me and remain revocable", () => {
