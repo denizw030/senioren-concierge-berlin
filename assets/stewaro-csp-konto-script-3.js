@@ -342,7 +342,6 @@
         const PASSWORD_RESET_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-password-recovery-request-secure";
         const MFA_STATUS_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-mfa-status";
         const MFA_MANAGE_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-mfa-manage";
-        const SAFETY_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/safety";
         const SAFETY_CONTACTS_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-safety-contacts";
         const MANAGED_SAFETY_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-managed-safety-context";
         let managedSafetyAuthorized = false;
@@ -2155,28 +2154,10 @@
               safety_enabled: safety.enabled === true,
               checkin_times: Array.isArray(safety.checkin_times) ? safety.checkin_times : [],
               next_checkin_at: safety.next_checkin_at || null,
-              backend_active: safety.enabled === true
+              backend_active: safety.enabled === true,
+              customer_call_delay_minutes: Number(safety.customer_call_delay_minutes ?? 5),
+              emergency_contact_delay_minutes: Number(safety.emergency_contact_delay_minutes ?? 3)
             };
-
-            // Legacy n8n is no longer the availability authority. If reachable, it may
-            // still supply the two detailed escalation-delay values for the self view.
-            if (!managedContext) {
-              try {
-                const legacyResponse = await fetch(SAFETY_URL, {
-                  method: "GET",
-                  headers: { Authorization: "Bearer " + token },
-                  signal: AbortSignal.timeout(2500)
-                });
-                const legacyBody = await legacyResponse.json().catch(() => ({}));
-                if (legacyResponse.ok) {
-                  const legacy = legacyBody?.data || legacyBody?.safety || legacyBody || {};
-                  const customerDelay = Number(legacy.customer_call_delay_minutes ?? legacy.safety_escalation_minutes);
-                  const emergencyDelay = Number(legacy.emergency_contact_delay_minutes);
-                  if (Number.isFinite(customerDelay)) renderPayload.customer_call_delay_minutes = customerDelay;
-                  if (Number.isFinite(emergencyDelay)) renderPayload.emergency_contact_delay_minutes = emergencyDelay;
-                }
-              } catch (_) {}
-            }
 
             lastSafetyContacts = contacts;
             renderSafety(renderPayload, contacts);
@@ -2265,7 +2246,9 @@
                   enabled: safetyEnabled.checked,
                   checkin_times: times,
                   contacts,
-                  timezone: "Europe/Berlin"
+                  timezone: "Europe/Berlin",
+                  customer_call_delay_minutes: clampSafetyDelay(safetyCustomerDelay.value, 5),
+                  emergency_contact_delay_minutes: clampSafetyDelay(safetyEmergencyDelay.value, 3)
                 })
               });
               const body = await response.json().catch(() => ({}));
@@ -2293,7 +2276,6 @@
             return;
           }
 
-          const firstContact = contacts[0] || { name: "", phone: "" };
           const customerDelay = clampSafetyDelay(safetyCustomerDelay.value, 5);
           const emergencyDelay = clampSafetyDelay(safetyEmergencyDelay.value, 3);
           safetyCustomerDelay.value = String(customerDelay);
@@ -2302,36 +2284,29 @@
           safetySaveButton.disabled = true;
           safetySaveButton.textContent = "Wird gespeichert …";
           showSafetySaveStatus("Änderungen werden gespeichert …");
-          const previousContacts = Array.isArray(lastSafetyContacts)
-            ? lastSafetyContacts.map((contact) => ({
-                name: contact.name || "",
-                phone: contact.phone || "",
-                relationship: contact.relationship || ""
-              }))
-            : [];
-          let contactsSaved = false;
           try {
-            const savedContacts = await saveSafetyContacts(token, contacts);
-            contactsSaved = true;
-            const response = await fetch(SAFETY_URL, {
-              method: "POST",
+            const response = await fetch(MANAGED_SAFETY_URL, {
+              method: "PUT",
               headers: {
                 "Content-Type": "application/json",
                 Authorization: "Bearer " + token
               },
               body: JSON.stringify({
-                safety_enabled: safetyEnabled.checked,
-                schedule_mode: "recurring",
+                enabled: safetyEnabled.checked,
                 checkin_times: times,
-                trusted_contact_name: firstContact.name,
-                trusted_contact_phone: firstContact.phone,
+                contacts,
+                timezone: "Europe/Berlin",
                 customer_call_delay_minutes: customerDelay,
                 emergency_contact_delay_minutes: emergencyDelay
               })
             });
             const body = await response.json().catch(() => ({}));
-            if (!response.ok || body?.ok === false) throw new Error(String(body?.status || "safety_update_failed"));
+            if (!response.ok || body?.ok !== true) {
+              throw new Error(String(body?.status || "safety_context_save_failed"));
+            }
+            const savedContacts = Array.isArray(body?.safety?.contacts) ? body.safety.contacts : contacts;
             lastSafetyContacts = savedContacts;
+            safetyLoadStarted = false;
             await loadSafety();
             showSafetySaveStatus("Gespeichert.");
             setTimeout(() => {
@@ -2339,11 +2314,8 @@
               setSafetyFormOpen(false);
             }, 700);
           } catch (error) {
-            if (contactsSaved) {
-              await saveSafetyContacts(token, previousContacts).catch(() => {});
-            }
             const status = error instanceof Error ? error.message : "";
-            if (status === "contacts_save_failed" || status === "invalid_contact" || status === "duplicate_contact_phone") {
+            if (status === "invalid_contact" || status === "duplicate_contact_phone") {
               showSafetySaveStatus("Die Sicherheitskontakte konnten nicht gespeichert werden. Bitte prüfen Sie die Angaben.", true);
             } else {
               showSafetySaveStatus("Die Änderung konnte gerade nicht gespeichert werden. Bitte versuchen Sie es erneut.", true);
