@@ -446,7 +446,7 @@ img { display: block; max-width: 100%; }
   .hero-subtitle { margin-top:20px; font-size:17px; }
   .hero-actions { display:grid; margin-top:30px; }
   .hero-button { width:100%; }
-  .hero-image { width:116%; height:110%; inset:-3% -8%; object-position:46% center; }
+  .hero-image { width:116%; height:110%; inset:-3% -8%; object-position:54% center; }
   .scroll-cue { display:none; }
   .promise, .care-section, .precision, .services, .how, .audience, .trust, .contact { padding-left:20px; padding-right:20px; }
   .precision { padding-top:108px; padding-bottom:112px; }

@@ -89,8 +89,8 @@ test("registration no longer loads photo carousel or voice-preview assets", () =
 
 test("registration uses one calm canonical step flow for self and Family entry", () => {
   assert.match(html, /stewaro-registration-wizard\.css\?v=1/);
-  assert.match(html, /stewaro-account-flow\.js\?v=3/);
-  assert.match(html, /assets\/onboarding\.js\?v=29/);
+  assert.match(html, /stewaro-account-flow\.js\?v=4/);
+  assert.match(html, /assets\/onboarding\.js\?v=30/);
   assert.match(accountFlow, /if\(!document\.body\.classList\.contains\("registration-page"\)\)return/);
   assert.doesNotMatch(accountFlow, /registration-page"\)\|\|source!==/);
   assert.match(accountFlow, /familyMode=params\.get\("fuer"\)==="andere"/);
@@ -99,13 +99,15 @@ test("registration uses one calm canonical step flow for self and Family entry",
 test("wizard asks only relevant questions and starts with email", () => {
   const emailStep=accountFlow.indexOf('addInputStep("email"');
   const ownerStep=accountFlow.indexOf('addInputStep(\n    "owner-name"');
-  const postalStep=accountFlow.indexOf('addInputStep("postal"');
   const recipientStep=accountFlow.indexOf('addInputStep(\n      "recipient"');
+  const recipientPostalStep=accountFlow.indexOf('"recipient-postal"');
+  const selfPostalStep=accountFlow.indexOf('"postal",\n      "Wie lautet deine Postleitzahl?"');
   const contactStep=accountFlow.indexOf('key:"contact"');
   const safetyStep=accountFlow.indexOf('key:"safety"');
   const passwordStep=accountFlow.indexOf('addInputStep("password"');
-  assert.ok(emailStep>=0 && ownerStep>emailStep && postalStep>ownerStep);
-  assert.ok(recipientStep>postalStep && contactStep>recipientStep);
+  assert.ok(emailStep>=0 && ownerStep>emailStep);
+  assert.ok(recipientStep>ownerStep && recipientPostalStep>recipientStep);
+  assert.ok(selfPostalStep>recipientPostalStep && contactStep>selfPostalStep);
   assert.ok(safetyStep>contactStep && passwordStep>safetyStep);
   assert.match(accountFlow, /conditional:\(\)=>preferredContact\.value==="APP"/);
   assert.match(accountFlow, /conditional:\(\)=>whatsappEnabled\.value==="true"/);
@@ -175,4 +177,22 @@ test("pending Family setup survives a manual login in the same tab", () => {
   const familyRuntime = readFileSync(new URL("../assets/family-owner-sponsored-access.js", import.meta.url), "utf8");
   assert.match(onboarding,/sessionStorage\.setItem\(FAMILY_REGISTRATION_DRAFT_KEY, JSON\.stringify\(familyDraft\)\)/);
   assert.match(familyRuntime,/new URLSearchParams\(location\.search\)\.get\("family_setup"\)==="1"\|\|readRegistrationDraft\(\)/);
+});
+
+
+test("Family wizard asks for the Klient postcode and never assigns it to the account holder", () => {
+  assert.match(html, /id="recipientPostalCode"[\s\S]*pattern="\[0-9\]\{5\}"/);
+  assert.match(accountFlow, /Wie lautet die Postleitzahl des Klienten\?/);
+  assert.match(accountFlow, /FIDEL regionale Hilfe und Dienste für den Klienten passend einordnen/);
+  assert.match(accountFlow, /ownerPostal\.required=!familyMode/);
+  assert.match(accountFlow, /recipientPostal\.required=familyMode/);
+  assert.match(onboarding, /account_holder_postal_code: self \?/);
+  assert.match(onboarding, /postal_code: self \?/);
+  assert.match(onboarding, /postal_code: String\(\$\("recipientPostalCode"\)\?\.value/);
+  assert.match(onboarding, /account_holder_postal_code: "",\n      postal_code: ""/);
+});
+
+test("registration review identifies the Klient postcode separately", () => {
+  assert.match(accountFlow, /familyMode\?"PLZ Klient":"PLZ"/);
+  assert.match(accountFlow, /const postalCode=String\(\(familyMode\?recipientPostal:ownerPostal\)/);
 });

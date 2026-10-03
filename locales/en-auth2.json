@@ -35,5 +35,6 @@
   "Die tatsächliche Du-/Sie-Ansprache richtet sich nach der bei der Registrierung gewählten Einstellung.": "The actual form of address follows the setting selected during registration.",
   "Deine Daten sind bei uns sicher und DSGVO-konform geschützt.": "Your data is protected securely and in accordance with GDPR.",
   "Angebot": "Offering",
-  "Tägliche Check-in-Zeit": "Daily check-in time"
+  "Tägliche Check-in-Zeit": "Daily check-in time",
+  "Postleitzahl des Klienten": "Klient postcode"
 }

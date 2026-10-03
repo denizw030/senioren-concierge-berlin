@@ -67,13 +67,16 @@ test("Family CTA activates the existing other-person registration mode without e
   assert.match(routing,/data-direct-registration/);
 });
 
-test("self registration captures required postal code and keeps FIDEL fixed",()=>{
+test("registration assigns postal code to the correct person and keeps FIDEL fixed",()=>{
   assert.match(register,/id="ownerPostalCode"/);
-  assert.match(register,/autocomplete="postal-code"/);
+  assert.match(register,/id="recipientPostalCode"/);
+  assert.match(register,/Postleitzahl des Klienten/);
   assert.match(register,/pattern="\[0-9\]\{5\}"/);
   assert.match(register,/name="conciergeChoice" value="fidel"/);
-  assert.match(onboarding,/account_holder_postal_code/);
-  assert.match(onboarding,/postal_code/);
+  assert.match(onboarding,/account_holder_postal_code: self \?/);
+  assert.match(onboarding,/postal_code: self \?/);
+  assert.match(onboarding,/recipientPostalCode/);
+  assert.match(onboarding,/account_holder_postal_code: "",\n      postal_code: ""/);
 });
 
 test("unified account flow keeps one-field login and progressive registration presentation",()=>{

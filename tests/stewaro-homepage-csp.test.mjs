@@ -10,7 +10,7 @@ test('German launch homepage has no inline executable script, style or event han
   assert.doesNotMatch(html, /\s(?:style|on[a-z]+)\s*=/i);
 });
 test('Homepage CSP resources are same-origin, present and retain ordered style identities', () => {
-  const links = [...html.matchAll(/<link rel="stylesheet" href="\/(assets\/stewaro-home-de-[^"?]+\.css)\?v=1"(?: id="([^"]+)")?>/g)];
+  const links = [...html.matchAll(/<link rel="stylesheet" href="\/(assets\/stewaro-home-de-[^"?]+\.css)\?v=\d+"(?: id="([^"]+)")?>/g)];
   assert.deepEqual(links.map(x => x[2] || 'base'), [
     'base', 'stewaro-static-safety', 'stewaro-gold-brand', 'stewaro-real-gold-sphere',
     'stewaro-care-luxury-v2', 'stewaro-leaf-luxury-v1', 'stewaro-precision-fullbleed-v1'
