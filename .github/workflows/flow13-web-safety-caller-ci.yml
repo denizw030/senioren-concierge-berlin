@@ -1,0 +1,31 @@
+name: Flow 13 Web Safety Caller CI
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'assets/stewaro-csp-konto-script-3.js'
+      - 'tests/flow13-web-safety-caller-cutover.test.mjs'
+      - '.github/workflows/flow13-web-safety-caller-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'assets/stewaro-csp-konto-script-3.js'
+      - 'tests/flow13-web-safety-caller-cutover.test.mjs'
+      - '.github/workflows/flow13-web-safety-caller-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Syntax
+        run: node --check assets/stewaro-csp-konto-script-3.js
+      - name: Web Safety caller contract
+        run: node --test tests/flow13-web-safety-caller-cutover.test.mjs
