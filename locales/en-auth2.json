@@ -44,5 +44,6 @@
   "Die PLZ reicht für die Region. Deine genaue Adresse kannst du im selben Schritt freiwillig ergänzen.": "The postcode is enough for the region. You can optionally add your exact address in the same step.",
   "Damit FIDEL z. B. den tatsächlich nächsten Hausarzt und die Entfernung von der Adresse des Klienten genauer bestimmen kann.": "This lets FIDEL identify, for example, the genuinely nearest GP and estimate the distance from the Klient's address more precisely.",
   "Damit FIDEL z. B. den tatsächlich nächsten Hausarzt und die Entfernung von deiner Adresse genauer bestimmen kann.": "This lets FIDEL identify, for example, the genuinely nearest GP and estimate the distance from your address more precisely.",
-  "Adresse": "Address"
+  "Adresse": "Address",
+  "z. B. Ringstraße 12": "e.g. Ringstrasse 12"
 }
