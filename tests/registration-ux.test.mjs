@@ -135,7 +135,7 @@ test("wizard includes optional Safety without exposing a large legacy form", () 
 
 
 test("registration wizard is not obscured by the floating concierge", () => {
-  assert.match(authNav, /FLOATING_CONCIERGE_EXCLUDE = new Set\(\["web-concierge\\.html", "registrieren\\.html"\]\)/);
+  assert.match(authNav, /FLOATING_CONCIERGE_EXCLUDE = new Set\(\["web-concierge\.html", "registrieren\.html"\]\)/);
 });
 
 test("wizard keeps WhatsApp branding restrained in the main question", () => {
