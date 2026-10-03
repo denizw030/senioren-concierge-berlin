@@ -81,7 +81,9 @@
   const ownerFirst=$("ownerFirstName");
   const ownerLast=$("ownerLastName");
   const ownerPostal=$("ownerPostalCode");
+  const ownerStreet=$("ownerStreetAddress");
   const recipientPostal=$("recipientPostalCode");
+  const recipientStreet=$("recipientStreetAddress");
   const password=$("webPassword");
   const ownerPhone=$("ownerPhone");
   const recipientFirst=$("recipientFirstName");
@@ -162,8 +164,8 @@
   form.append(shell);
 
   const movableNodes=[
-    fieldNode(emailInput),fieldNode(ownerFirst),fieldNode(ownerLast),fieldNode(ownerPostal),
-    fieldNode(password),fieldNode(ownerPhone),fieldNode(recipientFirst),fieldNode(recipientLast),fieldNode(recipientPostal),
+    fieldNode(emailInput),fieldNode(ownerFirst),fieldNode(ownerLast),fieldNode(ownerPostal),fieldNode(ownerStreet),
+    fieldNode(password),fieldNode(ownerPhone),fieldNode(recipientFirst),fieldNode(recipientLast),fieldNode(recipientPostal),fieldNode(recipientStreet),
     fieldNode(recipientPhone),fieldNode(relationship),safetyFields,privacyRow,termsRow,consentRow,
     submit,status
   ].filter(Boolean);
@@ -189,6 +191,49 @@
     });
   };
 
+  const addPostalStep=(key,titleText,introText,postalInput,addressInput,{family=false}={})=>{
+    add({
+      key,title:titleText,intro:introText,
+      render(){
+        const box=document.createElement("div");
+        box.className="stewaro-wizard-fields";
+        const postalNode=fieldNode(postalInput);
+        const addressNode=fieldNode(addressInput);
+        if(postalNode)box.append(postalNode);
+        const option=document.createElement("div");
+        option.className="stewaro-address-option";
+        const toggle=document.createElement("button");
+        toggle.type="button";
+        toggle.className="stewaro-address-toggle";
+        toggle.textContent="Adresse optional hinzufügen";
+        const reason=document.createElement("p");
+        reason.className="stewaro-address-reason";
+        reason.textContent=family
+          ?"Damit FIDEL z. B. den tatsächlich nächsten Hausarzt und die Entfernung von der Adresse des Klienten genauer bestimmen kann."
+          :"Damit FIDEL z. B. den tatsächlich nächsten Hausarzt und die Entfernung von deiner Adresse genauer bestimmen kann.";
+        const hasAddress=Boolean(String(addressInput?.value||"").trim());
+        if(addressNode){
+          addressNode.hidden=!hasAddress;
+          if(hasAddress)toggle.hidden=true;
+        }
+        toggle.setAttribute("aria-expanded",String(hasAddress));
+        toggle.addEventListener("click",()=>{
+          if(!addressNode)return;
+          addressNode.hidden=false;
+          toggle.hidden=true;
+          toggle.setAttribute("aria-expanded","true");
+          setTimeout(()=>addressInput?.focus(),0);
+        });
+        option.append(toggle,reason);
+        if(addressNode)option.append(addressNode);
+        box.append(option);
+        return box;
+      },
+      focus:postalInput,
+      validate:()=>postalInput?.reportValidity()!==false
+    });
+  };
+
   addInputStep("email","Wie lautet deine E-Mail-Adresse?","Damit meldest du dich später sicher bei STEWARO an.",[fieldNode(emailInput)],[emailInput]);
 
   addInputStep(
@@ -207,12 +252,13 @@
       [fieldNode(recipientFirst),fieldNode(recipientLast)],
       [recipientFirst,recipientLast]
     );
-    addInputStep(
+    addPostalStep(
       "recipient-postal",
       "Wie lautet die Postleitzahl des Klienten?",
-      "So kann FIDEL regionale Hilfe und Dienste für den Klienten passend einordnen.",
-      [fieldNode(recipientPostal)],
-      [recipientPostal]
+      "Die PLZ reicht für die Region. Die genaue Adresse kannst du im selben Schritt freiwillig ergänzen.",
+      recipientPostal,
+      recipientStreet,
+      {family:true}
     );
     add({
       key:"relationship",
@@ -226,12 +272,12 @@
       validate:()=>relationship?.reportValidity()!==false
     });
   }else{
-    addInputStep(
+    addPostalStep(
       "postal",
       "Wie lautet deine Postleitzahl?",
-      "So kann FIDEL regionale Hilfe und Dienste passend einordnen.",
-      [fieldNode(ownerPostal)],
-      [ownerPostal]
+      "Die PLZ reicht für die Region. Deine genaue Adresse kannst du im selben Schritt freiwillig ergänzen.",
+      ownerPostal,
+      ownerStreet
     );
   }
 
@@ -349,20 +395,25 @@
       summary.className="stewaro-wizard-summary";
       const personName=familyMode?[recipientFirst?.value,recipientLast?.value].filter(Boolean).join(" "):[ownerFirst?.value,ownerLast?.value].filter(Boolean).join(" ");
       const postalCode=String((familyMode?recipientPostal:ownerPostal)?.value||"").trim();
+      const streetAddress=String((familyMode?recipientStreet:ownerStreet)?.value||"").trim();
       const channel=preferredContact.value==="WHATSAPP"?"WhatsApp":(whatsappEnabled.value==="true"?"App · WhatsApp zusätzlich":"App");
       const checkinValue=String($("checkinTimes")?.value||"").trim();
       const safety=safetyEnabled.checked?(checkinValue?/^\d{2}:\d{2}$/.test(checkinValue)?"Täglich um "+checkinValue+" Uhr":checkinValue:"Ja"):"Nein";
-      summary.innerHTML=`
-        <div><span>Für</span><strong></strong></div>
-        <div><span>${familyMode?"PLZ Klient":"PLZ"}</span><strong></strong></div>
-        <div><span>Hauptkontakt</span><strong></strong></div>
-        <div><span>Safety-Check-in</span><strong></strong></div>
-      `;
-      const strongs=summary.querySelectorAll("strong");
-      strongs[0].textContent=personName||"—";
-      strongs[1].textContent=postalCode||"—";
-      strongs[2].textContent=channel;
-      strongs[3].textContent=safety;
+      const summaryRows=[
+        ["Für",personName||"—"],
+        [familyMode?"PLZ Klient":"PLZ",postalCode||"—"]
+      ];
+      if(streetAddress)summaryRows.push(["Adresse",streetAddress]);
+      summaryRows.push(["Hauptkontakt",channel],["Safety-Check-in",safety]);
+      for(const [label,value] of summaryRows){
+        const row=document.createElement("div");
+        const labelNode=document.createElement("span");
+        const valueNode=document.createElement("strong");
+        labelNode.textContent=label;
+        valueNode.textContent=value;
+        row.append(labelNode,valueNode);
+        summary.append(row);
+      }
       box.append(summary);
       const legal=document.createElement("div");
       legal.className="stewaro-registration-legal";
