@@ -299,6 +299,75 @@ body.registration-page.stewaro-registration-wizard-active #signupForm>*:not(.ste
   top:50%!important;
   transform:translateY(-50%)!important;
 }
+
+.stewaro-address-option{
+  display:grid;
+  gap:9px;
+  margin-top:2px;
+}
+.stewaro-address-toggle{
+  justify-self:start;
+  min-height:44px;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:#9b7b45;
+  font:700 13px/1.35 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;
+  text-decoration:underline;
+  text-underline-offset:4px;
+  cursor:pointer;
+}
+.stewaro-address-toggle:hover,
+.stewaro-address-toggle:focus-visible{
+  color:#173126;
+  outline:none;
+}
+.stewaro-address-reason{
+  width:min(100%,470px);
+  margin:0!important;
+  color:#7b807b!important;
+  font-size:12px!important;
+  line-height:1.5!important;
+}
+.stewaro-address-option>.field{
+  margin-top:2px!important;
+}
+.stewaro-registration-screen,
+.stewaro-registration-screen .stewaro-wizard-fields,
+.stewaro-registration-screen .progressive-panel,
+.stewaro-registration-screen .progressive-panel>.row,
+.stewaro-registration-screen .field{
+  min-width:0!important;
+  max-width:100%!important;
+  box-sizing:border-box!important;
+}
+.stewaro-registration-screen #safetyFields{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+.stewaro-registration-screen #safetyFields :is(input:not([type="checkbox"]):not([type="radio"]),select,textarea){
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+}
+.stewaro-registration-screen #safetyFields input[type="time"]{
+  display:block!important;
+  min-inline-size:0!important;
+}
+.stewaro-registration-screen #safetyFields>.tiny{
+  width:100%!important;
+  margin:0!important;
+  overflow-wrap:anywhere;
+}
+
 @media(max-width:620px){
   body.registration-page.stewaro-registration-wizard-active .signup{
     width:min(100% - 28px,560px)!important;
