@@ -94,7 +94,8 @@
   ]);
   const INVITE_FIELDS=Object.freeze([
     "first_name","last_name","relationship","whatsapp_number","preferred_language",
-    "concierge_choice","form_of_address","personal_message","contact_consent_attested","entitlements"
+    "concierge_choice","form_of_address","personal_message","postal_code","street_address",
+    "contact_consent_attested","entitlements"
   ]);
   const UUID_RE=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   const IDEM_RE=/^[A-Za-z0-9._:-]{16,200}$/;
@@ -142,7 +143,11 @@
     const concierge=String(input?.concierge_choice||"").trim();
     const address=String(input?.form_of_address||"").toUpperCase();
     const message=String(input?.personal_message||"").trim().slice(0,1200);
+    const postalCode=String(input?.postal_code||"").trim().slice(0,5);
+    const streetAddress=String(input?.street_address||"").trim().slice(0,180);
     if(!first||!last||!Object.hasOwn(RELATIONSHIPS,relationship)||!plausiblePhone(input?.whatsapp_number))return null;
+    if(postalCode&&!/^\d{5}$/.test(postalCode))return null;
+    if(streetAddress&&!postalCode)return null;
     if(!language||!concierge||!["DU","SIE"].includes(address)||input?.contact_consent_attested!==true)return null;
     if(!Array.isArray(input?.entitlements)||input.entitlements.some((item)=>!FEATURE_CODES.includes(String(item?.feature_code||""))||!Number.isFinite(Number(item?.included_quantity))||Number(item.included_quantity)<0))return null;
     return {
@@ -154,6 +159,8 @@
       concierge_choice:concierge.slice(0,120),
       form_of_address:address,
       personal_message:message,
+      postal_code:postalCode,
+      street_address:streetAddress,
       contact_consent_attested:true,
       entitlements:input.entitlements.map((item)=>({feature_code:String(item.feature_code),included_quantity:Number(item.included_quantity)}))
     };
@@ -358,6 +365,8 @@
     set("familyLastName",row.last_name);
     set("familyRelationship",row.relationship||"OTHER");
     set("familyWhatsappNumber",row.whatsapp_number||"");
+    set("familyPostalCode",row.postal_code||"");
+    set("familyStreetAddress",row.street_address||"");
     set("familyPreferredLanguage",row.preferred_language||"de");
     set("familyFormOfAddress",row.form_of_address||"DU");
     set("familyConciergeChoice","fidel");
@@ -386,6 +395,8 @@
       concierge_choice:conciergeSelect.value,
       form_of_address:document.getElementById("familyFormOfAddress").value,
       personal_message:document.getElementById("familyPersonalMessage").value,
+      postal_code:document.getElementById("familyPostalCode")?.value||"",
+      street_address:document.getElementById("familyStreetAddress")?.value||"",
       contact_consent_attested:consent.checked,
       entitlements
     });
