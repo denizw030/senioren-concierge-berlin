@@ -36,5 +36,14 @@
   "Deine Daten sind bei uns sicher und DSGVO-konform geschützt.": "Your data is protected securely and in accordance with GDPR.",
   "Angebot": "Offering",
   "Tägliche Check-in-Zeit": "Daily check-in time",
-  "Postleitzahl des Klienten": "Klient postcode"
+  "Postleitzahl des Klienten": "Klient postcode",
+  "Straße und Hausnummer": "Street and house number",
+  "Straße und Hausnummer des Klienten": "Klient street and house number",
+  "Adresse optional hinzufügen": "Add address optionally",
+  "Die PLZ reicht für die Region. Die genaue Adresse kannst du im selben Schritt freiwillig ergänzen.": "The postcode is enough for the region. You can optionally add the exact address in the same step.",
+  "Die PLZ reicht für die Region. Deine genaue Adresse kannst du im selben Schritt freiwillig ergänzen.": "The postcode is enough for the region. You can optionally add your exact address in the same step.",
+  "Damit FIDEL z. B. den tatsächlich nächsten Hausarzt und die Entfernung von der Adresse des Klienten genauer bestimmen kann.": "This lets FIDEL identify, for example, the genuinely nearest GP and estimate the distance from the Klient's address more precisely.",
+  "Damit FIDEL z. B. den tatsächlich nächsten Hausarzt und die Entfernung von deiner Adresse genauer bestimmen kann.": "This lets FIDEL identify, for example, the genuinely nearest GP and estimate the distance from your address more precisely.",
+  "Adresse": "Address",
+  "z. B. Ringstraße 12": "e.g. Ringstrasse 12"
 }

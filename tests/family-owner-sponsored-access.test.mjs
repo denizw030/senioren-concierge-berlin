@@ -19,7 +19,7 @@ const input={first_name:"Ayse",last_name:"Example",relationship:"MOTHER",whatsap
 
 test("normal user cannot see OWNER controls by default",()=>{assert.match(konto,/id="familyOwnerPanel" hidden/);assert.equal(h.operatorContextAllowed({ok:true,operator:{role:"MEMBER",can_manage_sponsored_people:true},browser_actor_authority:false}),false)});
 test("server OWNER context alone enables controls",()=>{assert.equal(h.operatorContextAllowed({ok:true,operator:{role:"OWNER",can_manage_sponsored_people:true,can_manage_sponsored_entitlements:true},browser_actor_authority:false}),true);assert.equal(h.operatorContextAllowed({ok:true,operator:{role:"OWNER",can_manage_sponsored_people:false},browser_actor_authority:false}),false);assert.equal(h.operatorContextAllowed({ok:true,operator:{role:"OWNER",can_manage_sponsored_people:true},browser_actor_authority:true}),false)});
-test("browser invitation payload cannot forge authority",()=>{const p=h.invitationPayload(input);assert.deepEqual(Object.keys(p),["first_name","last_name","relationship","whatsapp_number","preferred_language","concierge_choice","form_of_address","personal_message","contact_consent_attested","entitlements"]);for(const f of h.FORBIDDEN_AUTHORITY_FIELDS)assert.equal(Object.hasOwn(p,f),false)});
+test("browser invitation payload cannot forge authority",()=>{const p=h.invitationPayload(input);assert.deepEqual(Object.keys(p),["first_name","last_name","relationship","whatsapp_number","preferred_language","concierge_choice","form_of_address","personal_message","postal_code","street_address","contact_consent_attested","entitlements"]);for(const f of h.FORBIDDEN_AUTHORITY_FIELDS)assert.equal(Object.hasOwn(p,f),false)});
 test("Person hinzufügen flow and required consent are present",()=>{assert.match(konto,/id="familyPersonAddButton"[^>]*>Person hinzufügen/);assert.match(konto,/id="familyFirstName"[^>]*required/);assert.match(konto,/id="familyLastName"[^>]*required/);assert.match(konto,/id="familyWhatsappNumber"[^>]*required/);assert.match(konto,/id="familyContactConsent"[^>]*required/);assert.equal(h.invitationPayload({...input,contact_consent_attested:false}),null)});
 test("phone validation is UX-only and rejects implausible input",()=>{assert.equal(h.plausiblePhone("+49 170 0000011"),true);assert.equal(h.plausiblePhone("abc"),false);assert.equal(h.plausiblePhone("123"),false)});
 test("languages include de tr en fr es and stay BCP47 extensible",()=>{for(const code of ["de","tr","en","fr","es"])assert.match(konto,new RegExp('value="'+code+'"'));assert.equal(h.normalizeLanguage("de-at"),"de-AT");assert.equal(h.normalizeLanguage("pl"),"pl");assert.equal(h.normalizeLanguage("bad language"),null)});
@@ -47,6 +47,20 @@ test("registration handoff prefills the verified Family invitation without bypas
   assert.match(js,/contact_consent_attested/);
   assert.match(js,/sessionStorage\?\.removeItem\(REGISTRATION_DRAFT_KEY\)/);
   assert.match(js,/Er kann erst nach der Bestätigung der unterstützten Person aktiviert werden/);
-  assert.match(konto,/assets\/family-owner-sponsored-access\.js\?v=3/);
+  assert.match(konto,/assets\/family-owner-sponsored-access\.js\?v=4/);
   assert.match(konto,/<option value="SIE">Sie<\/option>/);
+});
+
+
+test("registration handoff carries Klient location without browser authority",()=>{
+  const p=h.invitationPayload({...input,postal_code:"88131",street_address:"Ringstraße 12"});
+  assert.equal(p.postal_code,"88131");
+  assert.equal(p.street_address,"Ringstraße 12");
+  assert.equal(h.invitationPayload({...input,postal_code:"8813",street_address:"Ringstraße 12"}),null);
+  assert.equal(h.invitationPayload({...input,postal_code:"",street_address:"Ringstraße 12"}),null);
+  for(const f of h.FORBIDDEN_AUTHORITY_FIELDS)assert.equal(Object.hasOwn(p,f),false);
+  assert.match(js,/set\("familyPostalCode",row\.postal_code\|\|""\)/);
+  assert.match(js,/set\("familyStreetAddress",row\.street_address\|\|""\)/);
+  assert.match(konto,/id="familyPostalCode" type="hidden"/);
+  assert.match(konto,/id="familyStreetAddress" type="hidden"/);
 });
