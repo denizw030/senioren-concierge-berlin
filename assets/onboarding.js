@@ -123,7 +123,7 @@
   if (!Object.hasOwn(PLANS, currentPlanKey)) currentPlanKey = "free";
   const selectedPlan = () => PLANS[currentPlanKey];
   const planBookable = () => selectedPlan().bookable;
-  const recipientIds = ["recipientSalutation", "recipientFirstName", "recipientLastName", "relationship", "recipientPhone", "familyMessage"];
+  const recipientIds = ["recipientSalutation", "recipientFirstName", "recipientLastName", "recipientPostalCode", "relationship", "recipientPhone", "familyMessage"];
   const fullName = (first, last) => [first.trim(), last.trim()].filter(Boolean).join(" ");
   const isSelf = () => form.querySelector('input[name="setupFor"]:checked')?.value === "self";
   const conciergeValue = () => "fidel";
@@ -266,10 +266,13 @@
     $("ownerPhoneField").hidden = !self;
     $("ownerPhone").required = false;
     $("ownerPhone").disabled = !self;
+    $("ownerPostalCode").required = self;
+    $("ownerPostalCode").disabled = !self;
     consent.disabled = self;
     recipientIds.forEach((id) => { $(id).disabled = self; });
     $("recipientFirstName").required = !self;
     $("recipientLastName").required = !self;
+    $("recipientPostalCode").required = !self;
     $("recipientPhone").required = false;
     const recipientHasWhatsapp = !self && Boolean($("recipientPhone").value.trim());
     consentRow.hidden = self || !recipientHasWhatsapp;
@@ -533,7 +536,7 @@
     const request = {
       product, concierge_profile: "FIDEL", concierge_choice: "fidel", package: selectedPlan().code,
       registration_type: self ? "self" : "other", account_holder_name: fullName($("ownerFirstName").value, $("ownerLastName").value), account_holder_salutation: $("ownerSalutation").value,
-      account_holder_first_name: $("ownerFirstName").value.trim(), account_holder_last_name: $("ownerLastName").value.trim(), account_holder_postal_code: $("ownerPostalCode")?.value.trim() || "", postal_code: $("ownerPostalCode")?.value.trim() || "", email: $("ownerEmail").value.trim(), phone: self ? $("ownerPhone").value.trim() : "",
+      account_holder_first_name: $("ownerFirstName").value.trim(), account_holder_last_name: $("ownerLastName").value.trim(), account_holder_postal_code: self ? ($("ownerPostalCode")?.value.trim() || "") : "", postal_code: self ? ($("ownerPostalCode")?.value.trim() || "") : ($("recipientPostalCode")?.value.trim() || ""), email: $("ownerEmail").value.trim(), phone: self ? $("ownerPhone").value.trim() : "",
       supported_person_name: fullName(p.first, p.last), supported_person_salutation: p.sal, supported_person_first_name: p.first, supported_person_last_name: p.last,
       relationship: self ? "Ich selbst" : $("relationship").selectedOptions[0].textContent.trim(), supported_whatsapp: p.phone, form_of_address: $("addressing").value.toUpperCase(),
       preferred_contact_channel: $("preferredContactChannel")?.value || "APP",
@@ -560,6 +563,7 @@
       first_name: request.supported_person_first_name,
       last_name: request.supported_person_last_name,
       relationship: familyRelationshipMap[String($("relationship")?.value || "")] || "OTHER",
+      postal_code: String($("recipientPostalCode")?.value || "").trim(),
       whatsapp_number: request.supported_whatsapp,
       preferred_language: "de",
       form_of_address: request.form_of_address,
@@ -588,6 +592,8 @@
       checkin_times: "",
       trusted_contact_name: "",
       trusted_contact_phone: "",
+      account_holder_postal_code: "",
+      postal_code: "",
       account_holder_web_only: true,
       family_setup_pending: true
     } : request;
