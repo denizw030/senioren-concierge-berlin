@@ -10,8 +10,8 @@ const chatCss = read("assets/web-customer-concierge.css");
 const chatPage = read("web-concierge.html");
 const chatClean = read("web-concierge/index.html");
 
-test("floating concierge is available without login on every non-chat page", () => {
-  assert.match(auth, /const FLOATING_CONCIERGE_EXCLUDE = new Set\(\["web-concierge\.html"\]\)/);
+test("floating concierge stays public except on chat and the active registration wizard", () => {
+  assert.match(auth, /const FLOATING_CONCIERGE_EXCLUDE = new Set\(\["web-concierge\.html", "registrieren\.html"\]\)/);
   assert.doesNotMatch(auth, /if \(!isLoggedIn\(\) \|\| FLOATING_CONCIERGE_EXCLUDE\.has\(page\(\)\)\) return/);
   assert.match(auth, /if \(FLOATING_CONCIERGE_EXCLUDE\.has\(page\(\)\)\) return/);
   assert.match(auth, /normalizeShell\(\);\s*ensureFloatingConcierge\(\);\s*const current = page\(\)/s);
