@@ -372,7 +372,7 @@
     });
   }
   // STEWARO CLEAN ROUTES + FLOATING CONCIERGE 2026-09-16
-  const FLOATING_CONCIERGE_EXCLUDE = new Set(["web-concierge.html"]);
+  const FLOATING_CONCIERGE_EXCLUDE = new Set(["web-concierge.html", "registrieren.html"]);
   function removeFloatingConcierge() {
     document.getElementById("nwFloatingConciergeRegion")?.remove();
     document.getElementById("nwFloatingConcierge")?.remove();
