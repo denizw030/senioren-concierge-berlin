@@ -108,7 +108,14 @@ test('remaining scene copy keeps STEWARO as protection layer', () => {
 test('mobile premium story reuses the sticky canonical film stage', () => {
   assert.doesNotMatch(page, /class="ds-mobile-video"/);
   assert.match(css, /Mobile premium scroll-film/);
-  assert.match(css, /height:760svh/);
+  assert.match(css, /height:1080svh/);
   assert.match(css, /position:sticky/);
   assert.match(css, /\.ds-mobile-flow\{display:none!important\}/);
+});
+
+test('mobile scrub caps perceived playback speed', () => {
+  assert.match(js, /dt \* 1\.05/);
+  assert.match(js, /easedStep = diff \* 0\.18/);
+  assert.match(js, /if \(desktop\.matches\)/);
+  assert.match(js, /requestAnimationFrame\(flushScrub\)/);
 });
