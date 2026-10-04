@@ -177,6 +177,40 @@ jobs:
             } else {
               await evaluate('window.scrollTo({top:0,left:0,behavior:"instant"})');
               await sleep(300);
+
+              const heroState = await evaluate(`(() => {
+                const story = document.querySelector('.ds-story');
+                const stage = document.querySelector('[data-ds-stage]');
+                const active = document.querySelector('[data-ds-overlay].is-active');
+                const media = document.querySelector('.ds-media.is-active');
+                if (!story || !stage) return null;
+                const storyRect = story.getBoundingClientRect();
+                const stageRect = stage.getBoundingClientRect();
+                const style = getComputedStyle(stage);
+                const topElement = document.elementFromPoint(Math.floor(innerWidth / 2), Math.min(innerHeight - 1, 180));
+                return {
+                  scrollY,
+                  innerHeight,
+                  storyTop: storyRect.top,
+                  storyBottom: storyRect.bottom,
+                  storyHeight: storyRect.height,
+                  storyBackground: getComputedStyle(story).backgroundColor,
+                  stageTop: stageRect.top,
+                  stageBottom: stageRect.bottom,
+                  stageHeight: stageRect.height,
+                  stageDisplay: style.display,
+                  stagePosition: style.position,
+                  stageVisibility: style.visibility,
+                  stageOpacity: style.opacity,
+                  active: active?.dataset.dsOverlay || null,
+                  media: media?.dataset.dsMedia || null,
+                  topElement: topElement?.className || topElement?.tagName || null
+                };
+              })()`);
+              console.log('MOBILE_HERO_STATE=' + JSON.stringify(heroState));
+              if (!heroState || heroState.stagePosition !== 'fixed' || heroState.stageDisplay === 'none' || heroState.stageVisibility === 'hidden' || Number(heroState.stageOpacity) === 0 || heroState.stageTop > 1 || heroState.stageBottom < heroState.innerHeight - 1 || heroState.active !== '0' || heroState.media !== '0') {
+                throw new Error('mobile_hero_not_immediate:' + JSON.stringify(heroState));
+              }
               await capture('mobile-hero');
 
               const story = await evaluate(`(() => {
