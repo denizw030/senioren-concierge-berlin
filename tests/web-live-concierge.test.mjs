@@ -12,7 +12,7 @@ test("web chat mounts Live Concierge on the right without replacing voice memo",
     const html=read(page);
     assert.match(html,/assets\/web-voice-memo\.js\?v=11/);
     assert.match(html,/assets\/web-customer-concierge\.js\?v=59/);
-    assert.match(html,/assets\/web-live-concierge\.js\?v=30/);
+    assert.match(html,/assets\/web-live-concierge\.js\?v=29/);
     assert.match(html,/assets\/nahwerk-live-concierge\.css\?v=6/);
   }
   const boot=read("assets/web-live-concierge.js");
@@ -49,13 +49,15 @@ test("Live client uses WebRTC, central delegation and active concierge portrait"
   assert.doesNotMatch(client,/OPENAI_API_KEY|sk-[A-Za-z0-9]/);
 });
 
-test("native app Live page accepts token only in memory and uses APP channel",()=>{
+test("native app Live module accepts token only in memory and uses APP channel",()=>{
   const page=read("app-live.html");
-  assert.match(page,/channel:"APP"/);
-  assert.match(page,/startNahwerkAppLive/);
-  assert.match(page,/getAuthToken:\(\)=>token/);
-  assert.doesNotMatch(page,/[?&](?:session_)?token=/i);
-  assert.doesNotMatch(page,/location\\.(?:search|href).*token/i);
+  const app=read("assets/stewaro-csp-app-live-script-1.js");
+  assert.match(page,/stewaro-csp-app-live-script-1\.js\?v=2/);
+  assert.match(app,/channel:"APP"/);
+  assert.match(app,/startNahwerkAppLive/);
+  assert.match(app,/getAuthToken:\(\)=>token/);
+  assert.doesNotMatch(page+app,/[?&](?:session_)?token=/i);
+  assert.doesNotMatch(page+app,/location\\.(?:search|href).*token/i);
 });
 
 test("Live visual surface has reactive FIDEL gold glass orb",()=>{
