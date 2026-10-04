@@ -106,11 +106,12 @@ test('remaining scene copy keeps STEWARO as protection layer', () => {
   assert.doesNotMatch(page, /FIDEL hat Ingrid heute bei einem verdächtigen Link geschützt\./);
 });
 
-test('mobile premium story reuses the sticky canonical film stage', () => {
+test('mobile premium story reuses the persistent canonical film stage', () => {
   assert.doesNotMatch(page, /class="ds-mobile-video"/);
   assert.match(css, /Mobile premium scroll-film/);
   assert.match(css, /height:1080svh/);
-  assert.match(css, /position:sticky/);
+  assert.match(css, /\.ds-story \.ds-stage\{position:fixed/);
+  assert.match(css, /\.ds-story\.is-mobile-story-past \.ds-stage\{position:absolute/);
   assert.match(css, /\.ds-mobile-flow\{display:none!important\}/);
 });
 
@@ -126,6 +127,7 @@ test('film opens immediately after header without redundant intro', () => {
   assert.doesNotMatch(page, /class="ds-intro"/);
   assert.match(page, /<main id="main">\s*<section class="ds-story"/);
   assert.match(page, /nahwerk-logo-v2\.css\?v=10/);
+  assert.match(page, /digitaler-schutz\.css\?v=4/);
 });
 
 test('premium header logo glint is restrained and reduced-motion safe', () => {
