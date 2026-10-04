@@ -145,6 +145,7 @@ export function mountNahwerkLiveConcierge({
 
   let pc=null,dc=null,micStream=null,micMeter=null,outMeter=null,raf=0,inputFlushTimer=0,outputFlushTimer=0,transcriptSeq=0,userTurnSeq=0,assistantTurnSeq=0,maxSessionTimer=0;
   let audioOutputMode="realtime",voiceVariant="",hybridAudio=null,hybridGeneration=0,hybridSpeaking=false;
+  const usesHybridTts=()=>usesHybridTts()||audioOutputMode==="tts_elevenlabs";
   const hybridSpokenKeys=new Set();
   // LIVE_PARALLEL_EXECUTION_V1_20260926
   const activeDelegations=new Map();
@@ -257,7 +258,7 @@ export function mountNahwerkLiveConcierge({
   const animate=()=>{
     const inLevel=rms(micMeter?.analyser);
     const rawOutLevel=rms(outMeter?.analyser);
-    const outLevel=audioOutputMode==="tts_onyx"?0:rawOutLevel;
+    const outLevel=usesHybridTts()?0:rawOutLevel;
     const level=hybridSpeaking?Math.max(inLevel,.18):Math.max(inLevel,outLevel);
     orb.style.setProperty("--nw-live-level",level.toFixed(3));
     fidelOrb?.setAudio(inLevel,outLevel);
@@ -331,7 +332,7 @@ export function mountNahwerkLiveConcierge({
   };
   const playHybridSpeech=async(text,eventKey="")=>{
     const value=String(text||"").trim();
-    if(audioOutputMode!=="tts_onyx"||!sessionId||!value)return;
+    if(!usesHybridTts()||!sessionId||!value)return;
     const key=String(eventKey||value.slice(0,160));
     if(hybridSpokenKeys.has(key))return;
     hybridSpokenKeys.add(key);
@@ -357,14 +358,14 @@ export function mountNahwerkLiveConcierge({
         URL.revokeObjectURL(url);
         if(generation===hybridGeneration){
           hybridSpeaking=false;hybridAudio=null;
-          state("error",{error:"FIDEL_ONYX_PLAYBACK_FAILED"});
+          state("error",{error:"FIDEL_TTS_PLAYBACK_FAILED"});
         }
       };
       await audio.play();
     }catch(error){
       if(generation===hybridGeneration){
         hybridSpeaking=false;hybridAudio=null;
-        reportClientDiagnostic("FIDEL_ONYX_"+String(error?.message||"FAILED").slice(0,100));
+        reportClientDiagnostic("FIDEL_TTS_"+String(error?.message||"FAILED").slice(0,100));
         setFidelOrbState("warning");
         setStatus("Stimme konnte gerade nicht wiedergegeben werden.");
       }
@@ -585,7 +586,7 @@ export function mountNahwerkLiveConcierge({
       }
       return;
     }
-    if(e.type==="input_audio_buffer.speech_started"){inputSpeechActive=true;lastInputActivityAt=Date.now();noteTranscriptEvent();if(audioOutputMode==="tts_onyx")stopHybridSpeech();setFidelOrbState("listening");return;}
+    if(e.type==="input_audio_buffer.speech_started"){inputSpeechActive=true;lastInputActivityAt=Date.now();noteTranscriptEvent();if(usesHybridTts())stopHybridSpeech();setFidelOrbState("listening");return;}
     if(e.type==="response.created"||e.type==="response.in_progress"){responseActive=true;noteTranscriptEvent();setFidelOrbState("thinking");}
     if(e.type==="session.input_transcript.delta"||e.type==="conversation.item.input_audio_transcription.delta"){
       noteTranscriptEvent();
@@ -626,7 +627,7 @@ export function mountNahwerkLiveConcierge({
       if(end!==null){outputEndMs=end;lastAssistantPersistedEndMs=end;}
       mirrorTranscriptDelta("ASSISTANT",delta,start,end);
       void persistTranscript("ASSISTANT",delta,start,end,`delta:assistant:${String(e.event_id||uid())}`);
-      if(audioOutputMode==="tts_onyx"){setFidelOrbState("thinking");setStatus("FIDEL antwortet …");}
+      if(usesHybridTts()){setFidelOrbState("thinking");setStatus("FIDEL antwortet …");}
       else{setFidelOrbState("speaking");setStatus((name.textContent||"FIDEL")+" spricht …");}
       return;
     }
@@ -637,7 +638,7 @@ export function mountNahwerkLiveConcierge({
       const speechKey=String(e?.response_id??e?.item_id??e?.event_id??("assistant:"+assistantTurnSeq+":"+finalText.slice(0,80)));
       await persistFinalTranscriptTail("ASSISTANT",e);
       await flushAssistantTranscript();
-      if(audioOutputMode==="tts_onyx"&&finalText)void playHybridSpeech(finalText,speechKey);
+      if(usesHybridTts()&&finalText)void playHybridSpeech(finalText,speechKey);
       return;
     }
     if(e.type==="input_audio_buffer.speech_stopped"){
@@ -716,7 +717,7 @@ export function mountNahwerkLiveConcierge({
       sessionId=live.session_id;
       audioOutputMode=String(live?.audio_output_mode||"realtime");
       voiceVariant=String(live?.persona?.voice_variant||"");
-      remoteAudio.muted=audioOutputMode==="tts_onyx";
+      remoteAudio.muted=usesHybridTts();
       state("voice_selected",{voice_variant:voiceVariant,audio_output_mode:audioOutputMode});
       startWithGreeting=live?.start_with_greeting===true&&String(live?.greeting_contract||"")==="live-proactive-greeting-v1";
       initialGreeting=String(live?.initial_greeting||"").trim();
