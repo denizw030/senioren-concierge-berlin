@@ -225,3 +225,22 @@
   .ds-mobile-flow article{min-height:76svh}
   .ds-mobile-chapter{padding:22px 20px}
 }
+
+/* Mobile premium scroll-film: one persistent viewport stage, not stacked video cards. */
+@media (max-width:900px) and (prefers-reduced-motion:no-preference){
+  .ds-story{display:block;height:760svh;position:relative;background:#071f1a}
+  .ds-stage{display:block;position:sticky;top:0;height:100svh;min-height:100svh;overflow:hidden}
+  .ds-film{position:absolute;inset:0}
+  .ds-media{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:0;transition:opacity .32s var(--ds-ease)}
+  .ds-media.is-active{opacity:1}
+  .ds-film-shade{background:linear-gradient(180deg,rgba(4,22,18,.08) 0%,rgba(4,22,18,.16) 46%,rgba(4,22,18,.72) 100%)}
+  .ds-overlays{display:block;position:absolute;inset:0;z-index:4}
+  .ds-overlay{display:flex;position:absolute;inset:0;padding:calc(84px + env(safe-area-inset-top)) 20px calc(28px + env(safe-area-inset-bottom));align-items:flex-end;opacity:0;pointer-events:none;transform:translateY(12px);transition:opacity .3s var(--ds-ease),transform .4s var(--ds-ease)}
+  .ds-overlay.is-active{opacity:1;transform:none;pointer-events:auto}
+  .ds-copy,.ds-copy--right{width:100%;max-width:520px;margin:0}
+  .ds-overlay--split{grid-template-columns:none}
+  .ds-phone-shot{width:min(58vw,280px);margin:14px 0 0 auto;transform:none}
+  .ds-overlay--split .ds-copy{max-width:88%}
+  .ds-stage-chrome{display:block}
+  .ds-mobile-flow{display:none!important}
+}
