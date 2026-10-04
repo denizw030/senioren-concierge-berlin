@@ -179,6 +179,52 @@
     if ('requestIdleCallback' in window) requestIdleCallback(warmRemaining, { timeout: 1800 });
     else setTimeout(warmRemaining, 900);
   }
+  const mobileScenes = [...document.querySelectorAll('[data-mobile-scene]')];
+  let mobileObserver;
+
+  const stopMobileVideo = (article) => {
+    const video = article?.querySelector('.ds-mobile-video');
+    article?.classList.remove('is-cinematic-active');
+    if (!video) return;
+    video.pause();
+  };
+
+  const startMobileVideo = (article) => {
+    if (desktop.matches || reducedMotion.matches || !article) return;
+    const scene = Number(article.dataset.mobileScene);
+    const video = article.querySelector('.ds-mobile-video');
+    if (!video) return;
+    loadMedia(video);
+    // Warm only the immediate next chapter; never fan out across all remote MP4s.
+    const next = mobileScenes[scene + 1]?.querySelector('.ds-mobile-video');
+    if (next) loadMedia(next);
+    mobileScenes.forEach((item) => { if (item !== article) stopMobileVideo(item); });
+    article.classList.add('is-cinematic-active');
+    video.muted = true;
+    video.playsInline = true;
+    const play = video.play();
+    if (play && typeof play.catch === 'function') play.catch(() => {
+      // Poster remains visible if iOS declines playback.
+      article.classList.add('is-cinematic-active');
+    });
+  };
+
+  const setupMobileCinema = () => {
+    mobileObserver?.disconnect();
+    mobileScenes.forEach(stopMobileVideo);
+    if (desktop.matches || reducedMotion.matches || !('IntersectionObserver' in window)) return;
+    mobileObserver = new IntersectionObserver((entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (visible && visible.intersectionRatio >= 0.34) startMobileVideo(visible.target);
+    }, { rootMargin: '12% 0px 12% 0px', threshold: [0.34, 0.55, 0.72] });
+    mobileScenes.forEach((article) => mobileObserver.observe(article));
+  };
+
+  desktop.addEventListener?.('change', setupMobileCinema);
+  reducedMotion.addEventListener?.('change', setupMobileCinema);
+  setupMobileCinema();
   setScene(0, 0);
   requestRender();
 })();

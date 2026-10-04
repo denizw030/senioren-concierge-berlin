@@ -210,3 +210,18 @@
   .ds-mobile-flow>article>p,.ds-mobile-flow>article>ul li,.ds-mobile-flow>article>small{color:rgba(255,255,255,.82)}
   .ds-mobile-app{box-shadow:none}
 }
+
+@media (max-width:900px) and (prefers-reduced-motion:no-preference){
+  .ds-mobile-flow article{position:relative;min-height:min(82svh,760px);padding:0;overflow:hidden;isolation:isolate;background:#0a2a23}
+  .ds-mobile-cinema{position:absolute;inset:0;z-index:0;background:#0a2a23}
+  .ds-mobile-video{width:100%;height:100%;display:block;object-fit:cover;object-position:center;opacity:0;transition:opacity .45s var(--ds-ease);background:#0a2a23}
+  .ds-mobile-flow article.is-cinematic-active .ds-mobile-video{opacity:1}
+  .ds-mobile-cinema-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,25,20,.10) 0%,rgba(5,25,20,.28) 42%,rgba(5,25,20,.88) 100%),linear-gradient(90deg,rgba(5,25,20,.20),rgba(5,25,20,.05));pointer-events:none}
+  .ds-mobile-chapter{position:relative;z-index:1;min-height:inherit;padding:26px 22px;display:flex;flex-direction:column;justify-content:flex-end}
+  .ds-mobile-chapter>.ds-mobile-app{margin-top:20px}
+  .ds-mobile-chapter>.ds-message-card{margin-top:18px}
+}
+@media (max-width:620px) and (prefers-reduced-motion:no-preference){
+  .ds-mobile-flow article{min-height:76svh}
+  .ds-mobile-chapter{padding:22px 20px}
+}
