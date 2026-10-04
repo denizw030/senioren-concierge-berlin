@@ -28,6 +28,7 @@
   let activeScene = 0;
   let ticking = false;
   let scrubRaf = 0;
+  let scrubLastFrame = 0;
   const scrubTargets = new WeakMap();
 
   const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
@@ -64,17 +65,46 @@
     }
   };
 
-  const flushScrub = () => {
+  const flushScrub = (frameTime) => {
     scrubRaf = 0;
+    const now = Number.isFinite(frameTime) ? frameTime : performance.now();
+    const dt = scrubLastFrame ? clamp((now - scrubLastFrame) / 1000, 1 / 120, 0.05) : 1 / 60;
+    scrubLastFrame = now;
+    let pending = false;
+
     medias.forEach((media) => {
       const target = scrubTargets.get(media);
-      if (!Number.isFinite(target) || media.readyState < 2 || media.seeking) return;
-      if (Math.abs(media.currentTime - target) <= 0.075) return;
+      if (!Number.isFinite(target) || media.readyState < 2) return;
+
+      const diff = target - media.currentTime;
+      const threshold = desktop.matches ? 0.075 : 0.025;
+      if (Math.abs(diff) <= threshold) return;
+
+      if (media.seeking) {
+        if (!desktop.matches) pending = true;
+        return;
+      }
+
       try {
-        if (typeof media.fastSeek === 'function' && Math.abs(media.currentTime - target) > 0.35) media.fastSeek(target);
-        else media.currentTime = target;
+        if (desktop.matches) {
+          if (typeof media.fastSeek === 'function' && Math.abs(diff) > 0.35) media.fastSeek(target);
+          else media.currentTime = target;
+          return;
+        }
+
+        // iPhone/Safari: never let a normal swipe make the person move faster
+        // than roughly natural playback. The video eases toward scroll position
+        // instead of jumping directly to every new currentTime target.
+        const maxStep = Math.max(0.018, dt * 1.05);
+        const easedStep = diff * 0.18;
+        const step = clamp(easedStep, -maxStep, maxStep);
+        const maxTime = Math.max(0, media.duration - 0.04);
+        media.currentTime = clamp(media.currentTime + step, 0, maxTime);
+        if (Math.abs(diff) > 0.035) pending = true;
       } catch (_) { /* Safari can reject a seek while media is changing state */ }
     });
+
+    if (pending && !scrubRaf) scrubRaf = requestAnimationFrame(flushScrub);
   };
 
   const scheduleScrub = (media, target) => {
@@ -161,7 +191,11 @@
       primeMedia(media);
       requestRender();
     }, { passive: true });
-    media.addEventListener('seeked', flushScrub, { passive: true });
+    media.addEventListener('seeked', () => {
+      if (!desktop.matches && Number.isFinite(scrubTargets.get(media)) && !scrubRaf) {
+        scrubRaf = requestAnimationFrame(flushScrub);
+      }
+    }, { passive: true });
   });
 
   document.addEventListener('visibilitychange', () => {
@@ -177,9 +211,8 @@
     requestRender();
   });
 
-  // Desktop uses scroll-scrubbing and benefits from decoding/warming nearby clips.
-  // Mobile/tablet uses the linear fallback: keep remote MP4s lazy so Safari can
-  // finish the document load instead of warming five large videos unnecessarily.
+  // Desktop may warm nearby clips aggressively. Mobile keeps preparation to
+  // the opening pair and then active + next so Safari stays responsive.
   if (!reducedMotion.matches) {
     primeMedia(medias[0]);
     // Desktop may warm more aggressively; mobile starts with only the opening pair.
