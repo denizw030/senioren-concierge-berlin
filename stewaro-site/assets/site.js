@@ -1,6 +1,0 @@
-(()=>{const b=document.querySelector('.menu'),n=document.querySelector('.links');if(b&&n)b.addEventListener('click',()=>{const o=n.classList.toggle('open');b.setAttribute('aria-expanded',String(o))});
-const y=document.querySelector('[data-year]');if(y)y.textContent=new Date().getFullYear();
-const p=new URLSearchParams(location.search);const src=p.get('source')||p.get('src')||p.get('utm_source');if(src){try{sessionStorage.setItem('stewaro_acquisition_source',src)}catch{}}
-const stored=(()=>{try{return sessionStorage.getItem('stewaro_acquisition_source')}catch{return null}})();
-if(stored){document.querySelectorAll('a[data-preserve-source]').forEach(a=>{const u=new URL(a.href,location.origin);if(!u.searchParams.has('source'))u.searchParams.set('source',stored);a.href=u.toString()})}
-const els=[...document.querySelectorAll('[data-reveal]')];if('IntersectionObserver'in window){const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('show');io.unobserve(e.target)}}),{threshold:.12});els.forEach(e=>io.observe(e))}else els.forEach(e=>e.classList.add('show'))})();
