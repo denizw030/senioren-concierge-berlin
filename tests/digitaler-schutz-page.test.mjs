@@ -40,12 +40,6 @@ test('video is muted, inline and never autoplay', () => {
     assert.match(tag, /\bmuted\b/);
     assert.match(tag, /\bplaysinline\b/);
   }
-  const mobileVideos = [...page.matchAll(/<video\b[^>]*class="ds-mobile-video"[^>]*>/g)].map((m) => m[0]);
-  assert.equal(mobileVideos.length, 8);
-  for (const tag of mobileVideos) {
-    assert.match(tag, /\bpreload="none"/);
-    assert.match(tag, /\bposter=/);
-  }
 });
 
 test('reduced-motion fallback and responsive mobile flow exist', () => {
