@@ -84,11 +84,12 @@
     menu.hidden=true;
     menu.innerHTML=`<nav aria-label="Mobile Navigation">
       <a class="mobile-menu-login-runtime" href="/anmelden" data-direct-login="true"><span>Anmelden</span><small>Für bestehende Klienten</small></a>
-      <a href="#services">Was STEWARO tut</a>
-      <a href="#for-you">Für Sie</a>
-      <a href="#family">Für Angehörige</a>
-      <a href="/pakete">Preise</a>
+      <a href="/de/">Startseite</a>
+      <a href="/prime-concierge">Concierge</a>
+      <a href="/angehoerige">Für Angehörige</a>
       <a href="/safety">Sicherheit</a>
+      <a href="/telefonannahme">Telefon</a>
+      <a href="/pakete">Preise</a>
       <a href="/kontakt">Kontakt</a>
     </nav>`;
     header.appendChild(menu);
