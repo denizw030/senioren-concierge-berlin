@@ -189,7 +189,7 @@ jobs:
 
               const checkpoints = [0.04,0.16,0.29,0.42,0.54,0.67,0.80,0.94];
               for (let i = 0; i < checkpoints.length; i++) {
-                const y = Math.max(0, story.top + (story.height - innerHeight) * checkpoints[i]);
+                const y = Math.max(0, story.top + (story.height - 844) * checkpoints[i]);
                 await evaluate('window.scrollTo({top:' + y + ',left:0,behavior:"instant"})');
                 await sleep(420);
                 const state = await evaluate(`(() => ({
