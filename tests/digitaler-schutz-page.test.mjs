@@ -62,9 +62,9 @@ test('app surfaces are clean code-rendered replicas of the approved UI', () => {
   assert.match(page, /Lege fest, wie STEWARO verdächtige Links prüft und wie FIDEL dich informiert\./);
   assert.match(page, /Prüfen, blockieren und verständlich informieren\./);
   assert.match(page, /Schutz aktivieren/);
-  assert.match(page, /Dein Schutz/);
-  assert.match(page, /Schutz ist aktiv/);
-  assert.match(page, /STEWARO prüft im Hintergrund\. FIDEL erklärt dir, wenn etwas wichtig ist\./);
+  assert.doesNotMatch(page, /ds-app-shell--active/);
+  assert.doesNotMatch(page, /Dein Schutz/);
+  assert.doesNotMatch(page, /Schutz ist aktiv/);
   assert.match(page, /STEWARO hat den verdächtigen Link blockiert\./);
   assert.match(page, /Die Nachricht wurde geprüft\. Der Link war auffällig und wurde vorsorglich nicht geöffnet\./);
   assert.match(page, /Ich habe die Nachricht geprüft\. Wenn du möchtest, erkläre ich dir, was daran auffällig war\./);
