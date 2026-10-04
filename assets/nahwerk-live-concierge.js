@@ -145,7 +145,7 @@ export function mountNahwerkLiveConcierge({
 
   let pc=null,dc=null,micStream=null,micMeter=null,outMeter=null,raf=0,inputFlushTimer=0,outputFlushTimer=0,transcriptSeq=0,userTurnSeq=0,assistantTurnSeq=0,maxSessionTimer=0;
   let audioOutputMode="realtime",voiceVariant="",hybridAudio=null,hybridGeneration=0,hybridSpeaking=false;
-  const usesHybridTts=()=>usesHybridTts()||audioOutputMode==="tts_elevenlabs";
+  const usesHybridTts=()=>audioOutputMode==="tts_onyx"||audioOutputMode==="tts_elevenlabs";
   const hybridSpokenKeys=new Set();
   // LIVE_PARALLEL_EXECUTION_V1_20260926
   const activeDelegations=new Map();
