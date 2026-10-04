@@ -1449,7 +1449,7 @@
           ["/de/", "Startseite"],
           ["/prime-concierge", "Concierge"],
           ["/angehoerige", "Für Angehörige"],
-          ["/safety", "Sicherheit"],
+          ["/digitaler-schutz", "Digitaler Schutz"],
           ["/telefonannahme", "Telefon"],
           ["/pakete", "Preise"],
           ["/kontakt", "Kontakt"]
@@ -1482,6 +1482,7 @@
 
       const retiredPublicPaths = new Set([
         "/concierges",
+        "/safety",
         "/leistungen",
         "/ablauf",
         "/senioren-concierge",
