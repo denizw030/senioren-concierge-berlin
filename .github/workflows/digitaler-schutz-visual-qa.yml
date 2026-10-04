@@ -200,6 +200,23 @@ jobs:
                 if (!movedCard) throw new Error('mobile_scene_missing:' + (i + 1));
                 await sleep(350);
                 await capture('mobile-scene-' + String(i + 1).padStart(2, '0'));
+
+                const rect = await evaluate(`(() => {
+                  const card = document.querySelectorAll('.ds-mobile-flow > article')[${i}];
+                  const r = card.getBoundingClientRect();
+                  return {x:r.left + scrollX, y:r.top + scrollY, width:r.width, height:r.height};
+                })()`);
+                if (!rect || !rect.width || !rect.height) throw new Error('mobile_scene_rect_missing:' + (i + 1));
+                const full = await send('Page.captureScreenshot', {
+                  format:'png',
+                  fromSurface:true,
+                  captureBeyondViewport:true,
+                  clip:{x:rect.x,y:rect.y,width:rect.width,height:rect.height,scale:1}
+                });
+                fs.writeFileSync(
+                  '/tmp/digitaler-schutz-visual/mobile-scene-' + String(i + 1).padStart(2, '0') + '-full.png',
+                  Buffer.from(full.data, 'base64')
+                );
               }
 
               const state = await evaluate(`(() => ({
