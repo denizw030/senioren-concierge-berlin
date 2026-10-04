@@ -16,6 +16,16 @@
 .ds-page .top .links{color:#273a34}
 .ds-page .top .links a:hover,.ds-page .top .links a.active{color:#8e7137}
 .ds-page .top .auth-link.register-link{background:#e5cf9c!important;color:#1b312a!important}
+/* The global site reveal script adds transform to every main > section.
+   A transformed story becomes the containing block for its fixed mobile film,
+   so the film incorrectly scrolls away from the viewport. The cinematic story
+   owns its own motion and must never receive that global reveal transform. */
+.ds-page .ds-story.reveal,
+.ds-page .ds-story.reveal.is-visible{
+  opacity:1!important;
+  transform:none!important;
+  transition:none!important;
+}
 .ds-shell{width:min(calc(100% - 44px),1280px);margin-inline:auto}
 .ds-kicker{margin:0 0 18px;font-size:12px;line-height:1.25;font-weight:760;letter-spacing:.22em;color:#9a7838;text-transform:uppercase}
 .ds-intro{min-height:92svh;padding:clamp(110px,12vw,180px) 0 80px;display:flex;align-items:center;background:radial-gradient(circle at 78% 30%,rgba(198,164,95,.18),transparent 32%),linear-gradient(180deg,#f7f2e8 0%,#f1eadf 100%);overflow:hidden}
