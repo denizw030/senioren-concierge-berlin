@@ -148,9 +148,7 @@
 
 
   const FIDEL_VOICE_LABELS = Object.freeze({
-    fidel_souveraen:{name:"FIDEL Souverän",description:"Tief, markant und sehr präsent."},
-    fidel_klar:{name:"FIDEL Klar",description:"Ruhig, klar und klassisch männlich."},
-    fidel_warm:{name:"FIDEL Warm",description:"Warm, weich und weiblich."}
+    fidel_souveraen:{name:"FIDEL",description:"Süß, warm, hell und verspielt – FIDELs eigene Stimme."}
   });
 
   async function liveVoiceRequest(path,{method="GET",body=null}={}) {
@@ -178,7 +176,7 @@
     section.innerHTML=`
       <div class="stewaro-fidel-voice-head">
         <span class="stewaro-app-more-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 10v4M9 7v10M13 5v14M17 8v8M21 10v4"></path></svg></span>
-        <span class="stewaro-app-more-copy"><strong id="stewaroFidelVoiceTitle">FIDEL Stimme</strong><span>Wähle den Klang von FIDEL. Name und Persönlichkeit bleiben gleich.</span></span>
+        <span class="stewaro-app-more-copy"><strong id="stewaroFidelVoiceTitle">FIDEL Stimme</strong><span>FIDEL verwendet überall dieselbe eigene Stimme.</span></span>
       </div>
       <div class="stewaro-fidel-voice-options" role="radiogroup" aria-labelledby="stewaroFidelVoiceTitle">
         ${Object.entries(FIDEL_VOICE_LABELS).map(([key,value])=>`
