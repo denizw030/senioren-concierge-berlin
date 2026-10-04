@@ -113,7 +113,7 @@ jobs:
           test "$(tr -d '\r\n' < CNAME)" = "stewaro.com"
 
       - name: Run STEWARO shared-base contract
-        run: node --test tests/stewaro-shared-base-brand-shell.test.mjs
+        run: node --test tests/stewaro-shared-base-brand-shell.test.mjs tests/stewaro-home-mobile-menu.test.mjs tests/stewaro-public-surface-cleanup.test.mjs
 
       - name: Verify homepage CSP preparation
         run: node --test tests/stewaro-homepage-csp.test.mjs
