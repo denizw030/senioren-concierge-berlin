@@ -117,6 +117,14 @@
     return clamp((progress - start) / Math.max(end - start, 0.001));
   };
 
+  // Approved calm windows replace the head-lift sequence, on both devices.
+  const scrubWindow = (media) => {
+    const limit = Math.max(0, media.duration - 0.04);
+    const start = clamp(Number(media.dataset.scrubStart || 0), 0, limit);
+    const end = clamp(Number(media.dataset.scrubEnd || limit), start, limit);
+    return [start, end];
+  };
+
   const setScene = (scene, progress) => {
     if (scene !== activeScene) activeScene = scene;
     overlays.forEach((overlay, index) => overlay.classList.toggle('is-active', index === scene));
@@ -134,7 +142,8 @@
     if (activeMedia && Number.isFinite(activeMedia.duration) && activeMedia.duration > 0) {
       const local = localProgress(progress, scene);
       const reusedHold = scene >= 4 && scene <= 6 && activeMedia.dataset.dsMedia === '3';
-      const target = reusedHold ? Math.max(0, activeMedia.duration - 0.05) : Math.min(activeMedia.duration - 0.04, local * activeMedia.duration);
+      const [start, end] = scrubWindow(activeMedia);
+      const target = reusedHold ? Math.max(start, end - 0.01) : start + local * (end - start);
       scheduleScrub(activeMedia, target);
       activeMedia.pause();
     }

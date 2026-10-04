@@ -137,6 +137,61 @@ jobs:
               fs.writeFileSync('/tmp/digitaler-schutz-visual/' + name + '.png', Buffer.from(shot.data, 'base64'));
             }
 
+            async function assertHeaderAndMedia() {
+              const state = await evaluate(`(() => {
+                const header = document.querySelector('.top');
+                const word = document.querySelector('.top .brandtext');
+                const icon = document.querySelector('.top .mark');
+                const h = getComputedStyle(header), w = getComputedStyle(word), i = getComputedStyle(icon);
+                const active = document.querySelector('.ds-media.is-active');
+                return { background: h.backgroundColor, image: h.backgroundImage,
+                  opacity:h.opacity, blend:h.mixBlendMode, backdrop:h.backdropFilter,
+                  headerTop:header.getBoundingClientRect().top,
+                  hit:document.elementFromPoint(10,20)?.closest('.top') === header,
+                  wordMask:w.maskImage || w.webkitMaskImage, iconMask:i.maskImage || i.webkitMaskImage,
+                  wordFill:w.backgroundImage, iconFill:i.backgroundImage, wordMode:w.maskMode,
+                  animation:w.animationName, video:active?.dataset.dsMedia,
+                  ready:active?.readyState, time:active?.currentTime,
+                  end:active?.dataset.scrubEnd, replacement:document.querySelector('[data-ds-media="1"]')?.dataset.replacement,
+                  replacementSrc:document.querySelector('[data-ds-media="1"]')?.dataset.src,
+                  intro:!!document.querySelector('.ds-intro') };
+              })()`);
+              if (!state || state.background !== 'rgb(255, 255, 255)' || state.image !== 'none' || state.opacity !== '1' || state.blend !== 'normal' || state.backdrop !== 'none' || state.headerTop > 1 || !state.hit || state.intro) throw new Error('opaque_header_failed:'+JSON.stringify(state));
+              if (!state.wordMask.includes('stewaro-wordmark.svg') || !state.iconMask.includes('stewaro-icon.svg') || state.wordMode !== 'alpha' || !state.wordFill.includes('linear-gradient') || !state.iconFill.includes('linear-gradient') || state.wordFill.includes('url(') || state.iconFill.includes('url(')) throw new Error('alpha_gold_failed:'+JSON.stringify(state));
+              if (state.replacement !== 'quiet-phone-shot' || !state.replacementSrc.includes('4ba12ffb-54eb-4304-bbe6-c2507e3ad4c2')) throw new Error('replacement_mapping_failed');
+              if (!spec.reduced && (state.ready < 2 || !Number.isFinite(state.time) || (state.end && state.time > Number(state.end)+0.025))) throw new Error('decoded_safe_media_failed:'+JSON.stringify(state));
+              return state;
+            }
+            async function waitDecoded() {
+              for (let attempt=0; attempt<60; attempt++) {
+                const ready=await evaluate("document.querySelector('.ds-media.is-active')?.readyState >= 2");
+                if (ready) return;
+                await sleep(250);
+              }
+              throw new Error('active_video_decode_timeout');
+            }
+            await waitDecoded();
+            await assertHeaderAndMedia();
+            if (spec.mobile) {
+              const menu = await evaluate(`(() => {
+                const header=document.querySelector('.top').getBoundingClientRect();
+                const toggle=document.querySelector('.nav-toggle');
+                const rect=toggle?.getBoundingClientRect();
+                return {top:rect?.top,bottom:rect?.bottom,headerTop:header.top,headerBottom:header.bottom,visible:toggle && getComputedStyle(toggle).display !== 'none'};
+              })()`);
+              if (!menu?.visible || menu.top < menu.headerTop || menu.bottom > menu.headerBottom) throw new Error('menu_outside_header:'+JSON.stringify(menu));
+              await evaluate("document.querySelector('.nav-toggle').click()");
+              await sleep(100);
+              const opened=await evaluate(`(() => {
+                const links=document.querySelector('.top .links');
+                return {open:links.classList.contains('is-open'),background:getComputedStyle(links).backgroundColor,display:getComputedStyle(links).display};
+              })()`);
+              if (!opened.open || opened.display === 'none' || opened.background !== 'rgb(255, 255, 255)') throw new Error('white_menu_failed:'+JSON.stringify(opened));
+              await capture('mobile-menu');
+              await evaluate("document.querySelector('.nav-toggle').click()");
+              await sleep(100);
+            }
+
             if (!spec.mobile) {
               await evaluate('window.scrollTo({top:0,left:0,behavior:"instant"})');
               await sleep(300);
@@ -164,6 +219,8 @@ jobs:
                 await sleep(800);
                 const active = await evaluate("document.querySelector('[data-ds-overlay].is-active')?.dataset.dsOverlay || null");
                 if (active !== expectedScene) throw new Error('desktop_scene_mismatch:' + name + ':' + active + ':' + expectedScene);
+                await waitDecoded();
+                await assertHeaderAndMedia();
                 await capture(name);
               }
 
@@ -231,7 +288,9 @@ jobs:
                   active: document.querySelector('[data-ds-overlay].is-active')?.dataset.dsOverlay || null,
                   media: document.querySelector('.ds-media.is-active')?.dataset.dsMedia || null
                 }))()`);
-                if (!state || !['sticky','fixed'].includes(state.stage) || state.active === null || state.media === null) throw new Error('mobile_sticky_scene_failed:' + (i + 1) + ':' + JSON.stringify(state));
+                if (!state || !['sticky','fixed'].includes(state.stage) || state.active !== String(i) || state.media === null) throw new Error('mobile_sticky_scene_failed:' + (i + 1) + ':' + JSON.stringify(state));
+                await waitDecoded();
+                await assertHeaderAndMedia();
                 await capture('mobile-scene-' + String(i + 1).padStart(2, '0'));
               }
 
@@ -252,6 +311,18 @@ jobs:
               }
             }
 
+            await send('Emulation.setEmulatedMedia', {features:[{name:'prefers-reduced-motion',value:'reduce'}]});
+            await sleep(300);
+            const reduced = await evaluate(`(() => ({
+              word:getComputedStyle(document.querySelector('.top .brandtext')).animationName,
+              icon:getComputedStyle(document.querySelector('.top .mark')).animationName,
+              stage:getComputedStyle(document.querySelector('[data-ds-stage]')).display,
+              fallback:getComputedStyle(document.querySelector('.ds-mobile-flow')).display
+            }))()`);
+            if (reduced.word !== 'none' || reduced.icon !== 'none' || reduced.stage !== 'none' || reduced.fallback === 'none') throw new Error('reduced_motion_failed:'+JSON.stringify(reduced));
+            await evaluate('window.scrollTo({top:0,left:0,behavior:"instant"})');
+            await sleep(100);
+            await capture(spec.name + '-reduced-motion');
             ws.close();
           }
 
