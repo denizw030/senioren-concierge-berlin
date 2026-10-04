@@ -12,7 +12,9 @@
   background:var(--ds-cream);
   color:#1d2d28;
 }
-.ds-page .top{background:rgba(246,241,231,.88)!important;border-color:rgba(18,56,47,.12)!important;backdrop-filter:blur(24px) saturate(125%)}
+html body.story-site.ds-page .top{background:#fff!important;background-image:none!important;border-color:rgba(18,56,47,.12)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;color:#173126!important;opacity:1!important;mix-blend-mode:normal!important}
+html body.story-site.ds-page .top .links a{color:#273a34!important}
+html body.story-site.ds-page .top .nav-toggle span{background:#173126!important}
 .ds-page .top .links{color:#273a34}
 .ds-page .top .links a:hover,.ds-page .top .links a.active{color:#8e7137}
 .ds-page .top .auth-link.register-link{background:#e5cf9c!important;color:#1b312a!important}

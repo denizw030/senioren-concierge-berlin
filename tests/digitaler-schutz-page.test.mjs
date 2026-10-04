@@ -26,7 +26,6 @@ test('all eight canonical scenes are present', () => {
 test('approved live-action media IDs are wired', () => {
   for (const id of [
     '99f251fd-ffa4-4c0a-ad86-fc39bf0dfe84',
-    '1d420177-9f40-40a9-ac27-23207996053a',
     '4ba12ffb-54eb-4304-bbe6-c2507e3ad4c2',
     '1f16f1f5-4b44-47ba-ad7b-7c5a486618e3',
     'dda81b2a-84b7-4c6b-80ef-eddac4cade49'
@@ -126,8 +125,8 @@ test('mobile scrub caps perceived playback speed', () => {
 test('film opens immediately after header without redundant intro', () => {
   assert.doesNotMatch(page, /class="ds-intro"/);
   assert.match(page, /<main id="main">\s*<section class="ds-story"/);
-  assert.match(page, /nahwerk-logo-v2\.css\?v=10/);
-  assert.match(page, /digitaler-schutz\.css\?v=5/);
+  assert.match(page, /nahwerk-logo-v2\.css\?v=11/);
+  assert.match(page, /digitaler-schutz\.css\?v=6/);
 });
 
 test('premium header logo glint is restrained and reduced-motion safe', () => {
@@ -144,4 +143,36 @@ test('mobile header overlays the opening film without reserving intro space', ()
   assert.match(css, /\.ds-page \.top\{position:fixed!important/);
   assert.match(css, /\.ds-page #main\{margin:0!important;padding:0!important\}/);
   assert.match(css, /\.ds-story\{margin:0!important;padding:0!important\}/);
+});
+
+
+test('opening head-lift and look-up clip are excluded, quiet approved replacement is bounded', () => {
+  assert.doesNotMatch(page, /1d420177-9f40-40a9-ac27-23207996053a/);
+  for (const index of [0, 1]) {
+    const tag = page.match(new RegExp('<video[^>]*data-ds-media="' + index + '"[^>]*>'))?.[0];
+    assert.match(tag, /data-scrub-start="0" data-scrub-end="0.70"/);
+  }
+  const replacement = page.match(/<video[^>]*data-ds-media="1"[^>]*>/)?.[0];
+  assert.match(replacement, /data-replacement="quiet-phone-shot"/);
+  assert.match(replacement, /4ba12ffb-54eb-4304-bbe6-c2507e3ad4c2/);
+  assert.match(js, /const \[start, end\] = scrubWindow\(activeMedia\)/);
+  assert.match(js, /start \+ local \* \(end - start\)/);
+});
+
+test('film cannot tint the opaque white header', () => {
+  assert.match(css, /html body.story-site.ds-page \.top\{background:#fff!important;background-image:none!important/);
+  assert.match(css, /backdrop-filter:none!important;-webkit-backdrop-filter:none!important/);
+  assert.match(css, /opacity:1!important;mix-blend-mode:normal!important/);
+});
+
+test('logo uses pure alpha shapes and gold from CSS, including the left symbol', () => {
+  const wordmark = read('assets/logos/stewaro-wordmark.svg');
+  assert.match(wordmark, /fill:\s*#000000/);
+  assert.doesNotMatch(wordmark, /linearGradient|stop-color/);
+  const active = logoCss.slice(logoCss.indexOf('/* STEWARO_PREMIUM_LOGO_GLINT_20261004'));
+  assert.match(active, /mask-mode:alpha!important/);
+  assert.match(active, /mask:url\("\/assets\/logos\/stewaro-wordmark\.svg"\)/);
+  assert.match(active, /mask:url\("\/assets\/logos\/stewaro-icon\.svg"\)/);
+  assert.doesNotMatch(active, /#8f6721|#9b6d20|url\([^)]*\)\s*!important;\s*filter/);
+  assert.match(active, /background-position:-120% 50%,50% 50%!important/);
 });
