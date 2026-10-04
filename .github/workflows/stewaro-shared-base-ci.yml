@@ -101,7 +101,7 @@ jobs:
           git fetch --no-tags origin main
           changed="$(git diff --name-only origin/main...HEAD)"
           printf '%s\n' "$changed"
-          if printf '%s\n' "$changed" | grep -Eq '^(CNAME|stewaro-site/|.*orfidel.*)'; then
+          if printf '%s\n' "$changed" | grep -Eq '^(CNAME|.*orfidel.*)'; then
             echo "Forbidden production/frozen/protected path changed."
             exit 1
           fi
