@@ -1446,12 +1446,11 @@
 
       document.querySelectorAll("nav.links").forEach((nav) => {
         const targets = [
-          ["/de/", "Übersicht"],
+          ["/de/", "Startseite"],
           ["/prime-concierge", "Concierge"],
           ["/angehoerige", "Für Angehörige"],
-          ["/safety", "Sicherheit"],
+          ["/digitaler-schutz", "Digitaler Schutz"],
           ["/telefonannahme", "Telefon"],
-          ["/leistungen", "Leistungen"],
           ["/pakete", "Preise"],
           ["/kontakt", "Kontakt"]
         ];
@@ -1479,6 +1478,27 @@
             else nav.appendChild(link);
           });
         }
+      });
+
+      const retiredPublicPaths = new Set([
+        "/concierges",
+        "/safety",
+        "/leistungen",
+        "/ablauf",
+        "/senioren-concierge",
+        "/ueber-mich",
+        "/alltag-organisieren",
+        "/dokumente-verstehen",
+        "/technik-verstehen",
+        "/voice-audition",
+        "/martin-anpassen"
+      ]);
+      document.querySelectorAll(".footer a").forEach((link) => {
+        const path = normalizeNavPath(link.getAttribute("href"));
+        if (!retiredPublicPaths.has(path)) return;
+        link.hidden = true;
+        link.setAttribute("aria-hidden", "true");
+        link.tabIndex = -1;
       });
 
       document.querySelectorAll(".odysx-info-bar").forEach((element) => element.remove());

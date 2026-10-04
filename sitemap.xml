@@ -8,6 +8,20 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/de/" />
   </url>
   <url>
+    <loc>https://stewaro.com/en/</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/de/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/de/" />
+  </url>
+  <url>
+    <loc>https://stewaro.com/tr/</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/de/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/de/" />
+  </url>
+  <url>
     <loc>https://stewaro.com/prime-concierge</loc>
     <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/prime-concierge" />
     <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/prime-concierge" />
@@ -15,14 +29,35 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/prime-concierge" />
   </url>
   <url>
-    <loc>https://stewaro.com/safety</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/safety" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/safety" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/safety" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/safety" />
+    <loc>https://stewaro.com/en/prime-concierge</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/prime-concierge" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/prime-concierge" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/prime-concierge" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/prime-concierge" />
+  </url>
+  <url>
+    <loc>https://stewaro.com/tr/prime-concierge</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/prime-concierge" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/prime-concierge" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/prime-concierge" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/prime-concierge" />
   </url>
   <url>
     <loc>https://stewaro.com/angehoerige</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/angehoerige" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/angehoerige" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/angehoerige" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/angehoerige" />
+  </url>
+  <url>
+    <loc>https://stewaro.com/en/angehoerige</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/angehoerige" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/angehoerige" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/angehoerige" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/angehoerige" />
+  </url>
+  <url>
+    <loc>https://stewaro.com/tr/angehoerige</loc>
     <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/angehoerige" />
     <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/angehoerige" />
     <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/angehoerige" />
@@ -36,18 +71,18 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/telefonannahme" />
   </url>
   <url>
-    <loc>https://stewaro.com/senioren-concierge</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/senioren-concierge" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/senioren-concierge" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/senioren-concierge" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/senioren-concierge" />
+    <loc>https://stewaro.com/en/telefonannahme</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/telefonannahme" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/telefonannahme" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/telefonannahme" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/telefonannahme" />
   </url>
   <url>
-    <loc>https://stewaro.com/leistungen</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/leistungen" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/leistungen" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/leistungen" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/leistungen" />
+    <loc>https://stewaro.com/tr/telefonannahme</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/telefonannahme" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/telefonannahme" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/telefonannahme" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/telefonannahme" />
   </url>
   <url>
     <loc>https://stewaro.com/pakete</loc>
@@ -57,42 +92,35 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/pakete" />
   </url>
   <url>
-    <loc>https://stewaro.com/ablauf</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/ablauf" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/ablauf" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/ablauf" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/ablauf" />
+    <loc>https://stewaro.com/en/pakete</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/pakete" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/pakete" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/pakete" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/pakete" />
   </url>
   <url>
-    <loc>https://stewaro.com/alltag-organisieren</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/alltag-organisieren" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/alltag-organisieren" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/alltag-organisieren" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/alltag-organisieren" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/dokumente-verstehen</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/dokumente-verstehen" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/dokumente-verstehen" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/dokumente-verstehen" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/dokumente-verstehen" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/technik-verstehen</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/technik-verstehen" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/technik-verstehen" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/technik-verstehen" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/technik-verstehen" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/ueber-mich</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/ueber-mich" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/ueber-mich" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/ueber-mich" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/ueber-mich" />
+    <loc>https://stewaro.com/tr/pakete</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/pakete" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/pakete" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/pakete" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/pakete" />
   </url>
   <url>
     <loc>https://stewaro.com/faq</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/faq" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/faq" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/faq" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/faq" />
+  </url>
+  <url>
+    <loc>https://stewaro.com/en/faq</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/faq" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/faq" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/faq" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/faq" />
+  </url>
+  <url>
+    <loc>https://stewaro.com/tr/faq</loc>
     <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/faq" />
     <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/faq" />
     <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/faq" />
@@ -104,6 +132,25 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/kontakt" />
     <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/kontakt" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/kontakt" />
+  </url>
+  <url>
+    <loc>https://stewaro.com/en/kontakt</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/kontakt" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/kontakt" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/kontakt" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/kontakt" />
+  </url>
+  <url>
+    <loc>https://stewaro.com/tr/kontakt</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/kontakt" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/kontakt" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/kontakt" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/kontakt" />
+  </url>
+  <url>
+    <loc>https://stewaro.com/digitaler-schutz</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/digitaler-schutz" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/digitaler-schutz" />
   </url>
   <url>
     <loc>https://stewaro.com/impressum</loc>
@@ -139,215 +186,5 @@
     <loc>https://stewaro.com/nutzungsbedingungen/</loc>
     <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/nutzungsbedingungen/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/nutzungsbedingungen/" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/en/</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/de/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/de/" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/en/prime-concierge</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/prime-concierge" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/prime-concierge" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/prime-concierge" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/prime-concierge" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/en/safety</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/safety" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/safety" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/safety" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/safety" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/en/angehoerige</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/angehoerige" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/angehoerige" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/angehoerige" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/angehoerige" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/en/telefonannahme</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/telefonannahme" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/telefonannahme" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/telefonannahme" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/telefonannahme" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/en/pakete</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/pakete" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/pakete" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/pakete" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/pakete" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/en/leistungen</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/leistungen" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/leistungen" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/leistungen" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/leistungen" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/en/ablauf</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/ablauf" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/ablauf" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/ablauf" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/ablauf" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/en/faq</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/faq" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/faq" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/faq" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/faq" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/en/kontakt</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/kontakt" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/kontakt" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/kontakt" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/kontakt" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/en/senioren-concierge</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/senioren-concierge" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/senioren-concierge" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/senioren-concierge" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/senioren-concierge" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/en/alltag-organisieren</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/alltag-organisieren" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/alltag-organisieren" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/alltag-organisieren" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/alltag-organisieren" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/en/dokumente-verstehen</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/dokumente-verstehen" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/dokumente-verstehen" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/dokumente-verstehen" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/dokumente-verstehen" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/en/technik-verstehen</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/technik-verstehen" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/technik-verstehen" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/technik-verstehen" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/technik-verstehen" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/en/ueber-mich</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/ueber-mich" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/ueber-mich" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/ueber-mich" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/ueber-mich" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/tr/</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/de/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/de/" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/tr/prime-concierge</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/prime-concierge" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/prime-concierge" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/prime-concierge" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/prime-concierge" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/tr/safety</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/safety" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/safety" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/safety" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/safety" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/tr/angehoerige</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/angehoerige" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/angehoerige" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/angehoerige" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/angehoerige" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/tr/telefonannahme</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/telefonannahme" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/telefonannahme" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/telefonannahme" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/telefonannahme" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/tr/pakete</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/pakete" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/pakete" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/pakete" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/pakete" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/tr/leistungen</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/leistungen" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/leistungen" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/leistungen" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/leistungen" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/tr/ablauf</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/ablauf" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/ablauf" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/ablauf" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/ablauf" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/tr/faq</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/faq" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/faq" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/faq" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/faq" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/tr/kontakt</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/kontakt" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/kontakt" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/kontakt" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/kontakt" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/tr/senioren-concierge</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/senioren-concierge" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/senioren-concierge" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/senioren-concierge" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/senioren-concierge" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/tr/alltag-organisieren</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/alltag-organisieren" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/alltag-organisieren" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/alltag-organisieren" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/alltag-organisieren" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/tr/dokumente-verstehen</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/dokumente-verstehen" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/dokumente-verstehen" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/dokumente-verstehen" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/dokumente-verstehen" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/tr/technik-verstehen</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/technik-verstehen" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/technik-verstehen" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/technik-verstehen" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/technik-verstehen" />
-  </url>
-  <url>
-    <loc>https://stewaro.com/tr/ueber-mich</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://stewaro.com/ueber-mich" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://stewaro.com/en/ueber-mich" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://stewaro.com/tr/ueber-mich" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://stewaro.com/ueber-mich" />
   </url>
 </urlset>

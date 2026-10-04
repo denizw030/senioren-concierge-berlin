@@ -18,7 +18,7 @@ test("STEWARO shared-base brand shell is wired without forking runtime", () => {
   assert.match(siteUi, /STEWARO_SHARED_BASE_BRAND_ADAPTER_V1/);
   assert.match(siteUi, /Presentation-only migration layer/);
   assert.match(siteUi, /normalizeNavPath/);
-  assert.match(siteUi, /\["\/safety", "Sicherheit"\]/);
+  assert.match(siteUi, /\["\/digitaler-schutz", "Digitaler Schutz"\]/);
   assert.match(siteUi, /\["\/pakete", "Preise"\]/);
   assert.match(siteUi, /\["\/angehoerige", "Für Angehörige"\]/);
 
@@ -48,7 +48,7 @@ test("STEWARO shared-base brand shell is wired without forking runtime", () => {
   const heroVideo = fs.statSync("assets/media/stewaro-hero-pferd.mp4");
   assert.ok(heroVideo.size > 100_000 && heroVideo.size < 6_000_000, "hero video must stay web-optimized while allowing the 1080p master replacement");
 
-  assert.match(matrix, /stewaro-site\/.*frozen/i);
+  assert.match(matrix, /stewaro-site\/.*removed/i);
   assert.match(matrix, /existing production website\/customer-account/i);
 
   // Legacy runtime identifiers must remain available during the migration.
