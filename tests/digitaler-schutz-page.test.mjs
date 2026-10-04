@@ -176,3 +176,9 @@ test('logo uses pure alpha shapes and gold from CSS, including the left symbol',
   assert.doesNotMatch(active, /#8f6721|#9b6d20|url\([^)]*\)\s*!important;\s*filter/);
   assert.match(active, /background-position:-120% 50%,50% 50%!important/);
 });
+
+
+test('mobile hamburger stays positioned within the white header, with a white open menu', () => {
+  assert.match(css, /ds-page \.top \.nav \.nav-toggle\{position:absolute!important;top:50%!important/);
+  assert.match(css, /ds-page \.top \.links\.is-open\{background:#fff!important/);
+});

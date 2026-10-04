@@ -172,6 +172,25 @@ jobs:
             }
             await waitDecoded();
             await assertHeaderAndMedia();
+            if (spec.mobile) {
+              const menu = await evaluate(`(() => {
+                const header=document.querySelector('.top').getBoundingClientRect();
+                const toggle=document.querySelector('.nav-toggle');
+                const rect=toggle?.getBoundingClientRect();
+                return {top:rect?.top,bottom:rect?.bottom,headerTop:header.top,headerBottom:header.bottom,visible:toggle && getComputedStyle(toggle).display !== 'none'};
+              })()`);
+              if (!menu?.visible || menu.top < menu.headerTop || menu.bottom > menu.headerBottom) throw new Error('menu_outside_header:'+JSON.stringify(menu));
+              await evaluate("document.querySelector('.nav-toggle').click()");
+              await sleep(100);
+              const opened=await evaluate(`(() => {
+                const links=document.querySelector('.top .links');
+                return {open:links.classList.contains('is-open'),background:getComputedStyle(links).backgroundColor,display:getComputedStyle(links).display};
+              })()`);
+              if (!opened.open || opened.display === 'none' || opened.background !== 'rgb(255, 255, 255)') throw new Error('white_menu_failed:'+JSON.stringify(opened));
+              await capture('mobile-menu');
+              await evaluate("document.querySelector('.nav-toggle').click()");
+              await sleep(100);
+            }
 
             if (!spec.mobile) {
               await evaluate('window.scrollTo({top:0,left:0,behavior:"instant"})');
@@ -301,6 +320,8 @@ jobs:
               fallback:getComputedStyle(document.querySelector('.ds-mobile-flow')).display
             }))()`);
             if (reduced.word !== 'none' || reduced.icon !== 'none' || reduced.stage !== 'none' || reduced.fallback === 'none') throw new Error('reduced_motion_failed:'+JSON.stringify(reduced));
+            await evaluate('window.scrollTo({top:0,left:0,behavior:"instant"})');
+            await sleep(100);
             await capture(spec.name + '-reduced-motion');
             ws.close();
           }
