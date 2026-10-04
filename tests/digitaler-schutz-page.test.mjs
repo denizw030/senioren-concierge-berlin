@@ -53,3 +53,32 @@ test('scroll ranges match canonical scene map', () => {
     assert.ok(js.includes(pair), 'missing range ' + pair);
   }
 });
+
+
+test('app surfaces are clean code-rendered replicas of the approved UI', () => {
+  assert.doesNotMatch(page, /d2ol7oe51mr4n9\.cloudfront\.net/);
+  assert.match(page, /Schutz einrichten/);
+  assert.match(page, /Lege fest, wie STEWARO verdächtige Links prüft und wie FIDEL dich informiert\./);
+  assert.match(page, /Prüfen, blockieren und verständlich informieren\./);
+  assert.match(page, /Schutz aktivieren/);
+  assert.match(page, /Dein Schutz/);
+  assert.match(page, /Schutz ist aktiv/);
+  assert.match(page, /STEWARO prüft im Hintergrund\. FIDEL erklärt dir, wenn etwas wichtig ist\./);
+  assert.match(page, /STEWARO hat den verdächtigen Link blockiert\./);
+  assert.match(page, /Die Nachricht wurde geprüft\. Der Link war auffällig und wurde vorsorglich nicht geöffnet\./);
+  assert.match(page, /Ich habe die Nachricht geprüft\. Wenn du möchtest, erkläre ich dir, was daran auffällig war\./);
+  assert.match(page, /Verstanden/);
+  assert.match(css, /\.ds-app-shell/);
+});
+
+test('story copy does not contradict the setup screen', () => {
+  const sceneOne = page.match(/data-ds-overlay="0"[\s\S]*?data-ds-overlay="1"/)?.[0] || '';
+  assert.match(sceneOne, /Einrichtung/);
+  assert.doesNotMatch(sceneOne, /ds-status-pill">Aktiv/);
+});
+
+test('privacy notification stays hidden until its second phase', () => {
+  assert.match(css, /\.ds-consent-card,\.ds-notification-card\{[^}]*opacity:0/);
+  assert.match(css, /\.ds-privacy-line\{[^}]*opacity:0/);
+  assert.match(css, /data-phase="2"[^}]*\.ds-notification-card/);
+});
