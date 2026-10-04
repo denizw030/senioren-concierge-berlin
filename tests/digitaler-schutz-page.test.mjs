@@ -127,7 +127,7 @@ test('film opens immediately after header without redundant intro', () => {
   assert.doesNotMatch(page, /class="ds-intro"/);
   assert.match(page, /<main id="main">\s*<section class="ds-story"/);
   assert.match(page, /nahwerk-logo-v2\.css\?v=10/);
-  assert.match(page, /digitaler-schutz\.css\?v=4/);
+  assert.match(page, /digitaler-schutz\.css\?v=5/);
 });
 
 test('premium header logo glint is restrained and reduced-motion safe', () => {
