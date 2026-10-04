@@ -49,15 +49,13 @@ test("Live client uses WebRTC, central delegation and active concierge portrait"
   assert.doesNotMatch(client,/OPENAI_API_KEY|sk-[A-Za-z0-9]/);
 });
 
-test("native app Live module accepts token only in memory and uses APP channel",()=>{
+test("native app Live page accepts token only in memory and uses APP channel",()=>{
   const page=read("app-live.html");
-  const app=read("assets/stewaro-csp-app-live-script-1.js");
-  assert.match(page,/stewaro-csp-app-live-script-1\.js\?v=2/);
-  assert.match(app,/channel:"APP"/);
-  assert.match(app,/startNahwerkAppLive/);
-  assert.match(app,/getAuthToken:\(\)=>token/);
-  assert.doesNotMatch(page+app,/[?&](?:session_)?token=/i);
-  assert.doesNotMatch(page+app,/location\\.(?:search|href).*token/i);
+  assert.match(page,/channel:"APP"/);
+  assert.match(page,/startNahwerkAppLive/);
+  assert.match(page,/getAuthToken:\(\)=>token/);
+  assert.doesNotMatch(page,/[?&](?:session_)?token=/i);
+  assert.doesNotMatch(page,/location\\.(?:search|href).*token/i);
 });
 
 test("Live visual surface has reactive FIDEL gold glass orb",()=>{
