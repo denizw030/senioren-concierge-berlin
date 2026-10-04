@@ -82,3 +82,17 @@ test('privacy notification stays hidden until its second phase', () => {
   assert.match(css, /\.ds-privacy-line\{[^}]*opacity:0/);
   assert.match(css, /data-phase="2"[^}]*\.ds-notification-card/);
 });
+
+
+test('website narrative matches app role language', () => {
+  assert.match(page, /STEWARO prüft verdächtige Links im Hintergrund\. FIDEL erklärt, wenn etwas wichtig ist/);
+  assert.match(page, /STEWARO hat den verdächtigen Link vorsorglich blockiert\./);
+  assert.match(page, /STEWARO prüft\. Leise\./);
+  assert.match(page, /FIDEL erklärt nur, wenn etwas wichtig ist\./);
+  assert.doesNotMatch(page, /FIDEL hat die Seite vorsorglich gestoppt/);
+  assert.doesNotMatch(page, /FIDEL prüft verdächtige Links, bevor etwas passieren kann/);
+});
+
+test('mobile story suppresses the global floating concierge to protect the UI', () => {
+  assert.match(css, /\.ds-page \.nw-floating-concierge\{display:none!important\}/);
+});
