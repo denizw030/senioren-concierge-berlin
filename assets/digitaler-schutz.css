@@ -228,7 +228,7 @@
 
 /* Mobile premium scroll-film: one persistent viewport stage, not stacked video cards. */
 @media (max-width:900px) and (prefers-reduced-motion:no-preference){
-  .ds-story{display:block;height:760svh;position:relative;background:#071f1a}
+  .ds-story{display:block;height:1080svh;position:relative;background:#071f1a}
   .ds-stage{display:block;position:sticky;top:0;height:100svh;min-height:100svh;overflow:hidden}
   .ds-film{position:absolute;inset:0}
   .ds-media{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:0;transition:opacity .32s var(--ds-ease)}
