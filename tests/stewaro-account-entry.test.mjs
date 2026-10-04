@@ -107,3 +107,10 @@ test("account password screen renders canonical icon and wordmark centered witho
   assert.match(accountCss,/main>\.section\{[\s\S]*justify-content:center!important;[\s\S]*align-items:center!important/);
   assert.match(accountCss,/\.loginwrap\{[\s\S]*margin-inline:auto!important/);
 });
+
+
+test("email step uses direct, natural client-facing copy",()=>{
+  assert.match(access,/Geben Sie Ihre E-Mail-Adresse ein\. Danach geht es direkt weiter\./);
+  assert.doesNotMatch(access,/ruhigen Schritt/);
+  assert.equal(accessClean,access);
+});
