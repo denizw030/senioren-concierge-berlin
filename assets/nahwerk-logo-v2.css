@@ -695,8 +695,10 @@ html body .home-reference .top a.brand .mark.nahwerk-mark{
 html body .top a.brand .brandtext{
   -webkit-mask:url("/assets/logos/stewaro-wordmark.svg") center/contain no-repeat!important;
   mask:url("/assets/logos/stewaro-wordmark.svg") center/contain no-repeat!important;
+  mask-mode:alpha!important;
 }
 html body .top a.brand .mark{
   -webkit-mask:url("/assets/logos/stewaro-icon.svg") center/contain no-repeat!important;
   mask:url("/assets/logos/stewaro-icon.svg") center/contain no-repeat!important;
+  mask-mode:alpha!important;
 }
