@@ -8,6 +8,7 @@ const page = read('digitaler-schutz.html');
 const mirror = read('digitaler-schutz/index.html');
 const css = read('assets/digitaler-schutz.css');
 const js = read('assets/digitaler-schutz.js');
+const logoCss = read('assets/nahwerk-logo-v2.css');
 
 test('clean route mirror only adds base href', () => {
   const normalized = mirror.replace('<head><base href="/">', '<head>');
@@ -118,4 +119,20 @@ test('mobile scrub caps perceived playback speed', () => {
   assert.match(js, /easedStep = diff \* 0\.18/);
   assert.match(js, /if \(desktop\.matches\)/);
   assert.match(js, /requestAnimationFrame\(flushScrub\)/);
+});
+
+
+test('film opens immediately after header without redundant intro', () => {
+  assert.doesNotMatch(page, /class="ds-intro"/);
+  assert.match(page, /<main id="main">\s*<section class="ds-story"/);
+  assert.match(page, /nahwerk-logo-v2\.css\?v=10/);
+});
+
+test('premium header logo glint is restrained and reduced-motion safe', () => {
+  assert.match(logoCss, /STEWARO_PREMIUM_LOGO_GLINT_20261004/);
+  assert.match(logoCss, /stewaroLuxuryGlint 8\.4s/);
+  assert.match(logoCss, /animation-delay:\.14s/);
+  assert.match(logoCss, /@keyframes stewaroLuxuryGlint/);
+  assert.match(logoCss, /0%,58%/);
+  assert.match(logoCss, /prefers-reduced-motion:reduce/);
 });
