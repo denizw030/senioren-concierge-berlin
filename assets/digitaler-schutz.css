@@ -74,7 +74,7 @@
 .ds-app-setting:last-child{border-bottom:0}
 .ds-app-setting-icon{display:grid;place-items:center;width:29px;height:29px;border-radius:9px;background:#f3ebde;color:#315047;font-size:13px}
 .ds-app-setting strong,.ds-app-status-list strong{display:block;font-size:10.7px;line-height:1.2}
-.ds-app-setting small,.ds-app-status-list small{display:block;margin-top:3px;color:#74807b;font-size:8.8px;line-height:1.32}
+.ds-app-setting small,.ds-app-status-list small{display:block;margin-top:3px;color:#68766f;font-size:9.1px;line-height:1.34}
 .ds-app-toggle{position:relative;display:block;width:34px;height:20px;border-radius:999px;background:#d9ddd9}
 .ds-app-toggle:after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.16)}
 .ds-app-toggle.is-on{background:#123f34}
@@ -172,6 +172,7 @@
 .ds-btn--primary{background:var(--ds-green);border-color:var(--ds-green);color:#fff}
 
 @media (max-width:900px){
+  .ds-page .nw-floating-concierge{display:none!important}
   .ds-intro{min-height:auto;padding-top:130px}
   .ds-intro-grid{grid-template-columns:1fr;gap:42px}
   .ds-intro-device{justify-self:center;width:min(62vw,330px);transform:rotate(1.4deg)}
