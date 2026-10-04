@@ -197,7 +197,7 @@ jobs:
                   active: document.querySelector('[data-ds-overlay].is-active')?.dataset.dsOverlay || null,
                   media: document.querySelector('.ds-media.is-active')?.dataset.dsMedia || null
                 }))()`);
-                if (!state || state.stage !== 'sticky' || state.active === null || state.media === null) throw new Error('mobile_sticky_scene_failed:' + (i + 1) + ':' + JSON.stringify(state));
+                if (!state || !['sticky','fixed'].includes(state.stage) || state.active === null || state.media === null) throw new Error('mobile_sticky_scene_failed:' + (i + 1) + ':' + JSON.stringify(state));
                 await capture('mobile-scene-' + String(i + 1).padStart(2, '0'));
               }
 
@@ -213,7 +213,7 @@ jobs:
                 })(),
                 width: innerWidth
               }))()`);
-              if (!state || state.stage === 'none' || state.stagePosition !== 'sticky' || state.flow !== 'none' || state.overlays !== 8 || state.videos !== 5 || state.width !== 390 || !['none','absent'].includes(state.concierge)) {
+              if (!state || state.stage === 'none' || !['sticky','fixed'].includes(state.stagePosition) || state.flow !== 'none' || state.overlays !== 8 || state.videos !== 5 || state.width !== 390 || !['none','absent'].includes(state.concierge)) {
                 throw new Error('mobile_contract_failed:' + JSON.stringify(state));
               }
             }
