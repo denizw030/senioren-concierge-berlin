@@ -18,7 +18,7 @@ test("STEWARO shared-base brand shell is wired without forking runtime", () => {
   assert.match(siteUi, /STEWARO_SHARED_BASE_BRAND_ADAPTER_V1/);
   assert.match(siteUi, /Presentation-only migration layer/);
   assert.match(siteUi, /normalizeNavPath/);
-  assert.match(siteUi, /\["\/safety", "Sicherheit"\]/);
+  assert.match(siteUi, /\["\/digitaler-schutz", "Digitaler Schutz"\]/);
   assert.match(siteUi, /\["\/pakete", "Preise"\]/);
   assert.match(siteUi, /\["\/angehoerige", "Für Angehörige"\]/);
 
