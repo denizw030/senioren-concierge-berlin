@@ -48,7 +48,7 @@ test("STEWARO shared-base brand shell is wired without forking runtime", () => {
   const heroVideo = fs.statSync("assets/media/stewaro-hero-pferd.mp4");
   assert.ok(heroVideo.size > 100_000 && heroVideo.size < 6_000_000, "hero video must stay web-optimized while allowing the 1080p master replacement");
 
-  assert.match(matrix, /stewaro-site\/.*frozen/i);
+  assert.match(matrix, /stewaro-site\/.*removed/i);
   assert.match(matrix, /existing production website\/customer-account/i);
 
   // Legacy runtime identifiers must remain available during the migration.
