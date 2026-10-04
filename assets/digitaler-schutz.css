@@ -182,7 +182,7 @@
   .ds-mobile-flow article{padding:26px;border:1px solid rgba(236,215,167,.24);border-radius:26px;background:linear-gradient(145deg,rgba(20,66,55,.92),rgba(9,42,35,.96));box-shadow:0 24px 70px rgba(0,0,0,.18)}
   .ds-mobile-flow article>span{font-size:11px;letter-spacing:.18em;color:#e4c67d}
   .ds-mobile-flow h2{margin:10px 0 12px;color:#fffaf0!important;font-size:clamp(2rem,8vw,3.25rem)!important;line-height:1}
-  .ds-mobile-flow p,.ds-mobile-flow li,.ds-mobile-flow small{color:rgba(255,255,255,.8);line-height:1.55}
+  .ds-mobile-flow>article>p,.ds-mobile-flow>article>ul li,.ds-mobile-flow>article>small{color:rgba(255,255,255,.8);line-height:1.55}
   .ds-mobile-flow{scroll-margin-top:76px}
   .ds-mobile-flow .ds-message-card p{color:#41544e}
   .ds-mobile-flow ul{padding-left:20px;margin:18px 0 0}
@@ -207,6 +207,6 @@
   .ds-mobile-flow{display:grid;gap:18px;width:min(calc(100% - 32px),760px);margin-inline:auto}
   .ds-mobile-flow article{padding:26px;border:1px solid rgba(236,215,167,.24);border-radius:26px;background:#123f34}
   .ds-mobile-flow h2{color:#fffaf0!important}
-  .ds-mobile-flow p,.ds-mobile-flow li,.ds-mobile-flow small{color:rgba(255,255,255,.82)}
+  .ds-mobile-flow>article>p,.ds-mobile-flow>article>ul li,.ds-mobile-flow>article>small{color:rgba(255,255,255,.82)}
   .ds-mobile-app{box-shadow:none}
 }
