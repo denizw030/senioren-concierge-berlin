@@ -96,3 +96,11 @@ test('website narrative matches app role language', () => {
 test('mobile story suppresses the global floating concierge to protect the UI', () => {
   assert.match(css, /\.ds-page \.nw-floating-concierge\{display:none!important\}/);
 });
+
+
+test('remaining scene copy keeps STEWARO as protection layer', () => {
+  assert.match(page, /Ingrid tippt einmal gutgläubig auf den Link\. STEWARO prüft im Hintergrund\./);
+  assert.match(page, /STEWARO hat heute einen verdächtigen Link für Ingrid blockiert\./);
+  assert.doesNotMatch(page, /Ingrid tippt einmal gutgläubig auf den Link\. FIDEL prüft im Hintergrund\./);
+  assert.doesNotMatch(page, /FIDEL hat Ingrid heute bei einem verdächtigen Link geschützt\./);
+});
