@@ -145,3 +145,10 @@ test('mobile header overlays the opening film without reserving intro space', ()
   assert.match(css, /\.ds-page #main\{margin:0!important;padding:0!important\}/);
   assert.match(css, /\.ds-story\{margin:0!important;padding:0!important\}/);
 });
+
+
+test('cinematic story neutralizes the global section reveal transform', () => {
+  assert.match(css, /\.ds-page \.ds-story\.reveal/);
+  assert.match(css, /transform:none!important/);
+  assert.match(css, /transition:none!important/);
+});
