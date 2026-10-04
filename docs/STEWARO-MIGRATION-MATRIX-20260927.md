@@ -213,3 +213,28 @@ Implementation candidate:
 - WebRTC, pricing, transcript persistence, Core delegation, provider routing and Production authority remain unchanged.
 - Scope-specific Web Concierge, runtime, shared-base, account and integrity checks are GREEN on the candidate. A stacked-branch SEO check is RED for pre-existing parent-branch i18n parity assertions about the already-retired `concierges` route / old senior assets; the orb change does not touch those files.
 - No Production deployment/cutover is authorized by this visual-runtime change.
+
+
+## Owner public-surface cleanup · 2026-10-04
+
+Owner decision: the public STEWARO website is intentionally reduced to a small, coherent primary structure instead of exposing every historical product/editorial route as a top-level destination.
+
+Primary public navigation:
+- Startseite
+- Concierge
+- Für Angehörige
+- Digitaler Schutz
+- Telefon
+- Preise
+- Kontakt
+
+Cleanup rules:
+- `leistungen`, `ablauf`, `senioren-concierge`, `ueber-mich`, `alltag-organisieren`, `dokumente-verstehen`, `technik-verstehen` and legacy `safety` are no longer primary navigation or sitemap surfaces. Their files remain temporarily available for compatibility/redirect and SEO review unless separately retired.
+- `digitaler-schutz` is the canonical public protection/safety entry.
+- `voice-audition` and the obsolete `martin-anpassen` compatibility route are removed from the public website source.
+- Internal owner/product tooling such as `produktluecken` is not treated as public navigation and is preserved.
+- `stewaro-site/` remains frozen reference-only and is not deleted or deployed; AWS delivery already excludes it.
+- Account, auth, Web Concierge, E-Mail, billing, app/live, phone runtime and legal routes are not removed by this cleanup.
+- Existing historical URLs with possible SEO/bookmark value are not hard-deleted merely to simplify the menu; redirect/retirement is handled separately where needed.
+
+This cleanup changes website information architecture only. Concierge Core, AWS runtime authority, account/auth contracts and production-domain authority are unchanged.
