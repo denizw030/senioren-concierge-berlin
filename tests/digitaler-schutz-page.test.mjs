@@ -138,3 +138,10 @@ test('premium header logo glint is restrained and reduced-motion safe', () => {
   assert.match(logoCss, /0%,58%/);
   assert.match(logoCss, /prefers-reduced-motion:reduce/);
 });
+
+
+test('mobile header overlays the opening film without reserving intro space', () => {
+  assert.match(css, /\.ds-page \.top\{position:fixed!important/);
+  assert.match(css, /\.ds-page #main\{margin:0!important;padding:0!important\}/);
+  assert.match(css, /\.ds-story\{margin:0!important;padding:0!important\}/);
+});
