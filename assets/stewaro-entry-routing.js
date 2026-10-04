@@ -87,7 +87,7 @@
       <a href="/de/">Startseite</a>
       <a href="/prime-concierge">Concierge</a>
       <a href="/angehoerige">Für Angehörige</a>
-      <a href="/safety">Sicherheit</a>
+      <a href="/digitaler-schutz">Digitaler Schutz</a>
       <a href="/telefonannahme">Telefon</a>
       <a href="/pakete">Preise</a>
       <a href="/kontakt">Kontakt</a>
