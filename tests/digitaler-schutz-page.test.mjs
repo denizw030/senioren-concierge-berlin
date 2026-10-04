@@ -35,10 +35,16 @@ test('approved live-action media IDs are wired', () => {
 test('video is muted, inline and never autoplay', () => {
   assert.doesNotMatch(page, /\bautoplay\b/i);
   const videos = [...page.matchAll(/<video\b[^>]*>/g)].map((m) => m[0]);
-  assert.equal(videos.length, 5);
+  assert.equal(videos.length, 13);
   for (const tag of videos) {
     assert.match(tag, /\bmuted\b/);
     assert.match(tag, /\bplaysinline\b/);
+  }
+  const mobileVideos = [...page.matchAll(/<video\b[^>]*class="ds-mobile-video"[^>]*>/g)].map((m) => m[0]);
+  assert.equal(mobileVideos.length, 8);
+  for (const tag of mobileVideos) {
+    assert.match(tag, /\bpreload="none"/);
+    assert.match(tag, /\bposter=/);
   }
 });
 
