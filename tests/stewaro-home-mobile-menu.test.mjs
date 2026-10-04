@@ -16,7 +16,7 @@ test("German homepage runtime restores direct login and an accessible mobile men
   assert.match(routing,/Menü öffnen/);
   assert.match(routing,/Für bestehende Klienten/);
   for(const route of ["/de/","/prime-concierge","/angehoerige","/digitaler-schutz","/telefonannahme","/pakete","/kontakt"]) assert.match(routing,new RegExp(`href="${route}"`));
-  assert.doesNotMatch(routing,/href="#services"|href="#for-you"|href="#family"|href="\\/safety"/);
+  for(const retired of ['href="#services"','href="#for-you"','href="#family"','href="/safety"']) assert.ok(!routing.includes(retired),retired+" must not appear in the mobile menu");
 });
 
 test("direct login bypasses the public onboarding rewrite while other auth links keep canonical routing",()=>{
