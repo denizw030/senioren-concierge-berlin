@@ -1,5 +1,5 @@
 // WEB_CONCIERGE_LIVE_BOOT_V2_20260928
-import { mountNahwerkLiveConcierge } from "./nahwerk-live-concierge.js?v=29";
+import { mountNahwerkLiveConcierge } from "./nahwerk-live-concierge.js?v=30";
 import { mountFidelGoldOrb } from "./fidel-gold-orb.js?v=1";
 
 const GATEWAY="https://ta832v8wah.execute-api.eu-central-1.amazonaws.com/prod/v1/web";
