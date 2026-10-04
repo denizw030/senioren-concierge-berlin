@@ -638,3 +638,52 @@ html body .home-reference .top .brandtext strong::before,
 html body .home-reference .top .brandtext strong::after{
   content:none!important;display:none!important;animation:none!important;background:none!important;
 }
+
+/* STEWARO_PREMIUM_LOGO_GLINT_20261004
+ * Restrained jewelry-style reflection: static metallic gold most of the time,
+ * followed by one narrow directional highlight. The icon leads the wordmark
+ * very slightly so the reflection reads as one physical light pass.
+ */
+html body .top .brand .brandtext,
+html body .home-reference .top .brand .brandtext,
+html body .top .brand .mark,
+html body .top .brand .mark.nahwerk-mark,
+html body .home-reference .top .brand .mark,
+html body .home-reference .top .brand .mark.nahwerk-mark{
+  position:relative!important;
+  overflow:hidden!important;
+  background:
+    linear-gradient(104deg,transparent 0 37%,rgba(255,250,230,0) 42%,rgba(255,246,211,.26) 46%,rgba(255,255,255,.94) 50%,rgba(255,239,190,.46) 54%,rgba(255,246,211,0) 60%,transparent 64%) -120% 50%/46% 100% no-repeat,
+    linear-gradient(94deg,#8f6721 0%,#bf8f32 16%,#e0bd69 31%,#f3dfa2 39%,#b37f27 56%,#d8b25b 75%,#9b6d20 100%) 50% 50%/100% 100% no-repeat!important;
+  filter:drop-shadow(0 1px 0 rgba(255,255,255,.16)) drop-shadow(0 2px 4px rgba(92,64,16,.10))!important;
+}
+@media(prefers-reduced-motion:no-preference){
+  html body .top .brand .mark,
+  html body .top .brand .mark.nahwerk-mark,
+  html body .home-reference .top .brand .mark,
+  html body .home-reference .top .brand .mark.nahwerk-mark{
+    animation:stewaroLuxuryGlint 8.4s cubic-bezier(.22,.61,.36,1) infinite!important;
+  }
+  html body .top .brand .brandtext,
+  html body .home-reference .top .brand .brandtext{
+    animation:stewaroLuxuryGlint 8.4s cubic-bezier(.22,.61,.36,1) infinite!important;
+    animation-delay:.14s!important;
+  }
+}
+@keyframes stewaroLuxuryGlint{
+  0%,58%{background-position:-120% 50%,50% 50%}
+  72%{background-position:165% 50%,50% 50%}
+  100%{background-position:165% 50%,50% 50%}
+}
+@media(prefers-reduced-motion:reduce){
+  html body .top .brand .brandtext,
+  html body .home-reference .top .brand .brandtext,
+  html body .top .brand .mark,
+  html body .top .brand .mark.nahwerk-mark,
+  html body .home-reference .top .brand .mark,
+  html body .home-reference .top .brand .mark.nahwerk-mark{
+    animation:none!important;
+    background-position:50% 50%,50% 50%!important;
+  }
+}
+
