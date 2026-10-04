@@ -252,3 +252,122 @@
   .ds-story.is-mobile-story-active .ds-stage{position:fixed;inset:0;top:0;left:0;right:0;bottom:auto;width:100%;height:100svh;z-index:30}
   .ds-story.is-mobile-story-past .ds-stage{position:absolute;top:auto;bottom:0;left:0;right:0}
 }
+
+/* Final mobile composition polish: keep app surfaces readable and fully on-screen
+   without covering Ingrid's face or breaking the single sticky film stage. */
+@media (max-width:900px) and (prefers-reduced-motion:no-preference){
+  .ds-stage-chrome{
+    top:calc(74px + env(safe-area-inset-top));
+    left:18px;
+    right:18px;
+  }
+  .ds-scene-index i{width:42px}
+  .ds-story-progress{width:112px}
+
+  .ds-overlay{
+    padding:calc(122px + env(safe-area-inset-top)) 18px calc(30px + env(safe-area-inset-bottom));
+  }
+  .ds-overlay .ds-kicker{
+    font-size:10px;
+    line-height:1.25;
+    letter-spacing:.19em;
+    margin-bottom:8px;
+  }
+  .ds-overlay h2{
+    font-size:clamp(2.45rem,12vw,3.6rem)!important;
+    line-height:.92!important;
+    margin-bottom:14px;
+  }
+  .ds-overlay p{
+    font-size:1rem;
+    line-height:1.45;
+  }
+
+  .ds-overlay--split{
+    display:block;
+    position:absolute;
+  }
+  .ds-overlay--split .ds-copy{
+    position:absolute;
+    left:18px;
+    top:calc(126px + env(safe-area-inset-top));
+    width:min(57vw,230px);
+    max-width:none;
+    z-index:2;
+  }
+  .ds-overlay--split .ds-phone-shot{
+    position:absolute;
+    right:16px;
+    bottom:calc(30px + env(safe-area-inset-bottom));
+    width:min(45vw,188px);
+    max-height:54svh;
+    margin:0;
+    aspect-ratio:.47/1;
+    transform:none;
+    opacity:1;
+    z-index:3;
+    box-shadow:0 22px 54px rgba(0,0,0,.34);
+  }
+
+  .ds-overlay[data-ds-overlay="0"] .ds-copy{width:min(54vw,220px)}
+  .ds-overlay[data-ds-overlay="0"] .ds-phone-shot{width:min(44vw,184px)}
+
+  .ds-overlay[data-ds-overlay="3"] .ds-copy,
+  .ds-overlay[data-ds-overlay="4"] .ds-copy{
+    width:min(56vw,224px);
+  }
+  .ds-overlay[data-ds-overlay="3"] .ds-phone-shot,
+  .ds-overlay[data-ds-overlay="4"] .ds-phone-shot{
+    width:min(43vw,180px);
+  }
+
+  .ds-overlay[data-ds-overlay="1"] .ds-copy,
+  .ds-overlay[data-ds-overlay="2"] .ds-copy,
+  .ds-overlay[data-ds-overlay="5"] .ds-copy,
+  .ds-overlay[data-ds-overlay="6"] .ds-copy{
+    max-width:min(88vw,440px);
+    margin:0 auto 0 0;
+  }
+  .ds-overlay[data-ds-overlay="1"] .ds-message-card,
+  .ds-overlay[data-ds-overlay="2"] .ds-message-card{
+    max-width:min(88vw,390px);
+    padding:19px 20px;
+    border-radius:20px;
+  }
+  .ds-overlay[data-ds-overlay="5"] .ds-check-panel{
+    max-width:min(86vw,390px);
+    margin-top:20px;
+  }
+  .ds-overlay[data-ds-overlay="6"] .ds-consent-stack{
+    max-width:min(88vw,390px);
+    margin-top:18px;
+  }
+
+  .ds-overlay[data-ds-overlay="7"]{
+    align-items:flex-end;
+    justify-content:center;
+  }
+  .ds-overlay[data-ds-overlay="7"] .ds-copy{
+    width:min(88vw,420px);
+    margin:0 auto;
+    padding-bottom:calc(22px + env(safe-area-inset-bottom));
+    text-align:left;
+  }
+
+  /* Keep the subject's face unobstructed on portrait crops. */
+  .ds-media{object-position:46% center}
+  .ds-overlay[data-ds-overlay="0"] ~ *{}
+}
+
+@media (max-width:430px) and (prefers-reduced-motion:no-preference){
+  .ds-overlay--split .ds-copy{width:52vw}
+  .ds-overlay--split .ds-phone-shot{width:43vw}
+  .ds-overlay[data-ds-overlay="3"] .ds-phone-shot,
+  .ds-overlay[data-ds-overlay="4"] .ds-phone-shot{width:42vw}
+  .ds-app-shell{font-size:11px}
+  .ds-app-content>h3{font-size:25px}
+  .ds-app-block-body>h3{font-size:20px}
+  .ds-app-block-body{padding:14px 13px}
+  .ds-app-fidel-box{grid-template-columns:32px 1fr;padding:10px}
+  .ds-app-fidel-orb{width:32px;height:32px}
+}
