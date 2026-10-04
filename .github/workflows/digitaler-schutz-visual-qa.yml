@@ -188,9 +188,13 @@ jobs:
                 stage: getComputedStyle(document.querySelector('[data-ds-stage]')).display,
                 flow: getComputedStyle(document.querySelector('.ds-mobile-flow')).display,
                 cards: document.querySelectorAll('.ds-mobile-flow > article').length,
+                concierge: (() => {
+                  const el = document.querySelector('.nw-floating-concierge');
+                  return el ? getComputedStyle(el).display : 'absent';
+                })(),
                 width: innerWidth
               }))()`);
-              if (!state || state.stage !== 'none' || state.flow === 'none' || state.cards !== 8 || state.width !== 390) {
+              if (!state || state.stage !== 'none' || state.flow === 'none' || state.cards !== 8 || state.width !== 390 || !['none','absent'].includes(state.concierge)) {
                 throw new Error('mobile_contract_failed:' + JSON.stringify(state));
               }
             }
