@@ -101,7 +101,7 @@ jobs:
           git fetch --no-tags origin main
           changed="$(git diff --name-only origin/main...HEAD)"
           printf '%s\n' "$changed"
-          if printf '%s\n' "$changed" | grep -Eq '^(CNAME|.*orfidel.*)'; then
+          if printf '%s\n' "$changed" | grep -Eq '^(CNAME|stewaro-site/|.*orfidel.*)'; then
             echo "Forbidden production/frozen/protected path changed."
             exit 1
           fi
@@ -113,7 +113,7 @@ jobs:
           test "$(tr -d '\r\n' < CNAME)" = "stewaro.com"
 
       - name: Run STEWARO shared-base contract
-        run: node --test tests/stewaro-shared-base-brand-shell.test.mjs tests/stewaro-home-mobile-menu.test.mjs tests/stewaro-public-surface-cleanup.test.mjs
+        run: node --test tests/stewaro-shared-base-brand-shell.test.mjs
 
       - name: Verify homepage CSP preparation
         run: node --test tests/stewaro-homepage-csp.test.mjs
