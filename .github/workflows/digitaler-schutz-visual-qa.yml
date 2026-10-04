@@ -1,0 +1,257 @@
+name: STEWARO Digitaler Schutz Visual QA
+
+on:
+  pull_request:
+    paths:
+      - "digitaler-schutz.html"
+      - "digitaler-schutz/**"
+      - "assets/digitaler-schutz.css"
+      - "assets/digitaler-schutz.js"
+      - "tests/digitaler-schutz-page.test.mjs"
+      - ".github/workflows/digitaler-schutz-visual-qa.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  visual-qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Static contract
+        run: |
+          node --check assets/digitaler-schutz.js
+          node --test tests/digitaler-schutz-page.test.mjs
+
+      - name: Start local preview
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/digitaler-schutz-http.log 2>&1 &
+          echo $! >/tmp/digitaler-schutz-http.pid
+          for i in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:4173/digitaler-schutz/ >/dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/digitaler-schutz-http.log
+          exit 1
+
+      - name: Capture desktop and mobile visual proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          mkdir -p /tmp/digitaler-schutz-visual
+          "$CHROME" --headless --no-sandbox --disable-gpu --remote-debugging-port=0 --user-data-dir=/tmp/ds-cdp about:blank >/tmp/ds-cdp.log 2>&1 &
+          for attempt in $(seq 1 20); do
+            test -s /tmp/ds-cdp/DevToolsActivePort && break
+            sleep 1
+          done
+          test -s /tmp/ds-cdp/DevToolsActivePort
+          export CDP_PORT="$(head -n 1 /tmp/ds-cdp/DevToolsActivePort)"
+
+          node <<'NODE'
+          const fs = require('node:fs');
+          const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+          const cdpBase = 'http://127.0.0.1:' + process.env.CDP_PORT;
+          const pageUrl = 'http://127.0.0.1:4173/digitaler-schutz/';
+
+          async function createTarget() {
+            const response = await fetch(cdpBase + '/json/new?about:blank', { method: 'PUT' });
+            if (!response.ok) throw new Error('cdp_target_create_failed');
+            return response.json();
+          }
+
+          async function connect(url) {
+            return new Promise((resolve, reject) => {
+              const ws = new WebSocket(url);
+              ws.addEventListener('open', () => resolve(ws), { once: true });
+              ws.addEventListener('error', () => reject(new Error('cdp_websocket_failed')), { once: true });
+            });
+          }
+
+          async function session(spec) {
+            const target = await createTarget();
+            const ws = await connect(target.webSocketDebuggerUrl);
+            let seq = 0;
+            const pending = new Map();
+            const listeners = new Map();
+
+            ws.addEventListener('message', (event) => {
+              const message = JSON.parse(String(event.data));
+              if (message.id && pending.has(message.id)) {
+                const handler = pending.get(message.id);
+                pending.delete(message.id);
+                if (message.error) handler.reject(new Error(message.error.message || 'cdp_error'));
+                else handler.resolve(message.result || {});
+                return;
+              }
+              const queue = listeners.get(message.method);
+              if (queue && queue.length) queue.shift()(message.params || {});
+            });
+
+            const send = (method, params = {}) => new Promise((resolve, reject) => {
+              const id = ++seq;
+              pending.set(id, { resolve, reject });
+              ws.send(JSON.stringify({ id, method, params }));
+            });
+
+            const waitEvent = (method) => new Promise((resolve) => {
+              const queue = listeners.get(method) || [];
+              queue.push(resolve);
+              listeners.set(method, queue);
+            });
+
+            const evaluate = async (expression) => {
+              const result = await send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true });
+              return result.result && result.result.value;
+            };
+
+            await send('Page.enable');
+            await send('Runtime.enable');
+            await send('Emulation.setDeviceMetricsOverride', {
+              width: spec.width,
+              height: spec.height,
+              deviceScaleFactor: 1,
+              mobile: spec.mobile,
+              screenWidth: spec.width,
+              screenHeight: spec.height
+            });
+
+            const loaded = waitEvent('Page.loadEventFired');
+            await send('Page.navigate', { url: pageUrl + '?visual=' + spec.name });
+            await loaded;
+            await sleep(1800);
+
+            async function capture(name) {
+              const shot = await send('Page.captureScreenshot', {
+                format: 'png',
+                fromSurface: true,
+                captureBeyondViewport: false
+              });
+              fs.writeFileSync('/tmp/digitaler-schutz-visual/' + name + '.png', Buffer.from(shot.data, 'base64'));
+            }
+
+            if (!spec.mobile) {
+              await evaluate('window.scrollTo({top:0,left:0,behavior:"instant"})');
+              await sleep(300);
+              await capture('desktop-hero');
+
+              for (const [name, progress, expectedScene] of [
+                ['desktop-scene-01', 0.05, '0'],
+                ['desktop-scene-02', 0.18, '1'],
+                ['desktop-scene-03', 0.305, '2'],
+                ['desktop-scene-04', 0.42, '3'],
+                ['desktop-scene-05', 0.54, '4'],
+                ['desktop-scene-06', 0.665, '5'],
+                ['desktop-scene-07-consent', 0.755, '6'],
+                ['desktop-scene-07-notice', 0.845, '6'],
+                ['desktop-scene-08', 0.93, '7']
+              ]) {
+                const moved = await evaluate(`(() => {
+                  const story = document.querySelector('[data-ds-story]');
+                  const top = scrollY + story.getBoundingClientRect().top;
+                  const range = Math.max(1, story.offsetHeight - innerHeight);
+                  window.scrollTo({ top: top + ${progress} * range, left: 0, behavior: 'instant' });
+                  return { top, range, target: top + ${progress} * range };
+                })()`);
+                if (!moved) throw new Error('story_missing');
+                await sleep(800);
+                const active = await evaluate("document.querySelector('[data-ds-overlay].is-active')?.dataset.dsOverlay || null");
+                if (active !== expectedScene) throw new Error('desktop_scene_mismatch:' + name + ':' + active + ':' + expectedScene);
+                await capture(name);
+              }
+
+              const state = await evaluate(`(() => ({
+                overlays: document.querySelectorAll('[data-ds-overlay]').length,
+                videos: document.querySelectorAll('[data-ds-media]').length,
+                activeOverlay: document.querySelector('[data-ds-overlay].is-active')?.dataset.dsOverlay || null,
+                reducedFallback: getComputedStyle(document.querySelector('.ds-mobile-flow')).display
+              }))()`);
+              if (!state || state.overlays !== 8 || state.videos !== 5) throw new Error('desktop_contract_failed:' + JSON.stringify(state));
+            } else {
+              await evaluate('window.scrollTo({top:0,left:0,behavior:"instant"})');
+              await sleep(300);
+              await capture('mobile-hero');
+
+              const moved = await evaluate(`(() => {
+                const flow = document.querySelector('.ds-mobile-flow');
+                if (!flow) return false;
+                window.scrollTo({top: Math.max(0, scrollY + flow.getBoundingClientRect().top - 76), left:0, behavior:'instant'});
+                return true;
+              })()`);
+              if (!moved) throw new Error('mobile_flow_missing');
+              await sleep(300);
+              await capture('mobile-story-start');
+
+              for (let i = 0; i < 8; i++) {
+                const movedCard = await evaluate(`(() => {
+                  const card = document.querySelectorAll('.ds-mobile-flow > article')[${i}];
+                  if (!card) return false;
+                  const top = scrollY + card.getBoundingClientRect().top - 76;
+                  window.scrollTo({top: Math.max(0, top), left:0, behavior:'instant'});
+                  return true;
+                })()`);
+                if (!movedCard) throw new Error('mobile_scene_missing:' + (i + 1));
+                await sleep(350);
+                await capture('mobile-scene-' + String(i + 1).padStart(2, '0'));
+
+                const rect = await evaluate(`(() => {
+                  const card = document.querySelectorAll('.ds-mobile-flow > article')[${i}];
+                  const r = card.getBoundingClientRect();
+                  return {x:r.left + scrollX, y:r.top + scrollY, width:r.width, height:r.height};
+                })()`);
+                if (!rect || !rect.width || !rect.height) throw new Error('mobile_scene_rect_missing:' + (i + 1));
+                const full = await send('Page.captureScreenshot', {
+                  format:'png',
+                  fromSurface:true,
+                  captureBeyondViewport:true,
+                  clip:{x:rect.x,y:rect.y,width:rect.width,height:rect.height,scale:1}
+                });
+                fs.writeFileSync(
+                  '/tmp/digitaler-schutz-visual/mobile-scene-' + String(i + 1).padStart(2, '0') + '-full.png',
+                  Buffer.from(full.data, 'base64')
+                );
+              }
+
+              const state = await evaluate(`(() => ({
+                stage: getComputedStyle(document.querySelector('[data-ds-stage]')).display,
+                flow: getComputedStyle(document.querySelector('.ds-mobile-flow')).display,
+                cards: document.querySelectorAll('.ds-mobile-flow > article').length,
+                concierge: (() => {
+                  const el = document.querySelector('.nw-floating-concierge');
+                  return el ? getComputedStyle(el).display : 'absent';
+                })(),
+                width: innerWidth
+              }))()`);
+              if (!state || state.stage !== 'none' || state.flow === 'none' || state.cards !== 8 || state.width !== 390 || !['none','absent'].includes(state.concierge)) {
+                throw new Error('mobile_contract_failed:' + JSON.stringify(state));
+              }
+            }
+
+            ws.close();
+          }
+
+          (async () => {
+            await session({ name:'desktop', width:1440, height:1000, mobile:false });
+            await session({ name:'mobile', width:390, height:844, mobile:true });
+            console.log('DIGITALER_SCHUTZ_VISUAL_QA=GREEN');
+          })().catch((error) => {
+            console.error(error && error.stack ? error.stack : error);
+            process.exit(1);
+          });
+          NODE
+
+      - name: Upload visual proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: digitaler-schutz-visual-proof
+          path: /tmp/digitaler-schutz-visual/*.png
+          if-no-files-found: error
+          retention-days: 14
