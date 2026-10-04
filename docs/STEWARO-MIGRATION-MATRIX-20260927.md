@@ -6,7 +6,7 @@ This matrix implements the current owner decision:
 
 - **STEWARO is the first replacement public website being executed now.**
 - The existing production website/customer-account codebase is the technical migration base.
-- `stewaro-site/` is frozen as **reference only**. Do not continue building runtime behavior there.
+- `stewaro-site/` was an early standalone prototype and is now **retired from the active source tree**. Recoverable history remains in Git; no runtime may depend on it.
 - Existing registration, login, account, Web Concierge, E-Mail, usage, Safety, Voice/phone and Billing capabilities are reused.
 - NAHWERK remains only as legacy technical naming during migration; no new public-facing NAHWERK branding is introduced.
 - ORFIDEL public website work is paused. Preserve `feature/orfidel-preview-v4-cinematic`.
@@ -77,16 +77,15 @@ No production DNS, domain or runtime cutover is authorized by this document.
 10. Legal/deletion routes and their backend processes
 11. Existing clean-route parity and regression infrastructure
 
-## Frozen standalone prototype
+## Retired standalone prototype
 
-`stewaro-site/` remains in the repository because it contains recoverable STEWARO copy, page ideas and early brand structure.
+`stewaro-site/` was the early standalone STEWARO prototype. Its useful presentation/copy was compared against the shared technical base and the directory is now removed from the active source tree under the 2026-10-04 owner cleanup decision.
 
 Rules:
-- no deletion;
-- no further runtime expansion;
-- no new production dependency may point to it;
-- do not merge the pending standalone-only storage/session change merely to advance this prototype;
-- extract useful presentation/copy into the shared technical base only through scoped STEWARO migration work.
+- Git history is the recovery source; do not restore the duplicate tree as a second website system.
+- no production dependency may point to `stewaro-site/`;
+- public website work continues only on the shared canonical website base;
+- account, app and runtime surfaces remain separate from this public-site retirement.
 
 ## Protected parallel work
 
@@ -98,7 +97,7 @@ unless the ORFIDEL workstream is explicitly reactivated.
 
 ## Implementation order
 
-1. Freeze standalone prototype and lock architecture.
+1. Retire the standalone prototype and keep one canonical website architecture.
 2. Establish STEWARO brand shell/tokens on the existing website foundation.
 3. Integrate the approved STEWARO landing experience into the shared base.
 4. Convert auth + registration.
@@ -233,7 +232,7 @@ Cleanup rules:
 - `digitaler-schutz` is the canonical public protection/safety entry.
 - `voice-audition` and the obsolete `martin-anpassen` compatibility route are removed from the public website source.
 - Internal owner/product tooling such as `produktluecken` is not treated as public navigation and is preserved.
-- `stewaro-site/` remains frozen reference-only and is not deleted or deployed; AWS delivery already excludes it.
+- `stewaro-site/` is removed from the active source tree; AWS delivery already excluded it, and Git history remains the recovery source.
 - Account, auth, Web Concierge, E-Mail, billing, app/live, phone runtime and legal routes are not removed by this cleanup.
 - Existing historical URLs with possible SEO/bookmark value are not hard-deleted merely to simplify the menu; redirect/retirement is handled separately where needed.
 
