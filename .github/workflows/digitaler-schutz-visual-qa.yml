@@ -145,7 +145,9 @@ jobs:
               for (const [name, progress] of [
                 ['desktop-scene-01', 0.05],
                 ['desktop-scene-04', 0.42],
-                ['desktop-scene-07', 0.79],
+                ['desktop-scene-05', 0.54],
+                ['desktop-scene-07-consent', 0.755],
+                ['desktop-scene-07-notice', 0.845],
                 ['desktop-scene-08', 0.93]
               ]) {
                 const moved = await evaluate(`(() => {
@@ -175,7 +177,7 @@ jobs:
               const moved = await evaluate(`(() => {
                 const flow = document.querySelector('.ds-mobile-flow');
                 if (!flow) return false;
-                window.scrollTo({top: scrollY + flow.getBoundingClientRect().top, left:0, behavior:'instant'});
+                window.scrollTo({top: Math.max(0, scrollY + flow.getBoundingClientRect().top - 76), left:0, behavior:'instant'});
                 return true;
               })()`);
               if (!moved) throw new Error('mobile_flow_missing');
