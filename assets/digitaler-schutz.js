@@ -42,6 +42,7 @@
   const mediaForScene = (scene) => medias.find((media) => scenesFor(media).includes(scene));
 
   const preloadAround = (scene) => {
+    if (!desktop.matches) return;
     [scene - 1, scene, scene + 1].forEach((index) => loadMedia(mediaForScene(index)));
   };
 
@@ -168,13 +169,16 @@
   reducedMotion.addEventListener?.('change', requestRender);
   desktop.addEventListener?.('change', requestRender);
 
-  // Prime the opening pair immediately and opportunistically warm the remaining
-  // approved clips after first paint, avoiding a cold decode exactly at scene changes.
-  primeMedia(medias[0]);
-  primeMedia(medias[1]);
-  const warmRemaining = () => medias.slice(2).forEach(loadMedia);
-  if ('requestIdleCallback' in window) requestIdleCallback(warmRemaining, { timeout: 1800 });
-  else setTimeout(warmRemaining, 900);
+  // Desktop uses scroll-scrubbing and benefits from decoding/warming nearby clips.
+  // Mobile/tablet uses the linear fallback: keep remote MP4s lazy so Safari can
+  // finish the document load instead of warming five large videos unnecessarily.
+  if (desktop.matches && !reducedMotion.matches) {
+    primeMedia(medias[0]);
+    primeMedia(medias[1]);
+    const warmRemaining = () => medias.slice(2).forEach(loadMedia);
+    if ('requestIdleCallback' in window) requestIdleCallback(warmRemaining, { timeout: 1800 });
+    else setTimeout(warmRemaining, 900);
+  }
   setScene(0, 0);
   requestRender();
 })();
