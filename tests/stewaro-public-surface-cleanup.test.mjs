@@ -16,11 +16,13 @@ test("public navigation exposes only the canonical STEWARO surface set",()=>{
   }
 });
 
-test("obsolete public QA, persona compatibility and standalone V1 surfaces are removed",()=>{
-  for(const file of ["voice-audition.html","voice-audition/index.html","martin-anpassen.html","martin-anpassen/index.html",".github/workflows/stewaro-site-v1.yml","tests/stewaro-site-v1.test.mjs"]){
+test("obsolete public QA and persona compatibility routes are removed while frozen reference stays protected",()=>{
+  for(const file of ["voice-audition.html","voice-audition/index.html","martin-anpassen.html","martin-anpassen/index.html"]){
     assert.equal(fs.existsSync(file),false,file+" should be removed");
   }
-  assert.equal(fs.existsSync("stewaro-site"),false,"obsolete standalone STEWARO Site V1 directory should be removed");
+  for(const protectedPath of ["stewaro-site",".github/workflows/stewaro-site-v1.yml","tests/stewaro-site-v1.test.mjs"]){
+    assert.equal(fs.existsSync(protectedPath),true,protectedPath+" must remain as frozen reference infrastructure");
+  }
 });
 
 test("sitemap contains only launch-facing public surfaces",()=>{
