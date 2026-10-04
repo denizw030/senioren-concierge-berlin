@@ -35,16 +35,10 @@ test('approved live-action media IDs are wired', () => {
 test('video is muted, inline and never autoplay', () => {
   assert.doesNotMatch(page, /\bautoplay\b/i);
   const videos = [...page.matchAll(/<video\b[^>]*>/g)].map((m) => m[0]);
-  assert.equal(videos.length, 13);
+  assert.equal(videos.length, 5);
   for (const tag of videos) {
     assert.match(tag, /\bmuted\b/);
     assert.match(tag, /\bplaysinline\b/);
-  }
-  const mobileVideos = [...page.matchAll(/<video\b[^>]*class="ds-mobile-video"[^>]*>/g)].map((m) => m[0]);
-  assert.equal(mobileVideos.length, 8);
-  for (const tag of mobileVideos) {
-    assert.match(tag, /\bpreload="none"/);
-    assert.match(tag, /\bposter=/);
   }
 });
 
@@ -109,4 +103,12 @@ test('remaining scene copy keeps STEWARO as protection layer', () => {
   assert.match(page, /STEWARO hat heute einen verdächtigen Link für Ingrid blockiert\./);
   assert.doesNotMatch(page, /Ingrid tippt einmal gutgläubig auf den Link\. FIDEL prüft im Hintergrund\./);
   assert.doesNotMatch(page, /FIDEL hat Ingrid heute bei einem verdächtigen Link geschützt\./);
+});
+
+test('mobile premium story reuses the sticky canonical film stage', () => {
+  assert.doesNotMatch(page, /class="ds-mobile-video"/);
+  assert.match(css, /Mobile premium scroll-film/);
+  assert.match(css, /height:760svh/);
+  assert.match(css, /position:sticky/);
+  assert.match(css, /\.ds-mobile-flow\{display:none!important\}/);
 });

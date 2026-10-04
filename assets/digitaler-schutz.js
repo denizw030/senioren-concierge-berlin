@@ -42,8 +42,9 @@
   const mediaForScene = (scene) => medias.find((media) => scenesFor(media).includes(scene));
 
   const preloadAround = (scene) => {
-    if (!desktop.matches) return;
-    [scene - 1, scene, scene + 1].forEach((index) => loadMedia(mediaForScene(index)));
+    const radius = desktop.matches ? 1 : 0;
+    for (let index = scene - radius; index <= scene + radius; index += 1) loadMedia(mediaForScene(index));
+    if (!desktop.matches) loadMedia(mediaForScene(scene + 1));
   };
 
   const primeMedia = (media) => {
@@ -172,12 +173,17 @@
   // Desktop uses scroll-scrubbing and benefits from decoding/warming nearby clips.
   // Mobile/tablet uses the linear fallback: keep remote MP4s lazy so Safari can
   // finish the document load instead of warming five large videos unnecessarily.
-  if (desktop.matches && !reducedMotion.matches) {
+  if (!reducedMotion.matches) {
     primeMedia(medias[0]);
-    primeMedia(medias[1]);
-    const warmRemaining = () => medias.slice(2).forEach(loadMedia);
-    if ('requestIdleCallback' in window) requestIdleCallback(warmRemaining, { timeout: 1800 });
-    else setTimeout(warmRemaining, 900);
+    // Desktop may warm more aggressively; mobile starts with only the opening pair.
+    if (desktop.matches) {
+      primeMedia(medias[1]);
+      const warmRemaining = () => medias.slice(2).forEach(loadMedia);
+      if ('requestIdleCallback' in window) requestIdleCallback(warmRemaining, { timeout: 1800 });
+      else setTimeout(warmRemaining, 900);
+    } else {
+      loadMedia(medias[1]);
+    }
   }
   const mobileScenes = [...document.querySelectorAll('[data-mobile-scene]')];
   let mobileObserver;
@@ -190,7 +196,7 @@
   };
 
   const startMobileVideo = (article) => {
-    if (desktop.matches || reducedMotion.matches || !article) return;
+    if (!article || !document.querySelector('.ds-mobile-flow')?.offsetParent) return;
     const scene = Number(article.dataset.mobileScene);
     const video = article.querySelector('.ds-mobile-video');
     if (!video) return;
@@ -212,7 +218,7 @@
   const setupMobileCinema = () => {
     mobileObserver?.disconnect();
     mobileScenes.forEach(stopMobileVideo);
-    if (desktop.matches || reducedMotion.matches || !('IntersectionObserver' in window)) return;
+    if (desktop.matches || reducedMotion.matches || !document.querySelector('.ds-mobile-flow')?.offsetParent || !('IntersectionObserver' in window)) return;
     mobileObserver = new IntersectionObserver((entries) => {
       const visible = entries
         .filter((entry) => entry.isIntersecting)

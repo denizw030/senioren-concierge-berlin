@@ -179,57 +179,41 @@ jobs:
               await sleep(300);
               await capture('mobile-hero');
 
-              const moved = await evaluate(`(() => {
-                const flow = document.querySelector('.ds-mobile-flow');
-                if (!flow) return false;
-                window.scrollTo({top: Math.max(0, scrollY + flow.getBoundingClientRect().top - 76), left:0, behavior:'instant'});
-                return true;
+              const story = await evaluate(`(() => {
+                const el = document.querySelector('.ds-story');
+                if (!el) return null;
+                const r = el.getBoundingClientRect();
+                return {top: scrollY + r.top, height: el.offsetHeight};
               })()`);
-              if (!moved) throw new Error('mobile_flow_missing');
-              await sleep(300);
-              await capture('mobile-story-start');
+              if (!story || !story.height) throw new Error('mobile_story_missing');
 
-              for (let i = 0; i < 8; i++) {
-                const movedCard = await evaluate(`(() => {
-                  const card = document.querySelectorAll('.ds-mobile-flow > article')[${i}];
-                  if (!card) return false;
-                  const top = scrollY + card.getBoundingClientRect().top - 76;
-                  window.scrollTo({top: Math.max(0, top), left:0, behavior:'instant'});
-                  return true;
-                })()`);
-                if (!movedCard) throw new Error('mobile_scene_missing:' + (i + 1));
-                await sleep(350);
+              const checkpoints = [0.04,0.16,0.29,0.42,0.54,0.67,0.80,0.94];
+              for (let i = 0; i < checkpoints.length; i++) {
+                const y = Math.max(0, story.top + (story.height - 844) * checkpoints[i]);
+                await evaluate('window.scrollTo({top:' + y + ',left:0,behavior:"instant"})');
+                await sleep(420);
+                const state = await evaluate(`(() => ({
+                  stage: getComputedStyle(document.querySelector('[data-ds-stage]')).position,
+                  active: document.querySelector('[data-ds-overlay].is-active')?.dataset.dsOverlay || null,
+                  media: document.querySelector('.ds-media.is-active')?.dataset.dsMedia || null
+                }))()`);
+                if (!state || state.stage !== 'sticky' || state.active === null || state.media === null) throw new Error('mobile_sticky_scene_failed:' + (i + 1) + ':' + JSON.stringify(state));
                 await capture('mobile-scene-' + String(i + 1).padStart(2, '0'));
-
-                const rect = await evaluate(`(() => {
-                  const card = document.querySelectorAll('.ds-mobile-flow > article')[${i}];
-                  const r = card.getBoundingClientRect();
-                  return {x:r.left + scrollX, y:r.top + scrollY, width:r.width, height:r.height};
-                })()`);
-                if (!rect || !rect.width || !rect.height) throw new Error('mobile_scene_rect_missing:' + (i + 1));
-                const full = await send('Page.captureScreenshot', {
-                  format:'png',
-                  fromSurface:true,
-                  captureBeyondViewport:true,
-                  clip:{x:rect.x,y:rect.y,width:rect.width,height:rect.height,scale:1}
-                });
-                fs.writeFileSync(
-                  '/tmp/digitaler-schutz-visual/mobile-scene-' + String(i + 1).padStart(2, '0') + '-full.png',
-                  Buffer.from(full.data, 'base64')
-                );
               }
 
               const state = await evaluate(`(() => ({
                 stage: getComputedStyle(document.querySelector('[data-ds-stage]')).display,
+                stagePosition: getComputedStyle(document.querySelector('[data-ds-stage]')).position,
                 flow: getComputedStyle(document.querySelector('.ds-mobile-flow')).display,
-                cards: document.querySelectorAll('.ds-mobile-flow > article').length,
+                overlays: document.querySelectorAll('[data-ds-overlay]').length,
+                videos: document.querySelectorAll('[data-ds-media]').length,
                 concierge: (() => {
                   const el = document.querySelector('.nw-floating-concierge');
                   return el ? getComputedStyle(el).display : 'absent';
                 })(),
                 width: innerWidth
               }))()`);
-              if (!state || state.stage !== 'none' || state.flow === 'none' || state.cards !== 8 || state.width !== 390 || !['none','absent'].includes(state.concierge)) {
+              if (!state || state.stage === 'none' || state.stagePosition !== 'sticky' || state.flow !== 'none' || state.overlays !== 8 || state.videos !== 5 || state.width !== 390 || !['none','absent'].includes(state.concierge)) {
                 throw new Error('mobile_contract_failed:' + JSON.stringify(state));
               }
             }
