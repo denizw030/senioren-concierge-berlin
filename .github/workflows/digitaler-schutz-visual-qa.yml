@@ -142,13 +142,16 @@ jobs:
               await sleep(300);
               await capture('desktop-hero');
 
-              for (const [name, progress] of [
-                ['desktop-scene-01', 0.05],
-                ['desktop-scene-04', 0.42],
-                ['desktop-scene-05', 0.54],
-                ['desktop-scene-07-consent', 0.755],
-                ['desktop-scene-07-notice', 0.845],
-                ['desktop-scene-08', 0.93]
+              for (const [name, progress, expectedScene] of [
+                ['desktop-scene-01', 0.05, '0'],
+                ['desktop-scene-02', 0.18, '1'],
+                ['desktop-scene-03', 0.305, '2'],
+                ['desktop-scene-04', 0.42, '3'],
+                ['desktop-scene-05', 0.54, '4'],
+                ['desktop-scene-06', 0.665, '5'],
+                ['desktop-scene-07-consent', 0.755, '6'],
+                ['desktop-scene-07-notice', 0.845, '6'],
+                ['desktop-scene-08', 0.93, '7']
               ]) {
                 const moved = await evaluate(`(() => {
                   const story = document.querySelector('[data-ds-story]');
@@ -159,6 +162,8 @@ jobs:
                 })()`);
                 if (!moved) throw new Error('story_missing');
                 await sleep(800);
+                const active = await evaluate("document.querySelector('[data-ds-overlay].is-active')?.dataset.dsOverlay || null");
+                if (active !== expectedScene) throw new Error('desktop_scene_mismatch:' + name + ':' + active + ':' + expectedScene);
                 await capture(name);
               }
 
@@ -183,6 +188,19 @@ jobs:
               if (!moved) throw new Error('mobile_flow_missing');
               await sleep(300);
               await capture('mobile-story-start');
+
+              for (let i = 0; i < 8; i++) {
+                const movedCard = await evaluate(`(() => {
+                  const card = document.querySelectorAll('.ds-mobile-flow > article')[${i}];
+                  if (!card) return false;
+                  const top = scrollY + card.getBoundingClientRect().top - 76;
+                  window.scrollTo({top: Math.max(0, top), left:0, behavior:'instant'});
+                  return true;
+                })()`);
+                if (!movedCard) throw new Error('mobile_scene_missing:' + (i + 1));
+                await sleep(350);
+                await capture('mobile-scene-' + String(i + 1).padStart(2, '0'));
+              }
 
               const state = await evaluate(`(() => ({
                 stage: getComputedStyle(document.querySelector('[data-ds-stage]')).display,
