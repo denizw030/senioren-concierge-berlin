@@ -246,10 +246,17 @@
 }
 
 @media (max-width:900px) and (prefers-reduced-motion:no-preference){
+  /* The film is the first content on this route. Keep the mobile header as an
+     overlay so it does not reserve a blank block before the opening frame. */
+  .ds-page .top{position:fixed!important;top:0;left:0;right:0;width:100%;z-index:50}
+  .ds-page #main{margin:0!important;padding:0!important}
+  .ds-story{margin:0!important;padding:0!important}
+
   /* iOS Safari: explicitly lock the cinematic stage while the full 8-scene
      story track is active. This avoids sticky containment jumps into after/footer. */
-  .ds-story .ds-stage{position:absolute;top:0;left:0;right:0;width:100%;height:100svh}
-  .ds-story.is-mobile-story-active .ds-stage{position:fixed;inset:0;top:0;left:0;right:0;bottom:auto;width:100%;height:100svh;z-index:30}
+  /* With the former intro removed, the film is now the first page content.
+     Keep it visible from the initial frame instead of waiting for scroll entry. */
+  .ds-story .ds-stage{position:fixed;inset:0;top:0;left:0;right:0;bottom:auto;width:100%;height:100svh;z-index:30}
   .ds-story.is-mobile-story-past .ds-stage{position:absolute;top:auto;bottom:0;left:0;right:0}
 }
 

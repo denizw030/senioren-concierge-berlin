@@ -8,6 +8,7 @@ const page = read('digitaler-schutz.html');
 const mirror = read('digitaler-schutz/index.html');
 const css = read('assets/digitaler-schutz.css');
 const js = read('assets/digitaler-schutz.js');
+const logoCss = read('assets/nahwerk-logo-v2.css');
 
 test('clean route mirror only adds base href', () => {
   const normalized = mirror.replace('<head><base href="/">', '<head>');
@@ -61,9 +62,9 @@ test('app surfaces are clean code-rendered replicas of the approved UI', () => {
   assert.match(page, /Lege fest, wie STEWARO verdächtige Links prüft und wie FIDEL dich informiert\./);
   assert.match(page, /Prüfen, blockieren und verständlich informieren\./);
   assert.match(page, /Schutz aktivieren/);
-  assert.match(page, /Dein Schutz/);
-  assert.match(page, /Schutz ist aktiv/);
-  assert.match(page, /STEWARO prüft im Hintergrund\. FIDEL erklärt dir, wenn etwas wichtig ist\./);
+  assert.doesNotMatch(page, /ds-app-shell--active/);
+  assert.doesNotMatch(page, /Dein Schutz/);
+  assert.doesNotMatch(page, /Schutz ist aktiv/);
   assert.match(page, /STEWARO hat den verdächtigen Link blockiert\./);
   assert.match(page, /Die Nachricht wurde geprüft\. Der Link war auffällig und wurde vorsorglich nicht geöffnet\./);
   assert.match(page, /Ich habe die Nachricht geprüft\. Wenn du möchtest, erkläre ich dir, was daran auffällig war\./);
@@ -105,11 +106,12 @@ test('remaining scene copy keeps STEWARO as protection layer', () => {
   assert.doesNotMatch(page, /FIDEL hat Ingrid heute bei einem verdächtigen Link geschützt\./);
 });
 
-test('mobile premium story reuses the sticky canonical film stage', () => {
+test('mobile premium story reuses the persistent canonical film stage', () => {
   assert.doesNotMatch(page, /class="ds-mobile-video"/);
   assert.match(css, /Mobile premium scroll-film/);
   assert.match(css, /height:1080svh/);
-  assert.match(css, /position:sticky/);
+  assert.match(css, /\.ds-story \.ds-stage\{position:fixed/);
+  assert.match(css, /\.ds-story\.is-mobile-story-past \.ds-stage\{position:absolute/);
   assert.match(css, /\.ds-mobile-flow\{display:none!important\}/);
 });
 
@@ -118,4 +120,28 @@ test('mobile scrub caps perceived playback speed', () => {
   assert.match(js, /easedStep = diff \* 0\.18/);
   assert.match(js, /if \(desktop\.matches\)/);
   assert.match(js, /requestAnimationFrame\(flushScrub\)/);
+});
+
+
+test('film opens immediately after header without redundant intro', () => {
+  assert.doesNotMatch(page, /class="ds-intro"/);
+  assert.match(page, /<main id="main">\s*<section class="ds-story"/);
+  assert.match(page, /nahwerk-logo-v2\.css\?v=10/);
+  assert.match(page, /digitaler-schutz\.css\?v=5/);
+});
+
+test('premium header logo glint is restrained and reduced-motion safe', () => {
+  assert.match(logoCss, /STEWARO_PREMIUM_LOGO_GLINT_20261004/);
+  assert.match(logoCss, /stewaroLuxuryGlint 8\.4s/);
+  assert.match(logoCss, /animation-delay:\.14s/);
+  assert.match(logoCss, /@keyframes stewaroLuxuryGlint/);
+  assert.match(logoCss, /0%,58%/);
+  assert.match(logoCss, /prefers-reduced-motion:reduce/);
+});
+
+
+test('mobile header overlays the opening film without reserving intro space', () => {
+  assert.match(css, /\.ds-page \.top\{position:fixed!important/);
+  assert.match(css, /\.ds-page #main\{margin:0!important;padding:0!important\}/);
+  assert.match(css, /\.ds-story\{margin:0!important;padding:0!important\}/);
 });
