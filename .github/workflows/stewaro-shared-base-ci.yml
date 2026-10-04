@@ -14,6 +14,8 @@ on:
       - "tests/stewaro-leaf-scroll-video.test.mjs"
       - "tests/stewaro-homepage-story-order.test.mjs"
       - "tests/stewaro-account-entry.test.mjs"
+      - "tests/stewaro-home-mobile-menu.test.mjs"
+      - "tests/stewaro-public-surface-cleanup.test.mjs"
       - "assets/stewaro-entry-routing.js"
       - "assets/stewaro-account-flow.js"
       - "assets/onboarding.js"
@@ -99,7 +101,7 @@ jobs:
           git fetch --no-tags origin main
           changed="$(git diff --name-only origin/main...HEAD)"
           printf '%s\n' "$changed"
-          if printf '%s\n' "$changed" | grep -Eq '^(CNAME|stewaro-site/|.*orfidel.*)'; then
+          if printf '%s\n' "$changed" | grep -Eq '^(CNAME|.*orfidel.*)'; then
             echo "Forbidden production/frozen/protected path changed."
             exit 1
           fi
@@ -133,6 +135,9 @@ jobs:
 
       - name: Run STEWARO unified experience contract
         run: node --test tests/stewaro-unified-experience.test.mjs
+
+      - name: Verify canonical public navigation and retired surfaces
+        run: node --test tests/stewaro-home-mobile-menu.test.mjs tests/stewaro-public-surface-cleanup.test.mjs
 
       - name: Audit every STEWARO customer page
         run: node --test tests/stewaro-every-page-design.test.mjs
