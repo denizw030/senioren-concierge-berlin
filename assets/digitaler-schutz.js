@@ -123,9 +123,12 @@
 
   const render = () => {
     ticking = false;
-    if (reducedMotion.matches || !desktop.matches) return;
+    if (reducedMotion.matches) return;
 
     const rect = story.getBoundingClientRect();
+    const mobileActive = !desktop.matches && rect.top <= 0 && rect.bottom >= window.innerHeight;
+    story.classList.toggle('is-mobile-story-active', mobileActive);
+    story.classList.toggle('is-mobile-story-past', !desktop.matches && rect.bottom < window.innerHeight);
     const scrollable = Math.max(1, story.offsetHeight - window.innerHeight);
     const progress = clamp(-rect.top / scrollable);
     story.style.setProperty('--story-progress', progress.toFixed(4));
@@ -167,8 +170,12 @@
 
   window.addEventListener('scroll', requestRender, { passive: true });
   window.addEventListener('resize', requestRender, { passive: true });
+  window.addEventListener('orientationchange', requestRender, { passive: true });
   reducedMotion.addEventListener?.('change', requestRender);
-  desktop.addEventListener?.('change', requestRender);
+  desktop.addEventListener?.('change', () => {
+    story.classList.remove('is-mobile-story-active', 'is-mobile-story-past');
+    requestRender();
+  });
 
   // Desktop uses scroll-scrubbing and benefits from decoding/warming nearby clips.
   // Mobile/tablet uses the linear fallback: keep remote MP4s lazy so Safari can
