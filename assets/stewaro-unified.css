@@ -1048,3 +1048,41 @@ html body.brand-stewaro.pricing-page .lead{
   filter:none!important;
   text-shadow:none!important;
 }
+
+
+/* PUBLIC_A11Y_CLOSURE_20261005
+   Explicit light-surface pairings after repairing the unified CSS parser boundary. */
+html body.pricing-page #telefonannahme-modelle{
+  background:#f7f3eb!important;
+  background-color:#f7f3eb!important;
+  background-image:none!important;
+  color:#173126!important;
+}
+html body.pricing-page #telefonannahme-modelle .lead{
+  color:#3e443f!important;
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
+html body.story-site #ablauf{
+  background:#efe8dd!important;
+  background-color:#efe8dd!important;
+  background-image:none!important;
+}
+html body.story-site #ablauf .story-title--section{
+  color:#173126!important;
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
+html body.story-site .top .nw-language-button > span:nth-child(2){
+  color:#173126!important;
+  opacity:1!important;
+  filter:none!important;
+}
+html body.registration-page .stewaro-registration-progress{
+  color:#76531b!important;
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
