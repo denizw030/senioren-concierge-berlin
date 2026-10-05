@@ -1039,3 +1039,12 @@ html body.brand-stewaro.pricing-page .hero .lead{
   color:#3e443f!important;
   opacity:1!important;
 }
+
+
+/* Pricing sections use the light STEWARO surface after unified-brand normalization. */
+html body.brand-stewaro.pricing-page .lead{
+  color:#3e443f!important;
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
