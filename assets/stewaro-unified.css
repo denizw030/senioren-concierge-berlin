@@ -897,3 +897,122 @@ html[data-nw-portal-theme="light"] body.account-premium-ui :is(.family-owner-per
 html[data-nw-portal-theme="light"] body.account-premium-ui .family-owner-person-meta span{
  color:#4f5c53!important;opacity:1!important;
 }
+
+
+/* STEWARO_TELEPHONE_PUBLIC_V2_20261005
+   Loaded after page styles by site-ui; keep the new public telephone surface deterministic. */
+html body.brand-stewaro.telephone-reception-page main > section.reveal{
+  opacity:1!important;
+  transform:none!important;
+  transition:none!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-hero{
+  background:
+    radial-gradient(720px 420px at 86% 16%,rgba(167,122,45,.14),transparent 70%),
+    linear-gradient(180deg,#fbf8f2,#f6f1e7)!important;
+  background-color:#f6f1e7!important;
+  color:#171814!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-section--light{
+  background:#fbf8f2!important;
+  background-color:#fbf8f2!important;
+  background-image:none!important;
+  color:#171814!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-section--green{
+  background:
+    radial-gradient(640px 420px at 85% 18%,rgba(216,181,112,.12),transparent 68%),
+    #123a31!important;
+  background-color:#123a31!important;
+  color:#fff!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-section--green :is(h2,h3){
+  color:#fff!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-section--green .tr-kicker{
+  color:#e2c98f!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-section--green .tr-lead{
+  color:#d8e0db!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-example{
+  background:rgba(255,255,255,.055)!important;
+  background-color:rgba(255,255,255,.055)!important;
+  color:#fff!important;
+  border-color:rgba(255,255,255,.17)!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-example :is(p,strong){
+  color:#f1f3ef!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-example small{
+  color:#e2c98f!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-voice-note{
+  background:#f5efe4!important;
+  background-color:#f5efe4!important;
+  background-image:none!important;
+  color:#3e443f!important;
+  opacity:1!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-voice-note strong{
+  color:#171814!important;
+  opacity:1!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-voice-note span{
+  color:#3e443f!important;
+  opacity:1!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-trust-grid article{
+  background:#fffdf9!important;
+  background-color:#fffdf9!important;
+  background-image:none!important;
+  color:#171814!important;
+  opacity:1!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-trust-grid article h3{
+  color:#171814!important;
+  opacity:1!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-trust-grid article p{
+  color:#3e443f!important;
+  opacity:1!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-button--primary{
+  background:#123a31!important;
+  background-color:#123a31!important;
+  background-image:none!important;
+  border-color:#123a31!important;
+  color:#fff!important;
+  opacity:1!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-button--secondary{
+  background:rgba(255,255,255,.72)!important;
+  background-color:rgba(255,255,255,.72)!important;
+  background-image:none!important;
+  border-color:rgba(23,24,20,.20)!important;
+  color:#171814!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-final{
+  background:#0c2d26!important;
+  background-color:#0c2d26!important;
+  background-image:none!important;
+  color:#fff!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-final :is(h2,p){
+  color:#f1f3ef!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-final .tr-kicker{
+  color:#e2c98f!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-final .tr-button--primary{
+  background:#f0dca0!important;
+  background-color:#f0dca0!important;
+  border-color:#f0dca0!important;
+  color:#102019!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-final .tr-button--secondary-dark{
+  background:transparent!important;
+  background-image:none!important;
+  border-color:rgba(255,255,255,.48)!important;
+  color:#fff!important;
+}
