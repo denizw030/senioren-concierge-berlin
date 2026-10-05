@@ -1086,3 +1086,18 @@ html body.registration-page .stewaro-registration-progress{
   filter:none!important;
   text-shadow:none!important;
 }
+
+
+/* Public story soft sections always pair dark forest text with the light cream surface. */
+html body.story-site .story-section--soft{
+  background:#efe8dd!important;
+  background-color:#efe8dd!important;
+  background-image:none!important;
+  color:#173126!important;
+}
+html body.story-site .story-section--soft .story-title--section{
+  color:#173126!important;
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
