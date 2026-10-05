@@ -22,9 +22,10 @@ test("client requires server greeting contract before proactive response",()=>{
   assert.match(client,/LIVE_INITIAL_GREETING_MISSING/);
 });
 
-test("Web and App bust cache to the proactive greeting client",()=>{
-  assert.match(boot,/nahwerk-live-concierge\.js\?v=29/);
+test("Web and App load the ElevenLabs-aware live client without changing outer CSP URLs",()=>{
+  assert.match(boot,/nahwerk-live-concierge\.js\?v=30/);
   assert.match(webLegacy,/web-live-concierge\.js\?v=29/);
   assert.match(webClean,/web-live-concierge\.js\?v=29/);
-  assert.match(app,/nahwerk-live-concierge\.js\?v=29/);
+  assert.match(app,/nahwerk-live-concierge\.js\?v=30/);
+
 });

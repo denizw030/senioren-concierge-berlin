@@ -1,5 +1,5 @@
 
-    import { mountNahwerkLiveConcierge } from "/assets/nahwerk-live-concierge.js?v=29";
+    import { mountNahwerkLiveConcierge } from "/assets/nahwerk-live-concierge.js?v=30";
     let token="";
     let controller=null;
     const notifyClose=()=>{

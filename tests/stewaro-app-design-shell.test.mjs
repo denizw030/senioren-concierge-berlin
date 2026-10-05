@@ -88,13 +88,12 @@ test("More uses existing Account surfaces and logout invalidates the existing se
 console.log("STEWARO_APP_DESIGN_SHELL=GREEN");
 
 
-test("STEWARO app exposes exactly three FIDEL-labelled voice choices",()=>{
+test("STEWARO app exposes one canonical FIDEL voice",()=>{
   const shell=read("assets/stewaro-app-shell.js");
   assert.match(shell,/fidel_souveraen/);
-  assert.match(shell,/fidel_klar/);
-  assert.match(shell,/fidel_warm/);
-  assert.match(shell,/FIDEL Souverän/);
-  assert.match(shell,/FIDEL Klar/);
-  assert.match(shell,/FIDEL Warm/);
+  assert.match(shell,/name:"FIDEL"/);
+  assert.match(shell,/Süß, warm, hell und verspielt/);
+  assert.doesNotMatch(shell,/fidel_klar|fidel_warm/);
+  assert.doesNotMatch(shell,/FIDEL Souverän|FIDEL Klar|FIDEL Warm/);
   assert.doesNotMatch(shell,/Konrad|Alexander|Leyla/);
 });

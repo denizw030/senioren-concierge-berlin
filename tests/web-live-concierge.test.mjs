@@ -343,22 +343,25 @@ test("FIDEL Live surface never yields to a legacy persona portrait",()=>{
 });
 
 
-test("FIDEL Souverän mutes native Live audio and plays authenticated ONYX TTS",()=>{
+test("FIDEL hybrid Live mutes native OpenAI audio and plays authenticated ElevenLabs TTS",()=>{
   const client=read("assets/nahwerk-live-concierge.js");
-  assert.match(client,/audioOutputMode==="tts_onyx"/);
-  assert.match(client,/remoteAudio\.muted=audioOutputMode==="tts_onyx"/);
+  assert.match(client,/const usesHybridTts=\(\)=>audioOutputMode==="tts_onyx"\|\|audioOutputMode==="tts_elevenlabs"/);
+  assert.match(client,/remoteAudio\.muted=usesHybridTts\(\)/);
   assert.match(client,/postAudio\("\/tts"/);
   assert.match(client,/stopHybridSpeech\(\)/);
   assert.match(client,/hybridSpeaking/);
+  assert.match(client,/FIDEL_TTS_PLAYBACK_FAILED/);
+  assert.doesNotMatch(client,/FIDEL_ONYX_PLAYBACK_FAILED/);
 });
 
-test("FIDEL voice selection stays voice-only and never changes FIDEL visual identity",()=>{
+test("STEWARO app exposes one canonical FIDEL voice and no legacy persona labels",()=>{
   const shell=read("assets/stewaro-app-shell.js");
-  assert.match(shell,/FIDEL Souverän/);
-  assert.match(shell,/FIDEL Klar/);
-  assert.match(shell,/FIDEL Warm/);
+  assert.match(shell,/fidel_souveraen/);
+  assert.match(shell,/name:"FIDEL"/);
+  assert.match(shell,/Süß, warm, hell und verspielt/);
+  assert.doesNotMatch(shell,/FIDEL Souverän|FIDEL Klar|FIDEL Warm/);
   assert.doesNotMatch(shell,/Konrad|Alexander|Leyla/);
-  assert.match(shell,/Name und Persönlichkeit bleiben gleich/);
+  assert.match(shell,/FIDEL verwendet überall dieselbe eigene Stimme/);
 });
 
 
