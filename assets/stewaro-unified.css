@@ -1022,3 +1022,20 @@ html body.brand-stewaro.telephone-reception-page .tr-final .tr-button--secondary
   border-color:rgba(255,255,255,.48)!important;
   color:#fff!important;
 }
+
+
+/* STEP1_FINAL_A11Y_20261005 */
+html body.brand-stewaro.telephone-reception-page .tr-feature-grid article > span{
+  color:#76531b!important;
+  opacity:1!important;
+}
+html body.brand-stewaro.pricing-page .hero{
+  background:#fbf8f2!important;
+  background-color:#fbf8f2!important;
+  background-image:none!important;
+  color:#173126!important;
+}
+html body.brand-stewaro.pricing-page .hero .lead{
+  color:#3e443f!important;
+  opacity:1!important;
+}
