@@ -1,2 +1,70 @@
-/* STEWARO Pricing Public V2 */
-body.pricing-v2-page{background:#f6f1e7;color:#171814}
+/* STEWARO Pricing Public V2 — presentation only */
+:root{--pv-cream:#f6f1e7;--pv-paper:#fffdf9;--pv-ink:#171814;--pv-muted:#59615b;--pv-green:#123a31;--pv-green-dark:#0c2d26;--pv-gold:#76531b;--pv-line:rgba(23,24,20,.12);--pv-shadow:0 24px 68px rgba(43,35,22,.08)}
+html{scroll-behavior:smooth}
+body.pricing-v2-page{margin:0;background:var(--pv-cream);color:var(--pv-ink)}
+body.pricing-v2-page main{background:var(--pv-cream)!important;color:var(--pv-ink)!important}
+body.pricing-v2-page main>section.reveal{opacity:1!important;transform:none!important;transition:none!important}
+.pv-hero{padding:clamp(86px,10vw,142px) 0 clamp(82px,9vw,126px);border-bottom:1px solid var(--pv-line);background:radial-gradient(760px 430px at 88% 8%,rgba(167,122,45,.14),transparent 70%),linear-gradient(180deg,#fffdf9 0%,var(--pv-cream) 100%)!important}
+.pv-hero-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,.65fr);gap:clamp(44px,8vw,104px);align-items:end}
+.pv-kicker{margin:0 0 16px;color:var(--pv-gold)!important;font-size:.76rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+.pv-hero h1,.pv-section h2,.pv-final h2{margin:0;color:var(--pv-green)!important;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif!important;font-weight:620!important;letter-spacing:-.052em!important;line-height:.99!important}
+.pv-hero h1{max-width:850px;font-size:clamp(3rem,6.6vw,6.3rem)!important}
+.pv-section h2,.pv-final h2{font-size:clamp(2.25rem,4.5vw,4.4rem)!important}
+.pv-lead{max-width:760px;margin:26px 0 0;color:var(--pv-muted)!important;font-size:clamp(1.06rem,1.55vw,1.23rem);line-height:1.7}
+.pv-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.pv-button{display:inline-flex;min-height:52px;align-items:center;justify-content:center;box-sizing:border-box;padding:0 22px;border:1px solid transparent;border-radius:999px;font-size:.94rem;font-weight:760;text-decoration:none;transition:transform .18s ease,background .18s ease,border-color .18s ease}
+.pv-button:hover{transform:translateY(-1px)}
+.pv-button:focus-visible{outline:3px solid rgba(167,122,45,.38);outline-offset:3px}
+.pv-button--primary{background:var(--pv-green)!important;color:#fff!important;border-color:var(--pv-green)!important}
+.pv-button--primary:hover{background:var(--pv-green-dark)!important;border-color:var(--pv-green-dark)!important}
+.pv-button--secondary{background:rgba(255,255,255,.78)!important;color:var(--pv-ink)!important;border-color:rgba(23,24,20,.18)!important}
+.pv-button--light{background:#fff!important;color:var(--pv-green)!important;border-color:rgba(23,58,49,.18)!important}
+.pv-button--gold{background:#ead59d!important;color:#17231d!important;border-color:#ead59d!important}
+.pv-hero-summary{padding:28px;border:1px solid var(--pv-line);border-radius:28px;background:rgba(255,255,255,.78)!important;box-shadow:var(--pv-shadow)}
+.pv-hero-summary strong{display:block;color:var(--pv-green)!important;font-size:1.05rem}
+.pv-hero-summary ul{display:grid;gap:14px;margin:20px 0 0;padding:0;list-style:none}
+.pv-hero-summary li{position:relative;padding-left:24px;color:var(--pv-muted)!important;line-height:1.5}
+.pv-hero-summary li::before{content:"";position:absolute;left:0;top:.48em;width:8px;height:8px;border-radius:50%;background:#8a6422}
+.pv-section{padding:clamp(84px,9vw,126px) 0;background:#fbf8f2!important;border-bottom:1px solid var(--pv-line)}
+.pv-section--cream{background:var(--pv-cream)!important}
+.pv-section-head{max-width:860px}
+.pv-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:52px}
+.pv-card{position:relative;display:flex;min-width:0;flex-direction:column;padding:28px;border:1px solid var(--pv-line);border-radius:24px;background:var(--pv-paper)!important;color:var(--pv-ink)!important;box-shadow:0 12px 38px rgba(43,35,22,.04)}
+.pv-card--featured{border-color:rgba(138,100,34,.42);box-shadow:0 22px 64px rgba(75,56,23,.10)}
+.pv-badge{display:inline-flex;align-self:flex-start;margin:0 0 22px;padding:7px 10px;border-radius:999px;background:#f0e5cb!important;color:#674919!important;font-size:.69rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase}
+.pv-plan{margin:0;color:var(--pv-green)!important;font-size:1.25rem!important;font-weight:760!important;letter-spacing:-.015em!important}
+.pv-price{display:flex;align-items:baseline;gap:7px;margin-top:18px;color:var(--pv-ink)!important;font-size:clamp(2.35rem,4vw,3.45rem);font-weight:660;letter-spacing:-.05em;line-height:1}
+.pv-price small{color:#626a64!important;font-size:.76rem;font-weight:650;letter-spacing:0}
+.pv-usage{display:block;margin:18px 0 0;padding:12px 0;border-top:1px solid var(--pv-line);border-bottom:1px solid var(--pv-line);color:#425048!important;font-size:.87rem;font-weight:700;line-height:1.5}
+.pv-description{margin:18px 0 0;color:var(--pv-muted)!important;line-height:1.62}
+.pv-features{display:grid;gap:9px;margin:20px 0 26px;padding:0;list-style:none}
+.pv-features li{position:relative;padding-left:22px;color:#414841!important;font-size:.93rem;line-height:1.5}
+.pv-features li::before{content:"✓";position:absolute;left:0;color:#76531b;font-weight:900}
+.pv-card .pv-button{width:100%;margin-top:auto}
+.pv-note{margin-top:26px;padding:20px 22px;border:1px solid rgba(138,100,34,.18);border-radius:18px;background:#f3ecdf!important;color:#454c47!important;line-height:1.62}
+.pv-note strong{color:var(--pv-green)!important}
+.pv-principles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:48px;border-top:1px solid var(--pv-line)}
+.pv-principle{padding:28px 28px 4px 0;border-right:1px solid var(--pv-line)}
+.pv-principle+.pv-principle{padding-left:28px}
+.pv-principle:last-child{border-right:0}
+.pv-principle span{display:block;margin-bottom:28px;color:var(--pv-gold)!important;font-size:.73rem;font-weight:800;letter-spacing:.12em}
+.pv-principle h3{margin:0 0 10px;color:var(--pv-green)!important;font-size:1.2rem!important}
+.pv-principle p{margin:0;color:var(--pv-muted)!important;line-height:1.62}
+.pv-phone{padding:clamp(80px,9vw,118px) 0;background:var(--pv-green)!important;color:#fff!important}
+.pv-phone-grid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:50px;align-items:end}
+.pv-phone .pv-kicker{color:#e5cc91!important}
+.pv-phone h2{margin:0;color:#fff!important;font-size:clamp(2.2rem,4.4vw,4.2rem)!important;letter-spacing:-.05em!important;line-height:1!important}
+.pv-phone p{max-width:760px;margin:20px 0 0;color:#d8e1dc!important;line-height:1.65;font-size:1.06rem}
+.pv-phone .pv-actions{justify-content:flex-end}
+.pv-final{padding:clamp(88px,10vw,132px) 0;background:var(--pv-green-dark)!important;color:#fff!important}
+.pv-final-grid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:48px;align-items:end}
+.pv-final .pv-kicker{color:#e5cc91!important}
+.pv-final h2{color:#fff!important}
+.pv-final p{max-width:700px;margin:22px 0 0;color:#d8e1dc!important;line-height:1.65}
+.pv-final .pv-actions{justify-content:flex-end}
+body.pricing-v2-page .footer{background:#0a221d!important;border-top:1px solid rgba(255,255,255,.09)!important}
+body.pricing-v2-page .footer :is(p,a,span,small){color:#dce4e0!important}
+body.pricing-v2-page .footer :is(h3,h4){color:#fff!important}
+@media(max-width:1040px){.pv-hero-grid,.pv-phone-grid,.pv-final-grid{grid-template-columns:1fr}.pv-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.pv-phone .pv-actions,.pv-final .pv-actions{justify-content:flex-start}}
+@media(max-width:700px){.pv-hero{padding-top:68px}.pv-hero h1{font-size:clamp(2.75rem,13vw,4rem)!important}.pv-section h2,.pv-phone h2,.pv-final h2{font-size:clamp(2.2rem,10vw,3.35rem)!important}.pv-actions{display:grid;grid-template-columns:1fr}.pv-button{width:100%}.pv-grid{grid-template-columns:1fr}.pv-card{padding:24px}.pv-principles{grid-template-columns:1fr;border-top:0}.pv-principle,.pv-principle+.pv-principle{padding:24px 0;border-right:0;border-top:1px solid var(--pv-line)}.pv-principle span{margin-bottom:12px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.pv-button{transition:none}}
