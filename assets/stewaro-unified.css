@@ -704,7 +704,13 @@ html body .footer .brandtext strong{
 html body .top .brandtext strong::before,
 html body .home-reference .top .brandtext strong::before,
 html body .footer .brandtext strong::before{
-  content:""!impo/* STEWARO_CANONICAL_WORDMARK_GUARD_20260928 */
+  content:""!important;
+  display:none!important;
+  animation:none!important;
+  background:none!important;
+}
+
+/* STEWARO_CANONICAL_WORDMARK_GUARD_20260928 */
 html body .top .brand .brandtext,
 html body .home-reference .top .brand .brandtext{
   position:relative!important;
@@ -896,4 +902,202 @@ html[data-nw-portal-theme="light"] body.account-premium-ui :is(.family-owner-per
 
 html[data-nw-portal-theme="light"] body.account-premium-ui .family-owner-person-meta span{
  color:#4f5c53!important;opacity:1!important;
+}
+
+
+/* STEWARO_TELEPHONE_PUBLIC_V2_20261005
+   Loaded after page styles by site-ui; keep the new public telephone surface deterministic. */
+html body.brand-stewaro.telephone-reception-page main > section.reveal{
+  opacity:1!important;
+  transform:none!important;
+  transition:none!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-hero{
+  background:
+    radial-gradient(720px 420px at 86% 16%,rgba(167,122,45,.14),transparent 70%),
+    linear-gradient(180deg,#fbf8f2,#f6f1e7)!important;
+  background-color:#f6f1e7!important;
+  color:#171814!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-section--light{
+  background:#fbf8f2!important;
+  background-color:#fbf8f2!important;
+  background-image:none!important;
+  color:#171814!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-section--green{
+  background:
+    radial-gradient(640px 420px at 85% 18%,rgba(216,181,112,.12),transparent 68%),
+    #123a31!important;
+  background-color:#123a31!important;
+  color:#fff!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-section--green :is(h2,h3){
+  color:#fff!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-section--green .tr-kicker{
+  color:#e2c98f!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-section--green .tr-lead{
+  color:#d8e0db!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-example{
+  background:rgba(255,255,255,.055)!important;
+  background-color:rgba(255,255,255,.055)!important;
+  color:#fff!important;
+  border-color:rgba(255,255,255,.17)!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-example :is(p,strong){
+  color:#f1f3ef!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-example small{
+  color:#e2c98f!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-voice-note{
+  background:#f5efe4!important;
+  background-color:#f5efe4!important;
+  background-image:none!important;
+  color:#3e443f!important;
+  opacity:1!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-voice-note strong{
+  color:#171814!important;
+  opacity:1!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-voice-note span{
+  color:#3e443f!important;
+  opacity:1!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-trust-grid article{
+  background:#fffdf9!important;
+  background-color:#fffdf9!important;
+  background-image:none!important;
+  color:#171814!important;
+  opacity:1!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-trust-grid article h3{
+  color:#171814!important;
+  opacity:1!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-trust-grid article p{
+  color:#3e443f!important;
+  opacity:1!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-button--primary{
+  background:#123a31!important;
+  background-color:#123a31!important;
+  background-image:none!important;
+  border-color:#123a31!important;
+  color:#fff!important;
+  opacity:1!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-button--secondary{
+  background:rgba(255,255,255,.72)!important;
+  background-color:rgba(255,255,255,.72)!important;
+  background-image:none!important;
+  border-color:rgba(23,24,20,.20)!important;
+  color:#171814!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-final{
+  background:#0c2d26!important;
+  background-color:#0c2d26!important;
+  background-image:none!important;
+  color:#fff!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-final :is(h2,p){
+  color:#f1f3ef!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-final .tr-kicker{
+  color:#e2c98f!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-final .tr-button--primary{
+  background:#f0dca0!important;
+  background-color:#f0dca0!important;
+  border-color:#f0dca0!important;
+  color:#102019!important;
+}
+html body.brand-stewaro.telephone-reception-page .tr-final .tr-button--secondary-dark{
+  background:transparent!important;
+  background-image:none!important;
+  border-color:rgba(255,255,255,.48)!important;
+  color:#fff!important;
+}
+
+
+/* STEP1_FINAL_A11Y_20261005 */
+html body.brand-stewaro.telephone-reception-page .tr-feature-grid article > span{
+  color:#76531b!important;
+  opacity:1!important;
+}
+html body.brand-stewaro.pricing-page .hero{
+  background:#fbf8f2!important;
+  background-color:#fbf8f2!important;
+  background-image:none!important;
+  color:#173126!important;
+}
+html body.brand-stewaro.pricing-page .hero .lead{
+  color:#3e443f!important;
+  opacity:1!important;
+}
+
+
+/* Pricing sections use the light STEWARO surface after unified-brand normalization. */
+html body.brand-stewaro.pricing-page .lead{
+  color:#3e443f!important;
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
+
+
+/* PUBLIC_A11Y_CLOSURE_20261005
+   Explicit light-surface pairings after repairing the unified CSS parser boundary. */
+html body.pricing-page #telefonannahme-modelle{
+  background:#f7f3eb!important;
+  background-color:#f7f3eb!important;
+  background-image:none!important;
+  color:#173126!important;
+}
+html body.pricing-page #telefonannahme-modelle .lead{
+  color:#3e443f!important;
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
+html body.story-site #ablauf{
+  background:#efe8dd!important;
+  background-color:#efe8dd!important;
+  background-image:none!important;
+}
+html body.story-site #ablauf .story-title--section{
+  color:#173126!important;
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
+html body.story-site .top .nw-language-button > span:nth-child(2){
+  color:#173126!important;
+  opacity:1!important;
+  filter:none!important;
+}
+html body.registration-page .stewaro-registration-progress{
+  color:#76531b!important;
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
+
+
+/* Public story soft sections always pair dark forest text with the light cream surface. */
+html body.story-site .story-section--soft{
+  background:#efe8dd!important;
+  background-color:#efe8dd!important;
+  background-image:none!important;
+  color:#173126!important;
+}
+html body.story-site .story-section--soft .story-title--section{
+  color:#173126!important;
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
 }

@@ -38,13 +38,12 @@ test("public story avoids fear-first and surveillance positioning",()=>{
   assert.match(visibleText(read("angehoerige.html")),/Keine automatische Einsicht/i);
 });
 
-test("unreleased telephone setup and warm-transfer marketing stay hidden",()=>{
+test("unreleased telephone setup and warm-transfer implementation stay out of the public page",()=>{
   const page=read("telefonannahme.html");
-  assert.match(page,/class="tr-section story-hidden-unreleased" hidden aria-hidden="true"/);
-  assert.match(page,/id="einrichtung" hidden aria-hidden="true"/);
   const publicCopy=visibleText(page);
-  assert.doesNotMatch(publicCopy,/Festnetz-Warm-Transfer|Telefonannahme einrichten/);
-  assert.match(publicCopy,/Weitere Telefonfunktionen werden erst öffentlich gezeigt/);
+  assert.doesNotMatch(page,/story-hidden-unreleased|id="einrichtung"|telephoneReceptionSetupForm|NUMBER_SUBMITTED|ROUTING_PENDING|PORTING_PENDING/);
+  assert.doesNotMatch(publicCopy,/Festnetz-Warm-Transfer|Telefonannahme einrichten|Platform-Endpunkt/);
+  assert.match(publicCopy,/Telefonfunktionen werden nur nach der vorgesehenen Einrichtung/);
 });
 
 test("core product pages share STEWARO navigation and FIDEL identity",()=>{

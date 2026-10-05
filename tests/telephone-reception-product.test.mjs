@@ -54,21 +54,20 @@ const success201={
 const replay200={...success201,duplicate:true};
 
 test("telephone reception presents FIDEL without invented prices",()=>{
-  assert.match(page,/STEWARO geht für dich ans Telefon/);
+  assert.match(page,/Telefonannahme mit FIDEL/);
+  assert.match(page,/Mehr Ruhe, wenn das Telefon klingelt/);
   assert.match(page,/FIDEL am Telefon/);
-  assert.match(page,/Telefonannahme Standalone/);
-  assert.match(page,/Concierge \+ Telefonannahme/);
   assert.match(page,/FIDEL Stimme/);
+  assert.doesNotMatch(page,/Alexander|Luisa|Konrad|James/);
   assert.doesNotMatch(page,/\b\d+[,.]\d{2}\s*€/);
 });
 
-test("closed platform contract SHA and prepared-but-not-deployed truth are explicit",()=>{
+test("closed platform contract remains fail-closed without leaking implementation details publicly",()=>{
   assert.match(js,/b9cae952e1c9cdae45a238d9cd902a9f2d798452/);
-  assert.match(page,/b9cae952e1c9cdae45a238d9cd902a9f2d798452/);
   assert.match(js,/PREPARED_NUMBER_ONBOARDING_ENDPOINT = "https:\/\/djicahhmnnamtjuqedqd\.supabase\.co\/functions\/v1\/nahwerk-telephone-reception-onboarding\/number\/submit"/);
   assert.match(js,/const NUMBER_ONBOARDING_ENDPOINT = null/);
-  assert.match(page,/Platform-Endpunkt ist vorbereitet, aber noch nicht deployed/);
-  assert.doesNotMatch(page,/Endpunkt fehlt noch/);
+  assert.doesNotMatch(page,/b9cae952e1c9cdae45a238d9cd902a9f2d798452/);
+  assert.doesNotMatch(page,/Platform-Endpunkt ist vorbereitet|NUMBER_SUBMITTED|ROUTING_PENDING|PORTING_PENDING/);
 });
 
 test("endpoint null produces zero network requests",async()=>{
@@ -215,20 +214,21 @@ test("role guards remain fail closed",()=>{
 test("telephone onboarding remains inert until separately deployed and approved",()=>{
   assert.match(js,/Runtime safety boundary\. Keep null until the Platform function is actually deployed and separately approved/);
   assert.match(js,/const NUMBER_ONBOARDING_ENDPOINT = null/);
-  assert.match(page,/data-runtime-status="inert"/);
+  assert.doesNotMatch(page,/telephone-reception-product\.js/);
+  assert.doesNotMatch(page,/telephoneReceptionSetupForm/);
 });
 
 test("only routing or porting active are active states",()=>{
   assert.match(js,/new Set\(\["ROUTING_ACTIVE", "PORTING_ACTIVE"\]\)/);
-  for(const state of ["NUMBER_SUBMITTED","OWNERSHIP_PENDING","OWNERSHIP_VERIFIED","PROVIDER_SETUP_PENDING","ROUTING_PENDING","PORTING_PENDING","ROUTING_ACTIVE","PORTING_ACTIVE","ROUTING_FAILED"]) assert.ok(page.includes(state),state);
-  assert.match(page,/Nie automatisch aktiv/);
+  for(const state of ["NUMBER_SUBMITTED","OWNERSHIP_PENDING","OWNERSHIP_VERIFIED","PROVIDER_SETUP_PENDING","ROUTING_PENDING","PORTING_PENDING","ROUTING_ACTIVE","PORTING_ACTIVE","ROUTING_FAILED"]) {
+    assert.ok(!page.includes(state),state+" must not leak into public HTML");
+  }
+  assert.match(page,/Telefonfunktionen werden nur nach der vorgesehenen Einrichtung/);
 });
 
-test("prepared fixed-line markup stays inert while shared-context story is preserved",()=>{
-  assert.match(page,/class="tr-section story-hidden-unreleased" hidden aria-hidden="true"[\s\S]*Kein Smartphone nötig/);
-  assert.match(page,/normales Festnetztelefon/);
-  assert.match(page,/Keine App, kein QR-Code, keine Push-Nachricht/);
-  assert.match(page,/Ein Concierge\. Dasselbe Gespräch\. Egal über welchen Weg\./);
+test("unreleased fixed-line implementation stays out of public HTML while shared context remains",()=>{
+  assert.doesNotMatch(page,/story-hidden-unreleased|Festnetz-Warm-Transfer|Kein Smartphone nötig|Telefonannahme einrichten/);
+  assert.match(page,/Ein Concierge\. Ein Kontext\./);
   assert.match(page,/Hausverwaltung/);
 });
 
