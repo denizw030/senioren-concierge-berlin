@@ -35,11 +35,12 @@ test("homepage is the STEWARO FIDEL experience and conversion remains reachable"
 
 test("public capability truth stays fail-closed",()=>{
   const c=read(homepage)+read("prime-concierge.html")+read("telefonannahme.html");
-  assert.match(c,/Welche WhatsApp- oder Telefonfunktionen verfügbar sind, richtet sich nach dem eingerichteten Produkt und Zugang|Weitere Telefonfunktionen werden erst öffentlich gezeigt/);
+  assert.match(c,/Welche WhatsApp- oder Telefonfunktionen verfügbar sind, richtet sich nach dem eingerichteten Produkt und Zugang|Telefonfunktionen werden nur nach der vorgesehenen Einrichtung/);
   assert.doesNotMatch(c,/Customer Release ist weiterhin deaktiviert|Jetzt verfügbar/);
   const phone=read("telefonannahme.html");
-  assert.match(phone,/id="einrichtung" hidden aria-hidden="true"/);
-  assert.match(phone,/story-hidden-unreleased/);
+  assert.doesNotMatch(phone,/telephoneReceptionSetupForm|story-hidden-unreleased|NUMBER_SUBMITTED|ROUTING_PENDING|PORTING_PENDING/);
+  assert.doesNotMatch(phone,/telephone-reception-product\.js/);
+  assert.match(phone,/Sie behalten die Kontrolle/);
 });
 
 test("real activation requires post-registration usage delta",()=>{
