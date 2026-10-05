@@ -67,7 +67,7 @@ body.telephone-reception-page .skip-link:focus{top:10px}
 .tr-feature-grid article{min-height:220px;padding:30px 28px 10px 0;border-right:1px solid var(--tr-line)}
 .tr-feature-grid article+article{padding-left:28px}
 .tr-feature-grid article:last-child{border-right:0}
-.tr-feature-grid article>span{display:block;margin-bottom:34px;color:var(--tr-gold);font-size:.76rem;font-weight:800;letter-spacing:.12em}
+.tr-feature-grid article>span{display:block;margin-bottom:34px;color:#76531b;font-size:.76rem;font-weight:800;letter-spacing:.12em}
 .tr-feature-grid h3,.tr-trust-grid h3{margin:0 0 10px;font-size:1.25rem}
 .tr-feature-grid p,.tr-trust-grid p{margin:0;color:var(--tr-muted);line-height:1.68}
 .tr-section--green{background:
