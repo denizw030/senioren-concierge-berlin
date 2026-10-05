@@ -115,3 +115,35 @@ body.telephone-reception-page .footer h3{color:#fff!important}
   html{scroll-behavior:auto}
   .tr-button{transition:none}
 }
+
+
+/* Public telephone accessibility: deterministic AA contrast against shared legacy shell rules. */
+html body.telephone-reception-page .tr-voice-note{
+  background:#f5efe4!important;
+  background-color:#f5efe4!important;
+  background-image:none!important;
+  color:#454840!important;
+  opacity:1!important;
+}
+html body.telephone-reception-page .tr-voice-note strong{
+  color:#171814!important;
+  opacity:1!important;
+}
+html body.telephone-reception-page .tr-voice-note span{
+  color:#454840!important;
+  opacity:1!important;
+}
+html body.telephone-reception-page .tr-trust-grid article{
+  background:#fffdf9!important;
+  background-color:#fffdf9!important;
+  background-image:none!important;
+  opacity:1!important;
+}
+html body.telephone-reception-page .tr-trust-grid article h3{
+  color:#171814!important;
+  opacity:1!important;
+}
+html body.telephone-reception-page .tr-trust-grid article p{
+  color:#454840!important;
+  opacity:1!important;
+}
