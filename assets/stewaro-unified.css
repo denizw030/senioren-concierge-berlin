@@ -704,7 +704,13 @@ html body .footer .brandtext strong{
 html body .top .brandtext strong::before,
 html body .home-reference .top .brandtext strong::before,
 html body .footer .brandtext strong::before{
-  content:""!impo/* STEWARO_CANONICAL_WORDMARK_GUARD_20260928 */
+  content:""!important;
+  display:none!important;
+  animation:none!important;
+  background:none!important;
+}
+
+/* STEWARO_CANONICAL_WORDMARK_GUARD_20260928 */
 html body .top .brand .brandtext,
 html body .home-reference .top .brand .brandtext{
   position:relative!important;
