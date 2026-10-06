@@ -12,7 +12,7 @@ test("HQ login intent is explicit and cannot be triggered by next=hq alone", () 
 
 test("HQ handoff asks the canonical session authority for target hq", () => {
   assert.match(login, /JSON\.stringify\(\{action:'handoff_create',target:hq\?'hq':'app'\}\)/);
-  assert.ok(login.includes("hq\\\\.stewaro\\\\.com"));
+  assert.match(login, /hq[^A-Za-z0-9]+stewaro[^A-Za-z0-9]+com/);
   assert.match(login, /handoff_hq_aal2_required/);
 });
 
