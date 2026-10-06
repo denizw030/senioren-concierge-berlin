@@ -10,6 +10,7 @@ const ENTRY_PARAMS=new URLSearchParams(location.search);
 const ENTRY_PRODUCT=ENTRY_PARAMS.get('produkt')==='senioren'?'senioren':null;
 const ENTRY_GUEST_HANDOFF=ENTRY_PARAMS.get('source')==='web_guest_chat';
 const ENTRY_APP_HANDOFF=ENTRY_PARAMS.get('next')==='app';
+const ENTRY_HQ_HANDOFF=ENTRY_PARAMS.get('produkt')==='internal-hq'&&ENTRY_PARAMS.get('next')==='hq';
 const ENTRY_NEXT=ENTRY_GUEST_HANDOFF&&ENTRY_PARAMS.get('next')==='/payg'?'/payg':'';
 const form=document.getElementById('loginForm');
 const status=document.getElementById('loginStatus');
@@ -44,6 +45,9 @@ if(ENTRY_GUEST_HANDOFF&&ENTRY_NEXT){
 if(ENTRY_APP_HANDOFF){
   document.querySelectorAll('a[href="/registrieren"]').forEach(a=>a.href='/registrieren?produkt=senioren&next=app');
 }
+if(ENTRY_HQ_HANDOFF){
+  document.querySelectorAll('a[href="/registrieren"]').forEach(a=>a.hidden=true);
+}
 
 const eye='<svg class="eye-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.7"></circle></svg>';
 const eyeOff='<svg class="eye-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 3 18 18"></path><path d="M10.7 6.1A10.8 10.8 0 0 1 12 6c6 0 9.5 6 9.5 6a16.3 16.3 0 0 1-2.2 2.8"></path><path d="M6.2 6.2C3.8 8 2.5 12 2.5 12s3.5 6 9.5 6a10 10 0 0 0 4.1-.9"></path><path d="M9.8 9.8A3.1 3.1 0 0 0 14.2 14.2"></path></svg>';
@@ -54,21 +58,30 @@ function show(msg,error=false){
   status.innerHTML=msg;
 }
 
-async function handoffToApp(sessionToken){
+async function handoffToTarget(sessionToken,target){
+  const hq=target==='hq';
+  const expected=hq?/^https:\/\/hq\.stewaro\.com\/#handoff=/:/^https:\/\/app\.stewaro\.com\/#handoff=/;
   try{
     const res=await fetch(SESSION_URL,{
       method:'POST',
       headers:{'Content-Type':'application/json',Authorization:'Bearer '+sessionToken},
-      body:JSON.stringify({action:'handoff_create'}),
+      body:JSON.stringify({action:'handoff_create',target:hq?'hq':'app'}),
       cache:'no-store',
       credentials:'omit'
     });
     const body=await res.json().catch(()=>({}));
-    if(!res.ok||body?.ok!==true||body?.status!=='handoff_ready'||!/^https:\/\/app\.stewaro\.com\/#handoff=/.test(String(body?.target_url||''))){
+    if(!res.ok||body?.ok!==true||body?.status!=='handoff_ready'||!expected.test(String(body?.target_url||''))){
       throw new Error(String(body?.status||'handoff_create_failed'));
     }
     location.replace(String(body.target_url));
-  }catch(_){
+  }catch(error){
+    if(hq){
+      const aal2=String(error?.message||'')==='handoff_hq_aal2_required';
+      show(aal2
+        ?'<strong>Management HQ benötigt eine zusätzliche Bestätigung.</strong><br>Bitte aktiviere bzw. bestätige MFA für deinen STEWARO-Zugang.'
+        :'<strong>Management HQ konnte gerade nicht sicher geöffnet werden.</strong><br>Deine Anmeldung bleibt aktiv; es wurde kein HQ-Zugang erstellt.',true);
+      return;
+    }
     show('<strong>FIDEL konnte gerade nicht geöffnet werden.</strong><br>Deine Anmeldung ist sicher aktiv. Öffne FIDEL bitte erneut aus deinem Konto.',true);
     setTimeout(()=>location.href='/konto',1800);
   }
@@ -94,9 +107,14 @@ function completeLogin(body){
   sessionStorage.setItem(SESSION_KEY,JSON.stringify(sessionPayload));
   if(rememberMe)localStorage.setItem(SESSION_KEY,JSON.stringify(sessionPayload));
   pendingMfa=null;
+  if(ENTRY_HQ_HANDOFF){
+    show('<strong>Erfolgreich angemeldet.</strong><br>Management HQ wird jetzt sicher geöffnet.');
+    setTimeout(()=>void handoffToTarget(body.session_token,'hq'),120);
+    return true;
+  }
   if(ENTRY_APP_HANDOFF){
     show('<strong>Erfolgreich angemeldet.</strong><br>FIDEL wird jetzt sicher geöffnet.');
-    setTimeout(()=>void handoffToApp(body.session_token),120);
+    setTimeout(()=>void handoffToTarget(body.session_token,'app'),120);
     return true;
   }
   show(ENTRY_NEXT==='/payg'
