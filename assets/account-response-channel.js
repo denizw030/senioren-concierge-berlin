@@ -1,5 +1,6 @@
 (()=>{
   const ENDPOINT="https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/nahwerk-web-gateway/web/account/response-channel";
+  const EXECUTION_RESULT_DRAFT_KEY="nw_execution_result_onboarding_v1";
   const card=document.getElementById("responseChannelCard");
   if(!card)return;
   const conciergeTab=document.getElementById("accountTabConcierge");
@@ -51,6 +52,45 @@
   const callTarget=document.getElementById("responseChannelCallTarget");
   const quickButtons=Array.from(document.querySelectorAll("[data-response-channel-quick]"));
   const quickStatus=document.getElementById("conciergeQuickChannelStatus");
+
+  // Runtime copy migration keeps mirrored account HTML stable while making the
+  // execution-result policy explicit and email-first.
+  const headCopy=card.querySelector(".response-channel-head .muted");
+  if(headCopy)headCopy.textContent="Normale Chats bleiben im jeweiligen Kanal. Ausführungsrückmeldungen kommen standardmäßig per E-Mail.";
+  const scopeEyebrow=card.querySelector(".response-channel-scope .eyebrow");
+  if(scopeEyebrow)scopeEyebrow.textContent="Ausführungsrückmeldungen";
+  const scopeTitle=card.querySelector(".response-channel-scope strong");
+  if(scopeTitle)scopeTitle.textContent="Wo soll das Ergebnis ankommen?";
+  const scopeHint=card.querySelector(".response-channel-scope > span");
+  if(scopeHint)scopeHint.textContent="Diese Auswahl gilt nur für Ausführungen, zum Beispiel Anrufe, Termine oder Recherchen.";
+  const sameRadio=radios.find((r)=>r.value==="SAME_CHANNEL");
+  if(sameRadio)sameRadio.value="WHATSAPP";
+  const emailRadio=radios.find((r)=>r.value==="EMAIL");
+  const whatsappRadio=radios.find((r)=>r.value==="WHATSAPP");
+  const callRadio=radios.find((r)=>r.value==="CALL");
+  callRadio?.closest(".response-channel-option")?.remove();
+  if(emailRadio&&whatsappRadio){
+    const box=emailRadio.closest(".response-channel-options");
+    const emailOption=emailRadio.closest(".response-channel-option");
+    const whatsappOption=whatsappRadio.closest(".response-channel-option");
+    if(box&&emailOption&&whatsappOption){
+      box.prepend(emailOption);
+      box.append(whatsappOption);
+      emailOption.querySelector("strong").textContent="E-Mail · empfohlen";
+      const emailExtra=document.createElement("small");
+      emailExtra.textContent="Keine WhatsApp-Nachrichtengebühr.";
+      emailOption.querySelector("span")?.append(emailExtra);
+      const fee=whatsappOption.querySelector(".response-channel-fee-note");
+      if(fee)fee.textContent="0,06 € pro gesendeter Nachricht. Zwischenstände werden gebündelt; im Normalfall erhältst du nur das abschließende Ergebnis.";
+    }
+  }
+
+  function onboardingDraft(){
+    try{
+      const row=JSON.parse(sessionStorage.getItem(EXECUTION_RESULT_DRAFT_KEY)||"null");
+      return row?.version===1&&row?.scope==="self"?row:null;
+    }catch{return null}
+  }
   function token(){try{return JSON.parse(sessionStorage.getItem("scb_web_session")||"null")?.session_token||""}catch{return ""}}
   function setFeedback(message,kind=""){feedback.textContent=message;feedback.className="response-channel-save-status"+(kind?" is-"+kind:"")}
   function label(channel){return {WHATSAPP:"WhatsApp",EMAIL:"E-Mail"}[channel]||channel}
@@ -86,6 +126,15 @@
       const r=await fetch(ENDPOINT,{headers:{Authorization:"Bearer "+t},signal:AbortSignal.timeout(9000)});
       const d=await r.json().catch(()=>({}));if(!r.ok||d?.ok!==true)throw new Error("load_failed");
       apply(d);setFeedback("");
+      const draft=onboardingDraft();
+      if(draft){
+        if(draft.channel==="WHATSAPP"&&draft.whatsapp_paid_opt_in===true&&Number(draft.whatsapp_unit_price_cents)===6){
+          const saved=await savePreference("WHATSAPP");
+          if(saved)sessionStorage.removeItem(EXECUTION_RESULT_DRAFT_KEY);
+        }else{
+          sessionStorage.removeItem(EXECUTION_RESULT_DRAFT_KEY);
+        }
+      }
     }catch{status.textContent="Nicht verfügbar";setFeedback("Der Antwortkanal konnte gerade nicht geladen werden.","error")}
   }
   async function savePreference(selected,trigger=null){
