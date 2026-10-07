@@ -66,6 +66,7 @@
     input.value=value;
     return input;
   };
+  const EXECUTION_RESULT_DRAFT_KEY="nw_execution_result_onboarding_v1";
   const preferredContact=ensureHidden("preferredContactChannel","APP");
   const whatsappEnabled=ensureHidden("whatsappEnabled","false");
   const executionResultChannel=ensureHidden("executionResultChannel","EMAIL");
@@ -107,6 +108,20 @@
     field.append(label,recipientEmail,help);
     form.append(field);
   }
+  const saveExecutionResultDraft=()=>{
+    try{
+      sessionStorage.setItem(EXECUTION_RESULT_DRAFT_KEY,JSON.stringify({
+        version:1,
+        scope:familyMode?"family":"self",
+        channel:executionResultChannel.value||"EMAIL",
+        whatsapp_paid_opt_in:whatsappExecutionOptIn.value==="true",
+        whatsapp_unit_price_cents:whatsappExecutionOptIn.value==="true"?6:null,
+        recipient_email:familyMode?String(recipientEmail?.value||"").trim().toLowerCase():"",
+        created_at:new Date().toISOString()
+      }));
+    }catch{}
+  };
+  recipientEmail?.addEventListener("input",saveExecutionResultDraft);
   const relationship=$("relationship");
   const addressing=$("addressing");
   const safetyEnabled=$("safetyEnabled");
@@ -375,6 +390,7 @@
         executionResultChannel.value=value;
         whatsappExecutionOptIn.value=value==="WHATSAPP"?"true":"false";
         whatsappExecutionFeeCents.value=value==="WHATSAPP"?"6":"";
+        saveExecutionResultDraft();
         goNext();
       });
     },
@@ -541,5 +557,6 @@
   if(ownerPostal)ownerPostal.required=!familyMode;
   if(recipientPostal)recipientPostal.required=familyMode;
   setWhatsappEnabled(false);
+  saveExecutionResultDraft();
   render();
 })();
