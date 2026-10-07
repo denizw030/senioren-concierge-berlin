@@ -5,7 +5,9 @@
   const email=String(params.get("email")||"").trim().toLowerCase();
   const hqEntry=params.get("produkt")==="internal-hq"&&params.get("next")==="hq";
 
-  if(document.body.classList.contains("login-image-page")&&(source==="stewaro_account"||hqEntry)){
+  const canonicalLogin=document.body.classList.contains("login-image-page")&&!document.body.classList.contains("senior-product")&&document.body.dataset.product!=="senioren";
+
+  if(canonicalLogin){
     document.body.classList.add("stewaro-account-flow");
     if(hqEntry){
       document.body.classList.add("stewaro-hq-entry");
