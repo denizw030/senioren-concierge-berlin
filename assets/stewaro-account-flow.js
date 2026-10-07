@@ -3,9 +3,15 @@
   const params=new URLSearchParams(location.search);
   const source=params.get("source");
   const email=String(params.get("email")||"").trim().toLowerCase();
+  const hqEntry=params.get("produkt")==="internal-hq"&&params.get("next")==="hq";
 
-  if(document.body.classList.contains("login-image-page")&&source==="stewaro_account"){
+  if(document.body.classList.contains("login-image-page")&&(source==="stewaro_account"||hqEntry)){
     document.body.classList.add("stewaro-account-flow");
+    if(hqEntry){
+      document.body.classList.add("stewaro-hq-entry");
+      document.documentElement.classList.add("stewaro-hq-login-entry");
+      document.title="Sicher anmelden | STEWARO";
+    }
     const emailInput=document.getElementById("loginEmail");
     if(emailInput&&email){emailInput.value=email;emailInput.closest(".field")?.classList.add("account-flow-email-field");}
     const card=document.querySelector(".logincard");
@@ -18,7 +24,13 @@
       brand.innerHTML='<img class="stewaro-account-flow-icon" src="/assets/logos/stewaro-icon.svg" alt="" aria-hidden="true"><img class="stewaro-account-flow-wordmark" src="/assets/logos/stewaro-wordmark.svg" alt="" aria-hidden="true">';
       card.prepend(brand);
     }
-    if(h)h.textContent="Ihr Passwort";
+    if(h)h.textContent=hqEntry?"Sicher anmelden":"Ihr Passwort";
+    if(hqEntry&&h&&!card?.querySelector(".stewaro-account-flow-intro")){
+      const intro=document.createElement("p");
+      intro.className="stewaro-account-flow-intro";
+      intro.textContent="Mit deinem STEWARO-Zugang fortfahren.";
+      h.insertAdjacentElement("afterend",intro);
+    }
     if(card&&email){
       const summary=document.createElement("div");
       summary.className="account-flow-email-summary";
@@ -26,15 +38,18 @@
       summary.querySelector("span").textContent=email;
       h?.insertAdjacentElement("afterend",summary);
     }
-    const register=document.createElement("p");
-    register.style.cssText="margin:22px 0 0;text-align:center;color:#747a75;font-size:13px";
-    const a=document.createElement("a");
-    a.href="/registrieren?source=stewaro_account&email="+encodeURIComponent(email);
-    a.textContent="Noch kein Konto? Konto erstellen";
-    a.style.cssText="color:#173126;font-weight:700;text-decoration:underline;text-underline-offset:3px";
-    register.append(a);
-    document.querySelector("#loginForm")?.append(register);
-    setTimeout(()=>document.getElementById("loginPassword")?.focus(),0);
+    if(!hqEntry){
+      const register=document.createElement("p");
+      register.className="stewaro-account-flow-register";
+      register.style.cssText="margin:22px 0 0;text-align:center;color:#747a75;font-size:13px";
+      const a=document.createElement("a");
+      a.href="/registrieren?source=stewaro_account&email="+encodeURIComponent(email);
+      a.textContent="Noch kein Konto? Konto erstellen";
+      a.style.cssText="color:#173126;font-weight:700;text-decoration:underline;text-underline-offset:3px";
+      register.append(a);
+      document.querySelector("#loginForm")?.append(register);
+    }
+    setTimeout(()=>document.getElementById(hqEntry&&!email?"loginEmail":"loginPassword")?.focus(),0);
     return;
   }
 
