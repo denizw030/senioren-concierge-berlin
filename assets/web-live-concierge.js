@@ -97,8 +97,9 @@ async function boot(){
   const backendReady=await ready();
   const sync=()=>{
     const b=bridge();
-    const usable=backendReady&&Boolean(b?.isAllowed?.());
-    if(usable)ensureCallJoin();
+    const allowed=Boolean(b?.isAllowed?.());
+    const usable=backendReady&&allowed;
+    if(allowed)ensureCallJoin();
     const hasText=Boolean(input.value.trim());
     send.hidden=usable;
     if(usable){
