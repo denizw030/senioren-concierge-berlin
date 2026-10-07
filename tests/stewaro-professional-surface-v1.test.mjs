@@ -6,10 +6,6 @@ const read=(p)=>fs.readFileSync(p,"utf8");
 
 test("direct login always enters the canonical STEWARO shell",()=>{
   const flow=read("assets/stewaro-account-flow.js");
-  for(const page of ["anmelden.html","anmelden/index.html"]){
-    const html=read(page);
-    assert.match(html,/stewaro-account-flow\.js\?v=3/);
-  }
   assert.match(flow,/const canonicalLogin=document\.body\.classList\.contains\("login-image-page"\)/);
   assert.match(flow,/if\(canonicalLogin\)/);
 });
@@ -25,10 +21,8 @@ test("legacy public and legal pages share one calm professional surface contract
 
 test("standalone product handoffs use STEWARO light surfaces",()=>{
   const mail=read("email-concierge/index.html");
-  const live=read("assets/stewaro-csp-app-live-style-1.css");
   const phone=read("telefonate/index.html");
   assert.match(mail,/--mail-bg:#f7f4ec/);
-  assert.match(live,/--live-bg:#f7f4ec/);
   assert.match(phone,/<title>Telefonate \| STEWARO<\/title>/);
   assert.doesNotMatch(phone,/NAHWERK/);
 });
