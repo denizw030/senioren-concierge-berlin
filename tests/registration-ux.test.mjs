@@ -89,8 +89,8 @@ test("registration no longer loads photo carousel or voice-preview assets", () =
 
 test("registration uses one calm canonical step flow for self and Family entry", () => {
   assert.match(html, /stewaro-registration-wizard\.css\?v=2/);
-  assert.match(html, /stewaro-account-flow\.js\?v=5/);
-  assert.match(html, /assets\/onboarding\.js\?v=31/);
+  assert.match(html, /stewaro-account-flow\.js\?v=6/);
+  assert.match(html, /assets\/onboarding\.js\?v=32/);
   assert.match(accountFlow, /if\(!document\.body\.classList\.contains\("registration-page"\)\)return/);
   assert.doesNotMatch(accountFlow, /registration-page"\)\|\|source!==/);
   assert.match(accountFlow, /familyMode=params\.get\("fuer"\)==="andere"/);
@@ -114,6 +114,18 @@ test("wizard asks only relevant questions and starts with email", () => {
   assert.match(accountFlow, /conditional:\(\)=>safetyEnabled\.checked/);
 });
 
+test("execution result routing defaults to email and clearly prices WhatsApp", () => {
+  assert.match(accountFlow, /ensureHidden\("executionResponseChannel","EMAIL"\)/);
+  assert.match(accountFlow, /Wohin sollen Rückmeldungen zu Ausführungen gehen\?/);
+  assert.match(accountFlow, /E-Mail – empfohlen/);
+  assert.match(accountFlow, /0,06 € pro gesendeter Nachricht/);
+  assert.match(html, /id="recipientEmail"[^>]*type="email"/);
+  assert.match(html, /Für Ausführungsrückmeldungen ohne WhatsApp-Nachrichtengebühr/);
+  assert.match(onboarding, /execution_response_channel: \$\("executionResponseChannel"\)\?\.value \|\| "EMAIL"/);
+  assert.match(onboarding, /whatsapp_fee_ack_cents:[\s\S]*=== "WHATSAPP" \? 6 : 0/);
+  assert.match(onboarding, /supported_email: self \? \$\("ownerEmail"\)\.value\.trim\(\)/);
+});
+
 test("wizard preserves real controls and forwards channel preferences", () => {
   assert.match(accountFlow, /const parking=document\.createElement\("div"\)/);
   assert.match(accountFlow, /if\(stage\.contains\(node\)\)parking\.append\(node\)/);
@@ -121,7 +133,7 @@ test("wizard preserves real controls and forwards channel preferences", () => {
   assert.match(accountFlow, /whatsappEnabled/);
   assert.match(onboarding, /preferred_contact_channel: \$\("preferredContactChannel"\)\?\.value \|\| "APP"/);
   assert.match(onboarding, /whatsapp_enabled: \$\("whatsappEnabled"\)\?\.value === "true"/);
-  assert.match(onboarding, /onboarding_version: "stewaro_step_flow_v2"/);
+  assert.match(onboarding, /onboarding_version: "stewaro_step_flow_v3"/);
 });
 
 test("wizard includes optional Safety without exposing a large legacy form", () => {
