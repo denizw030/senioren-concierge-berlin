@@ -93,7 +93,7 @@
     "beneficiary_customer_member_id","accepted","state","source","customer_charge"
   ]);
   const INVITE_FIELDS=Object.freeze([
-    "first_name","last_name","relationship","whatsapp_number","preferred_language",
+    "first_name","last_name","relationship","whatsapp_number","email","execution_response_channel","whatsapp_fee_ack_cents","preferred_language",
     "concierge_choice","form_of_address","personal_message","postal_code","street_address",
     "contact_consent_attested","entitlements"
   ]);
@@ -143,11 +143,16 @@
     const concierge=String(input?.concierge_choice||"").trim();
     const address=String(input?.form_of_address||"").toUpperCase();
     const message=String(input?.personal_message||"").trim().slice(0,1200);
+    const email=String(input?.email||"").trim().toLowerCase().slice(0,320);
+    const executionResponseChannel=String(input?.execution_response_channel||"EMAIL").trim().toUpperCase();
     const postalCode=String(input?.postal_code||"").trim().slice(0,5);
     const streetAddress=String(input?.street_address||"").trim().slice(0,180);
     if(!first||!last||!Object.hasOwn(RELATIONSHIPS,relationship)||!plausiblePhone(input?.whatsapp_number))return null;
     if(postalCode&&!/^\d{5}$/.test(postalCode))return null;
     if(streetAddress&&!postalCode)return null;
+    if(email&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))return null;
+    if(!["EMAIL","WHATSAPP"].includes(executionResponseChannel))return null;
+    if(executionResponseChannel==="EMAIL"&&!email)return null;
     if(!language||!concierge||!["DU","SIE"].includes(address)||input?.contact_consent_attested!==true)return null;
     if(!Array.isArray(input?.entitlements)||input.entitlements.some((item)=>!FEATURE_CODES.includes(String(item?.feature_code||""))||!Number.isFinite(Number(item?.included_quantity))||Number(item.included_quantity)<0))return null;
     return {
@@ -155,6 +160,9 @@
       last_name:last.slice(0,120),
       relationship,
       whatsapp_number:String(input.whatsapp_number).trim(),
+      email:email||null,
+      execution_response_channel:executionResponseChannel,
+      whatsapp_fee_ack_cents:executionResponseChannel==="WHATSAPP"?6:0,
       preferred_language:language,
       concierge_choice:concierge.slice(0,120),
       form_of_address:address,
@@ -365,6 +373,8 @@
     set("familyLastName",row.last_name);
     set("familyRelationship",row.relationship||"OTHER");
     set("familyWhatsappNumber",row.whatsapp_number||"");
+    set("familyEmail",row.email||"");
+    set("familyExecutionResponseChannel",row.execution_response_channel||"EMAIL");
     set("familyPostalCode",row.postal_code||"");
     set("familyStreetAddress",row.street_address||"");
     set("familyPreferredLanguage",row.preferred_language||"de");
@@ -391,6 +401,8 @@
       last_name:document.getElementById("familyLastName").value,
       relationship:document.getElementById("familyRelationship").value,
       whatsapp_number:document.getElementById("familyWhatsappNumber").value,
+      email:document.getElementById("familyEmail")?.value||"",
+      execution_response_channel:document.getElementById("familyExecutionResponseChannel")?.value||"EMAIL",
       preferred_language:selectedLanguage(),
       concierge_choice:conciergeSelect.value,
       form_of_address:document.getElementById("familyFormOfAddress").value,
@@ -537,7 +549,7 @@
     event.preventDefault();setStatus("");
     if(!form.reportValidity())return;
     const payload=inputPayload();
-    if(!payload){setStatus("Bitte prüfe Pflichtfelder, WhatsApp-Nummer, Sprache, Concierge, Anrede und Kontingente.",true);return}
+    if(!payload){setStatus("Bitte prüfe Pflichtfelder, E-Mail/WhatsApp-Rückmeldeweg, Sprache, Concierge, Anrede und Kontingente.",true);return}
     const submit=document.getElementById("familyPersonSubmit");submit.disabled=true;
     const outcome=await createInvitation({base:FAMILY_GATEWAY_BASE,token:sessionToken(),input:payload,fetchImpl:globalThis.fetch,storage:globalThis.sessionStorage,cryptoImpl:globalThis.crypto});
     submit.disabled=false;

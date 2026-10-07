@@ -43,6 +43,8 @@ test("response routes are saved from the dedicated WhatsApp preference selector"
   assert.match(js,/async function savePreference\(selected,trigger=null\)/);
   assert.match(js,/const selected=radios\.find\(\(r\)=>r\.checked&&!r\.disabled\)\?\.value/);
   assert.match(js,/void savePreference\(selected,save\)/);
+  assert.match(js,/whatsapp_opt_in:paidWhatsApp/);
+  assert.match(js,/whatsapp_fee_ack_cents:paidWhatsApp\?6:0/);
 });
 
 test("single answers can be delivered elsewhere without changing defaults",()=>{
@@ -61,5 +63,5 @@ test("response channel layout is symmetric and responsive",()=>{
 
 test("response channel assets are cache-busted together",()=>{
   assert.match(account,/assets\/account-response-channel\.css\?v=6/);
-  assert.match(account,/assets\/account-response-channel\.js\?v=6/);
+  assert.match(account,/assets\/account-response-channel\.js\?v=7/);
 });

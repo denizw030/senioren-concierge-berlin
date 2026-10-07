@@ -123,7 +123,7 @@
   if (!Object.hasOwn(PLANS, currentPlanKey)) currentPlanKey = "free";
   const selectedPlan = () => PLANS[currentPlanKey];
   const planBookable = () => selectedPlan().bookable;
-  const recipientIds = ["recipientSalutation", "recipientFirstName", "recipientLastName", "recipientPostalCode", "recipientStreetAddress", "relationship", "recipientPhone", "familyMessage"];
+  const recipientIds = ["recipientSalutation", "recipientFirstName", "recipientLastName", "recipientPostalCode", "recipientStreetAddress", "relationship", "recipientPhone", "recipientEmail", "familyMessage"];
   const fullName = (first, last) => [first.trim(), last.trim()].filter(Boolean).join(" ");
   const isSelf = () => form.querySelector('input[name="setupFor"]:checked')?.value === "self";
   const conciergeValue = () => "fidel";
@@ -539,10 +539,14 @@
       registration_type: self ? "self" : "other", account_holder_name: fullName($("ownerFirstName").value, $("ownerLastName").value), account_holder_salutation: $("ownerSalutation").value,
       account_holder_first_name: $("ownerFirstName").value.trim(), account_holder_last_name: $("ownerLastName").value.trim(), account_holder_postal_code: self ? ($("ownerPostalCode")?.value.trim() || "") : "", postal_code: self ? ($("ownerPostalCode")?.value.trim() || "") : ($("recipientPostalCode")?.value.trim() || ""), street_address: self ? ($("ownerStreetAddress")?.value.trim() || "") : ($("recipientStreetAddress")?.value.trim() || ""), email: $("ownerEmail").value.trim(), phone: self ? $("ownerPhone").value.trim() : "",
       supported_person_name: fullName(p.first, p.last), supported_person_salutation: p.sal, supported_person_first_name: p.first, supported_person_last_name: p.last,
-      relationship: self ? "Ich selbst" : $("relationship").selectedOptions[0].textContent.trim(), supported_whatsapp: p.phone, form_of_address: $("addressing").value.toUpperCase(),
+      relationship: self ? "Ich selbst" : $("relationship").selectedOptions[0].textContent.trim(), supported_whatsapp: p.phone,
+      supported_email: self ? $("ownerEmail").value.trim() : ($("recipientEmail")?.value.trim() || ""),
+      form_of_address: $("addressing").value.toUpperCase(),
       preferred_contact_channel: $("preferredContactChannel")?.value || "APP",
       whatsapp_enabled: $("whatsappEnabled")?.value === "true",
-      onboarding_version: "stewaro_step_flow_v2",
+      execution_response_channel: $("executionResponseChannel")?.value || "EMAIL",
+      whatsapp_fee_ack_cents: ($("executionResponseChannel")?.value || "EMAIL") === "WHATSAPP" ? 6 : 0,
+      onboarding_version: "stewaro_step_flow_v3",
       initial_notes: (() => {
         const notes = $("note").value.trim();
         const personal = self ? "" : familyMessageValue();
@@ -567,6 +571,9 @@
       postal_code: String($("recipientPostalCode")?.value || "").trim(),
       street_address: String($("recipientStreetAddress")?.value || "").trim(),
       whatsapp_number: request.supported_whatsapp,
+      email: request.supported_email,
+      execution_response_channel: request.execution_response_channel,
+      whatsapp_fee_ack_cents: request.whatsapp_fee_ack_cents,
       preferred_language: "de",
       form_of_address: request.form_of_address,
       contact_consent_attested: request.contact_consent === true,
@@ -587,6 +594,7 @@
       supported_person_last_name: request.account_holder_last_name,
       relationship: "Ich selbst",
       supported_whatsapp: "",
+      supported_email: request.account_holder_first_name ? request.email : "",
       phone: "",
       form_of_address: "DU",
       contact_consent: true,
@@ -598,6 +606,10 @@
       postal_code: "",
       street_address: "",
       account_holder_web_only: true,
+      preferred_contact_channel: "APP",
+      whatsapp_enabled: false,
+      execution_response_channel: "EMAIL",
+      whatsapp_fee_ack_cents: 0,
       family_setup_pending: true
     } : request;
     const draft = { ...request, web_password: undefined, web_password_repeat: undefined, createdAt: new Date().toISOString(), source: "website" };

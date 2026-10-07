@@ -93,6 +93,8 @@ function page(mode){
     set("familyLastName","Cimen");
     set("familyRelationship","MOTHER");
     set("familyWhatsappNumber","+491700000777");
+    set("familyEmail","huelya@example.com");
+    set("familyExecutionResponseChannel","EMAIL");
     set("familyPreferredLanguage","tr");
     set("familyConciergeChoice","leyla");
     set("familyFormOfAddress","DU");

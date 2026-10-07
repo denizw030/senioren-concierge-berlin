@@ -68,6 +68,7 @@
   };
   const preferredContact=ensureHidden("preferredContactChannel","APP");
   const whatsappEnabled=ensureHidden("whatsappEnabled","false");
+  const executionResponseChannel=ensureHidden("executionResponseChannel","EMAIL");
   const setWhatsappEnabled=(enabled)=>{
     const on=Boolean(enabled);
     whatsappEnabled.value=on?"true":"false";
@@ -89,6 +90,7 @@
   const recipientFirst=$("recipientFirstName");
   const recipientLast=$("recipientLastName");
   const recipientPhone=$("recipientPhone");
+  const recipientEmail=$("recipientEmail");
   const relationship=$("relationship");
   const addressing=$("addressing");
   const safetyEnabled=$("safetyEnabled");
@@ -166,7 +168,7 @@
   const movableNodes=[
     fieldNode(emailInput),fieldNode(ownerFirst),fieldNode(ownerLast),fieldNode(ownerPostal),fieldNode(ownerStreet),
     fieldNode(password),fieldNode(ownerPhone),fieldNode(recipientFirst),fieldNode(recipientLast),fieldNode(recipientPostal),fieldNode(recipientStreet),
-    fieldNode(recipientPhone),fieldNode(relationship),safetyFields,privacyRow,termsRow,consentRow,
+    fieldNode(recipientPhone),fieldNode(recipientEmail),fieldNode(relationship),safetyFields,privacyRow,termsRow,consentRow,
     submit,status
   ].filter(Boolean);
   const parkCurrentFields=()=>{
@@ -288,7 +290,7 @@
     render(){
       return makeChoiceScreen([
         {label:"App",value:"APP",description:"Ohne zusätzliche Nachrichtengebühr"},
-        {label:"WhatsApp",value:"WHATSAPP",description:"Direkt im gewohnten Chat"}
+        {label:"WhatsApp",value:"WHATSAPP",description:"Direkt im gewohnten Chat · 0,06 € je gesendeter Nachricht"}
       ],value=>{
         preferredContact.value=value;
         setWhatsappEnabled(value==="WHATSAPP");
@@ -306,14 +308,55 @@
     intro:"Nur wenn du FIDEL auch über WhatsApp erreichen möchtest.",
     render(){
       return makeChoiceScreen([
-        {label:"Ja, zusätzlich",value:"yes"},
-        {label:"Nein, nur App",value:"no"}
+        {label:"Ja, zusätzlich",value:"yes",description:"0,06 € je von FIDEL gesendeter WhatsApp-Nachricht"},
+        {label:"Nein, nur App",value:"no",description:"Keine WhatsApp-Nachrichtengebühr"}
       ],value=>{
         setWhatsappEnabled(value==="yes");
         goNext();
       });
     },
     validate:()=>whatsappEnabled.value==="true"||whatsappEnabled.value==="false"
+  });
+
+  add({
+    key:"execution-results",
+    title:"Wohin sollen Rückmeldungen zu Ausführungen gehen?",
+    intro:"E-Mail ist empfohlen. WhatsApp kostet 0,06 € pro gesendeter Nachricht; Statusmeldungen werden möglichst gebündelt.",
+    render(){
+      const box=document.createElement("div");
+      box.className="stewaro-wizard-fields";
+      if(familyMode&&recipientEmail){
+        recipientEmail.required=false;
+        const emailNode=fieldNode(recipientEmail);
+        if(emailNode)box.append(emailNode);
+      }
+      const choices=makeChoiceScreen([
+        {label:"E-Mail – empfohlen",value:"EMAIL",description:"Ohne WhatsApp-Nachrichtengebühr"},
+        {label:"WhatsApp",value:"WHATSAPP",description:"0,06 € pro gesendeter Nachricht"}
+      ],value=>{
+        if(value==="EMAIL"&&familyMode){
+          const email=String(recipientEmail?.value||"").trim();
+          if(!email){
+            recipientEmail.required=true;
+            recipientEmail.setCustomValidity("Bitte gib die E-Mail-Adresse des Klienten an oder wähle WhatsApp.");
+            recipientEmail.reportValidity();
+            recipientEmail.setCustomValidity("");
+            return;
+          }
+          if(recipientEmail.reportValidity()===false)return;
+        }
+        executionResponseChannel.value=value;
+        if(value==="WHATSAPP"){
+          if(recipientEmail)recipientEmail.required=false;
+          setWhatsappEnabled(true);
+        }
+        goNext();
+      });
+      box.append(choices);
+      return box;
+    },
+    focus:familyMode?recipientEmail:null,
+    validate:()=>executionResponseChannel.value==="EMAIL"||executionResponseChannel.value==="WHATSAPP"
   });
 
   add({
@@ -397,6 +440,7 @@
       const postalCode=String((familyMode?recipientPostal:ownerPostal)?.value||"").trim();
       const streetAddress=String((familyMode?recipientStreet:ownerStreet)?.value||"").trim();
       const channel=preferredContact.value==="WHATSAPP"?"WhatsApp":(whatsappEnabled.value==="true"?"App · WhatsApp zusätzlich":"App");
+      const executionChannel=executionResponseChannel.value==="WHATSAPP"?"WhatsApp · 0,06 € / Nachricht":"E-Mail · ohne WhatsApp-Nachrichtengebühr";
       const checkinValue=String($("checkinTimes")?.value||"").trim();
       const safety=safetyEnabled.checked?(checkinValue?/^\d{2}:\d{2}$/.test(checkinValue)?"Täglich um "+checkinValue+" Uhr":checkinValue:"Ja"):"Nein";
       const summaryRows=[
@@ -404,7 +448,7 @@
         [familyMode?"PLZ Klient":"PLZ",postalCode||"—"]
       ];
       if(streetAddress)summaryRows.push(["Adresse",streetAddress]);
-      summaryRows.push(["Hauptkontakt",channel],["Safety-Check-in",safety]);
+      summaryRows.push(["Hauptkontakt",channel],["Ausführungsrückmeldungen",executionChannel],["Safety-Check-in",safety]);
       for(const [label,value] of summaryRows){
         const row=document.createElement("div");
         const labelNode=document.createElement("span");

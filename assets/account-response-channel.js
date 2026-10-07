@@ -98,7 +98,12 @@
     setFeedback("Wird gespeichert …");
     if(quickStatus)quickStatus.textContent="Wird gespeichert …";
     try{
-      const r=await fetch(ENDPOINT,{method:"POST",headers:{Authorization:"Bearer "+t,"Content-Type":"application/json"},body:JSON.stringify({preferred_channel:selected}),signal:AbortSignal.timeout(10000)});
+      const paidWhatsApp=selected==="SAME_CHANNEL"||selected==="WHATSAPP";
+      const r=await fetch(ENDPOINT,{method:"POST",headers:{Authorization:"Bearer "+t,"Content-Type":"application/json"},body:JSON.stringify({
+        preferred_channel:selected,
+        whatsapp_opt_in:paidWhatsApp,
+        whatsapp_fee_ack_cents:paidWhatsApp?6:0
+      }),signal:AbortSignal.timeout(10000)});
       const d=await r.json().catch(()=>({}));
       if(!r.ok||d?.ok!==true)throw new Error(String(d?.error||"save_failed"));
       apply(d);
