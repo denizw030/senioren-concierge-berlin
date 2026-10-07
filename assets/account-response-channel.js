@@ -53,20 +53,21 @@
   const quickStatus=document.getElementById("conciergeQuickChannelStatus");
   function token(){try{return JSON.parse(sessionStorage.getItem("scb_web_session")||"null")?.session_token||""}catch{return ""}}
   function setFeedback(message,kind=""){feedback.textContent=message;feedback.className="response-channel-save-status"+(kind?" is-"+kind:"")}
-  function label(channel){return {SAME_CHANNEL:"WhatsApp",WHATSAPP:"WhatsApp",EMAIL:"E-Mail",CALL:"Anruf"}[channel]||channel}
+  function label(channel){return {WHATSAPP:"WhatsApp",EMAIL:"E-Mail"}[channel]||channel}
   function apply(data){
-    const stored=String(data?.preferred_channel||"SAME_CHANNEL").toUpperCase();
-    const selected=stored==="WHATSAPP"?"SAME_CHANNEL":stored;
+    const stored=String(data?.preferred_channel||data?.default_channel||"EMAIL").toUpperCase();
+    const selected=stored==="SAME_CHANNEL"?"WHATSAPP":stored;
     const available=data?.available||{};
     radios.forEach((radio)=>{
-      const enabled=radio.value==="SAME_CHANNEL"?available?.WHATSAPP===true:available?.[radio.value]===true;
+      const normalized=radio.value==="SAME_CHANNEL"?"WHATSAPP":radio.value;
+      const enabled=["EMAIL","WHATSAPP"].includes(normalized)&&available?.[normalized]===true;
       radio.disabled=!enabled;
       radio.closest(".response-channel-option")?.classList.toggle("is-disabled",!enabled);
-      radio.checked=radio.value===selected&&enabled;
+      radio.checked=(radio.value==="SAME_CHANNEL"?"WHATSAPP":radio.value)===selected&&enabled;
     });
     if(!radios.some((r)=>r.checked&&!r.disabled)){
-      const same=radios.find((r)=>r.value==="SAME_CHANNEL"&&!r.disabled);
-      if(same)same.checked=true;
+      const email=radios.find((r)=>r.value==="EMAIL"&&!r.disabled);
+      if(email)email.checked=true;
     }
     if(emailTarget)emailTarget.textContent=available.EMAIL===true?(data?.targets?.email?"An "+data.targets.email+".":"E-Mail ist verfügbar."):"Keine E-Mail-Adresse verfügbar.";
     if(whatsappTarget)whatsappTarget.textContent=available.WHATSAPP===true?(data?.targets?.whatsapp?"Direkt zurück an "+data.targets.whatsapp+".":"Direkt zurück über diesen Kanal."):"Keine WhatsApp-Nummer verfügbar.";
@@ -77,7 +78,7 @@
       button.classList.toggle("is-selected",selected===target);
       button.setAttribute("aria-pressed",String(selected===target));
     });
-    if(status)status.textContent="WhatsApp → "+label(selected);
+    if(status)status.textContent="Ausführungen → "+label(selected);
   }
   async function load(){
     const t=token();if(!t){status.textContent="Nicht verfügbar";return}
@@ -98,17 +99,23 @@
     setFeedback("Wird gespeichert …");
     if(quickStatus)quickStatus.textContent="Wird gespeichert …";
     try{
-      const r=await fetch(ENDPOINT,{method:"POST",headers:{Authorization:"Bearer "+t,"Content-Type":"application/json"},body:JSON.stringify({preferred_channel:selected}),signal:AbortSignal.timeout(10000)});
+      const normalized=selected==="SAME_CHANNEL"?"WHATSAPP":selected;
+      const payload={preferred_channel:normalized};
+      if(normalized==="WHATSAPP"){
+        payload.whatsapp_paid_opt_in=true;
+        payload.whatsapp_unit_price_cents=6;
+      }
+      const r=await fetch(ENDPOINT,{method:"POST",headers:{Authorization:"Bearer "+t,"Content-Type":"application/json"},body:JSON.stringify(payload),signal:AbortSignal.timeout(10000)});
       const d=await r.json().catch(()=>({}));
       if(!r.ok||d?.ok!==true)throw new Error(String(d?.error||"save_failed"));
       apply(d);
       const savedLabel=label(d.preferred_channel);
-      setFeedback("Gespeichert. WhatsApp-Aufträge werden künftig per "+savedLabel+" beantwortet.","success");
-      if(quickStatus)quickStatus.textContent="Gespeichert: WhatsApp → "+savedLabel;
+      setFeedback("Gespeichert. Ausführungsrückmeldungen kommen künftig per "+savedLabel+".","success");
+      if(quickStatus)quickStatus.textContent="Gespeichert: Ausführungen → "+savedLabel;
       return true;
     }catch(e){
       const code=String(e?.message||"");
-      const message=code.includes("UNAVAILABLE")?"Dieser Antwortkanal ist noch nicht verfügbar.":"Die Einstellung konnte gerade nicht gespeichert werden.";
+      const message=code.includes("WHATSAPP_PRICE_ACK_REQUIRED")?"WhatsApp kann erst nach dem Hinweis auf 0,06 € pro Nachricht aktiviert werden.":(code.includes("UNAVAILABLE")?"Dieser Antwortkanal ist noch nicht verfügbar.":"Die Einstellung konnte gerade nicht gespeichert werden.");
       setFeedback(message,"error");
       if(quickStatus)quickStatus.textContent=message;
       return false;
@@ -130,7 +137,7 @@
   quickButtons.forEach((button)=>{
     button.addEventListener("click",()=>{
       const selected=String(button.dataset.responseChannelQuick||"").toUpperCase();
-      if(!["EMAIL","CALL"].includes(selected))return;
+      if(selected!=="EMAIL")return;
       void savePreference(selected,button);
     });
   });
