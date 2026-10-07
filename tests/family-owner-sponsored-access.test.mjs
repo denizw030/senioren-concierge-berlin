@@ -15,11 +15,25 @@ function storage(){const m=new Map();return {getItem:k=>m.has(k)?m.get(k):null,s
 function response(status,body){return {status,ok:status>=200&&status<300,json:async()=>body}}
 const h=hooks(),token="x".repeat(40);
 const entitlements=Object.fromEntries(h.FEATURE_CODES.map(code=>[code,1]));
-const input={first_name:"Ayse",last_name:"Example",relationship:"MOTHER",whatsapp_number:"+491700000011",preferred_language:"tr",concierge_choice:"leyla",form_of_address:"DU",personal_message:"Hallo",contact_consent_attested:true,entitlements:h.buildEntitlements(entitlements)};
+const input={first_name:"Ayse",last_name:"Example",relationship:"MOTHER",whatsapp_number:"+491700000011",email:"ayse@example.com",execution_response_channel:"EMAIL",preferred_language:"tr",concierge_choice:"leyla",form_of_address:"DU",personal_message:"Hallo",contact_consent_attested:true,entitlements:h.buildEntitlements(entitlements)};
 
 test("normal user cannot see OWNER controls by default",()=>{assert.match(konto,/id="familyOwnerPanel" hidden/);assert.equal(h.operatorContextAllowed({ok:true,operator:{role:"MEMBER",can_manage_sponsored_people:true},browser_actor_authority:false}),false)});
 test("server OWNER context alone enables controls",()=>{assert.equal(h.operatorContextAllowed({ok:true,operator:{role:"OWNER",can_manage_sponsored_people:true,can_manage_sponsored_entitlements:true},browser_actor_authority:false}),true);assert.equal(h.operatorContextAllowed({ok:true,operator:{role:"OWNER",can_manage_sponsored_people:false},browser_actor_authority:false}),false);assert.equal(h.operatorContextAllowed({ok:true,operator:{role:"OWNER",can_manage_sponsored_people:true},browser_actor_authority:true}),false)});
-test("browser invitation payload cannot forge authority",()=>{const p=h.invitationPayload(input);assert.deepEqual(Object.keys(p),["first_name","last_name","relationship","whatsapp_number","preferred_language","concierge_choice","form_of_address","personal_message","postal_code","street_address","contact_consent_attested","entitlements"]);for(const f of h.FORBIDDEN_AUTHORITY_FIELDS)assert.equal(Object.hasOwn(p,f),false)});
+test("browser invitation payload cannot forge authority",()=>{const p=h.invitationPayload(input);assert.deepEqual(Object.keys(p),["first_name","last_name","relationship","whatsapp_number","email","execution_response_channel","whatsapp_fee_ack_cents","preferred_language","concierge_choice","form_of_address","personal_message","postal_code","street_address","contact_consent_attested","entitlements"]);for(const f of h.FORBIDDEN_AUTHORITY_FIELDS)assert.equal(Object.hasOwn(p,f),false)});
+test("Family execution results default to email and price WhatsApp explicitly",()=>{
+  assert.match(konto,/id="familyEmail"[^>]*type="email"/);
+  assert.match(konto,/id="familyExecutionResponseChannel"[^>]*required/);
+  assert.match(konto,/E-Mail – empfohlen · ohne WhatsApp-Nachrichtengebühr/);
+  assert.match(konto,/WhatsApp · 0,06 € pro gesendeter Nachricht/);
+  const emailPayload=h.invitationPayload(input);
+  assert.equal(emailPayload.execution_response_channel,"EMAIL");
+  assert.equal(emailPayload.whatsapp_fee_ack_cents,0);
+  const waPayload=h.invitationPayload({...input,email:"",execution_response_channel:"WHATSAPP"});
+  assert.equal(waPayload.execution_response_channel,"WHATSAPP");
+  assert.equal(waPayload.whatsapp_fee_ack_cents,6);
+  assert.equal(h.invitationPayload({...input,email:"",execution_response_channel:"EMAIL"}),null);
+});
+
 test("Person hinzufügen flow and required consent are present",()=>{assert.match(konto,/id="familyPersonAddButton"[^>]*>Person hinzufügen/);assert.match(konto,/id="familyFirstName"[^>]*required/);assert.match(konto,/id="familyLastName"[^>]*required/);assert.match(konto,/id="familyWhatsappNumber"[^>]*required/);assert.match(konto,/id="familyContactConsent"[^>]*required/);assert.equal(h.invitationPayload({...input,contact_consent_attested:false}),null)});
 test("phone validation is UX-only and rejects implausible input",()=>{assert.equal(h.plausiblePhone("+49 170 0000011"),true);assert.equal(h.plausiblePhone("abc"),false);assert.equal(h.plausiblePhone("123"),false)});
 test("languages include de tr en fr es and stay BCP47 extensible",()=>{for(const code of ["de","tr","en","fr","es"])assert.match(konto,new RegExp('value="'+code+'"'));assert.equal(h.normalizeLanguage("de-at"),"de-AT");assert.equal(h.normalizeLanguage("pl"),"pl");assert.equal(h.normalizeLanguage("bad language"),null)});
@@ -47,7 +61,7 @@ test("registration handoff prefills the verified Family invitation without bypas
   assert.match(js,/contact_consent_attested/);
   assert.match(js,/sessionStorage\?\.removeItem\(REGISTRATION_DRAFT_KEY\)/);
   assert.match(js,/Er kann erst nach der Bestätigung der unterstützten Person aktiviert werden/);
-  assert.match(konto,/assets\/family-owner-sponsored-access\.js\?v=4/);
+  assert.match(konto,/assets\/family-owner-sponsored-access\.js\?v=5/);
   assert.match(konto,/<option value="SIE">Sie<\/option>/);
 });
 
