@@ -914,20 +914,11 @@ body.account-premium-ui:has(#accountTabEmail[aria-selected="true"]) .account-pan
 
 /* STEWARO CLIENT PORTAL V2 — ACCOUNT CENTER FINAL OVERRIDES
    Presentation only. Existing tabs, auth, endpoints and runtime state remain untouched. */
-html body.account-premium-ui.account-premium-ui{
-  --portal-v2-bg:#f6f1e7;
-  --portal-v2-paper:#fffdf9;
-  --portal-v2-ink:#171714;
-  --portal-v2-green:#10271f;
-  --portal-v2-muted:#6d675e;
-  --portal-v2-gold:#a98548;
-  --portal-v2-line:rgba(16,39,31,.12);
-}
 html[data-nw-portal-theme="light"] body.account-premium-ui.account-premium-ui main,
 html body.account-premium-ui.account-premium-ui.nw-portal-light main{
   background:
     radial-gradient(880px 520px at 92% -2%,rgba(188,157,96,.15),transparent 68%),
-    linear-gradient(180deg,#fbf9f4 0%,var(--portal-v2-bg) 62%,#f1e9dd 100%)!important;
+    linear-gradient(180deg,#fbf9f4 0%,#f6f1e7 62%,#f1e9dd 100%)!important;
 }
 html[data-nw-portal-theme="light"] body.account-premium-ui.account-premium-ui .account-hero,
 html body.account-premium-ui.account-premium-ui.nw-portal-light .account-hero{
@@ -937,7 +928,7 @@ html body.account-premium-ui.account-premium-ui.nw-portal-light .account-hero{
 }
 html[data-nw-portal-theme="light"] body.account-premium-ui.account-premium-ui .account-hero h1,
 html body.account-premium-ui.account-premium-ui.nw-portal-light .account-hero h1{
-  color:var(--portal-v2-green)!important;
+  color:#10271f!important;
   font-family:Georgia,"Times New Roman",serif!important;
   font-size:clamp(2.25rem,4.6vw,4.1rem)!important;
   font-weight:400!important;
@@ -958,7 +949,7 @@ html body.account-premium-ui.account-premium-ui.nw-portal-light .account-setup-b
   gap:2px 14px!important;
   margin:0 0 14px!important;
   padding:14px 16px!important;
-  border:1px solid var(--portal-v2-line)!important;
+  border:1px solid rgba(16,39,31,.12)!important;
   border-radius:18px!important;
   background:rgba(255,253,249,.70)!important;
   box-shadow:none!important;
@@ -966,26 +957,26 @@ html body.account-premium-ui.account-premium-ui.nw-portal-light .account-setup-b
 html body.account-premium-ui.account-premium-ui .account-setup-by .eyebrow{
   grid-column:1!important;
   grid-row:1!important;
-  color:var(--portal-v2-gold)!important;
+  color:#a98548!important;
 }
 html body.account-premium-ui.account-premium-ui .account-setup-name{
   grid-column:1!important;
   grid-row:2!important;
   font-size:15px!important;
-  color:var(--portal-v2-green)!important;
+  color:#10271f!important;
 }
 html body.account-premium-ui.account-premium-ui .account-setup-context-label{
   grid-column:2!important;
   grid-row:1/3!important;
   align-self:center!important;
-  color:var(--portal-v2-muted)!important;
+  color:#6d675e!important;
 }
 html body.account-premium-ui.account-premium-ui .account-tabs-shell{
   position:relative!important;
   top:auto!important;
   margin:0 0 18px!important;
   padding:5px!important;
-  border:1px solid var(--portal-v2-line)!important;
+  border:1px solid rgba(16,39,31,.12)!important;
   border-radius:18px!important;
   background:rgba(255,253,249,.72)!important;
   box-shadow:none!important;
@@ -1036,7 +1027,7 @@ html body.account-premium-ui.account-premium-ui .account-tabs.account-tabs-moder
 }
 html body.account-premium-ui.account-premium-ui .account-tabs.account-tabs-modern .account-tab[aria-selected="true"]{
   background:#fff!important;
-  color:var(--portal-v2-green)!important;
+  color:#10271f!important;
   box-shadow:0 5px 16px rgba(51,43,28,.07)!important;
 }
 html body.account-premium-ui.account-premium-ui .account-tabs.account-tabs-modern .account-tab::after{
@@ -1061,7 +1052,7 @@ html body.account-premium-ui.account-premium-ui .dash>.summary-card[data-account
   grid-column:span 6!important;
   min-height:118px!important;
   padding:20px!important;
-  border:1px solid var(--portal-v2-line)!important;
+  border:1px solid rgba(16,39,31,.12)!important;
   border-radius:22px!important;
   background:rgba(255,253,249,.74)!important;
   box-shadow:none!important;
@@ -1076,7 +1067,7 @@ html body.account-premium-ui.account-premium-ui .account-overview-highlights[dat
 html body.account-premium-ui.account-premium-ui .account-overview-highlights[data-account-panel="overview"]>.account-overview-link{
   min-height:176px!important;
   padding:24px!important;
-  border:1px solid var(--portal-v2-line)!important;
+  border:1px solid rgba(16,39,31,.12)!important;
   border-radius:24px!important;
   background:rgba(255,253,249,.82)!important;
   box-shadow:0 16px 42px rgba(51,43,28,.055)!important;
@@ -1093,18 +1084,18 @@ html body.account-premium-ui.account-premium-ui .account-overview-highlights[dat
   grid-column:span 3!important;
 }
 html body.account-premium-ui.account-premium-ui .account-overview-link .eyebrow{
-  color:var(--portal-v2-gold)!important;
+  color:#a98548!important;
   margin-bottom:11px!important;
 }
 html body.account-premium-ui.account-premium-ui .account-overview-link strong,
 html body.account-premium-ui.account-premium-ui .account-overview-link .value{
-  color:var(--portal-v2-green)!important;
+  color:#10271f!important;
   font-size:clamp(1.15rem,1.8vw,1.6rem)!important;
   line-height:1.15!important;
 }
 html body.account-premium-ui.account-premium-ui .account-overview-link>span:last-child,
 html body.account-premium-ui.account-premium-ui .account-overview-link .muted{
-  color:var(--portal-v2-muted)!important;
+  color:#6d675e!important;
   font-size:12.5px!important;
   line-height:1.55!important;
 }
@@ -1125,7 +1116,7 @@ html body.account-premium-ui.account-premium-ui .account-panel-heading[data-acco
   border:0!important;
 }
 html body.account-premium-ui.account-premium-ui .account-panel-heading[data-account-panel]:not([data-account-panel="overview"]) h2{
-  color:var(--portal-v2-green)!important;
+  color:#10271f!important;
   font-family:Georgia,"Times New Roman",serif!important;
   font-size:clamp(2rem,4vw,3.3rem)!important;
   font-weight:400!important;
@@ -1133,7 +1124,7 @@ html body.account-premium-ui.account-premium-ui .account-panel-heading[data-acco
 html body.account-premium-ui.account-premium-ui .dash>article.card[data-account-panel]:not([data-account-panel="overview"]){
   grid-column:1/-1!important;
   padding:24px!important;
-  border:1px solid var(--portal-v2-line)!important;
+  border:1px solid rgba(16,39,31,.12)!important;
   border-radius:24px!important;
   background:rgba(255,253,249,.80)!important;
   background-image:none!important;
@@ -1141,7 +1132,7 @@ html body.account-premium-ui.account-premium-ui .dash>article.card[data-account-
 }
 html[data-nw-portal-theme="light"] body.account-premium-ui.account-premium-ui :is(.usagebox,.safety-hub-card,.email-provider-card,.email-capability,.response-channel-option,.mfa-method,.access-person,.access-right,.family-owner-panel,.family-managed-detail),
 html body.account-premium-ui.account-premium-ui.nw-portal-light :is(.usagebox,.safety-hub-card,.email-provider-card,.email-capability,.response-channel-option,.mfa-method,.access-person,.access-right,.family-owner-panel,.family-managed-detail){
-  border:1px solid var(--portal-v2-line)!important;
+  border:1px solid rgba(16,39,31,.12)!important;
   border-radius:18px!important;
   background:rgba(255,255,255,.52)!important;
   background-image:none!important;
