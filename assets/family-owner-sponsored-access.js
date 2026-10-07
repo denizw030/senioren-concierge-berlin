@@ -49,6 +49,7 @@
   }
   const PENDING_INVITE_KEY="nw_family_owner_invite_pending_v1";
   const REGISTRATION_DRAFT_KEY="nw_family_registration_pending_v1";
+  const EXECUTION_RESULT_DRAFT_KEY="nw_execution_result_onboarding_v1";
   const INERT_MESSAGE="Diese Funktion wird derzeit vorbereitet.";
   const RELATIONSHIPS=Object.freeze({
     MOTHER:"Mutter",FATHER:"Vater",GRANDMOTHER:"Großmutter",GRANDFATHER:"Großvater",
@@ -414,16 +415,23 @@
       return row?.version===1&&row?.first_name&&row?.last_name?row:null;
     }catch{return null}
   }
+  function readExecutionResultDraft(storage=globalThis.sessionStorage){
+    try{
+      const row=JSON.parse(storage?.getItem(EXECUTION_RESULT_DRAFT_KEY)||"null");
+      return row?.version===1&&row?.scope==="family"?row:null;
+    }catch{return null}
+  }
   function applyRegistrationDraft(){
     const row=readRegistrationDraft();
     if(!row)return false;
+    const resultDraft=readExecutionResultDraft();
     const set=(id,value)=>{const input=document.getElementById(id);if(input&&value!=null)input.value=String(value)};
     set("familyFirstName",row.first_name);
     set("familyLastName",row.last_name);
     set("familyRelationship",row.relationship||"OTHER");
     set("familyWhatsappNumber",row.whatsapp_number||"");
-    set("familyEmail",row.email||"");
-    set("familyExecutionResultChannel",row.execution_result_channel||"EMAIL");
+    set("familyEmail",resultDraft?.recipient_email||row.email||"");
+    set("familyExecutionResultChannel",resultDraft?.channel||row.execution_result_channel||"EMAIL");
     set("familyPostalCode",row.postal_code||"");
     set("familyStreetAddress",row.street_address||"");
     set("familyPreferredLanguage",row.preferred_language||"de");
@@ -606,6 +614,7 @@
     submit.disabled=false;
     if(!outcome.ok){setStatus(outcome.kind==="runtime_inert"?INERT_MESSAGE:"Die Einladung konnte nicht sicher bestätigt werden. Es wurde kein lokaler Erfolgsstatus erzeugt.",true);return}
     globalThis.sessionStorage?.removeItem(REGISTRATION_DRAFT_KEY);
+    globalThis.sessionStorage?.removeItem(EXECUTION_RESULT_DRAFT_KEY);
     renderInviteDelivery(outcome.outbound);
     setFormOpen(false);await loadPeople();
   });
