@@ -68,6 +68,9 @@
   };
   const preferredContact=ensureHidden("preferredContactChannel","APP");
   const whatsappEnabled=ensureHidden("whatsappEnabled","false");
+  const executionResultChannel=ensureHidden("executionResultChannel","EMAIL");
+  const whatsappExecutionOptIn=ensureHidden("whatsappExecutionOptIn","false");
+  const whatsappExecutionFeeCents=ensureHidden("whatsappExecutionFeeCents","");
   const setWhatsappEnabled=(enabled)=>{
     const on=Boolean(enabled);
     whatsappEnabled.value=on?"true":"false";
@@ -89,6 +92,21 @@
   const recipientFirst=$("recipientFirstName");
   const recipientLast=$("recipientLastName");
   const recipientPhone=$("recipientPhone");
+  let recipientEmail=$("recipientEmail");
+  if(familyMode&&!recipientEmail){
+    const field=document.createElement("div");
+    field.className="field";
+    const label=document.createElement("label");
+    label.htmlFor="recipientEmail";
+    label.textContent="E-Mail-Adresse des Klienten (optional)";
+    recipientEmail=document.createElement("input");
+    recipientEmail.id="recipientEmail";recipientEmail.type="email";recipientEmail.autocomplete="email";
+    const help=document.createElement("span");
+    help.className="tiny";
+    help.textContent="Empfohlen für Ausführungsrückmeldungen per E-Mail ohne WhatsApp-Nachrichtengebühr.";
+    field.append(label,recipientEmail,help);
+    form.append(field);
+  }
   const relationship=$("relationship");
   const addressing=$("addressing");
   const safetyEnabled=$("safetyEnabled");
@@ -166,7 +184,7 @@
   const movableNodes=[
     fieldNode(emailInput),fieldNode(ownerFirst),fieldNode(ownerLast),fieldNode(ownerPostal),fieldNode(ownerStreet),
     fieldNode(password),fieldNode(ownerPhone),fieldNode(recipientFirst),fieldNode(recipientLast),fieldNode(recipientPostal),fieldNode(recipientStreet),
-    fieldNode(recipientPhone),fieldNode(relationship),safetyFields,privacyRow,termsRow,consentRow,
+    fieldNode(recipientPhone),fieldNode(recipientEmail),fieldNode(relationship),safetyFields,privacyRow,termsRow,consentRow,
     submit,status
   ].filter(Boolean);
   const parkCurrentFields=()=>{
@@ -251,6 +269,14 @@
       "Nur der Name der Person, die FIDEL unterstützen soll.",
       [fieldNode(recipientFirst),fieldNode(recipientLast)],
       [recipientFirst,recipientLast]
+    );
+    addInputStep(
+      "recipient-email",
+      "Wie lautet die E-Mail-Adresse des Klienten?",
+      "Optional, aber empfohlen: Ausführungsrückmeldungen können so per E-Mail statt kostenpflichtig über WhatsApp kommen.",
+      [fieldNode(recipientEmail)],
+      [recipientEmail],
+      {optional:true,validate:()=>recipientEmail?.value?recipientEmail.reportValidity():true}
     );
     addPostalStep(
       "recipient-postal",
@@ -337,6 +363,25 @@
   });
 
   add({
+    key:"execution-results",
+    conditional:()=>whatsappEnabled.value==="true",
+    title:"Wie sollen Ausführungsrückmeldungen kommen?",
+    intro:"E-Mail ist der Standard. WhatsApp kostet 0,06 € pro gesendeter Nachricht; Zwischenstände werden gebündelt.",
+    render(){
+      return makeChoiceScreen([
+        {label:"E-Mail · empfohlen",value:"EMAIL",description:"Keine WhatsApp-Nachrichtengebühr"},
+        {label:"WhatsApp · 0,06 €",value:"WHATSAPP",description:"0,06 € pro gesendeter Nachricht"}
+      ],value=>{
+        executionResultChannel.value=value;
+        whatsappExecutionOptIn.value=value==="WHATSAPP"?"true":"false";
+        whatsappExecutionFeeCents.value=value==="WHATSAPP"?"6":"";
+        goNext();
+      });
+    },
+    validate:()=>["EMAIL","WHATSAPP"].includes(executionResultChannel.value)
+  });
+
+  add({
     key:"addressing",
     title:"Wie soll FIDEL ansprechen?",
     intro:familyMode?"Wähle, wie FIDEL die unterstützte Person ansprechen soll.":"Wähle die Ansprache, die sich richtig anfühlt.",
@@ -404,7 +449,8 @@
         [familyMode?"PLZ Klient":"PLZ",postalCode||"—"]
       ];
       if(streetAddress)summaryRows.push(["Adresse",streetAddress]);
-      summaryRows.push(["Hauptkontakt",channel],["Safety-Check-in",safety]);
+      const resultChannel=executionResultChannel.value==="WHATSAPP"?"WhatsApp · 0,06 € pro Nachricht":"E-Mail · ohne WhatsApp-Gebühr";
+      summaryRows.push(["Hauptkontakt",channel],["Ausführungsrückmeldungen",resultChannel],["Safety-Check-in",safety]);
       for(const [label,value] of summaryRows){
         const row=document.createElement("div");
         const labelNode=document.createElement("span");
