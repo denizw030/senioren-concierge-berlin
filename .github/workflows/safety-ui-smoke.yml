@@ -61,7 +61,7 @@ jobs:
               'Mailbox',
               'safetyToggleLabel.textContent = enabled ? "Deaktivieren" : "Aktivieren"',
               'const enteredContacts = rawContacts.filter',
-              'await saveSafetyContacts(token, previousContacts).catch',
+              'const savedContacts = Array.isArray(body?.safety?.contacts) ? body.safety.contacts : contacts;',
           ):
               assert marker in html, marker
 
@@ -79,6 +79,11 @@ jobs:
           assert 'usage?.whatsapp_dialogues_used' in html
           assert '50 Dialoge Kontingent' not in html
           assert '20 Dialoge Kontingent' not in html
+
+          # Contacts are saved atomically with the current Safety context; no obsolete
+          # split contact-write rollback is required.
+          assert 'contacts,' in html
+          assert 'await saveSafetyContacts(token, previousContacts).catch' not in html
 
           # Existing backend contract remains.
           assert 'const SAFETY_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/safety";' in html
