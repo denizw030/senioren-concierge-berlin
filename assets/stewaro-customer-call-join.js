@@ -14,6 +14,7 @@
   let activated = false;
   let activating = null;
   let tokenExpiresAt = 0;
+  let currentJoined = false;
 
   function sessionToken() {
     const bridge = window.NAHWERKWebCustomerConciergeLiveBridge;
@@ -103,22 +104,37 @@
   function openSurface(call, conferenceId) {
     currentCall = call;
     currentConferenceId = conferenceId;
+    currentJoined = false;
     const root = ensureSurface();
+    const accept = root.querySelector("#stewaroCallJoinAccept");
+    const decline = root.querySelector("#stewaroCallJoinDecline");
+    if (accept) accept.hidden = false;
+    if (decline) {
+      decline.hidden = false;
+      decline.textContent = "Nicht jetzt";
+    }
     setButtonsDisabled(false);
     setStatus("Bereit zum Beitreten.");
     root.hidden = false;
     document.documentElement.classList.add("stewaro-call-join-open");
-    root.querySelector("#stewaroCallJoinAccept")?.focus();
+    accept?.focus();
   }
 
   function closeSurface() {
     const root = document.getElementById("stewaroCustomerCallJoin");
-    if (root) root.hidden = true;
+    if (root) {
+      root.hidden = true;
+      const accept = root.querySelector("#stewaroCallJoinAccept");
+      const decline = root.querySelector("#stewaroCallJoinDecline");
+      if (accept) accept.hidden = false;
+      if (decline) decline.textContent = "Nicht jetzt";
+    }
     document.documentElement.classList.remove("stewaro-call-join-open");
     setButtonsDisabled(false);
     setStatus("");
     currentCall = null;
     currentConferenceId = "";
+    currentJoined = false;
   }
 
   function incomingContext(call) {
@@ -145,6 +161,23 @@
     setButtonsDisabled(true);
     setStatus("Mikrofon wird verbunden …");
     try {
+      call.once?.("accept", () => {
+        if (currentCall !== call) return;
+        currentJoined = true;
+        setStatus("Du bist im Gespräch.", "connected");
+        const root = ensureSurface();
+        const accept = root.querySelector("#stewaroCallJoinAccept");
+        const decline = root.querySelector("#stewaroCallJoinDecline");
+        if (accept) accept.hidden = true;
+        if (decline) {
+          decline.hidden = false;
+          decline.textContent = "Gespräch verlassen";
+          decline.disabled = false;
+        }
+        window.dispatchEvent(new CustomEvent("stewaro:customer-call-joined", {
+          detail: { conference_session_id: currentConferenceId, channel }
+        }));
+      });
       call.accept({
         rtcConstraints: {
           audio: {
@@ -154,23 +187,7 @@
           }
         }
       });
-      setStatus("Du bist im Gespräch.", "connected");
-      const root = ensureSurface();
-      const accept = root.querySelector("#stewaroCallJoinAccept");
-      const decline = root.querySelector("#stewaroCallJoinDecline");
-      if (accept) accept.hidden = true;
-      if (decline) {
-        decline.hidden = false;
-        decline.textContent = "Gespräch verlassen";
-        decline.disabled = false;
-        decline.onclick = () => {
-          try { call.disconnect?.(); } catch {}
-          closeSurface();
-        };
-      }
-      window.dispatchEvent(new CustomEvent("stewaro:customer-call-joined", {
-        detail: { conference_session_id: currentConferenceId, channel }
-      }));
+      setStatus("Verbindung wird hergestellt …");
     } catch {
       setButtonsDisabled(false);
       setStatus("Die Audioverbindung konnte nicht hergestellt werden. Bitte versuche es erneut.", "error");
@@ -181,6 +198,11 @@
     const call = currentCall;
     const conferenceId = currentConferenceId;
     if (!call || !UUID.test(conferenceId)) return;
+    if (currentJoined) {
+      try { call.disconnect?.(); } catch {}
+      closeSurface();
+      return;
+    }
     setButtonsDisabled(true);
     setStatus("Wird gespeichert …");
     let lastError = null;
