@@ -1,6 +1,7 @@
 // WEB_CONCIERGE_LIVE_BOOT_V2_20260928
 import { mountNahwerkLiveConcierge } from "./nahwerk-live-concierge.js?v=29";
 import { mountFidelGoldOrb } from "./fidel-gold-orb.js?v=1";
+import { createStewaroClientCallJoin } from "./stewaro-client-call-join.js?v=1";
 
 const GATEWAY="https://ta832v8wah.execute-api.eu-central-1.amazonaws.com/prod/v1/web";
 
@@ -51,6 +52,23 @@ async function boot(){
   send.removeAttribute("tabindex");
   send.after(button);
 
+  const callJoin=createStewaroClientCallJoin({
+    channel:"WEB",
+    getAuthToken:()=>{
+      void window.SCBAuth?.validateSession?.().catch(()=>false);
+      return bridge()?.sessionToken?.()||"";
+    },
+    onStateChange:(detail)=>window.dispatchEvent(new CustomEvent("stewaro:client-call-join-state",{detail}))
+  });
+  let callJoinReady=false,callJoinStarting=false;
+  const ensureCallJoin=()=>{
+    if(callJoinReady||callJoinStarting)return;
+    const token=String(bridge()?.sessionToken?.()||"");
+    if(token.length<32)return;
+    callJoinStarting=true;
+    void callJoin.start().then((ok)=>{callJoinReady=ok===true}).finally(()=>{callJoinStarting=false});
+  };
+
   const controller=mountNahwerkLiveConcierge({
     button,
     input,
@@ -79,7 +97,9 @@ async function boot(){
   const backendReady=await ready();
   const sync=()=>{
     const b=bridge();
-    const usable=backendReady&&Boolean(b?.isAllowed?.());
+    const allowed=Boolean(b?.isAllowed?.());
+    const usable=backendReady&&allowed;
+    if(allowed)ensureCallJoin();
     const hasText=Boolean(input.value.trim());
     send.hidden=usable;
     if(usable){
@@ -114,6 +134,7 @@ async function boot(){
     clearInterval(timer);
     headerOrb?.destroy();
     controller.stop({notifyBackend:true}).catch(()=>{});
+    callJoin.stop().catch(()=>{});
   },{once:true});
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});

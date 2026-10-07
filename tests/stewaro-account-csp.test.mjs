@@ -27,7 +27,7 @@ test('parser-blocking first-paint theme scripts retain their IDs and order', () 
   }
 });
 test('existing app-live module and submission denial remain explicit', () => {
-  assert.match(fs.readFileSync('app-live.html', 'utf8'), /<script type="module" src="\/assets\/stewaro-csp-app-live-script-1\.js\?v=2">/);
+  assert.match(fs.readFileSync('app-live.html', 'utf8'), /<script type="module" src="\/assets\/stewaro-csp-app-live-script-1\.js\?v=3">/);
   const submit = fs.readFileSync('assets/stewaro-csp-web-concierge-submit.js', 'utf8');
   let listener;
   vm.runInNewContext(submit, { document: { querySelector: () => ({ addEventListener: (name, fn) => { assert.equal(name, 'submit'); listener = fn; } }) } });
