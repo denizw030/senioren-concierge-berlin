@@ -346,7 +346,10 @@
           if(recipientEmail.reportValidity()===false)return;
         }
         executionResponseChannel.value=value;
-        if(value==="WHATSAPP")setWhatsappEnabled(true);
+        if(value==="WHATSAPP"){
+          if(recipientEmail)recipientEmail.required=false;
+          setWhatsappEnabled(true);
+        }
         goNext();
       });
       box.append(choices);
