@@ -318,3 +318,205 @@ body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-produc
   .stewaro-account-flow-icon{width:38px!important;height:47px!important}
   .stewaro-account-flow-wordmark{width:154px!important}
 }
+
+
+/* STEWARO_CANONICAL_LOGIN_SURFACE_V3_20261007
+   Mirrors the current DE homepage tokens and lockup. Auth/MFA behavior is untouched. */
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]){
+  --sa-bg:#f7f4ec;
+  --sa-paper:#fffdf9;
+  --sa-ink:#171613;
+  --sa-muted:#675f53;
+  --sa-green:#0b1913;
+  --sa-gold:#a88d60;
+  --sa-line:rgba(23,22,19,.14);
+  font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) main{
+  position:relative!important;
+  isolation:isolate!important;
+  overflow:hidden!important;
+  padding:clamp(30px,5vw,64px) 24px!important;
+  background:
+    radial-gradient(900px 520px at 50% -170px,rgba(205,187,148,.22),transparent 70%),
+    radial-gradient(680px 420px at 92% 88%,rgba(17,38,29,.035),transparent 70%),
+    linear-gradient(180deg,#fbf9f4 0%,#f7f4ec 56%,#efe9dd 100%)!important;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) main::before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  width:min(76vw,920px);
+  aspect-ratio:1;
+  left:50%;
+  top:48%;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  border:1px solid rgba(168,141,96,.055);
+  box-shadow:0 0 0 88px rgba(168,141,96,.018),0 0 0 176px rgba(168,141,96,.01);
+  pointer-events:none;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .loginwrap{
+  width:min(100%,470px)!important;
+  max-width:470px!important;
+}
+body.login-image-page.stewaro-account-flow .stewaro-account-flow-brand{
+  width:100%!important;
+  margin:0 0 46px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:13px!important;
+  text-decoration:none!important;
+}
+body.login-image-page.stewaro-account-flow .stewaro-account-flow-icon{
+  display:block!important;
+  width:36px!important;
+  height:36px!important;
+  object-fit:contain!important;
+  filter:drop-shadow(0 2px 5px rgba(110,80,24,.10));
+}
+body.login-image-page.stewaro-account-flow .stewaro-account-flow-wordmark{
+  display:block!important;
+  width:148px!important;
+  height:22px!important;
+  object-fit:contain!important;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .logincard>h2{
+  margin:0!important;
+  color:#171613!important;
+  font:400 clamp(42px,6vw,56px)/1.01 Georgia,"Times New Roman",serif!important;
+  letter-spacing:-.044em!important;
+  text-align:center!important;
+  text-wrap:balance;
+}
+.stewaro-account-flow-intro{
+  margin:16px auto 36px!important;
+  max-width:390px;
+  color:#675f53!important;
+  font-size:16px!important;
+  line-height:1.62!important;
+  text-align:center!important;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .field{
+  margin-bottom:18px!important;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .field label{
+  display:block!important;
+  margin:0 0 8px!important;
+  color:#34342f!important;
+  font-size:13px!important;
+  font-weight:650!important;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .field input,
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .field input:-webkit-autofill,
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .field input:-webkit-autofill:hover,
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .field input:-webkit-autofill:focus{
+  width:100%!important;
+  min-height:60px!important;
+  box-sizing:border-box!important;
+  padding:0 17px!important;
+  border:1px solid rgba(23,22,19,.14)!important;
+  border-radius:16px!important;
+  outline:none!important;
+  background:rgba(255,253,249,.96)!important;
+  color:#171613!important;
+  -webkit-text-fill-color:#171613!important;
+  caret-color:#171613!important;
+  font:500 16px/1.2 Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;
+  -webkit-box-shadow:0 0 0 1000px #fffdf9 inset!important;
+  box-shadow:0 10px 34px rgba(45,39,29,.035),0 0 0 1000px #fffdf9 inset!important;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) .field input:focus{
+  border-color:rgba(168,141,96,.72)!important;
+  box-shadow:0 0 0 4px rgba(168,141,96,.12),0 14px 34px rgba(45,39,29,.045)!important;
+}
+body.login-image-page.stewaro-account-flow .password-toggle{
+  right:10px!important;
+  width:40px!important;
+  height:40px!important;
+  color:#655f54!important;
+  opacity:.76!important;
+}
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) #loginSubmit,
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) #mfaChoiceSms,
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) #mfaVerify,
+body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) #mfaRecoverySubmit{
+  width:100%!important;
+  min-height:58px!important;
+  margin-top:4px!important;
+  border:1px solid #0b1913!important;
+  border-radius:999px!important;
+  background:#0b1913!important;
+  color:#f8f4eb!important;
+  font-size:15px!important;
+  font-weight:680!important;
+  letter-spacing:.01em!important;
+  box-shadow:0 12px 28px rgba(11,25,19,.09)!important;
+}
+body.login-image-page.stewaro-account-flow .mfa-step{
+  margin-top:26px!important;
+  padding-top:24px!important;
+  border-top:1px solid rgba(23,22,19,.14)!important;
+}
+body.login-image-page.stewaro-account-flow .mfa-step .btn.light{
+  width:100%!important;
+  min-height:52px!important;
+  margin-top:10px!important;
+  border:1px solid rgba(23,22,19,.14)!important;
+  border-radius:999px!important;
+  background:rgba(255,253,249,.76)!important;
+  color:#34342f!important;
+  box-shadow:none!important;
+}
+body.login-image-page.stewaro-account-flow .status{
+  border:1px solid rgba(168,141,96,.22)!important;
+  border-left:1px solid rgba(168,141,96,.42)!important;
+  border-radius:14px!important;
+  background:rgba(255,253,249,.88)!important;
+  color:#171613!important;
+  box-shadow:none!important;
+}
+body.login-image-page.stewaro-account-flow .split a{
+  color:#75613f!important;
+  font-weight:620!important;
+  text-decoration:none!important;
+}
+body.login-image-page.stewaro-account-flow .split a:hover{
+  text-decoration:underline!important;
+}
+@media(hover:hover) and (pointer:fine){
+  body.login-image-page.stewaro-account-flow #loginSubmit:hover,
+  body.login-image-page.stewaro-account-flow #mfaChoiceSms:hover,
+  body.login-image-page.stewaro-account-flow #mfaVerify:hover,
+  body.login-image-page.stewaro-account-flow #mfaRecoverySubmit:hover{
+    transform:translateY(-1px)!important;
+    background:#11261d!important;
+    box-shadow:0 16px 32px rgba(11,25,19,.12)!important;
+  }
+}
+@media(max-width:620px){
+  body.login-image-page.stewaro-account-flow:not(.senior-product):not([data-product="senioren"]) main{
+    align-items:flex-start!important;
+    padding:clamp(34px,8vh,66px) 20px 36px!important;
+  }
+  body.login-image-page.stewaro-account-flow .stewaro-account-flow-brand{
+    margin-bottom:38px!important;
+    gap:11px!important;
+  }
+  body.login-image-page.stewaro-account-flow .stewaro-account-flow-icon{
+    width:32px!important;
+    height:32px!important;
+  }
+  body.login-image-page.stewaro-account-flow .stewaro-account-flow-wordmark{
+    width:132px!important;
+    height:auto!important;
+  }
+  .stewaro-account-flow-intro{
+    margin-top:14px!important;
+    margin-bottom:30px!important;
+    font-size:15px!important;
+  }
+}
