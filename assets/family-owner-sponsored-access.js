@@ -93,7 +93,7 @@
     "beneficiary_customer_member_id","accepted","state","source","customer_charge"
   ]);
   const INVITE_FIELDS=Object.freeze([
-    "first_name","last_name","relationship","whatsapp_number","email","execution_response_channel","preferred_language",
+    "first_name","last_name","relationship","whatsapp_number","email","execution_response_channel","whatsapp_fee_ack_cents","preferred_language",
     "concierge_choice","form_of_address","personal_message","postal_code","street_address",
     "contact_consent_attested","entitlements"
   ]);
