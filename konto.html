@@ -196,7 +196,9 @@
                     <label class="family-owner-field"><span>Vorname</span><input id="familyFirstName" type="text" maxlength="120" autocomplete="off" required /></label>
                     <label class="family-owner-field"><span>Nachname</span><input id="familyLastName" type="text" maxlength="120" autocomplete="off" required /></label>
                     <label class="family-owner-field"><span>Beziehung</span><select id="familyRelationship" required><option value="">Auswählen</option><option value="MOTHER">Mutter</option><option value="FATHER">Vater</option><option value="GRANDMOTHER">Großmutter</option><option value="GRANDFATHER">Großvater</option><option value="PARTNER">Partner/in</option><option value="RELATIVE">Angehörige/r</option><option value="OTHER">Andere</option></select></label>
-                    <label class="family-owner-field"><span>WhatsApp-Nummer</span><input id="familyWhatsappNumber" type="tel" autocomplete="off" placeholder="+49 …" required /></label><input id="familyPostalCode" type="hidden" /><input id="familyStreetAddress" type="hidden" />
+                    <label class="family-owner-field"><span>WhatsApp-Nummer</span><input id="familyWhatsappNumber" type="tel" autocomplete="off" placeholder="+49 …" required /></label>
+                    <label class="family-owner-field"><span>E-Mail des Klienten <small>empfohlen</small></span><input id="familyEmail" type="email" autocomplete="off" placeholder="name@beispiel.de" /><small>Für Ausführungsrückmeldungen ohne WhatsApp-Nachrichtengebühr.</small></label>
+                    <label class="family-owner-field"><span>Ausführungsrückmeldungen</span><select id="familyExecutionResponseChannel" required><option value="EMAIL" selected>E-Mail – empfohlen · ohne WhatsApp-Nachrichtengebühr</option><option value="WHATSAPP">WhatsApp · 0,06 € pro gesendeter Nachricht</option></select></label><input id="familyPostalCode" type="hidden" /><input id="familyStreetAddress" type="hidden" />
                     <label class="family-owner-field"><span>Sprache</span><select id="familyPreferredLanguage" required><option value="de">Deutsch</option><option value="tr">Türkçe</option><option value="en">English</option><option value="pl">Polski</option><option value="ar">العربية</option><option value="fr">Français</option><option value="es">Español</option><option value="__custom__">Weitere Sprache …</option></select></label>
                     <label class="family-owner-field" id="familyCustomLanguageWrap" hidden><span>Sprachcode (BCP 47)</span><input id="familyCustomLanguage" type="text" maxlength="35" placeholder="z. B. pl oder de-AT" /></label>
                     <label class="family-owner-field"><span>Concierge auswählen</span><select id="familyConciergeChoice" required><option value="">Concierge auswählen</option></select></label>
@@ -1032,7 +1034,7 @@
     <script src="assets/acquisition-v1.js?v=2"></script>
     <script src="/assets/stewaro-csp-konto-script-3.js?v=1"></script>
   <script src="assets/concierge-carousel.js?v=20"></script>
-  <script src="assets/family-owner-sponsored-access.js?v=4"></script>
+  <script src="assets/family-owner-sponsored-access.js?v=2"></script>
   <script src="assets/email-account-integration.js?v=18"></script>
   <script src="/assets/stewaro-csp-konto-script-4.js?v=1"></script>
   <script src="assets/email-provider-logo-connect-v3.js?v=20260922-6"></script>
@@ -1040,6 +1042,6 @@
   <script src="assets/web-concierge-chat.js?v=3"></script>
   <script src="assets/account-header-concierge.js?v=4"></script>
     <script src="assets/account-address-editor.js?v=1"></script>
-  <script src="assets/account-response-channel.js?v=6"></script>
+  <script src="assets/account-response-channel.js?v=2"></script>
   <script src="assets/site-ui.js?v=25"></script></body>
 </html>
