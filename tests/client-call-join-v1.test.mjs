@@ -48,7 +48,7 @@ test('both mirrored routes load local SDK and call-join CSS',()=>{
     assert.match(html,/stewaro-client-call-join\.css\?v=1/);
     assert.match(html,/vendor\/twilio-voice-sdk-2\.18\.5\.min\.js/);
   }
-  const normalize=(html)=>html.replace('<base href="/">\n','');
+  const normalize=(html)=>html.replace('<base href="/">','');
   assert.equal(normalize(webB),webA);
   assert.equal(normalize(appB),appA);
 });
