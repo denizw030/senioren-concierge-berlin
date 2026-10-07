@@ -1,5 +1,9 @@
 
-    html,body{margin:0;min-height:100%;background:#030405;color:#fff}
-    #appLiveStart{position:fixed;inset:50% auto auto 50%;transform:translate(-50%,-50%);opacity:0;pointer-events:none}
-    #appLiveBoot{position:fixed;inset:0;display:grid;place-items:center;font:500 16px -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;color:rgba(255,255,255,.68)}
-  
+:root{color-scheme:light;--live-bg:#f7f4ec;--live-ink:#10271f;--live-muted:#6b655c;--live-gold:#a88d60}
+html,body{margin:0;min-height:100%;background:
+radial-gradient(780px 460px at 50% -120px,rgba(201,179,132,.20),transparent 70%),
+linear-gradient(180deg,#fbf9f4 0%,var(--live-bg) 100%);color:var(--live-ink)}
+body{font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+#appLiveStart{position:fixed;inset:50% auto auto 50%;transform:translate(-50%,-50%);opacity:0;pointer-events:none}
+#appLiveBoot{position:fixed;inset:0;display:grid;place-items:center;padding:32px;text-align:center;font:560 15px/1.55 Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--live-muted)}
+#appLiveBoot::before{content:"";position:absolute;top:calc(50% - 52px);left:50%;width:34px;height:34px;transform:translate(-50%,-50%);background:center/contain no-repeat url("/assets/logos/stewaro-icon.svg");filter:drop-shadow(0 3px 8px rgba(108,78,29,.10))}
