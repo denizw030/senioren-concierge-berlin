@@ -93,8 +93,9 @@
     "beneficiary_customer_member_id","accepted","state","source","customer_charge"
   ]);
   const INVITE_FIELDS=Object.freeze([
-    "first_name","last_name","relationship","whatsapp_number","preferred_language",
+    "first_name","last_name","relationship","whatsapp_number","email","preferred_language",
     "concierge_choice","form_of_address","personal_message","postal_code","street_address",
+    "execution_result_channel","whatsapp_execution_opt_in","whatsapp_execution_fee_cents",
     "contact_consent_attested","entitlements"
   ]);
   const UUID_RE=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -118,6 +119,10 @@
     if(!raw||!/^[+0-9().\s/-]+$/.test(raw))return false;
     const digits=raw.replace(/\D/g,"");
     return digits.length>=8&&digits.length<=15;
+  }
+  function plausibleEmail(value){
+    const raw=String(value??"").trim().toLowerCase();
+    return raw===""||/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(raw);
   }
   function conciergeCatalogFrom(profiles){
     return Array.isArray(profiles)?profiles.flatMap((profile)=>{
@@ -143,9 +148,16 @@
     const concierge=String(input?.concierge_choice||"").trim();
     const address=String(input?.form_of_address||"").toUpperCase();
     const message=String(input?.personal_message||"").trim().slice(0,1200);
+    const email=String(input?.email||"").trim().toLowerCase();
+    const executionResultChannel=String(input?.execution_result_channel||"EMAIL").trim().toUpperCase();
+    const whatsappExecutionOptIn=input?.whatsapp_execution_opt_in===true;
+    const whatsappExecutionFeeCents=Number(input?.whatsapp_execution_fee_cents);
     const postalCode=String(input?.postal_code||"").trim().slice(0,5);
     const streetAddress=String(input?.street_address||"").trim().slice(0,180);
     if(!first||!last||!Object.hasOwn(RELATIONSHIPS,relationship)||!plausiblePhone(input?.whatsapp_number))return null;
+    if(!plausibleEmail(email))return null;
+    if(!["EMAIL","WHATSAPP"].includes(executionResultChannel))return null;
+    if(executionResultChannel==="WHATSAPP"&&(!whatsappExecutionOptIn||whatsappExecutionFeeCents!==6))return null;
     if(postalCode&&!/^\d{5}$/.test(postalCode))return null;
     if(streetAddress&&!postalCode)return null;
     if(!language||!concierge||!["DU","SIE"].includes(address)||input?.contact_consent_attested!==true)return null;
@@ -155,12 +167,16 @@
       last_name:last.slice(0,120),
       relationship,
       whatsapp_number:String(input.whatsapp_number).trim(),
+      email:email||"",
       preferred_language:language,
       concierge_choice:concierge.slice(0,120),
       form_of_address:address,
       personal_message:message,
       postal_code:postalCode,
       street_address:streetAddress,
+      execution_result_channel:executionResultChannel,
+      whatsapp_execution_opt_in:executionResultChannel==="WHATSAPP",
+      whatsapp_execution_fee_cents:executionResultChannel==="WHATSAPP"?6:null,
       contact_consent_attested:true,
       entitlements:input.entitlements.map((item)=>({feature_code:String(item.feature_code),included_quantity:Number(item.included_quantity)}))
     };
@@ -292,7 +308,7 @@
   globalThis.NAHWERKFamilyOwnerTestHooks=Object.freeze({
     PLATFORM_CONTRACT,PLATFORM_CONTRACT_SHA,PREPARED_FAMILY_GATEWAY_BASE,RUNTIME_CONFIG_ENDPOINT,PAGES_RUNTIME_CONFIG_ENDPOINT,runtimeGatewayBase:FAMILY_GATEWAY_BASE,
     RELATIONSHIPS,LANGUAGE_LABELS,FEATURE_DEFS,FEATURE_CODES,INVITE_STATES,ACCESS_STATES,STATE_LABELS,
-    FORBIDDEN_AUTHORITY_FIELDS,INVITE_FIELDS,INERT_MESSAGE,sessionToken,operatorContextAllowed,canManageEntitlements,
+    FORBIDDEN_AUTHORITY_FIELDS,INVITE_FIELDS,INERT_MESSAGE,sessionToken,operatorContextAllowed,canManageEntitlements,plausibleEmail,
     normalizeLanguage,plausiblePhone,conciergeCatalogFrom,buildEntitlements,invitationPayload,containsAuthorityFields,
     runtimeConfigGateway,loadRuntimeGateway,getOperatorContext,getManagedPeople,getInvitations,createInvitation,getEntitlements,getUsage,updateEntitlements,
     transition,revokeInvitation,stateLabel,relationLabel,languageLabel,mergeServerPeople,usageRows,pendingIdempotency
@@ -312,6 +328,47 @@
     detailQuota=document.getElementById("familyManagedQuotaGrid"),quotaSave=document.getElementById("familyManagedQuotaSave"),
     detailClose=document.getElementById("familyManagedDetailClose");
   let operatorBody=null,operatorResolved=false,currentManagedId=null,currentPeople=[];
+
+  function ensureExecutionDeliveryFields(){
+    const phone=document.getElementById("familyWhatsappNumber");
+    const grid=phone?.closest(".family-owner-grid");
+    if(!phone||!grid||document.getElementById("familyExecutionResultChannel"))return;
+    const emailWrap=document.createElement("label");
+    emailWrap.className="family-owner-field";
+    const emailLabel=document.createElement("span");
+    emailLabel.textContent="E-Mail-Adresse des Klienten (optional)";
+    const emailInput=document.createElement("input");
+    emailInput.id="familyEmail";emailInput.type="email";emailInput.autocomplete="email";
+    emailInput.placeholder="E-Mail für Ausführungsrückmeldungen";
+    const emailHelp=document.createElement("small");
+    emailHelp.textContent="Empfohlen: Ausführungsrückmeldungen per E-Mail ohne WhatsApp-Nachrichtengebühr.";
+    emailWrap.append(emailLabel,emailInput,emailHelp);
+
+    const routeWrap=document.createElement("label");
+    routeWrap.className="family-owner-field";
+    const routeLabel=document.createElement("span");
+    routeLabel.textContent="Ausführungsrückmeldungen";
+    const route=document.createElement("select");
+    route.id="familyExecutionResultChannel";
+    const emailOption=document.createElement("option");
+    emailOption.value="EMAIL";emailOption.textContent="E-Mail · empfohlen";
+    const waOption=document.createElement("option");
+    waOption.value="WHATSAPP";waOption.textContent="WhatsApp · 0,06 € pro Nachricht";
+    route.append(emailOption,waOption);
+    const help=document.createElement("small");
+    help.id="familyExecutionResultChannelHelp";
+    help.textContent="Standard: E-Mail. WhatsApp wird nur auf deine ausdrückliche Auswahl aktiviert und kostet 0,06 € pro gesendeter Nachricht.";
+    routeWrap.append(routeLabel,route,help);
+    route.addEventListener("change",()=>{
+      help.textContent=route.value==="WHATSAPP"
+        ?"WhatsApp ist kostenpflichtig: 0,06 € pro gesendeter Nachricht. Zwischenstände werden gebündelt."
+        :"E-Mail ist empfohlen und verursacht keine WhatsApp-Nachrichtengebühr.";
+    });
+    const phoneWrap=phone.closest(".family-owner-field");
+    phoneWrap?.insertAdjacentElement("afterend",emailWrap);
+    emailWrap.insertAdjacentElement("afterend",routeWrap);
+  }
+  ensureExecutionDeliveryFields();
 
   function setFormOpen(open){form.hidden=!open;addButton.setAttribute("aria-expanded",String(open));if(open)document.getElementById("familyFirstName")?.focus();else form.reset()}
   function setStatus(message,isError=false){formStatus.textContent=message||"";formStatus.classList.toggle("is-error",isError)}
@@ -365,6 +422,8 @@
     set("familyLastName",row.last_name);
     set("familyRelationship",row.relationship||"OTHER");
     set("familyWhatsappNumber",row.whatsapp_number||"");
+    set("familyEmail",row.email||"");
+    set("familyExecutionResultChannel",row.execution_result_channel||"EMAIL");
     set("familyPostalCode",row.postal_code||"");
     set("familyStreetAddress",row.street_address||"");
     set("familyPreferredLanguage",row.preferred_language||"de");
@@ -391,6 +450,10 @@
       last_name:document.getElementById("familyLastName").value,
       relationship:document.getElementById("familyRelationship").value,
       whatsapp_number:document.getElementById("familyWhatsappNumber").value,
+      email:document.getElementById("familyEmail")?.value||"",
+      execution_result_channel:document.getElementById("familyExecutionResultChannel")?.value||"EMAIL",
+      whatsapp_execution_opt_in:document.getElementById("familyExecutionResultChannel")?.value==="WHATSAPP",
+      whatsapp_execution_fee_cents:document.getElementById("familyExecutionResultChannel")?.value==="WHATSAPP"?6:null,
       preferred_language:selectedLanguage(),
       concierge_choice:conciergeSelect.value,
       form_of_address:document.getElementById("familyFormOfAddress").value,
