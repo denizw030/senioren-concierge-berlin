@@ -1066,7 +1066,7 @@ html body.account-premium-ui.account-premium-ui .dash>.summary-card[data-account
   background:rgba(255,253,249,.74)!important;
   box-shadow:none!important;
 }
-html body.account-premium-ui.account-premium-ui .account-overview-highlights[data-account-panel="overview"]{
+html body.account-premium-ui.account-premium-ui .account-overview-highlights[data-account-panel="overview"]:not([hidden]):not([data-account-tab-visible="false"]){
   order:10!important;
   grid-column:1/-1!important;
   display:grid!important;
