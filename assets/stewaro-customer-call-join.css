@@ -1,0 +1,122 @@
+/* STEWARO_CUSTOMER_CALL_WEBRTC_JOIN_V1_20261007 */
+html.stewaro-call-join-open,
+html.stewaro-call-join-open body { overflow: hidden; }
+
+.stewaro-call-join {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  display: grid;
+  place-items: center;
+  padding: max(20px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom));
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Inter, sans-serif;
+}
+
+.stewaro-call-join[hidden] { display: none !important; }
+
+.stewaro-call-join__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 18, 14, .58);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.stewaro-call-join__card {
+  position: relative;
+  width: min(100%, 430px);
+  border: 1px solid rgba(176, 145, 76, .32);
+  border-radius: 30px;
+  padding: 30px 26px 24px;
+  background: rgba(250, 248, 242, .98);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .28);
+  color: #102019;
+  text-align: center;
+}
+
+.stewaro-call-join__orb {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #0d2f23;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 14px 28px rgba(13,47,35,.18);
+}
+
+.stewaro-call-join__orb img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.stewaro-call-join__eyebrow {
+  margin: 0 0 8px;
+  color: #9b7b37;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .12em;
+}
+
+.stewaro-call-join h2 {
+  margin: 0;
+  font-size: clamp(26px, 7vw, 34px);
+  line-height: 1.08;
+  letter-spacing: -.035em;
+}
+
+.stewaro-call-join #stewaroCallJoinText {
+  margin: 14px auto 0;
+  max-width: 34ch;
+  color: #526159;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.stewaro-call-join__status {
+  min-height: 22px;
+  margin-top: 16px;
+  color: #526159;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.stewaro-call-join__status[data-kind="connected"] { color: #17623f; }
+.stewaro-call-join__status[data-kind="error"] { color: #8f312d; }
+
+.stewaro-call-join__actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.stewaro-call-join__actions button {
+  min-height: 50px;
+  border-radius: 16px;
+  padding: 0 18px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.stewaro-call-join__primary {
+  border: 0;
+  background: #0d2f23;
+  color: #fff;
+}
+
+.stewaro-call-join__secondary {
+  border: 1px solid rgba(13,47,35,.16);
+  background: transparent;
+  color: #173228;
+}
+
+.stewaro-call-join__actions button:disabled {
+  cursor: wait;
+  opacity: .58;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stewaro-call-join__backdrop { backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
