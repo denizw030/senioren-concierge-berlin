@@ -85,10 +85,10 @@ jobs:
           assert 'contacts,' in html
           assert 'await saveSafetyContacts(token, previousContacts).catch' not in html
 
-          # Existing backend contract remains.
-          assert 'const SAFETY_URL = "https://denizw.app.n8n.cloud/webhook/senioren-concierge/web/safety";' in html
-          assert 'safety_enabled: safetyEnabled.checked' in html
-          assert 'schedule_mode: "recurring"' in html
+          # Current managed Safety backend contract remains.
+          assert 'const MANAGED_SAFETY_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-managed-safety-context";' in html
+          assert 'enabled: safetyEnabled.checked' in html
+          assert 'checkin_times: times' in html
 
           # Inline JS syntax.
           scripts=[]
