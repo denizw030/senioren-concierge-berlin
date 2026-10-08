@@ -19,7 +19,8 @@ test('floating concierge is public while protected account routes remain fail-cl
   assert.match(auth,/normalizeShell\(\);[\s\S]*ensureFloatingConcierge\(\);[\s\S]*const current = page\(\)/);
   assert.match(auth,/if \(FLOATING_CONCIERGE_EXCLUDE\.has\(page\(\)\)\) return/);
   assert.doesNotMatch(auth,/if \(!isLoggedIn\(\) \|\| FLOATING_CONCIERGE_EXCLUDE/);
-  assert.match(auth,/if \(PROTECTED\.has\(current\)\) location\.replace\("\/anmelden"\)/);
+  assert.match(auth,/if \(PROTECTED\.has\(current\) && !hasRenderableSession\(\)\) \{/);
+  assert.match(auth,/if \(response\.status === 401 \|\| response\.status === 403\) \{[\s\S]*?clearLocalAuth\(\)/);
   assert.match(auth,/href = "\/web-concierge"/);
   assert.doesNotMatch(auth,/web-concierge-chat\.js/);
 });
