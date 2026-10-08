@@ -22,6 +22,7 @@
   let sessionValidated = false;
   let validatedSession = null;
   let validationPromise = null;
+  let validationUnavailable = false;
   let lastValidatedProfile = null;
   const page = () => {
     const pathname = String(location.pathname || "/").replace(/\/+$/, "");
@@ -284,6 +285,7 @@
     if (!session?.session_token) {
       sessionValidated = false;
       validatedSession = null;
+      validationUnavailable = false;
       lastValidatedProfile = null;
       return false;
     }
@@ -315,6 +317,7 @@
           remember_me
         };
         sessionValidated = true;
+        validationUnavailable = false;
         lastValidatedProfile = null;
         localStorage.removeItem(SESSION_KEY);
         sessionStorage.removeItem(SESSION_KEY);
@@ -323,20 +326,27 @@
         return true;
       }
       if (response.status === 401 || response.status === 403) {
+        validationUnavailable = false;
         clearLocalAuth();
         return false;
       }
+      sessionValidated = false;
+      validatedSession = null;
+      validationUnavailable = true;
+      return false;
     } catch (_) {
       sessionValidated = false;
       validatedSession = null;
+      validationUnavailable = true;
       return false;
     }
-    clearLocalAuth();
-    return false;
   }
 
   function validateSession(force = false) {
-    if (force) validationPromise = null;
+    if (force) {
+      validationPromise = null;
+      validationUnavailable = false;
+    }
     if (!validationPromise) validationPromise = performSessionValidation();
     return validationPromise;
   }
@@ -413,7 +423,24 @@
     } else {
       ensureFloatingConcierge();
       normalizeShell();
-      if (PROTECTED.has(current)) location.replace("/anmelden");
+      if (PROTECTED.has(current) && !hasRenderableSession()) {
+        location.replace("/anmelden");
+        return;
+      }
+      if (validationUnavailable && hasRenderableSession()) {
+        window.setTimeout(async () => {
+          const recovered = await validateSession(true);
+          if (recovered) {
+            updateNav();
+            ensureFloatingConcierge();
+            if (current === "anmelden.html" || current === "registrieren.html") location.replace("/konto");
+            return;
+          }
+          if (!validationUnavailable && PROTECTED.has(current) && !hasRenderableSession()) {
+            location.replace("/anmelden");
+          }
+        }, 1500);
+      }
     }
   });
   window.SCBAuth = {
