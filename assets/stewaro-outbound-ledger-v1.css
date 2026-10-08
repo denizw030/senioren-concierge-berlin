@@ -1,0 +1,14 @@
+:root{color-scheme:light;--bg:#f7f4ed;--ink:#181916;--soft:#575e55;--paper:#fffdf9;--gold:#a78b58;--border:#e5e2d8;--forest:#143a2b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 -apple-system,BlinkMacSystemFont,Inter,"Segoe UI",sans-serif}
+main{width:min(960px,calc(100% - 36px));margin:auto;padding:30px 0 100px}
+nav{display:flex;justify-content:space-between;align-items:center;gap:15px}nav strong{letter-spacing:.16em;font-size:18px}nav a{color:var(--ink);text-decoration:none;border:1px solid var(--border);padding:10px 15px;border-radius:30px;background:var(--paper)}
+header{padding:68px 0 40px;max-width:760px}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.18em;color:var(--gold);font-weight:700}
+h1{font-size:clamp(36px,7vw,62px);letter-spacing:-.06em;line-height:1.05;margin:12px 0 20px}header p{color:var(--soft);font-size:17px}
+#state{background:var(--paper);padding:18px 22px;border:1px solid var(--border);border-radius:16px}
+#calls{display:grid;gap:14px}.call{background:var(--paper);border:1px solid var(--border);border-radius:20px;padding:22px}.call h2{font-size:21px;margin:0}.meta{color:var(--soft);font-size:14px;margin:7px 0 14px}.status{display:inline-block;background:#edf2ed;color:var(--forest);padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700}
+dt{font-size:12px;color:var(--soft);font-weight:700;text-transform:uppercase;letter-spacing:.06em}dd{margin:4px 0 14px;white-space:pre-wrap;overflow-wrap:anywhere}
+button{border:1px solid var(--forest);background:var(--forest);color:#fff;border-radius:28px;padding:11px 17px;font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+button:disabled{opacity:.5;cursor:default}article .details{margin-top:17px;padding-top:17px;border-top:1px solid var(--border)}
+.messages{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:10px}.messages li{padding:13px 14px;background:#f3f0e9;border-radius:12px;white-space:pre-wrap;overflow-wrap:anywhere}.speaker{display:block;font-size:12px;font-weight:800;color:var(--forest);margin-bottom:4px}
+.small,.privacy{color:var(--soft);font-size:13px}.privacy{padding:26px 0}.error{color:#9d3030}
+@media(max-width:650px){nav{align-items:flex-start}header{padding:46px 0 30px}.call{padding:17px}}
