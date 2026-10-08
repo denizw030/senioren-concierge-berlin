@@ -4,6 +4,10 @@
   document.head.appendChild(mobileCss);
   const SESSION_KEY = "scb_web_session";
   const PRODUCT_KEY = "nahwerk_product";
+  const PUBLIC_ORIGIN = "https://stewaro.com";
+  const ACCOUNT_ORIGIN = "https://account.stewaro.com";
+  const accountUrl = (path = "/") => ACCOUNT_ORIGIN + path;
+  const publicUrl = (path = "/") => PUBLIC_ORIGIN + path;
   const CHECK_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-session-secure";
   const PROFILE_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-profile";
   const LOGOUT_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-session-secure";
@@ -112,7 +116,7 @@
   }
   function makeAccountLink(cls = "") {
     const link = document.createElement("a");
-    link.href = "/konto";
+    link.href = accountUrl("/konto");
     link.className = ("nw-account-link " + cls).trim();
     link.setAttribute("aria-label", "Kundenkonto öffnen");
     const name = sessionFirstName();
@@ -150,7 +154,7 @@
       } catch (_) {}
     }
     clearLocalAuth();
-    location.href = "/de/";
+    location.href = publicUrl("/de/");
   }
   function ensureOdysxBar() {
     document.querySelectorAll(".odysx-info-bar").forEach((element) => element.remove());
@@ -193,8 +197,8 @@
         nav.appendChild(accountCluster);
       } else {
         const suffix = `?produkt=${product}`;
-        nav.appendChild(makeLink(`/anmelden${suffix}`, "Anmelden", `${current === "anmelden.html" ? "active " : ""}auth-link login-link`.trim()));
-        nav.appendChild(makeLink(`/registrieren${suffix}`, "Registrieren", `${current === "registrieren.html" ? "active " : ""}auth-link register-link`.trim()));
+        nav.appendChild(makeLink(accountUrl(`/anmelden${suffix}`), "Anmelden", `${current === "anmelden.html" ? "active " : ""}auth-link login-link`.trim()));
+        nav.appendChild(makeLink(accountUrl(`/registrieren${suffix}`), "Registrieren", `${current === "registrieren.html" ? "active " : ""}auth-link register-link`.trim()));
       }
       nav.id ||= "main-navigation";
       if (!nav.previousElementSibling?.classList.contains("nav-toggle")) {
@@ -256,7 +260,7 @@
     if (!isLoggedIn()) return;
     document.querySelectorAll(".footergrid>div").forEach((box) => {
       if (box.querySelector("h4")?.textContent.trim() === "Informationen" && !box.querySelector('a[href="konto.html"],a[href="/konto"]')) {
-        box.appendChild(makeLink("/konto", "Kundenbereich"));
+        box.appendChild(makeLink(accountUrl("/konto"), "Kundenbereich"));
         const out = makeLink("#", "Abmelden");
         out.dataset.logout = "1";
         out.addEventListener("click", (event) => { event.preventDefault(); logout(); });
@@ -405,6 +409,7 @@
   }
 
   document.addEventListener("DOMContentLoaded", async () => {
+    if (window.STEWARO_ACCOUNT_AUTH_READY) await window.STEWARO_ACCOUNT_AUTH_READY;
     decorateWhatsApp();
     activatePlanCards();
     new MutationObserver((mutations) => {
@@ -420,12 +425,12 @@
     if (valid) {
       updateNav();
       ensureFloatingConcierge();
-      if (current === "anmelden.html" || current === "registrieren.html") location.replace("/konto");
+      if (current === "anmelden.html" || current === "registrieren.html") location.replace(accountUrl("/konto"));
     } else {
       ensureFloatingConcierge();
       normalizeShell();
       if (PROTECTED.has(current) && !hasRenderableSession()) {
-        location.replace("/anmelden");
+        location.replace(accountUrl("/anmelden"));
         return;
       }
       if (validationUnavailable && hasRenderableSession()) {
@@ -434,11 +439,11 @@
           if (recovered) {
             updateNav();
             ensureFloatingConcierge();
-            if (current === "anmelden.html" || current === "registrieren.html") location.replace("/konto");
+            if (current === "anmelden.html" || current === "registrieren.html") location.replace(accountUrl("/konto"));
             return;
           }
           if (!validationUnavailable && PROTECTED.has(current) && !hasRenderableSession()) {
-            location.replace("/anmelden");
+            location.replace(accountUrl("/anmelden"));
           }
         }, 1500);
       }
