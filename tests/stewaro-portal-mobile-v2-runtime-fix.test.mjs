@@ -4,10 +4,10 @@ import fs from "node:fs";
 
 const css=fs.readFileSync("assets/account-portal-text-nav-v1.css","utf8");
 
-test("mobile V2 suppresses the legacy duplicate menu shell",()=>{
+test("mobile V2 keeps the approved overview plus hamburger navigation",()=>{
   assert.match(css,/STEWARO PORTAL MOBILE RUNTIME CONFLICT FIX/);
-  assert.match(css,/#nwMobileAccountNav\{\s*display:none!important/);
-  assert.match(css,/\.account-tabs-shell\{[\s\S]*?display:block!important/);
+  assert.match(css,/#nwMobileAccountNav\{[\s\S]*?display:flex!important/);
+  assert.match(css,/\.account-tabs-shell\{\s*display:none!important/);
 });
 
 test("mobile overview can never collapse into a half-width column",()=>{
