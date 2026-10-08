@@ -1234,61 +1234,22 @@ html body.account-premium-ui.account-premium-ui.nw-portal-light :is(.usagebox,.s
    but V2 owns presentation. This prevents the old runtime shell from
    reintroducing narrow two-column overview cards after page load. */
 @media(max-width:760px){
+  /* Keep the previously approved compact mobile navigation:
+     Übersicht on the left + Menü/hamburger on the right.
+     The underlying tab strip remains available to the runtime but is not exposed visually. */
   html body.account-premium-ui.account-premium-ui #nwMobileAccountNav{
-    display:none!important;
-  }
-
-  html body.account-premium-ui.account-premium-ui .account-tabs-shell{
-    display:block!important;
+    display:flex!important;
     width:100%!important;
     max-width:100%!important;
     margin:0 0 14px!important;
-    padding:4px!important;
-    overflow:hidden!important;
-    border:1px solid rgba(16,39,31,.12)!important;
-    border-radius:16px!important;
-    background:rgba(255,253,249,.74)!important;
-    box-shadow:none!important;
+  }
+
+  html body.account-premium-ui.account-premium-ui .account-tabs-shell{
+    display:none!important;
   }
 
   html body.account-premium-ui.account-premium-ui .account-tabs.account-tabs-modern{
     display:flex!important;
-    width:100%!important;
-    max-width:100%!important;
-    grid-template-columns:none!important;
-    grid-template-rows:none!important;
-    gap:2px!important;
-    padding:0!important;
-    margin:0!important;
-    overflow-x:auto!important;
-    overflow-y:hidden!important;
-    scrollbar-width:none!important;
-    -webkit-overflow-scrolling:touch!important;
-  }
-  html body.account-premium-ui.account-premium-ui .account-tabs.account-tabs-modern::-webkit-scrollbar{
-    display:none!important;
-  }
-  html body.account-premium-ui.account-premium-ui .account-tabs.account-tabs-modern .account-tab{
-    flex:0 0 auto!important;
-    grid-column:auto!important;
-    grid-row:auto!important;
-    width:auto!important;
-    min-width:max-content!important;
-    max-width:none!important;
-    height:40px!important;
-    min-height:40px!important;
-    padding:0 12px!important;
-    border:0!important;
-    border-radius:12px!important;
-    background:transparent!important;
-    color:#746e65!important;
-    box-shadow:none!important;
-    white-space:nowrap!important;
-  }
-  html body.account-premium-ui.account-premium-ui .account-tabs.account-tabs-modern .account-tab[aria-selected="true"]{
-    background:#fff!important;
-    color:#10271f!important;
-    box-shadow:0 5px 16px rgba(51,43,28,.07)!important;
   }
 
   html body.account-premium-ui.account-premium-ui .dash{
