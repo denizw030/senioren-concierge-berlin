@@ -1227,3 +1227,141 @@ html body.account-premium-ui.account-premium-ui.nw-portal-light :is(.usagebox,.s
     border-radius:20px!important;
   }
 }
+
+
+/* STEWARO PORTAL MOBILE RUNTIME CONFLICT FIX — 2026-10-08
+   The legacy mobile menu is still created by site-ui.js for compatibility,
+   but V2 owns presentation. This prevents the old runtime shell from
+   reintroducing narrow two-column overview cards after page load. */
+@media(max-width:760px){
+  html body.account-premium-ui.account-premium-ui #nwMobileAccountNav{
+    display:none!important;
+  }
+
+  html body.account-premium-ui.account-premium-ui .account-tabs-shell{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin:0 0 14px!important;
+    padding:4px!important;
+    overflow:hidden!important;
+    border:1px solid rgba(16,39,31,.12)!important;
+    border-radius:16px!important;
+    background:rgba(255,253,249,.74)!important;
+    box-shadow:none!important;
+  }
+
+  html body.account-premium-ui.account-premium-ui .account-tabs.account-tabs-modern{
+    display:flex!important;
+    width:100%!important;
+    max-width:100%!important;
+    grid-template-columns:none!important;
+    grid-template-rows:none!important;
+    gap:2px!important;
+    padding:0!important;
+    margin:0!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    scrollbar-width:none!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+  html body.account-premium-ui.account-premium-ui .account-tabs.account-tabs-modern::-webkit-scrollbar{
+    display:none!important;
+  }
+  html body.account-premium-ui.account-premium-ui .account-tabs.account-tabs-modern .account-tab{
+    flex:0 0 auto!important;
+    grid-column:auto!important;
+    grid-row:auto!important;
+    width:auto!important;
+    min-width:max-content!important;
+    max-width:none!important;
+    height:40px!important;
+    min-height:40px!important;
+    padding:0 12px!important;
+    border:0!important;
+    border-radius:12px!important;
+    background:transparent!important;
+    color:#746e65!important;
+    box-shadow:none!important;
+    white-space:nowrap!important;
+  }
+  html body.account-premium-ui.account-premium-ui .account-tabs.account-tabs-modern .account-tab[aria-selected="true"]{
+    background:#fff!important;
+    color:#10271f!important;
+    box-shadow:0 5px 16px rgba(51,43,28,.07)!important;
+  }
+
+  html body.account-premium-ui.account-premium-ui .dash{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    width:100%!important;
+    max-width:100%!important;
+    gap:10px!important;
+  }
+
+  html body.account-premium-ui.account-premium-ui .dash >
+  .account-overview-highlights[data-account-panel="overview"]:not([hidden]):not([data-account-tab-visible="false"]){
+    display:grid!important;
+    grid-column:1/-1!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    gap:10px!important;
+    margin:0!important;
+    overflow:visible!important;
+  }
+
+  html body.account-premium-ui.account-premium-ui
+  .account-overview-highlights[data-account-panel="overview"] >
+  .account-overview-link{
+    display:block!important;
+    grid-column:1/-1!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:20px!important;
+    box-sizing:border-box!important;
+    border:1px solid rgba(16,39,31,.12)!important;
+    border-radius:20px!important;
+    background:rgba(255,253,249,.86)!important;
+    background-image:none!important;
+    box-shadow:0 12px 34px rgba(51,43,28,.055)!important;
+    overflow:hidden!important;
+  }
+
+  html body.account-premium-ui.account-premium-ui
+  .account-overview-highlights[data-account-panel="overview"] >
+  .account-overview-link::after{
+    right:18px!important;
+  }
+
+  html body.account-premium-ui.account-premium-ui
+  .account-overview-highlights[data-account-panel="overview"] >
+  .account-overview-link[data-open-account-tab="concierge"]{
+    display:grid!important;
+    grid-template-columns:58px minmax(0,1fr)!important;
+    column-gap:16px!important;
+    align-items:center!important;
+  }
+
+  html body.account-premium-ui.account-premium-ui
+  .account-overview-link[data-open-account-tab="concierge"] [data-overview-concierge-avatar]{
+    width:58px!important;
+    height:58px!important;
+    min-width:58px!important;
+    min-height:58px!important;
+  }
+
+  html body.account-premium-ui.account-premium-ui .account-section>.wrap{
+    width:min(100% - 20px,1160px)!important;
+    max-width:100%!important;
+  }
+
+  html body.account-premium-ui.account-premium-ui main,
+  html body.account-premium-ui.account-premium-ui .account-section{
+    overflow-x:hidden!important;
+  }
+}
