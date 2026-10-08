@@ -1,7 +1,7 @@
 (() => {
   "use strict";
   if(window.STEWAROEntryRouting)return;
-  if(!document.querySelector('script[data-stewaro-domain-contract]')&&!window.STEWARO_DOMAINS){
+  if(typeof document.querySelector==="function"&&!document.querySelector('script[data-stewaro-domain-contract]')&&!window.STEWARO_DOMAINS){
     const domainScript=document.createElement("script");
     domainScript.src="/assets/stewaro-domain-contract.js?v=1";
     domainScript.dataset.stewaroDomainContract="1";
