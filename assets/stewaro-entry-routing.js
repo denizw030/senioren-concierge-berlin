@@ -9,8 +9,8 @@
   }
   const host=String(location.hostname||"").toLowerCase();
   const STAGING_WEBSITE_HOST="d357yw2h09cpne.cloudfront.net";
-  const STAGING_ACCOUNT_ORIGIN="https://d23le2tjpjl7la.cloudfront.net";
-  const STAGING_ACCOUNT_HOST="d23le2tjpjl7la.cloudfront.net";
+  const STAGING_ACCOUNT_ORIGIN="https://d23le2tjpi7la.cloudfront.net";
+  const STAGING_ACCOUNT_HOST="d23le2tjpi7la.cloudfront.net";
   const PROD_ACCOUNT_ORIGIN="https://account.stewaro.com";
   const isWebsitePreview=host===STAGING_WEBSITE_HOST;
   const isAccount=host==="account.stewaro.com"||host===STAGING_ACCOUNT_HOST;
