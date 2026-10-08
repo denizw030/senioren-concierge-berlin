@@ -87,6 +87,7 @@
     sessionValidated = false;
     validatedSession = null;
     validationPromise = null;
+    validationUnavailable = false;
     lastValidatedProfile = null;
     localStorage.removeItem(SESSION_KEY);
     localStorage.removeItem("nw_account_profile_cache_v1");
