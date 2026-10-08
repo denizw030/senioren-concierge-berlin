@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Ausgehende Anrufe – STEWARO</title>
+<meta name="description" content="Geschützte Aufträge und Gesprächsverläufe der von FIDEL ausgeführten Telefonate.">
+<link rel="icon" type="image/svg+xml" href="/assets/logos/stewaro-icon.svg?v=1">
+<style>
+:root{color-scheme:light;--bg:#f7f4ed;--ink:#181916;--soft:#575e55;--paper:#fffdf9;--gold:#a78b58;--border:#e5e2d8;--forest:#143a2b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 -apple-system,BlinkMacSystemFont,Inter,"Segoe UI",sans-serif}
+main{width:min(960px,calc(100% - 36px));margin:auto;padding:30px 0 100px}
+nav{display:flex;justify-content:space-between;align-items:center;gap:15px}nav strong{letter-spacing:.16em;font-size:18px}nav a{color:var(--ink);text-decoration:none;border:1px solid var(--border);padding:10px 15px;border-radius:30px;background:var(--paper)}
+header{padding:68px 0 40px;max-width:760px}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.18em;color:var(--gold);font-weight:700}
+h1{font-size:clamp(36px,7vw,62px);letter-spacing:-.06em;line-height:1.05;margin:12px 0 20px}header p{color:var(--soft);font-size:17px}
+#state{background:var(--paper);padding:18px 22px;border:1px solid var(--border);border-radius:16px}
+#calls{display:grid;gap:14px}.call{background:var(--paper);border:1px solid var(--border);border-radius:20px;padding:22px}.call h2{font-size:21px;margin:0}.meta{color:var(--soft);font-size:14px;margin:7px 0 14px}.status{display:inline-block;background:#edf2ed;color:var(--forest);padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700}
+dt{font-size:12px;color:var(--soft);font-weight:700;text-transform:uppercase;letter-spacing:.06em}dd{margin:4px 0 14px;white-space:pre-wrap;overflow-wrap:anywhere}
+button{border:1px solid var(--forest);background:var(--forest);color:#fff;border-radius:28px;padding:11px 17px;font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+button:disabled{opacity:.5;cursor:default}article .details{margin-top:17px;padding-top:17px;border-top:1px solid var(--border)}
+.messages{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:10px}.messages li{padding:13px 14px;background:#f3f0e9;border-radius:12px;white-space:pre-wrap;overflow-wrap:anywhere}.speaker{display:block;font-size:12px;font-weight:800;color:var(--forest);margin-bottom:4px}
+.small,.privacy{color:var(--soft);font-size:13px}.privacy{padding:26px 0}.error{color:#9d3030}
+@media(max-width:650px){nav{align-items:flex-start}header{padding:46px 0 30px}.call{padding:17px}}
+</style>
+</head>
+<body><main>
+<nav><strong>STEWARO</strong><a href="/telefonate">Alle Telefonate</a></nav>
+<header><span class="eyebrow">Klientenportal · Telefon</span><h1>Ausgehende Anrufe</h1>
+<p>Alle Aufträge, bei denen FIDEL in deinem Namen telefoniert hat. Sieh nach, wen FIDEL angerufen hat, welchen Auftrag du erteilt hast und was im Gespräch tatsächlich erfasst wurde.</p></header>
+<p id="state" role="status" aria-live="polite">Dein geschütztes Outbound-Protokoll wird geladen …</p>
+<section id="calls" aria-label="Ausgehende Telefonate" hidden></section>
+<p class="privacy">Die Gesprächsbeiträge stammen aus automatischer Spracherkennung und können unvollständig oder fehlerhaft sein. Ein Transkript ist keine Audioaufnahme. Ein beendeter Anruf beweist nicht, dass der Auftrag inhaltlich korrekt erledigt wurde. Zugang nur nach Anmeldung.</p>
+</main>
+<script>
+(()=>{
+"use strict";
+const ROOT="https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/account-security-auth-cleanup-temp";
+const state=document.getElementById("state"),root=document.getElementById("calls");
+const token=()=>{try{return JSON.parse(sessionStorage.getItem("scb_web_session")||"null")?.session_token||""}catch{return""}};
+const d=v=>{const x=new Date(v??"");return Number.isNaN(x.getTime())?"Zeit nicht verfügbar":x.toLocaleString("de-DE",{dateStyle:"medium",timeStyle:"short"})};
+const node=(tag,cls,text)=>{const x=document.createElement(tag);if(cls)x.className=cls;if(text!=null)x.textContent=String(text);return x};
+const err=text=>{state.hidden=false;state.className="error";state.textContent=text;root.hidden=true};
+const get=async path=>{const t=token();if(!t)throw Error("Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.");const res=await fetch(ROOT+path,{headers:{Authorization:"Bearer "+t,Accept:"application/json"},cache:"no-store"});if(res.status===401)throw Error("Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.");const body=await res.json().catch(()=>null);if(!res.ok||body?.ok!==true||body.authoritative!==true||body.environment!=="PROD"||body.phone_contract!=="customer-outbound-ledger-v1")throw Error("Das Outbound-Protokoll konnte gerade nicht sicher geladen werden.");return body};
+const field=(dl,label,value)=>{const dt=node("dt",null,label),dd=node("dd",null,value??"Nicht dokumentiert");dl.append(dt,dd)};
+const show=async(call,container,button)=>{
+ button.disabled=true;button.textContent="Gespräch wird geladen …";
+ try{
+  const b=await get("/phone/outbound/transcript?call_id="+encodeURIComponent(call.call_id));
+  const detail=b.call;if(!detail||detail.call_id!==call.call_id)throw Error("Das Gespräch konnte nicht sicher zugeordnet werden.");
+  container.replaceChildren();
+  container.append(node("p","small",detail.transcript_coverage||"Keine Transkriptangaben verfügbar."));
+  const entries=Array.isArray(detail.transcript)?detail.transcript:[],list=node("ol","messages");
+  entries.forEach(item=>{const li=node("li"),who=node("span","speaker",item.speaker||"Gespräch"),message=node("span",null,item.text||"");li.append(who,message);list.append(li)});
+  if(entries.length)container.append(list);else container.append(node("p",null,"Für diesen Anruf sind keine eindeutig zugeordneten Gesprächsbeiträge gespeichert."));
+  button.textContent="Gespräch ausgeblendet";button.dataset.open="true";
+ }catch(e){container.replaceChildren(node("p","error",e.message||"Die Gesprächsdaten sind derzeit nicht verfügbar."));button.textContent="Erneut versuchen"}
+ finally{button.disabled=false}
+};
+const render=items=>{
+ root.replaceChildren();
+ if(!items.length){state.hidden=false;state.textContent="Noch keine ausgehenden Anrufaufträge vorhanden.";root.hidden=true;return}
+ state.hidden=true;root.hidden=false;
+ items.forEach(call=>{
+  const article=node("article","call"),top=node("div"),title=node("h2",null,call.contact_name||"Kontakt");
+  const status=node("span","status",call.call_status||"Unbekannt");
+  const meta=node("p","meta",d(call.requested_at));
+  const dl=node("dl");field(dl,"Dein Auftrag",call.requested_objective);
+  field(dl,"Telefonstatus",call.call_status);
+  field(dl,"Bisherige Statusmeldung (nicht verifiziert)",call.result_note||"Keine");
+  const btn=node("button",null,"Gesprächsverlauf anzeigen"),details=node("div","details");details.hidden=true;
+  btn.type="button";
+  btn.addEventListener("click",()=>{if(btn.dataset.open==="true"){details.hidden=true;btn.dataset.open="false";btn.textContent="Gesprächsverlauf anzeigen";return}details.hidden=false;show(call,details,btn)});
+  top.append(title,meta,status);article.append(top,dl,btn,details);root.append(article)
+ })
+};
+get("/phone/outbound").then(x=>render(Array.isArray(x.calls)?x.calls:[])).catch(x=>err(x.message||"Der Telefonverlauf ist momentan nicht abrufbar."));
+})();
+</script>
+</body></html>
