@@ -139,6 +139,7 @@
   }
 
   function rewriteLinks(){
+    if(!publicHosts.has(location.hostname)&&location.hostname!==accountHost)return;
     document.querySelectorAll("a[href]").forEach((link)=>{
       const raw=link.getAttribute("href");
       if(!raw||raw.startsWith("#")||raw.startsWith("mailto:")||raw.startsWith("tel:")||raw.startsWith("http://")||raw.startsWith("https://"))return;
