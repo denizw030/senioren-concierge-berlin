@@ -1,0 +1,43 @@
+(()=>{
+"use strict";
+const ROOT="https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/account-security-auth-cleanup-temp";
+const state=document.getElementById("state"),root=document.getElementById("calls");
+const token=()=>{try{return JSON.parse(sessionStorage.getItem("scb_web_session")||"null")?.session_token||""}catch{return""}};
+const d=v=>{const x=new Date(v??"");return Number.isNaN(x.getTime())?"Zeit nicht verfügbar":x.toLocaleString("de-DE",{dateStyle:"medium",timeStyle:"short"})};
+const node=(tag,cls,text)=>{const x=document.createElement(tag);if(cls)x.className=cls;if(text!=null)x.textContent=String(text);return x};
+const err=text=>{state.hidden=false;state.className="error";state.textContent=text;root.hidden=true};
+const get=async path=>{const t=token();if(!t)throw Error("Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.");const res=await fetch(ROOT+path,{headers:{Authorization:"Bearer "+t,Accept:"application/json"},cache:"no-store"});if(res.status===401)throw Error("Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.");const body=await res.json().catch(()=>null);if(!res.ok||body?.ok!==true||body.authoritative!==true||body.environment!=="PROD"||body.phone_contract!=="customer-outbound-ledger-v1")throw Error("Das Outbound-Protokoll konnte gerade nicht sicher geladen werden.");return body};
+const field=(dl,label,value)=>{const dt=node("dt",null,label),dd=node("dd",null,value??"Nicht dokumentiert");dl.append(dt,dd)};
+const show=async(call,container,button)=>{
+ button.disabled=true;button.textContent="Gespräch wird geladen …";
+ try{
+  const b=await get("/phone/outbound/transcript?call_id="+encodeURIComponent(call.call_id));
+  const detail=b.call;if(!detail||detail.call_id!==call.call_id)throw Error("Das Gespräch konnte nicht sicher zugeordnet werden.");
+  container.replaceChildren();
+  container.append(node("p","small",detail.transcript_coverage||"Keine Transkriptangaben verfügbar."));
+  const entries=Array.isArray(detail.transcript)?detail.transcript:[],list=node("ol","messages");
+  entries.forEach(item=>{const li=node("li"),who=node("span","speaker",item.speaker||"Gespräch"),message=node("span",null,item.text||"");li.append(who,message);list.append(li)});
+  if(entries.length)container.append(list);else container.append(node("p",null,"Für diesen Anruf sind keine eindeutig zugeordneten Gesprächsbeiträge gespeichert."));
+  button.textContent="Gespräch ausgeblendet";button.dataset.open="true";
+ }catch(e){container.replaceChildren(node("p","error",e.message||"Die Gesprächsdaten sind derzeit nicht verfügbar."));button.textContent="Erneut versuchen"}
+ finally{button.disabled=false}
+};
+const render=items=>{
+ root.replaceChildren();
+ if(!items.length){state.hidden=false;state.textContent="Noch keine ausgehenden Anrufaufträge vorhanden.";root.hidden=true;return}
+ state.hidden=true;root.hidden=false;
+ items.forEach(call=>{
+  const article=node("article","call"),top=node("div"),title=node("h2",null,call.contact_name||"Kontakt");
+  const status=node("span","status",call.call_status||"Unbekannt");
+  const meta=node("p","meta",d(call.requested_at));
+  const dl=node("dl");field(dl,"Dein Auftrag",call.requested_objective);
+  field(dl,"Telefonstatus",call.call_status);
+  field(dl,"Bisherige Statusmeldung (nicht verifiziert)",call.result_note||"Keine");
+  const btn=node("button",null,"Gesprächsverlauf anzeigen"),details=node("div","details");details.hidden=true;
+  btn.type="button";
+  btn.addEventListener("click",()=>{if(btn.dataset.open==="true"){details.hidden=true;btn.dataset.open="false";btn.textContent="Gesprächsverlauf anzeigen";return}details.hidden=false;show(call,details,btn)});
+  top.append(title,meta,status);article.append(top,dl,btn,details);root.append(article)
+ })
+};
+get("/phone/outbound").then(x=>render(Array.isArray(x.calls)?x.calls:[])).catch(x=>err(x.message||"Der Telefonverlauf ist momentan nicht abrufbar."));
+})();
