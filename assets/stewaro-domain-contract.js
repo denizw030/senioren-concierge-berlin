@@ -14,6 +14,10 @@
     "/payg","/telefonate","/zugang-uebertragen","/passwort-zuruecksetzen",
     "/email-concierge"
   ]);
+  const sessionMigrationPaths=new Set([
+    "/","/konto","/concierge-anpassen","/payg","/telefonate",
+    "/zugang-uebertragen","/email-concierge"
+  ]);
   const publicPrefixes=[
     "/de","/prime-concierge","/concierges","/safety","/digitaler-schutz",
     "/angehoerige","/leistungen","/kontakt","/pakete","/faq","/ablauf",
@@ -155,6 +159,24 @@
       }
     });
   }
+
+  document.addEventListener("click",(event)=>{
+    if(!publicHosts.has(location.hostname)||event.defaultPrevented)return;
+    const anchor=event.target instanceof Element?event.target.closest("a[href]"):null;
+    if(!(anchor instanceof HTMLAnchorElement)||anchor.target==="_blank"||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+    let url;
+    try{url=new URL(anchor.href,location.href);}catch(_){return;}
+    const p=cleanPath(url.pathname);
+    const accountDestination=url.origin===ACCOUNT_ORIGIN;
+    const legacyPublicAccountRoute=publicHosts.has(url.hostname)&&explicitAccountPaths.has(p);
+    if(!accountDestination&&!legacyPublicAccountRoute)return;
+    const migrationPath=p==="/"||p==="/zugang"||p==="/anmelden"||p==="/registrieren"?"/konto":p;
+    if(!sessionMigrationPaths.has(migrationPath)||!readSession()?.session_token)return;
+    event.preventDefault();
+    void migrateRememberedSession(migrationPath).then((migrated)=>{
+      if(!migrated)location.href=accountDestination?url.href:accountPath(p)+url.search+url.hash;
+    });
+  },true);
 
   window.STEWARO_DOMAINS=Object.freeze({
     publicOrigin:PUBLIC_ORIGIN,
