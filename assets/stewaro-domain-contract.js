@@ -28,6 +28,11 @@
   const currentPath=cleanPath(location.pathname);
   const accountPath=(path)=>ACCOUNT_ORIGIN+(path==="/zugang"?"/":path);
   const publicPath=(path)=>PUBLIC_ORIGIN+path;
+  const safeAccountNext=(value)=>{
+    const p=cleanPath(value||"/konto");
+    if(p==="/"||explicitAccountPaths.has(p))return p==="/zugang"?"/":p;
+    return "/konto";
+  };
 
   function readSession(){
     for(const storage of [sessionStorage,localStorage]){
@@ -37,6 +42,55 @@
       }catch(_){}
     }
     return null;
+  }
+
+  function storeSession(body){
+    if(!body?.session_token)return false;
+    const payload={
+      session_token:body.session_token,
+      customer_account_id:body.customer_account_id,
+      person_id:body.person_id,
+      role:body.role,
+      auth_level:body.auth_level,
+      expires_at:body.expires_at,
+      idle_expires_at:body.idle_expires_at,
+      remember_me:body.remember_me===true,
+      product_context:body.product_context||"senioren"
+    };
+    sessionStorage.setItem(SESSION_KEY,JSON.stringify(payload));
+    if(payload.remember_me)localStorage.setItem(SESSION_KEY,JSON.stringify(payload));
+    else localStorage.removeItem(SESSION_KEY);
+    return true;
+  }
+
+  async function claimAccountHandoff(){
+    if(location.hostname!==accountHost)return true;
+    const hash=new URLSearchParams(location.hash.replace(/^#/,""));
+    const token=String(hash.get("handoff")||"");
+    if(!token)return true;
+    const next=safeAccountNext(new URLSearchParams(location.search).get("next"));
+    try{
+      const response=await fetch(SESSION_URL,{
+        method:"POST",
+        headers:{"Content-Type":"application/json",Authorization:"Bearer "+token},
+        body:JSON.stringify({action:"handoff_claim"}),
+        cache:"no-store",
+        credentials:"omit"
+      });
+      const body=await response.json().catch(()=>({}));
+      if(!response.ok||body?.ok!==true||body?.status!=="handoff_claimed"||!storeSession(body)){
+        history.replaceState({},"", "/anmelden?source=account_handoff_failed");
+        location.replace("/anmelden?source=account_handoff_failed");
+        return false;
+      }
+      history.replaceState({},"",next);
+      location.replace(next);
+      return false;
+    }catch(_){
+      history.replaceState({},"","/anmelden?source=account_handoff_retry");
+      location.replace("/anmelden?source=account_handoff_retry");
+      return false;
+    }
   }
 
   async function migrateRememberedSession(targetPath){
@@ -52,10 +106,10 @@
       });
       const body=await response.json().catch(()=>({}));
       if(!response.ok||body?.ok!==true||body?.status!=="handoff_ready")return false;
-      const target=String(body.target_url||"");
-      if(!target.startsWith(ACCOUNT_ORIGIN+"/#handoff="))return false;
-      const join=target.includes("?")?"&":"?";
-      location.replace(target+join+"next="+encodeURIComponent(targetPath||"/konto"));
+      const target=new URL(String(body.target_url||""));
+      if(target.origin!==ACCOUNT_ORIGIN||!target.hash.startsWith("#handoff="))return false;
+      const next=safeAccountNext(targetPath);
+      location.replace(ACCOUNT_ORIGIN+"/?next="+encodeURIComponent(next)+target.hash);
       return true;
     }catch(_){
       return false;
@@ -112,6 +166,7 @@
   });
 
   if(moveAccountPublicRoute())return;
+  window.STEWARO_ACCOUNT_AUTH_READY=claimAccountHandoff();
   void movePublicAccountRoute();
   document.addEventListener("DOMContentLoaded",rewriteLinks,{once:true});
 })();
