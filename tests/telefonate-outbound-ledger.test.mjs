@@ -21,6 +21,14 @@ test("portal distinguishes call times, evidence, duration and mission outcome",(
  assert.match(js,/mission_verified===true/);
  assert.match(js,/ein beendeter Anruf bestätigt keine persönliche Antwort/);
 });
+test("page-level CSP permits only self-hosted active assets and bound production history API",()=>{
+ assert.match(page,/http-equiv="Content-Security-Policy"/);
+ assert.match(page,/script-src 'self'/);
+ assert.match(page,/style-src 'self'/);
+ assert.match(page,/connect-src 'self' https:\/\/djicahhmnnamtjuqedqd\.supabase\.co/);
+ assert.match(page,/object-src 'none'/);
+ assert.doesNotMatch(page,/unsafe-inline|unsafe-eval/);
+});
 test("portal requires secure existing session and renders transcripts as text",()=>{
  assert.match(js,/scb_web_session/);
  assert.match(js,/Authorization:"Bearer "/);
