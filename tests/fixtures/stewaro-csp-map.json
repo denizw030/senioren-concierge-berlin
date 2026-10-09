@@ -279,5 +279,8 @@
     "asset": "assets/stewaro-csp-datenschutz-style-1.css",
     "opening": "<style id=\"stewaro-privacy-hub-v1\">",
     "closing": "</style>"
+  },
+  " href=\"assets/stewaro-app.css?v=2\"": {
+    "original": " href=\"assets/stewaro-app.css?v=1\""
   }
 }
