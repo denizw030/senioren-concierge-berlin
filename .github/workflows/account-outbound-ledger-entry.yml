@@ -1,0 +1,23 @@
+name: STEWARO Outbound Same Tab Account Navigation
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'assets/account-header-concierge.js'
+      - 'tests/account-outbound-ledger-entry.test.mjs'
+      - '.github/workflows/account-outbound-ledger-entry.yml'
+permissions:
+  contents: read
+jobs:
+  account-navigation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify new Klient account route and preserved login/account parity
+        run: node --test tests/account-outbound-ledger-entry.test.mjs tests/telefonate-session-recovery.test.mjs tests/telefonate-outbound-ledger.test.mjs tests/konto-clean-route-parity.test.mjs tests/critical-route-parity.test.mjs
+      - name: Validate browser syntax
+        run: node --check assets/account-header-concierge.js

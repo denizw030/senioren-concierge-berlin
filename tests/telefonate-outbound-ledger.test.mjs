@@ -20,6 +20,26 @@ test("portal distinguishes call times, evidence, duration and mission outcome",(
  assert.match(js,/Antwort der Zielperson/);
  assert.match(js,/Auftrag tatsächlich erfüllt/);
  assert.match(js,/mission_verified===true/);
+ assert.match(js,/mission_outcome==="Auftrag nicht erledigt"/);
+ assert.match(js,/mission-outcome-".*resultClass\(call\)/);
+ assert.match(fs.readFileSync("assets/stewaro-outbound-ledger-v1.css","utf8"),/mission-outcome-failed/);
+ assert.match(js,/Noch nicht überprüft/);
+ assert.match(js,/Auftrag erledigt/);
+ assert.match(js,/Abweichung festgestellt/);
+ assert.match(js,/resultLabel\(call\)/);
+ assert.match(page,/stewaro-outbound-ledger-v1\.js\?v=6/);
+ assert.match(page,/stewaro-outbound-ledger-v1\.css\?v=2/);
+
+ assert.match(js,/Telefonassistenz/);
+ assert.match(js,/call\.assistant_name/);
+ assert.match(js,/detail\.mission_issue/);
+ assert.match(js,/Erfolgsnachweis/);
+ assert.match(js,/call\.mission_evidence/);
+ assert.match(js,/detail\.mission_evidence/);
+ assert.match(js,/Terminvereinbarung – Gesprächsstand/);
+ assert.match(js,/Warum noch nicht bestätigt/);
+ assert.match(js,/detail\.appointment_progress/);
+ assert.match(js,/call\.appointment_evidence/);
  assert.match(js,/ein beendeter Anruf bestätigt keine persönliche Antwort/);
 });
 test("page-level CSP permits only self-hosted active assets and bound production history API",()=>{

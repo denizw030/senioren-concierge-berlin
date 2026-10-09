@@ -6,6 +6,38 @@
   if (!source || !nav) return;
 
   const sourceCard = source.closest(".account-overview-link");
+  // Keep navigation within the authenticated Safari tab. A link opened externally
+  // (for example from a messaging app) cannot inherit sessionStorage from this tab.
+  const overview = sourceCard?.closest(".account-overview-highlights");
+  if (overview && !document.getElementById("accountOutboundHistoryLink")) {
+    const entry = document.createElement("a");
+    entry.id = "accountOutboundHistoryLink";
+    entry.className = "account-overview-link account-outbound-history-link";
+    entry.href = "/telefonate/ausgehend/";
+    entry.setAttribute("aria-label", "Ausgehende Anrufe von FIDEL – Gesprächsprotokoll öffnen");
+    entry.style.textDecoration = "none";
+    entry.style.color = "inherit";
+    const eyebrow = document.createElement("span");
+    eyebrow.className = "eyebrow";
+    eyebrow.textContent = "Telefonate";
+    const title = document.createElement("strong");
+    title.textContent = "Ausgehende Anrufe";
+    const description = document.createElement("span");
+    description.textContent = "Gesprächsverläufe und Ergebnisse von FIDEL ansehen.";
+    entry.append(eyebrow, title, description);
+    overview.insertBefore(entry, sourceCard);
+  }
+
+  const quickMenu = document.getElementById("conciergeQuickMenu");
+  if (quickMenu && !document.getElementById("accountOutboundHistoryQuickLink")) {
+    const entry = document.createElement("a");
+    entry.id = "accountOutboundHistoryQuickLink";
+    entry.className = "concierge-quick-item";
+    entry.href = "/telefonate/ausgehend/";
+    entry.setAttribute("role", "menuitem");
+    entry.innerHTML = '<span>Ausgehende Anrufe</span><span aria-hidden="true">›</span>';
+    quickMenu.append(entry);
+  }
   const link = document.createElement("a");
   link.id = "accountHeaderConcierge";
   link.className = "nw-header-concierge";

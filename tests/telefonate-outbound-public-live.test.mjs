@@ -9,20 +9,35 @@ async function request(path){
 }
 const {res:page,body:html}=await request("/telefonate/ausgehend/");
 assert.match(html,/<title>Ausgehende Anrufe – STEWARO<\/title>/);
-assert.match(html,/href="\/assets\/stewaro-outbound-ledger-v1\.css\?v=1"/);
-assert.match(html,/src="\/assets\/stewaro-outbound-ledger-v1\.js\?v=1"/);
+const cssVersion=html.match(/href="\/assets\/stewaro-outbound-ledger-v1\.css\?v=([12])"/)?.[1];
+assert.ok(cssVersion,"public release has known stylesheet version");
+assert.match(html,/src="\/assets\/stewaro-phone-session-v1\.js\?v=1"/);
+const jsVersion=html.match(/src="\/assets\/stewaro-outbound-ledger-v1\.js\?v=([2456])"/)?.[1];
+assert.ok(jsVersion,"public release has known runtime version");
 assert.match(html,/id="calls"/);
 assert.doesNotMatch(html,/<script(?![^>]*src=)[^>]*>/i);
 assert.doesNotMatch(html,/<style\b/i);
 console.log("OUTBOUND_PORTAL_PUBLIC_HTML_200=GREEN");
-const {body:css}=await request("/assets/stewaro-outbound-ledger-v1.css?v=1");
+const {body:css}=await request("/assets/stewaro-outbound-ledger-v1.css?v="+cssVersion);
 assert.match(css,/\.messages/);
 console.log("OUTBOUND_PORTAL_PUBLIC_CSS_200=GREEN");
-const {body:js}=await request("/assets/stewaro-outbound-ledger-v1.js?v=1");
+const {body:js}=await request("/assets/stewaro-outbound-ledger-v1.js?v="+jsVersion);
 assert.match(js,/phone\/outbound\/transcript/);
 assert.match(js,/Gesprächsdauer/);
 assert.match(js,/mission_verified===true/);
+if(["4","5","6"].includes(jsVersion)){
+ assert.match(js,/mission-outcome-"\+resultClass\(call\)/);
+ assert.match(css,/mission-outcome-failed/);
+ assert.match(js,/Noch nicht überprüft/);
+ assert.match(js,/resultLabel/);
+ if(["5","6"].includes(jsVersion))assert.match(js,/Erfolgsnachweis/);
+ if(jsVersion==="6")assert.match(js,/Terminvereinbarung – Gesprächsstand/);
+}
 console.log("OUTBOUND_PORTAL_PUBLIC_JS_200=GREEN");
+const {body:session}=await request("/assets/stewaro-phone-session-v1.js?v=1");
+assert.match(session,/remember_me!==true/);
+assert.match(session,/expires_at/);
+console.log("OUTBOUND_PORTAL_PUBLIC_SESSION_HELPER_200=GREEN");
 const csp=page.headers.get("content-security-policy");
 console.log("OUTBOUND_PORTAL_PUBLIC_CSP_HEADER="+(csp?"PRESENT":"ABSENT_HOST_HEADER"));
 if(html.includes('http-equiv="Content-Security-Policy"')){
