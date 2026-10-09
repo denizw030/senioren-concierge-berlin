@@ -12,6 +12,15 @@ test("independent private outbound ledger route is discoverable from existing te
  assert.match(js,/customer-outbound-ledger-v1/);
  assert.match(js,/cache:"no-store"/);
 });
+test("portal distinguishes call times, evidence, duration and mission outcome",()=>{
+ assert.match(js,/Beginn des Telefonats/);
+ assert.match(js,/Ende des Telefonats/);
+ assert.match(js,/Gesprächsdauer/);
+ assert.match(js,/Antwort der Zielperson/);
+ assert.match(js,/Auftrag tatsächlich erfüllt/);
+ assert.match(js,/mission_verified===true/);
+ assert.match(js,/ein beendeter Anruf bestätigt keine persönliche Antwort/);
+});
 test("portal requires secure existing session and renders transcripts as text",()=>{
  assert.match(js,/scb_web_session/);
  assert.match(js,/Authorization:"Bearer "/);
