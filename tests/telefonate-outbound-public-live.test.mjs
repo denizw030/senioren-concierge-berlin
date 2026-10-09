@@ -12,7 +12,7 @@ assert.match(html,/<title>Ausgehende Anrufe – STEWARO<\/title>/);
 const cssVersion=html.match(/href="\/assets\/stewaro-outbound-ledger-v1\.css\?v=([12])"/)?.[1];
 assert.ok(cssVersion,"public release has known stylesheet version");
 assert.match(html,/src="\/assets\/stewaro-phone-session-v1\.js\?v=1"/);
-const jsVersion=html.match(/src="\/assets\/stewaro-outbound-ledger-v1\.js\?v=([24])"/)?.[1];
+const jsVersion=html.match(/src="\/assets\/stewaro-outbound-ledger-v1\.js\?v=([245])"/)?.[1];
 assert.ok(jsVersion,"public release has known runtime version");
 assert.match(html,/id="calls"/);
 assert.doesNotMatch(html,/<script(?![^>]*src=)[^>]*>/i);
@@ -25,10 +25,12 @@ const {body:js}=await request("/assets/stewaro-outbound-ledger-v1.js?v="+jsVersi
 assert.match(js,/phone\/outbound\/transcript/);
 assert.match(js,/Gesprächsdauer/);
 assert.match(js,/mission_verified===true/);
-if(jsVersion==="4"){
- assert.match(js,/mission-outcome-failed/);
+if(jsVersion==="4"||jsVersion==="5"){
+ assert.match(js,/mission-outcome-"\+resultClass\(call\)/);
+ assert.match(css,/mission-outcome-failed/);
  assert.match(js,/Noch nicht überprüft/);
  assert.match(js,/resultLabel/);
+ if(jsVersion==="5")assert.match(js,/Erfolgsnachweis/);
 }
 console.log("OUTBOUND_PORTAL_PUBLIC_JS_200=GREEN");
 const {body:session}=await request("/assets/stewaro-phone-session-v1.js?v=1");
