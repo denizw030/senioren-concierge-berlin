@@ -10,6 +10,7 @@
   const ACCOUNT_LOGIN="https://account.stewaro.com/anmelden?produkt=senioren&next=app";
   const SITE_ORIGIN="https://stewaro.com";
   const ACCOUNT_ORIGIN="https://account.stewaro.com";
+  const ACCOUNT_SESSION_TRANSFER=ACCOUNT_ORIGIN+"/konto?stewaro_app=1";
 
   document.documentElement.dataset.stewaroApp="1";
   const style=document.createElement("style");
@@ -99,7 +100,9 @@
 
   if(!readSession()){
     window.STEWARO_APP_AUTH_READY=Promise.resolve(false);
-    accountLogin();
+    // Ask the signed-in Account host to issue a scoped one-time App handoff.
+    // An anonymous Account visitor will be sent to the existing app-aware login.
+    location.replace(ACCOUNT_SESSION_TRANSFER);
     return;
   }
 
