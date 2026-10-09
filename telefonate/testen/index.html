@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; font-src 'self'; form-action 'self'; upgrade-insecure-requests">
+<title>Gespräche testen – STEWARO</title>
+<meta name="description" content="Sichere, einzeln vorbereitbare FIDEL-Telefonaufträge ohne automatische Anrufe.">
+<link rel="icon" href="/assets/logos/stewaro-icon.svg?v=1" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/stewaro-unified.css?v=20260928-3">
+<link rel="stylesheet" href="/assets/stewaro-call-lab-v1.css?v=1">
+</head>
+<body>
+<main class="wrap">
+<nav class="top"><a class="brand" href="/telefonate">STEWARO</a><a class="back" href="/telefonate/ausgehend">Anrufprotokoll</a></nav>
+<header class="hero"><p class="eyebrow">STEWARO · FIDEL · Telefon</p><h1>Gespräche testen.</h1>
+<p>Wähle einen Auftrag aus, bereite ihn vor und prüfe ihn Schritt für Schritt. Du entscheidest, ob FIDEL später wirklich telefonieren soll.</p></header>
+<section class="notice" aria-label="Testmodus"><strong>Vorbereitung – kein echter Anruf</strong><p>Diese Seite baut ausschließlich einen Gesprächsauftrag im Browser. Nichts wird versendet, gespeichert, gebucht oder angerufen. Echte Anrufe können Kosten verursachen und müssen separat bei FIDEL ausdrücklich beauftragt und freigegeben werden.</p></section>
+<div id="auth" class="notice" role="status" aria-live="polite">Deine Anmeldung wird geprüft …</div>
+<div id="lab" hidden>
+<section class="panel" aria-labelledby="catalog-title">
+<div class="sectionheading"><div><p class="eyebrow">24 einzeln testbare Fälle</p><h2 id="catalog-title">Was soll FIDEL erledigen?</h2></div><span id="selection-count">0 / 24 getestet</span></div>
+<label for="category">Bereich auswählen</label><select id="category"></select>
+<div id="catalog" class="catalog" role="group" aria-label="Gesprächsaufträge"></div>
+</section>
+<section class="panel" aria-labelledby="brief-title">
+<p class="eyebrow">Dein Gesprächsauftrag</p><h2 id="brief-title">Einzeln vorbereiten</h2>
+<form id="prepare" autocomplete="off">
+<label for="recipient">Name oder Stelle (optional)</label><input id="recipient" name="recipient" maxlength="100" placeholder="z. B. Praxis Dr. Beispiel">
+<label for="details">Was genau soll FIDEL klären?</label><textarea id="details" rows="4" maxlength="1400" placeholder="Anliegen, Zeitraum, Rückfragen, gewünschter Ton – ohne Passwörter oder Gesundheitsdetails"></textarea>
+<label for="phone">Telefonnummer (optional, nur zur Vorbereitung)</label><input id="phone" name="phone" maxlength="36" inputmode="tel" autocomplete="off" placeholder="Nicht für Simulation nötig">
+<p class="small">Diese Eingaben bleiben nur in diesem Browser-Tab und werden beim Schließen verworfen. Sensible Daten nur bei Bedarf und mit Freigabe teilen.</p>
+<button type="submit" class="primary">Gesprächsauftrag vorbereiten</button>
+</form>
+</section>
+<section class="panel" aria-labelledby="preview-title">
+<p class="eyebrow">Vorschau · noch kein Telefonat</p><h2 id="preview-title">Auftrag an FIDEL</h2>
+<textarea id="preview" rows="12" readonly aria-label="Vorbereiteter Gesprächsauftrag"></textarea>
+<div class="actions"><button type="button" id="copy" class="primary">Auftrag kopieren</button><a id="open-fidel" href="/web-concierge/">FIDEL öffnen und einfügen</a></div>
+<p id="copy-state" class="small" role="status" aria-live="polite">Erst vorbereiten, dann kopieren und bei FIDEL einfügen. Nichts wird automatisch gesendet.</p>
+</section>
+<section class="panel" aria-labelledby="check-title">
+<p class="eyebrow">Nach dem Test</p><h2 id="check-title">Worauf kommt es an?</h2><p id="expected"></p><p id="caution" class="small"></p>
+<div id="checks" class="checks"></div>
+<p class="small">Häkchen sind nur Deine eigene Test-Notiz, kein technischer oder verbindlicher Nachweis. Maßgeblich ist das geschützte <a href="/telefonate/ausgehend">Outbound-Anrufprotokoll</a>.</p>
+<button id="reset" type="button">Prüfpunkte zurücksetzen</button>
+</section>
+</div>
+</main>
+<script src="/assets/stewaro-phone-session-v1.js?v=1" defer></script>
+<script src="/assets/stewaro-call-lab-v1.js?v=1" defer></script>
+</body>
+</html>
