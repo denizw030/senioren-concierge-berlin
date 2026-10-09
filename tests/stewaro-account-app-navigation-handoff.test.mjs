@@ -152,7 +152,7 @@ test("all mirrored Account and FIDEL pages load the same cache-busted safe navig
     assert.match(html,/\/assets\/stewaro-account-app-navigation\.js\?v=1/);
   }
   for(const page of ["web-concierge.html","web-concierge/index.html"]){
-    assert.match(read(page),/\/assets\/stewaro-app-bootstrap\.js\?v=4/);
+    assert.match(read(page),/\/assets\/stewaro-app-bootstrap\.js\?v=3\.1/);
   }
   assert.equal(read("konto/index.html").replace('<head><base href="/">','<head>'),read("konto.html"));
   assert.equal(read("anmelden/index.html").replace('<head><base href="/">','<head>'),read("anmelden.html"));
