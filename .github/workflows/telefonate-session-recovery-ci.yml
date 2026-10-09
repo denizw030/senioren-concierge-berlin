@@ -1,0 +1,28 @@
+name: STEWARO Telephone Session Recovery CI
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'telefonate/index.html'
+      - 'telefonate/ausgehend/index.html'
+      - 'assets/stewaro-outbound-ledger-v1.js'
+      - 'assets/stewaro-phone-session-v1.js'
+      - 'assets/stewaro-csp-anmelden-script-1.js'
+      - 'tests/telefonate-outbound-ledger.test.mjs'
+      - 'tests/telefonate-session-recovery.test.mjs'
+      - '.github/workflows/telefonate-session-recovery-ci.yml'
+permissions:
+  contents: read
+jobs:
+  token-recovery-and-route:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test sessions, client portal and critical route mirrors
+        run: node --test tests/telefonate-session-recovery.test.mjs tests/telefonate-outbound-ledger.test.mjs tests/konto-clean-route-parity.test.mjs tests/critical-route-parity.test.mjs
+      - name: Validate changed browser code syntax
+        run: node --check assets/stewaro-phone-session-v1.js && node --check assets/stewaro-outbound-ledger-v1.js && node --check assets/stewaro-csp-anmelden-script-1.js
