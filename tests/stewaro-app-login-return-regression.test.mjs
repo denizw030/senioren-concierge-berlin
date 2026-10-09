@@ -10,7 +10,8 @@ const app = fs.readFileSync("assets/stewaro-app-bootstrap.js", "utf8");
 const home = fs.readFileSync("index.html", "utf8");
 
 function resolveDestination(page, search) {
-  const code = auth.match(/  function signedInDestination\(currentPage, search\) \{[\s\S]*?\n  \}/)?.[0];
+  assert.equal((auth.match(/const destination = signedInDestination\(current, location\.search\);/g) || []).length, 2);
+  assert.equal((auth.match(/if \(destination\) location\.replace\(accountUrl\(destination\)\);/g) || []).length, 2);
   assert.ok(code, "post-auth redirect helper exists");
   const fn = vm.runInNewContext("(" + code.trim() + ")", { URLSearchParams });
   return fn(page, search);
