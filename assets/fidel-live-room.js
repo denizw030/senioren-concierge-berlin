@@ -1,3 +1,4 @@
+import { mountStewaroFidelMini3D } from "./stewaro-fidel-mini-3d.js?v=1";
 // FIDEL LIVE ROOM V1 · dependency-free WebGL spatial stage
 // The room is production-safe progressive enhancement. The geometric FIDEL is a
 // placeholder until the approved rigged fidel.glb asset exists; WebRTC/Core stay untouched.
@@ -245,12 +246,16 @@ function makeRenderer(canvas){
   return {render,destroy};
 }
 
-export function mountFidelLiveRoom(host,{enabled=true}={}){
+export function mountFidelLiveRoom(host,{enabled=true,modelUrl="/assets/fidel/FIDEL_Mini_QUAD_BODYRIG_TEXTURED_v4_1.glb"}={}){
   if(!(host instanceof HTMLElement)||!enabled)return null;
   const canvas=document.createElement("canvas");
   canvas.className="nw-fidel-room-canvas";
   canvas.setAttribute("aria-hidden","true");
-  host.replaceChildren(canvas);
+  const modelHost=document.createElement("div");
+  modelHost.className="nw-fidel-mini3d-layer";
+  modelHost.hidden=true;
+  Object.assign(modelHost.style,{position:"absolute",inset:"0",zIndex:"1"});
+  host.replaceChildren(canvas,modelHost);
   let renderer=null;
   try{renderer=makeRenderer(canvas);}catch{renderer=null;}
   if(!renderer){
@@ -261,7 +266,28 @@ export function mountFidelLiveRoom(host,{enabled=true}={}){
   host.dataset.fidelRoomSupported="true";
   const reduced=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches===true;
   let state="idle",inLevel=0,outLevel=0,raf=0,running=false,last=0,approach=0,stand=0;
-  let speakingAt=0;
+  let speakingAt=0,mini=null,miniPromise=null,modelReady=false;
+
+  const ensureMini=()=>{
+    if(mini)return Promise.resolve(mini);
+    if(miniPromise)return miniPromise;
+    miniPromise=mountStewaroFidelMini3D(modelHost,{modelUrl,idleClip:"Idle_12",reducedMotion:reduced})
+      .then(controller=>{
+        mini=controller;modelReady=true;
+        canvas.hidden=true;modelHost.hidden=false;
+        host.dataset.fidelRoomModel="fidel-mini-v4-1";
+        window.dispatchEvent(new CustomEvent("stewaro:fidel-room-ready",{detail:{version:2,placeholder_model:false,model:"FIDEL_Mini_QUAD_BODYRIG_TEXTURED_v4_1.glb"}}));
+        return controller;
+      })
+      .catch(error=>{
+        modelReady=false;modelHost.hidden=true;canvas.hidden=false;
+        host.dataset.fidelRoomModel="fallback";
+        window.dispatchEvent(new CustomEvent("stewaro:fidel-room-model-error",{detail:{error:error?.message||"FIDEL_3D_LOAD_FAILED"}}));
+        return null;
+      })
+      .finally(()=>{miniPromise=null;});
+    return miniPromise;
+  };
 
   const normalizedState=(value)=>{
     switch(String(value||"").toLowerCase()){
@@ -292,6 +318,7 @@ export function mountFidelLiveRoom(host,{enabled=true}={}){
   };
   const setAudio=(input=0,output=0)=>{
     inLevel=clamp(input);outLevel=clamp(output);
+    mini?.setSpeechLevel?.(outLevel);
   };
   const frame=(now)=>{
     if(!running)return;
@@ -317,19 +344,26 @@ export function mountFidelLiveRoom(host,{enabled=true}={}){
       turn:reduced?0:Math.sin(t*.72)*.025+listening*.025,
       gesture:reduced?0:activeSpeech*(.35+.65*(Math.sin(t*3.2)*.5+.5))
     };
-    renderer.render(scene);
+    if(!modelReady)renderer.render(scene);
     raf=requestAnimationFrame(frame);
   };
   const start=()=>{
     if(running)return;
     running=true;host.hidden=false;last=performance.now();
     raf=requestAnimationFrame(frame);
-    window.dispatchEvent(new CustomEvent("stewaro:fidel-room-ready",{detail:{version:1,placeholder_model:true}}));
+    window.dispatchEvent(new CustomEvent("stewaro:fidel-room-ready",{detail:{version:1,placeholder_model:true,loading_model:true}}));
+    void ensureMini();
   };
   const stop=()=>{
     running=false;cancelAnimationFrame(raf);raf=0;setAudio(0,0);setState("idle");
+    mini?.resetFace?.();
   };
-  const destroy=()=>{stop();renderer.destroy();host.replaceChildren();};
+  const destroy=()=>{
+    stop();
+    try{mini?.destroy?.();}catch{}
+    mini=null;miniPromise=null;modelReady=false;
+    renderer.destroy();host.replaceChildren();
+  };
 
   return {supported:true,start,stop,setState,setAudio,destroy};
 }
