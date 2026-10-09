@@ -111,9 +111,17 @@
       const body=await response.json().catch(()=>({}));
       if(!response.ok||body?.ok!==true||body?.status!=="handoff_ready")return false;
       const target=new URL(String(body.target_url||""));
-      if(target.origin!==ACCOUNT_ORIGIN||!target.hash.startsWith("#handoff="))return false;
+      // Account root currently serves an entry surface without a verified claim
+      // script. The Account login page has the parser-blocking domain contract.
+      // Accept one fixed-shape capability, never arbitrary server-provided paths.
+      const params=new URLSearchParams(target.hash.replace(/^#/,""));
+      const capability=String(params.get("handoff")||"");
+      if(target.origin!==ACCOUNT_ORIGIN||target.pathname!=="/"||target.search||
+         !target.hash.startsWith("#handoff=")||
+         [...params.keys()].length!==1||!/^hnd_[A-Za-z0-9_-]{43}$/.test(capability))return false;
       const next=safeAccountNext(targetPath);
-      location.replace(ACCOUNT_ORIGIN+"/?next="+encodeURIComponent(next)+target.hash);
+      // The capability remains only in the fragment: no auth bearer in URL query.
+      location.replace(ACCOUNT_ORIGIN+"/anmelden?next="+encodeURIComponent(next)+"#handoff="+encodeURIComponent(capability));
       return true;
     }catch(_){
       return false;
