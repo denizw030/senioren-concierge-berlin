@@ -69,10 +69,22 @@
 
   async function claimAccountHandoff(){
     if(location.hostname!==accountHost)return true;
-    const hash=new URLSearchParams(location.hash.replace(/^#/,""));
+    const fragment=location.hash;
+    const hash=new URLSearchParams(fragment.replace(/^#/,""));
+    if(!hash.has("handoff"))return true;
     const token=String(hash.get("handoff")||"");
-    if(!token)return true;
     const next=safeAccountNext(new URLSearchParams(location.search).get("next"));
+    // Never let the Account page restore or render a previous Klient identity
+    // while a new, origin-bound one-time handoff is being claimed.
+    try{sessionStorage.removeItem(SESSION_KEY);}catch(_){}
+    try{localStorage.removeItem(SESSION_KEY);}catch(_){}
+    // Strip the capability from browser history before the asynchronous claim.
+    history.replaceState({},"",location.pathname+location.search);
+    if(!fragment.startsWith("#handoff=")||[...hash.keys()].length!==1||
+       !/^hnd_[A-Za-z0-9_-]{43}$/.test(token)){
+      location.replace("/anmelden?source=account_handoff_failed");
+      return false;
+    }
     try{
       const response=await fetch(SESSION_URL,{
         method:"POST",

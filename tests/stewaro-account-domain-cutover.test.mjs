@@ -140,7 +140,57 @@ test("script-backed Account login claims token before customer portal navigation
   assert.deepEqual(JSON.parse(calls[0].options.body),{action:"handoff_claim"});
   assert.equal(calls[0].options.headers.Authorization,"Bearer "+capability);
   assert.equal(JSON.parse(saved.get("scb_web_session")).session_token,sessionToken);
-  assert.deepEqual(historyPaths,["/konto"]);
+  assert.deepEqual(historyPaths,["/anmelden?next=%2Fkonto","/konto"]);
   assert.deepEqual(replaced,["/konto"]);
   assert.ok(!replaced.some(url=>url.includes(capability)||url.includes(sessionToken)));
+});
+
+test("Account claim isolates stale signed-in identity and removes capability before network response",async()=>{
+  const capability="hnd_"+"d".repeat(43);
+  const stored=new Map([["scb_web_session",JSON.stringify({session_token:"STALE_ACCOUNT_IDENTITY",remember_me:true})]]);
+  const persistent=new Map(stored);
+  const storage=(map)=>({getItem:(key)=>map.get(key)||null,setItem:(key,val)=>map.set(key,val),removeItem:(key)=>map.delete(key)});
+  const historyPaths=[],redirects=[],calls=[];
+  const location={hostname:"account.stewaro.com",pathname:"/anmelden",search:"?next=%2Fkonto",
+    hash:"#handoff="+capability,replace:(url)=>redirects.push(url)};
+  let resolveClaim;
+  const claimResponse=new Promise((resolve)=>{resolveClaim=resolve;});
+  const window={};
+  vm.runInNewContext(domains,{location,document:{addEventListener:()=>{}},window,
+    sessionStorage:storage(stored),localStorage:storage(persistent),URL,URLSearchParams,
+    history:{replaceState:(_state,_title,path)=>historyPaths.push(path)},
+    fetch:async(_url,options)=>{calls.push(options);return claimResponse;}
+  });
+  assert.equal(stored.has("scb_web_session"),false,"previous tab-scoped identity must be cleared before async claim");
+  assert.equal(persistent.has("scb_web_session"),false,"old remembered identity must not be restored");
+  assert.deepEqual(historyPaths,["/anmelden?next=%2Fkonto"],"fragment must disappear before fetch completion");
+  assert.equal(calls.length,1);
+  assert.equal(calls[0].headers.Authorization,"Bearer "+capability);
+  resolveClaim({ok:false,status:409,json:async()=>({ok:false,status:"handoff_already_claimed"})});
+  await window.STEWARO_ACCOUNT_AUTH_READY;
+  assert.equal(stored.has("scb_web_session"),false);
+  assert.equal(persistent.has("scb_web_session"),false);
+  assert.deepEqual(redirects,["/anmelden?source=account_handoff_failed"]);
+  assert.ok(!historyPaths.some((path)=>path.includes(capability)));
+});
+
+test("malformed or multi-key Account capabilities cannot restore an earlier identity",async()=>{
+  for(const hash of ["#handoff=invalid","#handoff=hnd_"+"e".repeat(43)+"&next=https%3A%2F%2Fevil.example"]){
+    const stored=new Map([["scb_web_session",JSON.stringify({session_token:"STALE"})]]);
+    const storage={getItem:(key)=>stored.get(key)||null,setItem:(key,val)=>stored.set(key,val),removeItem:(key)=>stored.delete(key)};
+    let calls=0;const redirects=[],historyPaths=[];
+    const location={hostname:"account.stewaro.com",pathname:"/anmelden",search:"",
+      hash,replace:(url)=>redirects.push(url)};
+    const window={};
+    vm.runInNewContext(domains,{location,window,document:{addEventListener:()=>{}},
+      sessionStorage:storage,localStorage:storage,URL,URLSearchParams,
+      history:{replaceState:(_state,_title,path)=>historyPaths.push(path)},
+      fetch:async()=>{calls++;throw Error("no network claim for malformed capability");}
+    });
+    assert.equal(calls,0);
+    assert.equal(stored.has("scb_web_session"),false);
+    assert.deepEqual(historyPaths,["/anmelden"]);
+    assert.deepEqual(redirects,["/anmelden?source=account_handoff_failed"]);
+    assert.ok(!redirects[0].includes("#handoff="));
+  }
 });
