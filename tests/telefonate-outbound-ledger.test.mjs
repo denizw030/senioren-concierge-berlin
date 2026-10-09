@@ -20,6 +20,9 @@ test("portal distinguishes call times, evidence, duration and mission outcome",(
  assert.match(js,/Antwort der Zielperson/);
  assert.match(js,/Auftrag tatsächlich erfüllt/);
  assert.match(js,/mission_verified===true/);
+ assert.match(js,/Telefonassistenz/);
+ assert.match(js,/call\.assistant_name/);
+ assert.match(js,/detail\.mission_issue/);
  assert.match(js,/ein beendeter Anruf bestätigt keine persönliche Antwort/);
 });
 test("page-level CSP permits only self-hosted active assets and bound production history API",()=>{
