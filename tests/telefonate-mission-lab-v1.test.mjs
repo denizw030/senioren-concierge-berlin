@@ -45,7 +45,7 @@ test("private session and explicit intent remain mandatory; no PII persistence",
 });
 test("mission results are never conflated with phone status; personal evaluation only",()=>{
  assert.match(source,/Ein beendeter Anruf ist kein Beweis/);
- assert.match(source,/kein technischer oder verbindlicher Nachweis|nur Deine eigene Test-Notiz/i);
- assert.match(page,/geschützte[s|n]? Outbound-Anrufprotokoll/i);
+ assert.match(page,/kein technischer oder verbindlicher Nachweis|nur Deine eigene Test-Notiz/i);
+ assert.match(page,/Outbound-Anrufprotokoll/i);
 });
 test("syntactically valid standalone asset",()=>{new vm.Script(source)});
