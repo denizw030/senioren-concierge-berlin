@@ -25,10 +25,11 @@ async function probe(target) {
     const expectedBody = target.marker.test(text);
     const isHtml = !target.name.includes("asset");
     const kindOk = isHtml ? /<!doctype html|<html[\\s>]/i.test(text) : !/<html[\\s>]/i.test(text);
+    const safeTitle = (text.match(/<title[^>]*>([^<]{0,100})<\\/title>/i)?.[1] || "").trim();
     const rootDiagnostics = target.name==="Account root handoff entry"
-      ? { hasAccountClaimScript:/stewaro-domain-contract\\.js/i.test(text), genericHomeRedirect:text.includes('window.location.replace("/de/"') }
+      ? { title:safeTitle, hasAccountClaimScript:/stewaro-domain-contract\\.js/i.test(text), hasAccountEntryMarkup:/stewaro-access-page|loginForm/i.test(text), genericHomeRedirect:text.includes('window.location.replace("/de/"') }
       : target.name==="FIDEL App root handoff entry"
-        ? { forwardsFragmentToChat:/web-concierge[\\s\\S]{0,120}window\\.location\\.hash/.test(text) }
+        ? { title:safeTitle, hasAppBootstrap:/stewaro-app-bootstrap\\.js/i.test(text), hasFidelAppShell:/stewaroAppShell|web-concierge-page/i.test(text), forwardsFragmentToChat:/web-concierge[\\s\\S]{0,120}window\\.location\\.hash/.test(text) }
         : {};
     const ok = response.ok && expectedHost && expectedBody && kindOk;
     return {name:target.name, code:response.status, final:final.origin+final.pathname,
