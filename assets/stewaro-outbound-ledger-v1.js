@@ -23,6 +23,9 @@ const show=async(call,container,button)=>{
   const detail=b.call;if(!detail||detail.call_id!==call.call_id)throw Error("Das Gespräch konnte nicht sicher zugeordnet werden.");
   container.replaceChildren();
   container.append(node("p","small",detail.transcript_coverage||"Keine Transkriptangaben verfügbar."));
+  if(detail.mission_issue){
+    container.append(node("p","error",detail.mission_issue));
+  }
   const entries=Array.isArray(detail.transcript)?detail.transcript:[],list=node("ol","messages");
   entries.forEach(item=>{const li=node("li"),who=node("span","speaker",item.speaker||"Gespräch"),message=node("span",null,item.text||"");li.append(who,message);list.append(li)});
   if(entries.length)container.append(list);else container.append(node("p",null,"Für diesen Anruf sind keine eindeutig zugeordneten Gesprächsbeiträge gespeichert."));
@@ -40,6 +43,7 @@ const render=items=>{
   const meta=node("p","meta",d(call.requested_at));
   const dl=node("dl");field(dl,"Dein Auftrag",call.requested_objective);
   field(dl,"Telefonstatus",call.call_status);
+  field(dl,"Telefonassistenz",call.assistant_name||"Nicht dokumentiert");
   field(dl,"Beginn des Telefonats",call.call_started_at?d(call.call_started_at):"Nicht dokumentiert");
   field(dl,"Ende des Telefonats",call.call_ended_at?d(call.call_ended_at):"Nicht dokumentiert");
   field(dl,"Gesprächsdauer",elapsed(call.duration_seconds));
