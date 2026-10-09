@@ -11,7 +11,10 @@ const ENTRY_PRODUCT=ENTRY_PARAMS.get('produkt')==='senioren'?'senioren':null;
 const ENTRY_GUEST_HANDOFF=ENTRY_PARAMS.get('source')==='web_guest_chat';
 const ENTRY_APP_HANDOFF=ENTRY_PARAMS.get('next')==='app';
 const ENTRY_HQ_HANDOFF=ENTRY_PARAMS.get('produkt')==='internal-hq'&&ENTRY_PARAMS.get('next')==='hq';
-const ENTRY_NEXT=ENTRY_GUEST_HANDOFF&&ENTRY_PARAMS.get('next')==='/payg'?'/payg':'';
+const ENTRY_REQUESTED_NEXT=ENTRY_PARAMS.get('next')||'';
+const ENTRY_NEXT=ENTRY_GUEST_HANDOFF&&ENTRY_REQUESTED_NEXT==='/payg'?'/payg':
+  (ENTRY_REQUESTED_NEXT==='/telefonate'||ENTRY_REQUESTED_NEXT==='/telefonate/ausgehend'
+    ? ENTRY_REQUESTED_NEXT:'');
 const form=document.getElementById('loginForm');
 const status=document.getElementById('loginStatus');
 const forgot=document.getElementById('forgotPassword');
