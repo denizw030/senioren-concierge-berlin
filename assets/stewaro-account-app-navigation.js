@@ -2,6 +2,10 @@
   "use strict";
   // Domain-scoped account navigation only; never move sessions via URL/query.
   if (location.hostname !== "account.stewaro.com") return;
+  // Both the shared auth loader and legacy page markup may load this helper.
+  // Install navigation listeners exactly once; never create duplicate handoffs.
+  if (document.__stewaroAccountAppNavigationV1) return;
+  document.__stewaroAccountAppNavigationV1 = true;
 
   const SITE_ORIGIN = "https://stewaro.com";
   const APP_ORIGIN = "https://app.stewaro.com";
