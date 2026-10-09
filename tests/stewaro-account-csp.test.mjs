@@ -7,6 +7,22 @@ import { effectiveHtmlSource } from './helpers/effective-source-fs.mjs';
 
 const hashes = JSON.parse(fs.readFileSync('tests/fixtures/stewaro-csp-original-hashes.json', 'utf8'));
 
+// The *historical* CSP baselines remain unchanged. Explicitly authorize only
+// the two login-page reconstructions affected by the reviewed HQ handoff fix.
+// SHA-256 values are from the failed complete CI reconstruction of this exact
+// source change (PR #366), NOT from skipping HTML, legal or auth checks.
+const authorizedOwnerHqLoginDigests = Object.freeze({
+  'anmelden/index.html': Object.freeze({
+    historical: 'e889895cfbdf33edfbea1aadf287a28f6c41f05fac800f23fbef6881e1a40e08',
+    approved: '8efd1cdc10d31a0ce3fc9320a5415195a51cb9fddde405e69c4d8660347b3705'
+  }),
+  'anmelden.html': Object.freeze({
+    historical: '41534d401b35d71281897d17fed0907fa3653cbb89603b616350ccb260163ee6',
+    approved: '2a64cc5822a0f229b5958fcb2d163a81dcfd52ade1e8a73354a83778ea5d7c2f'
+  })
+});
+
+
 // Preserve every historical CSP/auth/markup hash. The only normalized exceptions
 // are the exactly authorized Account-origin canonical links and a single parser-
 // blocking domain-contract script in PR #341's six Account identity pages.
@@ -30,7 +46,16 @@ for (const [page, originalHash] of Object.entries(hashes)) {
     const html = fs.readFileSync(page, 'utf8');
     assert.doesNotMatch(html, /<style\b|\sstyle\s*=|\son[a-z]+\s*=/i);
     assert.doesNotMatch(html, /<script\b(?![^>]*\bsrc=)[^>]*>[\s\S]*?<\/script>/i);
-    assert.equal(crypto.createHash('sha256').update(effectiveHtmlSource(normalizeAuthorizedAccountCutover(html, page))).digest('hex'), originalHash);
+    const digest = crypto.createHash('sha256')
+      .update(effectiveHtmlSource(normalizeAuthorizedAccountCutover(html, page)))
+      .digest('hex');
+    const authorizedHqLogin = authorizedOwnerHqLoginDigests[page];
+    if (authorizedHqLogin) {
+      assert.equal(originalHash, authorizedHqLogin.historical, page + ': historical CSP baseline must remain pinned');
+      assert.equal(digest, authorizedHqLogin.approved, page + ': exactly reviewed HQ login reconstruction');
+    } else {
+      assert.equal(digest, originalHash);
+    }
     for (const [, asset] of html.matchAll(/(?:src|href)="\/(assets\/stewaro-csp-[^"?]+)\?v=1"/g)) {
       assert.ok(fs.readFileSync(asset, 'utf8').length > 0, `${page}: ${asset} must exist`);
     }

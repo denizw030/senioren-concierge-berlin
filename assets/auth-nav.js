@@ -56,6 +56,18 @@
       ? "/konto?stewaro_app=1"
       : "/konto";
   }
+  // An existing validated Owner session must resume the same AAL2 + operator-gated
+  // one-time HQ handoff as a fresh login. Never silently fall back to /konto.
+  function resumeHQSignIn() {
+    if (typeof window.STEWARO_HQ_LOGIN_RESUME === "function" &&
+        validatedSession?.session_token &&
+        window.STEWARO_HQ_LOGIN_RESUME(validatedSession.session_token) === true) return;
+    const note = document.getElementById("loginStatus");
+    if (note) {
+      note.textContent = "Management HQ konnte nicht sicher geöffnet werden. Bitte lade die Anmeldung erneut.";
+      note.style.display = "block";
+    }
+  }
   function productContext(current = page()) {
     if (PROTECTED.has(current)) {
       const accountProduct = getSession()?.product_context;
@@ -450,6 +462,7 @@
       if (current === "anmelden.html" || current === "registrieren.html") {
         const destination = signedInDestination(current, location.search);
         if (destination) location.replace(accountUrl(destination));
+        else resumeHQSignIn();
       }
     } else {
       ensureFloatingConcierge();
@@ -467,6 +480,7 @@
             if (current === "anmelden.html" || current === "registrieren.html") {
         const destination = signedInDestination(current, location.search);
         if (destination) location.replace(accountUrl(destination));
+        else resumeHQSignIn();
       }
             return;
           }

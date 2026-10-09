@@ -56,3 +56,53 @@ test("stale public HQ login link goes to Account with intent intact, never /kont
   assert.equal(replaced.length, 1);
   assert.equal(replaced[0], "https://account.stewaro.com/anmelden?produkt=internal-hq&next=hq");
 });
+
+test("already authenticated Owner starts HQ handoff after initial validation or delayed recovery", () => {
+  assert.equal((navigation.match(/else resumeHQSignIn\(\);/g)||[]).length, 2);
+  const source = navigation.match(/  function resumeHQSignIn\(\) \{[\s\S]*?\n  \}/)?.[0];
+  assert.ok(source, "guarded existing-session HQ continuation is installed");
+  const handoffs = [];
+  const status = {textContent: "", style: {}};
+  const ctx = {
+    validatedSession: {session_token: "validated-Owner-token"},
+    window: {STEWARO_HQ_LOGIN_RESUME: (token) => { handoffs.push(token); return true; }},
+    document: {getElementById: (id) => id === "loginStatus" ? status : null}
+  };
+  const resume = vm.runInNewContext("(" + source.trim() + ")", ctx);
+  resume();
+  assert.deepEqual(handoffs, ["validated-Owner-token"]);
+  assert.equal(status.textContent, "", "successful HQ entry does not show an error");
+
+  ctx.window.STEWARO_HQ_LOGIN_RESUME = undefined;
+  resume();
+  assert.equal(handoffs.length, 1, "missing handler must not start any other request");
+  assert.match(status.textContent, /Management HQ konnte nicht sicher geöffnet/);
+  assert.doesNotMatch(source, /location\.replace|\/konto/, "no silent customer-portal fallback");
+});
+
+test("both fresh and remembered Owner sessions use one single-use, HQ-scoped handoff", () => {
+  assert.match(login, /if\(ENTRY_HQ_HANDOFF\)window\.STEWARO_HQ_LOGIN_RESUME=resumeHqHandoff/);
+  assert.match(login, /setTimeout\(\(\)=>resumeHqHandoff\(body\.session_token\),120\)/);
+  const source = login.match(/function resumeHqHandoff\(sessionToken\)\{[\s\S]*?\n\}/)?.[0];
+  assert.ok(source, "shared HQ handoff function exists");
+  const calls = [];
+  const notices = [];
+  const ctx = {
+    ENTRY_HQ_HANDOFF: true,
+    hqHandoffInFlight: false,
+    show: (message) => notices.push(message),
+    handoffToTarget: (token, target) => { calls.push([token,target]); return Promise.resolve(); }
+  };
+  const resume = vm.runInNewContext("(" + source + ")", ctx);
+  assert.equal(resume("validated-Owner-token"), true);
+  assert.equal(resume("validated-Owner-token"), true);
+  assert.equal(resume(""), false);
+  assert.deepEqual(calls, [["validated-Owner-token", "hq"]]);
+  assert.equal(notices.length, 1, "repeat resume must not create another handoff");
+
+  const notHQ = vm.runInNewContext("(" + source + ")", {
+    ...ctx, ENTRY_HQ_HANDOFF: false, hqHandoffInFlight: false
+  });
+  assert.equal(notHQ("validated-Owner-token"), false);
+  assert.equal(calls.length, 1, "non-HQ login cannot initiate an HQ handoff");
+});
