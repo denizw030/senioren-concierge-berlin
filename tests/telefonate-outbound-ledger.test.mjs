@@ -21,7 +21,8 @@ test("portal distinguishes call times, evidence, duration and mission outcome",(
  assert.match(js,/Auftrag tatsächlich erfüllt/);
  assert.match(js,/mission_verified===true/);
  assert.match(js,/mission_outcome==="Auftrag nicht erledigt"/);
- assert.match(js,/mission-outcome-failed/);
+ assert.match(js,/mission-outcome-".*resultClass\(call\)/);
+ assert.match(fs.readFileSync("assets/stewaro-outbound-ledger-v1.css","utf8"),/mission-outcome-failed/);
  assert.match(js,/Noch nicht überprüft/);
  assert.match(js,/Auftrag erledigt/);
  assert.match(js,/Abweichung festgestellt/);
