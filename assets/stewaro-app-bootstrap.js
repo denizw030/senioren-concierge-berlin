@@ -1,6 +1,12 @@
 (() => {
   "use strict";
   const APP_HOST="app.stewaro.com";
+  // Old Account-hosted chat URLs now enter through a real cross-origin session handoff.
+  if(location.hostname==="account.stewaro.com"){
+    const path=location.pathname.replace(/\/index\.html$/,"").replace(/\/+$/,"");
+    if(path==="/web-concierge"||path==="/web-concierge.html")location.replace("/konto?stewaro_app=1");
+    return;
+  }
   if(location.hostname!==APP_HOST)return;
 
   window.STEWARO_APP_AUTH_READY=Promise.resolve(true);
