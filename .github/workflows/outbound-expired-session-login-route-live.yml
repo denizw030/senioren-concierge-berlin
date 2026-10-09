@@ -1,0 +1,21 @@
+name: STEWARO Existing Client Login Route Live Proof
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'tests/outbound-expired-session-login-route-live.mjs'
+      - '.github/workflows/outbound-expired-session-login-route-live.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live-public-route:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify real STEWARO login endpoints versus registration
+        run: node tests/outbound-expired-session-login-route-live.mjs

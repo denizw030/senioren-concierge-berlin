@@ -4,6 +4,7 @@ import fs from "node:fs";
 const page=fs.readFileSync("telefonate/ausgehend/index.html","utf8");
 const previous=fs.readFileSync("telefonate/index.html","utf8");
 const js=fs.readFileSync("assets/stewaro-outbound-ledger-v1.js","utf8");
+const phoneSession=fs.readFileSync("assets/stewaro-phone-session-v1.js","utf8");
 
 test("independent private outbound ledger route is discoverable from existing telephone history",()=>{
  assert.match(previous,/href="\/telefonate\/ausgehend"/);
@@ -30,7 +31,7 @@ test("page-level CSP permits only self-hosted active assets and bound production
  assert.doesNotMatch(page,/unsafe-inline|unsafe-eval/);
 });
 test("portal requires secure existing session and renders transcripts as text",()=>{
- assert.match(js,/scb_web_session/);
+ assert.match(phoneSession,/scb_web_session/);
  assert.match(js,/Authorization:"Bearer "/);
  assert.match(js,/transcript_coverage/);
  assert.match(js,/textContent/);
