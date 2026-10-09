@@ -20,6 +20,7 @@ class Link {
 
 function launch({host="account.stewaro.com",pathname="/konto",search="",session=true,remembered=false,target=ONE_TIME_URL,ok=true}={}){
   const listeners={};
+  const listenerCounts={};
   const redirects=[];
   const calls=[];
   const nodes=new Map();
@@ -33,7 +34,7 @@ function launch({host="account.stewaro.com",pathname="/konto",search="",session=
   const fidel=new Link("/web-concierge");
   const document={
     readyState:"loading",
-    addEventListener:(name,callback)=>{listeners[name]=callback;},
+    addEventListener:(name,callback)=>{listeners[name]=callback;listenerCounts[name]=(listenerCounts[name]||0)+1;},
     querySelectorAll:(selector)=>selector==="a[href]"?[brand,fidel]:[brand],
     getElementById:(id)=>nodes.get(id)||null,
     createElement:()=>({id:"",style:{},setAttribute(){},textContent:""}),
@@ -47,7 +48,8 @@ function launch({host="account.stewaro.com",pathname="/konto",search="",session=
     calls.push({url,options});
     return {ok,status:ok?200:403,json:async()=>ok?{ok:true,status:"handoff_ready",target_url:target}:{ok:false,status:"blocked"}};
   };
-  vm.runInNewContext(navigation,{location,document,sessionStorage:storage(active),localStorage:storage(persistent),fetch,URL,URLSearchParams,Date,Number,AbortSignal,Promise});
+  const context={location,document,sessionStorage:storage(active),localStorage:storage(persistent),fetch,URL,URLSearchParams,Date,Number,AbortSignal,Promise};
+  vm.runInNewContext(navigation,context);
   const click=(link)=>{
     let prevented=false;
     listeners.click?.({
@@ -56,7 +58,7 @@ function launch({host="account.stewaro.com",pathname="/konto",search="",session=
     });
     return prevented;
   };
-  return {brand,fidel,document,location,active,persistent,redirects,calls,nodes,listeners,click};
+  return {brand,fidel,document,location,active,persistent,redirects,calls,nodes,listeners,listenerCounts,rerun:()=>vm.runInNewContext(navigation,context),click};
 }
 
 test("account logo always navigates to public STEWARO, even if older navigation resets href",()=>{
@@ -154,4 +156,16 @@ test("all mirrored Account and FIDEL pages load the same cache-busted safe navig
   }
   assert.equal(read("konto/index.html").replace('<head><base href="/">','<head>'),read("konto.html"));
   assert.equal(read("anmelden/index.html").replace('<head><base href="/">','<head>'),read("anmelden.html"));
+});
+
+test("duplicate helper inclusions install just one navigation listener and one handoff",async()=>{
+  const x=launch();
+  x.rerun();
+  assert.equal(x.listenerCounts.click,1);
+  assert.equal(x.listenerCounts.DOMContentLoaded,1);
+  x.listeners.DOMContentLoaded();
+  x.click(x.fidel);
+  await wait();
+  assert.equal(x.calls.length,1);
+  assert.deepEqual(x.redirects,[ONE_TIME_URL]);
 });
