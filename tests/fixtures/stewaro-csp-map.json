@@ -1,4 +1,6 @@
 {
+  " href=\"assets/stewaro-app.css?v=2\"": {"original": " href=\"assets/stewaro-app.css?v=1\""},
+  " src=\"assets/stewaro-app-shell.js?v=2\"": {"original": " src=\"assets/stewaro-app-shell.js?v=1\""},
   "<link rel=\"stylesheet\" href=\"/assets/stewaro-csp-app-live-style-1.css?v=1\">": {
     "asset": "assets/stewaro-csp-app-live-style-1.css",
     "opening": "<style>",
