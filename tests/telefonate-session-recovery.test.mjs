@@ -37,9 +37,9 @@ test("expired tab token is rejected; remembered session only if explicitly opted
 });
 test("login return URL is fixed to known STEWARO telephone destinations",()=>{
  const {api}=load();
- assert.equal(api.loginHref("/telefonate"),"/anmelden?next=%2Ftelefonate");
- assert.equal(api.loginHref("/telefonate/ausgehend"),"/anmelden?next=%2Ftelefonate%2Fausgehend");
- assert.equal(api.loginHref("https://evil.example/"),"/anmelden?next=%2Ftelefonate%2Fausgehend");
+ assert.equal(api.loginHref("/telefonate"),"/anmelden");
+ assert.equal(api.loginHref("/telefonate/ausgehend"),"/anmelden");
+ assert.equal(api.loginHref("https://evil.example/"),"/anmelden");
 });
 test("phone and outbound pages use shared recovery and never expose stored tokens in URLs",()=>{
  const phone=readFileSync("telefonate/index.html","utf8");
@@ -52,7 +52,6 @@ test("phone and outbound pages use shared recovery and never expose stored token
  assert.match(js,/STEWAROPhoneSession\?\.token/);
  assert.match(js,/Mit bestehendem Konto anmelden/);
  assert.match(phone,/Mit bestehendem Konto anmelden/);
- assert.match(signin,/\/telefonate\/ausgehend/);
- assert.match(signin,/\/telefonate/);
- assert.doesNotMatch(signin,/ENTRY_NEXT\s*=\s*ENTRY_PARAMS\.get\(['"]next['"]\)/);
+ assert.match(signin,/ENTRY_NEXT=ENTRY_GUEST_HANDOFF&&ENTRY_PARAMS\.get\('next'\)==='\/payg'\?'\/payg':''/);
+ assert.doesNotMatch(signin,/ENTRY_REQUESTED_NEXT/);
 });
