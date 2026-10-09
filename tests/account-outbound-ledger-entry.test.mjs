@@ -67,7 +67,9 @@ test("account Concierge quick menu repeats the same-tab outbound entry",()=>{
  assert.match(entry.innerHTML,/Ausgehende Anrufe/);
 });
 test("no unrelated login, registration or session authorizations are changed",()=>{
- assert.doesNotMatch(code,/localStorage|sessionStorage|session_token|document\.cookie|window\.open/);
+ // Navigation source comments may explain sessionStorage; assert on executable code.
+ const executable=code.replace(/\/\/[^\n]*/g,"");
+ assert.doesNotMatch(executable,/localStorage|sessionStorage|session_token|document\.cookie|window\.open/);
  assert.match(code,/href = "\/telefonate\/ausgehend\/"/);
  const phone=readFileSync("assets/stewaro-phone-session-v1.js","utf8");
  assert.match(phone,/remember_me!==true/);
