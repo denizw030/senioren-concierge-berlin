@@ -14,12 +14,14 @@ function resolveDestination(page, search) {
   assert.ok(code, "post-auth redirect helper exists");
   const fn = vm.runInNewContext("(" + code.trim() + ")", { URLSearchParams });
   return fn(page, search);
+
 }
 
 test("signed-in app-aware login preserves FIDEL goal through validation and delayed session recovery", () => {
   assert.equal(resolveDestination("anmelden.html", "?produkt=senioren&next=app"), "/konto?stewaro_app=1");
   assert.equal(resolveDestination("anmelden.html", "?next=app&lang=tr"), "/konto?stewaro_app=1");
-  assert.equal((auth.match(/location\.replace\(accountUrl\(signedInDestination\(current, location\.search\)\)\)/g) || []).length, 2);
+  assert.equal((auth.match(/const destination = signedInDestination\(current, location\.search\);/g) || []).length, 2);
+  assert.equal((auth.match(/if \(destination\) location\.replace\(accountUrl\(destination\)\);/g) || []).length, 2);
   assert.match(accountNav, /new URLSearchParams\(location\.search\)\.get\("stewaro_app"\) === "1"/);
   assert.match(accountNav, /action: "handoff_create", target: "app"/);
   assert.match(login, /const ENTRY_APP_HANDOFF=ENTRY_PARAMS\.get\('next'\)==='app'/);

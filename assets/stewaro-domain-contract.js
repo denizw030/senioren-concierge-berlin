@@ -122,6 +122,14 @@
 
   async function movePublicAccountRoute(){
     if(!publicHosts.has(location.hostname)||!explicitAccountPaths.has(currentPath))return false;
+    // Legacy HQ login links must not lose their target during Account migration.
+    if(currentPath==="/anmelden"){
+      const intent=new URLSearchParams(location.search);
+      if(intent.get("produkt")==="internal-hq"&&intent.get("next")==="hq"){
+        location.replace(accountPath(currentPath)+location.search+location.hash);
+        return true;
+      }
+    }
     const target=currentPath==="/zugang"?"/":currentPath;
     if(await migrateRememberedSession(target))return true;
     location.replace(accountPath(currentPath)+location.search+location.hash);

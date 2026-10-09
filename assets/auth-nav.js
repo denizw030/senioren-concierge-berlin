@@ -46,10 +46,13 @@
     if (last === "de" || last === "en" || last === "tr" || last === "index") return "index.html";
     return last.endsWith(".html") ? last : last + ".html";
   };
-  // Keep the explicitly requested App target when an existing session skips the login form.
-  // Only the recognized local App handoff flag is forwarded; all other next values fail closed to /konto.
+  // A remembered Account session is not an authorized HQ session.
+  // Preserve the exact HQ login intent so MFA and operator authorization can mint
+  // the separate, one-time HQ handoff. Unknown next values still fail closed to /konto.
   function signedInDestination(currentPage, search) {
-    return currentPage === "anmelden.html" && new URLSearchParams(search).get("next") === "app"
+    const params = new URLSearchParams(search);
+    if (currentPage === "anmelden.html" && params.get("produkt") === "internal-hq" && params.get("next") === "hq") return null;
+    return currentPage === "anmelden.html" && params.get("next") === "app"
       ? "/konto?stewaro_app=1"
       : "/konto";
   }
@@ -444,7 +447,10 @@
     if (valid) {
       updateNav();
       ensureFloatingConcierge();
-      if (current === "anmelden.html" || current === "registrieren.html") location.replace(accountUrl(signedInDestination(current, location.search)));
+      if (current === "anmelden.html" || current === "registrieren.html") {
+        const destination = signedInDestination(current, location.search);
+        if (destination) location.replace(accountUrl(destination));
+      }
     } else {
       ensureFloatingConcierge();
       normalizeShell();
@@ -458,7 +464,10 @@
           if (recovered) {
             updateNav();
             ensureFloatingConcierge();
-            if (current === "anmelden.html" || current === "registrieren.html") location.replace(accountUrl(signedInDestination(current, location.search)));
+            if (current === "anmelden.html" || current === "registrieren.html") {
+        const destination = signedInDestination(current, location.search);
+        if (destination) location.replace(accountUrl(destination));
+      }
             return;
           }
           if (!validationUnavailable && PROTECTED.has(current) && !hasRenderableSession()) {
