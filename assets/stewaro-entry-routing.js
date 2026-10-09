@@ -1,15 +1,20 @@
 (() => {
   "use strict";
   if(window.STEWAROEntryRouting)return;
+  if(typeof document.querySelector==="function"&&!document.querySelector('script[data-stewaro-domain-contract]')&&!window.STEWARO_DOMAINS){
+    const domainScript=document.createElement("script");
+    domainScript.src="/assets/stewaro-domain-contract.js?v=1";
+    domainScript.dataset.stewaroDomainContract="1";
+    document.head.appendChild(domainScript);
+  }
   const host=String(location.hostname||"").toLowerCase();
   const STAGING_WEBSITE_HOST="d357yw2h09cpne.cloudfront.net";
-  const STAGING_ACCOUNT_ORIGIN="https://d23le2tjpjl7la.cloudfront.net";
-  const STAGING_ACCOUNT_HOST="d23le2tjpjl7la.cloudfront.net";
+  const STAGING_ACCOUNT_ORIGIN="https://d23le2tjpi7la.cloudfront.net";
+  const STAGING_ACCOUNT_HOST="d23le2tjpi7la.cloudfront.net";
+  const PROD_ACCOUNT_ORIGIN="https://account.stewaro.com";
   const isWebsitePreview=host===STAGING_WEBSITE_HOST;
   const isAccount=host==="account.stewaro.com"||host===STAGING_ACCOUNT_HOST;
-  // Keep the public website on its working same-origin access route until
-  // account.stewaro.com has a verified public DNS/CloudFront cutover.
-  const accountEntry=isAccount?"/":(isWebsitePreview?STAGING_ACCOUNT_ORIGIN+"/":"/zugang");
+  const accountEntry=isAccount?"/":(isWebsitePreview?STAGING_ACCOUNT_ORIGIN+"/":PROD_ACCOUNT_ORIGIN+"/");
   const parentEntry="/angehoerige?source=stewaro";
   const isAccountSurface=/(?:^|\/)(?:zugang|anmelden|registrieren)(?:\.html)?\/?$/.test(location.pathname);
 
@@ -64,7 +69,7 @@
 
     const login=document.createElement("a");
     login.className="header-login-runtime";
-    login.href="/anmelden";
+    login.href=isWebsitePreview?STAGING_ACCOUNT_ORIGIN+"/anmelden":PROD_ACCOUNT_ORIGIN+"/anmelden";
     login.dataset.directLogin="true";
     login.textContent="Anmelden";
     nav.insertBefore(login,cta);
@@ -83,7 +88,7 @@
     menu.id="stewaro-mobile-menu-runtime";
     menu.hidden=true;
     menu.innerHTML=`<nav aria-label="Mobile Navigation">
-      <a class="mobile-menu-login-runtime" href="/anmelden" data-direct-login="true"><span>Anmelden</span><small>Für bestehende Klienten</small></a>
+      <a class="mobile-menu-login-runtime" href="${isWebsitePreview?STAGING_ACCOUNT_ORIGIN:PROD_ACCOUNT_ORIGIN}/anmelden" data-direct-login="true"><span>Anmelden</span><small>Für bestehende Klienten</small></a>
       <a href="/de/">Startseite</a>
       <a href="/prime-concierge">Concierge</a>
       <a href="/angehoerige">Für Angehörige</a>

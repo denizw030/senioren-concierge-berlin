@@ -5,11 +5,21 @@
     domainNavigation.src = "/assets/stewaro-account-app-navigation.js?v=1";
     document.head.appendChild(domainNavigation);
   }
+  if(!document.querySelector('script[data-stewaro-domain-contract]')&&!window.STEWARO_DOMAINS){
+    const domainScript=document.createElement("script");
+    domainScript.src="/assets/stewaro-domain-contract.js?v=1";
+    domainScript.dataset.stewaroDomainContract="1";
+    document.head.appendChild(domainScript);
+  }
   const mobileCss = document.createElement("style");
   mobileCss.textContent = `.top .nav{min-height:84px!important;align-items:flex-end!important;padding-top:10px!important;padding-bottom:0!important}.top .brand{align-self:center!important;margin-bottom:6px}.top .links{align-self:flex-end!important;gap:6px!important}.top .links a,.top .links .auth-link{min-height:42px!important;margin:0 0 3px!important;padding:11px 10px 9px!important;border:0!important;border-bottom:1px solid transparent!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;transform-origin:center bottom;transition:transform .18s ease,border-color .18s ease,color .18s ease!important}.top .links a:hover{transform:scale(1.04);background:transparent!important;border-bottom-color:#cda84e!important}.top .links a.active{border-bottom-color:#cda84e!important}.top .links .register-link{background:transparent!important;color:inherit!important}.top .links .register-link:hover{background:transparent!important;color:#eed58e!important;border-bottom-color:#cda84e!important}body.senior-product .top .links a:hover,body[data-product="senioren"] .top .links a:hover{background:transparent!important;border-bottom-color:#a77c29!important}body.senior-product .top .links .register-link,body[data-product="senioren"] .top .links .register-link{color:inherit!important}@media(max-width:1280px){.top{position:sticky!important;top:0!important;z-index:60!important}.top .nav{position:relative!important;align-items:center!important;flex-wrap:nowrap!important;justify-content:space-between!important;padding-bottom:8px!important}.top .brand{margin-bottom:0}.top .nav-toggle{display:block!important;position:fixed!important;top:16px!important;right:clamp(10px,3vw,28px)!important;z-index:64!important;flex:0 0 auto!important;margin-left:auto!important}.top .links{display:none!important;position:fixed!important;top:var(--nw-mobile-menu-top,84px)!important;left:clamp(10px,3vw,28px)!important;right:clamp(10px,3vw,28px)!important;width:auto!important;max-height:calc(100dvh - var(--nw-mobile-menu-top,84px) - 12px)!important;overflow:auto!important;overscroll-behavior:contain;grid-template-columns:1fr!important;flex-direction:column!important;align-items:stretch!important;text-align:left!important;background:#090909!important}.top .links.is-open{display:flex!important}.top .links a,.top .links .auth-link{margin:0!important;padding:14px 16px!important;transform:none!important}}.nw-account-cluster{display:inline-flex!important;align-items:center!important;gap:6px!important;flex:0 0 auto!important}.nw-account-cluster-mobile{display:none!important}.top .links .nw-account-cluster-desktop{display:inline-flex!important;align-items:center!important;gap:6px!important;margin-left:2px!important}.nw-account-link,.top .links .nw-account-link{display:inline-flex!important;align-items:center!important;gap:8px!important;min-height:38px!important;margin:0!important;padding:5px 10px 5px 6px!important;border:1px solid rgba(255,255,255,.09)!important;border-radius:999px!important;background:rgba(255,255,255,.035)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.035)!important;color:inherit!important;text-decoration:none!important;white-space:nowrap!important;transform:none!important;backdrop-filter:blur(14px)!important;-webkit-backdrop-filter:blur(14px)!important;transition:background .18s ease,border-color .18s ease,box-shadow .18s ease!important}.nw-account-link:hover,.top .links .nw-account-link:hover{background:rgba(255,255,255,.065)!important;border-color:rgba(205,168,78,.28)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 5px 18px rgba(0,0,0,.12)!important;transform:none!important}.nw-account-avatar{display:grid!important;place-items:center!important;width:27px!important;height:27px!important;flex:0 0 27px!important;border:1px solid rgba(205,168,78,.24)!important;border-radius:50%!important;background:rgba(205,168,78,.08)!important}.nw-account-avatar svg{width:15px!important;height:15px!important;fill:none!important;stroke:currentColor!important;stroke-width:1.7!important;stroke-linecap:round!important;stroke-linejoin:round!important}.nw-account-name{display:block!important;max-width:112px!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;font-size:13.5px!important;font-weight:650!important;letter-spacing:-.012em!important;line-height:1!important}.nw-account-logout{display:grid!important;place-items:center!important;width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;margin:0!important;padding:0!important;border:1px solid rgba(255,255,255,.085)!important;border-radius:50%!important;background:rgba(255,255,255,.025)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.025)!important;color:inherit!important;cursor:pointer!important;backdrop-filter:blur(14px)!important;-webkit-backdrop-filter:blur(14px)!important;transition:background .18s ease,border-color .18s ease,transform .18s ease!important}.nw-account-logout:hover{background:rgba(255,255,255,.065)!important;border-color:rgba(205,168,78,.25)!important;transform:translateY(-1px)!important}.nw-account-logout:focus-visible,.nw-account-link:focus-visible{outline:2px solid rgba(205,168,78,.72)!important;outline-offset:2px!important}.nw-account-logout svg{width:16px!important;height:16px!important;fill:none!important;stroke:currentColor!important;stroke-width:1.65!important;stroke-linecap:round!important;stroke-linejoin:round!important}body.senior-product .nw-account-link,body[data-product="senioren"] .nw-account-link,body.senior-product .nw-account-logout,body[data-product="senioren"] .nw-account-logout{color:#353128!important;border-color:rgba(112,87,39,.16)!important;background:rgba(255,255,255,.54)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.5)!important}body.senior-product .nw-account-avatar,body[data-product="senioren"] .nw-account-avatar{border-color:rgba(112,87,39,.18)!important;background:rgba(167,124,41,.07)!important}body.senior-product .nw-account-link:hover,body[data-product="senioren"] .nw-account-link:hover,body.senior-product .nw-account-logout:hover,body[data-product="senioren"] .nw-account-logout:hover{background:rgba(255,255,255,.82)!important;border-color:rgba(167,124,41,.28)!important}@media(max-width:1280px){.nw-account-cluster-desktop{display:none!important}.nw-account-cluster-mobile{display:inline-flex!important;position:absolute!important;right:72px!important;top:50%!important;transform:translateY(-50%)!important;z-index:63!important;align-items:center!important;gap:5px!important}.nw-account-mobile{display:inline-flex!important;min-height:38px!important;max-width:min(148px,25vw)!important;padding:5px 9px 5px 5px!important;background:rgba(10,13,18,.72)!important;border-color:rgba(200,164,93,.23)!important}.nw-account-mobile .nw-account-name{max-width:min(92px,17vw)!important}.nw-account-cluster-mobile .nw-account-logout{width:36px!important;height:36px!important;min-width:36px!important;min-height:36px!important;background:rgba(10,13,18,.62)!important;border-color:rgba(200,164,93,.18)!important}body.senior-product .nw-account-mobile,body[data-product="senioren"] .nw-account-mobile,body.senior-product .nw-account-cluster-mobile .nw-account-logout,body[data-product="senioren"] .nw-account-cluster-mobile .nw-account-logout{background:rgba(247,243,234,.86)!important;border-color:rgba(112,87,39,.18)!important;color:#353128!important}}@media(max-width:620px){.top .links{left:10px!important;right:10px!important}.nw-account-cluster-mobile{right:66px!important}.nw-account-mobile{max-width:min(116px,29vw)!important}.nw-account-mobile .nw-account-name{max-width:min(63px,15vw)!important}.nw-account-avatar{width:25px!important;height:25px!important;flex-basis:25px!important}.nw-account-cluster-mobile .nw-account-logout{width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important}}@media(max-width:390px){.nw-account-cluster-mobile{gap:4px!important}.nw-account-mobile{max-width:84px!important;padding-right:7px!important}.nw-account-mobile .nw-account-name{max-width:37px!important}.nw-account-cluster-mobile .nw-account-logout{width:32px!important;height:32px!important;min-width:32px!important;min-height:32px!important}}`;
   document.head.appendChild(mobileCss);
   const SESSION_KEY = "scb_web_session";
   const PRODUCT_KEY = "nahwerk_product";
+  const PUBLIC_ORIGIN = "https://stewaro.com";
+  const ACCOUNT_ORIGIN = "https://account.stewaro.com";
+  const accountUrl = (path = "/") => ACCOUNT_ORIGIN + path;
+  const publicUrl = (path = "/") => PUBLIC_ORIGIN + path;
   const CHECK_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-session-secure";
   const PROFILE_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-profile";
   const LOGOUT_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-session-secure";
@@ -118,7 +128,7 @@
   }
   function makeAccountLink(cls = "") {
     const link = document.createElement("a");
-    link.href = "/konto";
+    link.href = accountUrl("/konto");
     link.className = ("nw-account-link " + cls).trim();
     link.setAttribute("aria-label", "Kundenkonto öffnen");
     const name = sessionFirstName();
@@ -156,7 +166,7 @@
       } catch (_) {}
     }
     clearLocalAuth();
-    location.href = "/de/";
+    location.href = publicUrl("/de/");
   }
   function ensureOdysxBar() {
     document.querySelectorAll(".odysx-info-bar").forEach((element) => element.remove());
@@ -199,8 +209,8 @@
         nav.appendChild(accountCluster);
       } else {
         const suffix = `?produkt=${product}`;
-        nav.appendChild(makeLink(`/anmelden${suffix}`, "Anmelden", `${current === "anmelden.html" ? "active " : ""}auth-link login-link`.trim()));
-        nav.appendChild(makeLink(`/registrieren${suffix}`, "Registrieren", `${current === "registrieren.html" ? "active " : ""}auth-link register-link`.trim()));
+        nav.appendChild(makeLink(accountUrl(`/anmelden${suffix}`), "Anmelden", `${current === "anmelden.html" ? "active " : ""}auth-link login-link`.trim()));
+        nav.appendChild(makeLink(accountUrl(`/registrieren${suffix}`), "Registrieren", `${current === "registrieren.html" ? "active " : ""}auth-link register-link`.trim()));
       }
       nav.id ||= "main-navigation";
       if (!nav.previousElementSibling?.classList.contains("nav-toggle")) {
@@ -262,7 +272,7 @@
     if (!isLoggedIn()) return;
     document.querySelectorAll(".footergrid>div").forEach((box) => {
       if (box.querySelector("h4")?.textContent.trim() === "Informationen" && !box.querySelector('a[href="konto.html"],a[href="/konto"]')) {
-        box.appendChild(makeLink("/konto", "Kundenbereich"));
+        box.appendChild(makeLink(accountUrl("/konto"), "Kundenbereich"));
         const out = makeLink("#", "Abmelden");
         out.dataset.logout = "1";
         out.addEventListener("click", (event) => { event.preventDefault(); logout(); });
@@ -411,6 +421,7 @@
   }
 
   document.addEventListener("DOMContentLoaded", async () => {
+    if (window.STEWARO_ACCOUNT_AUTH_READY) await window.STEWARO_ACCOUNT_AUTH_READY;
     decorateWhatsApp();
     activatePlanCards();
     new MutationObserver((mutations) => {
@@ -426,12 +437,12 @@
     if (valid) {
       updateNav();
       ensureFloatingConcierge();
-      if (current === "anmelden.html" || current === "registrieren.html") location.replace("/konto");
+      if (current === "anmelden.html" || current === "registrieren.html") location.replace(accountUrl("/konto"));
     } else {
       ensureFloatingConcierge();
       normalizeShell();
       if (PROTECTED.has(current) && !hasRenderableSession()) {
-        location.replace("/anmelden");
+        location.replace(accountUrl("/anmelden"));
         return;
       }
       if (validationUnavailable && hasRenderableSession()) {
@@ -440,11 +451,11 @@
           if (recovered) {
             updateNav();
             ensureFloatingConcierge();
-            if (current === "anmelden.html" || current === "registrieren.html") location.replace("/konto");
+            if (current === "anmelden.html" || current === "registrieren.html") location.replace(accountUrl("/konto"));
             return;
           }
           if (!validationUnavailable && PROTECTED.has(current) && !hasRenderableSession()) {
-            location.replace("/anmelden");
+            location.replace(accountUrl("/anmelden"));
           }
         }, 1500);
       }

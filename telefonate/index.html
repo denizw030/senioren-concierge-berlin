@@ -20,21 +20,16 @@
   </style>
   <script src="/assets/clean-url.js?v=1"></script>
   <link rel="stylesheet" href="/assets/stewaro-client-portal-v2.css?v=1" />
+  <script src="/assets/stewaro-domain-contract.js?v=1"></script>
 </head>
 <body class="stewaro-portal-surface stewaro-portal-phone">
   <main class="shell">
     <header class="top"><div class="brand">STEWARO</div><a class="back" href="/konto">Zurück zum Konto</a></header>
     <section class="hero"><div class="eyebrow">Klientenportal · Telefon</div><h1>Telefonate</h1><p>Hier findest du nachvollziehbar, was FIDEL telefonisch für dich erledigt hat – mit Ergebnis, Dauer und kurzer Zusammenfassung. Der normale Chat bleibt davon getrennt.</p></section>
-    <div class="notice" style="margin-bottom:16px">
-      <strong style="display:block;margin-bottom:5px">Ausgehende Anrufe von FIDEL</strong>
-      <span>Deine Telefonaufträge, tatsächlichen Anrufstatusmeldungen und gespeicherten Gesprächsbeiträge stehen getrennt zur Verfügung.</span>
-      <a href="/telefonate/ausgehend" style="display:inline-flex;margin-top:12px;padding:10px 15px;border-radius:999px;background:#143a2b;color:#fff;text-decoration:none;font-weight:700">Outbound-Anrufprotokoll öffnen</a>
-    </div>
     <div id="phoneState" class="notice">Telefonverlauf wird sicher geladen …</div>
     <section id="phoneList" class="list" hidden aria-live="polite"></section>
     <p class="privacy">Aus Datenschutzgründen zeigt dieser Bereich keine vollständigen Gesprächstranskripte, technischen Fehlerdetails oder internen Provider-Daten.</p>
   </main>
-  <script src="/assets/stewaro-phone-session-v1.js?v=1"></script>
   <script>
     (() => {
       // PROD history implementation currently runs in this retired function slot because the
@@ -42,13 +37,13 @@
       const ENDPOINT='https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/account-security-auth-cleanup-temp/phone/calls';
       const state=document.getElementById('phoneState'),list=document.getElementById('phoneList');
       document.documentElement.dataset.theme=(()=>{try{return localStorage.getItem('nw_portal_theme_v1')==='dark'?'dark':'light'}catch(_){return'dark'}})();
-      const token=()=>window.STEWAROPhoneSession?.token()||'';
+      const token=()=>{try{return JSON.parse(sessionStorage.getItem('scb_web_session')||'null')?.session_token||''}catch(_){return''}};
       const date=(value)=>{const d=new Date(value||'');return Number.isNaN(d.getTime())?'':d.toLocaleString('de-DE',{dateStyle:'medium',timeStyle:'short'})};
       const duration=(seconds)=>{const n=Number(seconds);if(!Number.isFinite(n)||n<=0)return'';const m=Math.floor(n/60),s=Math.round(n%60);return m?`${m} Min.${s?` ${s} Sek.`:''}`:`${s} Sek.`};
       const escape=(value)=>String(value??'').replace(/[&<>"']/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
       const row=(label,value)=>value?`<div class="detail"><strong>${escape(label)}:</strong> ${escape(value)}</div>`:'';
       const render=(calls)=>{list.innerHTML='';if(!calls.length){state.className='empty';state.textContent='Noch keine dokumentierten Telefonate vorhanden.';state.hidden=false;list.hidden=true;return}state.hidden=true;list.hidden=false;calls.forEach((call)=>{const article=document.createElement('article');article.className='call';const direction=call.direction==='INBOUND'?'Eingehend':'Ausgehend';const meta=[date(call.started_at),duration(call.duration_seconds),call.phone_masked].filter(Boolean).join(' · ');article.innerHTML=`<div class="call-head"><div class="call-title"><strong>${escape(call.title||'Telefonat')}</strong><div class="meta">${escape(meta)}</div></div><span class="pill">${escape(direction)} · ${escape(call.result||'Abgeschlossen')}</span></div>${call.summary?`<div class="summary"><strong>Ergebnis</strong><p>${escape(call.summary)}</p></div>`:''}${row('Auftrag',call.purpose)}${row('Nächster Schritt',call.next_step)}${row('Concierge',call.persona)}`;list.appendChild(article)})};
-      const load=async()=>{const sessionToken=token();if(!sessionToken){state.className='error';state.innerHTML='Deine sichere Sitzung ist nicht mehr aktiv. <a href="/anmelden">Mit bestehendem Konto anmelden.</a>';return}try{const response=await fetch(ENDPOINT,{headers:{Authorization:`Bearer ${sessionToken}`,Accept:'application/json'},cache:'no-store'});const body=await response.json().catch(()=>({}));if(response.status===401){state.className='error';state.innerHTML='Deine sichere Sitzung ist nicht mehr aktiv. <a href="/anmelden">Mit bestehendem Konto anmelden.</a>';return}if(!response.ok||body?.ok!==true||body?.environment!=='PROD'||body?.authoritative!==true||body?.raw_transcripts_included!==false)throw new Error('PHONE_HISTORY_NOT_AUTHORITATIVE');render(Array.isArray(body.calls)?body.calls:[])}catch(_){state.className='error';state.textContent='Der Telefonverlauf konnte gerade nicht sicher geladen werden.'}};
+      const load=async()=>{const sessionToken=token();if(!sessionToken){state.className='error';state.innerHTML='Deine sichere Sitzung ist abgelaufen. <a href="/anmelden">Bitte erneut anmelden.</a>';return}try{const response=await fetch(ENDPOINT,{headers:{Authorization:`Bearer ${sessionToken}`,Accept:'application/json'},cache:'no-store'});const body=await response.json().catch(()=>({}));if(response.status===401){state.className='error';state.innerHTML='Deine sichere Sitzung ist abgelaufen. <a href="/anmelden">Bitte erneut anmelden.</a>';return}if(!response.ok||body?.ok!==true||body?.environment!=='PROD'||body?.authoritative!==true||body?.raw_transcripts_included!==false)throw new Error('PHONE_HISTORY_NOT_AUTHORITATIVE');render(Array.isArray(body.calls)?body.calls:[])}catch(_){state.className='error';state.textContent='Der Telefonverlauf konnte gerade nicht sicher geladen werden.'}};
       load();
     })();
   </script>
