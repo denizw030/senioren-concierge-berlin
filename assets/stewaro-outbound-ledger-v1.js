@@ -4,6 +4,7 @@ const ROOT="https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/account-securi
 const state=document.getElementById("state"),root=document.getElementById("calls");
 const token=()=>{try{return JSON.parse(sessionStorage.getItem("scb_web_session")||"null")?.session_token||""}catch{return""}};
 const d=v=>{const x=new Date(v??"");return Number.isNaN(x.getTime())?"Zeit nicht verfügbar":x.toLocaleString("de-DE",{dateStyle:"medium",timeStyle:"short"})};
+const elapsed=v=>{const n=Number(v);return v!=null&&Number.isFinite(n)&&n>=0?`${Math.floor(n/60)} Min. ${Math.floor(n%60)} Sek.`:"Nicht dokumentiert"};
 const node=(tag,cls,text)=>{const x=document.createElement(tag);if(cls)x.className=cls;if(text!=null)x.textContent=String(text);return x};
 const err=text=>{state.hidden=false;state.className="error";state.textContent=text;root.hidden=true};
 const get=async path=>{const t=token();if(!t)throw Error("Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.");const res=await fetch(ROOT+path,{headers:{Authorization:"Bearer "+t,Accept:"application/json"},cache:"no-store"});if(res.status===401)throw Error("Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.");const body=await res.json().catch(()=>null);if(!res.ok||body?.ok!==true||body.authoritative!==true||body.environment!=="PROD"||body.phone_contract!=="customer-outbound-ledger-v1")throw Error("Das Outbound-Protokoll konnte gerade nicht sicher geladen werden.");return body};
@@ -32,6 +33,11 @@ const render=items=>{
   const meta=node("p","meta",d(call.requested_at));
   const dl=node("dl");field(dl,"Dein Auftrag",call.requested_objective);
   field(dl,"Telefonstatus",call.call_status);
+  field(dl,"Beginn des Telefonats",call.call_started_at?d(call.call_started_at):"Nicht dokumentiert");
+  field(dl,"Ende des Telefonats",call.call_ended_at?d(call.call_ended_at):"Nicht dokumentiert");
+  field(dl,"Gesprächsdauer",elapsed(call.duration_seconds));
+  field(dl,"Antwort der Zielperson", "Nur anhand vorhandener Gesprächsbeiträge prüfbar; ein beendeter Anruf bestätigt keine persönliche Antwort.");
+  field(dl,"Auftrag tatsächlich erfüllt",call.mission_verified===true?"Als erfüllt bestätigt":"Nicht unabhängig bestätigt");
   field(dl,"Bisherige Statusmeldung (nicht verifiziert)",call.result_note||"Keine");
   const btn=node("button",null,"Gesprächsverlauf anzeigen"),details=node("div","details");details.hidden=true;
   btn.type="button";
