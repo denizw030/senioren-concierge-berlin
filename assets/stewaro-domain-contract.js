@@ -187,6 +187,9 @@
     const accountDestination=url.origin===ACCOUNT_ORIGIN;
     const legacyPublicAccountRoute=publicHosts.has(url.hostname)&&explicitAccountPaths.has(p);
     if(!accountDestination&&!legacyPublicAccountRoute)return;
+    // Keep exact Owner HQ intent. Account transfer for a remembered customer
+    // session would otherwise replace internal-hq/next=hq with /konto.
+    if(p==="/anmelden"&&url.searchParams.get("produkt")==="internal-hq"&&url.searchParams.get("next")==="hq")return;
     const migrationPath=p==="/"||p==="/zugang"||p==="/anmelden"||p==="/registrieren"?"/konto":p;
     if(!sessionMigrationPaths.has(migrationPath)||!readSession()?.session_token)return;
     event.preventDefault();
