@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import vm from "node:vm";
 
 const read=(p)=>fs.readFileSync(p,"utf8");
 const domains=read("assets/stewaro-domain-contract.js");
@@ -56,4 +57,90 @@ test("legacy account URLs are routed canonically without changing app ownership"
   assert.match(domains,/moveAccountPublicRoute/);
   assert.match(domains,/APP_ORIGIN\+parsed\.pathname/);
   assert.match(domains,/PUBLIC_ORIGIN\+parsed\.pathname/);
+});
+
+
+test("public STEWARO transfers an existing session to a script-backed Account login route",async()=>{
+  const capability="hnd_"+"a".repeat(43);
+  const parentBearer="parent-bearer-"+"p".repeat(48);
+  const location={
+    hostname:"stewaro.com", origin:"https://stewaro.com", pathname:"/konto",
+    search:"",hash:"",href:"https://stewaro.com/konto",replace:(url)=>redirects.push(url)
+  };
+  const redirects=[],requests=[];
+  const storage={getItem:(key)=>key==="scb_web_session"?JSON.stringify({session_token:parentBearer,remember_me:true}):null,setItem:()=>{},removeItem:()=>{}};
+  const window={};
+  const document={addEventListener:()=>{}};
+  vm.runInNewContext(domains,{location,document,window,sessionStorage:storage,localStorage:storage,URL,URLSearchParams,
+    fetch:async(url,options)=>{
+      requests.push({url,options});
+      return {ok:true,json:async()=>({ok:true,status:"handoff_ready",target_url:"https://account.stewaro.com/#handoff="+capability})};
+    }
+  });
+  await new Promise((resolve)=>setImmediate(resolve));
+  assert.equal(requests.length,1);
+  assert.deepEqual(JSON.parse(requests[0].options.body),{action:"handoff_create",target:"account"});
+  assert.equal(requests[0].options.headers.Authorization,"Bearer "+parentBearer);
+  assert.equal(redirects.length,1);
+  const destination=new URL(redirects[0]);
+  assert.equal(destination.origin,"https://account.stewaro.com");
+  assert.equal(destination.pathname,"/anmelden","do not enter Account root lacking claim script");
+  assert.equal(destination.searchParams.get("next"),"/konto");
+  assert.equal(destination.hash,"#handoff="+capability);
+  assert.ok(!redirects[0].includes(parentBearer),"parent session bearer is never navigated");
+  assert.match(read("anmelden/index.html"),/<script src="\/assets\/stewaro-domain-contract\.js\?v=1"><\/script>/);
+});
+
+test("Account handoff refuses arbitrary server target routes, origins, queries or extra fragments",async()=>{
+  const token="hnd_"+"b".repeat(43);
+  const targets=[
+    "https://evil.example/#handoff="+token,
+    "https://account.stewaro.com/de/#handoff="+token,
+    "https://account.stewaro.com/?foo=bar#handoff="+token,
+    "https://account.stewaro.com/#handoff="+token+"&redirect=https://evil.example",
+    "https://account.stewaro.com/#handoff=malformed"
+  ];
+  for(const target of targets){
+    const redirects=[];
+    const location={hostname:"stewaro.com",origin:"https://stewaro.com",pathname:"/konto",search:"",hash:"",
+      replace:(url)=>redirects.push(url)};
+    const storage={getItem:()=>JSON.stringify({session_token:"p".repeat(64)}),setItem:()=>{},removeItem:()=>{}};
+    vm.runInNewContext(domains,{location,document:{addEventListener:()=>{}},window:{},sessionStorage:storage,
+      localStorage:storage,URL,URLSearchParams,
+      fetch:async()=>({ok:true,json:async()=>({ok:true,status:"handoff_ready",target_url:target})})
+    });
+    await new Promise((resolve)=>setImmediate(resolve));
+    assert.deepEqual(redirects,["https://account.stewaro.com/konto"],"unsafe handoff cannot be followed: "+target);
+    assert.doesNotMatch(redirects[0],/handoff=/);
+  }
+});
+
+test("script-backed Account login claims token before customer portal navigation",async()=>{
+  const capability="hnd_"+"c".repeat(43),sessionToken="account-session-"+ "s".repeat(44);
+  const replaced=[],historyPaths=[],saved=new Map(),calls=[];
+  const location={hostname:"account.stewaro.com",origin:"https://account.stewaro.com",pathname:"/anmelden",
+    search:"?next=%2Fkonto",hash:"#handoff="+capability,
+    replace:(url)=>replaced.push(url)};
+  const storage={getItem:(key)=>saved.get(key)||null,setItem:(key,value)=>saved.set(key,value),removeItem:(key)=>saved.delete(key)};
+  const window={};
+  vm.runInNewContext(domains,{location,document:{addEventListener:()=>{}},window,sessionStorage:storage,
+    localStorage:storage,URL,URLSearchParams,
+    history:{replaceState:(_state,_title,path)=>historyPaths.push(path)},
+    fetch:async(url,options)=>{
+      calls.push({url,options});
+      return {ok:true,json:async()=>({
+        ok:true,status:"handoff_claimed",session_token:sessionToken,
+        person_id:"person",customer_account_id:"account",auth_level:"aal2",remember_me:true,
+        product_context:"senioren",expires_at:"2026-10-10T01:00:00Z",idle_expires_at:"2026-10-10T01:00:00Z"
+      })};
+    }
+  });
+  await window.STEWARO_ACCOUNT_AUTH_READY;
+  assert.equal(calls.length,1);
+  assert.deepEqual(JSON.parse(calls[0].options.body),{action:"handoff_claim"});
+  assert.equal(calls[0].options.headers.Authorization,"Bearer "+capability);
+  assert.equal(JSON.parse(saved.get("scb_web_session")).session_token,sessionToken);
+  assert.deepEqual(historyPaths,["/konto"]);
+  assert.deepEqual(replaced,["/konto"]);
+  assert.ok(!replaced.some(url=>url.includes(capability)||url.includes(sessionToken)));
 });
