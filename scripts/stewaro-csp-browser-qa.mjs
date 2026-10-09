@@ -21,6 +21,11 @@ async function connect() {
     if (message.method === 'Runtime.exceptionThrown') exceptions.push(message.params.exceptionDetails.exception?.description || message.params.exceptionDetails.text);
     if (message.method === 'Page.frameRequestedNavigation' && message.params?.url) documentNavigations.push(message.params.url);
     if (message.method === 'Network.requestWillBeSent' && message.params?.type === 'Document' && message.params.request?.url) documentNavigations.push(message.params.request.url);
+    if (message.method === 'Fetch.requestPaused' && message.params?.request?.url?.startsWith('https://account.stewaro.com/')) {
+      documentNavigations.push(message.params.request.url);
+      // The fixture never accesses a real Klient login; the requested URL itself is the E2E signal.
+      void send('Fetch.failRequest', { requestId: message.params.requestId, errorReason: 'Aborted' }).catch(() => {});
+    }
   });
   const send = (method, params = {}) => new Promise((resolve, reject) => { const id = ++seq; pending.set(id, { resolve, reject }); ws.send(JSON.stringify({ id, method, params })); });
   const evaluate = async expression => {
@@ -29,6 +34,7 @@ async function connect() {
     return result.result.value;
   };
   await send('Page.enable'); await send('Runtime.enable'); await send('Network.enable');
+  await send('Fetch.enable', { patterns: [{ urlPattern: 'https://account.stewaro.com/*', requestStage: 'Request' }] });
   return { send, evaluate, exceptions, documentNavigations, close: () => ws.close() };
 }
 
@@ -65,7 +71,9 @@ for (const page of ['zugang.html', 'anmelden.html', 'registrieren.html', 'web-co
     if (page === 'konto.html') {
       // The canonical Account split must deny anonymous portal display and
       // actually navigate to the exact HTTPS login, not merely show a blank page.
-      assert.ok(browser.documentNavigations.includes('https://account.stewaro.com/anmelden'), 'Anonymous konto must request canonical Account login redirect');
+      const currentUrl = await browser.evaluate('location.href').catch(() => 'unavailable');
+      assert.ok(browser.documentNavigations.includes('https://account.stewaro.com/anmelden') || currentUrl === 'https://account.stewaro.com/anmelden',
+        'Anonymous konto must request canonical Account login redirect; observed=' + JSON.stringify({ currentUrl, documentNavigations: browser.documentNavigations }));
     } else {
       assert.ok(body.length > 0, `Anonymous ${page} must render`);
     }
