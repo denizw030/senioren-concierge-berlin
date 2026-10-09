@@ -57,13 +57,17 @@ test("STEWARO shared-base brand shell is wired without forking runtime", () => {
 
 test("header logo uses stable champagne gold with a mobile-safe specular sweep", () => {
   const home = homepageSource("de/index.html");
+  const deSource = read("de/index.html");
   const gold = read("assets/stewaro-home-de-stewaro-gold-brand-v2.css");
   assert.match(home, /class="brand-shine" aria-hidden="true"/);
   assert.match(gold, /background-size:100% 100% !important/);
   assert.match(gold, /stewaroHeaderGoldShine/);
-  assert.match(gold, /translate3d\(525%,0,0\)/);
+  assert.match(gold, /translate3d\(440%,0,0\)/);
   assert.match(gold, /will-change:transform,opacity/);
-  assert.match(gold, /html\[lang="de"\][\s\S]*--stewaro-logo-word-w:112px/);
+  assert.match(gold, /animation:stewaroHeaderGoldShine 15\.6s/);
+  assert.match(gold, /width:calc\(var\(--stewaro-logo-icon\) \+ var\(--stewaro-logo-gap\) \+ var\(--stewaro-logo-word-w\)\)/);
+  assert.doesNotMatch(gold, /--stewaro-logo-word-w:112px/);
+  assert.match(deSource, /stewaro-home-de-stewaro-gold-brand-v2\.css\?v=2/);
   assert.match(gold, /prefers-reduced-motion: reduce/);
   assert.doesNotMatch(gold, /stewaroPremiumGold/);
 });
