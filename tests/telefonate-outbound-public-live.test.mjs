@@ -25,4 +25,10 @@ assert.match(js,/mission_verified===true/);
 console.log("OUTBOUND_PORTAL_PUBLIC_JS_200=GREEN");
 const csp=page.headers.get("content-security-policy");
 console.log("OUTBOUND_PORTAL_PUBLIC_CSP_HEADER="+(csp?"PRESENT":"ABSENT_HOST_HEADER"));
+if(html.includes('http-equiv="Content-Security-Policy"')){
+ assert.match(html,/connect-src 'self' https:\/\/djicahhmnnamtjuqedqd\.supabase\.co/);
+ console.log("OUTBOUND_PORTAL_PUBLIC_CSP_META=PRESENT");
+}else{
+ console.log("OUTBOUND_PORTAL_PUBLIC_CSP_META=NOT_YET_PUBLISHED");
+}
 console.log("OUTBOUND_PORTAL_PUBLIC_READONLY=GREEN");
