@@ -16,7 +16,8 @@ test("My Day is account-gated, uses existing app palette, and does not forge tas
   assert.match(style, /@media\(max-width:650px\)/);
   assert.match(style, /prefers-reduced-motion:reduce/);
   assert.match(shell, /Auftragsstände werden nicht geschätzt/);
-  assert.doesNotMatch(shell, /TODAY_INTENTS[\s\S]*?function todayChatNotice[\s\S]*?fetch\(/);
+  const featureCode = shell.split("STEWARO_APP_TODAY_SHORTCUTS_V1")[1].split("  function mountExistingFidel()")[0];
+  assert.doesNotMatch(featureCode, /\bfetch\(|\.submit\(|\.requestSubmit\(|\.click\(\)/);
 });
 
 function mockApp(hostname = "app.stewaro.com") {
@@ -93,7 +94,7 @@ function mockApp(hostname = "app.stewaro.com") {
     AbortSignal: { timeout() { return {}; } },
     fetch: async () => ({ ok: false, json: async () => ({ ok: false }) }),
     addEventListener() {},
-    Promise, Object, CSS, console
+    Promise, Object, CSS: { escape: (value) => value }, console
   };
   vm.runInNewContext(shell, ctx);
   return {
