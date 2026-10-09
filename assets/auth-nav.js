@@ -46,12 +46,33 @@
     if (last === "de" || last === "en" || last === "tr" || last === "index") return "index.html";
     return last.endsWith(".html") ? last : last + ".html";
   };
-  // Keep the explicitly requested App target when an existing session skips the login form.
-  // Only the recognized local App handoff flag is forwarded; all other next values fail closed to /konto.
+  // Existing signed-in sessions must preserve the exact Owner HQ intention.
+  // Do not send an authorized HQ user to the customer portal before the AAL2-gated handoff.
   function signedInDestination(currentPage, search) {
-    return currentPage === "anmelden.html" && new URLSearchParams(search).get("next") === "app"
-      ? "/konto?stewaro_app=1"
-      : "/konto";
+    if (currentPage === "anmelden.html") {
+      const params = new URLSearchParams(search);
+      if (params.get("produkt") === "internal-hq" && params.get("next") === "hq") return null;
+      if (params.get("next") === "app") return "/konto?stewaro_app=1";
+    }
+    return "/konto";
+  }
+  function continueSignedInEntry(current) {
+    if (current !== "anmelden.html" && current !== "registrieren.html") return;
+    const destination = signedInDestination(current, location.search);
+    if (destination !== null) {
+      location.replace(accountUrl(destination));
+      return;
+    }
+    // The only null destination is an explicit internal-hq + next=hq entry.
+    // The sign-in page owns the same server-gated handoff as a fresh login.
+    if (typeof window.STEWARO_HQ_LOGIN_RESUME === "function" &&
+        validatedSession?.session_token &&
+        window.STEWARO_HQ_LOGIN_RESUME(validatedSession.session_token) === true) return;
+    const note = document.getElementById("loginStatus");
+    if (note) {
+      note.textContent = "Management HQ konnte nicht sicher geöffnet werden. Bitte lade die Anmeldung erneut.";
+      note.style.display = "block";
+    }
   }
   function productContext(current = page()) {
     if (PROTECTED.has(current)) {
@@ -444,7 +465,7 @@
     if (valid) {
       updateNav();
       ensureFloatingConcierge();
-      if (current === "anmelden.html" || current === "registrieren.html") location.replace(accountUrl(signedInDestination(current, location.search)));
+      continueSignedInEntry(current);
     } else {
       ensureFloatingConcierge();
       normalizeShell();
@@ -458,7 +479,7 @@
           if (recovered) {
             updateNav();
             ensureFloatingConcierge();
-            if (current === "anmelden.html" || current === "registrieren.html") location.replace(accountUrl(signedInDestination(current, location.search)));
+            continueSignedInEntry(current);
             return;
           }
           if (!validationUnavailable && PROTECTED.has(current) && !hasRenderableSession()) {
