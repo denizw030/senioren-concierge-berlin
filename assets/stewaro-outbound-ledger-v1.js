@@ -31,6 +31,10 @@ const show=async(call,container,button)=>{
   if(detail.mission_verified===true&&detail.mission_evidence){
     container.append(node("p","small",detail.mission_evidence));
   }
+  if(detail.appointment_progress){
+    container.append(node("p","small",detail.appointment_progress));
+    if(detail.appointment_evidence)container.append(node("p","small",detail.appointment_evidence));
+  }
   const entries=Array.isArray(detail.transcript)?detail.transcript:[],list=node("ol","messages");
   entries.forEach(item=>{const li=node("li"),who=node("span","speaker",item.speaker||"Gespräch"),message=node("span",null,item.text||"");li.append(who,message);list.append(li)});
   if(entries.length)container.append(list);else container.append(node("p",null,"Für diesen Anruf sind keine eindeutig zugeordneten Gesprächsbeiträge gespeichert."));
@@ -60,6 +64,10 @@ const render=items=>{
   }
   if(call.mission_verified===true&&call.mission_evidence){
     field(dl,"Erfolgsnachweis",call.mission_evidence);
+  }
+  if(call.appointment_progress){
+    field(dl,"Terminvereinbarung – Gesprächsstand",call.appointment_progress);
+    if(call.appointment_evidence)field(dl,"Warum noch nicht bestätigt",call.appointment_evidence);
   }
   field(dl,"Bisherige Statusmeldung (nicht verifiziert)",call.result_note||"Keine");
   const btn=node("button",null,"Gesprächsverlauf anzeigen"),details=node("div","details");details.hidden=true;
