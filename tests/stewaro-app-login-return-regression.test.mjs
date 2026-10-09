@@ -19,11 +19,47 @@ function resolveDestination(page, search) {
 test("signed-in app-aware login preserves FIDEL goal through validation and delayed session recovery", () => {
   assert.equal(resolveDestination("anmelden.html", "?produkt=senioren&next=app"), "/konto?stewaro_app=1");
   assert.equal(resolveDestination("anmelden.html", "?next=app&lang=tr"), "/konto?stewaro_app=1");
-  assert.equal((auth.match(/location\.replace\(accountUrl\(signedInDestination\(current, location\.search\)\)\)/g) || []).length, 2);
+  assert.equal((auth.match(/continueSignedInEntry\(current\);/g) || []).length, 2);
   assert.match(accountNav, /new URLSearchParams\(location\.search\)\.get\("stewaro_app"\) === "1"/);
   assert.match(accountNav, /action: "handoff_create", target: "app"/);
   assert.match(login, /const ENTRY_APP_HANDOFF=ENTRY_PARAMS\.get\('next'\)==='app'/);
   assert.match(login, /handoffToTarget\(body\.session_token,'app'\)/);
+});
+
+test("already-signed-in Owner returns to HQ through one gated handoff, never /konto", () => {
+  assert.equal(resolveDestination("anmelden.html", "?produkt=internal-hq&next=hq"), null);
+  assert.equal(resolveDestination("anmelden.html", "?next=hq"), "/konto");
+  assert.equal(resolveDestination("anmelden.html", "?produkt=internal-hq&next=other"), "/konto");
+  assert.equal(resolveDestination("registrieren.html", "?produkt=internal-hq&next=hq"), "/konto");
+
+  const source = auth.match(/  function continueSignedInEntry\(current\) \{[\s\S]*?\n  \}/)?.[0];
+  assert.ok(source, "Owner-aware validated-session continuation exists");
+  const redirects = [];
+  const ownerTokens = [];
+  const note = { textContent: "", style: {} };
+  const context = {
+    location: { search: "?produkt=internal-hq&next=hq", replace: (url) => redirects.push(url) },
+    window: { STEWARO_HQ_LOGIN_RESUME: (token) => { ownerTokens.push(token); return true; } },
+    document: { getElementById: (id) => id === "loginStatus" ? note : null },
+    accountUrl: (path) => "https://account.stewaro.com" + path,
+    signedInDestination: resolveDestination,
+    validatedSession: { session_token: "validated-owner-session" }
+  };
+  const continueEntry = vm.runInNewContext("(" + source.trim() + ")", context);
+  continueEntry("anmelden.html");
+  assert.deepEqual(ownerTokens, ["validated-owner-session"]);
+  assert.deepEqual(redirects, [], "the Owner is never bounced into the customer account");
+
+  context.window.STEWARO_HQ_LOGIN_RESUME = undefined;
+  continueEntry("anmelden.html");
+  assert.deepEqual(redirects, [], "a missing HQ handoff must stay fail closed");
+  assert.match(note.textContent, /Management HQ konnte nicht sicher geöffnet/);
+
+  context.location.search = "?next=hq";
+  continueEntry("anmelden.html");
+  assert.deepEqual(redirects, ["https://account.stewaro.com/konto"], "next=hq without exact HQ product is not privileged");
+  assert.equal(ownerTokens.length, 1, "invalid HQ intent cannot start another handoff");
+  assert.ok(redirects.every((url) => !url.includes("validated-owner-session")), "session bearer is never in the URL");
 });
 
 test("only the exact App intent is forwarded; no external redirects, HQ or registration escalation", () => {
