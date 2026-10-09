@@ -286,7 +286,7 @@
   "<script src=\"/assets/stewaro-account-app-navigation.js?v=1\"></script>": {
     "original": ""
   },
-  "<script src=\"/assets/stewaro-app-bootstrap.js?v=4\"></script>": {
+  "<script src=\"/assets/stewaro-app-bootstrap.js?v=3.1\"></script>": {
     "original": "<script src=\"/assets/stewaro-app-bootstrap.js?v=3\"></script>"
   }
 }
