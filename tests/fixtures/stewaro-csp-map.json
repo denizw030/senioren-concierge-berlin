@@ -279,5 +279,14 @@
     "asset": "assets/stewaro-csp-datenschutz-style-1.css",
     "opening": "<style id=\"stewaro-privacy-hub-v1\">",
     "closing": "</style>"
+  },
+  "<a class=\"brand\" href=\"https://stewaro.com/de/\" aria-label=\"STEWARO – Startseite\">": {
+    "original": "<a class=\"brand\" href=\"/de/\" aria-label=\"STEWARO – Startseite\">"
+  },
+  "<script src=\"/assets/stewaro-account-app-navigation.js?v=1\"></script>": {
+    "original": ""
+  },
+  "<script src=\"/assets/stewaro-app-bootstrap.js?v=3.1\"></script>": {
+    "original": "<script src=\"/assets/stewaro-app-bootstrap.js?v=3\"></script>"
   }
 }
