@@ -35,6 +35,11 @@ const show=async(call,container,button)=>{
     container.append(node("p","small",detail.appointment_progress));
     if(detail.appointment_evidence)container.append(node("p","small",detail.appointment_evidence));
   }
+  if(detail.mission_verified===true&&detail.appointment_evidence_kind==="independent_provider_confirmation"
+    &&detail.appointment_starts_at&&detail.appointment_provider_verified_at){
+    container.append(node("p","small","Durch Praxis bestätigter Termin: "+d(detail.appointment_starts_at)));
+    container.append(node("p","small","Bestätigung geprüft: "+d(detail.appointment_provider_verified_at)));
+  }
   const entries=Array.isArray(detail.transcript)?detail.transcript:[],list=node("ol","messages");
   entries.forEach(item=>{const li=node("li"),who=node("span","speaker",item.speaker||"Gespräch"),message=node("span",null,item.text||"");li.append(who,message);list.append(li)});
   if(entries.length)container.append(list);else container.append(node("p",null,"Für diesen Anruf sind keine eindeutig zugeordneten Gesprächsbeiträge gespeichert."));

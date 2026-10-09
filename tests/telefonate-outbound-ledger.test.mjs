@@ -27,7 +27,7 @@ test("portal distinguishes call times, evidence, duration and mission outcome",(
  assert.match(js,/Auftrag erledigt/);
  assert.match(js,/Abweichung festgestellt/);
  assert.match(js,/resultLabel\(call\)/);
- assert.match(page,/stewaro-outbound-ledger-v1\.js\?v=6/);
+ assert.match(page,/stewaro-outbound-ledger-v1\.js\?v=7/);
  assert.match(page,/stewaro-outbound-ledger-v1\.css\?v=2/);
 
  assert.match(js,/Telefonassistenz/);
@@ -39,6 +39,10 @@ test("portal distinguishes call times, evidence, duration and mission outcome",(
  assert.match(js,/Terminvereinbarung – Gesprächsstand/);
  assert.match(js,/Warum noch nicht bestätigt/);
  assert.match(js,/detail\.appointment_progress/);
+ assert.match(js,/detail\.appointment_evidence_kind===\"independent_provider_confirmation\"/);
+ assert.match(js,/Durch Praxis bestätigter Termin/);
+ assert.match(js,/detail\.appointment_starts_at/);
+ assert.match(js,/detail\.appointment_provider_verified_at/);
  assert.match(js,/call\.appointment_evidence/);
  assert.match(js,/ein beendeter Anruf bestätigt keine persönliche Antwort/);
 });
