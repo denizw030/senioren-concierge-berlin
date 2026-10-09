@@ -46,6 +46,13 @@
     if (last === "de" || last === "en" || last === "tr" || last === "index") return "index.html";
     return last.endsWith(".html") ? last : last + ".html";
   };
+  // Keep the explicitly requested App target when an existing session skips the login form.
+  // Only the recognized local App handoff flag is forwarded; all other next values fail closed to /konto.
+  function signedInDestination(currentPage, search) {
+    return currentPage === "anmelden.html" && new URLSearchParams(search).get("next") === "app"
+      ? "/konto?stewaro_app=1"
+      : "/konto";
+  }
   function productContext(current = page()) {
     if (PROTECTED.has(current)) {
       const accountProduct = getSession()?.product_context;
@@ -437,7 +444,7 @@
     if (valid) {
       updateNav();
       ensureFloatingConcierge();
-      if (current === "anmelden.html" || current === "registrieren.html") location.replace(accountUrl("/konto"));
+      if (current === "anmelden.html" || current === "registrieren.html") location.replace(accountUrl(signedInDestination(current, location.search)));
     } else {
       ensureFloatingConcierge();
       normalizeShell();
@@ -451,7 +458,7 @@
           if (recovered) {
             updateNav();
             ensureFloatingConcierge();
-            if (current === "anmelden.html" || current === "registrieren.html") location.replace(accountUrl("/konto"));
+            if (current === "anmelden.html" || current === "registrieren.html") location.replace(accountUrl(signedInDestination(current, location.search)));
             return;
           }
           if (!validationUnavailable && PROTECTED.has(current) && !hasRenderableSession()) {
