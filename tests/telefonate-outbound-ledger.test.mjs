@@ -27,12 +27,15 @@ test("portal distinguishes call times, evidence, duration and mission outcome",(
  assert.match(js,/Auftrag erledigt/);
  assert.match(js,/Abweichung festgestellt/);
  assert.match(js,/resultLabel\(call\)/);
- assert.match(page,/stewaro-outbound-ledger-v1\.js\?v=4/);
+ assert.match(page,/stewaro-outbound-ledger-v1\.js\?v=5/);
  assert.match(page,/stewaro-outbound-ledger-v1\.css\?v=2/);
 
  assert.match(js,/Telefonassistenz/);
  assert.match(js,/call\.assistant_name/);
  assert.match(js,/detail\.mission_issue/);
+ assert.match(js,/Erfolgsnachweis/);
+ assert.match(js,/call\.mission_evidence/);
+ assert.match(js,/detail\.mission_evidence/);
  assert.match(js,/ein beendeter Anruf bestätigt keine persönliche Antwort/);
 });
 test("page-level CSP permits only self-hosted active assets and bound production history API",()=>{
