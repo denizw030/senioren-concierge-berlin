@@ -46,11 +46,17 @@ function mockApp(hostname = "app.stewaro.com") {
       const attr = selector === "[data-stewaro-today-action]" ? "data-stewaro-today-action"
         : selector === "[data-stewaro-today-open]" ? "data-stewaro-today-open" : null;
       if (!attr) return [];
-      return [...String(this.innerHTML || "").matchAll(new RegExp(attr + '="([^"]+)"', "g"))].map((match) => {
-        const item = new FakeElement();
-        item.setAttribute(attr, match[1]);
-        return item;
-      });
+      // DOM querySelectorAll returns the same DOM nodes on later queries.
+      this._nodes = this._nodes || new Map();
+      if (!this._nodes.has(selector)) {
+        const matches = [...String(this.innerHTML || "").matchAll(new RegExp(attr + '="([^"]+)"', "g"))];
+        this._nodes.set(selector, matches.map((match) => {
+          const item = new FakeElement();
+          item.setAttribute(attr, match[1]);
+          return item;
+        }));
+      }
+      return this._nodes.get(selector);
     }
     insertAdjacentElement(position, node) {
       assert.equal(position, "afterend");
