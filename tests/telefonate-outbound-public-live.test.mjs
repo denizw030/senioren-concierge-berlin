@@ -26,7 +26,8 @@ assert.match(js,/phone\/outbound\/transcript/);
 assert.match(js,/Gesprächsdauer/);
 assert.match(js,/mission_verified===true/);
 if(jsVersion==="4"||jsVersion==="5"){
- assert.match(js,/mission-outcome-failed/);
+ assert.match(js,/mission-outcome-"\+resultClass\(call\)/);
+ assert.match(css,/mission-outcome-failed/);
  assert.match(js,/Noch nicht überprüft/);
  assert.match(js,/resultLabel/);
  if(jsVersion==="5")assert.match(js,/Erfolgsnachweis/);
