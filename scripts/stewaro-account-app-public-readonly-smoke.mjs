@@ -4,8 +4,10 @@ import { appendFile } from "node:fs/promises";
 
 const targets = [
   { name:"STEWARO public homepage", url:"https://stewaro.com/de/", hostname:"stewaro.com", marker:/STEWARO/i },
+  { name:"Account root handoff entry", url:"https://account.stewaro.com/", hostname:"account.stewaro.com", marker:/STEWARO/i },
   { name:"Account sign-in", url:"https://account.stewaro.com/anmelden", hostname:"account.stewaro.com", marker:/loginForm|STEWARO/i },
   { name:"Account portal", url:"https://account.stewaro.com/konto", hostname:"account.stewaro.com", marker:/auth-nav\.js|account-premium-ui|STEWARO/i },
+  { name:"FIDEL App root handoff entry", url:"https://app.stewaro.com/", hostname:"app.stewaro.com", marker:/STEWARO/i },
   { name:"FIDEL App", url:"https://app.stewaro.com/web-concierge", hostname:"app.stewaro.com", marker:/stewaro-app-bootstrap\.js|stewaroAppShell|web-concierge/i },
   { name:"FIDEL bootstrap asset", url:"https://app.stewaro.com/assets/stewaro-app-bootstrap.js", hostname:"app.stewaro.com", marker:/APP_HOST|app\.stewaro\.com/i }
 ];
@@ -23,9 +25,14 @@ async function probe(target) {
     const expectedBody = target.marker.test(text);
     const isHtml = !target.name.includes("asset");
     const kindOk = isHtml ? /<!doctype html|<html[\\s>]/i.test(text) : !/<html[\\s>]/i.test(text);
+    const rootDiagnostics = target.name==="Account root handoff entry"
+      ? { hasAccountClaimScript:/stewaro-domain-contract\\.js/i.test(text), genericHomeRedirect:text.includes('window.location.replace("/de/"') }
+      : target.name==="FIDEL App root handoff entry"
+        ? { forwardsFragmentToChat:/web-concierge[\\s\\S]{0,120}window\\.location\\.hash/.test(text) }
+        : {};
     const ok = response.ok && expectedHost && expectedBody && kindOk;
     return {name:target.name, code:response.status, final:final.origin+final.pathname,
-      expectedHost, expectedBody, expectedType:kindOk, passed:ok};
+      expectedHost, expectedBody, expectedType:kindOk, passed:ok, ...rootDiagnostics};
   } catch (error) {
     return {name:target.name, passed:false, error:String(error?.cause?.code||error?.name||error)};
   }
