@@ -12,3 +12,10 @@ button:disabled{opacity:.5;cursor:default}article .details{margin-top:17px;paddi
 .messages{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:10px}.messages li{padding:13px 14px;background:#f3f0e9;border-radius:12px;white-space:pre-wrap;overflow-wrap:anywhere}.speaker{display:block;font-size:12px;font-weight:800;color:var(--forest);margin-bottom:4px}
 .small,.privacy{color:var(--soft);font-size:13px}.privacy{padding:26px 0}.error{color:#9d3030}
 @media(max-width:650px){nav{align-items:flex-start}header{padding:46px 0 30px}.call{padding:17px}}
+
+
+/* Authenticated evidence states: technical call status remains separate. */
+.mission-outcome{display:inline-flex;align-items:center;margin-top:8px;padding:8px 13px;border-radius:9px;font-size:.92rem;font-weight:700;line-height:1.35;max-width:100%;border:1px solid transparent}
+.mission-outcome-failed{background:#fdf1ee;color:#9b2834;border-color:#ecc8c6}
+.mission-outcome-unverified{background:#f4f1e8;color:#574e39;border-color:#ded6c2}
+.mission-outcome-complete{background:#eaf4eb;color:#275838;border-color:#bed8c4}

@@ -1,0 +1,26 @@
+name: STEWARO Outbound Mission Status UI
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'assets/stewaro-outbound-ledger-v1.js'
+      - 'assets/stewaro-outbound-ledger-v1.css'
+      - 'telefonate/ausgehend/index.html'
+      - 'tests/telefonate-outbound-ledger.test.mjs'
+      - 'tests/telefonate-outbound-public-live.test.mjs'
+      - '.github/workflows/outbound-mission-status-ui-ci.yml'
+permissions:
+  contents: read
+jobs:
+  ui:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Client privacy, mission status and route regressions
+        run: node --test tests/telefonate-outbound-ledger.test.mjs tests/telefonate-session-recovery.test.mjs tests/critical-route-parity.test.mjs tests/konto-clean-route-parity.test.mjs
+      - name: Browser syntax
+        run: node --check assets/stewaro-outbound-ledger-v1.js
