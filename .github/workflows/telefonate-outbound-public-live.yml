@@ -1,0 +1,21 @@
+name: STEWARO Outbound Public Shell HTTPS Proof
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'tests/telefonate-outbound-public-live.test.mjs'
+      - '.github/workflows/telefonate-outbound-public-live.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  readonly-public-shell:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify live public static portal assets over HTTPS
+        run: node tests/telefonate-outbound-public-live.test.mjs
