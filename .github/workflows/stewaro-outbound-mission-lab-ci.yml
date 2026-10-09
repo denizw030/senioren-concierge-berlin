@@ -1,0 +1,26 @@
+name: STEWARO Outbound Mission Lab UI
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'telefonate/testen/index.html'
+      - 'telefonate/ausgehend/index.html'
+      - 'assets/stewaro-call-lab-v1.js'
+      - 'assets/stewaro-call-lab-v1.css'
+      - 'tests/telefonate-mission-lab-v1.test.mjs'
+      - '.github/workflows/stewaro-outbound-mission-lab-ci.yml'
+permissions:
+  contents: read
+jobs:
+  isolated-client-test-lab:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Scoped scenario, non-dialing and security checks
+        run: node --test tests/telefonate-mission-lab-v1.test.mjs tests/telefonate-outbound-ledger.test.mjs tests/telefonate-session-recovery.test.mjs tests/konto-clean-route-parity.test.mjs tests/critical-route-parity.test.mjs
+      - name: Static UI parse
+        run: node --check assets/stewaro-call-lab-v1.js
