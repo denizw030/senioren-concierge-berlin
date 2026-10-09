@@ -191,6 +191,6 @@ test("malformed or multi-key Account capabilities cannot restore an earlier iden
     assert.equal(stored.has("scb_web_session"),false);
     assert.deepEqual(historyPaths,["/anmelden"]);
     assert.deepEqual(redirects,["/anmelden?source=account_handoff_failed"]);
-    assert.ok(!redirects[0].includes("handoff"));
+    assert.ok(!redirects[0].includes("#handoff="));
   }
 });
