@@ -282,5 +282,8 @@
   },
   " href=\"assets/stewaro-app.css?v=2\"": {
     "original": " href=\"assets/stewaro-app.css?v=1\""
+  },
+  " src=\"assets/stewaro-app-shell.js?v=2\"": {
+    "original": " src=\"assets/stewaro-app-shell.js?v=1\""
   }
 }
