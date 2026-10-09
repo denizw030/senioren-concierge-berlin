@@ -11,6 +11,7 @@ async function connect() {
   let seq = 0;
   const pending = new Map();
   const exceptions = [];
+  const documentNavigations = [];
   ws.addEventListener('message', event => {
     const message = JSON.parse(String(event.data));
     if (message.id && pending.has(message.id)) {
@@ -18,6 +19,8 @@ async function connect() {
       message.error ? item.reject(Error(message.error.message)) : item.resolve(message.result || {});
     }
     if (message.method === 'Runtime.exceptionThrown') exceptions.push(message.params.exceptionDetails.exception?.description || message.params.exceptionDetails.text);
+    if (message.method === 'Page.frameRequestedNavigation' && message.params?.url) documentNavigations.push(message.params.url);
+    if (message.method === 'Network.requestWillBeSent' && message.params?.type === 'Document' && message.params.request?.url) documentNavigations.push(message.params.request.url);
   });
   const send = (method, params = {}) => new Promise((resolve, reject) => { const id = ++seq; pending.set(id, { resolve, reject }); ws.send(JSON.stringify({ id, method, params })); });
   const evaluate = async expression => {
@@ -25,8 +28,8 @@ async function connect() {
     if (result.exceptionDetails) throw Error(result.exceptionDetails.text);
     return result.result.value;
   };
-  await send('Page.enable'); await send('Runtime.enable');
-  return { send, evaluate, exceptions, close: () => ws.close() };
+  await send('Page.enable'); await send('Runtime.enable'); await send('Network.enable');
+  return { send, evaluate, exceptions, documentNavigations, close: () => ws.close() };
 }
 
 for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844 }]) {
@@ -57,9 +60,15 @@ for (const page of ['zugang.html', 'anmelden.html', 'registrieren.html', 'web-co
   for (const port of [8766, 8765]) {
     const browser = await connect();
     await browser.send('Page.navigate', { url: `http://127.0.0.1:${port}/${page}` });
-    await sleep(1500);
+    await sleep(page === 'konto.html' ? 2500 : 1500);
     const body = await browser.evaluate('document.body?.innerText?.trim() || ""');
-    assert.ok(body.length > 0, `Anonymous ${page} must render`);
+    if (page === 'konto.html') {
+      // The canonical Account split must deny anonymous portal display and
+      // actually navigate to the exact HTTPS login, not merely show a blank page.
+      assert.ok(browser.documentNavigations.includes('https://account.stewaro.com/anmelden'), 'Anonymous konto must request canonical Account login redirect');
+    } else {
+      assert.ok(body.length > 0, `Anonymous ${page} must render`);
+    }
     assert.ok(!browser.exceptions.some(value => /SyntaxError/.test(value)), `Anonymous ${page}: syntax failure`);
     errors.push(browser.exceptions.map(value => value.replace(/http:\/\/127\.0\.0\.1:\d+/g, 'FIXTURE').replace(/stewaro-csp-[^\s:]+\.js/g, 'INLINE_RUNTIME').split('\n')[0]).sort());
     browser.close();
