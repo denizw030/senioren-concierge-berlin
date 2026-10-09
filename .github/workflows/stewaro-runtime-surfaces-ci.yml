@@ -23,6 +23,8 @@ on:
       - "concierge-anpassen.html"
       - "concierge-anpassen/**"
       - "assets/stewaro-app-bootstrap.js"
+      - "assets/stewaro-account-app-navigation.js"
+      - "tests/stewaro-account-app-navigation-handoff.test.mjs"
       - "assets/stewaro-app.css"
       - "assets/stewaro-app-shell.js"
       - "tests/stewaro-app-auth-ready.test.mjs"
@@ -80,12 +82,13 @@ jobs:
           node --test             tests/stewaro-shared-base-brand-shell.test.mjs             tests/stewaro-runtime-surfaces-v1.test.mjs             tests/konto-clean-route-parity.test.mjs             tests/critical-route-parity.test.mjs             tests/auth-security.test.mjs
 
       - name: App handoff bootstrap behavior
-        run: node --test tests/stewaro-app-launch-shell-v1.test.mjs tests/stewaro-app-auth-ready.test.mjs tests/stewaro-app-design-shell.test.mjs
+        run: node --test tests/stewaro-app-launch-shell-v1.test.mjs tests/stewaro-app-auth-ready.test.mjs tests/stewaro-app-design-shell.test.mjs tests/stewaro-account-app-navigation-handoff.test.mjs
 
       - name: Syntax-check migrated runtime modules
         run: |
           node --check assets/auth-nav.js
           node --check assets/stewaro-app-bootstrap.js
+          node --check assets/stewaro-account-app-navigation.js
           node --check assets/stewaro-app-shell.js
           node --check assets/site-ui.js
           node --check assets/acquisition-v1.js
