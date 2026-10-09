@@ -87,6 +87,18 @@ async function handoffToTarget(sessionToken,target){
   }
 }
 
+let hqHandoffInFlight=false;
+function resumeHqHandoff(sessionToken){
+  if(!ENTRY_HQ_HANDOFF||typeof sessionToken!=='string'||!sessionToken)return false;
+  if(hqHandoffInFlight)return true;
+  hqHandoffInFlight=true;
+  show('<strong>Erfolgreich angemeldet.</strong><br>Management HQ wird jetzt sicher geöffnet.');
+  void handoffToTarget(sessionToken,'hq');
+  return true;
+}
+// Exposed only on a deliberate Owner HQ entry; no token is embedded in the URL.
+if(ENTRY_HQ_HANDOFF)window.STEWARO_HQ_LOGIN_RESUME=resumeHqHandoff;
+
 function completeLogin(body){
   void window.NahwerkAnalytics?.track("login_complete", { funnel_name: "login", funnel_step: "complete" });
   if(!body||body.ok!==true||body.status!=='logged_in'||!body.session_token||body.mfa_required===true)return false;
@@ -108,8 +120,7 @@ function completeLogin(body){
   if(rememberMe)localStorage.setItem(SESSION_KEY,JSON.stringify(sessionPayload));
   pendingMfa=null;
   if(ENTRY_HQ_HANDOFF){
-    show('<strong>Erfolgreich angemeldet.</strong><br>Management HQ wird jetzt sicher geöffnet.');
-    setTimeout(()=>void handoffToTarget(body.session_token,'hq'),120);
+    setTimeout(()=>resumeHqHandoff(body.session_token),120);
     return true;
   }
   if(ENTRY_APP_HANDOFF){
