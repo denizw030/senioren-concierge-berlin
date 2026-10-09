@@ -27,6 +27,6 @@
   };
   window.STEWAROPhoneSession=Object.freeze({
     token:()=>session()?.session_token||"",
-    loginHref:(next)=>"/anmelden?next="+encodeURIComponent(next==="/telefonate"?"/telefonate":"/telefonate/ausgehend")
+    loginHref:()=>"/anmelden"
   });
 })();
