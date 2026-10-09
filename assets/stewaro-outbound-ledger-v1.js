@@ -2,12 +2,19 @@
 "use strict";
 const ROOT="https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/account-security-auth-cleanup-temp";
 const state=document.getElementById("state"),root=document.getElementById("calls");
-const token=()=>{try{return JSON.parse(sessionStorage.getItem("scb_web_session")||"null")?.session_token||""}catch{return""}};
+const token=()=>window.STEWAROPhoneSession?.token()||"";
 const d=v=>{const x=new Date(v??"");return Number.isNaN(x.getTime())?"Zeit nicht verfügbar":x.toLocaleString("de-DE",{dateStyle:"medium",timeStyle:"short"})};
 const elapsed=v=>{const n=Number(v);return v!=null&&Number.isFinite(n)&&n>=0?`${Math.floor(n/60)} Min. ${Math.floor(n%60)} Sek.`:"Nicht dokumentiert"};
 const node=(tag,cls,text)=>{const x=document.createElement(tag);if(cls)x.className=cls;if(text!=null)x.textContent=String(text);return x};
 const err=text=>{state.hidden=false;state.className="error";state.textContent=text;root.hidden=true};
-const get=async path=>{const t=token();if(!t)throw Error("Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.");const res=await fetch(ROOT+path,{headers:{Authorization:"Bearer "+t,Accept:"application/json"},cache:"no-store"});if(res.status===401)throw Error("Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.");const body=await res.json().catch(()=>null);if(!res.ok||body?.ok!==true||body.authoritative!==true||body.environment!=="PROD"||body.phone_contract!=="customer-outbound-ledger-v1")throw Error("Das Outbound-Protokoll konnte gerade nicht sicher geladen werden.");return body};
+const authRequired=()=>Object.assign(new Error("Deine sichere Sitzung ist nicht mehr aktiv."),{code:"AUTH_REQUIRED"});
+const relogin=text=>{
+ err(text);
+ const link=node("a","login-link","Mit bestehendem Konto anmelden");
+ link.href=window.STEWAROPhoneSession.loginHref("/telefonate/ausgehend");
+ state.append(" ",link);
+};
+const get=async path=>{const t=token();if(!t)throw authRequired();const res=await fetch(ROOT+path,{headers:{Authorization:"Bearer "+t,Accept:"application/json"},cache:"no-store"});if(res.status===401)throw authRequired();const body=await res.json().catch(()=>null);if(!res.ok||body?.ok!==true||body.authoritative!==true||body.environment!=="PROD"||body.phone_contract!=="customer-outbound-ledger-v1")throw Error("Das Outbound-Protokoll konnte gerade nicht sicher geladen werden.");return body};
 const field=(dl,label,value)=>{const dt=node("dt",null,label),dd=node("dd",null,value??"Nicht dokumentiert");dl.append(dt,dd)};
 const show=async(call,container,button)=>{
  button.disabled=true;button.textContent="Gespräch wird geladen …";
@@ -20,7 +27,7 @@ const show=async(call,container,button)=>{
   entries.forEach(item=>{const li=node("li"),who=node("span","speaker",item.speaker||"Gespräch"),message=node("span",null,item.text||"");li.append(who,message);list.append(li)});
   if(entries.length)container.append(list);else container.append(node("p",null,"Für diesen Anruf sind keine eindeutig zugeordneten Gesprächsbeiträge gespeichert."));
   button.textContent="Gespräch ausgeblendet";button.dataset.open="true";
- }catch(e){container.replaceChildren(node("p","error",e.message||"Die Gesprächsdaten sind derzeit nicht verfügbar."));button.textContent="Erneut versuchen"}
+ }catch(e){container.replaceChildren(node("p","error",e.message||"Die Gesprächsdaten sind derzeit nicht verfügbar."));if(e?.code==="AUTH_REQUIRED"){const link=node("a",null,"Mit bestehendem Konto anmelden");link.href=window.STEWAROPhoneSession.loginHref("/telefonate/ausgehend");container.append(link)}button.textContent="Erneut versuchen"}
  finally{button.disabled=false}
 };
 const render=items=>{
@@ -45,5 +52,5 @@ const render=items=>{
   top.append(title,meta,status);article.append(top,dl,btn,details);root.append(article)
  })
 };
-get("/phone/outbound").then(x=>render(Array.isArray(x.calls)?x.calls:[])).catch(x=>err(x.message||"Der Telefonverlauf ist momentan nicht abrufbar."));
+get("/phone/outbound").then(x=>render(Array.isArray(x.calls)?x.calls:[])).catch(x=>x?.code==="AUTH_REQUIRED"?relogin(x.message):err(x.message||"Der Telefonverlauf ist momentan nicht abrufbar."));
 })();
