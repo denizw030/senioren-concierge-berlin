@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import vm from "node:vm";
 
 const login = fs.readFileSync("assets/stewaro-csp-anmelden-script-1.js", "utf8");
 const clean = fs.readFileSync("anmelden/index.html", "utf8");
@@ -24,4 +25,32 @@ test("both login route mirrors load the shared login script", () => {
   for (const html of [clean, flat]) {
     assert.match(html, /stewaro-csp-anmelden-script-1\.js/);
   }
+});
+
+test("fresh and already authenticated Owners share an idempotent HQ-only handoff", () => {
+  assert.match(login, /if\(ENTRY_HQ_HANDOFF\)window\.STEWARO_HQ_LOGIN_RESUME=resumeHqHandoff/);
+  assert.match(login, /setTimeout\(\(\)=>resumeHqHandoff\(body\.session_token\),120\)/);
+  const source = login.match(/function resumeHqHandoff\(sessionToken\)\{[\s\S]*?\n\}/)?.[0];
+  assert.ok(source);
+  const calls = [];
+  const messages = [];
+  const context = {
+    ENTRY_HQ_HANDOFF: true,
+    hqHandoffInFlight: false,
+    show: (message) => messages.push(message),
+    handoffToTarget: (token, target) => { calls.push([token, target]); return Promise.resolve(); }
+  };
+  const resume = vm.runInNewContext("(" + source + ")", context);
+  assert.equal(resume("validated-owner-session"), true);
+  assert.equal(resume("validated-owner-session"), true, "repeat start is already in progress");
+  assert.equal(resume(""), false, "empty session is never accepted");
+  assert.equal(calls.length, 1, "handoff_create cannot run twice");
+  assert.deepEqual(calls[0], ["validated-owner-session", "hq"]);
+  assert.equal(messages.length, 1);
+
+  const notHQ = vm.runInNewContext("(" + source + ")", {
+    ...context, ENTRY_HQ_HANDOFF: false, hqHandoffInFlight: false
+  });
+  assert.equal(notHQ("validated-owner-session"), false);
+  assert.equal(calls.length, 1, "other login intents cannot request HQ handoff");
 });
