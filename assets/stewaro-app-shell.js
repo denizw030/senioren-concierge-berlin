@@ -318,6 +318,21 @@
     location.replace(LOGIN_URL);
   }
 
+  // The FIDEL phone execution view belongs in the authenticated App, not Account settings.
+  // This link is only mounted after the existing App handoff/session boot succeeds.
+  function mountOutboundMissionEntry() {
+    const settingsLink = document.querySelector(
+      '.stewaro-app-card a[href="https://account.stewaro.com/telefonannahme"]'
+    );
+    if (!settingsLink || document.getElementById("stewaroAppOutboundMissionEntry")) return;
+    const link = document.createElement("a");
+    link.id = "stewaroAppOutboundMissionEntry";
+    link.className = "stewaro-app-card-link";
+    link.href = "/telefonate/ausgehend/";
+    link.textContent = "Telefonaufträge live verfolgen →";
+    settingsLink.parentElement.insertBefore(link, settingsLink);
+  }
+
   function bindNavigation() {
     document.querySelectorAll("[data-stewaro-app-tab]").forEach((button) => {
       button.addEventListener("click", () => selectTab(button.getAttribute("data-stewaro-app-tab"), { focus: true }));
@@ -360,6 +375,7 @@
     shell.hidden = false;
     mountExistingFidel();
     bindNavigation();
+    mountOutboundMissionEntry();
     selectTab("overview");
     syncConnectionFromChat();
     bindNetworkState();
