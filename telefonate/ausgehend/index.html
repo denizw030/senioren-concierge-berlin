@@ -9,14 +9,20 @@
 <meta name="description" content="Geschützte Aufträge und Gesprächsverläufe der von FIDEL ausgeführten Telefonate.">
 <link rel="icon" type="image/svg+xml" href="/assets/logos/stewaro-icon.svg?v=1">
 <link rel="stylesheet" href="/assets/stewaro-unified.css?v=20260928-3">
-<link rel="stylesheet" href="/assets/stewaro-outbound-ledger-v1.css?v=2">
+<link rel="stylesheet" href="/assets/stewaro-outbound-ledger-v1.css?v=3">
 </head>
 <body><main>
 <nav><strong>STEWARO</strong><a href="/telefonate/testen/">Gespräche testen</a><a href="/telefonate">Alle Telefonate</a></nav>
 <header><span class="eyebrow">Klientenportal · Telefon</span><h1>Ausgehende Anrufe</h1>
 <p>Alle Aufträge, bei denen FIDEL in deinem Namen telefoniert hat. Sieh nach, wen FIDEL angerufen hat, welchen Auftrag du erteilt hast und was im Gespräch tatsächlich erfasst wurde.</p></header>
 <p id="state" role="status" aria-live="polite">Dein geschütztes Outbound-Protokoll wird geladen …</p>
-<section id="outbound-live" class="live-section" aria-label="Laufende Telefonaufträge">\n<h2>Live mitverfolgen</h2>\n<p id="outbound-live-status" role="status" aria-live="polite">Live-Status wird geprüft …</p>\n<div id="outbound-live-calls"></div>\n<div id="outbound-live-transcript" class="details" aria-label="Automatisch erkannte Live-Gesprächsbeiträge" hidden></div>\n</section>\n<section id="calls" aria-label="Ausgehende Telefonate" hidden></section>
+<section id="outbound-live" class="live-section" aria-label="Laufende Telefonaufträge">
+<h2>Live mitverfolgen</h2>
+<p id="outbound-live-status" role="status" aria-live="polite">Live-Status wird geprüft …</p>
+<div id="outbound-live-calls"></div>
+<div id="outbound-live-transcript" class="details" aria-label="Automatisch erkannte Live-Gesprächsbeiträge" hidden></div>
+</section>
+<section id="calls" aria-label="Ausgehende Telefonate" hidden></section>
 <p class="privacy">Die Gesprächsbeiträge stammen aus automatischer Spracherkennung und können unvollständig oder fehlerhaft sein. Ein Transkript ist keine Audioaufnahme. Ein beendeter Anruf beweist nicht, dass der Auftrag inhaltlich korrekt erledigt wurde. Zugang nur nach Anmeldung.</p>
 </main>
 <script src="/assets/stewaro-phone-session-v1.js?v=1" defer></script>
