@@ -27,8 +27,8 @@ test("portal distinguishes call times, evidence, duration and mission outcome",(
  assert.match(js,/Auftrag erledigt/);
  assert.match(js,/Abweichung festgestellt/);
  assert.match(js,/resultLabel\(call\)/);
- assert.match(page,/stewaro-outbound-ledger-v1\.js\?v=7/);
- assert.match(page,/stewaro-outbound-ledger-v1\.css\?v=2/);
+ assert.match(page,/stewaro-outbound-ledger-v1\.js\?v=8/);
+ assert.match(page,/stewaro-outbound-ledger-v1\.css\?v=3/);
 
  assert.match(js,/Telefonassistenz/);
  assert.match(js,/call\.assistant_name/);
