@@ -1,9 +1,9 @@
 # STEWARO Mission v1 – Live-Verfolgung ausgehender Anrufe
 
-Status: SOURCE CANDIDATE, nicht produktiv bereitgestellt.
+Status 2026-10-10: Implementierter SOURCE CANDIDATE in Website Draft PR #370; nicht produktiv bereitgestellt.
 
 Klienten sollen in ihrem authentifizierten Portal den aktuellen Status eines beauftragten ausgehenden Anrufs und das bereits tatsächlich gespeicherte, eindeutig gebundene automatische Gesprächstranskript verfolgen. Quelle bleibt ausschließlich der bestehende Endpunkt `/phone/outbound` beziehungsweise `/phone/outbound/transcript?call_id=...` mit identischem Konto-/Mitglied-/Personen-/Call-Job-/SIP-Binding.
 
 Keine neuen Anrufe, kein Join, keine Kosten, kein Mitschnitt und keine erfundene Echtzeitgarantie. Live-Anzeige nur lesend, sichere Sitzung erforderlich, keine Tokens in URLs oder persistenter Speicherung. Leere, verspätete und fehlerhafte Spracherkennung klar kenntlich machen. Auth-Fehler müssen personenbezogene Ansicht entfernen. Sichtbares Browsertab darf pollend aktualisieren; im Hintergrund nicht fortlaufend abrufen.
 
-Offen: Frontend-Implementierung, Quelltests, sicherer AWS-Release, realer Klienten-Safari-Test, separate zustimmungsgebundene Zuschaltung mit Camille.
+Frontend im geschützten Outbound-Protokoll implementiert: Live-Status für job-gebundene Vorgemerkt/Anruf läuft-Aufträge; 4-Sekunden-Aktualisierung bei aktiven Anrufen, sonst 15 Sekunden, keine regelmäßigen Abfragen im Hintergrund; fortlaufendes Nachladen der bis dahin tatsächlich gespeicherten automatischen Gesprächsbeiträge. Browser-JavaScript Syntaxcheck bestanden, 11/11 isolierte Quellen-/Regelprüfungen bestanden. Acht automatische PR-Prüfläufe meldeten failure ohne Job-Schritte; Log-Downloads meldeten BlobNotFound, Ursache nicht verifiziert. Keine Produktionsänderung oder kostenpflichtigen Calls. Offen: vollständige Node-/Browser-Tests auf funktionsfähiger CI, sicherer AWS-Staging-Release mit Source-Hash/Rollback, realer Klienten-Safari-Test, separate zustimmungsgebundene Zuschaltung mit Camille. Kanonischer MASTER-Delta: website PR #370 DRAFT, live tracker source_only, PROD 0 %, E2E 0 %, keine Änderung an AWS-Core/Telefonruntime.
