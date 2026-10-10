@@ -27,6 +27,8 @@
   };
   window.STEWAROPhoneSession=Object.freeze({
     token:()=>session()?.session_token||"",
-    loginHref:()=>"/anmelden"
+    loginHref:()=>window.location?.hostname==="app.stewaro.com"
+      ?"https://account.stewaro.com/anmelden?produkt=senioren&next=app"
+      :"/anmelden"
   });
 })();

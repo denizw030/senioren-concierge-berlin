@@ -81,5 +81,86 @@ const render=items=>{
   top.append(title,meta,status,outcome);article.append(top,dl,btn,details);root.append(article)
  })
 };
+
+/* MISSION_V1_LIVE_TRACKING: use the existing authenticated, no-store ledger client.
+   No extra credential handling, call creation, joins or paid side effects. */
+const liveStatus=document.getElementById("outbound-live-status");
+const liveCalls=document.getElementById("outbound-live-calls");
+const liveTranscript=document.getElementById("outbound-live-transcript");
+let trackedCallId="",liveTimer=null,liveBusy=false,liveStopped=false,wasLive=false;
+const isLiveId=v=>/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(String(v??""));
+const liveClear=()=>{liveCalls?.replaceChildren();liveTranscript?.replaceChildren();if(liveTranscript)liveTranscript.hidden=true};
+const liveSchedule=ms=>{if(liveStopped)return;clearTimeout(liveTimer);liveTimer=setTimeout(liveRefresh,ms)};
+const liveRefresh=async()=>{
+ if(!liveStatus||!liveCalls||!liveTranscript||liveStopped||liveBusy)return;
+ if(document.visibilityState==="hidden"){liveSchedule(15000);return}
+ liveBusy=true;
+ let delay=15000;
+ try{
+  const payload=await get("/phone/outbound");
+  const list=Array.isArray(payload.calls)?payload.calls:[];
+  const running=list.filter(c=>isLiveId(c?.call_id)&&c.job_bound===true&&
+   (c.call_status==="Anruf läuft"||c.call_status==="Vorgemerkt")).slice(0,10);
+  delay=running.length?4000:15000;
+  // Refresh the original history once when the last active mission finishes.
+  if(wasLive&&!running.length)render(list);
+  wasLive=running.length>0;
+  liveCalls.replaceChildren();
+  if(!running.some(c=>c.call_id===trackedCallId)){trackedCallId="";liveTranscript.replaceChildren();liveTranscript.hidden=true}
+  liveStatus.textContent=running.length?
+   running.length+" laufende oder vorgemerkte Telefonaufträge werden automatisch aktualisiert.":
+   "Derzeit kein laufender oder vorgemerkter Anruf bestätigt. Automatische Aktualisierung aktiv.";
+  for(const c of running){
+   const article=node("article","live-call");
+   article.append(node("h3",null,c.contact_name||"Kontakt"),
+    node("p","small",c.call_status+" · "+(c.assistant_name||"Telefonassistenz noch nicht bestätigt")),
+    node("p",null,c.requested_objective||"Auftrag nicht dokumentiert"));
+   const button=node("button",null,trackedCallId===c.call_id?"Transkript wird verfolgt":"Live-Transkript anzeigen");
+   button.type="button";button.setAttribute("aria-pressed",String(trackedCallId===c.call_id));
+   button.addEventListener("click",()=>{
+    trackedCallId=trackedCallId===c.call_id?"":c.call_id;
+    liveTranscript.replaceChildren();liveTranscript.hidden=true;
+    clearTimeout(liveTimer);void liveRefresh();
+   });
+   article.append(button);liveCalls.append(article);
+  }
+  if(trackedCallId){
+   const desired=trackedCallId;
+   const b=await get("/phone/outbound/transcript?call_id="+encodeURIComponent(desired));
+   liveTranscript.replaceChildren();
+   if(b.call?.call_id===desired&&trackedCallId===desired){
+    liveTranscript.hidden=false;
+    liveTranscript.append(node("p","small","Automatisch erkannte Gesprächsbeiträge. Zeitverzögerungen, Fehler und Lücken sind möglich. Keine Audioaufnahme."));
+    const turns=Array.isArray(b.call.transcript)?b.call.transcript:[];
+    const ol=node("ol","messages");
+    for(const turn of turns.slice(-100)){
+     if(typeof turn?.text!=="string"||!turn.text.trim())continue;
+     const li=node("li");
+     li.append(node("span","speaker",turn.speaker||"Gespräch"),node("span",null,turn.text));
+     ol.append(li);
+    }
+    if(ol.children.length)liveTranscript.append(ol);
+    else liveTranscript.append(node("p","small","Noch keine eindeutig zugeordneten Gesprächsbeiträge gespeichert."));
+   }
+  }
+ }catch(e){
+  liveClear();
+  if(e?.code==="AUTH_REQUIRED"){
+   liveStopped=true;clearTimeout(liveTimer);trackedCallId="";
+   liveStatus.textContent="Deine sichere Sitzung ist abgelaufen. Bitte melde dich erneut an.";
+   const a=node("a",null,"Zum bestehenden Konto");
+   a.href=window.STEWAROPhoneSession.loginHref("/telefonate/ausgehend");
+   liveStatus.append(" ",a);
+  }else liveStatus.textContent="Live-Daten derzeit nicht sicher abrufbar. Bestehende Anrufe werden nicht beendet.";
+ }finally{
+  liveBusy=false;
+  if(!liveStopped)liveSchedule(delay);
+ }
+};
+document.addEventListener("visibilitychange",()=>{
+ if(document.visibilityState==="visible"&&!liveStopped){clearTimeout(liveTimer);void liveRefresh()}
+});
+void liveRefresh();
+
 get("/phone/outbound").then(x=>render(Array.isArray(x.calls)?x.calls:[])).catch(x=>x?.code==="AUTH_REQUIRED"?relogin(x.message):err(x.message||"Der Telefonverlauf ist momentan nicht abrufbar."));
 })();
