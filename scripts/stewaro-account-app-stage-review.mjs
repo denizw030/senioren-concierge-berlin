@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Immutable source-pinned Account/App REVIEW artifact. NOT a deployable site or AWS release.
 import { createHash } from "node:crypto";
+import { execFileSync } from "node:child_process";
 import { lstat, readFile, mkdir, writeFile, copyFile } from "node:fs/promises";
 import { resolve, dirname, join, relative } from "node:path";
 
@@ -25,6 +26,8 @@ function envPins(){
   if(!isSHA(candidate)||!isSHA(baseline)||candidate===baseline){
     throw Error("explicit distinct full candidate/base SHA pins required");
   }
+  const checkedOut=execFileSync("git",["rev-parse","--verify","HEAD"],{cwd:SOURCE,encoding:"utf8"}).trim();
+  if(candidate!==checkedOut)throw Error("candidate SHA does not match checked-out Git HEAD");
   return {candidate,baseline};
 }
 async function checkedBytes(source){
@@ -33,7 +36,10 @@ async function checkedBytes(source){
   if(rel.startsWith("..")||rel===".."||rel.startsWith("/")||rel.startsWith("\\")||!rel)throw Error("unsafe path");
   const stat=await lstat(path);
   if(!stat.isFile()||stat.isSymbolicLink())throw Error("source must be a regular file: "+source);
-  return readFile(path);
+  const bytes=await readFile(path);
+  const committed=execFileSync("git",["show","HEAD:"+source],{cwd:SOURCE,maxBuffer:32*1024*1024});
+  if(!bytes.equals(committed))throw Error("source bytes differ from pinned Git HEAD: "+source);
+  return bytes;
 }
 async function expectedManifest(){
   const {candidate,baseline}=envPins();

@@ -3,10 +3,11 @@ import assert from "node:assert/strict";
 import { mkdtemp, readFile, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve, join } from "node:path";
-import { spawnSync } from "node:child_process";
+import { spawnSync, execFileSync } from "node:child_process";
 
 const SCRIPT=resolve("scripts/stewaro-account-app-stage-review.mjs");
-const candidate="a".repeat(40),baseline="b".repeat(40);
+const candidate=execFileSync("git",["rev-parse","--verify","HEAD"],{encoding:"utf8"}).trim();
+const baseline=candidate[0]==="b"?"c".repeat(40):"b".repeat(40);
 function run(mode,path,{sha=candidate,base=baseline}={}){
   return spawnSync(process.execPath,[SCRIPT,mode,path],{
     cwd:resolve("."),encoding:"utf8",
@@ -34,6 +35,15 @@ test("review artifact is pinned, isolated, and verifiable; never claims AWS or P
     const verify=run("verify",out);
     assert.equal(verify.status,0,verify.stderr);
     assert.match(verify.stdout,/STEWARO_REVIEW_ARTIFACT_VERIFIED=10\/10/);
+  }finally{await rm(dir,{recursive:true,force:true});}
+});
+test("a different valid-format candidate SHA fails the exact Git HEAD check",async()=>{
+  const dir=await mkdtemp(join(tmpdir(),"stewaro-account-review-"));
+  try{
+    const unrelated=(candidate[0]==="a"?"c":"a")+candidate.slice(1);
+    const result=run("build",join(dir,"wrong-head"),{sha:unrelated});
+    assert.notEqual(result.status,0);
+    assert.match(result.stderr,/candidate SHA does not match checked-out Git HEAD/);
   }finally{await rm(dir,{recursive:true,force:true});}
 });
 test("tampered artifact cannot pass source parity",async()=>{
