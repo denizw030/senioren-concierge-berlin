@@ -83,6 +83,7 @@ test("mission v1 read-only live call tracking reuses existing secure outbound en
  assert.match(js,/cache:"no-store"/);
  assert.match(js,/AUTH_REQUIRED/);
  assert.match(js,/liveStopped=true/);
+ assert.match(js,/if\(wasLive&&!running\.length\)render\(list\)/);
  assert.match(js,/textContent/);
  assert.doesNotMatch(js,/liveJoin|joinConference|startNewCall|triggerPaidCall/);
 });
