@@ -87,7 +87,7 @@ const render=items=>{
 const liveStatus=document.getElementById("outbound-live-status");
 const liveCalls=document.getElementById("outbound-live-calls");
 const liveTranscript=document.getElementById("outbound-live-transcript");
-let trackedCallId="",liveTimer=null,liveBusy=false,liveStopped=false;
+let trackedCallId="",liveTimer=null,liveBusy=false,liveStopped=false,wasLive=false;
 const isLiveId=v=>/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(String(v??""));
 const liveClear=()=>{liveCalls?.replaceChildren();liveTranscript?.replaceChildren();if(liveTranscript)liveTranscript.hidden=true};
 const liveSchedule=ms=>{if(liveStopped)return;clearTimeout(liveTimer);liveTimer=setTimeout(liveRefresh,ms)};
@@ -102,6 +102,9 @@ const liveRefresh=async()=>{
   const running=list.filter(c=>isLiveId(c?.call_id)&&c.job_bound===true&&
    (c.call_status==="Anruf läuft"||c.call_status==="Vorgemerkt")).slice(0,10);
   delay=running.length?4000:15000;
+  // Refresh the original history once when the last active mission finishes.
+  if(wasLive&&!running.length)render(list);
+  wasLive=running.length>0;
   liveCalls.replaceChildren();
   if(!running.some(c=>c.call_id===trackedCallId)){trackedCallId="";liveTranscript.replaceChildren();liveTranscript.hidden=true}
   liveStatus.textContent=running.length?
