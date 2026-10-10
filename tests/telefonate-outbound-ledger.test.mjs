@@ -27,8 +27,8 @@ test("portal distinguishes call times, evidence, duration and mission outcome",(
  assert.match(js,/Auftrag erledigt/);
  assert.match(js,/Abweichung festgestellt/);
  assert.match(js,/resultLabel\(call\)/);
- assert.match(page,/stewaro-outbound-ledger-v1\.js\?v=7/);
- assert.match(page,/stewaro-outbound-ledger-v1\.css\?v=2/);
+ assert.match(page,/stewaro-outbound-ledger-v1\.js\?v=8/);
+ assert.match(page,/stewaro-outbound-ledger-v1\.css\?v=3/);
 
  assert.match(js,/Telefonassistenz/);
  assert.match(js,/call\.assistant_name/);
@@ -66,4 +66,24 @@ test("portal requires secure existing session and renders transcripts as text",(
  assert.match(page,/stewaro-outbound-ledger-v1\.css/);
  assert.doesNotMatch(page,/<script>\s*\(/);
  assert.doesNotMatch(page,/<style>/);
+});
+
+test("mission v1 read-only live call tracking reuses existing secure outbound endpoint",()=>{
+ assert.match(page,/id="outbound-live"/);
+ assert.match(page,/id="outbound-live-status"/);
+ assert.match(page,/id="outbound-live-transcript"/);
+ assert.match(js,/MISSION_V1_LIVE_TRACKING/);
+ assert.match(js,/const liveRefresh=async/);
+ assert.match(js,/get\("\/phone\/outbound"\)/);
+ assert.match(js,/get\("\/phone\/outbound\/transcript\?call_id="/);
+ assert.match(js,/job_bound===true/);
+ assert.match(js,/Anruf läuft/);
+ assert.match(js,/Vorgemerkt/);
+ assert.match(js,/document\.visibilityState==="hidden"/);
+ assert.match(js,/cache:"no-store"/);
+ assert.match(js,/AUTH_REQUIRED/);
+ assert.match(js,/liveStopped=true/);
+ assert.match(js,/if\(wasLive&&!running\.length\)render\(list\)/);
+ assert.match(js,/textContent/);
+ assert.doesNotMatch(js,/liveJoin|joinConference|startNewCall|triggerPaidCall/);
 });
