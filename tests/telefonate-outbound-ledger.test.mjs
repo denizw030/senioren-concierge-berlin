@@ -67,3 +67,22 @@ test("portal requires secure existing session and renders transcripts as text",(
  assert.doesNotMatch(page,/<script>\s*\(/);
  assert.doesNotMatch(page,/<style>/);
 });
+
+test("mission v1 read-only live call tracking reuses existing secure outbound endpoint",()=>{
+ assert.match(page,/id="outbound-live"/);
+ assert.match(page,/id="outbound-live-status"/);
+ assert.match(page,/id="outbound-live-transcript"/);
+ assert.match(js,/MISSION_V1_LIVE_TRACKING/);
+ assert.match(js,/const liveRefresh=async/);
+ assert.match(js,/get\("\/phone\/outbound"\)/);
+ assert.match(js,/get\("\/phone\/outbound\/transcript\?call_id="/);
+ assert.match(js,/job_bound===true/);
+ assert.match(js,/Anruf läuft/);
+ assert.match(js,/Vorgemerkt/);
+ assert.match(js,/document\.visibilityState==="hidden"/);
+ assert.match(js,/cache:"no-store"/);
+ assert.match(js,/AUTH_REQUIRED/);
+ assert.match(js,/liveStopped=true/);
+ assert.match(js,/textContent/);
+ assert.doesNotMatch(js,/liveJoin|joinConference|startNewCall|triggerPaidCall/);
+});
