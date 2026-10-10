@@ -1,0 +1,7 @@
+{
+  "name": "nahwerk-concierge-cores",
+  "private": true,
+  "scripts": {
+    "test:mobility": "node --test mobility-core/*.test.js"
+  }
+}
