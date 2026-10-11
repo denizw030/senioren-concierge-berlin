@@ -41,6 +41,18 @@ test("401 is always treated as lost authorization",async()=>{
   const h=makeHarness(A,async()=>({...good(),status:401,ok:false}));
   assert.ok(await hasCode(()=>h.get("/phone/outbound"),"AUTH_REQUIRED"));
 });
+test("403 denied account or membership immediately requires re-login",async()=>{
+  const h=makeHarness(A,async()=>({...good(),status:403,ok:false}));
+  assert.ok(await hasCode(()=>h.get("/phone/outbound"),"AUTH_REQUIRED"));
+});
+test("409 invalid or ambiguous account membership immediately requires re-login",async()=>{
+  const h=makeHarness(A,async()=>({...good(),status:409,ok:false}));
+  assert.ok(await hasCode(()=>h.get("/phone/outbound"),"AUTH_REQUIRED"));
+});
+test("non-auth HTTP failures fail closed without claiming success",async()=>{
+  const h=makeHarness(A,async()=>({...good(),status:503,ok:false}));
+  await assert.rejects(()=>h.get("/phone/outbound"),/nicht sicher geladen/);
+});
 test("session token replaced while fetch is pending rejects old response",async()=>{
   const gate=delayed(),h=makeHarness(A,()=>gate.promise);
   const pending=h.get("/phone/outbound");
@@ -84,6 +96,9 @@ test("logout and navigation handlers erase previous DOM data, not only hide it",
   assert.match(source,/window\.addEventListener\("pagehide",\(\)=>\{[\s\S]{0,220}root\.replaceChildren\(\);root\.hidden=true;liveClear\(\)/);
   assert.match(source,/liveClear=\(\)=>\{liveCalls\?\.replaceChildren\(\);liveTranscript\?\.replaceChildren\(\)/);
   assert.match(source,/window\.addEventListener\("pageshow",event=>\{if\(event\.persisted\)window\.location\.reload\(\)\}\)/);
+  assert.match(source,/const relogin=text=>\\{\\s*viewActive=false;liveStopped=true;clearTimeout\\(liveTimer\\);trackedCallId="";wasLive=false;/);
+  assert.match(source,/liveClear\\(\\);if\\(liveStatus\\)liveStatus.textContent/);
+  assert.match(source,/if\\(e\\?\\.code==="AUTH_REQUIRED"\\)\\{\\s*viewActive=false;liveStopped=true;/);
   assert.match(source,/viewActive=false;liveStopped=true/);
   assert.match(source,/if\(!viewActive\)return;\s*const list=/);
   assert.match(source,/if\(!viewActive\)return;\s*liveTranscript\.replaceChildren\(\)/);
