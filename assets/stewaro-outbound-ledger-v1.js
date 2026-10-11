@@ -7,6 +7,7 @@ const d=v=>{const x=new Date(v??"");return Number.isNaN(x.getTime())?"Zeit nicht
 const elapsed=v=>{const n=Number(v);return v!=null&&Number.isFinite(n)&&n>=0?`${Math.floor(n/60)} Min. ${Math.floor(n%60)} Sek.`:"Nicht dokumentiert"};
 const node=(tag,cls,text)=>{const x=document.createElement(tag);if(cls)x.className=cls;if(text!=null)x.textContent=String(text);return x};
 const err=text=>{root.replaceChildren();state.hidden=false;state.className="error";state.textContent=text;root.hidden=true};
+let viewActive=true;
 const authRequired=()=>Object.assign(new Error("Deine sichere Sitzung ist nicht mehr aktiv."),{code:"AUTH_REQUIRED"});
 const relogin=text=>{
  err(text);
@@ -15,14 +16,14 @@ const relogin=text=>{
  state.append(" ",link);
 };
 const get=async path=>{
- const t=token();if(!t)throw authRequired();
+ const t=token();if(!t||!viewActive)throw authRequired();
  const res=await fetch(ROOT+path,{headers:{Authorization:"Bearer "+t,Accept:"application/json"},cache:"no-store"});
  // Never render a response fetched for a session that expired or was replaced
  // while the request was pending, even if the old token returned HTTP 200.
- if(token()!==t)throw authRequired();
+ if(!viewActive||token()!==t)throw authRequired();
  if(res.status===401)throw authRequired();
  const body=await res.json().catch(()=>null);
- if(token()!==t)throw authRequired();
+ if(!viewActive||token()!==t)throw authRequired();
  if(!res.ok||body?.ok!==true||body.authoritative!==true||body.environment!=="PROD"||body.phone_contract!=="customer-outbound-ledger-v1")throw Error("Das Outbound-Protokoll konnte gerade nicht sicher geladen werden.");
  return body;
 };
@@ -33,6 +34,7 @@ const show=async(call,container,button)=>{
  button.disabled=true;button.textContent="Gespräch wird geladen …";
  try{
   const b=await get("/phone/outbound/transcript?call_id="+encodeURIComponent(call.call_id));
+  if(!viewActive)return;
   const detail=b.call;if(!detail||detail.call_id!==call.call_id)throw Error("Das Gespräch konnte nicht sicher zugeordnet werden.");
   container.replaceChildren();
   container.append(node("p","small",detail.transcript_coverage||"Keine Transkriptangaben verfügbar."));
@@ -55,7 +57,7 @@ const show=async(call,container,button)=>{
   entries.forEach(item=>{const li=node("li"),who=node("span","speaker",item.speaker||"Gespräch"),message=node("span",null,item.text||"");li.append(who,message);list.append(li)});
   if(entries.length)container.append(list);else container.append(node("p",null,"Für diesen Anruf sind keine eindeutig zugeordneten Gesprächsbeiträge gespeichert."));
   button.textContent="Gespräch ausgeblendet";button.dataset.open="true";
- }catch(e){container.replaceChildren(node("p","error",e.message||"Die Gesprächsdaten sind derzeit nicht verfügbar."));if(e?.code==="AUTH_REQUIRED"){const link=node("a",null,"Mit bestehendem Konto anmelden");link.href=window.STEWAROPhoneSession.loginHref("/telefonate/ausgehend");container.append(link)}button.textContent="Erneut versuchen"}
+ }catch(e){if(!viewActive)return;container.replaceChildren(node("p","error",e.message||"Die Gesprächsdaten sind derzeit nicht verfügbar."));if(e?.code==="AUTH_REQUIRED"){const link=node("a",null,"Mit bestehendem Konto anmelden");link.href=window.STEWAROPhoneSession.loginHref("/telefonate/ausgehend");container.append(link)}button.textContent="Erneut versuchen"}
  finally{button.disabled=false}
 };
 const render=items=>{
@@ -109,6 +111,7 @@ const liveRefresh=async()=>{
  let delay=15000;
  try{
   const payload=await get("/phone/outbound");
+  if(!viewActive)return;
   const list=Array.isArray(payload.calls)?payload.calls:[];
   const running=list.filter(c=>isLiveId(c?.call_id)&&c.job_bound===true&&
    (c.call_status==="Anruf läuft"||c.call_status==="Vorgemerkt")).slice(0,10);
@@ -138,6 +141,7 @@ const liveRefresh=async()=>{
   if(trackedCallId){
    const desired=trackedCallId;
    const b=await get("/phone/outbound/transcript?call_id="+encodeURIComponent(desired));
+   if(!viewActive)return;
    liveTranscript.replaceChildren();
    if(b.call?.call_id===desired&&trackedCallId===desired){
     liveTranscript.hidden=false;
@@ -155,6 +159,7 @@ const liveRefresh=async()=>{
    }
   }
  }catch(e){
+  if(!viewActive)return;
   liveClear();
   if(e?.code==="AUTH_REQUIRED"){
    liveStopped=true;clearTimeout(liveTimer);trackedCallId="";
@@ -171,7 +176,7 @@ const liveRefresh=async()=>{
 };
 // Prevent history/transcripts from surviving a completed page navigation in BFCache.
 window.addEventListener("pagehide",()=>{
- liveStopped=true;clearTimeout(liveTimer);trackedCallId="";wasLive=false;
+ viewActive=false;liveStopped=true;clearTimeout(liveTimer);trackedCallId="";wasLive=false;
  root.replaceChildren();root.hidden=true;liveClear();
 });
 // A BFCache restore must recheck authentication before showing any account data.
@@ -181,5 +186,5 @@ document.addEventListener("visibilitychange",()=>{
 });
 void liveRefresh();
 
-get("/phone/outbound").then(x=>render(Array.isArray(x.calls)?x.calls:[])).catch(x=>x?.code==="AUTH_REQUIRED"?relogin(x.message):err(x.message||"Der Telefonverlauf ist momentan nicht abrufbar."));
+get("/phone/outbound").then(x=>{if(viewActive)render(Array.isArray(x.calls)?x.calls:[])}).catch(x=>{if(!viewActive)return;x?.code==="AUTH_REQUIRED"?relogin(x.message):err(x.message||"Der Telefonverlauf ist momentan nicht abrufbar.")});
 })();
