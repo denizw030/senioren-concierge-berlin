@@ -174,6 +174,8 @@ window.addEventListener("pagehide",()=>{
  liveStopped=true;clearTimeout(liveTimer);trackedCallId="";wasLive=false;
  root.replaceChildren();root.hidden=true;liveClear();
 });
+// A BFCache restore must recheck authentication before showing any account data.
+window.addEventListener("pageshow",event=>{if(event.persisted)window.location.reload()});
 document.addEventListener("visibilitychange",()=>{
  if(document.visibilityState==="visible"&&!liveStopped){clearTimeout(liveTimer);void liveRefresh()}
 });
