@@ -8,6 +8,13 @@ const end=source.indexOf("const resultLabel",start);
 assert.ok(start>=0&&end>start,"exact production request handler exists");
 const getSource=source.slice(start,end);
 const makeGetter=new Function("token","fetch","authRequired","ROOT","viewActive",getSource+"; return get;");
+const showStart=source.indexOf("const show=async(");
+const showEnd=source.indexOf("const render=items=>",showStart);
+assert.ok(showStart>=0&&showEnd>showStart,"exact transcript disclosure handler exists");
+const makeShow=new Function("get","viewActive","relogin","node","d",source.slice(showStart,showEnd)+"; return show;");
+const mockNode=(tag,cls,text)=>({tag,cls,text});
+const mockDetail=()=>({replacements:[],replaceChildren(...nodes){this.replacements.push(nodes)},append(){}});
+const mockButton=()=>({disabled:false,textContent:"",dataset:{}});
 const A="a".repeat(40),B="b".repeat(40);
 const payload=()=>({ok:true,authoritative:true,environment:"PROD",
   phone_contract:"customer-outbound-ledger-v1",calls:[]});
@@ -52,6 +59,39 @@ test("409 invalid or ambiguous account membership immediately requires re-login"
 test("non-auth HTTP failures fail closed without claiming success",async()=>{
   const h=makeHarness(A,async()=>({...good(),status:503,ok:false}));
   await assert.rejects(()=>h.get("/phone/outbound"),/nicht sicher geladen/);
+});
+test("transcript disclosure 401/403/409 loss wipes full private view via relogin",async()=>{
+  for(const status of [401,403,409]){
+    const h=makeHarness(A,async()=>({...good(),status,ok:false}));
+    let resets=0;
+    const show=makeShow(h.get,true,()=>{resets++},mockNode,x=>x);
+    const detail=mockDetail(),button=mockButton();
+    await show({call_id:"18a7b27a-b143-42d3-8d9c-e5fdc79e0256"},detail,button);
+    assert.equal(resets,1,"revoked transcript must trigger global private cleanup");
+    assert.equal(detail.replacements.length,0,"no local-only replacement after global cleanup");
+    assert.equal(button.disabled,false);
+  }
+});
+test("transcript fetch under switched account triggers global cleanup",async()=>{
+  const gate=delayed(),h=makeHarness(A,()=>gate.promise);
+  let resets=0;
+  const show=makeShow(h.get,true,()=>{resets++},mockNode,x=>x);
+  const detail=mockDetail();
+  const pending=show({call_id:"18a7b27a-b143-42d3-8d9c-e5fdc79e0256"},detail,mockButton());
+  h.setToken(B);gate.release(good());
+  await pending;
+  assert.equal(resets,1);
+  assert.equal(detail.replacements.length,0);
+});
+test("transient transcript API outage is an error, never automatic re-login or successful transcript",async()=>{
+  const h=makeHarness(A,async()=>({...good(),status:503,ok:false}));
+  let resets=0;
+  const show=makeShow(h.get,true,()=>{resets++},mockNode,x=>x);
+  const detail=mockDetail(),button=mockButton();
+  await show({call_id:"18a7b27a-b143-42d3-8d9c-e5fdc79e0256"},detail,button);
+  assert.equal(resets,0);
+  assert.equal(detail.replacements.length,1);
+  assert.equal(button.textContent,"Erneut versuchen");
 });
 test("session token replaced while fetch is pending rejects old response",async()=>{
   const gate=delayed(),h=makeHarness(A,()=>gate.promise);
