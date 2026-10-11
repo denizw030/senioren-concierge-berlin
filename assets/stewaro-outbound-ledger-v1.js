@@ -10,6 +10,8 @@ const err=text=>{root.replaceChildren();state.hidden=false;state.className="erro
 let viewActive=true;
 const authRequired=()=>Object.assign(new Error("Deine sichere Sitzung ist nicht mehr aktiv."),{code:"AUTH_REQUIRED"});
 const relogin=text=>{
+ viewActive=false;liveStopped=true;clearTimeout(liveTimer);trackedCallId="";wasLive=false;
+ liveClear();if(liveStatus)liveStatus.textContent="Deine sichere Sitzung ist abgelaufen.";
  err(text);
  const link=node("a","login-link","Mit bestehendem Konto anmelden");
  link.href=window.STEWAROPhoneSession.loginHref("/telefonate/ausgehend");
@@ -21,7 +23,7 @@ const get=async path=>{
  // Never render a response fetched for a session that expired or was replaced
  // while the request was pending, even if the old token returned HTTP 200.
  if(!viewActive||token()!==t)throw authRequired();
- if(res.status===401)throw authRequired();
+ if([401,403,409].includes(res.status))throw authRequired();
  const body=await res.json().catch(()=>null);
  if(!viewActive||token()!==t)throw authRequired();
  if(!res.ok||body?.ok!==true||body.authoritative!==true||body.environment!=="PROD"||body.phone_contract!=="customer-outbound-ledger-v1")throw Error("Das Outbound-Protokoll konnte gerade nicht sicher geladen werden.");
@@ -162,7 +164,7 @@ const liveRefresh=async()=>{
   if(!viewActive)return;
   liveClear();
   if(e?.code==="AUTH_REQUIRED"){
-   liveStopped=true;clearTimeout(liveTimer);trackedCallId="";
+   viewActive=false;liveStopped=true;clearTimeout(liveTimer);trackedCallId="";
    root.replaceChildren();root.hidden=true;
    liveStatus.textContent="Deine sichere Sitzung ist abgelaufen. Bitte melde dich erneut an.";
    const a=node("a",null,"Zum bestehenden Konto");
