@@ -48,7 +48,7 @@ test("legacy website telephone routes keep their old login behavior", () => {
 });
 
 test("outbound reading is authenticated and only displays returned ASR text", () => {
-  assert.match(phoneView, /stewaro-outbound-ledger-v1\.js\?v=9/);
+  assert.match(phoneView, /stewaro-outbound-ledger-v1\.js\?v=10/);
   assert.match(phoneView, /stewaro-phone-session-v1\.js\?v=1/);
   assert.match(phoneView, /automatischer Spracherkennung/);
   assert.match(phoneView, /Zugang nur nach Anmeldung/);
