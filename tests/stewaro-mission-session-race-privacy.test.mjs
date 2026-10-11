@@ -78,6 +78,7 @@ test("logout and navigation handlers erase previous DOM data, not only hide it",
   assert.match(source,/liveStopped=true;clearTimeout\(liveTimer\);trackedCallId="";\s*root\.replaceChildren\(\);root\.hidden=true/);
   assert.match(source,/window\.addEventListener\("pagehide",\(\)=>\{[\s\S]{0,220}root\.replaceChildren\(\);root\.hidden=true;liveClear\(\)/);
   assert.match(source,/liveClear=\(\)=>\{liveCalls\?\.replaceChildren\(\);liveTranscript\?\.replaceChildren\(\)/);
+  assert.match(source,/window\.addEventListener\("pageshow",event=>\{if\(event\.persisted\)window\.location\.reload\(\)\}\)/);
 });
 test("source remains read-only and cannot place paid calls",()=>{
   assert.doesNotMatch(source,/joinConference|startNewCall|triggerPaidCall|call\/outbound\/start/);
