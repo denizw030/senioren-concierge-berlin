@@ -6,7 +6,7 @@ const token=()=>window.STEWAROPhoneSession?.token()||"";
 const d=v=>{const x=new Date(v??"");return Number.isNaN(x.getTime())?"Zeit nicht verfügbar":x.toLocaleString("de-DE",{dateStyle:"medium",timeStyle:"short"})};
 const elapsed=v=>{const n=Number(v);return v!=null&&Number.isFinite(n)&&n>=0?`${Math.floor(n/60)} Min. ${Math.floor(n%60)} Sek.`:"Nicht dokumentiert"};
 const node=(tag,cls,text)=>{const x=document.createElement(tag);if(cls)x.className=cls;if(text!=null)x.textContent=String(text);return x};
-const err=text=>{state.hidden=false;state.className="error";state.textContent=text;root.hidden=true};
+const err=text=>{root.replaceChildren();state.hidden=false;state.className="error";state.textContent=text;root.hidden=true};
 const authRequired=()=>Object.assign(new Error("Deine sichere Sitzung ist nicht mehr aktiv."),{code:"AUTH_REQUIRED"});
 const relogin=text=>{
  err(text);
@@ -14,7 +14,18 @@ const relogin=text=>{
  link.href=window.STEWAROPhoneSession.loginHref("/telefonate/ausgehend");
  state.append(" ",link);
 };
-const get=async path=>{const t=token();if(!t)throw authRequired();const res=await fetch(ROOT+path,{headers:{Authorization:"Bearer "+t,Accept:"application/json"},cache:"no-store"});if(res.status===401)throw authRequired();const body=await res.json().catch(()=>null);if(!res.ok||body?.ok!==true||body.authoritative!==true||body.environment!=="PROD"||body.phone_contract!=="customer-outbound-ledger-v1")throw Error("Das Outbound-Protokoll konnte gerade nicht sicher geladen werden.");return body};
+const get=async path=>{
+ const t=token();if(!t)throw authRequired();
+ const res=await fetch(ROOT+path,{headers:{Authorization:"Bearer "+t,Accept:"application/json"},cache:"no-store"});
+ // Never render a response fetched for a session that expired or was replaced
+ // while the request was pending, even if the old token returned HTTP 200.
+ if(token()!==t)throw authRequired();
+ if(res.status===401)throw authRequired();
+ const body=await res.json().catch(()=>null);
+ if(token()!==t)throw authRequired();
+ if(!res.ok||body?.ok!==true||body.authoritative!==true||body.environment!=="PROD"||body.phone_contract!=="customer-outbound-ledger-v1")throw Error("Das Outbound-Protokoll konnte gerade nicht sicher geladen werden.");
+ return body;
+};
 const resultLabel=call=>call?.mission_outcome==="Auftrag nicht erledigt"?"Auftrag nicht erledigt":call?.mission_verified===true?"Auftrag erledigt":"Noch nicht überprüft";
 const resultClass=call=>resultLabel(call)==="Auftrag nicht erledigt"?"failed":resultLabel(call)==="Auftrag erledigt"?"complete":"unverified";
 const field=(dl,label,value)=>{const dt=node("dt",null,label),dd=node("dd",null,value??"Nicht dokumentiert");dl.append(dt,dd)};
@@ -147,6 +158,7 @@ const liveRefresh=async()=>{
   liveClear();
   if(e?.code==="AUTH_REQUIRED"){
    liveStopped=true;clearTimeout(liveTimer);trackedCallId="";
+   root.replaceChildren();root.hidden=true;
    liveStatus.textContent="Deine sichere Sitzung ist abgelaufen. Bitte melde dich erneut an.";
    const a=node("a",null,"Zum bestehenden Konto");
    a.href=window.STEWAROPhoneSession.loginHref("/telefonate/ausgehend");
@@ -157,6 +169,11 @@ const liveRefresh=async()=>{
   if(!liveStopped)liveSchedule(delay);
  }
 };
+// Prevent history/transcripts from surviving a completed page navigation in BFCache.
+window.addEventListener("pagehide",()=>{
+ liveStopped=true;clearTimeout(liveTimer);trackedCallId="";wasLive=false;
+ root.replaceChildren();root.hidden=true;liveClear();
+});
 document.addEventListener("visibilitychange",()=>{
  if(document.visibilityState==="visible"&&!liveStopped){clearTimeout(liveTimer);void liveRefresh()}
 });
