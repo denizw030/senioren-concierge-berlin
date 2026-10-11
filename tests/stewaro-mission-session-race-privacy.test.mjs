@@ -7,16 +7,16 @@ const start=source.indexOf("const get=async path=>");
 const end=source.indexOf("const resultLabel",start);
 assert.ok(start>=0&&end>start,"exact production request handler exists");
 const getSource=source.slice(start,end);
-const makeGetter=new Function("token","fetch","authRequired","ROOT",getSource+"; return get;");
+const makeGetter=new Function("token","fetch","authRequired","ROOT","viewActive",getSource+"; return get;");
 const A="a".repeat(40),B="b".repeat(40);
 const payload=()=>({ok:true,authoritative:true,environment:"PROD",
   phone_contract:"customer-outbound-ledger-v1",calls:[]});
 const good=()=>({status:200,ok:true,json:async()=>payload()});
-const makeHarness=(initial=A,fetcher=async()=>good())=>{
+const makeHarness=(initial=A,fetcher=async()=>good(),viewActive=true)=>{
   let active=initial;
   const get=makeGetter(()=>active,fetcher,
     ()=>Object.assign(new Error("Session expired"),{code:"AUTH_REQUIRED"}),
-    "https://example.invalid");
+    "https://example.invalid",viewActive);
   return {get,setToken:t=>{active=t}};
 };
 const delayed=()=>{let release;const promise=new Promise(r=>{release=r});return {promise,release}};
@@ -59,6 +59,11 @@ test("session swapped while response JSON is pending cannot render stale private
   await Promise.resolve();h.setToken(B);gate.release(payload());
   assert.ok(await hasCode(()=>pending,"AUTH_REQUIRED"));
 });
+test("already inactive view refuses a request before fetch",async()=>{
+  let calls=0;const h=makeHarness(A,async()=>{calls++;return good()},false);
+  assert.ok(await hasCode(()=>h.get("/phone/outbound"),"AUTH_REQUIRED"));
+  assert.equal(calls,0);
+});
 test("session ended while JSON is pending cannot render private data",async()=>{
   const gate=delayed(),h=makeHarness(A,async()=>({...good(),json:()=>gate.promise}));
   const pending=h.get("/phone/outbound");
@@ -79,6 +84,9 @@ test("logout and navigation handlers erase previous DOM data, not only hide it",
   assert.match(source,/window\.addEventListener\("pagehide",\(\)=>\{[\s\S]{0,220}root\.replaceChildren\(\);root\.hidden=true;liveClear\(\)/);
   assert.match(source,/liveClear=\(\)=>\{liveCalls\?\.replaceChildren\(\);liveTranscript\?\.replaceChildren\(\)/);
   assert.match(source,/window\.addEventListener\("pageshow",event=>\{if\(event\.persisted\)window\.location\.reload\(\)\}\)/);
+  assert.match(source,/viewActive=false;liveStopped=true/);
+  assert.match(source,/if\(!viewActive\)return;\s*const list=/);
+  assert.match(source,/if\(!viewActive\)return;\s*liveTranscript\.replaceChildren\(\)/);
 });
 test("source remains read-only and cannot place paid calls",()=>{
   assert.doesNotMatch(source,/joinConference|startNewCall|triggerPaidCall|call\/outbound\/start/);
