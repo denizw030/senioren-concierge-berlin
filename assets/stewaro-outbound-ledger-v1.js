@@ -59,7 +59,12 @@ const show=async(call,container,button)=>{
   entries.forEach(item=>{const li=node("li"),who=node("span","speaker",item.speaker||"Gespräch"),message=node("span",null,item.text||"");li.append(who,message);list.append(li)});
   if(entries.length)container.append(list);else container.append(node("p",null,"Für diesen Anruf sind keine eindeutig zugeordneten Gesprächsbeiträge gespeichert."));
   button.textContent="Gespräch ausgeblendet";button.dataset.open="true";
- }catch(e){if(!viewActive)return;container.replaceChildren(node("p","error",e.message||"Die Gesprächsdaten sind derzeit nicht verfügbar."));if(e?.code==="AUTH_REQUIRED"){const link=node("a",null,"Mit bestehendem Konto anmelden");link.href=window.STEWAROPhoneSession.loginHref("/telefonate/ausgehend");container.append(link)}button.textContent="Erneut versuchen"}
+ }catch(e){
+  if(!viewActive)return;
+  if(e?.code==="AUTH_REQUIRED"){relogin(e.message);return;}
+  container.replaceChildren(node("p","error",e.message||"Die Gesprächsdaten sind derzeit nicht verfügbar."));
+  button.textContent="Erneut versuchen";
+ }
  finally{button.disabled=false}
 };
 const render=items=>{
