@@ -168,13 +168,8 @@ const liveRefresh=async()=>{
  }catch(e){
   if(!viewActive)return;
   liveClear();
-  if(e?.code==="AUTH_REQUIRED"){
-   viewActive=false;liveStopped=true;clearTimeout(liveTimer);trackedCallId="";
-   root.replaceChildren();root.hidden=true;
-   liveStatus.textContent="Deine sichere Sitzung ist abgelaufen. Bitte melde dich erneut an.";
-   const a=node("a",null,"Zum bestehenden Konto");
-   a.href=window.STEWAROPhoneSession.loginHref("/telefonate/ausgehend");
-   liveStatus.append(" ",a);
+  // Shared re-login clears both the visible history and any stuck initial loading state.
+  if(e?.code==="AUTH_REQUIRED"){relogin(e.message);
   }else liveStatus.textContent="Live-Daten derzeit nicht sicher abrufbar. Bestehende Anrufe werden nicht beendet.";
  }finally{
   liveBusy=false;
