@@ -56,7 +56,7 @@ test("Mission v1 outbound review pins all required read-only phone assets",async
     const targets=new Set(manifest.files.map(f=>f.target));
     required.forEach(x=>assert.ok(targets.has(x),"missing staged Mission v1 dependency: "+x));
     const html=await readFile(join(out,"app/telefonate/ausgehend/index.html"),"utf8");
-    assert.match(html,/stewaro-outbound-ledger-v1\.js\?v=10/);
+    assert.match(html,/stewaro-outbound-ledger-v1\.js\?v=11/);
     assert.match(html,/stewaro-phone-session-v1\.js\?v=1/);
     assert.equal(manifest.complete_website_artifact,false);
     assert.equal(manifest.aws_staging_deployed,false);
