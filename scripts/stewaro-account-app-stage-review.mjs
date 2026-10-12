@@ -62,7 +62,7 @@ async function expectedManifest(){
     "web-concierge/index.html":["/assets/stewaro-app-bootstrap.js"],
     "telefonate/ausgehend/index.html":[
       "/assets/stewaro-phone-session-v1.js?v=1",
-      "/assets/stewaro-outbound-ledger-v1.js?v=10",
+      "/assets/stewaro-outbound-ledger-v1.js?v=11",
       "/assets/stewaro-outbound-ledger-v1.css?v=3",
       "/assets/stewaro-unified.css",
       "/assets/logos/stewaro-icon.svg"
