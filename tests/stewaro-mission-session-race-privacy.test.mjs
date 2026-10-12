@@ -132,16 +132,24 @@ test("generic network errors cannot authorize previous user data",async()=>{
 });
 test("logout and navigation handlers erase previous DOM data, not only hide it",()=>{
   assert.match(source,/const err=text=>\{root\.replaceChildren\(\)/);
-  assert.match(source,/liveStopped=true;clearTimeout\(liveTimer\);trackedCallId="";\s*root\.replaceChildren\(\);root\.hidden=true/);
+  assert.match(source,/const relogin=text=>\{[\s\S]{0,280}err\(text\)/);
   assert.match(source,/window\.addEventListener\("pagehide",\(\)=>\{[\s\S]{0,220}root\.replaceChildren\(\);root\.hidden=true;liveClear\(\)/);
   assert.match(source,/liveClear=\(\)=>\{liveCalls\?\.replaceChildren\(\);liveTranscript\?\.replaceChildren\(\)/);
   assert.match(source,/window\.addEventListener\("pageshow",event=>\{if\(event\.persisted\)window\.location\.reload\(\)\}\)/);
   assert.match(source,/const relogin=text=>\{\s*viewActive=false;liveStopped=true;clearTimeout\(liveTimer\);trackedCallId="";wasLive=false;/);
   assert.match(source,/liveClear\(\);if\(liveStatus\)liveStatus.textContent/);
-  assert.match(source,/if\(e\?\.code==="AUTH_REQUIRED"\)\{\s*viewActive=false;liveStopped=true;/);
+  assert.match(source,/if\(e\?\.code==="AUTH_REQUIRED"\)\{\s*relogin\(e.message\);/);
   assert.match(source,/viewActive=false;liveStopped=true/);
   assert.match(source,/if\(!viewActive\)return;\s*const list=/);
   assert.match(source,/if\(!viewActive\)return;\s*liveTranscript\.replaceChildren\(\)/);
+});
+test("live poll auth denial shares global relogin so initial loading label cannot linger",()=>{
+  const begin=source.indexOf("const liveRefresh=async()=>");
+  const end=source.indexOf("// Prevent history/transcripts",begin);
+  assert.ok(begin>=0&&end>begin);
+  const handler=source.slice(begin,end);
+  assert.match(handler,/if\(e\?\.code==="AUTH_REQUIRED"\)\{\s*relogin\(e.message\);/);
+  assert.doesNotMatch(handler,/liveStatus\.append\(" ",a\)/);
 });
 test("source remains read-only and cannot place paid calls",()=>{
   assert.doesNotMatch(source,/joinConference|startNewCall|triggerPaidCall|call\/outbound\/start/);
