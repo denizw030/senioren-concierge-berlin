@@ -98,11 +98,11 @@
     opacity:.68;
   }
   62% {
-    transform:translate3d(440%,0,0) skewX(-12deg);
+    transform:translate3d(525%,0,0) skewX(-12deg);
     opacity:.88;
   }
   68%,100% {
-    transform:translate3d(440%,0,0) skewX(-12deg);
+    transform:translate3d(525%,0,0) skewX(-12deg);
     opacity:0;
   }
 }
