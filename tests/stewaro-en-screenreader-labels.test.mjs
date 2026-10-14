@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const html = readFileSync(new URL('../en/index.html', import.meta.url), 'utf8');
-const labels = [...html.matchAll(/\\baria-label="([^"]+)"/g)].map(match => match[1]);
+const labels = [...html.matchAll(/\baria-label="([^"]+)"/g)].map(match => match[1]);
 
 test('English STEWARO homepage has English navigation landmarks', () => {
   assert.match(html, /<html[^>]+lang="en"/);
