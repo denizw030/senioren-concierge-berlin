@@ -16,7 +16,14 @@ const FILES=Object.freeze([
   ["app","web-concierge/index.html","app/index.html"],
   ["app","web-concierge/index.html","app/web-concierge/index.html"],
   ["app","assets/stewaro-app-bootstrap.js","app/assets/stewaro-app-bootstrap.js"],
-  ["app","assets/stewaro-app-shell.js","app/assets/stewaro-app-shell.js"]
+  ["app","assets/stewaro-app-shell.js","app/assets/stewaro-app-shell.js"],
+  // Mission v1: a source-pinned read-only phone-view review artifact, not a deployment.
+  ["app","telefonate/ausgehend/index.html","app/telefonate/ausgehend/index.html"],
+  ["app","assets/stewaro-phone-session-v1.js","app/assets/stewaro-phone-session-v1.js"],
+  ["app","assets/stewaro-outbound-ledger-v1.js","app/assets/stewaro-outbound-ledger-v1.js"],
+  ["app","assets/stewaro-outbound-ledger-v1.css","app/assets/stewaro-outbound-ledger-v1.css"],
+  ["app","assets/stewaro-unified.css","app/assets/stewaro-unified.css"],
+  ["app","assets/logos/stewaro-icon.svg","app/assets/logos/stewaro-icon.svg"]
 ]);
 const sha256=bytes=>createHash("sha256").update(bytes).digest("hex");
 const isSHA=value=>/^[0-9a-f]{40}$/.test(value||"");
@@ -52,7 +59,14 @@ async function expectedManifest(){
     "zugang.html":["/assets/stewaro-domain-contract.js"],
     "anmelden/index.html":["/assets/stewaro-domain-contract.js"],
     "konto/index.html":["/assets/stewaro-domain-contract.js"],
-    "web-concierge/index.html":["/assets/stewaro-app-bootstrap.js"]
+    "web-concierge/index.html":["/assets/stewaro-app-bootstrap.js"],
+    "telefonate/ausgehend/index.html":[
+      "/assets/stewaro-phone-session-v1.js?v=1",
+      "/assets/stewaro-outbound-ledger-v1.js?v=11",
+      "/assets/stewaro-outbound-ledger-v1.css?v=3",
+      "/assets/stewaro-unified.css",
+      "/assets/logos/stewaro-icon.svg"
+    ]
   };
   for(const [source,scripts] of Object.entries(html)){
     const text=(await checkedBytes(source)).toString("utf8");
@@ -69,7 +83,7 @@ async function expectedManifest(){
     baseline_website_sha:baseline,
     public_site_untouched:true,
     domains:{account:"account.stewaro.com",app:"app.stewaro.com"},
-    release_gate:"HOLD_UNTIL_5_OF_5_LIVE_BYTES_AND_AUTHENTICATED_E2E_AND_ROLLBACK",
+    release_gate:"HOLD_UNTIL_ACCOUNT_APP_AND_MISSION_BYTES_PARITY_AND_AUTHENTICATED_E2E_AND_ROLLBACK",
     rollback_required:["record previous S3 object versions or verified complete bucket snapshots","record previous CloudFront provenance and distribution IDs","stage rollback with exact previous bytes","prove post-rollback service health without invalidating Klient sessions"],
     files
   };

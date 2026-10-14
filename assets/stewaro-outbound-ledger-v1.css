@@ -19,3 +19,14 @@ button:disabled{opacity:.5;cursor:default}article .details{margin-top:17px;paddi
 .mission-outcome-failed{background:#fdf1ee;color:#9b2834;border-color:#ecc8c6}
 .mission-outcome-unverified{background:#f4f1e8;color:#574e39;border-color:#ded6c2}
 .mission-outcome-complete{background:#eaf4eb;color:#275838;border-color:#bed8c4}
+
+/* Mission v1: separate, authenticated and read-only live telephone tracking. */
+.live-section{background:var(--paper);border:1px solid var(--border);border-radius:20px;padding:22px;margin-bottom:22px}
+.live-section h2{font-size:24px;margin:0 0 8px;letter-spacing:-.025em}
+#outbound-live-status{font-size:14px;color:var(--soft)}
+#outbound-live-calls{display:grid;gap:12px}
+.live-call{background:#f7f4ed;border:1px solid var(--border);border-radius:13px;padding:16px}
+.live-call h3{font-size:17px;margin:0 0 7px}
+.live-call p{overflow-wrap:anywhere;white-space:pre-wrap}
+#outbound-live-transcript{margin-top:15px;padding-top:15px;border-top:1px solid var(--border)}
+@media(max-width:650px){.live-section{padding:17px}}

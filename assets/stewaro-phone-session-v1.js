@@ -10,7 +10,7 @@
   const usable=(session)=>{
     if(typeof session?.session_token!=="string"||session.session_token.length<32||session.session_token.length>512)return false;
     for(const name of ["expires_at","idle_expires_at"]){
-      if(!session[name])continue;
+      if(!session[name])return false;
       const ms=Date.parse(session[name]);
       if(!Number.isFinite(ms)||ms<=Date.now())return false;
     }
@@ -27,6 +27,8 @@
   };
   window.STEWAROPhoneSession=Object.freeze({
     token:()=>session()?.session_token||"",
-    loginHref:()=>"/anmelden"
+    loginHref:()=>window.location?.hostname==="app.stewaro.com"
+      ?"https://account.stewaro.com/anmelden?produkt=senioren&next=app"
+      :"/anmelden"
   });
 })();
