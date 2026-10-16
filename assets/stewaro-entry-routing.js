@@ -131,7 +131,18 @@
       if(fragment)a.setAttribute("href",location.pathname+location.search+fragment);
     });
     document.querySelectorAll('a[data-entry="self"]').forEach(a=>a.href=accountEntry);
-    document.querySelectorAll('a[data-entry="loved-one"]').forEach(a=>a.href=parentEntry);
+    // Keep family CTAs in the visitor's language without trusting foreign attribution.
+    const locale=String(document.documentElement.lang||"").toLowerCase().split("-")[0];
+    const localizedParent=locale==="en"?"/en/angehoerige":locale==="tr"?"/tr/angehoerige":parentEntry;
+    document.querySelectorAll('a[data-entry="loved-one"]').forEach(a=>{
+      if(locale!=="en"&&locale!=="tr"){a.href=parentEntry;return;}
+      let attribution="";
+      try{
+        const original=new URL(a.getAttribute("href")||"",location.origin);
+        if(original.origin===location.origin&&original.searchParams.get("source")==="stewaro")attribution="?source=stewaro";
+      }catch(_){}
+      a.href=localizedParent+attribution;
+    });
     document.querySelectorAll('a.auth-link.login-link,a.auth-link.register-link').forEach(a=>a.href=accountEntry);
     if(!isAccountSurface){
       document.querySelectorAll('a[href^="/anmelden"],a[href^="/registrieren"]').forEach(a=>{if(!a.hasAttribute("data-direct-login")&&!a.hasAttribute("data-direct-registration"))a.href=accountEntry;});
