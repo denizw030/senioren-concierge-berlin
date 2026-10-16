@@ -138,7 +138,7 @@ test("handoff logic cannot run on public website or App host",()=>{
 
 test("App bootstrap recovers logged-in Account session; account-hosted old chat uses same transfer path",()=>{
   assert.match(bootstrap,/ACCOUNT_SESSION_TRANSFER=ACCOUNT_ORIGIN\+"\/konto\?stewaro_app=1"/);
-  assert.match(bootstrap,/if\(!readSession\(\)\)\{[\s\S]*?location\.replace\(ACCOUNT_SESSION_TRANSFER\)/);
+  assert.match(bootstrap,/if\(!currentSession\)\{[\s\S]*?location\.replace\(ACCOUNT_SESSION_TRANSFER\)/);
   assert.match(bootstrap,/location\.hostname==="account\.stewaro\.com"/);
   assert.match(bootstrap,/path==="\/web-concierge"/);
   assert.match(bootstrap,/action:"handoff_claim"/);

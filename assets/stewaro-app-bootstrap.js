@@ -9,7 +9,7 @@
   }
   if(location.hostname!==APP_HOST)return;
 
-  window.STEWARO_APP_AUTH_READY=Promise.resolve(true);
+  window.STEWARO_APP_AUTH_READY=Promise.resolve(false);
 
   const SESSION_KEY="scb_web_session";
   const SESSION_URL="https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-session-secure";
@@ -104,13 +104,43 @@
     return;
   }
 
-  if(!readSession()){
+  const currentSession=readSession();
+  if(!currentSession){
     window.STEWARO_APP_AUTH_READY=Promise.resolve(false);
     // Ask the signed-in Account host to issue a scoped one-time App handoff.
     // An anonymous Account visitor will be sent to the existing app-aware login.
     location.replace(ACCOUNT_SESSION_TRANSFER);
     return;
   }
+
+  // Browser storage alone is not authentication. Block the App runtime until
+  // the existing session authority confirms identity and both expirations.
+  window.STEWARO_APP_AUTH_READY=fetch(SESSION_URL,{
+    method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+currentSession.session_token},
+    body:JSON.stringify({action:"check"}),
+    cache:"no-store",
+    credentials:"omit",
+    signal:typeof AbortSignal!=="undefined"&&typeof AbortSignal.timeout==="function"
+      ?AbortSignal.timeout(8000):undefined
+  }).then(async(response)=>{
+    const body=await response.json().catch(()=>({}));
+    const validDate=value=>typeof value==="string"&&Number.isFinite(Date.parse(value))&&Date.parse(value)>Date.now();
+    if(!response.ok||body?.ok!==true||body?.status!=="session_valid"
+       ||!currentSession.person_id||!currentSession.customer_account_id
+       ||String(body.person_id||"")!==String(currentSession.person_id)
+       ||String(body.customer_account_id||"")!==String(currentSession.customer_account_id)
+       ||!validDate(body.expires_at)||!validDate(body.idle_expires_at)){
+      throw new Error("session_check_failed");
+    }
+    saveSession({...currentSession,expires_at:body.expires_at,idle_expires_at:body.idle_expires_at});
+    return true;
+  }).catch(()=>{
+    try{sessionStorage.removeItem(SESSION_KEY)}catch{}
+    try{localStorage.removeItem(SESSION_KEY)}catch{}
+    accountLogin();
+    return false;
+  });
 
   addEventListener("DOMContentLoaded",()=>{
     document.querySelectorAll("header.top a.brand,footer a.brand").forEach((link)=>{
