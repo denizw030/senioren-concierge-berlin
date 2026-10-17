@@ -10,7 +10,9 @@
   // Keep the public website on its working same-origin access route until
   // account.stewaro.com has a verified public DNS/CloudFront cutover.
   const accountEntry=isAccount?"/":(isWebsitePreview?STAGING_ACCOUNT_ORIGIN+"/":"/zugang");
-  const parentEntry="/angehoerige?source=stewaro";
+  const locale=/^\/(en|tr)(?=\/|$)/.exec(location.pathname)?.[1]||"";
+  const familyPath=(locale?"/"+locale:"")+"/angehoerige";
+  const parentEntry=familyPath+"?source=stewaro";
   const isAccountSurface=/(?:^|\/)(?:zugang|anmelden|registrieren)(?:\.html)?\/?$/.test(location.pathname);
 
   const installGermanHomeMenu=()=>{
@@ -126,7 +128,11 @@
       if(fragment)a.setAttribute("href",location.pathname+location.search+fragment);
     });
     document.querySelectorAll('a[data-entry="self"]').forEach(a=>a.href=accountEntry);
-    document.querySelectorAll('a[data-entry="loved-one"]').forEach(a=>a.href=parentEntry);
+    document.querySelectorAll('a[data-entry="loved-one"]').forEach(a=>{
+      const current=a.getAttribute("href")||"";
+      const attributed=/(?:\?|&)source=stewaro(?:&|$)/.test(current);
+      a.href=familyPath+(attributed?"?source=stewaro":"");
+    });
     document.querySelectorAll('a.auth-link.login-link,a.auth-link.register-link').forEach(a=>a.href=accountEntry);
     if(!isAccountSurface){
       document.querySelectorAll('a[href^="/anmelden"],a[href^="/registrieren"]').forEach(a=>{if(!a.hasAttribute("data-direct-login")&&!a.hasAttribute("data-direct-registration"))a.href=accountEntry;});
