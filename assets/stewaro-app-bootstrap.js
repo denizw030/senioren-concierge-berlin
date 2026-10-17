@@ -9,7 +9,7 @@
   }
   if(location.hostname!==APP_HOST)return;
 
-  window.STEWARO_APP_AUTH_READY=Promise.resolve(true);
+  window.STEWARO_APP_AUTH_READY=Promise.resolve(false);
 
   const SESSION_KEY="scb_web_session";
   const SESSION_URL="https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-session-secure";
@@ -60,6 +60,36 @@
     else localStorage.removeItem(SESSION_KEY);
   }
 
+
+  // A bounded identity request must settle even in older Safari versions.
+  // A late response may never restore a session after the deadline.
+  function authRequest(token,action){
+    const controller=typeof AbortController==="function"?new AbortController():null;
+    let timer,expired=false,request;
+    try{
+      request=Promise.resolve(fetch(SESSION_URL,{
+        method:"POST",
+        headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},
+        body:JSON.stringify({action}),
+        cache:"no-store",
+        credentials:"omit",
+        ...(controller?{signal:controller.signal}:{})
+      })).then(async(response)=>{
+        const body=await response.json().catch(()=>({}));
+        if(expired)throw new Error("auth_timeout");
+        return {response,body};
+      });
+    }catch(error){request=Promise.reject(error);}
+    const timeout=new Promise((_,reject)=>{
+      timer=setTimeout(()=>{
+        expired=true;
+        try{controller?.abort()}catch{}
+        reject(new Error("auth_timeout"));
+      },8000);
+    });
+    return Promise.race([request,timeout]).finally(()=>clearTimeout(timer));
+  }
+
   function accountLogin(){
     location.replace(ACCOUNT_LOGIN);
   }
@@ -81,14 +111,7 @@
     shield.textContent="html.stewaro-app-claiming body{visibility:hidden!important}";
     document.head.appendChild(shield);
 
-    window.STEWARO_APP_AUTH_READY=fetch(SESSION_URL,{
-      method:"POST",
-      headers:{"Content-Type":"application/json","Authorization":"Bearer "+handoff},
-      body:JSON.stringify({action:"handoff_claim"}),
-      cache:"no-store",
-      credentials:"omit"
-    }).then(async(response)=>{
-      const body=await response.json().catch(()=>({}));
+    window.STEWARO_APP_AUTH_READY=authRequest(handoff,"handoff_claim").then(({response,body})=>{
       if(!response.ok||body?.ok!==true||body?.status!=="handoff_claimed"||!body?.session_token){
         throw new Error(String(body?.status||"handoff_claim_failed"));
       }
@@ -104,13 +127,34 @@
     return;
   }
 
-  if(!readSession()){
+  const currentSession=readSession();
+  if(!currentSession){
     window.STEWARO_APP_AUTH_READY=Promise.resolve(false);
     // Ask the signed-in Account host to issue a scoped one-time App handoff.
     // An anonymous Account visitor will be sent to the existing app-aware login.
     location.replace(ACCOUNT_SESSION_TRANSFER);
     return;
   }
+
+  // Browser storage alone is not authentication. Block the App runtime until
+  // the existing session authority confirms identity and both expirations.
+  window.STEWARO_APP_AUTH_READY=authRequest(currentSession.session_token,"check").then(({response,body})=>{
+    const validDate=value=>typeof value==="string"&&Number.isFinite(Date.parse(value))&&Date.parse(value)>Date.now();
+    if(!response.ok||body?.ok!==true||body?.status!=="session_valid"
+       ||!currentSession.person_id||!currentSession.customer_account_id
+       ||String(body.person_id||"")!==String(currentSession.person_id)
+       ||String(body.customer_account_id||"")!==String(currentSession.customer_account_id)
+       ||!validDate(body.expires_at)||!validDate(body.idle_expires_at)){
+      throw new Error("session_check_failed");
+    }
+    saveSession({...currentSession,expires_at:body.expires_at,idle_expires_at:body.idle_expires_at});
+    return true;
+  }).catch(()=>{
+    try{sessionStorage.removeItem(SESSION_KEY)}catch{}
+    try{localStorage.removeItem(SESSION_KEY)}catch{}
+    accountLogin();
+    return false;
+  });
 
   addEventListener("DOMContentLoaded",()=>{
     document.querySelectorAll("header.top a.brand,footer a.brand").forEach((link)=>{
