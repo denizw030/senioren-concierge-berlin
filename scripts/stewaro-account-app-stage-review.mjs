@@ -23,7 +23,19 @@ const FILES=Object.freeze([
   ["app","assets/stewaro-outbound-ledger-v1.js","app/assets/stewaro-outbound-ledger-v1.js"],
   ["app","assets/stewaro-outbound-ledger-v1.css","app/assets/stewaro-outbound-ledger-v1.css"],
   ["app","assets/stewaro-unified.css","app/assets/stewaro-unified.css"],
-  ["app","assets/logos/stewaro-icon.svg","app/assets/logos/stewaro-icon.svg"]
+  ["app","assets/logos/stewaro-icon.svg","app/assets/logos/stewaro-icon.svg"],
+  // Launch-critical FIDEL 2D voice orb + GPT-Live modules and their static dependencies.
+  // Review-only: these bytes must be copied from the exact candidate commit.
+  ["app","assets/web-live-concierge.js","app/assets/web-live-concierge.js"],
+  ["app","assets/nahwerk-live-concierge.js","app/assets/nahwerk-live-concierge.js"],
+  ["app","assets/fidel-gold-orb.js","app/assets/fidel-gold-orb.js"],
+  ["app","assets/fidel-live-room.js","app/assets/fidel-live-room.js"],
+  ["app","assets/web-customer-concierge.js","app/assets/web-customer-concierge.js"],
+  ["app","assets/web-voice-memo.js","app/assets/web-voice-memo.js"],
+  ["app","assets/web-customer-concierge.css","app/assets/web-customer-concierge.css"],
+  ["app","assets/web-voice-memo.css","app/assets/web-voice-memo.css"],
+  ["app","assets/nahwerk-live-concierge.css","app/assets/nahwerk-live-concierge.css"],
+  ["app","assets/stewaro-app.css","app/assets/stewaro-app.css"]
 ]);
 const sha256=bytes=>createHash("sha256").update(bytes).digest("hex");
 const isSHA=value=>/^[0-9a-f]{40}$/.test(value||"");
@@ -59,7 +71,25 @@ async function expectedManifest(){
     "zugang.html":["/assets/stewaro-domain-contract.js"],
     "anmelden/index.html":["/assets/stewaro-domain-contract.js"],
     "konto/index.html":["/assets/stewaro-domain-contract.js"],
-    "web-concierge/index.html":["/assets/stewaro-app-bootstrap.js"],
+    "web-concierge/index.html":[
+      "/assets/stewaro-app-bootstrap.js",
+      "assets/web-live-concierge.js?v=29",
+      "assets/web-customer-concierge.js?v=59",
+      "assets/web-voice-memo.js?v=11",
+      "assets/stewaro-app.css?v=2",
+      "assets/web-voice-memo.css?v=2",
+      "assets/nahwerk-live-concierge.css?v=6"
+    ],
+    "assets/web-live-concierge.js":[
+      "./nahwerk-live-concierge.js?v=29",
+      "./fidel-gold-orb.js?v=1",
+      "fidelRoom:false",
+      "getAuthToken:async()=>"
+    ],
+    "assets/nahwerk-live-concierge.js":[
+      "./fidel-live-room.js?v=1",
+      "fidelOrb?.setAudio(inLevel,outLevel)"
+    ],
     "telefonate/ausgehend/index.html":[
       "/assets/stewaro-phone-session-v1.js?v=1",
       "/assets/stewaro-outbound-ledger-v1.js?v=11",
@@ -72,6 +102,10 @@ async function expectedManifest(){
     const text=(await checkedBytes(source)).toString("utf8");
     for(const script of scripts) if(!text.includes(script))throw Error("missing protected script in "+source+": "+script);
   }
+  const liveBoot=(await checkedBytes("assets/web-live-concierge.js")).toString("utf8");
+  if(!/fidelRoom:\\s*false\\s*,/.test(liveBoot) || /fidelRoom:\\s*true\\s*,/.test(liveBoot)){
+    throw Error("launch candidate must not enable optional 3D room");
+  }
   return {
     schema:1,
     artifact_kind:"STEWARO_ACCOUNT_APP_SOURCE_PINNED_REVIEW_ONLY",
@@ -79,6 +113,8 @@ async function expectedManifest(){
     aws_staging_deployed:false,
     authenticated_safari_e2e_proven:false,
     complete_website_artifact:false,
+    launch_voice_visual:"existing_audio_reactive_fidel_2d_orb",
+    optional_3d_live_room_enabled:false,
     candidate_website_sha:candidate,
     baseline_website_sha:baseline,
     public_site_untouched:true,
