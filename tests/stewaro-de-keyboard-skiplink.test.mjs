@@ -6,7 +6,7 @@ const html = readFileSync(new URL('../de/index.html', import.meta.url), 'utf8');
 
 test('German homepage has one first-tab skip navigation before header', () => {
   assert.equal((html.match(/class="stewaro-skip-link"/g) || []).length, 1);
-  assert.match(html, /<body>\s*<a class="stewaro-skip-link" href="#top">Direkt zum Inhalt<\/a>\s*<header/);
+  assert.match(html, /<body>\s*<a class="stewaro-skip-link" href="\/de\/#top">Direkt zum Inhalt<\/a>\s*<header/);
 });
 
 test('skip target is focusable main content, not an unrelated section', () => {
@@ -25,4 +25,11 @@ test('brand hero, primary navigation and no-JS access remain intact', () => {
   assert.match(html, /<nav class="header-nav" aria-label="Hauptnavigation">/);
   assert.match(html, /<a class="header-cta" href="\/zugang"/);
   assert.doesNotMatch(html, /<script[^>]*>[^<]*skip-link/);
+});
+
+test('skip link stays on German page despite root base and without JavaScript', () => {
+  const base = html.match(/<base href="([^"]+)"/)?.[1];
+  const href = html.match(/class="stewaro-skip-link" href="([^"]+)"/)?.[1];
+  assert.equal(base, '/');
+  assert.equal(new URL(href, new URL(base, 'https://stewaro.com/de/')).href, 'https://stewaro.com/de/#top');
 });
