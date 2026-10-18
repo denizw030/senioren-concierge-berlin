@@ -2,7 +2,7 @@
 # STEWARO App STAGING ONLY. No production, account, website or infrastructure writes.
 set -Eeuo pipefail
 export AWS_DEFAULT_REGION=eu-central-1 AWS_PAGER=""
-PIN="f8703a583bd4cc893ee17c4744e0248bebd1cfa4"
+PIN="d1fbb97f59a986ad34c7d7435ce7f063fbf52240"
 DOMAIN="d2h3bbcracss71.cloudfront.net"
 if [[ "$#" -ne 1 || "$1" != "--apply" ]]; then echo "STOP: expected --apply"; exit 2; fi
 for cmd in aws curl tar sha256sum node; do
