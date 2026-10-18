@@ -1,0 +1,31 @@
+:root{--cream:#f7f3eb;--sand:#eee7da;--sage:#e9eee7;--green:#173126;--ink:#10251c;--gold:#b99854}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--ink);font:16px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit}a:focus-visible,button:focus-visible{outline:3px solid #a47b34;outline-offset:4px}
+.skip{position:absolute;z-index:9;background:white;transform:translateY(-200%);padding:10px}.skip:focus{transform:none}
+header{height:80px;padding:0 5vw;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #d9d1c2;gap:20px;background:var(--cream);position:relative;z-index:3}
+.brand{display:flex;align-items:center;gap:13px;text-decoration:none;letter-spacing:.15em;font:600 21px Georgia,serif;color:#ac893e}.brand img{object-fit:contain}header nav{display:flex;align-items:center;gap:clamp(12px,2.5vw,33px)}header nav a{font-size:13px;text-decoration:none;white-space:nowrap;font-weight:600}.pill{background:var(--green);color:white;border-radius:50px;padding:13px 23px;text-decoration:none;font-size:14px}
+.film-intro{height:calc(100svh - 80px);min-height:550px;display:flex;align-items:center;padding:8vw;background:radial-gradient(ellipse at 74% 44%,#ecdfc6,transparent 53%),var(--cream)}
+.intro-inner{max-width:1080px}.eyebrow,.film-eyebrow,.film-number{font-size:12px;font-weight:700;letter-spacing:.23em;color:#967638}
+h1,h2{font-family:Georgia,'Times New Roman',serif;font-weight:400;letter-spacing:-.055em}h1{font-size:clamp(59px,8vw,136px);line-height:1.08;margin:29px 0}.film-intro p:not(.eyebrow){font-size:clamp(18px,2.2vw,25px);max-width:600px;color:#486153}
+em{font-style:normal;color:#aa8b4c}.discover{display:inline-flex;gap:70px;margin-top:28px;padding-bottom:14px;border-bottom:1px solid #a68d50;text-decoration:none;font-weight:700;font-size:14px}
+.film-scene{height:255svh;min-height:1400px;background:var(--cream);border-top:1px solid #e0d8c8}.tone-1{background:var(--sand)}.tone-2{background:var(--sage)}
+.film-sticky{position:sticky;top:0;height:100svh;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(320px,1fr);align-items:center;gap:clamp(30px,5vw,95px);padding:clamp(22px,4.7vw,85px)}
+.film-picture{min-width:0}.film-stage{aspect-ratio:16/9;background:#1b3529;position:relative;overflow:hidden;box-shadow:0 23px 65px #0e291f2a;border-radius:3px}
+.film-stage video{position:relative;z-index:2;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .25s}.film-stage video.loaded{opacity:1}
+.film-preload{position:absolute;inset:0;display:grid;place-items:center;font:30px Georgia,serif;letter-spacing:.25em;color:#e9d39d}
+.film-progress{height:2px;background:#9fa99d;margin-top:18px}.film-progress i{height:100%;width:0;background:var(--gold);display:block}
+.film-controls{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-top:18px}.film-controls span{font-size:12px;color:#728477}.film-controls button{font:600 12px -apple-system,BlinkMacSystemFont,sans-serif;cursor:pointer;border:1px solid #afa488;border-radius:100px;background:transparent;padding:12px 17px;color:var(--ink)}
+.film-controls button:hover{background:var(--green);color:white}.film-copy{max-width:500px}.film-number{display:block;margin-bottom:37px}.film-eyebrow{display:block}
+.film-copy h2{font-size:clamp(40px,4.15vw,73px);line-height:1.13;margin:23px 0}.film-copy p{font-size:clamp(16px,1.45vw,20px);line-height:1.75;color:#456052;margin:0 0 35px}.film-copy a{text-decoration:none;font-size:14px;font-weight:700;border-bottom:1px solid #9a7d42;padding-bottom:11px}.film-copy a span{margin-left:18px}
+.film-final{padding:115px 24px 100px;text-align:center;background:var(--cream)}.film-final h2{font-size:clamp(51px,7vw,115px);margin:20px 0}.film-final>p:not(.eyebrow){font-size:20px;color:#496253}.actions{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;align-items:center;margin:42px auto 65px}.actions>a:not(.pill){font-size:14px;text-decoration:none;border-bottom:1px solid #a08f6b;padding-bottom:5px}.pill-gold{background:linear-gradient(110deg,#b38a35,#ead4a0 51%,#ad8131);color:var(--green);font-weight:700}
+.film-final small{display:block;max-width:720px;margin:auto;font-size:12px;line-height:1.6;color:#718075}footer{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:30px 6vw;border-top:1px solid #ddd4c2;font-size:12px}footer a{text-decoration:none}footer nav{display:flex;gap:20px}
+@media(max-width:950px){.film-sticky{gap:25px;grid-template-columns:1.25fr 1fr;padding:24px}.film-copy h2{font-size:clamp(33px,4.6vw,52px)}}
+@media(max-width:760px){header{height:67px;padding:0 20px}.brand{font-size:17px;gap:6px}.brand img{width:27px}header nav a:not(.pill){display:none}header nav .pill{padding:9px 16px;font-size:12px}
+.film-intro{height:calc(100svh - 67px);padding:28px}.film-intro h1{font-size:clamp(45px,12vw,70px)}.film-scene{height:223svh;min-height:1090px}
+.film-sticky{display:flex;flex-direction:column;justify-content:center;align-items:center;height:100svh;padding:12px 16px;gap:18px}
+.film-picture{width:100%;display:flex;align-items:center;flex-direction:column}.film-stage{aspect-ratio:9/16;height:min(58svh,560px);width:min(75vw,315px)}
+.film-stage video{object-fit:contain}.film-progress{width:min(75vw,315px);margin-top:9px}
+.film-controls{width:min(75vw,315px);margin-top:10px}.film-controls span{font-size:10px}.film-controls button{padding:9px 10px;font-size:11px}
+.film-copy{text-align:center}.film-number{margin-bottom:4px}.film-copy h2{font-size:clamp(26px,6.4vw,39px);line-height:1.14;margin:8px 0}.film-copy p{font-size:12px;line-height:1.45;margin:4px 0 10px}.film-copy a{font-size:12px;padding-bottom:6px}.film-final{padding:75px 20px}footer{flex-direction:column}footer nav{flex-wrap:wrap;justify-content:center}}
+@media(max-width:370px){.film-stage{height:min(51svh,470px);width:min(70vw,265px)}.film-progress,.film-controls{width:min(70vw,265px)}.film-controls span{display:none}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.film-scene{height:100svh;min-height:780px}.film-sticky{position:relative;height:100%;min-height:780px}.film-stage video{transition:none}}
