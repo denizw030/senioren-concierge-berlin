@@ -87,3 +87,19 @@ test("CloudFront STAGING cannot start Core requests or paid GPT-Live", () => {
     "render orb, then stop before mounting the paid Live controller");
   assert.match(boot.slice(stageLive,controller),/return;/);
 });
+
+test("STAGING preview blocks eager Account Auth and Voice Memo before network setup", () => {
+  const stage='d2h3bbcracss71.cloudfront.net';
+  const auth=read("assets/auth-nav.js");
+  const voice=read("assets/web-voice-memo.js");
+  const authGuard=auth.indexOf('if(location.hostname==="'+stage+'")return;');
+  const authInit=auth.indexOf('document.addEventListener("DOMContentLoaded", async');
+  const authNetwork=auth.indexOf('const CHECK_URL = ');
+  assert.ok(authGuard>0&&authGuard<authNetwork&&authGuard<authInit,
+    "preview must skip all account navigation/session restoration");
+  const voiceGuard=voice.indexOf('if(location.hostname==="'+stage+'")return;');
+  const voiceNetwork=voice.indexOf('const ENDPOINT = ');
+  const voiceInit=voice.indexOf('async function init()');
+  assert.ok(voiceGuard>0&&voiceGuard<voiceNetwork&&voiceGuard<voiceInit,
+    "preview must skip audio, microphone and diagnostics");
+});
