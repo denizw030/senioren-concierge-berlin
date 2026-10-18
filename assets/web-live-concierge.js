@@ -58,8 +58,14 @@ async function boot(){
     bindTrigger:false,
     // Launch decision 2026-10-18: show the existing audio-reactive FIDEL orb; 3D comes later.
     fidelRoom:false,
-    getAuthToken:()=>{
-      void window.SCBAuth?.validateSession?.().catch(()=>false);
+    // Live quote/session requests must wait for the real Account/App session check.
+    // The backend still validates each Bearer token independently.
+    getAuthToken:async()=>{
+      const validate=window.SCBAuth?.validateSession;
+      if(typeof validate!=="function")return "";
+      if(await validate()!==true)return "";
+      if(location.hostname==="app.stewaro.com"&&
+         await window.STEWARO_APP_AUTH_READY!==true)return "";
       return bridge()?.sessionToken?.()||"";
     },
     getThreadId:()=>bridge()?.threadId?.()||null,
