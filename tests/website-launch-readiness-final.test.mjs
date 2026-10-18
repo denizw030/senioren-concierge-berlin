@@ -15,10 +15,11 @@ test('privacy notice publishes the STEWARO controller identity from the current 
   assert.doesNotMatch(privacy, /aria-label="Kontaktdaten des Verantwortlichen"/);
 });
 
-test('pricing page marks Tarife, not Leistungen, as the current navigation item', () => {
+test('pricing page marks Preise as the current canonical navigation item', () => {
   const pricing = read('pakete.html');
-  assert.match(pricing, /<a href="(?:\/)?leistungen(?:\.html)?">Leistungen<\/a><a class="active" href="(?:\/)?pakete(?:\.html)?" aria-current="page">Tarife<\/a>/);
+  assert.match(pricing, /<a class="active" href="\/pakete" aria-current="page">Preise<\/a>/);
   assert.doesNotMatch(pricing, /<a class="active" href="(?:\/)?leistungen(?:\.html)?">Leistungen<\/a>/);
+  assert.doesNotMatch(pricing, />Tarife<\/a>/);
 });
 
 test('launch-readiness cleanup does not change frozen public prices or FREE quotas', () => {
@@ -38,8 +39,8 @@ test('homepage Safety copy is bound to configured escalation behavior', () => {
 
 test('pricing page presents FIDEL instead of legacy persona selection', () => {
   const pricing = read('pakete.html');
-  assert.match(pricing, /FIDEL als persönlichen KI-Concierge nutzen/);
-  assert.doesNotMatch(pricing, /Persönlichen Concierge wählen/);
+  assert.match(pricing, /Alle Pakete nutzen denselben persönlichen Concierge FIDEL/);
+  assert.doesNotMatch(pricing, /Persönlichen Concierge wählen|Telefonannahme Standalone|spezialisierter Telefonagent/);
   assert.doesNotMatch(pricing, /Kunden(?:nachrichten|bereich|konto)/);
 });
 

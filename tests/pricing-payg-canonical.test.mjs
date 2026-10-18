@@ -40,3 +40,27 @@ test("PAYG offers the first real 5 euro wallet top-up", () => {
     assert.match(html, /id="paygActivate">PAYG aktivieren<\/button>/);
   }
 });
+
+
+test("pricing public surface uses the professional STEWARO v2 presentation", () => {
+  const pricing = read("pakete.html");
+  for (const route of ["/de/","/prime-concierge","/angehoerige","/digitaler-schutz","/telefonannahme","/pakete","/kontakt"]) {
+    assert.ok(pricing.includes(`href="${route}"`), `${route} missing from canonical pricing navigation`);
+  }
+  assert.match(pricing, /pricing-page pricing-v2-page/);
+  assert.match(pricing, /pricing-public-v2\.css/);
+  assert.match(pricing, /Einfach starten\. Nur so viel, wie Sie brauchen\./);
+  assert.match(pricing, /Telefonannahme ist ein eigener Bereich\./);
+  assert.doesNotMatch(pricing, /STEWARO weltweit|Telefonannahme Standalone|spezialisierter Telefonagent|\/telefonannahme#einrichtung/);
+  assert.doesNotMatch(pricing, /\b(?:du|dich|dein|deine|deinem|deinen|deiner|deines)\b/i);
+});
+
+test("pricing locale pages share the same visual shell and clean routes mirror their canonicals", () => {
+  for (const lang of ["en","tr"]) {
+    const canonical = read(`${lang}/pakete.html`);
+    const clean = normalizeClean(read(`${lang}/pakete/index.html`));
+    assert.equal(clean, canonical, `${lang} clean pricing route must mirror canonical`);
+    assert.match(canonical, /pricing-page pricing-v2-page/);
+    assert.match(canonical, /pricing-public-v2\.css/);
+  }
+});
