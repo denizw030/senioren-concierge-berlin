@@ -95,14 +95,15 @@
   }
 
   const params=new URLSearchParams(location.hash.replace(/^#/,""));
-  const handoff=String(params.get("handoff")||"");
-  if(handoff){
+  const handoffValues=params.getAll("handoff");
+  const handoff=String(handoffValues[0]||"");
+  if(params.has("handoff")){
     // Remove a prior identity before other auth modules can restore or use it.
     // The only next active session is the result of this one-time claim.
     try{sessionStorage.removeItem(SESSION_KEY)}catch{}
     try{localStorage.removeItem(SESSION_KEY)}catch{}
     history.replaceState(null,"",location.pathname+location.search);
-    const valid=/^hnd_[A-Za-z0-9_-]{40,120}$/.test(handoff);
+    const valid=handoffValues.length===1&&[...params.keys()].every(key=>key==="handoff")&&/^hnd_[A-Za-z0-9_-]{40,120}$/.test(handoff);
     if(!valid){window.STEWARO_APP_AUTH_READY=Promise.resolve(false);accountLogin();return;}
 
     document.documentElement.classList.add("stewaro-app-claiming");
@@ -155,6 +156,26 @@
     accountLogin();
     return false;
   });
+
+  // A restored Safari tab must not expose an expired locally cached identity.
+  // The existing server remains authoritative for session validity.
+  let resumeRedirecting=false;
+  function checkResumedExpiry(){
+    if(document.visibilityState==="hidden"||resumeRedirecting)return;
+    window.STEWARO_APP_AUTH_READY.then((ready)=>{
+      if(ready!==true||resumeRedirecting)return;
+      const session=readSession();
+      const unexpired=value=>typeof value==="string"&&Number.isFinite(Date.parse(value))&&Date.parse(value)>Date.now();
+      if(session?.session_token&&unexpired(session.expires_at)&&unexpired(session.idle_expires_at))return;
+      resumeRedirecting=true;
+      try{sessionStorage.removeItem(SESSION_KEY)}catch{}
+      try{localStorage.removeItem(SESSION_KEY)}catch{}
+      accountLogin();
+    }).catch(()=>{});
+  }
+  addEventListener("pageshow",checkResumedExpiry);
+  addEventListener("focus",checkResumedExpiry);
+  document.addEventListener?.("visibilitychange",checkResumedExpiry);
 
   addEventListener("DOMContentLoaded",()=>{
     document.querySelectorAll("header.top a.brand,footer a.brand").forEach((link)=>{
