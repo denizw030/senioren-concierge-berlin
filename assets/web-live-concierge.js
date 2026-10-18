@@ -22,6 +22,12 @@ async function boot(){
 
   const headerOrbCanvas=document.querySelector(".web-concierge-avatar canvas[data-fidel-orb]");
   const headerOrb=mountFidelGoldOrb(headerOrbCanvas,{state:"idle",interactive:true});
+  // The source/UI preview is never an authenticated or billable GPT-Live session.
+  // Keep the existing golden 2D orb visible, but do not even mount the Live client.
+  if(location.hostname==="d2h3bbcracss71.cloudfront.net"){
+    window.addEventListener("pagehide",()=>headerOrb?.destroy(),{once:true});
+    return;
+  }
   const headerState=(value)=>{
     switch(String(value||"")){
       case "quoting":
