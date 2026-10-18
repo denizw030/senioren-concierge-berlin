@@ -11,7 +11,9 @@ test("German homepage runtime restores direct login and an accessible mobile men
   assert.match(routing,/const installGermanHomeMenu=/);
   assert.match(routing,/lang==="de"/);
   assert.match(routing,/header-login-runtime/);
-  assert.match(routing,/href="\/anmelden" data-direct-login="true"/);
+  assert.match(routing,/login\.href=isWebsitePreview\?STAGING_ACCOUNT_ORIGIN\+"\/anmelden":PROD_ACCOUNT_ORIGIN\+"\/anmelden"/);
+  assert.match(routing,/href="\$\{isWebsitePreview\?STAGING_ACCOUNT_ORIGIN:PROD_ACCOUNT_ORIGIN\}\/anmelden" data-direct-login="true"/);
+  assert.match(routing,/PROD_ACCOUNT_ORIGIN="https:\/\/account\.stewaro\.com"/);
   assert.match(routing,/aria-controls","stewaro-mobile-menu-runtime"/);
   assert.match(routing,/Menü öffnen/);
   assert.match(routing,/Für bestehende Klienten/);
