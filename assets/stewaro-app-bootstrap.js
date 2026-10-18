@@ -95,14 +95,15 @@
   }
 
   const params=new URLSearchParams(location.hash.replace(/^#/,""));
-  const handoff=String(params.get("handoff")||"");
-  if(handoff){
+  const handoffValues=params.getAll("handoff");
+  const handoff=String(handoffValues[0]||"");
+  if(params.has("handoff")){
     // Remove a prior identity before other auth modules can restore or use it.
     // The only next active session is the result of this one-time claim.
     try{sessionStorage.removeItem(SESSION_KEY)}catch{}
     try{localStorage.removeItem(SESSION_KEY)}catch{}
     history.replaceState(null,"",location.pathname+location.search);
-    const valid=/^hnd_[A-Za-z0-9_-]{40,120}$/.test(handoff);
+    const valid=handoffValues.length===1&&[...params.keys()].every(key=>key==="handoff")&&/^hnd_[A-Za-z0-9_-]{40,120}$/.test(handoff);
     if(!valid){window.STEWARO_APP_AUTH_READY=Promise.resolve(false);accountLogin();return;}
 
     document.documentElement.classList.add("stewaro-app-claiming");
