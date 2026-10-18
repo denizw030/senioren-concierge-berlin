@@ -27,7 +27,10 @@ test("homepage presents the canonical STEWARO FIDEL launch identity",()=>{
   const copy=visible(home);
   assert.match(home,/https:\/\/stewaro\.com\/de\//);
   assert.match(home,/\/assets\/logos\/stewaro-icon\.svg/);
-  assert.match(home,/\/assets\/logos\/stewaro-wordmark\.svg/);
+  const gold=r("assets/stewaro-home-de-stewaro-gold-brand-v2.css");
+  assert.match(home,/href="\/assets\/stewaro-home-de-stewaro-gold-brand-v2\.css\?v=\d+"/);
+  assert.match(home,/class="brand-word"/);
+  assert.match(gold,/\/assets\/logos\/stewaro-wordmark\.svg/);
   assert.match(home,/\/assets\/media\/stewaro-hero-pferd\.mp4/);
   assert.match(copy,/Jemand, der sich kümmert\./);
   assert.match(copy,/FIDEL/);

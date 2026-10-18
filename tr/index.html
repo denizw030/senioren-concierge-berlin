@@ -552,6 +552,7 @@ img { display: block; max-width: 100%; }
 
 .site-header .brand-lockup {
   --stewaro-logo-icon:36px;
+  --stewaro-logo-gap:13px;
   --stewaro-logo-word-w:148px;
   --stewaro-logo-word-h:22px;
   position:relative;
@@ -560,11 +561,15 @@ img { display: block; max-width: 100%; }
 
 .site-header .brand-shine {
   position:absolute;
-  inset:0;
+  top:50%;
+  left:0;
+  width:calc(var(--stewaro-logo-icon) + var(--stewaro-logo-gap) + var(--stewaro-logo-word-w));
+  height:var(--stewaro-logo-icon);
   z-index:3;
   display:block;
   overflow:hidden;
   pointer-events:none;
+  transform:translateY(-50%);
   -webkit-mask-image:url("/assets/logos/stewaro-icon.svg"),url("/assets/logos/stewaro-wordmark.svg");
   -webkit-mask-repeat:no-repeat,no-repeat;
   -webkit-mask-position:left center,right center;
@@ -578,10 +583,10 @@ img { display: block; max-width: 100%; }
 .site-header .brand-shine::before {
   content:"";
   position:absolute;
-  top:-28%;
-  bottom:-28%;
-  left:-38%;
-  width:34%;
+  top:-30%;
+  bottom:-30%;
+  left:-30%;
+  width:30%;
   opacity:0;
   background:linear-gradient(
     104deg,
@@ -600,46 +605,29 @@ img { display: block; max-width: 100%; }
 
 @media (prefers-reduced-motion: no-preference) {
   .site-header .brand-shine::before {
-    animation:stewaroHeaderGoldShine 9.4s cubic-bezier(.45,.03,.30,.98) infinite;
+    animation:stewaroHeaderGoldShine 15.6s cubic-bezier(.38,.05,.22,1) infinite;
   }
 }
 
 @keyframes stewaroHeaderGoldShine {
-  0%,12% {
+  0%,16% {
     transform:translate3d(0,0,0) skewX(-12deg);
     opacity:0;
   }
-  17% { opacity:.70; }
-  42% {
-    transform:translate3d(525%,0,0) skewX(-12deg);
+  21% {
+    transform:translate3d(0,0,0) skewX(-12deg);
+    opacity:.68;
+  }
+  62% {
+    transform:translate3d(440%,0,0) skewX(-12deg);
     opacity:.88;
   }
-  48% {
-    transform:translate3d(525%,0,0) skewX(-12deg);
-    opacity:0;
-  }
-  52% {
-    transform:translate3d(525%,0,0) skewX(-12deg);
-    opacity:0;
-  }
-  57% { opacity:.62; }
-  82% {
-    transform:translate3d(0,0,0) skewX(-12deg);
-    opacity:.80;
-  }
-  88%,100% {
-    transform:translate3d(0,0,0) skewX(-12deg);
+  68%,100% {
+    transform:translate3d(440%,0,0) skewX(-12deg);
     opacity:0;
   }
 }
 
-@media (max-width:600px) {
-  html[lang="de"] .site-header .brand-lockup {
-    --stewaro-logo-icon:32px;
-    --stewaro-logo-word-w:112px;
-    --stewaro-logo-word-h:18px;
-  }
-}
 
 @media (prefers-reduced-motion: reduce) {
   .site-header .brand-shine::before {
