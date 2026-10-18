@@ -64,3 +64,26 @@ test("GPT-Live must await successful session validation before using a token", a
   assert.equal(await pending,"existing-token");
   await assert.rejects(run({validation:()=>Promise.reject(new Error("not authorized"))}),/not authorized/);
 });
+
+test("CloudFront STAGING cannot start Core requests or paid GPT-Live", () => {
+  const customer=read("assets/web-customer-concierge.js");
+  const stage="d2h3bbcracss71.cloudfront.net";
+  const bootPoint=customer.indexOf("  async function boot() {");
+  const stagePoint=customer.indexOf('if(location.hostname==="'+stage+'")',bootPoint);
+  const initialization=customer.indexOf("    initThemeToggle();",bootPoint);
+  const history=customer.indexOf("const initialHistoryPromise=",bootPoint);
+  assert.ok(bootPoint>=0&&stagePoint>bootPoint&&stagePoint<initialization&&initialization<history,
+    "source preview must return before account/chat/history boot");
+  assert.match(customer.slice(stagePoint,initialization),/gatewayReady=false/);
+  assert.match(customer.slice(stagePoint,initialization),/input\.disabled=true/);
+  assert.match(customer.slice(stagePoint,initialization),/send\.disabled=true/);
+  assert.match(customer.slice(stagePoint,initialization),/body\?\.preview_read_only===true/);
+  assert.match(customer.slice(stagePoint,initialization),/body\?\.client_actions_allowed===false/);
+  assert.match(customer.slice(stagePoint,initialization),/body\?\.production===false/);
+  const orbPoint=boot.indexOf("const headerOrb=mountFidelGoldOrb(");
+  const stageLive=boot.indexOf('if(location.hostname==="'+stage+'")',orbPoint);
+  const controller=boot.indexOf("const controller=mountNahwerkLiveConcierge(",orbPoint);
+  assert.ok(orbPoint>=0&&stageLive>orbPoint&&stageLive<controller,
+    "render orb, then stop before mounting the paid Live controller");
+  assert.match(boot.slice(stageLive,controller),/return;/);
+});
