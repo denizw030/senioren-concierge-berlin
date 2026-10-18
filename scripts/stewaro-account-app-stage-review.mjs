@@ -2,7 +2,7 @@
 // Immutable source-pinned Account/App REVIEW artifact. NOT a deployable site or AWS release.
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
-import { lstat, readFile, mkdir, writeFile, copyFile } from "node:fs/promises";
+import { lstat, readFile, readdir, mkdir, writeFile, copyFile } from "node:fs/promises";
 import { resolve, dirname, join, relative } from "node:path";
 
 const SOURCE=resolve(".");
@@ -144,6 +144,28 @@ async function verify(out){
   const expected=await expectedManifest();
   const manifest=JSON.parse(await readFile(join(out,"manifest.json"),"utf8"));
   if(!sameJson(manifest,expected))throw Error("manifest differs from pinned source");
+  const allowedFiles=new Set(["manifest.json",...expected.files.map(item=>item.target)]);
+  const allowedDirs=new Set();
+  for(const key of allowedFiles){
+    const parts=key.split("/");
+    for(let depth=1;depth<parts.length;depth++)allowedDirs.add(parts.slice(0,depth).join("/"));
+  }
+  // No hidden payload, unexpected files, directories, or symlinks may pass source review.
+  async function scan(dir,prefix=""){
+    for(const name of await readdir(dir)){
+      const key=prefix?prefix+"/"+name:name;
+      const item=join(dir,name);
+      const stat=await lstat(item);
+      if(stat.isSymbolicLink())throw Error("symlink in staged review: "+key);
+      if(stat.isDirectory()){
+        if(!allowedDirs.has(key))throw Error("unexpected staged directory: "+key);
+        await scan(item,key);
+      }else if(!stat.isFile()||!allowedFiles.has(key)){
+        throw Error("unexpected staged file: "+key);
+      }
+    }
+  }
+  await scan(out);
   for(const item of expected.files){
     const dest=resolve(out,item.target);
     if(!relative(out,dest)||relative(out,dest).startsWith(".."))throw Error("unsafe destination");
