@@ -107,6 +107,6 @@ test("STAGING preview blocks eager Account Auth and Voice Memo before network se
 test("CloudFront STAGING prevents direct real-client conference joins",()=>{
   const join=read("assets/stewaro-customer-call-join.js");
   const stageGuard=join.indexOf('if(location.hostname==="d2h3bbcracss71.cloudfront.net")return;');
-  const api=join.indexOf('const LIVE_API=');
+  const api=join.search(/const\s+LIVE_API\s*=/);
   assert.ok(stageGuard>=0&&stageGuard<api,"call-join module must stop before PROD routing");
 });
