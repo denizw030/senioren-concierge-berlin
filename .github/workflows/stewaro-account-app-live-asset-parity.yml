@@ -1,0 +1,27 @@
+name: STEWARO Account App Exact Live Asset Parity
+on:
+  pull_request:
+    paths:
+      - "scripts/stewaro-account-app-production-asset-parity.mjs"
+      - ".github/workflows/stewaro-account-app-live-asset-parity.yml"
+      - "assets/stewaro-domain-contract.js"
+      - "assets/stewaro-account-app-navigation.js"
+      - "assets/stewaro-app-bootstrap.js"
+      - "assets/stewaro-app-shell.js"
+      - "assets/auth-nav.js"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-to-live-readonly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Compare five safe public JS assets to exact checked-out source bytes
+        run: node scripts/stewaro-account-app-production-asset-parity.mjs

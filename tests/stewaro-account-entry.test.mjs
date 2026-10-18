@@ -34,8 +34,8 @@ test("audience choices stay visually symmetric and text-only",()=>{
 
 test("loved-one entry stays on the verified STEWARO Family surface",()=>{
   assert.match(entry,/PARENT="\/angehoerige\?source=stewaro-account"/);
-  assert.doesNotMatch(routing,/ACCOUNT_ORIGIN="https:\/\/account\.stewaro\.com"/);
-  assert.match(routing,/accountEntry=isAccount\?"\/"\:\(isWebsitePreview\?STAGING_ACCOUNT_ORIGIN\+"\/"\:"\/zugang"\)/);
+  assert.match(routing,/PROD_ACCOUNT_ORIGIN="https:\/\/account\.stewaro\.com"/);
+  assert.match(routing,/accountEntry=isAccount\?"\/"\:\(isWebsitePreview\?STAGING_ACCOUNT_ORIGIN\+"\/"\:PROD_ACCOUNT_ORIGIN\+"\/"\)/);
   assert.match(routing,/parentEntry="\/angehoerige\?source=stewaro"/);
   assert.match(homepage,/href="#family"/);
   assert.match(homepage,/href="\/zugang" data-entry="self"/);
@@ -52,7 +52,7 @@ test("legacy public auth navigation converges on one account entry",()=>{
   assert.match(routing,/auth-link\.login-link,a\.auth-link\.register-link/);
   assert.match(routing,/a\.href=accountEntry/);
   assert.match(routing,/d357yw2h09cpne\.cloudfront\.net/);
-  assert.match(routing,/https:\/\/d23le2tjpjl7la\.cloudfront\.net/);
+  assert.match(routing,/https:\/\/d23le2tjpi7la\.cloudfront\.net/);
 });
 
 test("Family CTA activates the existing other-person registration mode without exposing a duplicate chooser",()=>{

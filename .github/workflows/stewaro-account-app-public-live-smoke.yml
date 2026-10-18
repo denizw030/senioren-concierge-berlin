@@ -1,0 +1,25 @@
+name: STEWARO Account App Public GET Smoke
+on:
+  pull_request:
+    paths:
+      - "scripts/stewaro-account-app-public-readonly-smoke.mjs"
+      - ".github/workflows/stewaro-account-app-public-live-smoke.yml"
+      - "assets/stewaro-domain-contract.js"
+      - "assets/stewaro-app-bootstrap.js"
+      - "assets/stewaro-account-app-navigation.js"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  anonymous-production-route-readonly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Test public DNS TLS routes and FIDEL static asset (anonymous GET only)
+        run: node scripts/stewaro-account-app-public-readonly-smoke.mjs

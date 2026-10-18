@@ -333,6 +333,88 @@
     });
   }
 
+  // STEWARO_APP_TODAY_SHORTCUTS_V1
+  // Presentation-only, account-gated shortcuts. Never sends a request, starts a call,
+  // writes a task, or infers a status. Existing FIDEL chat retains all authority.
+  const TODAY_INTENTS = Object.freeze({
+    appointment: "FIDEL, bitte hilf mir dabei, einen Termin zu organisieren. Frag mich zuerst nach den nötigen Angaben.",
+    reminder: "FIDEL, bitte hilf mir, eine Erinnerung einzurichten. Frag mich nach dem genauen Zeitpunkt und woran du mich erinnern sollst.",
+    document: "FIDEL, ich möchte einen Brief oder ein Dokument verstehen. Erkläre mir, wie ich es dir sicher zeigen kann.",
+    tasks: "FIDEL, zeig mir bitte den belegten aktuellen Stand meiner Aufträge und offenen Erledigungen. Wenn Informationen fehlen, sag mir das ausdrücklich."
+  });
+
+  function todayChatNotice(message) {
+    const mount = document.getElementById("stewaroAppFidelMount");
+    if (!mount) return;
+    let notice = document.getElementById("stewaroAppTodayChatNotice");
+    if (!notice) {
+      notice = document.createElement("p");
+      notice.id = "stewaroAppTodayChatNotice";
+      notice.className = "stewaro-app-today-chat-notice";
+      notice.setAttribute("role", "status");
+      notice.setAttribute("aria-live", "polite");
+      mount.prepend(notice);
+    }
+    notice.textContent = message;
+    notice.hidden = !message;
+  }
+
+  function openTodayAction(intent) {
+    if (!Object.hasOwn(TODAY_INTENTS, intent)) return;
+    selectTab("fidel");
+    const input = document.getElementById("webConciergeInput");
+    if (!(input instanceof HTMLTextAreaElement) || input.disabled) {
+      todayChatNotice("FIDEL verbindet sich noch. Bitte warte kurz und wähle die Aktion erneut.");
+      return;
+    }
+    if (input.value.trim()) {
+      todayChatNotice("Dein bisheriger Text bleibt erhalten. Du kannst ihn zuerst senden oder bearbeiten.");
+      input.focus();
+      return;
+    }
+    todayChatNotice("");
+    input.value = TODAY_INTENTS[intent];
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.focus();
+  }
+
+  function mountTodayShortcuts() {
+    const overview = document.querySelector('[data-stewaro-app-panel="overview"]');
+    const hero = overview?.querySelector(".stewaro-app-hero-card");
+    if (!hero || document.getElementById("stewaroAppToday")) return;
+    const section = document.createElement("section");
+    section.id = "stewaroAppToday";
+    section.className = "stewaro-app-today";
+    section.setAttribute("aria-labelledby", "stewaroAppTodayTitle");
+    // Static, trusted UI copy only. No profile, task, or provider data is interpolated.
+    section.innerHTML = `
+      <div class="stewaro-app-today-heading">
+        <div>
+          <p class="stewaro-app-kicker">DEIN ALLTAG · MIT FIDEL</p>
+          <h2 id="stewaroAppTodayTitle">Was steht heute an?</h2>
+          <p>Einfach sagen, was du brauchst. FIDEL hilft dir beim nächsten Schritt.</p>
+        </div>
+        <button class="stewaro-app-today-history" type="button" data-stewaro-today-open="fidel">
+          Chatverlauf öffnen <span aria-hidden="true">→</span>
+        </button>
+      </div>
+      <div class="stewaro-app-today-actions" aria-label="Fidel um Unterstützung bitten">
+        <button type="button" class="stewaro-app-today-action" data-stewaro-today-action="appointment"><span class="stewaro-app-today-action-icon" aria-hidden="true">01</span><span><strong>Termin organisieren</strong><small>Arzt, Behörde oder Alltag</small></span><span aria-hidden="true" class="stewaro-app-today-arrow">↗</span></button>
+        <button type="button" class="stewaro-app-today-action" data-stewaro-today-action="reminder"><span class="stewaro-app-today-action-icon" aria-hidden="true">02</span><span><strong>Erinnerung erstellen</strong><small>Wichtiges im Blick behalten</small></span><span aria-hidden="true" class="stewaro-app-today-arrow">↗</span></button>
+        <button type="button" class="stewaro-app-today-action" data-stewaro-today-action="document"><span class="stewaro-app-today-action-icon" aria-hidden="true">03</span><span><strong>Brief verstehen</strong><small>Gemeinsam Klarheit schaffen</small></span><span aria-hidden="true" class="stewaro-app-today-arrow">↗</span></button>
+        <button type="button" class="stewaro-app-today-action" data-stewaro-today-action="tasks"><span class="stewaro-app-today-action-icon" aria-hidden="true">04</span><span><strong>Aufträge prüfen</strong><small>Nach dem aktuellen Stand fragen</small></span><span aria-hidden="true" class="stewaro-app-today-arrow">↗</span></button>
+      </div>
+      <p class="stewaro-app-today-footnote">Die Auswahl öffnet nur einen bearbeitbaren Entwurf im FIDEL-Chat. Es wird noch nichts gesendet, bestellt oder angerufen. Auftragsstände werden nicht geschätzt.</p>
+    `;
+    hero.insertAdjacentElement("afterend", section);
+    section.querySelectorAll("[data-stewaro-today-action]").forEach((button) => {
+      button.addEventListener("click", () => openTodayAction(button.getAttribute("data-stewaro-today-action")));
+    });
+    section.querySelectorAll("[data-stewaro-today-open]").forEach((button) => {
+      button.addEventListener("click", () => { todayChatNotice(""); selectTab("fidel"); });
+    });
+  }
+
   function mountExistingFidel() {
     const workspace = document.querySelector(".web-concierge-shell > .web-concierge-workspace");
     const mount = document.getElementById("stewaroAppFidelMount");
@@ -359,6 +441,7 @@
     if (!shell) return;
     shell.hidden = false;
     mountExistingFidel();
+    mountTodayShortcuts();
     bindNavigation();
     selectTab("overview");
     syncConnectionFromChat();

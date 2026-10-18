@@ -61,30 +61,48 @@
         return frame.contentDocument;
       }
 
+      // The candidate Account portal is a different origin. Do not iframe-navigate
+      // into the live public hostname: enforce its exact HTTPS destination instead.
+      // Continue exercising the real login/theme DOM for local same-origin fallbacks.
+      async function assertClientAreaTransition(link, label, expectedProduct) {
+        const from = frame.contentWindow.location;
+        const target = new URL(link.href, from.href);
+        const local = target.origin === from.origin;
+        const account = target.origin === "https://account.stewaro.com";
+        assert(local || account, `${label}: unexpected account destination origin`);
+        assert(["/", "/zugang", "/anmelden", "/registrieren"].includes(target.pathname),
+          `${label}: unexpected account route`);
+        if (account) return;
+        const doc = await clickAndWait(link);
+        if (isAccountEntryPath()) return assertAccountEntry(doc, label);
+        if (isLoginPath()) {
+          return expectedProduct === "senioren"
+            ? assertSeniorLogin(doc, label)
+            : assertPrimeLogin(doc, label);
+        }
+        throw new Error(`${label}: not on account entry or login`);
+      }
+
       async function run() {
         let doc = await open("/safety.html", null);
         let links = [...doc.querySelectorAll("a")].filter((a) => a.textContent.trim() === "Zum Klientenbereich");
         assert(links.length === 2, "fresh Safety: expected two client-area links");
-        doc = await clickAndWait(links[links.length - 1]);
-        assertAccountEntry(doc, "fresh Safety");
+        await assertClientAreaTransition(links[links.length - 1], "fresh Safety", "prime");
 
         doc = await open("/safety.html", "senioren");
         links = [...doc.querySelectorAll("a")].filter((a) => a.textContent.trim() === "Zum Klientenbereich");
         assert(links.length === 2, "stale Senior Safety: expected two client-area links");
-        doc = await clickAndWait(links[links.length - 1]);
-        assertAccountEntry(doc, "stale Senior Safety");
+        await assertClientAreaTransition(links[links.length - 1], "stale Senior Safety", "prime");
 
         doc = await open("/senioren-concierge.html", null);
         let login = doc.querySelector("a.login-link");
         assert(login, "Senior page: login link missing");
-        doc = await clickAndWait(login);
-        assertAccountEntry(doc, "Senior page");
+        await assertClientAreaTransition(login, "Senior page", "senioren");
 
         doc = await open("/prime-concierge.html", "senioren");
         login = doc.querySelector("a.login-link");
         assert(login, "Prime page: login link missing");
-        doc = await clickAndWait(login);
-        assertAccountEntry(doc, "Prime page");
+        await assertClientAreaTransition(login, "Prime page", "prime");
 
         doc = await open("/anmelden.html?produkt=prime", "senioren");
         assertPrimeLogin(doc, "direct Prime login");

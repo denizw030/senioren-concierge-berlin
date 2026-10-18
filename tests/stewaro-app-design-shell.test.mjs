@@ -19,8 +19,8 @@ test("STEWARO app uses the approved ivory forest and champagne palette", () => {
 
 test("both FIDEL route mirrors load the same app shell assets", () => {
   for (const page of [flat, clean]) {
-    assert.match(page, /assets\/stewaro-app\.css\?v=1/);
-    assert.match(page, /assets\/stewaro-app-shell\.js\?v=1/);
+    assert.match(page, /assets\/stewaro-app\.css\?v=2/);
+    assert.match(page, /assets\/stewaro-app-shell\.js\?v=2/);
     assert.match(page, /id="stewaroAppShell"/);
     assert.match(page, /assets\/logos\/stewaro-wordmark\.svg\?v=1/);
     for (const label of ["Übersicht", "FIDEL", "Sicherheit", "Mehr"]) {

@@ -15,7 +15,8 @@ test("remembered login survives temporary session validation outages",()=>{
 });
 
 test("protected account does not force login while a remembered unexpired session can be retried",()=>{
-  assert.match(auth,/if \(PROTECTED\.has\(current\) && !hasRenderableSession\(\)\) \{\s*location\.replace\("\/anmelden"\)/);
+  assert.match(auth,/if \(PROTECTED\.has\(current\) && !hasRenderableSession\(\)\) \{\s*location\.replace\(accountUrl\("\/anmelden"\)\)/);
+  assert.match(auth,/const ACCOUNT_ORIGIN = "https:\/\/account\.stewaro\.com"/);
   assert.match(auth,/if \(validationUnavailable && hasRenderableSession\(\)\) \{[\s\S]*?validateSession\(true\)/);
   assert.match(auth,/window\.setTimeout\(async \(\) => \{[\s\S]*?\}, 1500\)/);
 });
