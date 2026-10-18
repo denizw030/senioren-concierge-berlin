@@ -157,6 +157,26 @@
     return false;
   });
 
+  // A restored Safari tab must not expose an expired locally cached identity.
+  // The existing server remains authoritative for session validity.
+  let resumeRedirecting=false;
+  function checkResumedExpiry(){
+    if(document.visibilityState==="hidden"||resumeRedirecting)return;
+    window.STEWARO_APP_AUTH_READY.then((ready)=>{
+      if(ready!==true||resumeRedirecting)return;
+      const session=readSession();
+      const unexpired=value=>typeof value==="string"&&Number.isFinite(Date.parse(value))&&Date.parse(value)>Date.now();
+      if(session?.session_token&&unexpired(session.expires_at)&&unexpired(session.idle_expires_at))return;
+      resumeRedirecting=true;
+      try{sessionStorage.removeItem(SESSION_KEY)}catch{}
+      try{localStorage.removeItem(SESSION_KEY)}catch{}
+      accountLogin();
+    }).catch(()=>{});
+  }
+  addEventListener("pageshow",checkResumedExpiry);
+  addEventListener("focus",checkResumedExpiry);
+  document.addEventListener?.("visibilitychange",checkResumedExpiry);
+
   addEventListener("DOMContentLoaded",()=>{
     document.querySelectorAll("header.top a.brand,footer a.brand").forEach((link)=>{
       if(link instanceof HTMLAnchorElement)link.href=SITE_ORIGIN;
