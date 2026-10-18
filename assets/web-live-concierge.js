@@ -56,7 +56,8 @@ async function boot(){
     input,
     channel:"WEB",
     bindTrigger:false,
-    fidelRoom:true,
+    // Launch decision 2026-10-18: show the existing audio-reactive FIDEL orb; 3D comes later.
+    fidelRoom:false,
     getAuthToken:()=>{
       void window.SCBAuth?.validateSession?.().catch(()=>false);
       return bridge()?.sessionToken?.()||"";
