@@ -103,7 +103,7 @@ async function expectedManifest(){
     for(const script of scripts) if(!text.includes(script))throw Error("missing protected script in "+source+": "+script);
   }
   const liveBoot=(await checkedBytes("assets/web-live-concierge.js")).toString("utf8");
-  if(!/fidelRoom:\\s*false\\s*,/.test(liveBoot) || /fidelRoom:\\s*true\\s*,/.test(liveBoot)){
+  if(!/fidelRoom:\s*false\s*,/.test(liveBoot) || /fidelRoom:\s*true\s*,/.test(liveBoot)){
     throw Error("launch candidate must not enable optional 3D room");
   }
   return {
