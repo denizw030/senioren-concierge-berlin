@@ -73,9 +73,9 @@ async function expectedManifest(){
     "konto/index.html":["/assets/stewaro-domain-contract.js"],
     "web-concierge/index.html":[
       "/assets/stewaro-app-bootstrap.js",
-      "assets/web-live-concierge.js?v=29",
-      "assets/web-customer-concierge.js?v=59",
-      "assets/web-voice-memo.js?v=11",
+      "assets/web-live-concierge.js?v=30",
+      "assets/web-customer-concierge.js?v=60",
+      "assets/web-voice-memo.js?v=12",
       "assets/stewaro-app.css?v=2",
       "assets/web-voice-memo.css?v=2",
       "assets/nahwerk-live-concierge.css?v=6"
