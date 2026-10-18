@@ -1250,6 +1250,36 @@
   }
 
   async function boot() {
+    // Existing AWS CloudFront STAGING is a source/UI preview, not an authenticated
+    // client application. Never call PROD chat, tasks, identity or Live from it.
+    if(location.hostname==="d2h3bbcracss71.cloudfront.net"){
+      const status=document.getElementById("webConciergeStatus");
+      const input=document.getElementById("webConciergeInput");
+      const send=document.getElementById("webConciergeSend");
+      gatewayReady=false;
+      if(input instanceof HTMLTextAreaElement){
+        input.disabled=true;
+        input.placeholder="STAGING · Vorschau ohne Live-Gespräche";
+      }
+      if(send instanceof HTMLButtonElement)send.disabled=true;
+      if(status){
+        status.textContent="STAGING · Sichere Vorschau";
+        status.classList.remove("is-online");
+      }
+      // The only network request is the non-production, read-only health probe.
+      try{
+        const response=await fetch(GATEWAY_ENDPOINT+"/health",{cache:"no-store",credentials:"omit"});
+        const body=await response.json().catch(()=>null);
+        const previewReady=response.ok&&body?.preview_read_only===true&&
+          body?.client_actions_allowed===false&&body?.production===false;
+        if(status)status.textContent=previewReady
+          ?"STAGING bereit · Gespräche gesperrt"
+          :"STAGING · Verbindung noch nicht freigegeben";
+      }catch{
+        if(status)status.textContent="STAGING · Verbindung noch nicht freigegeben";
+      }
+      return;
+    }
     if(location.hostname==="app.stewaro.com"&&window.STEWARO_APP_AUTH_READY){
       if(await window.STEWARO_APP_AUTH_READY!==true)return;
     }
