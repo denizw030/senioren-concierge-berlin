@@ -135,3 +135,22 @@ test("staging review includes the real FIDEL orb and rejects changed live bytes"
     await rm(dir,{recursive:true,force:true});
   }
 });
+
+test("source-pinned staging review rejects extra files and directories",async()=>{
+  const dir=await mkdtemp(join(tmpdir(),"stewaro-extra-file-review-")),out=join(dir,"review");
+  try{
+    const result=run("build",out);
+    assert.equal(result.status,0,result.stderr);
+    const extra=join(out,"app/assets/unpinned-client.js");
+    await writeFile(extra,"console.log('unexpected source');","utf8");
+    const rejected=run("verify",out);
+    assert.notEqual(rejected.status,0);
+    assert.match(rejected.stderr,/unexpected staged file: app\/assets\/unpinned-client\.js/);
+    await rm(extra);
+    const {mkdir}=await import("node:fs/promises");
+    await mkdir(join(out,"app/unknown-empty-directory"));
+    const rejectedDir=run("verify",out);
+    assert.notEqual(rejectedDir.status,0);
+    assert.match(rejectedDir.stderr,/unexpected staged directory: app\/unknown-empty-directory/);
+  }finally{await rm(dir,{recursive:true,force:true});}
+});
