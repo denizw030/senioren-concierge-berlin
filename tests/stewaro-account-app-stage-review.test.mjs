@@ -27,17 +27,24 @@ test("review artifact is pinned, isolated, and verifiable; never claims AWS or P
     assert.equal(manifest.aws_staging_deployed,false);
     assert.equal(manifest.authenticated_safari_e2e_proven,false);
     assert.equal(manifest.complete_website_artifact,false);
+    assert.equal(manifest.launch_voice_visual,"existing_audio_reactive_fidel_2d_orb");
+    assert.equal(manifest.optional_3d_live_room_enabled,false);
     assert.match(manifest.release_gate,/HOLD/);
-    assert.equal(manifest.files.length,16);
+    assert.equal(manifest.files.length,26);
     assert.deepEqual(manifest.files.filter(x=>x.source.startsWith("assets/")).map(x=>x.source).sort(),
       ["assets/auth-nav.js","assets/stewaro-account-app-navigation.js","assets/stewaro-app-bootstrap.js",
         "assets/stewaro-app-shell.js","assets/stewaro-domain-contract.js",
         "assets/stewaro-phone-session-v1.js","assets/stewaro-outbound-ledger-v1.js",
         "assets/stewaro-outbound-ledger-v1.css","assets/stewaro-unified.css",
-        "assets/logos/stewaro-icon.svg"].sort());
+        "assets/logos/stewaro-icon.svg",
+        "assets/web-live-concierge.js","assets/nahwerk-live-concierge.js",
+        "assets/fidel-gold-orb.js","assets/fidel-live-room.js",
+        "assets/web-customer-concierge.js","assets/web-voice-memo.js",
+        "assets/web-customer-concierge.css","assets/web-voice-memo.css",
+        "assets/nahwerk-live-concierge.css","assets/stewaro-app.css"].sort());
     const verify=run("verify",out);
     assert.equal(verify.status,0,verify.stderr);
-    assert.match(verify.stdout,/STEWARO_REVIEW_ARTIFACT_VERIFIED=16\/16/);
+    assert.match(verify.stdout,/STEWARO_REVIEW_ARTIFACT_VERIFIED=26\/26/);
   }finally{await rm(dir,{recursive:true,force:true});}
 });
 test("Mission v1 outbound review pins all required read-only phone assets",async()=>{
@@ -99,4 +106,32 @@ test("wrong or identical source pins and unsafe artifact root fail closed",async
     assert.notEqual(result.status,0);
     assert.match(result.stderr,/refuse writing into source root ancestor/);
   }finally{await rm(dir,{recursive:true,force:true});}
+});
+
+test("staging review includes the real FIDEL orb and rejects changed live bytes",async()=>{
+  const dir=await mkdtemp(join(tmpdir(),"stewaro-voice-orb-review-")),out=join(dir,"review");
+  try{
+    const result=run("build",out);
+    assert.equal(result.status,0,result.stderr);
+    const manifest=JSON.parse(await readFile(join(out,"manifest.json"),"utf8"));
+    const files=new Set(manifest.files.map(x=>x.target));
+    for(const path of [
+      "app/assets/web-live-concierge.js",
+      "app/assets/nahwerk-live-concierge.js",
+      "app/assets/fidel-gold-orb.js",
+      "app/assets/fidel-live-room.js",
+      "app/assets/web-customer-concierge.js",
+      "app/assets/nahwerk-live-concierge.css"
+    ]) assert.ok(files.has(path),"missing source-pinned live asset: "+path);
+    const boot=await readFile(join(out,"app/assets/web-live-concierge.js"),"utf8");
+    assert.match(boot,/fidelRoom:\s*false,/);
+    assert.doesNotMatch(boot,/fidelRoom:\s*true,/);
+    assert.match(boot,/getAuthToken:async\(\)=>/);
+    await writeFile(join(out,"app/assets/web-live-concierge.js"),"tampered","utf8");
+    const fail=run("verify",out);
+    assert.notEqual(fail.status,0);
+    assert.match(fail.stderr,/staged SHA mismatch: app\/assets\/web-live-concierge\.js/);
+  }finally{
+    await rm(dir,{recursive:true,force:true});
+  }
 });
