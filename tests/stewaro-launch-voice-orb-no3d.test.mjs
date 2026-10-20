@@ -77,9 +77,9 @@ test("CloudFront STAGING cannot start Core requests or paid GPT-Live", () => {
   assert.match(customer.slice(stagePoint,initialization),/gatewayReady=false/);
   assert.match(customer.slice(stagePoint,initialization),/input\.disabled=true/);
   assert.match(customer.slice(stagePoint,initialization),/send\.disabled=true/);
-  assert.match(customer.slice(stagePoint,initialization),/body\?\.preview_read_only===true/);
-  assert.match(customer.slice(stagePoint,initialization),/body\?\.client_actions_allowed===false/);
-  assert.match(customer.slice(stagePoint,initialization),/body\?\.production===false/);
+  assert.match(customer.slice(stagePoint,initialization),/STAGING · Test-Anmeldung möglich/);
+  assert.doesNotMatch(customer.slice(stagePoint,initialization),/fetch\(/);
+  assert.doesNotMatch(customer.slice(stagePoint,initialization),/GATEWAY_ENDPOINT/);
   const orbPoint=boot.indexOf("const headerOrb=mountFidelGoldOrb(");
   const stageLive=boot.indexOf('if(location.hostname==="'+stage+'")',orbPoint);
   const controller=boot.indexOf("const controller=mountNahwerkLiveConcierge(",orbPoint);
@@ -109,4 +109,20 @@ test("CloudFront STAGING prevents direct real-client conference joins",()=>{
   const stageGuard=join.indexOf('if(location.hostname==="d2h3bbcracss71.cloudfront.net")return;');
   const api=join.search(/const\s+LIVE_API\s*=/);
   assert.ok(stageGuard>=0&&stageGuard<api,"call-join module must stop before PROD routing");
+});
+
+test("STAGING authenticates only with isolated TEST Supabase Auth and no PROD voice/action",()=>{
+  const ui=read("assets/stewaro-stage-auth.js");
+  const html=read("web-concierge/index.html");
+  assert.match(html,/stewaro-stage-auth\.js\?v=1/);
+  assert.match(html,/stewaro-stage-auth\.css\?v=1/);
+  assert.match(ui,/if\(location\.hostname!=="d2h3bbcracss71\.cloudfront\.net"\)return;/);
+  assert.match(ui,/btqklftjmwtqqqdmwlnk\.supabase\.co/);
+  assert.match(ui,/auth\/v1\//);
+  assert.match(ui,/sessionStorage/);
+  assert.match(ui,/STAGING-Anmeldung bestätigt/);
+  assert.doesNotMatch(ui,/djicahhmnnamtjuqedqd/);
+  assert.doesNotMatch(ui,/ta832v8wah/);
+  assert.doesNotMatch(ui,/SUPABASE_SERVICE_ROLE_KEY|refresh_token/);
+  assert.doesNotMatch(ui,/RTCPeerConnection|live\/quote|client_actions_allowed:true/);
 });
