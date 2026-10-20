@@ -35,7 +35,9 @@ const FILES=Object.freeze([
   ["app","assets/web-customer-concierge.css","app/assets/web-customer-concierge.css"],
   ["app","assets/web-voice-memo.css","app/assets/web-voice-memo.css"],
   ["app","assets/nahwerk-live-concierge.css","app/assets/nahwerk-live-concierge.css"],
-  ["app","assets/stewaro-app.css","app/assets/stewaro-app.css"]
+  ["app","assets/stewaro-app.css","app/assets/stewaro-app.css"],
+  ["app","assets/stewaro-stage-auth.js","app/assets/stewaro-stage-auth.js"],
+  ["app","assets/stewaro-stage-auth.css","app/assets/stewaro-stage-auth.css"]
 ]);
 const sha256=bytes=>createHash("sha256").update(bytes).digest("hex");
 const isSHA=value=>/^[0-9a-f]{40}$/.test(value||"");
@@ -78,7 +80,9 @@ async function expectedManifest(){
       "assets/web-voice-memo.js?v=12",
       "assets/stewaro-app.css?v=2",
       "assets/web-voice-memo.css?v=2",
-      "assets/nahwerk-live-concierge.css?v=6"
+      "assets/nahwerk-live-concierge.css?v=6",
+      "/assets/stewaro-stage-auth.js?v=1",
+      "/assets/stewaro-stage-auth.css?v=1"
     ],
     "assets/web-live-concierge.js":[
       "./nahwerk-live-concierge.js?v=29",
