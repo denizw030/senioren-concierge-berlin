@@ -35,6 +35,8 @@ for f in assets/auth-nav.js assets/web-voice-memo.js assets/stewaro-customer-cal
   grep -Fq 'if(location.hostname==="d2h3bbcracss71.cloudfront.net")return;' "$f"
 done
 grep -Fq 'canvas data-fidel-orb' web-concierge/index.html
+grep -Fq 'stewaro-stage-auth.js?v=1' web-concierge/index.html
+grep -Fq 'btqklftjmwtqqqdmwlnk.supabase.co' assets/stewaro-stage-auth.js
 cat > "$work/files" <<'FILELIST'
 web-concierge/index.html
 assets/clean-url.js
@@ -49,6 +51,8 @@ assets/stewaro-app.css
 assets/web-voice-memo.css
 assets/nahwerk-live-concierge.css
 assets/stewaro-customer-call-join.css
+assets/stewaro-stage-auth.js
+assets/stewaro-stage-auth.css
 assets/stewaro-unified.css
 assets/logos/stewaro-icon.svg
 assets/logos/stewaro-wordmark.svg
@@ -68,6 +72,8 @@ FILELIST
 while IFS= read -r file; do
   [[ -f "$file" && ! -L "$file" ]] || { echo "STOP: missing/static path $file"; exit 9; }
 done < "$work/files"
+node --check assets/stewaro-stage-auth.js
+node --check assets/web-customer-concierge.js
 node --test tests/stewaro-launch-voice-orb-no3d.test.mjs > "$work/node-test.log" 2>&1 ||
   { echo "STOP: source tests failed"; tail -n 25 "$work/node-test.log"; exit 10; }
 echo "STAGING_SOURCE_TESTS=PASS"
