@@ -1266,18 +1266,9 @@
         status.textContent="STAGING · Sichere Vorschau";
         status.classList.remove("is-online");
       }
-      // The only network request is the non-production, read-only health probe.
-      try{
-        const response=await fetch(GATEWAY_ENDPOINT+"/health",{cache:"no-store",credentials:"omit"});
-        const body=await response.json().catch(()=>null);
-        const previewReady=response.ok&&body?.preview_read_only===true&&
-          body?.client_actions_allowed===false&&body?.production===false;
-        if(status)status.textContent=previewReady
-          ?"STAGING bereit · Gespräche gesperrt"
-          :"STAGING · Verbindung noch nicht freigegeben";
-      }catch{
-        if(status)status.textContent="STAGING · Verbindung noch nicht freigegeben";
-      }
+      // Only STAGING Auth may be called by the isolated login module.
+      // No request is sent to the PROD web gateway from this preview.
+      if(status)status.textContent="STAGING · Test-Anmeldung möglich";
       return;
     }
     if(location.hostname==="app.stewaro.com"&&window.STEWARO_APP_AUTH_READY){
