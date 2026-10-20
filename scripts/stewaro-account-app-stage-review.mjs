@@ -2,7 +2,7 @@
 // Immutable source-pinned Account/App REVIEW artifact. NOT a deployable site or AWS release.
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
-import { lstat, readFile, mkdir, writeFile, copyFile } from "node:fs/promises";
+import { lstat, readFile, readdir, mkdir, writeFile, copyFile } from "node:fs/promises";
 import { resolve, dirname, join, relative } from "node:path";
 
 const SOURCE=resolve(".");
@@ -23,7 +23,21 @@ const FILES=Object.freeze([
   ["app","assets/stewaro-outbound-ledger-v1.js","app/assets/stewaro-outbound-ledger-v1.js"],
   ["app","assets/stewaro-outbound-ledger-v1.css","app/assets/stewaro-outbound-ledger-v1.css"],
   ["app","assets/stewaro-unified.css","app/assets/stewaro-unified.css"],
-  ["app","assets/logos/stewaro-icon.svg","app/assets/logos/stewaro-icon.svg"]
+  ["app","assets/logos/stewaro-icon.svg","app/assets/logos/stewaro-icon.svg"],
+  // Launch-critical FIDEL 2D voice orb + GPT-Live modules and their static dependencies.
+  // Review-only: these bytes must be copied from the exact candidate commit.
+  ["app","assets/web-live-concierge.js","app/assets/web-live-concierge.js"],
+  ["app","assets/nahwerk-live-concierge.js","app/assets/nahwerk-live-concierge.js"],
+  ["app","assets/fidel-gold-orb.js","app/assets/fidel-gold-orb.js"],
+  ["app","assets/fidel-live-room.js","app/assets/fidel-live-room.js"],
+  ["app","assets/web-customer-concierge.js","app/assets/web-customer-concierge.js"],
+  ["app","assets/web-voice-memo.js","app/assets/web-voice-memo.js"],
+  ["app","assets/web-customer-concierge.css","app/assets/web-customer-concierge.css"],
+  ["app","assets/web-voice-memo.css","app/assets/web-voice-memo.css"],
+  ["app","assets/nahwerk-live-concierge.css","app/assets/nahwerk-live-concierge.css"],
+  ["app","assets/stewaro-app.css","app/assets/stewaro-app.css"],
+  ["app","assets/stewaro-stage-auth.js","app/assets/stewaro-stage-auth.js"],
+  ["app","assets/stewaro-stage-auth.css","app/assets/stewaro-stage-auth.css"]
 ]);
 const sha256=bytes=>createHash("sha256").update(bytes).digest("hex");
 const isSHA=value=>/^[0-9a-f]{40}$/.test(value||"");
@@ -59,7 +73,27 @@ async function expectedManifest(){
     "zugang.html":["/assets/stewaro-domain-contract.js"],
     "anmelden/index.html":["/assets/stewaro-domain-contract.js"],
     "konto/index.html":["/assets/stewaro-domain-contract.js"],
-    "web-concierge/index.html":["/assets/stewaro-app-bootstrap.js"],
+    "web-concierge/index.html":[
+      "/assets/stewaro-app-bootstrap.js",
+      "assets/web-live-concierge.js?v=30",
+      "assets/web-customer-concierge.js?v=60",
+      "assets/web-voice-memo.js?v=12",
+      "assets/stewaro-app.css?v=2",
+      "assets/web-voice-memo.css?v=2",
+      "assets/nahwerk-live-concierge.css?v=6",
+      "/assets/stewaro-stage-auth.js?v=1",
+      "/assets/stewaro-stage-auth.css?v=1"
+    ],
+    "assets/web-live-concierge.js":[
+      "./nahwerk-live-concierge.js?v=29",
+      "./fidel-gold-orb.js?v=1",
+      "fidelRoom:false",
+      "getAuthToken:async()=>"
+    ],
+    "assets/nahwerk-live-concierge.js":[
+      "./fidel-live-room.js?v=1",
+      "fidelOrb?.setAudio(inLevel,outLevel)"
+    ],
     "telefonate/ausgehend/index.html":[
       "/assets/stewaro-phone-session-v1.js?v=1",
       "/assets/stewaro-outbound-ledger-v1.js?v=11",
@@ -72,6 +106,10 @@ async function expectedManifest(){
     const text=(await checkedBytes(source)).toString("utf8");
     for(const script of scripts) if(!text.includes(script))throw Error("missing protected script in "+source+": "+script);
   }
+  const liveBoot=(await checkedBytes("assets/web-live-concierge.js")).toString("utf8");
+  if(!/fidelRoom:\s*false\s*,/.test(liveBoot) || /fidelRoom:\s*true\s*,/.test(liveBoot)){
+    throw Error("launch candidate must not enable optional 3D room");
+  }
   return {
     schema:1,
     artifact_kind:"STEWARO_ACCOUNT_APP_SOURCE_PINNED_REVIEW_ONLY",
@@ -79,6 +117,8 @@ async function expectedManifest(){
     aws_staging_deployed:false,
     authenticated_safari_e2e_proven:false,
     complete_website_artifact:false,
+    launch_voice_visual:"existing_audio_reactive_fidel_2d_orb",
+    optional_3d_live_room_enabled:false,
     candidate_website_sha:candidate,
     baseline_website_sha:baseline,
     public_site_untouched:true,
@@ -108,6 +148,28 @@ async function verify(out){
   const expected=await expectedManifest();
   const manifest=JSON.parse(await readFile(join(out,"manifest.json"),"utf8"));
   if(!sameJson(manifest,expected))throw Error("manifest differs from pinned source");
+  const allowedFiles=new Set(["manifest.json",...expected.files.map(item=>item.target)]);
+  const allowedDirs=new Set();
+  for(const key of allowedFiles){
+    const parts=key.split("/");
+    for(let depth=1;depth<parts.length;depth++)allowedDirs.add(parts.slice(0,depth).join("/"));
+  }
+  // No hidden payload, unexpected files, directories, or symlinks may pass source review.
+  async function scan(dir,prefix=""){
+    for(const name of await readdir(dir)){
+      const key=prefix?prefix+"/"+name:name;
+      const item=join(dir,name);
+      const stat=await lstat(item);
+      if(stat.isSymbolicLink())throw Error("symlink in staged review: "+key);
+      if(stat.isDirectory()){
+        if(!allowedDirs.has(key))throw Error("unexpected staged directory: "+key);
+        await scan(item,key);
+      }else if(!stat.isFile()||!allowedFiles.has(key)){
+        throw Error("unexpected staged file: "+key);
+      }
+    }
+  }
+  await scan(out);
   for(const item of expected.files){
     const dest=resolve(out,item.target);
     if(!relative(out,dest)||relative(out,dest).startsWith(".."))throw Error("unsafe destination");

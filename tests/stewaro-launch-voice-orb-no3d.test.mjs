@@ -1,0 +1,128 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+
+const read = path => readFileSync(new URL("../" + path, import.meta.url), "utf8");
+const boot = read("assets/web-live-concierge.js");
+const live = read("assets/nahwerk-live-concierge.js");
+const orb = read("assets/fidel-gold-orb.js");
+const page = read("web-concierge/index.html");
+
+test("FIDEL launch disables the optional 3D room but keeps the existing live controller", () => {
+  assert.match(boot, /mountNahwerkLiveConcierge\(\{/);
+  assert.match(boot, /fidelRoom:\s*false\s*,/);
+  assert.doesNotMatch(boot, /fidelRoom:\s*true\s*,/);
+});
+
+test("the familiar round FIDEL orb remains mounted in the live screen", () => {
+  assert.match(page, /canvas data-fidel-orb data-fidel-orb-state="idle"/);
+  assert.match(boot, /mountFidelGoldOrb\(headerOrbCanvas/);
+  assert.match(live, /const fidelOrb=mountFidelGoldOrb\(orbCanvas/);
+});
+
+test("real microphone/output audio still animates the orb", () => {
+  assert.match(live, /const inLevel=rms\(micMeter\?\.analyser\)/);
+  assert.match(live, /const rawOutLevel=rms\(outMeter\?\.analyser\)/);
+  assert.match(live, /fidelOrb\?\.setAudio\(inLevel,outLevel\)/);
+  assert.match(orb, /setAudio\(inLevel=0,outLevel=0\)/);
+});
+
+test("existing live voice and mute/interrupt paths are preserved", () => {
+  assert.match(live, /new RTCPeerConnection/);
+  assert.match(live, /getUserMedia\(\{audio:true,video:false\}\)/);
+  assert.match(live, /micStream\?\.getAudioTracks\(\)\?\.forEach\(t=>t\.enabled=!muted\)/);
+});
+
+test("GPT-Live must await successful session validation before using a token", async () => {
+  const { runInNewContext } = await import("node:vm");
+  const callback = boot.match(/getAuthToken:(async\(\)=>\{[\s\S]*?\n    \}),\n    getThreadId:/)?.[1];
+  assert.ok(callback, "live auth callback must be present");
+  const run = ({ host="account.stewaro.com", validation, appReady=true, session="existing-token" }) => {
+    const context = {
+      window: {
+        SCBAuth: validation ? { validateSession: validation } : undefined,
+        STEWARO_APP_AUTH_READY: Promise.resolve(appReady)
+      },
+      location: { hostname: host },
+      bridge: () => ({ sessionToken: () => session })
+    };
+    return runInNewContext("("+callback+")",context)();
+  };
+
+  assert.equal(await run({ validation: () => Promise.resolve(false) }), "");
+  assert.equal(await run({ validation: undefined }), "");
+  assert.equal(await run({ validation: () => true,host:"app.stewaro.com",appReady:false }), "");
+  assert.equal(await run({ validation: () => true,host:"app.stewaro.com",appReady:true }), "existing-token");
+
+  let settle;
+  const pending = run({ validation: () => new Promise(resolve => { settle=resolve; }) });
+  let settled=false;
+  pending.then(()=>{settled=true;});
+  await Promise.resolve();
+  assert.equal(settled,false,"token exposed before session validation returned");
+  settle(true);
+  assert.equal(await pending,"existing-token");
+  await assert.rejects(run({validation:()=>Promise.reject(new Error("not authorized"))}),/not authorized/);
+});
+
+test("CloudFront STAGING cannot start Core requests or paid GPT-Live", () => {
+  const customer=read("assets/web-customer-concierge.js");
+  const stage="d2h3bbcracss71.cloudfront.net";
+  const bootPoint=customer.indexOf("  async function boot() {");
+  const stagePoint=customer.indexOf('if(location.hostname==="'+stage+'")',bootPoint);
+  const initialization=customer.indexOf("    initThemeToggle();",bootPoint);
+  const history=customer.indexOf("const initialHistoryPromise=",bootPoint);
+  assert.ok(bootPoint>=0&&stagePoint>bootPoint&&stagePoint<initialization&&initialization<history,
+    "source preview must return before account/chat/history boot");
+  assert.match(customer.slice(stagePoint,initialization),/gatewayReady=false/);
+  assert.match(customer.slice(stagePoint,initialization),/input\.disabled=true/);
+  assert.match(customer.slice(stagePoint,initialization),/send\.disabled=true/);
+  assert.match(customer.slice(stagePoint,initialization),/STAGING · Test-Anmeldung möglich/);
+  assert.doesNotMatch(customer.slice(stagePoint,initialization),/fetch\(/);
+  assert.doesNotMatch(customer.slice(stagePoint,initialization),/GATEWAY_ENDPOINT/);
+  const orbPoint=boot.indexOf("const headerOrb=mountFidelGoldOrb(");
+  const stageLive=boot.indexOf('if(location.hostname==="'+stage+'")',orbPoint);
+  const controller=boot.indexOf("const controller=mountNahwerkLiveConcierge(",orbPoint);
+  assert.ok(orbPoint>=0&&stageLive>orbPoint&&stageLive<controller,
+    "render orb, then stop before mounting the paid Live controller");
+  assert.match(boot.slice(stageLive,controller),/return;/);
+});
+
+test("STAGING preview blocks eager Account Auth and Voice Memo before network setup", () => {
+  const stage='d2h3bbcracss71.cloudfront.net';
+  const auth=read("assets/auth-nav.js");
+  const voice=read("assets/web-voice-memo.js");
+  const authGuard=auth.indexOf('if(location.hostname==="'+stage+'")return;');
+  const authInit=auth.indexOf('document.addEventListener("DOMContentLoaded", async');
+  const authNetwork=auth.indexOf('const CHECK_URL = ');
+  assert.ok(authGuard>0&&authGuard<authNetwork&&authGuard<authInit,
+    "preview must skip all account navigation/session restoration");
+  const voiceGuard=voice.indexOf('if(location.hostname==="'+stage+'")return;');
+  const voiceNetwork=voice.indexOf('const ENDPOINT = ');
+  const voiceInit=voice.indexOf('async function init()');
+  assert.ok(voiceGuard>0&&voiceGuard<voiceNetwork&&voiceGuard<voiceInit,
+    "preview must skip audio, microphone and diagnostics");
+});
+
+test("CloudFront STAGING prevents direct real-client conference joins",()=>{
+  const join=read("assets/stewaro-customer-call-join.js");
+  const stageGuard=join.indexOf('if(location.hostname==="d2h3bbcracss71.cloudfront.net")return;');
+  const api=join.search(/const\s+LIVE_API\s*=/);
+  assert.ok(stageGuard>=0&&stageGuard<api,"call-join module must stop before PROD routing");
+});
+
+test("STAGING authenticates only with isolated TEST Supabase Auth and no PROD voice/action",()=>{
+  const ui=read("assets/stewaro-stage-auth.js");
+  const html=read("web-concierge/index.html");
+  assert.match(html,/stewaro-stage-auth\.js\?v=1/);
+  assert.match(html,/stewaro-stage-auth\.css\?v=1/);
+  assert.match(ui,/if\(location\.hostname!=="d2h3bbcracss71\.cloudfront\.net"\)return;/);
+  assert.match(ui,/btqklftjmwtqqqdmwlnk\.supabase\.co/);
+  assert.match(ui,/auth\/v1\//);
+  assert.match(ui,/sessionStorage/);
+  assert.match(ui,/STAGING-Anmeldung bestätigt/);
+  assert.doesNotMatch(ui,/djicahhmnnamtjuqedqd/);
+  assert.doesNotMatch(ui,/ta832v8wah/);
+  assert.doesNotMatch(ui,/SUPABASE_SERVICE_ROLE_KEY|refresh_token/);
+  assert.doesNotMatch(ui,/RTCPeerConnection|live\/quote|client_actions_allowed:true/);
+});

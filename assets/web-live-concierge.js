@@ -22,6 +22,12 @@ async function boot(){
 
   const headerOrbCanvas=document.querySelector(".web-concierge-avatar canvas[data-fidel-orb]");
   const headerOrb=mountFidelGoldOrb(headerOrbCanvas,{state:"idle",interactive:true});
+  // The source/UI preview is never an authenticated or billable GPT-Live session.
+  // Keep the existing golden 2D orb visible, but do not even mount the Live client.
+  if(location.hostname==="d2h3bbcracss71.cloudfront.net"){
+    window.addEventListener("pagehide",()=>headerOrb?.destroy(),{once:true});
+    return;
+  }
   const headerState=(value)=>{
     switch(String(value||"")){
       case "quoting":
@@ -56,9 +62,16 @@ async function boot(){
     input,
     channel:"WEB",
     bindTrigger:false,
-    fidelRoom:true,
-    getAuthToken:()=>{
-      void window.SCBAuth?.validateSession?.().catch(()=>false);
+    // Launch decision 2026-10-18: show the existing audio-reactive FIDEL orb; 3D comes later.
+    fidelRoom:false,
+    // Live quote/session requests must wait for the real Account/App session check.
+    // The backend still validates each Bearer token independently.
+    getAuthToken:async()=>{
+      const validate=window.SCBAuth?.validateSession;
+      if(typeof validate!=="function")return "";
+      if(await validate()!==true)return "";
+      if(location.hostname==="app.stewaro.com"&&
+         await window.STEWARO_APP_AUTH_READY!==true)return "";
       return bridge()?.sessionToken?.()||"";
     },
     getThreadId:()=>bridge()?.threadId?.()||null,

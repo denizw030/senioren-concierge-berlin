@@ -1,5 +1,7 @@
 (() => {
   "use strict";
+  // A static STAGING preview must never ask for a mic or contact PROD audio.
+  if(location.hostname==="d2h3bbcracss71.cloudfront.net")return;
 
   const SESSION_KEY = "scb_web_session";
   const ENDPOINT = "https://ta832v8wah.execute-api.eu-central-1.amazonaws.com/prod/v1/web/audio-message";

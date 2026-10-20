@@ -1,4 +1,7 @@
 (() => {
+  // The non-canonical STAGING preview must never restore, validate or submit a
+  // real client session, even though this common script is included in its HTML.
+  if(location.hostname==="d2h3bbcracss71.cloudfront.net")return;
   // Account-only navigation lives in an isolated helper and preserves shared auth.
   if (location.hostname === "account.stewaro.com") {
     const domainNavigation = document.createElement("script");

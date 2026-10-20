@@ -1,5 +1,7 @@
 (() => {
   "use strict";
+  // The public CloudFront STAGING preview never joins a real client call.
+  if(location.hostname==="d2h3bbcracss71.cloudfront.net")return;
 
   // STEWARO_CUSTOMER_CALL_WEBRTC_JOIN_V1_20261007
   const SESSION_KEY = "scb_web_session";

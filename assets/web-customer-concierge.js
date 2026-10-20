@@ -1250,6 +1250,27 @@
   }
 
   async function boot() {
+    // Existing AWS CloudFront STAGING is a source/UI preview, not an authenticated
+    // client application. Never call PROD chat, tasks, identity or Live from it.
+    if(location.hostname==="d2h3bbcracss71.cloudfront.net"){
+      const status=document.getElementById("webConciergeStatus");
+      const input=document.getElementById("webConciergeInput");
+      const send=document.getElementById("webConciergeSend");
+      gatewayReady=false;
+      if(input instanceof HTMLTextAreaElement){
+        input.disabled=true;
+        input.placeholder="STAGING · Vorschau ohne Live-Gespräche";
+      }
+      if(send instanceof HTMLButtonElement)send.disabled=true;
+      if(status){
+        status.textContent="STAGING · Sichere Vorschau";
+        status.classList.remove("is-online");
+      }
+      // Only STAGING Auth may be called by the isolated login module.
+      // No request is sent to the PROD web gateway from this preview.
+      if(status)status.textContent="STAGING · Test-Anmeldung möglich";
+      return;
+    }
     if(location.hostname==="app.stewaro.com"&&window.STEWARO_APP_AUTH_READY){
       if(await window.STEWARO_APP_AUTH_READY!==true)return;
     }
