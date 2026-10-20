@@ -14,7 +14,7 @@
   const box=document.createElement("section");
   box.className="stewaro-stage-auth";
   box.setAttribute("aria-label","STAGING-Testanmeldung");
-  box.innerHTML=\`
+  box.innerHTML=`
     <div class="stewaro-stage-auth__eyebrow">GESCHÜTZTE TESTUMGEBUNG</div>
     <h3>STEWARO Test-Anmeldung</h3>
     <p>Nur mit einem separaten STAGING-Konto anmelden. Verwende hier nicht dein echtes STEWARO-Passwort.</p>
@@ -29,7 +29,7 @@
     <p id="stewaroStageResult" role="status" aria-live="polite">Keine echte Nachricht oder Anruf möglich.</p>
     <button id="stewaroStageLogout" type="button" hidden>Test-Anmeldung beenden</button>
     <small>Testsystem getrennt von PROD · Sprachgespräche noch gesperrt.</small>
-  \`;
+  `;
   log.replaceChildren(box);
   const form=box.querySelector("#stewaroStageAuthForm");
   const email=box.querySelector("#stewaroStageEmail");
