@@ -30,7 +30,7 @@ test("review artifact is pinned, isolated, and verifiable; never claims AWS or P
     assert.equal(manifest.launch_voice_visual,"existing_audio_reactive_fidel_2d_orb");
     assert.equal(manifest.optional_3d_live_room_enabled,false);
     assert.match(manifest.release_gate,/HOLD/);
-    assert.equal(manifest.files.length,26);
+    assert.equal(manifest.files.length,28);
     assert.deepEqual(manifest.files.filter(x=>x.source.startsWith("assets/")).map(x=>x.source).sort(),
       ["assets/auth-nav.js","assets/stewaro-account-app-navigation.js","assets/stewaro-app-bootstrap.js",
         "assets/stewaro-app-shell.js","assets/stewaro-domain-contract.js",
@@ -41,10 +41,11 @@ test("review artifact is pinned, isolated, and verifiable; never claims AWS or P
         "assets/fidel-gold-orb.js","assets/fidel-live-room.js",
         "assets/web-customer-concierge.js","assets/web-voice-memo.js",
         "assets/web-customer-concierge.css","assets/web-voice-memo.css",
-        "assets/nahwerk-live-concierge.css","assets/stewaro-app.css"].sort());
+        "assets/nahwerk-live-concierge.css","assets/stewaro-app.css",
+        "assets/stewaro-stage-auth.js","assets/stewaro-stage-auth.css"].sort());
     const verify=run("verify",out);
     assert.equal(verify.status,0,verify.stderr);
-    assert.match(verify.stdout,/STEWARO_REVIEW_ARTIFACT_VERIFIED=26\/26/);
+    assert.match(verify.stdout,/STEWARO_REVIEW_ARTIFACT_VERIFIED=28\/28/);
   }finally{await rm(dir,{recursive:true,force:true});}
 });
 test("Mission v1 outbound review pins all required read-only phone assets",async()=>{
