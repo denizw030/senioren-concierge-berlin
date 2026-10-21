@@ -44,6 +44,8 @@
     for (const scene of scenes) {
       if (!scene.ready) continue;
       const rect = scene.root.getBoundingClientRect();
+      // Offscreen films must not consume seek/decode work during scrolling.
+      if (rect.top >= window.innerHeight || rect.bottom <= 0) continue;
       const travel = Math.max(1, rect.height - window.innerHeight);
       const progress = clamp(-rect.top / travel);
       scene.video.pause();
