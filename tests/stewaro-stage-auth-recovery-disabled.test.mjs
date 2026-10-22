@@ -19,7 +19,7 @@ function boot(hostname = HOST, respond = () => ({ ok: false, json: async () => (
     elements[id] = {
       id, value: id === "stewaroStageEmail" ? "test@example.invalid"
         : id === "stewaroStagePassword" ? "test-only-password" : "",
-      textContent: "", disabled: false, hidden: id === "stewaroStageLogout",
+      textContent: "", disabled: id === "stewaroStageRecover", hidden: id === "stewaroStageLogout",
       addEventListener: (kind, cb) => handlers.set(id + ":" + kind, cb),
       checkValidity: () => true, reportValidity: () => true,
     };
@@ -62,6 +62,7 @@ test("STAGING auth does not initialize on PROD or arbitrary hosts", () => {
 
 test("recovery remains disabled and never sends mail or calls a URL", async () => {
   const state = boot();
+  assert.match(source, /id="stewaroStageRecover"[^>]*disabled/);
   assert.equal(state.elements.stewaroStageRecover.disabled, true);
   await state.handlers.get("stewaroStageRecover:click")();
   assert.equal(state.requests.length, 0);
