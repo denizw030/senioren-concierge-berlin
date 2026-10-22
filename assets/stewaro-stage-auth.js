@@ -47,6 +47,8 @@
   const recover=box.querySelector("#stewaroStageRecover");
   const report=t=>{outcome.textContent=t;};
   const allowUI=enabled=>{login.disabled=!enabled;signup.disabled=!enabled;recover.disabled=!enabled||!STAGE_RECOVERY_ENABLED;};
+  // Keep reset button disabled now; make it accessible immediately only after explicit release flag.
+  allowUI(true);
   const save=token=>{
     // Tab-local session only; never cache email or password.
     sessionStorage.setItem(STORE,JSON.stringify({token,created:Date.now()}));
