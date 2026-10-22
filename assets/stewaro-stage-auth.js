@@ -7,6 +7,11 @@
   const PUBLISHABLE="sb_publishable_onbKIoe0eb9hgsYC2UeYzw_qttxclvj";
   const STORE="stewaro_stage_auth_session_v1";
   const MAX_AGE=3600;
+  // Off until the STAGING Supabase allowlist, recovery email template and
+  // exact App-only target have been independently inspected and approved.
+  // Never permit fallback to an unverified Site URL / PROD DATA operator UI.
+  const STAGE_RECOVERY_ENABLED=false;
+  const STAGE_RECOVERY_URL="https://d2h3bbcracss71.cloudfront.net/web-concierge/stage-password-reset.html";
   const headers={"apikey":PUBLISHABLE,"content-type":"application/json"};
   const status=document.getElementById("webConciergeStatus");
   const log=document.getElementById("webConciergeLog");
@@ -25,6 +30,7 @@
       <input type="password" id="stewaroStagePassword" autocomplete="current-password" required minlength="8" maxlength="256">
       <button id="stewaroStageLogin" type="submit">Test-Anmeldung prüfen</button>
       <button id="stewaroStageSignUp" type="button">Neues STAGING-Testkonto erstellen</button>
+      <button id="stewaroStageRecover" type="button" disabled>Testpasswort zurücksetzen (noch nicht freigegeben)</button>
     </form>
     <p id="stewaroStageResult" role="status" aria-live="polite">Keine echte Nachricht oder Anruf möglich.</p>
     <button id="stewaroStageLogout" type="button" hidden>Test-Anmeldung beenden</button>
@@ -38,8 +44,9 @@
   const login=box.querySelector("#stewaroStageLogin");
   const signup=box.querySelector("#stewaroStageSignUp");
   const logout=box.querySelector("#stewaroStageLogout");
+  const recover=box.querySelector("#stewaroStageRecover");
   const report=t=>{outcome.textContent=t;};
-  const allowUI=enabled=>{login.disabled=!enabled;signup.disabled=!enabled;};
+  const allowUI=enabled=>{login.disabled=!enabled;signup.disabled=!enabled;recover.disabled=!enabled||!STAGE_RECOVERY_ENABLED;};
   const save=token=>{
     // Tab-local session only; never cache email or password.
     sessionStorage.setItem(STORE,JSON.stringify({token,created:Date.now()}));
@@ -97,6 +104,26 @@
         ?"Falls das Testkonto erstellt wurde, bestätige bitte die E-Mail und melde dich anschließend an."
         :"STAGING-Registrierung nicht möglich. Ein vorhandenes Testkonto verwenden.");
     }catch{password.value="";report("STAGING-Registrierung nicht erreichbar.");}
+    finally{allowUI(true);}
+  });
+  recover.addEventListener("click",async()=>{
+    // Defense in depth: accidentally deploying this draft sends no reset email.
+    if(!STAGE_RECOVERY_ENABLED)return;
+    if(!email.value.trim()||!email.checkValidity()){
+      email.reportValidity();return;
+    }
+    allowUI(false);
+    report("Wiederherstellung für das STAGING-Testkonto wird angefordert …");
+    try{
+      // GoTrue's recover endpoint uses an exact URL allowlist; until confirmed
+      // it MUST remain disabled (some setups fall back to the Site URL).
+      const {response}=await auth("recover?redirect_to="+encodeURIComponent(STAGE_RECOVERY_URL),{
+        method:"POST",body:JSON.stringify({email:email.value.trim()})
+      });
+      report(response.ok
+        ?"Falls dieses STAGING-Konto existiert, erhältst du eine E-Mail. Bitte nur den STAGING-Link verwenden."
+        :"STAGING-Wiederherstellung derzeit nicht verfügbar.");
+    }catch{report("STAGING-Wiederherstellung derzeit nicht erreichbar.");}
     finally{allowUI(true);}
   });
   logout.addEventListener("click",()=>{clear();form.hidden=false;logout.hidden=true;
