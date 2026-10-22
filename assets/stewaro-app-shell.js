@@ -300,21 +300,41 @@
     }
   }
 
+  let logoutInProgress = false;
   async function logout() {
+    if (logoutInProgress) return;
+    logoutInProgress = true;
     const bearer = token();
-    if (bearer) {
-      try {
-        await fetch(SESSION_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: "Bearer " + bearer },
-          body: JSON.stringify({ action: "logout" }),
-          cache: "no-store",
-          signal: AbortSignal.timeout(6000)
-        });
-      } catch (_) {}
-    }
+    // Stop all subsequent App actions immediately, even if the network hangs.
     try { sessionStorage.removeItem(SESSION_KEY); } catch (_) {}
     try { localStorage.removeItem(SESSION_KEY); } catch (_) {}
+    window.STEWARO_APP_AUTH_READY = Promise.resolve(false);
+    document.documentElement.style?.setProperty("visibility", "hidden", "important");
+    try {
+      if (bearer) {
+        const controller = typeof AbortController === "function" ? new AbortController() : null;
+        let timeout;
+        try {
+          const request = Promise.resolve(fetch(SESSION_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: "Bearer " + bearer },
+            body: JSON.stringify({ action: "logout" }),
+            cache: "no-store",
+            credentials: "omit",
+            ...(controller ? { signal: controller.signal } : {})
+          }));
+          const deadline = new Promise((_, reject) => {
+            timeout = setTimeout(() => {
+              try { controller?.abort(); } catch (_) {}
+              reject(new Error("logout_timeout"));
+            }, 6000);
+          });
+          await Promise.race([request, deadline]);
+        } finally { clearTimeout(timeout); }
+      }
+    } catch (_) {
+      // Server revocation is best-effort; local credentials are already gone.
+    }
     location.replace(LOGIN_URL);
   }
 
