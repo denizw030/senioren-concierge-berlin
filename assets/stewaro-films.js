@@ -45,7 +45,10 @@
       if (!scene.ready) continue;
       const rect = scene.root.getBoundingClientRect();
       // Offscreen films must not consume seek/decode work during scrolling.
-      if (rect.top >= window.innerHeight || rect.bottom <= 0) continue;
+      if (rect.top >= window.innerHeight || rect.bottom <= 0) {
+        scene.pendingTime = null;
+        continue;
+      }
       const travel = Math.max(1, rect.height - window.innerHeight);
       const progress = clamp(-rect.top / travel);
       scene.video.pause();
@@ -73,6 +76,9 @@
       if (scene.pendingTime === null) return;
       const time = scene.pendingTime;
       scene.pendingTime = null;
+      // A seek already in flight may complete after the film leaves the viewport.
+      const rect = scene.root.getBoundingClientRect();
+      if (rect.top >= window.innerHeight || rect.bottom <= 0) return;
       seek(scene, time);
     });
   }
