@@ -81,7 +81,7 @@ test("verified STAGING identity permits only explicit password update", async ()
   assert.equal(r.requests.length, 2);
   assert.equal(r.requests[1].url, STAGE_AUTH + "user");
   assert.equal(r.requests[1].options.method, "PUT");
-  assert.equal(r.requests[1].options.wasScrubbed, true);
+  assert.equal(r.requests[1].wasScrubbed, true);
   assert.equal(r.nodes.stageNewPassword.value, "");
   assert.equal(r.nodes.stageConfirmPassword.value, "");
   assert.equal(r.nodes.stageRecoveryForm.hidden, true);
