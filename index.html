@@ -10,7 +10,21 @@
     } else {
       const safeAnchor = /^#(?:top|start|services|for-you|family|contact)$/.test(window.location.hash)
         ? window.location.hash : "";
-      window.location.replace("/de/" + window.location.search + safeAnchor);
+      // Public/unknown hosts must never carry identity or arbitrary query data
+      // into the marketing page. Keep only bounded acquisition attribution.
+      const safeParams = new URLSearchParams();
+      if (window.location.search.length <= 2048) {
+        try {
+          for (const [key, value] of new URLSearchParams(window.location.search)) {
+            if (/^(?:utm_(?:source|medium|campaign|content|term|id)|src|ref|campaign|gclid|fbclid|msclkid)$/i.test(key)
+                && value.length <= 200 && !/[\x00-\x1f\x7f]/.test(value)) {
+              safeParams.append(key, value);
+            }
+          }
+        } catch (_) { /* Invalid query: fail closed. */ }
+      }
+      const query = safeParams.toString();
+      window.location.replace("/de/" + (query ? "?" + query : "") + safeAnchor);
     }
   </script>
   <title>STEWARO</title>
@@ -20,4 +34,3 @@
   <a href="https://stewaro.com/de/">Weiter zu STEWARO</a>
 </body>
 </html>
-
