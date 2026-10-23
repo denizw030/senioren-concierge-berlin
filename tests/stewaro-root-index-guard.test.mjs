@@ -56,3 +56,7 @@ test('legitimate attribution survives, including campaign identifiers and harmle
 test('overlong or suspicious marketing values are dropped, not copied to public URL', () => {
   assert.deepEqual(redirectFor('stewaro.com','?ref='+ 'x'.repeat(201) +'&src=ok&gclid=%0Asecret'), ['/de/?src=ok']);
 });
+
+test('root redirect cannot be overridden by legacy clean-url script forwarding raw secrets', () => {
+  assert.doesNotMatch(root, /<script[^>]+src=["']\/assets\/clean-url\.js/i);
+});
