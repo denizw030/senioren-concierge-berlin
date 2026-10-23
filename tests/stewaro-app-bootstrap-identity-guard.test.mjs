@@ -9,7 +9,7 @@ const session={session_token:'old-token',person_id:'person-1',customer_account_i
 const expiry={expires_at:'2099-01-01T00:00:00Z',idle_expires_at:'2099-01-01T00:00:00Z'};
 const valid={ok:true,status:'session_valid',person_id:'person-1',customer_account_id:'account-1',...expiry};
 const response=body=>({ok:true,json:async()=>body});
-function boot({origin='https://app.stewaro.com',hash='',saved=true}={}){
+function boot({origin='https://app.stewaro.com',hash='',saved=true,replaceStateThrows=false}={}){
   let resolve;
   const values=new Map(saved?[[KEY,JSON.stringify(session)]]:[]),persistent=new Map(),redirects=[],calls=[];
   const storage=map=>({getItem:k=>map.get(k)||null,setItem:(k,v)=>map.set(k,v),removeItem:k=>map.delete(k)});
@@ -17,7 +17,7 @@ function boot({origin='https://app.stewaro.com',hash='',saved=true}={}){
   const document={visibilityState:'visible',documentElement:{dataset:{},classList:{add(){}}},createElement:()=>({}),head:{appendChild(){}},querySelectorAll:()=>[],addEventListener(){}};
   const window={};
   const context={window,location,document,sessionStorage:storage(values),localStorage:storage(persistent),URLSearchParams,HTMLAnchorElement:class{},
-    history:{replaceState:()=>{location.hash=''}},addEventListener(){},setTimeout:()=>1,clearTimeout(){},
+    history:{replaceState:()=>{if(replaceStateThrows)throw new Error('SecurityError');location.hash=''}},addEventListener(){},setTimeout:()=>1,clearTimeout(){},
     fetch:(url,opts)=>{calls.push({url,opts});return new Promise(r=>{resolve=r})}};
   vm.runInNewContext(source,context,{timeout:1000});
   return {window,values,redirects,calls,reply:body=>resolve(response(body)),read:()=>values.has(KEY)?JSON.parse(values.get(KEY)):null};
@@ -65,4 +65,12 @@ test('legacy Account redirect is limited to exact HTTPS Account origin',()=>{
     vm.runInNewContext(source,{location:{hostname:'account.stewaro.com',origin,pathname:'/web-concierge',replace:u=>redirects.push(u)}},{timeout:1000});
     assert.deepEqual(redirects,origin==='https://account.stewaro.com'?['/konto?stewaro_app=1']:[]);
   }
+});
+
+test('one-time handoff fails closed if browser refuses URL fragment removal',async()=>{
+  const x=boot({hash:'#handoff=hnd_'+'E'.repeat(40),replaceStateThrows:true});
+  assert.equal(x.calls.length,0,'never send the claim while its secret remains in the URL');
+  assert.equal(x.read(),null,'discard any previous local identity');
+  assert.deepEqual(x.redirects,['https://account.stewaro.com/anmelden?produkt=senioren&next=app']);
+  assert.equal(await x.window.STEWARO_APP_AUTH_READY,false);
 });
