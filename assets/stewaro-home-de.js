@@ -60,6 +60,7 @@
         return;
       }
       const rect = leafSection.getBoundingClientRect();
+      if (rect.bottom <= 0 || rect.top >= window.innerHeight) return;
       const travel = Math.max(1, window.innerHeight + rect.height);
       const progress = clamp01((window.innerHeight - rect.top) / travel);
       const target = progress * Math.max(0, leafVideo.duration - 0.04);
@@ -76,6 +77,7 @@
         return;
       }
       const rect = precisionSection.getBoundingClientRect();
+      if (rect.bottom <= 0 || rect.top >= window.innerHeight) return;
       const travel = Math.max(1, window.innerHeight + rect.height);
       const progress = clamp01((window.innerHeight - rect.top) / travel);
       const target = progress * Math.max(0, mechanismVideo.duration - 0.04);
