@@ -20,6 +20,9 @@
   const SITE_ORIGIN="https://stewaro.com";
   const ACCOUNT_ORIGIN="https://account.stewaro.com";
   const ACCOUNT_SESSION_TRANSFER=ACCOUNT_ORIGIN+"/konto?stewaro_app=1";
+  // Bound rechecks on return to a foreground App tab; never trust a stale local session indefinitely.
+  const REVALIDATE_AFTER_MS=60000;
+  let lastVerifiedAt=0;
 
   document.documentElement.dataset.stewaroApp="1";
   const style=document.createElement("style");
@@ -172,6 +175,7 @@
       return false;
     }
     saveSession({...currentSession,expires_at:body.expires_at,idle_expires_at:body.idle_expires_at});
+    lastVerifiedAt=Date.now();
     return true;
   }).catch(()=>{
     // A superseded validation must never delete a newer login or redirect it.
@@ -241,6 +245,7 @@
          ||String(body.customer_account_id||"")!==String(saved.customer_account_id)
          ||!future(body.expires_at)||!future(body.idle_expires_at))throw new Error("resume_invalid");
       saveSession({...active,expires_at:body.expires_at,idle_expires_at:body.idle_expires_at});
+      lastVerifiedAt=Date.now();
       if(shell&&revealAfterCheck)shell.hidden=false;
       return true;
     }).catch(()=>{
@@ -257,8 +262,14 @@
     window.STEWARO_APP_AUTH_READY=check;
   }
   addEventListener("pageshow",onPageShow);
-  addEventListener("focus",checkResumedExpiry);
-  document.addEventListener?.("visibilitychange",checkResumedExpiry);
+  function revalidateForegroundIfStale(){
+    if(document.visibilityState==="hidden"||resumeRedirecting||restoredValidation||!lastVerifiedAt)return;
+    if(Date.now()-lastVerifiedAt<REVALIDATE_AFTER_MS)return;
+    // Reuse the existing server-authoritative, single-flight and fail-closed resume gate.
+    onPageShow({persisted:true});
+  }
+  addEventListener("focus",()=>{checkResumedExpiry();revalidateForegroundIfStale();});
+  document.addEventListener?.("visibilitychange",()=>{checkResumedExpiry();revalidateForegroundIfStale();});
 
   addEventListener("DOMContentLoaded",()=>{
     document.querySelectorAll("header.top a.brand,footer a.brand").forEach((link)=>{
