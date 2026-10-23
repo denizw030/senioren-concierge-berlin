@@ -41,11 +41,19 @@
   }
 
   function update() {
+    // Hidden tabs should not scrub video frames or schedule decode work.
+    if (document.visibilityState === 'hidden') {
+      for (const scene of scenes) scene.pendingTime = null;
+      return;
+    }
     for (const scene of scenes) {
       if (!scene.ready) continue;
       const rect = scene.root.getBoundingClientRect();
       // Offscreen films must not consume seek/decode work during scrolling.
-      if (rect.top >= window.innerHeight || rect.bottom <= 0) continue;
+      if (rect.top >= window.innerHeight || rect.bottom <= 0) {
+        scene.pendingTime = null;
+        continue;
+      }
       const travel = Math.max(1, rect.height - window.innerHeight);
       const progress = clamp(-rect.top / travel);
       scene.video.pause();
@@ -70,9 +78,16 @@
       tick();
     });
     scene.video.addEventListener('seeked', () => {
+      if (document.visibilityState === 'hidden') {
+        scene.pendingTime = null;
+        return;
+      }
       if (scene.pendingTime === null) return;
       const time = scene.pendingTime;
       scene.pendingTime = null;
+      // A seek already in flight may complete after the film leaves the viewport.
+      const rect = scene.root.getBoundingClientRect();
+      if (rect.top >= window.innerHeight || rect.bottom <= 0) return;
       seek(scene, time);
     });
   }
@@ -96,6 +111,7 @@
     }
     tick();
   }
+  document.addEventListener?.('visibilitychange', tick);
   window.addEventListener('scroll', tick, { passive: true });
   window.addEventListener('resize', onLayout, { passive: true });
   mobile.addEventListener?.('change', onLayout);
