@@ -8,7 +8,7 @@ const html = readFileSync(new URL("../web-concierge/stage-password-reset.html", 
 const STAGE_AUTH = "https://btqklftjmwtqqqdmwlnk.supabase.co/auth/v1/";
 
 async function start({ hostname = "d2h3bbcracss71.cloudfront.net", path = "/web-concierge/stage-password-reset.html",
-  hash = "", reply = () => ({ ok: false, json: async () => ({}) }) } = {}) {
+  origin = "https://" + hostname, hash = "", reply = () => ({ ok: false, json: async () => ({}) }) } = {}) {
   const events = new Map(), requests = [], historyCalls = [];
   const nodes = {};
   for (const id of ["stageRecoveryForm", "stageRecoveryStatus", "stageNewPassword",
@@ -24,7 +24,7 @@ async function start({ hostname = "d2h3bbcracss71.cloudfront.net", path = "/web-
     return reply(url, options);
   };
   vm.runInNewContext(source, {
-    location: { protocol: "https:", hostname, pathname: path, hash },
+    location: { origin, protocol: "https:", hostname, pathname: path, hash },
     document, history, fetch, URLSearchParams
   }, { timeout: 500 });
   await new Promise(resolve => setImmediate(resolve));
@@ -98,7 +98,7 @@ test("mismatching new passwords never call Auth", async () => {
   assert.equal(r.requests.length, 1);
 });
 test("only isolated STAGING backend and local assets, no token storage", () => {
-  assert.match(source, /location\.hostname !== HOST/);
+  assert.match(source, /location\.origin !== "https:\/\/" \+ HOST/);
   assert.match(source, /history\.replaceState/);
   assert.doesNotMatch(source, /(?:localStorage|sessionStorage|console\.log)/);
   assert.doesNotMatch(source, /djicahhmnnamtjuqedqd|ta832v8wah/);
