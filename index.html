@@ -8,7 +8,9 @@
     if (window.location.hostname === "app.stewaro.com") {
       window.location.replace("/web-concierge" + window.location.search + window.location.hash);
     } else {
-      window.location.replace("/de/" + window.location.search + window.location.hash);
+      const safeAnchor = /^#(?:top|start|services|for-you|family|contact)$/.test(window.location.hash)
+        ? window.location.hash : "";
+      window.location.replace("/de/" + window.location.search + safeAnchor);
     }
   </script>
   <title>STEWARO</title>
