@@ -200,7 +200,62 @@
       accountLogin();
     }).catch(()=>{});
   }
-  addEventListener("pageshow",checkResumedExpiry);
+  // Safari's back-forward cache restores JS state without a fresh login.
+  // Hide personal UI before caching and revalidate with the existing authority.
+  let restoredValidation=null;
+  let cachedShellWasVisible=false;
+  addEventListener("pagehide",(event)=>{
+    if(event?.persisted!==true)return;
+    const shell=document.getElementById("stewaroAppShell");
+    cachedShellWasVisible=Boolean(shell&&!shell.hidden);
+    if(shell)shell.hidden=true;
+  });
+  function onPageShow(event){
+    if(event?.persisted!==true){checkResumedExpiry();return;}
+    if(resumeRedirecting||restoredValidation)return;
+    const shell=document.getElementById("stewaroAppShell");
+    const revealAfterCheck=cachedShellWasVisible||Boolean(shell&&!shell.hidden);
+    if(shell)shell.hidden=true;
+    cachedShellWasVisible=false;
+    const saved=readSession();
+    const future=value=>typeof value==="string"&&Number.isFinite(Date.parse(value))&&Date.parse(value)>Date.now();
+    if(!saved?.session_token||!future(saved.expires_at)||!future(saved.idle_expires_at)){
+      resumeRedirecting=true;
+      try{sessionStorage.removeItem(SESSION_KEY)}catch{}
+      try{localStorage.removeItem(SESSION_KEY)}catch{}
+      accountLogin();
+      return;
+    }
+    const priorGate=window.STEWARO_APP_AUTH_READY;
+    const check=Promise.resolve(priorGate).then(async(ready)=>{
+      if(ready!==true)throw new Error("resume_unready");
+      const {response,body}=await authRequest(saved.session_token,"check");
+      if(window.STEWARO_APP_AUTH_READY!==check)return false;
+      const active=readSession();
+      if(!active||active.session_token!==saved.session_token
+         ||active.person_id!==saved.person_id
+         ||active.customer_account_id!==saved.customer_account_id)return false;
+      if(!response.ok||body?.ok!==true||body?.status!=="session_valid"
+         ||String(body.person_id||"")!==String(saved.person_id)
+         ||String(body.customer_account_id||"")!==String(saved.customer_account_id)
+         ||!future(body.expires_at)||!future(body.idle_expires_at))throw new Error("resume_invalid");
+      saveSession({...active,expires_at:body.expires_at,idle_expires_at:body.idle_expires_at});
+      if(shell&&revealAfterCheck)shell.hidden=false;
+      return true;
+    }).catch(()=>{
+      if(window.STEWARO_APP_AUTH_READY!==check)return false;
+      const active=readSession();
+      if(active?.session_token&&active.session_token!==saved.session_token)return false;
+      resumeRedirecting=true;
+      try{sessionStorage.removeItem(SESSION_KEY)}catch{}
+      try{localStorage.removeItem(SESSION_KEY)}catch{}
+      accountLogin();
+      return false;
+    }).finally(()=>{if(restoredValidation===check)restoredValidation=null;});
+    restoredValidation=check;
+    window.STEWARO_APP_AUTH_READY=check;
+  }
+  addEventListener("pageshow",onPageShow);
   addEventListener("focus",checkResumedExpiry);
   document.addEventListener?.("visibilitychange",checkResumedExpiry);
 
