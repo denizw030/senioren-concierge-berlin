@@ -14,6 +14,8 @@
 
   const state = { profile: null, safety: null, currentTab: "overview", fidelVoice: null };
   let logoutInProgress = false;
+  let safetyAlertActive = false;
+  let safetyRequestGeneration = 0;
 
   function session() {
     try { return JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null"); }
@@ -37,6 +39,10 @@
 
   function selectTab(name, { focus = false } = {}) {
     const next = ["overview", "fidel", "safety", "more"].includes(name) ? name : "overview";
+    if (next !== "safety" && safetyAlertActive) {
+      safetyAlertActive = false;
+      safetyRequestGeneration += 1;
+    }
     state.currentTab = next;
     document.querySelectorAll("[data-stewaro-app-panel]").forEach((panel) => {
       const active = panel.getAttribute("data-stewaro-app-panel") === next;
@@ -255,6 +261,9 @@
   }
 
   async function loadSafety() {
+    // A phishing warning takes precedence over stale or concurrent safety-status reads.
+    if (safetyAlertActive || logoutInProgress) return false;
+    const requestGeneration = ++safetyRequestGeneration;
     const bearer = token();
     if (!bearer) return false;
     try {
@@ -266,9 +275,11 @@
       });
       const body = await response.json().catch(() => ({}));
       if (!response.ok || body?.ok !== true) throw new Error("safety_unavailable");
+      if (safetyAlertActive || logoutInProgress || requestGeneration !== safetyRequestGeneration) return false;
       renderSafety(body);
       return true;
     } catch (_) {
+      if (safetyAlertActive || logoutInProgress || requestGeneration !== safetyRequestGeneration) return false;
       setText("stewaroAppSafety", "Status nicht verfügbar");
       setText("stewaroAppSafetyMeta", "Sicherheitsstatus konnte gerade nicht geladen werden.");
       const notice = document.getElementById("stewaroSafetyUnavailable");
@@ -281,6 +292,8 @@
   }
 
   function showSafetyAlert(detail = {}) {
+    safetyAlertActive = true;
+    safetyRequestGeneration += 1;
     const host = String(detail.host || detail.hostname || "").trim();
     const reason = String(detail.reason || "").trim();
     setText("stewaroSafetyBlockedHost", host || "Verdächtiger Link");
