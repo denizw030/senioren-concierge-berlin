@@ -24,11 +24,19 @@ test('app host keeps the fragment-only handoff on the protected product route', 
 
 test('public and lookalike hosts never route to authenticated app', () => {
   for (const hostname of ['stewaro.com', 'account.stewaro.com', 'app.stewaro.com.evil.test', 'notapp.stewaro.com']) {
-    assert.deepEqual(redirectFor(hostname), ['/de/?src=campaign#handoff=hnd_test'], hostname);
+    assert.deepEqual(redirectFor(hostname), ['/de/?src=campaign'], hostname);
   }
 });
 
 test('no-script fallback leaves the product host for the canonical public site', () => {
   assert.match(root, /<a href="https:\/\/stewaro\.com\/de\/">Weiter zu STEWARO<\/a>/);
   assert.doesNotMatch(root, /<a href="\/de\/">Weiter zu STEWARO<\/a>/);
+});
+
+test('public redirect preserves only known navigation anchors, never auth fragments', () => {
+  assert.deepEqual(redirectFor('stewaro.com', '?ref=friend', '#services'), ['/de/?ref=friend#services']);
+  assert.deepEqual(redirectFor('stewaro.com', '', '#family'), ['/de/#family']);
+  assert.deepEqual(redirectFor('stewaro.com', '', '#handoff=hnd_secret'), ['/de/']);
+  assert.deepEqual(redirectFor('stewaro.com', '', '#foo=bar&handoff=hnd_secret'), ['/de/']);
+  assert.deepEqual(redirectFor('stewaro.com', '', '#%68andoff=hnd_secret'), ['/de/']);
 });
