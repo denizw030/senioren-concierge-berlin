@@ -60,3 +60,7 @@ test('overlong or suspicious marketing values are dropped, not copied to public 
 test('root redirect cannot be overridden by legacy clean-url script forwarding raw secrets', () => {
   assert.doesNotMatch(root, /<script[^>]+src=["']\/assets\/clean-url\.js/i);
 });
+
+test('root redirect does not send the original sensitive URL as same-origin Referer', () => {
+  assert.match(root, /<meta\s+name="referrer"\s+content="no-referrer"\s*\/>/i);
+});
