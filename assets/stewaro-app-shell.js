@@ -2,7 +2,7 @@
   "use strict";
 
   const APP_HOST = "app.stewaro.com";
-  if (location.hostname !== APP_HOST || document.documentElement.dataset.stewaroApp !== "1") return;
+  if (location.origin !== "https://app.stewaro.com" || document.documentElement.dataset.stewaroApp !== "1") return;
 
   const SESSION_KEY = "scb_web_session";
   const PROFILE_URL = "https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-profile";
@@ -13,6 +13,7 @@
   const LOGIN_URL = ACCOUNT_ORIGIN + "/anmelden?produkt=senioren&next=app";
 
   const state = { profile: null, safety: null, currentTab: "overview", fidelVoice: null };
+  let logoutInProgress = false;
 
   function session() {
     try { return JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null"); }
@@ -301,7 +302,15 @@
   }
 
   async function logout() {
+    if (logoutInProgress) return;
+    logoutInProgress = true;
     const bearer = token();
+    // Revoke local access and conceal personal content BEFORE waiting for the network.
+    try { sessionStorage.removeItem(SESSION_KEY); } catch (_) {}
+    try { localStorage.removeItem(SESSION_KEY); } catch (_) {}
+    const shell = document.getElementById("stewaroAppShell");
+    if (shell) shell.hidden = true;
+    window.STEWARO_APP_AUTH_READY = Promise.resolve(false);
     if (bearer) {
       try {
         await fetch(SESSION_URL, {
@@ -313,8 +322,6 @@
         });
       } catch (_) {}
     }
-    try { sessionStorage.removeItem(SESSION_KEY); } catch (_) {}
-    try { localStorage.removeItem(SESSION_KEY); } catch (_) {}
     location.replace(LOGIN_URL);
   }
 
@@ -451,7 +458,8 @@
   }
 
   async function boot() {
-    if (window.STEWARO_APP_AUTH_READY && await window.STEWARO_APP_AUTH_READY !== true) return;
+    // Missing or failed authentication gate must never mount the App shell.
+    if (!window.STEWARO_APP_AUTH_READY || await window.STEWARO_APP_AUTH_READY !== true || logoutInProgress) return;
     const shell = document.getElementById("stewaroAppShell");
     if (!shell) return;
     shell.hidden = false;
