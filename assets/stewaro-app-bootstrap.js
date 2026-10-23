@@ -109,7 +109,8 @@
     // The only next active session is the result of this one-time claim.
     try{sessionStorage.removeItem(SESSION_KEY)}catch{}
     try{localStorage.removeItem(SESSION_KEY)}catch{}
-    history.replaceState(null,"",location.pathname+location.search);
+    // A browser that refuses fragment removal must never claim the token.
+    try{history.replaceState(null,"",location.pathname+location.search)}catch{accountLogin();return;}
     const valid=handoffValues.length===1&&[...params.keys()].every(key=>key==="handoff")&&/^hnd_[A-Za-z0-9_-]{40,120}$/.test(handoff);
     if(!valid){window.STEWARO_APP_AUTH_READY=Promise.resolve(false);accountLogin();return;}
 
