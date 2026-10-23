@@ -3,13 +3,16 @@
   const APP_HOST="app.stewaro.com";
   // Old Account-hosted chat URLs now enter through a real cross-origin session handoff.
   if(location.hostname==="account.stewaro.com"){
+    if(location.origin!=="https://account.stewaro.com")return;
     const path=location.pathname.replace(/\/index\.html$/,"").replace(/\/+$/,"");
     if(path==="/web-concierge"||path==="/web-concierge.html")location.replace("/konto?stewaro_app=1");
     return;
   }
   if(location.hostname!==APP_HOST)return;
 
+  // Other shared FIDEL modules require this gate even on an invalid origin.
   window.STEWARO_APP_AUTH_READY=Promise.resolve(false);
+  if(location.origin!=="https://app.stewaro.com")return;
 
   const SESSION_KEY="scb_web_session";
   const SESSION_URL="https://djicahhmnnamtjuqedqd.supabase.co/functions/v1/web-session-secure";
@@ -17,6 +20,9 @@
   const SITE_ORIGIN="https://stewaro.com";
   const ACCOUNT_ORIGIN="https://account.stewaro.com";
   const ACCOUNT_SESSION_TRANSFER=ACCOUNT_ORIGIN+"/konto?stewaro_app=1";
+  // Bound rechecks on return to a foreground App tab; never trust a stale local session indefinitely.
+  const REVALIDATE_AFTER_MS=60000;
+  let lastVerifiedAt=0;
 
   document.documentElement.dataset.stewaroApp="1";
   const style=document.createElement("style");
@@ -54,7 +60,11 @@
       remember_me:body.remember_me===true,
       product_context:"senioren"
     };
-    if(!payload.session_token)throw new Error("session_token_missing");
+    const future=value=>typeof value==="string"&&Number.isFinite(Date.parse(value))&&Date.parse(value)>Date.now();
+    if(!payload.session_token||!payload.person_id||!payload.customer_account_id
+       ||!future(payload.expires_at)||!future(payload.idle_expires_at)){
+      throw new Error("session_payload_invalid");
+    }
     sessionStorage.setItem(SESSION_KEY,JSON.stringify(payload));
     if(payload.remember_me)localStorage.setItem(SESSION_KEY,JSON.stringify(payload));
     else localStorage.removeItem(SESSION_KEY);
@@ -102,7 +112,8 @@
     // The only next active session is the result of this one-time claim.
     try{sessionStorage.removeItem(SESSION_KEY)}catch{}
     try{localStorage.removeItem(SESSION_KEY)}catch{}
-    history.replaceState(null,"",location.pathname+location.search);
+    // A browser that refuses fragment removal must never claim the token.
+    try{history.replaceState(null,"",location.pathname+location.search)}catch{accountLogin();return;}
     const valid=handoffValues.length===1&&[...params.keys()].every(key=>key==="handoff")&&/^hnd_[A-Za-z0-9_-]{40,120}$/.test(handoff);
     if(!valid){window.STEWARO_APP_AUTH_READY=Promise.resolve(false);accountLogin();return;}
 
@@ -112,7 +123,10 @@
     shield.textContent="html.stewaro-app-claiming body{visibility:hidden!important}";
     document.head.appendChild(shield);
 
-    window.STEWARO_APP_AUTH_READY=authRequest(handoff,"handoff_claim").then(({response,body})=>{
+    // Only the current one-time claim may establish a new App identity.
+    // A logout, new login or another auth gate supersedes this request.
+    const claimGate=authRequest(handoff,"handoff_claim").then(({response,body})=>{
+      if(window.STEWARO_APP_AUTH_READY!==claimGate||readSession()?.session_token)return false;
       if(!response.ok||body?.ok!==true||body?.status!=="handoff_claimed"||!body?.session_token){
         throw new Error(String(body?.status||"handoff_claim_failed"));
       }
@@ -120,11 +134,14 @@
       location.replace(location.pathname+location.search);
       return false;
     }).catch(()=>{
+      // A stale rejection must not clear or redirect a newer authenticated user.
+      if(window.STEWARO_APP_AUTH_READY!==claimGate||readSession()?.session_token)return false;
       try{sessionStorage.removeItem(SESSION_KEY)}catch{}
       try{localStorage.removeItem(SESSION_KEY)}catch{}
       accountLogin();
       return false;
     });
+    window.STEWARO_APP_AUTH_READY=claimGate;
     return;
   }
 
@@ -139,7 +156,9 @@
 
   // Browser storage alone is not authentication. Block the App runtime until
   // the existing session authority confirms identity and both expirations.
-  window.STEWARO_APP_AUTH_READY=authRequest(currentSession.session_token,"check").then(({response,body})=>{
+  // Bind each async validation to its original local session and active gate.
+  // A logout or a newer login must not be undone by a late network response.
+  const authGate=authRequest(currentSession.session_token,"check").then(({response,body})=>{
     const validDate=value=>typeof value==="string"&&Number.isFinite(Date.parse(value))&&Date.parse(value)>Date.now();
     if(!response.ok||body?.ok!==true||body?.status!=="session_valid"
        ||!currentSession.person_id||!currentSession.customer_account_id
@@ -148,14 +167,27 @@
        ||!validDate(body.expires_at)||!validDate(body.idle_expires_at)){
       throw new Error("session_check_failed");
     }
+    const active=readSession();
+    if(window.STEWARO_APP_AUTH_READY!==authGate
+       ||String(active?.session_token||"")!==String(currentSession.session_token)
+       ||String(active?.person_id||"")!==String(currentSession.person_id)
+       ||String(active?.customer_account_id||"")!==String(currentSession.customer_account_id)){
+      return false;
+    }
     saveSession({...currentSession,expires_at:body.expires_at,idle_expires_at:body.idle_expires_at});
+    lastVerifiedAt=Date.now();
     return true;
   }).catch(()=>{
+    // A superseded validation must never delete a newer login or redirect it.
+    if(window.STEWARO_APP_AUTH_READY!==authGate)return false;
+    const active=readSession();
+    if(active?.session_token&&String(active.session_token)!==String(currentSession.session_token))return false;
     try{sessionStorage.removeItem(SESSION_KEY)}catch{}
     try{localStorage.removeItem(SESSION_KEY)}catch{}
     accountLogin();
     return false;
   });
+  window.STEWARO_APP_AUTH_READY=authGate;
 
   // A restored Safari tab must not expose an expired locally cached identity.
   // The existing server remains authoritative for session validity.
@@ -173,9 +205,71 @@
       accountLogin();
     }).catch(()=>{});
   }
-  addEventListener("pageshow",checkResumedExpiry);
-  addEventListener("focus",checkResumedExpiry);
-  document.addEventListener?.("visibilitychange",checkResumedExpiry);
+  // Safari's back-forward cache restores JS state without a fresh login.
+  // Hide personal UI before caching and revalidate with the existing authority.
+  let restoredValidation=null;
+  let cachedShellWasVisible=false;
+  addEventListener("pagehide",(event)=>{
+    if(event?.persisted!==true)return;
+    const shell=document.getElementById("stewaroAppShell");
+    cachedShellWasVisible=Boolean(shell&&!shell.hidden);
+    if(shell)shell.hidden=true;
+  });
+  function onPageShow(event){
+    if(event?.persisted!==true){checkResumedExpiry();return;}
+    if(resumeRedirecting||restoredValidation)return;
+    const shell=document.getElementById("stewaroAppShell");
+    const revealAfterCheck=cachedShellWasVisible||Boolean(shell&&!shell.hidden);
+    if(shell)shell.hidden=true;
+    cachedShellWasVisible=false;
+    const saved=readSession();
+    const future=value=>typeof value==="string"&&Number.isFinite(Date.parse(value))&&Date.parse(value)>Date.now();
+    if(!saved?.session_token||!future(saved.expires_at)||!future(saved.idle_expires_at)){
+      resumeRedirecting=true;
+      try{sessionStorage.removeItem(SESSION_KEY)}catch{}
+      try{localStorage.removeItem(SESSION_KEY)}catch{}
+      accountLogin();
+      return;
+    }
+    const priorGate=window.STEWARO_APP_AUTH_READY;
+    const check=Promise.resolve(priorGate).then(async(ready)=>{
+      if(ready!==true)throw new Error("resume_unready");
+      const {response,body}=await authRequest(saved.session_token,"check");
+      if(window.STEWARO_APP_AUTH_READY!==check)return false;
+      const active=readSession();
+      if(!active||active.session_token!==saved.session_token
+         ||active.person_id!==saved.person_id
+         ||active.customer_account_id!==saved.customer_account_id)return false;
+      if(!response.ok||body?.ok!==true||body?.status!=="session_valid"
+         ||String(body.person_id||"")!==String(saved.person_id)
+         ||String(body.customer_account_id||"")!==String(saved.customer_account_id)
+         ||!future(body.expires_at)||!future(body.idle_expires_at))throw new Error("resume_invalid");
+      saveSession({...active,expires_at:body.expires_at,idle_expires_at:body.idle_expires_at});
+      lastVerifiedAt=Date.now();
+      if(shell&&revealAfterCheck)shell.hidden=false;
+      return true;
+    }).catch(()=>{
+      if(window.STEWARO_APP_AUTH_READY!==check)return false;
+      const active=readSession();
+      if(active?.session_token&&active.session_token!==saved.session_token)return false;
+      resumeRedirecting=true;
+      try{sessionStorage.removeItem(SESSION_KEY)}catch{}
+      try{localStorage.removeItem(SESSION_KEY)}catch{}
+      accountLogin();
+      return false;
+    }).finally(()=>{if(restoredValidation===check)restoredValidation=null;});
+    restoredValidation=check;
+    window.STEWARO_APP_AUTH_READY=check;
+  }
+  addEventListener("pageshow",onPageShow);
+  function revalidateForegroundIfStale(){
+    if(document.visibilityState==="hidden"||resumeRedirecting||restoredValidation||!lastVerifiedAt)return;
+    if(Date.now()-lastVerifiedAt<REVALIDATE_AFTER_MS)return;
+    // Reuse the existing server-authoritative, single-flight and fail-closed resume gate.
+    onPageShow({persisted:true});
+  }
+  addEventListener("focus",()=>{checkResumedExpiry();revalidateForegroundIfStale();});
+  document.addEventListener?.("visibilitychange",()=>{checkResumedExpiry();revalidateForegroundIfStale();});
 
   addEventListener("DOMContentLoaded",()=>{
     document.querySelectorAll("header.top a.brand,footer a.brand").forEach((link)=>{
