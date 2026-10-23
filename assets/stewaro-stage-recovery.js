@@ -6,8 +6,7 @@
   const PATH = "/web-concierge/stage-password-reset.html";
   const STAGE_AUTH = "https://btqklftjmwtqqqdmwlnk.supabase.co/auth/v1/";
   const API_KEY = "sb_publishable_onbKIoe0eb9hgsYC2UeYzw_qttxclvj";
-  if (location.protocol !== "https:" || location.hostname !== HOST ||
-      location.pathname !== PATH) return;
+  if (location.origin !== "https://" + HOST || location.pathname !== PATH) return;
   const form = document.getElementById("stageRecoveryForm");
   const result = document.getElementById("stageRecoveryStatus");
   const password = document.getElementById("stageNewPassword");
@@ -26,15 +25,23 @@
     confirm.value = "";
     form.hidden = true;
   };
-  if (params.get("type") !== "recovery" ||
+  // Supabase implicit recovery may include these optional metadata fields.
+  // Duplicate or unexpected fragment keys must not ambiguously select an identity.
+  const allowed = new Set(["type", "access_token", "refresh_token",
+    "expires_in", "expires_at", "token_type"]);
+  const keys = [...params.keys()];
+  const unique = keys.length === new Set(keys).size;
+  if (!unique || keys.some(key => !allowed.has(key)) ||
+      params.get("type") !== "recovery" ||
       !params.get("access_token") ||
       !params.get("refresh_token") ||
-      params.get("error")) {
+      (params.has("token_type") && params.get("token_type") !== "bearer")) {
     clear();
     report("Kein gültiger STAGING-Wiederherstellungslink. Bitte einen neuen anfordern.");
     return;
   }
   token = params.get("access_token");
+  let submitting = false;
   const call = async (method, endpoint, value) => {
     const response = await fetch(STAGE_AUTH + endpoint, {
       method,
@@ -64,7 +71,7 @@
   })();
   form.addEventListener("submit", async event => {
     event.preventDefault();
-    if (!token || form.hidden) return;
+    if (submitting || !token || form.hidden) return;
     if (!form.reportValidity()) return;
     if (password.value !== confirm.value) {
       report("Die beiden Testpasswörter stimmen nicht überein.");
@@ -73,6 +80,7 @@
     const newPassword = password.value;
     password.value = "";
     confirm.value = "";
+    submitting = true;
     button.disabled = true;
     try {
       const response = await call("PUT", "user", { password: newPassword });
@@ -82,6 +90,7 @@
     } catch {
       report("Änderung fehlgeschlagen. Bitte einen neuen Wiederherstellungslink anfordern.");
     } finally {
+      submitting = false;
       button.disabled = false;
     }
   });
