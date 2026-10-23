@@ -25,7 +25,7 @@ function start(){
     querySelectorAll:()=>[]
   };
   const location={
-    hostname:'app.stewaro.com',pathname:'/web-concierge',search:'',hash:'',
+    hostname:'app.stewaro.com',origin:'https://app.stewaro.com',pathname:'/web-concierge',search:'',hash:'',
     replace:url=>redirects.push(url)
   };
   const context={
