@@ -6,9 +6,9 @@ import vm from 'node:vm';
 const root = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const script = root.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 
-function redirectFor(hostname, search = '?src=campaign', hash = '#handoff=hnd_test') {
+function redirectFor(hostname, search = '?src=campaign', hash = '#handoff=hnd_' + 'A'.repeat(48), origin = `https://${hostname}`) {
   const redirects = [];
-  const location = { hostname, search, hash, replace: (value) => redirects.push(value) };
+  const location = { hostname, origin, search, hash, replace: (value) => redirects.push(value) };
   vm.runInNewContext(script, { window: { location }, URLSearchParams });
   return redirects;
 }
@@ -19,7 +19,7 @@ test('root redirect page is noindex, public /de/ remains the canonical search la
 });
 
 test('app host keeps the fragment-only handoff on the protected product route', () => {
-  assert.deepEqual(redirectFor('app.stewaro.com'), ['/web-concierge?src=campaign#handoff=hnd_test']);
+  assert.deepEqual(redirectFor('app.stewaro.com'), ['/web-concierge?src=campaign#handoff=hnd_' + 'A'.repeat(48)]);
 });
 
 test('public and lookalike hosts never route to authenticated app', () => {
@@ -63,4 +63,24 @@ test('root redirect cannot be overridden by legacy clean-url script forwarding r
 
 test('root redirect does not send the original sensitive URL as same-origin Referer', () => {
   assert.match(root, /<meta\s+name="referrer"\s+content="no-referrer"\s*\/>/i);
+});
+
+
+test('only exact HTTPS app origin may retain an app handoff', () => {
+  const token = '#handoff=hnd_' + 'B'.repeat(48);
+  for (const origin of ['http://app.stewaro.com', 'https://app.stewaro.com:444', 'https://app.stewaro.com.evil.test']) {
+    assert.deepEqual(redirectFor('app.stewaro.com', '?src=ok&access_token=secret', token, origin), ['/de/?src=ok'], origin);
+  }
+});
+
+test('app root strips OAuth, identity and arbitrary query parameters', () => {
+  const token = '#handoff=hnd_' + 'C'.repeat(48);
+  assert.deepEqual(redirectFor('app.stewaro.com', '?src=family&access_token=secret&code=oauth&state=nonce&session_token=secret', token),
+    ['/web-concierge?src=family' + token]);
+});
+
+test('app root drops invalid, duplicate or encoded handoff fragments', () => {
+  for (const hash of ['#handoff=secret', '#handoff=hnd_' + 'D'.repeat(48) + '&handoff=other', '#%68andoff=hnd_' + 'E'.repeat(48), '#anything=other']) {
+    assert.deepEqual(redirectFor('app.stewaro.com', '', hash), ['/web-concierge'], hash);
+  }
 });
