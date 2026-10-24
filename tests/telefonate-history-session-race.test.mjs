@@ -81,3 +81,31 @@ test('a pre-pagehide response cannot repopulate private history after navigation
   assert.equal(t.list.hidden,true);assert.equal(t.list.children.length,0);
   assert.equal(t.state.className,'notice');
 });
+
+test('a visible private call list is cleared when the account changes before refocus',async()=>{
+  const t=setup();t.respond(200,ok);await tick();
+  assert.equal(t.list.children.length,1);
+  t.setToken('B'.repeat(48));t.dispatch('focus');
+  assert.equal(t.list.hidden,true);assert.equal(t.list.children.length,0);
+  assert.match(t.state.textContent,/Sitzung.*geändert/);
+});
+
+test('a cross-tab session change immediately hides previously rendered private calls',async()=>{
+  const t=setup();t.respond(200,ok);await tick();
+  assert.equal(t.list.children.length,1);
+  t.dispatch('storage',{key:'scb_web_session'});
+  assert.equal(t.list.hidden,true);assert.equal(t.list.children.length,0);
+  assert.equal(t.state.className,'notice');
+});
+
+test('an unrelated theme storage event preserves verified private calls',async()=>{
+  const t=setup();t.respond(200,ok);await tick();
+  t.dispatch('storage',{key:'nw_portal_theme_v1'});
+  assert.equal(t.list.hidden,false);assert.equal(t.list.children.length,1);
+});
+
+test('a pending old response cannot repopulate history after cross-tab logout',async()=>{
+  const t=setup();t.dispatch('storage',{key:'scb_web_session'});
+  t.respond(200,ok);await tick();
+  assert.equal(t.list.hidden,true);assert.equal(t.list.children.length,0);
+});
