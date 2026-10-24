@@ -16,6 +16,13 @@
   let logoutInProgress = false;
   let safetyAlertActive = false;
   let safetyRequestGeneration = 0;
+  let profileRequestGeneration = 0;
+  let voicePreferenceRequestGeneration = 0;
+
+  // Async account data may only be rendered for its initiating identity.
+  function sessionStillCurrent(bearer) {
+    return !logoutInProgress && Boolean(bearer) && token() === bearer;
+  }
 
   function session() {
     try { return JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null"); }
@@ -127,6 +134,8 @@
   }
 
   async function loadProfile() {
+    if (logoutInProgress) return false;
+    const generation = ++profileRequestGeneration;
     const bearer = token();
     if (!bearer) return false;
     try {
@@ -138,10 +147,12 @@
       });
       const body = await response.json().catch(() => ({}));
       if (!response.ok || body?.ok !== true) throw new Error("profile_unavailable");
+      if (!sessionStillCurrent(bearer) || generation !== profileRequestGeneration) return false;
       renderProfile(body);
       document.getElementById("stewaroAppDataNotice")?.setAttribute("hidden", "");
       return true;
     } catch (_) {
+      if (!sessionStillCurrent(bearer) || generation !== profileRequestGeneration) return false;
       const notice = document.getElementById("stewaroAppDataNotice");
       if (notice) {
         notice.hidden = false;
@@ -199,14 +210,18 @@
     section.querySelectorAll('input[name="stewaroFidelVoice"]').forEach((input)=>{
       input.addEventListener("change",async()=>{
         if(!input.checked)return;
+        const bearer=token();
+        if(!sessionStillCurrent(bearer))return;
         const all=[...section.querySelectorAll('input[name="stewaroFidelVoice"]')];
         all.forEach(x=>x.disabled=true);
         setText("stewaroFidelVoiceStatus","Stimme wird gespeichert …");
         try{
           const result=await liveVoiceRequest("/voice-preference",{method:"POST",body:{voice_variant:input.value}});
+          if(!sessionStillCurrent(bearer))return;
           state.fidelVoice=String(result.selected||input.value);
           setText("stewaroFidelVoiceStatus",(FIDEL_VOICE_LABELS[state.fidelVoice]?.name||"FIDEL")+" ist ausgewählt.");
         }catch{
+          if(!sessionStillCurrent(bearer))return;
           setText("stewaroFidelVoiceStatus","Die Stimme konnte gerade nicht gespeichert werden.");
           void loadFidelVoicePreference();
         }finally{
@@ -217,9 +232,14 @@
   }
 
   async function loadFidelVoicePreference() {
+    if (logoutInProgress) return false;
+    const generation = ++voicePreferenceRequestGeneration;
+    const bearer = token();
+    if (!bearer) return false;
     mountFidelVoiceSelector();
     try{
       const result=await liveVoiceRequest("/voice-options");
+      if (!sessionStillCurrent(bearer) || generation !== voicePreferenceRequestGeneration) return false;
       const selected=String(result.selected||"fidel_souveraen");
       state.fidelVoice=selected;
       const input=document.querySelector('input[name="stewaroFidelVoice"][value="'+CSS.escape(selected)+'"]');
@@ -227,6 +247,7 @@
       setText("stewaroFidelVoiceStatus",(FIDEL_VOICE_LABELS[selected]?.name||"FIDEL")+" ist ausgewählt.");
       return true;
     }catch{
+      if (!sessionStillCurrent(bearer) || generation !== voicePreferenceRequestGeneration) return false;
       setText("stewaroFidelVoiceStatus","Stimmenauswahl ist gerade nicht verfügbar.");
       return false;
     }
@@ -275,11 +296,11 @@
       });
       const body = await response.json().catch(() => ({}));
       if (!response.ok || body?.ok !== true) throw new Error("safety_unavailable");
-      if (safetyAlertActive || logoutInProgress || requestGeneration !== safetyRequestGeneration) return false;
+      if (safetyAlertActive || logoutInProgress || requestGeneration !== safetyRequestGeneration || !sessionStillCurrent(bearer)) return false;
       renderSafety(body);
       return true;
     } catch (_) {
-      if (safetyAlertActive || logoutInProgress || requestGeneration !== safetyRequestGeneration) return false;
+      if (safetyAlertActive || logoutInProgress || requestGeneration !== safetyRequestGeneration || !sessionStillCurrent(bearer)) return false;
       setText("stewaroAppSafety", "Status nicht verfügbar");
       setText("stewaroAppSafetyMeta", "Sicherheitsstatus konnte gerade nicht geladen werden.");
       const notice = document.getElementById("stewaroSafetyUnavailable");
@@ -317,6 +338,9 @@
   async function logout() {
     if (logoutInProgress) return;
     logoutInProgress = true;
+    profileRequestGeneration += 1;
+    voicePreferenceRequestGeneration += 1;
+    safetyRequestGeneration += 1;
     const bearer = token();
     // Revoke local access and conceal personal content BEFORE waiting for the network.
     try { sessionStorage.removeItem(SESSION_KEY); } catch (_) {}
