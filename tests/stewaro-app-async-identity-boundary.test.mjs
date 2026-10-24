@@ -126,11 +126,14 @@ test("late voice save never updates the next identity's settings", async () => {
   assert.equal(h.node("stewaroFidelVoiceStatus").textContent, "FIDEL Klar ist ausgewählt.");
   h.input.checked = true;
   const saving = h.input.listeners.change();
+  const pendingStatus = h.node("stewaroFidelVoiceStatus").textContent;
+  assert.equal(pendingStatus, "Stimme wird gespeichert …");
   assert.equal(h.requests.filter(item => item.url.includes("/voice-preference")).length, 1);
   h.data.set(KEY, JSON.stringify({ session_token: "session-B" }));
   h.reply("/voice-preference", { ok: true, selected: "fidel_warm" });
   await saving;
-  assert.equal(h.node("stewaroFidelVoiceStatus").textContent, "FIDEL Klar ist ausgewählt.");
+  // The old request may not replace the in-progress status with another identity's voice.
+  assert.equal(h.node("stewaroFidelVoiceStatus").textContent, pendingStatus);
 });
 
 test("noncanonical lookalike origin cannot mount the app shell", () => {
