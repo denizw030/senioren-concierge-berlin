@@ -68,8 +68,13 @@
   const success=()=>{report("STAGING-Anmeldung bestätigt. FIDEL-Sprachgespräche sind noch gesperrt.");
     if(status)status.textContent="STAGING · Anmeldung geprüft · Gespräche gesperrt";
     form.hidden=true;logout.hidden=false;};
-  async function useToken(token){
-    if(await sessionCheck(token)){save(token);success();return true;}
+  async function useToken(token,fresh){
+    if(await sessionCheck(token)){
+      save(token);success();
+      // Fresh password/signup only. A restored tab must not mint another handoff.
+      if(fresh)window.dispatchEvent(new CustomEvent("stewaro:stage-session",{detail:{token}}));
+      return true;
+    }
     clear();return false;
   }
   form.addEventListener("submit",async e=>{
@@ -79,7 +84,7 @@
         method:"POST",body:JSON.stringify({email:email.value.trim(),password:password.value})
       });
       password.value="";
-      if(!response.ok||!body?.access_token||!(await useToken(body.access_token)))
+      if(!response.ok||!body?.access_token||!(await useToken(body.access_token,true)))
         report("STAGING-Anmeldung fehlgeschlagen. Bitte nur dein Testkonto verwenden.");
     }catch{password.value="";report("Test-Anmeldung derzeit nicht erreichbar.");}
     finally{allowUI(true);}
@@ -92,7 +97,7 @@
         method:"POST",body:JSON.stringify({email:email.value.trim(),password:password.value})
       });
       password.value="";
-      if(response.ok&&body?.access_token&&await useToken(body.access_token))return;
+      if(response.ok&&body?.access_token&&await useToken(body.access_token,true))return;
       report(response.ok
         ?"Falls das Testkonto erstellt wurde, bestätige bitte die E-Mail und melde dich anschließend an."
         :"STAGING-Registrierung nicht möglich. Ein vorhandenes Testkonto verwenden.");
@@ -102,8 +107,12 @@
   logout.addEventListener("click",()=>{clear();form.hidden=false;logout.hidden=true;
     report("Test-Anmeldung beendet.");if(status)status.textContent="STAGING · Test-Anmeldung möglich";});
   // On page refresh, an existing STAGING token is validated against STAGING Auth.
-  // Never use canonical session storage, handoff tokens, PROD API or the Live gateway.
-  const old=getToken();
-  if(old){void useToken(old).catch(()=>{clear();report("Bitte erneut anmelden.");});}
-  else if(status)status.textContent="STAGING · Test-Anmeldung möglich";
+  // Never use canonical session storage, PROD API or the Live gateway.
+  // A one-time fragment is claimed by the staging handoff script; do not overwrite it.
+  const incomingHandoff=new URLSearchParams(location.hash.replace(/^#/,"")).get("handoff");
+  if(!incomingHandoff){
+    const old=getToken();
+    if(old){void useToken(old).catch(()=>{clear();report("Bitte erneut anmelden.");});}
+    else if(status)status.textContent="STAGING · Test-Anmeldung möglich";
+  }
 })();

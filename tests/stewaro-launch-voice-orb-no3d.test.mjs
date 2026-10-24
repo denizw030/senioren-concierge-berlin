@@ -117,6 +117,7 @@ test("STAGING authenticates only with isolated TEST Supabase Auth and no PROD vo
     const html=read(htmlPath);
     assert.match(html,/stewaro-stage-auth\.js\?v=1/);
     assert.match(html,/stewaro-stage-auth\.css\?v=1/);
+    assert.match(html,/stewaro-stage-handoff\.js\?v=1/);
   }
   assert.match(ui,/if\(location\.hostname!=="d2h3bbcracss71\.cloudfront\.net"\)return;/);
   assert.match(ui,/btqklftjmwtqqqdmwlnk\.supabase\.co/);
