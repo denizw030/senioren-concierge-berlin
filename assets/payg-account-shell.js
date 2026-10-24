@@ -31,7 +31,7 @@
     const request=String(handoff?.request||"").trim();
     const created=Date.parse(String(handoff?.created_at||""));
     const age=Date.now()-created;
-    if(!request||!Number.isFinite(created)||age<0||age>24*60*60*1000) return;
+    if(!request||handoff?.post_auth_target!=="/payg"||!Number.isFinite(created)||age<0||age>24*60*60*1000) return;
     const theme=document.getElementById("nwPortalThemeSetting");
     if(!theme||document.getElementById("paygGuestHandoff")) return;
     const card=document.createElement("section");
