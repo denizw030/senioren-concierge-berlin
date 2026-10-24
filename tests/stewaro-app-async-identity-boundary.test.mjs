@@ -153,3 +153,39 @@ test("real current-session errors still show a truthful unavailable status", asy
   assert.equal(h.node("stewaroAppSafety").textContent, "Status nicht verfügbar");
   assert.equal(h.node("stewaroFidelVoiceStatus").textContent, "Stimmenauswahl ist gerade nicht verfügbar.");
 });
+
+test("background refresh cannot overwrite a pending voice preference save", async () => {
+  const h = harness({ voiceUi: true });
+  const initial = h.window.STEWAROAppShell.refresh();
+  replyAll(h, { voice: "fidel_klar" });
+  await initial;
+  const saving = h.input.listeners.change();
+  assert.equal(h.node("stewaroFidelVoiceStatus").textContent, "Stimme wird gespeichert …");
+  const refresh = h.window.STEWAROAppShell.refresh();
+  h.reply("web-profile", { ok: true, profile: {} }, 1);
+  h.reply("web-managed-safety-context", { ok: true, safety: {} }, 1);
+  await refresh;
+  assert.equal(h.requests.filter(item => item.url.includes("/voice-options")).length, 1,
+    "no stale voice GET while POST is pending");
+  assert.equal(h.node("stewaroFidelVoiceStatus").textContent, "Stimme wird gespeichert …");
+  h.reply("/voice-preference", { ok: true, selected: "fidel_warm" });
+  await saving;
+  assert.equal(h.node("stewaroFidelVoiceStatus").textContent, "FIDEL Warm ist ausgewählt.");
+  assert.equal(h.input.disabled, false);
+});
+
+test("failed voice preference save rechecks server after releasing write lock", async () => {
+  const h = harness({ voiceUi: true });
+  const initial = h.window.STEWAROAppShell.refresh();
+  replyAll(h, { voice: "fidel_klar" });
+  await initial;
+  const saving = h.input.listeners.change();
+  h.reply("/voice-preference", { ok: false, error: "temporarily_unavailable" }, 0, false);
+  await saving;
+  assert.equal(h.input.disabled, false);
+  assert.equal(h.requests.filter(item => item.url.includes("/voice-options")).length, 2,
+    "failed write must trigger a fresh read only after unlocking");
+  h.reply("/voice-options", { ok: true, selected: "fidel_klar" }, 1);
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(h.node("stewaroFidelVoiceStatus").textContent, "FIDEL Klar ist ausgewählt.");
+});
