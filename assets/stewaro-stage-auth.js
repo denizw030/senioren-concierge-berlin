@@ -2,7 +2,7 @@
   "use strict";
   // STAGING ONLY: Supabase Auth against the pre-existing isolated TEST project.
   // This grants no access to PROD, Concierge Core, live calls or paid actions.
-  if(location.hostname!=="d2h3bbcracss71.cloudfront.net")return;
+  if(location.origin!=="https://d2h3bbcracss71.cloudfront.net")return;
   const STAGE="https://btqklftjmwtqqqdmwlnk.supabase.co";
   const PUBLISHABLE="sb_publishable_onbKIoe0eb9hgsYC2UeYzw_qttxclvj";
   const STORE="stewaro_stage_auth_session_v1";
@@ -38,6 +38,9 @@
   const login=box.querySelector("#stewaroStageLogin");
   const signup=box.querySelector("#stewaroStageSignUp");
   const logout=box.querySelector("#stewaroStageLogout");
+  // Only the newest login/restore/logout may change this tab's identity.
+  let authGeneration=0;
+  const current=g=>g===authGeneration;
   const report=t=>{outcome.textContent=t;};
   const allowUI=enabled=>{login.disabled=!enabled;signup.disabled=!enabled;};
   const save=token=>{
@@ -68,42 +71,49 @@
   const success=()=>{report("STAGING-Anmeldung bestätigt. FIDEL-Sprachgespräche sind noch gesperrt.");
     if(status)status.textContent="STAGING · Anmeldung geprüft · Gespräche gesperrt";
     form.hidden=true;logout.hidden=false;};
-  async function useToken(token){
-    if(await sessionCheck(token)){save(token);success();return true;}
+  async function useToken(token,generation){
+    const valid=await sessionCheck(token);
+    if(!current(generation))return false;
+    if(valid){save(token);success();return true;}
     clear();return false;
   }
   form.addEventListener("submit",async e=>{
-    e.preventDefault();allowUI(false);report("STAGING-Anmeldung wird geprüft …");
+    e.preventDefault();const generation=++authGeneration;
+    allowUI(false);report("STAGING-Anmeldung wird geprüft …");
     try{
       const {response,body}=await auth("token?grant_type=password",{
         method:"POST",body:JSON.stringify({email:email.value.trim(),password:password.value})
       });
+      if(!current(generation))return;
       password.value="";
-      if(!response.ok||!body?.access_token||!(await useToken(body.access_token)))
-        report("STAGING-Anmeldung fehlgeschlagen. Bitte nur dein Testkonto verwenden.");
-    }catch{password.value="";report("Test-Anmeldung derzeit nicht erreichbar.");}
-    finally{allowUI(true);}
+      if(!response.ok||!body?.access_token||!(await useToken(body.access_token,generation)))
+        if(current(generation))report("STAGING-Anmeldung fehlgeschlagen. Bitte nur dein Testkonto verwenden.");
+    }catch{if(current(generation)){password.value="";report("Test-Anmeldung derzeit nicht erreichbar.");}}
+    finally{if(current(generation))allowUI(true);}
   });
   signup.addEventListener("click",async()=>{
     if(!form.reportValidity())return;
+    const generation=++authGeneration;
     allowUI(false);report("STAGING-Konto wird angelegt …");
     try{
       const {response,body}=await auth("signup",{
         method:"POST",body:JSON.stringify({email:email.value.trim(),password:password.value})
       });
+      if(!current(generation))return;
       password.value="";
-      if(response.ok&&body?.access_token&&await useToken(body.access_token))return;
-      report(response.ok
+      if(response.ok&&body?.access_token&&await useToken(body.access_token,generation))return;
+      if(current(generation))report(response.ok
         ?"Falls das Testkonto erstellt wurde, bestätige bitte die E-Mail und melde dich anschließend an."
         :"STAGING-Registrierung nicht möglich. Ein vorhandenes Testkonto verwenden.");
-    }catch{password.value="";report("STAGING-Registrierung nicht erreichbar.");}
-    finally{allowUI(true);}
+    }catch{if(current(generation)){password.value="";report("STAGING-Registrierung nicht erreichbar.");}}
+    finally{if(current(generation))allowUI(true);}
   });
-  logout.addEventListener("click",()=>{clear();form.hidden=false;logout.hidden=true;
+  logout.addEventListener("click",()=>{++authGeneration;clear();form.hidden=false;logout.hidden=true;
     report("Test-Anmeldung beendet.");if(status)status.textContent="STAGING · Test-Anmeldung möglich";});
   // On page refresh, an existing STAGING token is validated against STAGING Auth.
   // Never use canonical session storage, handoff tokens, PROD API or the Live gateway.
   const old=getToken();
-  if(old){void useToken(old).catch(()=>{clear();report("Bitte erneut anmelden.");});}
+  if(old){const generation=++authGeneration;
+    void useToken(old,generation).catch(()=>{if(current(generation)){clear();report("Bitte erneut anmelden.");}});}
   else if(status)status.textContent="STAGING · Test-Anmeldung möglich";
 })();
