@@ -14,10 +14,11 @@ function setup(initialToken='A'.repeat(48)){
   const list={hidden:true,children:[],replaceChildren(...nodes){this.children=nodes;},appendChild(node){this.children.push(node);},set innerHTML(value){if(value==='')this.children=[];}};
   const document={documentElement:{dataset:{}},getElementById:id=>id==='phoneState'?state:list,
     createElement:tag=>({tagName:tag,href:'',textContent:'',innerHTML:'',className:''}),createTextNode:textContent=>({textContent})};
-  const window={STEWAROPhoneSession:{token:()=>currentToken,loginHref:()=>'/anmelden'}};
+  const handlers={};
+  const window={STEWAROPhoneSession:{token:()=>currentToken,loginHref:()=>'/anmelden'},addEventListener:(name,fn)=>{handlers[name]=fn;}};
   const fetch=(url,options)=>new Promise((resolve,reject)=>{resolveFetch=resolve;rejectFetch=reject;});
   runInNewContext(script,{window,document,localStorage:{getItem:()=>null},fetch,Date,Number,String,Array,JSON});
-  return {state,list,setToken:value=>{currentToken=value;},respond:(status,body)=>resolveFetch({status,ok:status>=200&&status<300,json:async()=>body}),reject:()=>rejectFetch(new Error('offline'))};
+  return {state,list,dispatch:(name,event={})=>handlers[name]?.(event),setToken:value=>{currentToken=value;},respond:(status,body)=>resolveFetch({status,ok:status>=200&&status<300,json:async()=>body}),reject:()=>rejectFetch(new Error('offline'))};
 }
 const ok={ok:true,environment:'PROD',authoritative:true,raw_transcripts_included:false,calls:[{title:'Private call A',summary:'Confidential A'}]};
 
@@ -62,4 +63,21 @@ test('non-authoritative history never renders private calls',async()=>{
   const t=setup();t.respond(200,{...ok,authoritative:false});await tick();
   assert.equal(t.list.hidden,true);assert.equal(t.list.children.length,0);
   assert.equal(t.state.className,'error');
+});
+
+test('pagehide removes private history before a browser back-forward cache restore',async()=>{
+  const t=setup();t.respond(200,ok);await tick();
+  assert.equal(t.list.children.length,1);
+  t.dispatch('pagehide');
+  assert.equal(t.list.hidden,true);assert.equal(t.list.children.length,0);
+  assert.equal(t.state.className,'notice');
+  t.dispatch('pageshow',{persisted:true});
+  t.respond(200,ok);await tick();
+  assert.equal(t.list.hidden,false);assert.equal(t.list.children.length,1);
+});
+
+test('a pre-pagehide response cannot repopulate private history after navigation',async()=>{
+  const t=setup();t.dispatch('pagehide');t.respond(200,ok);await tick();
+  assert.equal(t.list.hidden,true);assert.equal(t.list.children.length,0);
+  assert.equal(t.state.className,'notice');
 });
