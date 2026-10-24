@@ -44,7 +44,7 @@
       const state=document.getElementById('phoneState'),list=document.getElementById('phoneList');
       document.documentElement.dataset.theme=(()=>{try{return localStorage.getItem('nw_portal_theme_v1')==='dark'?'dark':'light'}catch(_){return'dark'}})();
       const token=()=>window.STEWAROPhoneSession?.token()||'';
-      const showLogin=()=>{state.className='error';const link=document.createElement('a');link.href=window.STEWAROPhoneSession?.loginHref('/telefonate')||'/anmelden';link.textContent='Mit bestehendem Konto anmelden.';state.replaceChildren(document.createTextNode('Deine sichere Sitzung ist nicht mehr aktiv. '),link);};
+      const showLogin=()=>{state.className='error';state.hidden=false;list.hidden=true;list.replaceChildren();const link=document.createElement('a');link.href=window.STEWAROPhoneSession?.loginHref('/telefonate')||'/anmelden';link.textContent='Mit bestehendem Konto anmelden.';state.replaceChildren(document.createTextNode('Deine sichere Sitzung ist nicht mehr aktiv. '),link);};
       const date=(value)=>{const d=new Date(value||'');return Number.isNaN(d.getTime())?'':d.toLocaleString('de-DE',{dateStyle:'medium',timeStyle:'short'})};
       const duration=(seconds)=>{const n=Number(seconds);if(!Number.isFinite(n)||n<=0)return'';const m=Math.floor(n/60),s=Math.round(n%60);return m?`${m} Min.${s?` ${s} Sek.`:''}`:`${s} Sek.`};
       const escape=(value)=>String(value??'').replace(/[&<>"']/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
