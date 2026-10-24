@@ -113,16 +113,20 @@ test("CloudFront STAGING prevents direct real-client conference joins",()=>{
 
 test("STAGING authenticates only with isolated TEST Supabase Auth and no PROD voice/action",()=>{
   const ui=read("assets/stewaro-stage-auth.js");
-  const html=read("web-concierge/index.html");
-  assert.match(html,/stewaro-stage-auth\.js\?v=1/);
-  assert.match(html,/stewaro-stage-auth\.css\?v=1/);
+  for(const htmlPath of ["web-concierge/index.html","web-concierge.html"]){
+    const html=read(htmlPath);
+    assert.match(html,/stewaro-stage-auth\.js\?v=1/);
+    assert.match(html,/stewaro-stage-auth\.css\?v=1/);
+  }
   assert.match(ui,/if\(location\.hostname!=="d2h3bbcracss71\.cloudfront\.net"\)return;/);
   assert.match(ui,/btqklftjmwtqqqdmwlnk\.supabase\.co/);
   assert.match(ui,/auth\/v1\//);
   assert.match(ui,/sessionStorage/);
   assert.match(ui,/STAGING-Anmeldung bestätigt/);
+  assert.match(ui,/FIDEL-Sprachgespräche sind noch gesperrt/);
   assert.doesNotMatch(ui,/djicahhmnnamtjuqedqd/);
   assert.doesNotMatch(ui,/ta832v8wah/);
+  assert.doesNotMatch(ui,/handoff_create|handoff_claim|web-session-secure/);
   assert.doesNotMatch(ui,/SUPABASE_SERVICE_ROLE_KEY|refresh_token/);
   assert.doesNotMatch(ui,/RTCPeerConnection|live\/quote|client_actions_allowed:true/);
 });
