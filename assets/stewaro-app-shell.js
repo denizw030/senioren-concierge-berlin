@@ -18,6 +18,7 @@
   let safetyRequestGeneration = 0;
   let profileRequestGeneration = 0;
   let voicePreferenceRequestGeneration = 0;
+  let voiceSaveInProgress = false;
 
   // Async account data may only be rendered for its initiating identity.
   function sessionStillCurrent(bearer) {
@@ -209,9 +210,13 @@
     host.insertBefore(section,host.lastElementChild);
     section.querySelectorAll('input[name="stewaroFidelVoice"]').forEach((input)=>{
       input.addEventListener("change",async()=>{
-        if(!input.checked)return;
+        if(!input.checked || voiceSaveInProgress)return;
         const bearer=token();
         if(!sessionStillCurrent(bearer))return;
+        // The pending write owns the voice UI; background refresh cannot replace it.
+        voiceSaveInProgress=true;
+        voicePreferenceRequestGeneration += 1;
+        let reloadAfterFailure=false;
         const all=[...section.querySelectorAll('input[name="stewaroFidelVoice"]')];
         all.forEach(x=>x.disabled=true);
         setText("stewaroFidelVoiceStatus","Stimme wird gespeichert …");
@@ -223,16 +228,20 @@
         }catch{
           if(!sessionStillCurrent(bearer))return;
           setText("stewaroFidelVoiceStatus","Die Stimme konnte gerade nicht gespeichert werden.");
-          void loadFidelVoicePreference();
+          reloadAfterFailure=true;
         }finally{
-          all.forEach(x=>x.disabled=false);
+          voiceSaveInProgress=false;
+          if(sessionStillCurrent(bearer)){
+            all.forEach(x=>x.disabled=false);
+            if(reloadAfterFailure)void loadFidelVoicePreference();
+          }
         }
       });
     });
   }
 
   async function loadFidelVoicePreference() {
-    if (logoutInProgress) return false;
+    if (logoutInProgress || voiceSaveInProgress) return false;
     const generation = ++voicePreferenceRequestGeneration;
     const bearer = token();
     if (!bearer) return false;
