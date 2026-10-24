@@ -1298,11 +1298,12 @@ syncIosVisualViewport();
         // valid only for the explicit PAYG continuation that created it.
         let handoff=null;
         try{handoff=JSON.parse(localStorage.getItem(GUEST_RESUME_KEY)||"null");}catch{}
-        try{localStorage.removeItem(GUEST_RESUME_KEY);}catch{}
+        let consumed=false;
+        try{localStorage.removeItem(GUEST_RESUME_KEY);consumed=true;}catch{}
         const created=Date.parse(typeof handoff?.created_at==="string"?handoff.created_at:"");
         const age=Date.now()-created;
         const request=typeof handoff?.request==="string"?handoff.request.trim().slice(0,4000):"";
-        if(request&&handoff?.post_auth_target==="/payg"&&Number.isFinite(created)
+        if(consumed&&request&&handoff?.post_auth_target==="/payg"&&Number.isFinite(created)
            &&age>=0&&age<=24*60*60*1000){
           const input=document.getElementById("webConciergeInput");
           if(input instanceof HTMLTextAreaElement){input.value=request;resizeInput();}
