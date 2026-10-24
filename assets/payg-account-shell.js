@@ -28,8 +28,8 @@
   function mountGuestHandoff() {
     let handoff=null;
     try { handoff=JSON.parse(localStorage.getItem(GUEST_RESUME_KEY)||"null"); } catch (_) {}
-    const request=String(handoff?.request||"").trim();
-    const created=Date.parse(String(handoff?.created_at||""));
+    const request=typeof handoff?.request==="string"?handoff.request.trim():"";
+    const created=Date.parse(typeof handoff?.created_at==="string"?handoff.created_at:"");
     const age=Date.now()-created;
     if(!request||handoff?.post_auth_target!=="/payg"||!Number.isFinite(created)||age<0||age>24*60*60*1000) return;
     const theme=document.getElementById("nwPortalThemeSetting");
