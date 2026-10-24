@@ -20,5 +20,7 @@ test('clean native FIDEL Live route matches the canonical entry except for root 
 });
 
 test('crawler rules explicitly exclude native FIDEL Live route', () => {
-  assert.match(read('robots.txt'), /^Disallow: \/app-live\s*$/m);
+  for (const path of ['/app-live', '/telefonate', '/zugang']) {
+    assert.ok(read('robots.txt').split('\n').includes('Disallow: ' + path), path);
+  }
 });

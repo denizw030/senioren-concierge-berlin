@@ -8,6 +8,8 @@ Disallow: /konto
 Disallow: /payg
 Disallow: /web-concierge
 Disallow: /app-live
+Disallow: /telefonate
+Disallow: /zugang
 Disallow: /passwort-zuruecksetzen
 Disallow: /zugang-uebertragen
 Disallow: /concierge-anpassen
