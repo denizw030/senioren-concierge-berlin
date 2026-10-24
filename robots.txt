@@ -7,6 +7,7 @@ Disallow: /registrieren
 Disallow: /konto
 Disallow: /payg
 Disallow: /web-concierge
+Disallow: /app-live
 Disallow: /passwort-zuruecksetzen
 Disallow: /zugang-uebertragen
 Disallow: /concierge-anpassen
