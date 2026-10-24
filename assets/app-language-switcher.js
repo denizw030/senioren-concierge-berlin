@@ -83,7 +83,11 @@
 
     const menu = document.createElement('div');
     menu.className = 'nw-language-menu';
+    menu.id = 'nw-app-language-menu';
     menu.setAttribute('role', 'menu');
+    menu.setAttribute('aria-label', lang === 'tr' ? 'Dil seçenekleri' : lang === 'en' ? 'Language options' : 'Sprachauswahl');
+    button.setAttribute('aria-controls', menu.id);
+    const options = [];
     Object.entries(SUPPORTED).forEach(([key, item]) => {
       const option = document.createElement('button');
       option.type = 'button';
@@ -100,18 +104,42 @@
         location.assign(hrefFor(key));
       });
       menu.appendChild(option);
+      options.push(option);
     });
 
     const close = () => {
       wrapper.classList.remove('is-open');
       button.setAttribute('aria-expanded', 'false');
     };
+    const openAndFocus = (index) => {
+      wrapper.classList.add('is-open');
+      button.setAttribute('aria-expanded', 'true');
+      options[index]?.focus();
+    };
     button.addEventListener('click', (event) => {
       event.preventDefault();
       event.stopPropagation();
-      const open = !wrapper.classList.contains('is-open');
-      wrapper.classList.toggle('is-open', open);
-      button.setAttribute('aria-expanded', String(open));
+      if (wrapper.classList.contains('is-open')) close();
+      else openAndFocus(Math.max(0, options.findIndex(option => option.dataset.nwLanguageTarget === lang)));
+    });
+    button.addEventListener('keydown', (event) => {
+      if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+      event.preventDefault();
+      openAndFocus(event.key === 'ArrowDown' ? 0 : options.length - 1);
+    });
+    menu.addEventListener('keydown', (event) => {
+      const current = options.indexOf(document.activeElement);
+      let next;
+      if (event.key === 'ArrowDown') next = current < 0 ? 0 : (current + 1) % options.length;
+      else if (event.key === 'ArrowUp') next = current < 0 ? options.length - 1 : (current + options.length - 1) % options.length;
+      else if (event.key === 'Home') next = 0;
+      else if (event.key === 'End') next = options.length - 1;
+      else return;
+      event.preventDefault();
+      options[next]?.focus();
+    });
+    wrapper.addEventListener('focusout', (event) => {
+      if (!wrapper.contains(event.relatedTarget)) close();
     });
     document.addEventListener('click', (event) => { if (!wrapper.contains(event.target)) close(); });
     document.addEventListener('keydown', (event) => {
