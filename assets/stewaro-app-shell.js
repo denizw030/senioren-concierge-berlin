@@ -100,7 +100,7 @@
     const label = String(source.textContent || "").trim();
     if (source.classList.contains("is-online") || /^online$/i.test(label)) {
       setConnection("online", "FIDEL verbunden");
-    } else if (/nicht möglich|fehler|offline/i.test(label)) {
+    } else if (/nicht möglich|fehler|fehlgeschlagen|gescheitert|offline/i.test(label)) {
       setConnection("error", "Verbindung gestört");
     } else {
       setConnection("pending", label || "Verbindung wird hergestellt");
