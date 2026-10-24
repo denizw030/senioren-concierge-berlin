@@ -14,16 +14,16 @@
       const generation=++lifecycleGeneration;
       token=sessionToken;
       document.getElementById("appLiveBoot")?.remove();
-      if(!controller){
-        controller=mountNahwerkLiveConcierge({
-          button:"#appLiveStart",
-          channel:"APP",
-          fidelRoom:true,
-          getAuthToken:()=>token,
-          onClose:notifyClose
-        });
-      }
       try{
+        if(!controller){
+          controller=mountNahwerkLiveConcierge({
+            button:"#appLiveStart",
+            channel:"APP",
+            fidelRoom:true,
+            getAuthToken:()=>token,
+            onClose:notifyClose
+          });
+        }
         await controller.start();
         return generation===lifecycleGeneration && token===sessionToken;
       }catch(error){
