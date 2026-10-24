@@ -66,3 +66,10 @@ test('non-PAYG handoff never advertises a broken PAYG continuation', () => {
   assert.equal(render({ request: 'PRIVATE_NOTE', created_at }).length, 0);
   assert.equal(render({ request: 'PRIVATE_NOTE', created_at, post_auth_target: 'https://app.stewaro.com/payg' }).length, 0);
 });
+
+test('malformed nonstring guest payload never creates a misleading continuation', () => {
+  const created_at = new Date(NOW - 60_000).toISOString();
+  assert.equal(render({ request: { note: 'PRIVATE_NOTE' }, created_at, post_auth_target: '/payg' }).length, 0);
+  assert.equal(render({ request: 123, created_at, post_auth_target: '/payg' }).length, 0);
+  assert.equal(render({ request: 'PRIVATE_NOTE', created_at: 1_000_000, post_auth_target: '/payg' }).length, 0);
+});
