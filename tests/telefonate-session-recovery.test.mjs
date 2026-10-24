@@ -17,22 +17,22 @@ const load=(tab={},persistent={})=>{
  return {api:window.STEWAROPhoneSession,sessionStorage,localStorage};
 };
 test("active tab session is used with no persistent copy",()=>{
- const t=load({scb_web_session:JSON.stringify({session_token:token,expires_at:future})});
+ const t=load({scb_web_session:JSON.stringify({session_token:token,expires_at:future,idle_expires_at:future})});
  assert.equal(t.api.token(),token);
  assert.equal(t.localStorage.has("scb_web_session"),false);
 });
 test("only an explicitly remembered unexpired token is restored into the active tab",()=>{
- const saved={scb_web_session:JSON.stringify({session_token:token,remember_me:true,expires_at:future})};
+ const saved={scb_web_session:JSON.stringify({session_token:token,remember_me:true,expires_at:future,idle_expires_at:future})};
  const a=load({},saved);
  assert.equal(a.api.token(),token);
  assert.equal(JSON.parse(a.sessionStorage.getItem("scb_web_session")).session_token,token);
- assert.equal(load({},{scb_web_session:JSON.stringify({session_token:token,remember_me:false,expires_at:future})}).api.token(),"");
- assert.equal(load({},{scb_web_session:JSON.stringify({session_token:token,remember_me:true,expires_at:past})}).api.token(),"");
+ assert.equal(load({},{scb_web_session:JSON.stringify({session_token:token,remember_me:false,expires_at:future,idle_expires_at:future})}).api.token(),"");
+ assert.equal(load({},{scb_web_session:JSON.stringify({session_token:token,remember_me:true,expires_at:past,idle_expires_at:future})}).api.token(),"");
  assert.equal(load({},{scb_web_session:"invalid-json"}).api.token(),"");
 });
 test("expired tab token is rejected; remembered session only if explicitly opted in",()=>{
- assert.equal(load({scb_web_session:JSON.stringify({session_token:token,expires_at:past})}).api.token(),"");
- const good=load({scb_web_session:JSON.stringify({session_token:token,expires_at:past})},{scb_web_session:JSON.stringify({session_token:token,expires_at:future,remember_me:true})});
+ assert.equal(load({scb_web_session:JSON.stringify({session_token:token,expires_at:past,idle_expires_at:future})}).api.token(),"");
+ const good=load({scb_web_session:JSON.stringify({session_token:token,expires_at:past,idle_expires_at:future})},{scb_web_session:JSON.stringify({session_token:token,expires_at:future,idle_expires_at:future,remember_me:true})});
  assert.equal(good.api.token(),token);
 });
 test("login return URL is fixed to known STEWARO telephone destinations",()=>{
@@ -54,4 +54,10 @@ test("phone and outbound pages use shared recovery and never expose stored token
  assert.match(phone,/Mit bestehendem Konto anmelden/);
  assert.match(signin,/ENTRY_NEXT=ENTRY_GUEST_HANDOFF&&ENTRY_PARAMS\.get\('next'\)==='\/payg'\?'\/payg':''/);
  assert.doesNotMatch(signin,/ENTRY_REQUESTED_NEXT/);
+});
+
+test("missing or expired idle expiry is never accepted for telephone access",()=>{
+ assert.equal(load({scb_web_session:JSON.stringify({session_token:token,expires_at:future})}).api.token(),"");
+ assert.equal(load({scb_web_session:JSON.stringify({session_token:token,expires_at:future,idle_expires_at:past})}).api.token(),"");
+ assert.equal(load({},{scb_web_session:JSON.stringify({session_token:token,remember_me:true,expires_at:future})}).api.token(),"");
 });
