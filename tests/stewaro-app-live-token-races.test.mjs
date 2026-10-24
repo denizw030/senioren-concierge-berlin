@@ -37,3 +37,13 @@ test('older successful start must not claim success for newer session',async()=>
  x.pending[0].resolve();assert.equal(await old,false);
  x.pending[1].resolve();assert.equal(await newer,true);assert.equal(x.token,newToken);
 });
+test('failed controller mount must not retain a session credential',async()=>{
+ const window={};
+ const inspected=source.replace('    let token="";', '    let token=""; window.__readToken=()=>token;');
+ vm.runInNewContext(inspected,{
+   window,document:{getElementById(){return {remove(){}}}},
+   mountNahwerkLiveConcierge(){throw Error('mount failed');}
+ },{timeout:1000});
+ await assert.rejects(window.startNahwerkAppLive(valid),/mount failed/);
+ assert.equal(window.__readToken(),'');
+});
