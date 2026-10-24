@@ -77,21 +77,34 @@
     if (text) text.textContent = label;
   }
 
+  // One observer per active chat status node. Online labels must never mask device offline state.
+  let chatStatusObserver = null;
+  let chatStatusSource = null;
   function syncConnectionFromChat() {
+    if (logoutInProgress) return;
     const source = document.getElementById("webConciergeStatus");
-    if (!source) return;
-    const apply = () => {
-      const label = String(source.textContent || "").trim();
-      if (source.classList.contains("is-online") || /^online$/i.test(label)) {
-        setConnection("online", "FIDEL verbunden");
-      } else if (/nicht möglich|fehler|offline/i.test(label)) {
-        setConnection("error", navigator.onLine ? "Verbindung gestört" : "Offline");
-      } else {
-        setConnection("pending", label || "Verbindung wird hergestellt");
+    if (source !== chatStatusSource) {
+      chatStatusObserver?.disconnect();
+      chatStatusObserver = null;
+      chatStatusSource = source;
+      if (source) {
+        chatStatusObserver = new MutationObserver(syncConnectionFromChat);
+        chatStatusObserver.observe(source, { childList: true, characterData: true, subtree: true, attributes: true });
       }
-    };
-    apply();
-    new MutationObserver(apply).observe(source, { childList: true, characterData: true, subtree: true, attributes: true });
+    }
+    if (!navigator.onLine) {
+      setConnection("error", "Offline");
+      return;
+    }
+    if (!source) return;
+    const label = String(source.textContent || "").trim();
+    if (source.classList.contains("is-online") || /^online$/i.test(label)) {
+      setConnection("online", "FIDEL verbunden");
+    } else if (/nicht möglich|fehler|offline/i.test(label)) {
+      setConnection("error", "Verbindung gestört");
+    } else {
+      setConnection("pending", label || "Verbindung wird hergestellt");
+    }
   }
 
   function renderUsage(plan, usage) {
