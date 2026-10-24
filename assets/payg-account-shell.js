@@ -28,9 +28,10 @@
   function mountGuestHandoff() {
     let handoff=null;
     try { handoff=JSON.parse(localStorage.getItem(GUEST_RESUME_KEY)||"null"); } catch (_) {}
-    const request=String(handoff?.request||"").trim();
-    const created=Date.parse(String(handoff?.created_at||""));
-    if(!request||!Number.isFinite(created)||Date.now()-created>24*60*60*1000) return;
+    const request=typeof handoff?.request==="string"?handoff.request.trim():"";
+    const created=Date.parse(typeof handoff?.created_at==="string"?handoff.created_at:"");
+    const age=Date.now()-created;
+    if(!request||handoff?.post_auth_target!=="/payg"||!Number.isFinite(created)||age<0||age>24*60*60*1000) return;
     const theme=document.getElementById("nwPortalThemeSetting");
     if(!theme||document.getElementById("paygGuestHandoff")) return;
     const card=document.createElement("section");
@@ -45,7 +46,8 @@
     copy.textContent="Du kommst aus dem kostenlosen Concierge-Chat. Lade zuerst PAYG-Guthaben ab 5 € auf. Danach kannst du deinen vorbereiteten Auftrag im Chat fortsetzen; vor einer kostenpflichtigen Ausführung siehst du den Preis.";
     const requestBox=document.createElement("div");
     requestBox.className="payg-guest-request";
-    requestBox.textContent=request.slice(0,700);
+    // Do not echo an unauthenticated guest request on a billing/account screen.
+    requestBox.textContent="Dein vorbereiteter Auftrag wird erst im Chat angezeigt.";
     const link=document.createElement("a");
     link.className="btn light payg-guest-resume";
     link.href="/web-concierge?resume_guest=1";
