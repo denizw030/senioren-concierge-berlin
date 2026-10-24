@@ -3,6 +3,7 @@
     let token="";
     let controller=null;
     const notifyClose=()=>{
+      token="";
       try{window.webkit?.messageHandlers?.nahwerkLiveClose?.postMessage("close");}catch{}
       try{window.NAHWERKAndroidLive?.close?.();}catch{}
     };
@@ -19,10 +20,16 @@
           onClose:notifyClose
         });
       }
-      await controller.start();
-      return true;
+      try{
+        await controller.start();
+        return true;
+      }catch(error){
+        token="";
+        throw error;
+      }
     };
     window.stopNahwerkAppLive=async()=>{
+      token="";
       if(controller)await controller.stop();
       return true;
     };
