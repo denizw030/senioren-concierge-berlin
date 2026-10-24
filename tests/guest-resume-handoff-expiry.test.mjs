@@ -9,11 +9,11 @@ const snippet=match[0];
 const KEY='nw_guest_resume_request_v1';
 const NOW=Date.parse('2026-10-24T07:00:00Z');
 class Input { constructor(){this.value='';} }
-function resume(handoff,{query='?resume_guest=1',throwRead=false}={}){
+function resume(handoff,{query='?resume_guest=1',throwRead=false,throwRemove=false}={}){
   const store=new Map(); if(handoff!==undefined)store.set(KEY,typeof handoff==='string'?handoff:JSON.stringify(handoff));
   const input=new Input();let resized=0;
   const context={URLSearchParams,location:{search:query},GUEST_RESUME_KEY:KEY,
-    localStorage:{getItem:k=>{if(throwRead)throw Error('blocked');return store.get(k)||null;},removeItem:k=>store.delete(k)},
+    localStorage:{getItem:k=>{if(throwRead)throw Error('blocked');return store.get(k)||null;},removeItem:k=>{if(throwRemove)throw Error('blocked');store.delete(k);}},
     document:{getElementById:()=>input},HTMLTextAreaElement:Input,resizeInput:()=>resized++,
     Date:class extends Date{static now(){return NOW;}},Number};
   vm.runInNewContext(snippet,context,{timeout:1000});
@@ -29,3 +29,5 @@ test('nonstring request is rejected',()=>{assert.deepEqual(resume({...fresh,requ
 test('exact 24 hour boundary remains valid',()=>{assert.equal(resume({...fresh,created_at:new Date(NOW-86_400_000).toISOString()}).value,'PRIVATE_NOTE');});
 test('unrequested continuation does not touch stored handoff',()=>{assert.deepEqual(resume(fresh,{query:''}),{value:'',resized:0,remaining:true});});
 test('storage read blocked fails closed',()=>{assert.deepEqual(resume(fresh,{throwRead:true}),{value:'',resized:0,remaining:false});});
+
+test('storage deletion blocked fails closed rather than replaying',()=>{assert.deepEqual(resume(fresh,{throwRemove:true}),{value:'',resized:0,remaining:true});});
