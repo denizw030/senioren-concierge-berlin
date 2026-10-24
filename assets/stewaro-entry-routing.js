@@ -15,6 +15,38 @@
   const parentEntry=familyPath+"?source=stewaro";
   const isAccountSurface=/(?:^|\/)(?:zugang|anmelden|registrieren)(?:\.html)?\/?$/.test(location.pathname);
 
+  const installHomeAccessibility=()=>{
+    const match=/^\/(de|en|tr)(?:\/|\/index\.html)?$/.exec(location.pathname);
+    const locale=match?.[1];
+    if(!locale||String(document.documentElement.lang||"").toLowerCase().split("-")[0]!==locale)return;
+    const main=document.querySelector("main#top");
+    if(!main)return;
+    const names={
+      de:{skip:"Zum Inhalt springen",header:"STEWARO Navigation",home:"STEWARO Startseite",nav:"Hauptnavigation"},
+      en:{skip:"Skip to main content",header:"STEWARO navigation",home:"STEWARO homepage",nav:"Main navigation"},
+      tr:{skip:"Ana içeriğe geç",header:"STEWARO gezinme menüsü",home:"STEWARO ana sayfa",nav:"Ana gezinme"}
+    }[locale];
+    const header=document.querySelector(".site-header");
+    header?.setAttribute("aria-label",names.header);
+    header?.querySelector(".brand-lockup")?.setAttribute("aria-label",names.home);
+    header?.querySelector(".header-nav")?.setAttribute("aria-label",names.nav);
+    if(document.getElementById("stewaro-skip-link"))return;
+    main.setAttribute("tabindex","-1");
+    const style=document.createElement("style");
+    style.id="stewaro-skip-link-style";
+    style.textContent=".stewaro-skip-link{position:fixed;top:12px;left:12px;z-index:9999;padding:12px 16px;border-radius:10px;background:#183b2e;color:#fff;font:600 16px/1.4 system-ui,sans-serif;transform:translateY(-180%)}.stewaro-skip-link:focus-visible,.stewaro-skip-link:focus{transform:none;outline:3px solid #c4a369;outline-offset:3px}";
+    document.head.appendChild(style);
+    const skip=document.createElement("a");
+    skip.id="stewaro-skip-link";
+    skip.className="stewaro-skip-link";
+    skip.setAttribute("href","#top");
+    skip.textContent=names.skip;
+    skip.addEventListener("click",()=>{
+      try{main.focus({preventScroll:true});}catch(_){main.focus();}
+    });
+    document.body.insertBefore(skip,document.body.firstChild);
+  };
+
   const installGermanHomeMenu=()=>{
     const lang=String(document.documentElement.lang||"").toLowerCase();
     const isGermanHome=lang==="de"&&/^\/de(?:\/|\/index\.html)?$/.test(location.pathname);
@@ -120,6 +152,7 @@
   };
 
   const rewrite=()=>{
+    installHomeAccessibility();
     installGermanHomeMenu();
     // A root <base> is needed for shared assets, but it also sends fragment links
     // to the homepage. Pin same-document anchors to the current document.
