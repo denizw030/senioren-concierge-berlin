@@ -28,11 +28,15 @@ test("history shows the shared secure login destination without HTML interpolati
   assert.equal((page.match(/showLogin\(\);return/g)||[]).length,2,"both missing and expired sessions use the renderer");
   assert.doesNotMatch(page,/<a href="\/anmelden">Mit bestehendem Konto anmelden/);
   const link={href:"",textContent:""};
-  const state={className:"",children:[],replaceChildren(...nodes){this.children=nodes;}};
+  const state={className:"",hidden:true,children:[],replaceChildren(...nodes){this.children=nodes;}};
+  const list={hidden:false,children:[{textContent:"private history"}],replaceChildren(...nodes){this.children=nodes;}};
   const document={createElement:()=>link,createTextNode:(value)=>({textContent:value})};
   const window={STEWAROPhoneSession:{loginHref:loginHref("app.stewaro.com")}};
-  runInNewContext("(()=>{"+match[0]+"showLogin();})()",{state,document,window});
+  runInNewContext("(()=>{"+match[0]+"showLogin();})()",{state,list,document,window});
   assert.equal(state.className,"error");
+  assert.equal(state.hidden,false);
+  assert.equal(list.hidden,true);
+  assert.equal(list.children.length,0,"private history must be cleared on expiry");
   assert.equal(state.children[1],link);
   assert.equal(link.href,ACCOUNT_LOGIN);
   assert.equal(link.textContent,"Mit bestehendem Konto anmelden.");
